@@ -1,38 +1,171 @@
-.App {
-  text-align: center;
+/* Navbar */
+
+.navbar h5 {
+    color: #8998ab;
+    font-size: 18px;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Background */
+
+.primary-bg {
+    background-color: #621012 !important;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.secondary-bg {
+    background-color: #efd2ac;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+/* Text */
+
+.primary-text {
+    color: #621012;
 }
 
-.App-link {
-  color: #61dafb;
+.text-white {
+    color: white !important;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Card */
+
+.card {
+    border: none;
+    background-color: white;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.card-header {
+    background-color: white;
+    border: none;
+    color: #621012;
+}
+
+.card-footer {
+    background-color: white;
+    border: none;
+}
+
+/* Button */
+
+.btn-primary {
+    background-color: #621012;
+    outline: none;
+    border: 1px solid #621012;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: transparent;
+    color: #621012;
+    border: 1px solid #621012;
+}
+
+.btn-primary-invert {
+    color: #621012;
+    background-color: #efd2ac;
+    border: 1px solid #efd2ac;
+}
+
+.btn-primary-invert:hover {
+    color: #621012;
+    background-color: transparent;
+    border: 1px solid #621012;
+}
+
+/* Form */
+
+.form-control {
+    outline: none;
+    border: none;
+    border: none;
+    background-color: white;
+    border-radius: 6px;
+}
+
+.form-control:focus {
+    outline: none;
+    background-color: white;
+    box-shadow: none;
+    border: none;
+}
+
+input[type="search"] {
+    outline: none;
+    border: none;
+    border-bottom: 1px solid #621012;
+    border-radius: 0;
+    background-color: transparent;
+}
+
+input[type="search"]:focus {
+    outline: none;
+    background-color: transparent;
+    box-shadow: none;
+    border: none;
+    border-bottom: 1px solid #621012;
+}
+
+/* Table */
+
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    border-top: none;
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.table td {
+    font-size: 13px;
+    vertical-align: middle;
+    font-weight: 600;
+}
+
+.table thead th {
+    border-bottom: none;
+}
+
+.table td img {
+    margin-top: -5px;
+    border-radius: 50%;
+    margin-right: 3px;
+}
+
+/* Tabs */
+
+.nav-tabs {
+    border: none;
+    margin-bottom: 5px;
+}
+
+.nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link {
+    color: #621012;
+    background-color: #fff;
+    border: none;
+    font-weight: 700;
+}
+
+.nav-link {
+    color: #4b4b4b;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 15px;
+    border-radius: 0.25rem;
+}
+
+/* Image */
+
+.profile-pic {
+    border-radius: 50%;
+}
+
+/* Section */
+
+.section {
+    padding-top: 6rem;
+    padding-bottom: 4rem;
+    background-color: #f7f7f7;
+    min-height: 100vh;
 }
