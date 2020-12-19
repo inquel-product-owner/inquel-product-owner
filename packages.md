@@ -6,10 +6,14 @@ List of packages used in this project
 
 npm install --save bootstrap
 
-### Reactstrap
+### React-bootstrap
 
-npm install --save reactstrap
+npm install react-bootstrap
 
 ### react-router-dom
 
 npm install --save react-router-dom
+
+### React-switch
+
+npm install --save react-switch
