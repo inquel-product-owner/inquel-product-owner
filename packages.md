@@ -14,6 +14,10 @@ npm install react-bootstrap
 
 npm install --save react-router-dom
 
+### react-popper
+
+npm install --save react-popper
+
 ### React-switch
 
 npm install --save react-switch

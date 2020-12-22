@@ -1,10 +1,11 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import profilepic from "../../assets/user.png";
 import watermark from "../../assets/code.jpg";
 import Switch from "react-switch";
 import Header from "./navbar";
 import SideNav from "./sidenav";
+import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
 
 class HodProfile extends Component {
     constructor() {
@@ -23,7 +24,32 @@ class HodProfile extends Component {
         this.setState({ checked });
     }
 
+    componentDidMount = () => {
+        var url = baseUrl + adminPathUrl;
+        var authToken = `Token ${localStorage.getItem("Inquel-Auth")}`;
+        var headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Inquel-Auth": authToken,
+        };
+
+        fetch(`${url}hod/3`, {
+            headers: headers,
+            method: "GET",
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     render() {
+        if (!localStorage.getItem("Inquel-Auth")) {
+            return <Redirect to="/login" />;
+        }
         return (
             <div className="wrapper">
                 {/* Navbar */}

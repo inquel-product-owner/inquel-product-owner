@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
+import { Link,Redirect } from "react-router-dom";
 import profilepic from "../../assets/user.png";
 import Header from "./navbar";
 import SideNav from "./sidenav";
@@ -19,6 +19,9 @@ class HodStudentList extends Component {
     };
 
     render() {
+        if (!localStorage.getItem("Inquel-Auth")) {
+            return <Redirect to="/login" />;
+        }
         return (
             <div className="wrapper">
                 {/* Navbar */}

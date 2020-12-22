@@ -3,7 +3,7 @@ import Header from "./navbar";
 import SideNav from "./sidenav";
 import userimage from "../../assets/user.png";
 import { Tabs, Tab } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import { Modal } from "react-bootstrap";
 import Switch from "react-switch";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl.js";
@@ -19,7 +19,7 @@ class HodModal extends Component {
             subcategory: "",
             discipline: "",
             subject: "",
-            university: "",
+            board: "",
             validity: "",
             progressivescore: false,
             type1: false,
@@ -45,26 +45,64 @@ class HodModal extends Component {
                 errortext: "Password is too short",
             });
         } else {
-            var url =
-                "http://3.16.43.25:8000/52fd_1f4a/api/v1/admin/create/hod/";
-            fetch(url, {
-                headers: {
-                    Accept: "application/json",
-                    "Content-Type": "application/json",
-                },
+            var url = baseUrl + adminPathUrl;
+            var authToken = localStorage.getItem("Inquel-Auth");
+            var headers = {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                "Inquel-Auth": authToken,
+            };
+            var d = new Date();
+            var year = d.getFullYear();
+            var month = d.getMonth();
+            var day = d.getDate();
+            var date = `${year + parseInt(this.state.validity)}-${
+                month + 1
+            }-${day} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`;
+
+            fetch(`${url}/create/hod/`, {
+                headers: headers,
                 method: "POST",
                 body: JSON.stringify({
-                    username: this.state.username,
-                    password: this.state.password,
+                    institute: {
+                        hods: {
+                            hod1: {
+                                email: this.state.email,
+                                username: this.state.username,
+                                password: this.state.password,
+                                category: this.state.category,
+                                subcategory: this.state.subcategory,
+                                discipline: this.state.discipline,
+                                board: this.state.board,
+                                valid_to: date,
+                                prog_sco_card: this.state.progressivescore,
+                                type_1_q: this.state.type1,
+                                type_2_q: this.state.type2,
+                                direct_q: this.state.directquestion,
+                                quiz: this.state.quiz,
+                                match: this.state.match,
+                                config_course: this.state.configure,
+                                sim_exam: this.state.simulationexam,
+                                lock_test: this.state.lockingoftest,
+                                copy_download: this.state.notesdownload,
+                                android_app: this.state.mobileapp,
+                            },
+                        },
+                    },
                 }),
             })
                 .then((res) => res.json())
                 .then((result) => {
-                    this.setState({
-                        items: result,
-                    });
                     console.log(result);
-                    console.log(this.state.items);
+                    if (result.sts) {
+                        this.setState({
+                            successtext: result.msg,
+                        });
+                    } else {
+                        this.setState({
+                            errortext: result.msg,
+                        });
+                    }
                 })
                 .catch((err) => {
                     console.log(err);
@@ -82,9 +120,64 @@ class HodModal extends Component {
         });
     };
 
-    handleSwitchChange = (name) => {
+    handlePSChange = () => {
         this.setState({
-            name: !this.state.name,
+            progressivescore: !this.state.progressivescore,
+        });
+    };
+    handleType1Change = () => {
+        this.setState({
+            type1: !this.state.type1,
+        });
+    };
+    handleType2Change = () => {
+        this.setState({
+            type2: !this.state.type2,
+        });
+    };
+    handleQuizChange = () => {
+        this.setState({
+            quiz: !this.state.quiz,
+        });
+    };
+    handleMatchChange = () => {
+        this.setState({
+            match: !this.state.match,
+        });
+    };
+    handleNotesChange = () => {
+        this.setState({
+            notesdownload: !this.state.notesdownload,
+        });
+    };
+    handleSummaryChange = () => {
+        this.setState({
+            summary: !this.state.summary,
+        });
+    };
+    handleDQChange = () => {
+        this.setState({
+            directquestion: !this.state.directquestion,
+        });
+    };
+    handleConfigureChange = () => {
+        this.setState({
+            configure: !this.state.configure,
+        });
+    };
+    handleSimulationChange = () => {
+        this.setState({
+            simulationexam: !this.state.simulationexam,
+        });
+    };
+    handleLockingoftestChange = () => {
+        this.setState({
+            lockingoftest: !this.state.lockingoftest,
+        });
+    };
+    handleMobileappChange = () => {
+        this.setState({
+            mobileapp: !this.state.mobileapp,
         });
     };
 
@@ -160,8 +253,12 @@ class HodModal extends Component {
                                         className="form-control form-control-sm shadow-sm"
                                         onChange={this.handleChange}
                                         value={this.state.category}
+                                        required
                                     >
-                                        <option value="school">School</option>
+                                        <option value="" disabled>
+                                            Select a category
+                                        </option>
+                                        <option value="DEG">School</option>
                                     </select>
                                 </div>
                                 <div className="form-group">
@@ -174,7 +271,11 @@ class HodModal extends Component {
                                         className="form-control form-control-sm shadow-sm"
                                         onChange={this.handleChange}
                                         value={this.state.subcategory}
+                                        required
                                     >
+                                        <option value="" disabled>
+                                            Select a sub-category
+                                        </option>
                                         <option value="sch">SCH</option>
                                     </select>
                                 </div>
@@ -188,7 +289,11 @@ class HodModal extends Component {
                                         className="form-control form-control-sm shadow-sm"
                                         onChange={this.handleChange}
                                         value={this.state.discipline}
+                                        required
                                     >
+                                        <option value="" disabled>
+                                            Select a discipline
+                                        </option>
                                         <option value="none">None</option>
                                     </select>
                                 </div>
@@ -200,21 +305,29 @@ class HodModal extends Component {
                                         className="form-control form-control-sm shadow-sm"
                                         onChange={this.handleChange}
                                         value={this.state.subject}
+                                        required
                                     >
+                                        <option value="" disabled>
+                                            Select a subject
+                                        </option>
                                         <option value="maths">Maths</option>
                                     </select>
                                 </div>
                                 <div className="form-group">
-                                    <label htmlFor="university">
+                                    <label htmlFor="board">
                                         Board / University
                                     </label>
                                     <select
-                                        name="university"
-                                        id="university"
+                                        name="board"
+                                        id="board"
                                         className="form-control form-control-sm shadow-sm"
                                         onChange={this.handleChange}
-                                        value={this.state.university}
+                                        value={this.state.board}
+                                        required
                                     >
+                                        <option value="" disabled>
+                                            Select a Board / University
+                                        </option>
                                         <option value="cbse">CBSE</option>
                                     </select>
                                 </div>
@@ -226,7 +339,11 @@ class HodModal extends Component {
                                         className="form-control form-control-sm shadow-sm"
                                         onChange={this.handleChange}
                                         value={this.state.validity}
+                                        required
                                     >
+                                        <option value="" disabled>
+                                            Select a validity
+                                        </option>
                                         <option value="1">1 year</option>
                                     </select>
                                 </div>
@@ -246,7 +363,7 @@ class HodModal extends Component {
                                             checked={
                                                 this.state.progressivescore
                                             }
-                                            onChange={this.handleSwitchChange}
+                                            onChange={this.handlePSChange}
                                             onColor="#efd2ac"
                                             onHandleColor="#621012"
                                             handleDiameter={12}
@@ -270,7 +387,7 @@ class HodModal extends Component {
                                     <div className="col-3 text-right">
                                         <Switch
                                             checked={this.state.type1}
-                                            onChange={this.handleSwitchChange}
+                                            onChange={this.handleType1Change}
                                             onColor="#efd2ac"
                                             onHandleColor="#621012"
                                             handleDiameter={12}
@@ -294,7 +411,7 @@ class HodModal extends Component {
                                     <div className="col-3 text-right">
                                         <Switch
                                             checked={this.state.type2}
-                                            onChange={this.handleSwitchChange}
+                                            onChange={this.handleType2Change}
                                             onColor="#efd2ac"
                                             onHandleColor="#621012"
                                             handleDiameter={12}
@@ -318,7 +435,7 @@ class HodModal extends Component {
                                     <div className="col-3 text-right">
                                         <Switch
                                             checked={this.state.quiz}
-                                            onChange={this.handleSwitchChange}
+                                            onChange={this.handleQuizChange}
                                             onColor="#efd2ac"
                                             onHandleColor="#621012"
                                             handleDiameter={12}
@@ -342,7 +459,7 @@ class HodModal extends Component {
                                     <div className="col-3 text-right">
                                         <Switch
                                             checked={this.state.match}
-                                            onChange={this.handleSwitchChange}
+                                            onChange={this.handleMatchChange}
                                             onColor="#efd2ac"
                                             onHandleColor="#621012"
                                             handleDiameter={12}
@@ -366,7 +483,7 @@ class HodModal extends Component {
                                     <div className="col-3 text-right">
                                         <Switch
                                             checked={this.state.notesdownload}
-                                            onChange={this.handleSwitchChange}
+                                            onChange={this.handleNotesChange}
                                             onColor="#efd2ac"
                                             onHandleColor="#621012"
                                             handleDiameter={12}
@@ -390,7 +507,7 @@ class HodModal extends Component {
                                     <div className="col-3 text-right">
                                         <Switch
                                             checked={this.state.summary}
-                                            onChange={this.handleSwitchChange}
+                                            onChange={this.handleSummaryChange}
                                             onColor="#efd2ac"
                                             onHandleColor="#621012"
                                             handleDiameter={12}
@@ -414,7 +531,7 @@ class HodModal extends Component {
                                     <div className="col-3 text-right">
                                         <Switch
                                             checked={this.state.directquestion}
-                                            onChange={this.handleSwitchChange}
+                                            onChange={this.handleDQChange}
                                             onColor="#efd2ac"
                                             onHandleColor="#621012"
                                             handleDiameter={12}
@@ -438,7 +555,9 @@ class HodModal extends Component {
                                     <div className="col-3 text-right">
                                         <Switch
                                             checked={this.state.configure}
-                                            onChange={this.handleSwitchChange}
+                                            onChange={
+                                                this.handleConfigureChange
+                                            }
                                             onColor="#efd2ac"
                                             onHandleColor="#621012"
                                             handleDiameter={12}
@@ -462,7 +581,9 @@ class HodModal extends Component {
                                     <div className="col-3 text-right">
                                         <Switch
                                             checked={this.state.simulationexam}
-                                            onChange={this.handleSwitchChange}
+                                            onChange={
+                                                this.handleSimulationChange
+                                            }
                                             onColor="#efd2ac"
                                             onHandleColor="#621012"
                                             handleDiameter={12}
@@ -486,7 +607,9 @@ class HodModal extends Component {
                                     <div className="col-3 text-right">
                                         <Switch
                                             checked={this.state.lockingoftest}
-                                            onChange={this.handleSwitchChange}
+                                            onChange={
+                                                this.handleLockingoftestChange
+                                            }
                                             onColor="#efd2ac"
                                             onHandleColor="#621012"
                                             handleDiameter={12}
@@ -510,7 +633,9 @@ class HodModal extends Component {
                                     <div className="col-3 text-right">
                                         <Switch
                                             checked={this.state.mobileapp}
-                                            onChange={this.handleSwitchChange}
+                                            onChange={
+                                                this.handleMobileappChange
+                                            }
                                             onColor="#efd2ac"
                                             onHandleColor="#621012"
                                             handleDiameter={12}
@@ -609,7 +734,7 @@ class Profiles extends Component {
 
     componentDidMount = () => {
         var url = baseUrl + adminPathUrl;
-        var authToken = `Token ${localStorage.getItem("Inquel-Auth")}`;
+        var authToken = localStorage.getItem("Inquel-Auth");
         var headers = {
             Accept: "application/json",
             "Content-Type": "application/json",
@@ -617,11 +742,11 @@ class Profiles extends Component {
         };
 
         Promise.all([
-            fetch(`${url}hod/`, {
+            fetch(`${url}/hod/`, {
                 headers: headers,
                 method: "GET",
             }).then((res) => res.json()),
-            fetch(`${url}student/`, {
+            fetch(`${url}/student/`, {
                 headers: headers,
                 method: "GET",
             }).then((res) => res.json()),
@@ -633,8 +758,6 @@ class Profiles extends Component {
                     isLoaded: true,
                 });
                 console.log(result);
-                console.log(this.state.hodItems);
-                console.log(this.state.studentItems);
             })
             .catch((err) => {
                 console.log(err);
@@ -642,14 +765,16 @@ class Profiles extends Component {
     };
 
     render() {
+        if (!localStorage.getItem("Inquel-Auth")) {
+            return <Redirect to="/login" />;
+        }
         return (
             <div className="wrapper">
                 {/* Navbar */}
                 <Header name="User Profiles" togglenav={this.toggleSideNav} />
-
                 {/* Sidebar */}
                 <SideNav shownav={this.state.showSideNav} />
-
+                div
                 <div
                     className={`section content ${
                         this.state.showSideNav ? "active" : ""

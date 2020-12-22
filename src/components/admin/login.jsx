@@ -53,7 +53,7 @@ class Login extends Component {
                 console.log(this.state.items);
 
                 if (this.state.items.sts) {
-                    localStorage.setItem("Inquel-Auth", this.state.items.token);
+                    localStorage.setItem("Inquel-Auth", `Token ${this.state.items.token}`);
                     this.setState({
                         isloggedIn: true,
                     });
@@ -78,7 +78,7 @@ class Login extends Component {
                 <Navbar className="secondary-bg py-2 px-4">
                     <Navbar.Brand>
                         <Link to="/">
-                            <img src={logo} alt="Logo" width="40" height="40" />
+                            <img src={logo} alt="Logo" width="50" height="50" />
                         </Link>
                     </Navbar.Brand>
                 </Navbar>

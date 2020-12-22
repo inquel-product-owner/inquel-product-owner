@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import profilepic from "../../assets/user.png";
 import Header from "./navbar";
 import SideNav from "./sidenav";
+import {Redirect} from 'react-router-dom';
 
 class TeacherProfile extends Component {
     constructor(props) {
@@ -18,6 +19,9 @@ class TeacherProfile extends Component {
     };
 
     render() {
+        if (!localStorage.getItem("Inquel-Auth")) {
+            return <Redirect to="/login" />;
+        }
         return (
             <div className="wrapper">
                 {/* Navbar */}

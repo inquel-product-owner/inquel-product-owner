@@ -3,6 +3,7 @@ import { Tab, Row, Col, Nav } from "react-bootstrap";
 import profilepic from "../../assets/user.png";
 import Header from "./navbar";
 import SideNav from "./sidenav";
+import { Redirect } from "react-router-dom";
 
 class HodTeacherList extends Component {
     constructor(props) {
@@ -19,6 +20,9 @@ class HodTeacherList extends Component {
     };
 
     render() {
+        if (!localStorage.getItem("Inquel-Auth")) {
+            return <Redirect to="/login" />;
+        }
         return (
             <div className="wrapper">
                 {/* Navbar */}

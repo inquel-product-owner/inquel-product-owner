@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { Card, Accordion } from "react-bootstrap";
+import { Redirect } from "react-router-dom";
 
 class CourseView extends Component {
     constructor(props) {
@@ -18,6 +19,9 @@ class CourseView extends Component {
     };
 
     render() {
+        if (!localStorage.getItem("Inquel-Auth")) {
+            return <Redirect to="/login" />;
+        }
         return (
             <div className="wrapper">
                 {/* Navbar */}

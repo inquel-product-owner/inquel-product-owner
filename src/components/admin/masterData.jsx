@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import Header from "./navbar";
 import SideNav from "./sidenav";
-import { Link } from "react-router-dom";
+import { Link,Redirect } from "react-router-dom";
 
 class MasterData extends Component {
     constructor(props) {
@@ -41,6 +41,9 @@ class MasterData extends Component {
     };
 
     render() {
+        if (!localStorage.getItem("Inquel-Auth")) {
+            return <Redirect to="/login" />;
+        }
         return (
             <div className="wrapper">
 
@@ -144,7 +147,7 @@ class MasterData extends Component {
                                                     }
                                                 >
                                                     <option value="">
-                                                        Select sub-category
+                                                        Select Sub category
                                                     </option>
                                                     <option value="engineering">
                                                         Engineering
