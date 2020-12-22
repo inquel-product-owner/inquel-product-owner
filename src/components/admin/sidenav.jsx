@@ -10,12 +10,12 @@ class SideNav extends Component {
                     this.props.shownav ? "active" : ""
                 }`}
             >
-                <button
+                {/* <button
                     className="btn btn-light btn-sm mb-3 d-block d-md-none"
                     onClick={this.props.togglenav}
                 >
                     <i className="fas fa-times fa-sm"></i>
-                </button>
+                </button> */}
                 <Link to="/">
                     <button
                         className="btn btn-primary-invert btn-sm mb-3"

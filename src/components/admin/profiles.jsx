@@ -5,6 +5,8 @@ import userimage from "../../assets/user.png";
 import { Tabs, Tab } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { Modal } from "react-bootstrap";
+import Switch from "react-switch";
+import { baseUrl, adminPathUrl } from "../../shared/baseUrl.js";
 
 class HodModal extends Component {
     constructor(props) {
@@ -13,46 +15,84 @@ class HodModal extends Component {
             email: "",
             username: "",
             password: "",
+            category: "",
+            subcategory: "",
+            discipline: "",
+            subject: "",
+            university: "",
+            validity: "",
+            progressivescore: false,
+            type1: false,
+            type2: false,
+            quiz: false,
+            match: false,
+            notesdownload: false,
+            summary: false,
+            directquestion: false,
+            configure: false,
+            simulationexam: false,
+            lockingoftest: false,
+            mobileapp: false,
             errortext: "",
+            successtext: "",
         };
-        this.hodemailOnchange = this.hodemailOnchange.bind(this);
-        this.hodusernameOnchange = this.hodusernameOnchange.bind(this);
-        this.hodpasswordOnchange = this.hodpasswordOnchange.bind(this);
-        this.handleHodSubmit = this.handleHodSubmit.bind(this);
     }
 
-    hodemailOnchange(event) {
-        this.setState({
-            email: event.target.value,
-        });
-    }
-
-    hodusernameOnchange(event) {
-        this.setState({
-            username: event.target.value,
-        });
-    }
-
-    hodpasswordOnchange(event) {
-        this.setState({
-            password: event.target.value,
-        });
-    }
-
-    handleHodSubmit(event) {
+    handleSubmit = (event) => {
         event.preventDefault();
         if (this.state.password.length < 12) {
             this.setState({
                 errortext: "Password is too short",
             });
+        } else {
+            var url =
+                "http://3.16.43.25:8000/52fd_1f4a/api/v1/admin/create/hod/";
+            fetch(url, {
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                },
+                method: "POST",
+                body: JSON.stringify({
+                    username: this.state.username,
+                    password: this.state.password,
+                }),
+            })
+                .then((res) => res.json())
+                .then((result) => {
+                    this.setState({
+                        items: result,
+                    });
+                    console.log(result);
+                    console.log(this.state.items);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
         }
-    }
+    };
+
+    handleChange = (event) => {
+        const target = event.target;
+        const value = target.value;
+        const name = target.name;
+
+        this.setState({
+            [name]: value,
+        });
+    };
+
+    handleSwitchChange = (name) => {
+        this.setState({
+            name: !this.state.name,
+        });
+    };
 
     render() {
         return (
             <Modal
                 {...this.props}
-                size="md"
+                size="lg"
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
@@ -62,45 +102,430 @@ class HodModal extends Component {
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <form action="" onSubmit={this.handleHodSubmit}>
-                        <div className="form-group">
-                            <label htmlFor="email">Email</label>
-                            <input
-                                type="email"
-                                name="email"
-                                id="email"
-                                className="form-control borders form-height"
-                                placeholder="Enter email"
-                                onChange={this.hodemailOnchange}
-                                value={this.state.email}
-                                required
-                            />
+                    <form action="" onSubmit={this.handleSubmit}>
+                        <div className="row mb-2">
+                            <div className="form-group col-md-4">
+                                <label htmlFor="email">Email</label>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    id="email"
+                                    className="form-control form-control-sm shadow-sm"
+                                    placeholder="Enter email"
+                                    onChange={this.handleChange}
+                                    value={this.state.email}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group col-md-4">
+                                <label htmlFor="username">Username</label>
+                                <input
+                                    type="text"
+                                    name="username"
+                                    id="username"
+                                    className="form-control form-control-sm shadow-sm"
+                                    placeholder="Enter username"
+                                    onChange={this.handleChange}
+                                    value={this.state.username}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group col-md-4">
+                                <label htmlFor="password">Password</label>
+                                <input
+                                    type="password"
+                                    name="password"
+                                    id="password"
+                                    className="form-control form-control-sm shadow-sm"
+                                    placeholder="Enter password"
+                                    onChange={this.handleChange}
+                                    value={this.state.password}
+                                    required
+                                />
+                            </div>
                         </div>
-                        <div className="form-group">
-                            <label htmlFor="username">Username</label>
-                            <input
-                                type="text"
-                                name="username"
-                                id="username"
-                                className="form-control borders form-height"
-                                placeholder="Enter username"
-                                onChange={this.hodusernameOnchange}
-                                value={this.state.username}
-                                required
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="password">Password</label>
-                            <input
-                                type="password"
-                                name="password"
-                                id="password"
-                                className="form-control borders form-height"
-                                placeholder="Enter password"
-                                onChange={this.hodpasswordOnchange}
-                                value={this.state.password}
-                                required
-                            />
+                        <div className="row mb-2">
+                            <div className="col-md-6">
+                                <h6 className="primary-text mb-3">
+                                    Personal Details
+                                </h6>
+
+                                <div className="form-group">
+                                    <label htmlFor="category">
+                                        Category ID
+                                    </label>
+                                    <select
+                                        name="category"
+                                        id="category"
+                                        className="form-control form-control-sm shadow-sm"
+                                        onChange={this.handleChange}
+                                        value={this.state.category}
+                                    >
+                                        <option value="school">School</option>
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="subcategory">
+                                        Sub Category
+                                    </label>
+                                    <select
+                                        name="subcategory"
+                                        id="subcategory"
+                                        className="form-control form-control-sm shadow-sm"
+                                        onChange={this.handleChange}
+                                        value={this.state.subcategory}
+                                    >
+                                        <option value="sch">SCH</option>
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="discipline">
+                                        Discipline
+                                    </label>
+                                    <select
+                                        name="discipline"
+                                        id="discipline"
+                                        className="form-control form-control-sm shadow-sm"
+                                        onChange={this.handleChange}
+                                        value={this.state.discipline}
+                                    >
+                                        <option value="none">None</option>
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="subject">Subjects</label>
+                                    <select
+                                        name="subject"
+                                        id="subject"
+                                        className="form-control form-control-sm shadow-sm"
+                                        onChange={this.handleChange}
+                                        value={this.state.subject}
+                                    >
+                                        <option value="maths">Maths</option>
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="university">
+                                        Board / University
+                                    </label>
+                                    <select
+                                        name="university"
+                                        id="university"
+                                        className="form-control form-control-sm shadow-sm"
+                                        onChange={this.handleChange}
+                                        value={this.state.university}
+                                    >
+                                        <option value="cbse">CBSE</option>
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="validity">Validity</label>
+                                    <select
+                                        name="validity"
+                                        id="validity"
+                                        className="form-control form-control-sm shadow-sm"
+                                        onChange={this.handleChange}
+                                        value={this.state.validity}
+                                    >
+                                        <option value="1">1 year</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="col-md-6">
+                                <h6 className="primary-text mb-3">
+                                    Configuration
+                                </h6>
+                                <div className="row mb-3">
+                                    <div className="col-9">
+                                        <p className="primary-text small mb-0 font-weight-bold">
+                                            Progressive Score
+                                        </p>
+                                    </div>
+                                    <div className="col-3 text-right">
+                                        <Switch
+                                            checked={
+                                                this.state.progressivescore
+                                            }
+                                            onChange={this.handleSwitchChange}
+                                            onColor="#efd2ac"
+                                            onHandleColor="#621012"
+                                            handleDiameter={12}
+                                            uncheckedIcon={false}
+                                            checkedIcon={false}
+                                            boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
+                                            activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
+                                            height={18}
+                                            width={35}
+                                            className="react-switch"
+                                            name="progressivescore"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="row mb-3">
+                                    <div className="col-9">
+                                        <p className="primary-text small mb-0 font-weight-bold">
+                                            Type 1
+                                        </p>
+                                    </div>
+                                    <div className="col-3 text-right">
+                                        <Switch
+                                            checked={this.state.type1}
+                                            onChange={this.handleSwitchChange}
+                                            onColor="#efd2ac"
+                                            onHandleColor="#621012"
+                                            handleDiameter={12}
+                                            uncheckedIcon={false}
+                                            checkedIcon={false}
+                                            boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
+                                            activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
+                                            height={18}
+                                            width={35}
+                                            className="react-switch"
+                                            name="type1"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="row mb-3">
+                                    <div className="col-9">
+                                        <p className="primary-text small mb-0 font-weight-bold">
+                                            Type 2
+                                        </p>
+                                    </div>
+                                    <div className="col-3 text-right">
+                                        <Switch
+                                            checked={this.state.type2}
+                                            onChange={this.handleSwitchChange}
+                                            onColor="#efd2ac"
+                                            onHandleColor="#621012"
+                                            handleDiameter={12}
+                                            uncheckedIcon={false}
+                                            checkedIcon={false}
+                                            boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
+                                            activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
+                                            height={18}
+                                            width={35}
+                                            className="react-switch"
+                                            name="type2"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="row mb-3">
+                                    <div className="col-9">
+                                        <p className="primary-text small mb-0 font-weight-bold">
+                                            Quiz
+                                        </p>
+                                    </div>
+                                    <div className="col-3 text-right">
+                                        <Switch
+                                            checked={this.state.quiz}
+                                            onChange={this.handleSwitchChange}
+                                            onColor="#efd2ac"
+                                            onHandleColor="#621012"
+                                            handleDiameter={12}
+                                            uncheckedIcon={false}
+                                            checkedIcon={false}
+                                            boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
+                                            activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
+                                            height={18}
+                                            width={35}
+                                            className="react-switch"
+                                            name="quiz"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="row mb-3">
+                                    <div className="col-9">
+                                        <p className="primary-text small mb-0 font-weight-bold">
+                                            Match
+                                        </p>
+                                    </div>
+                                    <div className="col-3 text-right">
+                                        <Switch
+                                            checked={this.state.match}
+                                            onChange={this.handleSwitchChange}
+                                            onColor="#efd2ac"
+                                            onHandleColor="#621012"
+                                            handleDiameter={12}
+                                            uncheckedIcon={false}
+                                            checkedIcon={false}
+                                            boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
+                                            activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
+                                            height={18}
+                                            width={35}
+                                            className="react-switch"
+                                            name="match"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="row mb-3">
+                                    <div className="col-9">
+                                        <p className="primary-text small mb-0 font-weight-bold">
+                                            Notes download
+                                        </p>
+                                    </div>
+                                    <div className="col-3 text-right">
+                                        <Switch
+                                            checked={this.state.notesdownload}
+                                            onChange={this.handleSwitchChange}
+                                            onColor="#efd2ac"
+                                            onHandleColor="#621012"
+                                            handleDiameter={12}
+                                            uncheckedIcon={false}
+                                            checkedIcon={false}
+                                            boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
+                                            activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
+                                            height={18}
+                                            width={35}
+                                            className="react-switch"
+                                            name="notesdownload"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="row mb-3">
+                                    <div className="col-9">
+                                        <p className="primary-text small mb-0 font-weight-bold">
+                                            Summary
+                                        </p>
+                                    </div>
+                                    <div className="col-3 text-right">
+                                        <Switch
+                                            checked={this.state.summary}
+                                            onChange={this.handleSwitchChange}
+                                            onColor="#efd2ac"
+                                            onHandleColor="#621012"
+                                            handleDiameter={12}
+                                            uncheckedIcon={false}
+                                            checkedIcon={false}
+                                            boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
+                                            activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
+                                            height={18}
+                                            width={35}
+                                            className="react-switch"
+                                            name="summary"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="row mb-3">
+                                    <div className="col-9">
+                                        <p className="primary-text small mb-0 font-weight-bold">
+                                            Direct Questions
+                                        </p>
+                                    </div>
+                                    <div className="col-3 text-right">
+                                        <Switch
+                                            checked={this.state.directquestion}
+                                            onChange={this.handleSwitchChange}
+                                            onColor="#efd2ac"
+                                            onHandleColor="#621012"
+                                            handleDiameter={12}
+                                            uncheckedIcon={false}
+                                            checkedIcon={false}
+                                            boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
+                                            activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
+                                            height={18}
+                                            width={35}
+                                            className="react-switch"
+                                            name="directquestion"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="row mb-3">
+                                    <div className="col-9">
+                                        <p className="primary-text small mb-0 font-weight-bold">
+                                            Configure
+                                        </p>
+                                    </div>
+                                    <div className="col-3 text-right">
+                                        <Switch
+                                            checked={this.state.configure}
+                                            onChange={this.handleSwitchChange}
+                                            onColor="#efd2ac"
+                                            onHandleColor="#621012"
+                                            handleDiameter={12}
+                                            uncheckedIcon={false}
+                                            checkedIcon={false}
+                                            boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
+                                            activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
+                                            height={18}
+                                            width={35}
+                                            className="react-switch"
+                                            name="configure"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="row mb-3">
+                                    <div className="col-9">
+                                        <p className="primary-text small mb-0 font-weight-bold">
+                                            Simulation Exam
+                                        </p>
+                                    </div>
+                                    <div className="col-3 text-right">
+                                        <Switch
+                                            checked={this.state.simulationexam}
+                                            onChange={this.handleSwitchChange}
+                                            onColor="#efd2ac"
+                                            onHandleColor="#621012"
+                                            handleDiameter={12}
+                                            uncheckedIcon={false}
+                                            checkedIcon={false}
+                                            boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
+                                            activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
+                                            height={18}
+                                            width={35}
+                                            className="react-switch"
+                                            name="simulationexam"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="row mb-3">
+                                    <div className="col-9">
+                                        <p className="primary-text small mb-0 font-weight-bold">
+                                            Locking of Tests
+                                        </p>
+                                    </div>
+                                    <div className="col-3 text-right">
+                                        <Switch
+                                            checked={this.state.lockingoftest}
+                                            onChange={this.handleSwitchChange}
+                                            onColor="#efd2ac"
+                                            onHandleColor="#621012"
+                                            handleDiameter={12}
+                                            uncheckedIcon={false}
+                                            checkedIcon={false}
+                                            boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
+                                            activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
+                                            height={18}
+                                            width={35}
+                                            className="react-switch"
+                                            name="lockingoftest"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="row">
+                                    <div className="col-9">
+                                        <p className="primary-text small mb-0 font-weight-bold">
+                                            Mobile App
+                                        </p>
+                                    </div>
+                                    <div className="col-3 text-right">
+                                        <Switch
+                                            checked={this.state.mobileapp}
+                                            onChange={this.handleSwitchChange}
+                                            onColor="#efd2ac"
+                                            onHandleColor="#621012"
+                                            handleDiameter={12}
+                                            uncheckedIcon={false}
+                                            checkedIcon={false}
+                                            boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
+                                            activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
+                                            height={18}
+                                            width={35}
+                                            className="react-switch"
+                                            name="mobileapp"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div className="row justify-content-center">
                             <div className="form-group col-md-6">
@@ -112,16 +537,45 @@ class HodModal extends Component {
                                 </button>
                             </div>
                         </div>
-                        <div className="form-group">
-                            <p className="text-danger text-center small mb-0">
-                                {this.state.errortext}
-                            </p>
-                        </div>
+                        {this.state.errortext !== "" ? (
+                            <div className="form-group">
+                                <p className="text-danger text-center small mb-0">
+                                    {this.state.errortext}
+                                </p>
+                            </div>
+                        ) : (
+                            ""
+                        )}
+                        {this.state.successtext !== "" ? (
+                            <div className="form-group">
+                                <p className="text-success text-center small mb-0">
+                                    {this.state.successtext}
+                                </p>
+                            </div>
+                        ) : (
+                            ""
+                        )}
                     </form>
                 </Modal.Body>
             </Modal>
         );
     }
+}
+
+function Loading() {
+    return (
+        <tr>
+            <td className="text-center">Loading...</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    );
 }
 
 class Profiles extends Component {
@@ -131,6 +585,9 @@ class Profiles extends Component {
             modalShow: false,
             showSideNav: false,
             activeTab: "hod",
+            hodItems: [],
+            studentItems: [],
+            isLoaded: false,
         };
     }
 
@@ -150,17 +607,48 @@ class Profiles extends Component {
         this.setState({ activeTab: key });
     };
 
+    componentDidMount = () => {
+        var url = baseUrl + adminPathUrl;
+        var authToken = `Token ${localStorage.getItem("Inquel-Auth")}`;
+        var headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Inquel-Auth": authToken,
+        };
+
+        Promise.all([
+            fetch(`${url}hod/`, {
+                headers: headers,
+                method: "GET",
+            }).then((res) => res.json()),
+            fetch(`${url}student/`, {
+                headers: headers,
+                method: "GET",
+            }).then((res) => res.json()),
+        ])
+            .then((result) => {
+                this.setState({
+                    hodItems: result[0].data,
+                    studentItems: result[1].data,
+                    isLoaded: true,
+                });
+                console.log(result);
+                console.log(this.state.hodItems);
+                console.log(this.state.studentItems);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     render() {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="User Profiles" />
+                <Header name="User Profiles" togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    togglenav={this.toggleSideNav}
-                />
+                <SideNav shownav={this.state.showSideNav} />
 
                 <div
                     className={`section content ${
@@ -168,12 +656,6 @@ class Profiles extends Component {
                     }`}
                 >
                     <div className="container-fluid">
-                        <button
-                            className="btn btn-outline-secondary btn-sm d-block d-md-none mb-3"
-                            onClick={this.toggleSideNav}
-                        >
-                            <i className="fas fa-bars"></i>
-                        </button>
                         <HodModal
                             show={this.state.modalShow}
                             onHide={this.toggleModal}
@@ -209,6 +691,7 @@ class Profiles extends Component {
                             </button>
                             <button className="btn btn-primary">Disable</button>
                         </div>
+
                         <Tabs
                             activeKey={this.state.activeTab}
                             id="uncontrolled-tab-example"
@@ -236,376 +719,90 @@ class Profiles extends Component {
                                                         Board University
                                                     </th>
                                                     <th scope="col">
-                                                        Handling Subject
+                                                        Registered On
                                                     </th>
                                                     <th scope="col"></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td className="text-center">
-                                                        <form>
-                                                            <input
-                                                                type="checkbox"
-                                                                name="enable"
-                                                                id="enable"
-                                                            />
-                                                        </form>
-                                                    </td>
-                                                    <td>001</td>
-                                                    <td>
-                                                        <img
-                                                            src={userimage}
-                                                            alt="User profile pic"
-                                                            width="20"
-                                                        />{" "}
-                                                        HOD Ram
-                                                    </td>
-                                                    <td>Degree</td>
-                                                    <td>Engineering</td>
-                                                    <td>Engineering</td>
-                                                    <td>Anna University</td>
-                                                    <td>Design</td>
-                                                    <td>
-                                                        <Link to="/hod/001">
-                                                            <button className="btn btn-sm btn-primary">
-                                                                View
-                                                            </button>
-                                                        </Link>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="text-center">
-                                                        <form>
-                                                            <input
-                                                                type="checkbox"
-                                                                name="enable"
-                                                                id="enable"
-                                                            />
-                                                        </form>
-                                                    </td>
-                                                    <td>002</td>
-                                                    <td>
-                                                        <img
-                                                            src={userimage}
-                                                            alt="User profile pic"
-                                                            width="20"
-                                                        />{" "}
-                                                        HOD Ram
-                                                    </td>
-                                                    <td>Degree</td>
-                                                    <td>Engineering</td>
-                                                    <td>Engineering</td>
-                                                    <td>Anna University</td>
-                                                    <td>Design</td>
-                                                    <td>
-                                                        <Link to="/hod/002">
-                                                            <button className="btn btn-sm btn-primary">
-                                                                View
-                                                            </button>
-                                                        </Link>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="text-center">
-                                                        <form>
-                                                            <input
-                                                                type="checkbox"
-                                                                name="enable"
-                                                                id="enable"
-                                                            />
-                                                        </form>
-                                                    </td>
-                                                    <td>003</td>
-                                                    <td>
-                                                        <img
-                                                            src={userimage}
-                                                            alt="User profile pic"
-                                                            width="20"
-                                                        />{" "}
-                                                        HOD Ram
-                                                    </td>
-                                                    <td>Degree</td>
-                                                    <td>Engineering</td>
-                                                    <td>Engineering</td>
-                                                    <td>Anna University</td>
-                                                    <td>Design</td>
-                                                    <td>
-                                                        <Link to="/hod/003">
-                                                            <button className="btn btn-sm btn-primary">
-                                                                View
-                                                            </button>
-                                                        </Link>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="text-center">
-                                                        <form>
-                                                            <input
-                                                                type="checkbox"
-                                                                name="enable"
-                                                                id="enable"
-                                                            />
-                                                        </form>
-                                                    </td>
-                                                    <td>004</td>
-                                                    <td>
-                                                        <img
-                                                            src={userimage}
-                                                            alt="User profile pic"
-                                                            width="20"
-                                                        />{" "}
-                                                        HOD Ram
-                                                    </td>
-                                                    <td>Degree</td>
-                                                    <td>Engineering</td>
-                                                    <td>Engineering</td>
-                                                    <td>Anna University</td>
-                                                    <td>Design</td>
-                                                    <td>
-                                                        <Link to="/hod/004">
-                                                            <button className="btn btn-sm btn-primary">
-                                                                View
-                                                            </button>
-                                                        </Link>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="text-center">
-                                                        <form>
-                                                            <input
-                                                                type="checkbox"
-                                                                name="enable"
-                                                                id="enable"
-                                                            />
-                                                        </form>
-                                                    </td>
-                                                    <td>005</td>
-                                                    <td>
-                                                        <img
-                                                            src={userimage}
-                                                            alt="User profile pic"
-                                                            width="20"
-                                                        />{" "}
-                                                        HOD Ram
-                                                    </td>
-                                                    <td>Degree</td>
-                                                    <td>Engineering</td>
-                                                    <td>Engineering</td>
-                                                    <td>Anna University</td>
-                                                    <td>Design</td>
-                                                    <td>
-                                                        <Link to="/hod/005">
-                                                            <button className="btn btn-sm btn-primary">
-                                                                View
-                                                            </button>
-                                                        </Link>
-                                                    </td>
-                                                </tr>
+                                                {this.state.isLoaded ? (
+                                                    this.state.hodItems.map(
+                                                        (list, index) => {
+                                                            return (
+                                                                <tr key={index}>
+                                                                    <td className="text-center">
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            name="enable"
+                                                                            value={
+                                                                                list.id
+                                                                            }
+                                                                        />
+                                                                    </td>
+                                                                    <td>
+                                                                        {
+                                                                            list.id
+                                                                        }
+                                                                    </td>
+                                                                    <td>
+                                                                        <img
+                                                                            src={
+                                                                                list.profile_link !==
+                                                                                null
+                                                                                    ? list.profile_link
+                                                                                    : userimage
+                                                                            }
+                                                                            alt="User profile pic"
+                                                                            width="20"
+                                                                        />{" "}
+                                                                        {`${list.first_name} ${list.last_name}`}
+                                                                    </td>
+                                                                    <td>
+                                                                        {
+                                                                            list.category
+                                                                        }
+                                                                    </td>
+                                                                    <td>
+                                                                        {
+                                                                            list.sub_category
+                                                                        }
+                                                                    </td>
+                                                                    <td>
+                                                                        {
+                                                                            list.discipline
+                                                                        }
+                                                                    </td>
+                                                                    <td>
+                                                                        {
+                                                                            list.board
+                                                                        }
+                                                                    </td>
+                                                                    <td>
+                                                                        {new Date(
+                                                                            list.date_joined
+                                                                        ).toLocaleDateString()}
+                                                                    </td>
+                                                                    <td>
+                                                                        <Link
+                                                                            to={`/hod/${list.id}`}
+                                                                        >
+                                                                            <button className="btn btn-sm btn-primary">
+                                                                                View
+                                                                            </button>
+                                                                        </Link>
+                                                                    </td>
+                                                                </tr>
+                                                            );
+                                                        }
+                                                    )
+                                                ) : (
+                                                    <Loading />
+                                                )}
                                             </tbody>
                                         </table>
                                     </div>
                                 </div>
                             </Tab>
-                            {/* <Tab
-                                eventKey="teacher"
-                                title="Teacher"
-                                onSelect={() => {
-                                    this.setState({ showAddHodbutton: false });
-                                }}
-                            >
-                                <div className="card shadow-sm">
-                                    <div className="table-responsive">
-                                        <table className="table">
-                                            <thead className="primary-text">
-                                                <tr>
-                                                    <th scope="col"></th>
-                                                    <th scope="col">ID</th>
-                                                    <th scope="col">Name</th>
-                                                    <th scope="col">
-                                                        Category
-                                                    </th>
-                                                    <th scope="col">
-                                                        Sub Category
-                                                    </th>
-                                                    <th scope="col">
-                                                        Discipline
-                                                    </th>
-                                                    <th scope="col">
-                                                        Board University
-                                                    </th>
-                                                    <th scope="col">
-                                                        Handling Subject
-                                                    </th>
-                                                    <th scope="col"></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td className="text-center">
-                                                        <form>
-                                                            <input
-                                                                type="checkbox"
-                                                                name="enable"
-                                                                id="enable"
-                                                            />
-                                                        </form>
-                                                    </td>
-                                                    <td>001</td>
-                                                    <td>
-                                                        <img
-                                                            src={userimage}
-                                                            alt="User profile pic"
-                                                            width="20"
-                                                        />{" "}
-                                                        Jeevan
-                                                    </td>
-                                                    <td>Degree</td>
-                                                    <td>Engineering</td>
-                                                    <td>Engineering</td>
-                                                    <td>Anna University</td>
-                                                    <td>Design</td>
-                                                    <td>
-                                                        <Link to="/teacher/001">
-                                                            <button className="btn btn-sm btn-primary">
-                                                                View
-                                                            </button>
-                                                        </Link>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="text-center">
-                                                        <form>
-                                                            <input
-                                                                type="checkbox"
-                                                                name="enable"
-                                                                id="enable"
-                                                            />
-                                                        </form>
-                                                    </td>
-                                                    <td>002</td>
-                                                    <td>
-                                                        <img
-                                                            src={userimage}
-                                                            alt="User profile pic"
-                                                            width="20"
-                                                        />{" "}
-                                                        Jeevan
-                                                    </td>
-                                                    <td>Degree</td>
-                                                    <td>Engineering</td>
-                                                    <td>Engineering</td>
-                                                    <td>Anna University</td>
-                                                    <td>Design</td>
-                                                    <td>
-                                                        <Link to="/teacher/002">
-                                                            <button className="btn btn-sm btn-primary">
-                                                                View
-                                                            </button>
-                                                        </Link>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="text-center">
-                                                        <form>
-                                                            <input
-                                                                type="checkbox"
-                                                                name="enable"
-                                                                id="enable"
-                                                            />
-                                                        </form>
-                                                    </td>
-                                                    <td>003</td>
-                                                    <td>
-                                                        <img
-                                                            src={userimage}
-                                                            alt="User profile pic"
-                                                            width="20"
-                                                        />{" "}
-                                                        Jeevan
-                                                    </td>
-                                                    <td>Degree</td>
-                                                    <td>Engineering</td>
-                                                    <td>Engineering</td>
-                                                    <td>Anna University</td>
-                                                    <td>Design</td>
-                                                    <td>
-                                                        <Link to="/teacher/003">
-                                                            <button className="btn btn-sm btn-primary">
-                                                                View
-                                                            </button>
-                                                        </Link>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="text-center">
-                                                        <form>
-                                                            <input
-                                                                type="checkbox"
-                                                                name="enable"
-                                                                id="enable"
-                                                            />
-                                                        </form>
-                                                    </td>
-                                                    <td>004</td>
-                                                    <td>
-                                                        <img
-                                                            src={userimage}
-                                                            alt="User profile pic"
-                                                            width="20"
-                                                        />{" "}
-                                                        Jeevan
-                                                    </td>
-                                                    <td>Degree</td>
-                                                    <td>Engineering</td>
-                                                    <td>Engineering</td>
-                                                    <td>Anna University</td>
-                                                    <td>Design</td>
-                                                    <td>
-                                                        <Link to="/teacher/004">
-                                                            <button className="btn btn-sm btn-primary">
-                                                                View
-                                                            </button>
-                                                        </Link>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="text-center">
-                                                        <form>
-                                                            <input
-                                                                type="checkbox"
-                                                                name="enable"
-                                                                id="enable"
-                                                            />
-                                                        </form>
-                                                    </td>
-                                                    <td>005</td>
-                                                    <td>
-                                                        <img
-                                                            src={userimage}
-                                                            alt="User profile pic"
-                                                            width="20"
-                                                        />{" "}
-                                                        Jeevan
-                                                    </td>
-                                                    <td>Degree</td>
-                                                    <td>Engineering</td>
-                                                    <td>Engineering</td>
-                                                    <td>Anna University</td>
-                                                    <td>Design</td>
-                                                    <td>
-                                                        <Link to="/teacher/005">
-                                                            <button className="btn btn-sm btn-primary">
-                                                                View
-                                                            </button>
-                                                        </Link>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </Tab> */}
                             <Tab eventKey="student" title="Student">
                                 <div className="card shadow-sm">
                                     <div className="table-responsive">
@@ -627,161 +824,74 @@ class Profiles extends Component {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td className="text-center">
-                                                        <form>
-                                                            <input
-                                                                type="checkbox"
-                                                                name="enable"
-                                                                id="enable"
-                                                            />
-                                                        </form>
-                                                    </td>
-                                                    <td>001</td>
-                                                    <td>
-                                                        <img
-                                                            src={userimage}
-                                                            alt="User profile pic"
-                                                            width="20"
-                                                        />{" "}
-                                                        Student 1
-                                                    </td>
-                                                    <td>stu@acde.com</td>
-                                                    <td>0123456789</td>
-                                                    <td>Engineering</td>
-                                                    <td>01.02.2020</td>
-                                                    <td>
-                                                        <Link to="/student/001">
-                                                            <button className="btn btn-sm btn-primary">
-                                                                View
-                                                            </button>
-                                                        </Link>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="text-center">
-                                                        <form>
-                                                            <input
-                                                                type="checkbox"
-                                                                name="enable"
-                                                                id="enable"
-                                                            />
-                                                        </form>
-                                                    </td>
-                                                    <td>002</td>
-                                                    <td>
-                                                        <img
-                                                            src={userimage}
-                                                            alt="User profile pic"
-                                                            width="20"
-                                                        />{" "}
-                                                        Student 2
-                                                    </td>
-                                                    <td>stu@acde.com</td>
-                                                    <td>0123456789</td>
-                                                    <td>Engineering</td>
-                                                    <td>01.02.2020</td>
-                                                    <td>
-                                                        <Link to="/student/002">
-                                                            <button className="btn btn-sm btn-primary">
-                                                                View
-                                                            </button>
-                                                        </Link>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="text-center">
-                                                        <form>
-                                                            <input
-                                                                type="checkbox"
-                                                                name="enable"
-                                                                id="enable"
-                                                            />
-                                                        </form>
-                                                    </td>
-                                                    <td>003</td>
-                                                    <td>
-                                                        <img
-                                                            src={userimage}
-                                                            alt="User profile pic"
-                                                            width="20"
-                                                        />{" "}
-                                                        Student 3
-                                                    </td>
-                                                    <td>stu@acde.com</td>
-                                                    <td>0123456789</td>
-                                                    <td>Engineering</td>
-                                                    <td>01.02.2020</td>
-                                                    <td>
-                                                        <Link to="/student/003">
-                                                            <button className="btn btn-sm btn-primary">
-                                                                View
-                                                            </button>
-                                                        </Link>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="text-center">
-                                                        <form>
-                                                            <input
-                                                                type="checkbox"
-                                                                name="enable"
-                                                                id="enable"
-                                                            />
-                                                        </form>
-                                                    </td>
-                                                    <td>004</td>
-                                                    <td>
-                                                        <img
-                                                            src={userimage}
-                                                            alt="User profile pic"
-                                                            width="20"
-                                                        />{" "}
-                                                        Student 4
-                                                    </td>
-                                                    <td>stu@acde.com</td>
-                                                    <td>0123456789</td>
-                                                    <td>Engineering</td>
-                                                    <td>01.02.2020</td>
-                                                    <td>
-                                                        <Link to="/student/004">
-                                                            <button className="btn btn-sm btn-primary">
-                                                                View
-                                                            </button>
-                                                        </Link>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="text-center">
-                                                        <form>
-                                                            <input
-                                                                type="checkbox"
-                                                                name="enable"
-                                                                id="enable"
-                                                            />
-                                                        </form>
-                                                    </td>
-                                                    <td>005</td>
-                                                    <td>
-                                                        <img
-                                                            src={userimage}
-                                                            alt="User profile pic"
-                                                            width="20"
-                                                        />{" "}
-                                                        Student 5
-                                                    </td>
-                                                    <td>stu@acde.com</td>
-                                                    <td>0123456789</td>
-                                                    <td>Engineering</td>
-                                                    <td>01.02.2020</td>
-                                                    <td>
-                                                        <Link to="/student/005">
-                                                            <button className="btn btn-sm btn-primary">
-                                                                View
-                                                            </button>
-                                                        </Link>
-                                                    </td>
-                                                </tr>
+                                                {this.state.isLoaded ? (
+                                                    this.state.studentItems.map(
+                                                        (list, index) => {
+                                                            return (
+                                                                <tr key={index}>
+                                                                    <td className="text-center">
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            name="enable"
+                                                                            value={
+                                                                                list.id
+                                                                            }
+                                                                        />
+                                                                    </td>
+                                                                    <td>
+                                                                        {
+                                                                            list.id
+                                                                        }
+                                                                    </td>
+                                                                    <td>
+                                                                        <img
+                                                                            src={
+                                                                                list.profile_link !==
+                                                                                null
+                                                                                    ? list.profile_link
+                                                                                    : userimage
+                                                                            }
+                                                                            alt="User profile pic"
+                                                                            width="20"
+                                                                        />{" "}
+                                                                        {`${list.first_name} ${list.last_name}`}
+                                                                    </td>
+                                                                    <td>
+                                                                        {
+                                                                            list.email
+                                                                        }
+                                                                    </td>
+                                                                    <td>
+                                                                        {
+                                                                            list.contact
+                                                                        }
+                                                                    </td>
+                                                                    <td>
+                                                                        {
+                                                                            list.category
+                                                                        }
+                                                                    </td>
+                                                                    <td>
+                                                                        {new Date(
+                                                                            list.date_joined
+                                                                        ).toLocaleDateString()}
+                                                                    </td>
+                                                                    <td>
+                                                                        <Link
+                                                                            to={`/student/${list.id}`}
+                                                                        >
+                                                                            <button className="btn btn-sm btn-primary">
+                                                                                View
+                                                                            </button>
+                                                                        </Link>
+                                                                    </td>
+                                                                </tr>
+                                                            );
+                                                        }
+                                                    )
+                                                ) : (
+                                                    <Loading />
+                                                )}
                                             </tbody>
                                         </table>
                                     </div>

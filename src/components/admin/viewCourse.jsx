@@ -21,13 +21,10 @@ class CourseView extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="Admin" />
+                <Header name="Admin" togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    togglenav={this.toggleSideNav}
-                />
+                <SideNav shownav={this.state.showSideNav} />
 
                 <div
                     className={`section content ${
@@ -35,12 +32,6 @@ class CourseView extends Component {
                     }`}
                 >
                     <div className="container-fluid">
-                        <button
-                            className="btn btn-outline-secondary btn-sm d-block d-md-none mb-3"
-                            onClick={this.toggleSideNav}
-                        >
-                            <i className="fas fa-bars"></i>
-                        </button>
                         <div className="row align-items-center mb-4">
                             <div className="col-md-6">
                                 <h5 className="primary-text">

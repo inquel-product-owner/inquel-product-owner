@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { Tabs, Tab, Modal } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import Switch from "react-switch";
 import courseimg from "../../assets/code.jpg";
 
@@ -94,7 +94,7 @@ class SubscriptionModal extends Component {
                                 />
                                 <label
                                     className="form-check-label"
-                                    for="discount"
+                                    htmlFor="discount"
                                 >
                                     Discounts applicable
                                 </label>
@@ -404,7 +404,7 @@ class AddCourse extends Component {
                                         />
                                         <label
                                             className="form-check-label"
-                                            for="discount"
+                                            htmlFor="discount"
                                         >
                                             Discounts applicable
                                         </label>
@@ -979,16 +979,16 @@ class Dashboard extends Component {
     };
 
     render() {
+        if (!localStorage.getItem("Inquel-Auth")) {
+            return <Redirect to="/login" />;
+        }
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="Admin" />
+                <Header name="Admin" togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    togglenav={this.toggleSideNav}
-                />
+                <SideNav shownav={this.state.showSideNav} />
 
                 <div
                     className={`section content ${
@@ -996,12 +996,6 @@ class Dashboard extends Component {
                     }`}
                 >
                     <div className="container-fluid">
-                        <button
-                            className="btn btn-outline-secondary btn-sm d-block d-md-none mb-2"
-                            onClick={this.toggleSideNav}
-                        >
-                            <i className="fas fa-bars"></i>
-                        </button>
                         <AddCourse
                             show={this.state.addCourseModal}
                             onHide={this.toggleCourseModal}
@@ -1013,8 +1007,8 @@ class Dashboard extends Component {
                                     Quick Stats
                                 </p>
                                 <div className="row mb-4">
-                                    <div className="col-md-3 col-sm-6 mb-3 mb-md-0">
-                                        <div className="card shadow-sm p-2">
+                                    <div className="col-md-3 col-6 mb-3 mb-md-0">
+                                        <div className="card shadow-sm p-2 h-100">
                                             <div className="card-body">
                                                 <p className="small font-weight-bold mb-2">
                                                     Total Courses
@@ -1025,8 +1019,8 @@ class Dashboard extends Component {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="col-md-3 col-sm-6 mb-3 mb-md-0">
-                                        <div className="card shadow-sm p-2">
+                                    <div className="col-md-3 col-6 mb-3 mb-md-0">
+                                        <div className="card shadow-sm p-2 h-100">
                                             <div className="card-body">
                                                 <p className="small font-weight-bold mb-2">
                                                     Pending Approval
@@ -1040,8 +1034,8 @@ class Dashboard extends Component {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="col-md-3 col-sm-6 mb-3 mb-md-0">
-                                        <div className="card shadow-sm p-2">
+                                    <div className="col-md-3 col-6 mb-3 mb-md-0">
+                                        <div className="card shadow-sm p-2 h-100">
                                             <div className="card-body">
                                                 <p className="small font-weight-bold mb-2">
                                                     New Courses this month
@@ -1055,8 +1049,8 @@ class Dashboard extends Component {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="col-md-3 col-sm-6 mb-3 mb-md-0">
-                                        <div className="card shadow-sm p-2">
+                                    <div className="col-md-3 col-6 mb-3 mb-md-0">
+                                        <div className="card shadow-sm p-2 h-100">
                                             <div className="card-body">
                                                 <p className="small font-weight-bold mb-2">
                                                     Online learning
@@ -1073,17 +1067,21 @@ class Dashboard extends Component {
                                 </div>
 
                                 {/* Filter area */}
-                                <div className="d-flex flex-wrap justify-content-center justify-content-md-end mb-4">
+                                <div className="row justify-content-center justify-content-md-end mb-4">
+                                    <div className="col-md-4 pr-md-0">
                                     <form>
+                                        <div className="form-group">
                                         <input
                                             type="search"
                                             name="search"
                                             id="search"
                                             className="form-control mb-md-0 mb-2"
                                             placeholder="Search"
-                                        />
+                                        /></div>
                                     </form>
-                                    <button className="btn btn-primary-invert mx-md-3 mx-0 ml-2 ml-md-0 mb-md-0 mb-2">
+                                    </div>
+                                    <div className="col-md-6 text-md-right text-center">
+                                    <button className="btn btn-primary-invert mr-md-3 mr-1">
                                         Filter{" "}
                                         <i className="fas fa-filter ml-1"></i>
                                     </button>
@@ -1101,11 +1099,11 @@ class Dashboard extends Component {
                                     </button>
                                     <button className="btn btn-primary">
                                         Disable
-                                    </button>
+                                    </button></div>
                                 </div>
 
                                 {/* Change view */}
-                                <div className="text-right">
+                                <div className="text-right mb-2">
                                     <div
                                         className="btn-group btn-group-toggle"
                                         data-toggle="buttons"
@@ -1158,7 +1156,7 @@ class Dashboard extends Component {
                                         id="uncontrolled-tab-example"
                                     >
                                         <Tab eventKey="all" title="All">
-                                            <div className="card shadow-sm">
+                                            <div className="card shadow-sm mb-3 mb-md-0">
                                                 <div className="table-responsive">
                                                     <table className="table">
                                                         <thead className="primary-text">
@@ -1514,7 +1512,7 @@ class Dashboard extends Component {
                                             eventKey="published"
                                             title="Courses published"
                                         >
-                                            <div className="card shadow-sm">
+                                            <div className="card shadow-sm mb-3 mb-md-0">
                                                 <div className="table-responsive">
                                                     <table className="table">
                                                         <thead className="primary-text">
@@ -1870,7 +1868,7 @@ class Dashboard extends Component {
                                             eventKey="publishing"
                                             title="Ready for publishing"
                                         >
-                                            <div className="card shadow-sm">
+                                            <div className="card shadow-sm mb-3 mb-md-0">
                                                 <div className="table-responsive">
                                                     <table className="table">
                                                         <thead className="primary-text">
