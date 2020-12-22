@@ -23,6 +23,8 @@ class MasterData extends Component {
     handleType = (event) => {
         this.setState({
             activeType: event.target.value,
+            activeCategory: "",
+            activeSubcategory: "",
         });
     };
 
@@ -41,14 +43,12 @@ class MasterData extends Component {
     render() {
         return (
             <div className="wrapper">
+
                 {/* Navbar */}
-                <Header name="Course Master Data" />
+                <Header name="Course Master Data" togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    togglenav={this.toggleSideNav}
-                />
+                <SideNav shownav={this.state.showSideNav} />
 
                 <div
                     className={`section content ${
@@ -56,12 +56,6 @@ class MasterData extends Component {
                     }`}
                 >
                     <div className="container-fluid">
-                        <button
-                            className="btn btn-outline-secondary btn-sm d-block d-md-none mb-3"
-                            onClick={this.toggleSideNav}
-                        >
-                            <i className="fas fa-bars"></i>
-                        </button>
 
                         <div className="d-flex flex-wrap mb-4">
                             <Link to="/course-management">
@@ -113,7 +107,7 @@ class MasterData extends Component {
                                                         this.handleCategory
                                                     }
                                                 >
-                                                    <option value=''>
+                                                    <option value="">
                                                         Select category
                                                     </option>
                                                     <option value="degree">
@@ -149,7 +143,7 @@ class MasterData extends Component {
                                                         this.handleSubcategory
                                                     }
                                                 >
-                                                    <option value=''>
+                                                    <option value="">
                                                         Select sub-category
                                                     </option>
                                                     <option value="engineering">

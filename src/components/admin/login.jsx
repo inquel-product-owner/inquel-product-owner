@@ -1,26 +1,29 @@
 import React, { Component } from "react";
 import { Navbar } from "react-bootstrap";
-import logo from "../../assets/logo192.png";
-import { Link } from "react-router-dom";
+import logo from "../../assets/IQ_Labs_V1.png";
+import { Link, Redirect } from "react-router-dom";
 
 class Login extends Component {
     constructor(props) {
         super(props);
-        this.state = { username: "", password: "", items: [] };
-        this.changeUsername = this.changeUsername.bind(this);
-        this.changePassword = this.changePassword.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
+        this.state = {
+            username: "",
+            password: "",
+            errortext: "",
+            isloggedIn: "false",
+            items: [],
+        };
     }
 
-    changeUsername(event) {
+    changeUsername = (event) => {
         this.setState({ username: event.target.value });
-    }
+    };
 
-    changePassword(event) {
+    changePassword = (event) => {
         this.setState({ password: event.target.value });
-    }
+    };
 
-    handleSubmit(event) {
+    handleSubmit = (event) => {
         event.preventDefault();
         var url = "http://3.16.43.25:8000/52fd_1f4a/api/v1/admin/login/";
         console.log(
@@ -47,10 +50,29 @@ class Login extends Component {
                     items: result,
                 });
                 console.log(result);
+                console.log(this.state.items);
+
+                if (this.state.items.sts) {
+                    localStorage.setItem("Inquel-Auth", this.state.items.token);
+                    this.setState({
+                        isloggedIn: true,
+                    });
+                }
+                if (!this.state.items.sts && this.state.items.msg) {
+                    this.setState({
+                        errortext: this.state.items.msg,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
             });
-    }
+    };
 
     render() {
+        if (localStorage.getItem("Inquel-Auth")) {
+            return <Redirect to="/" />;
+        }
         return (
             <>
                 <Navbar className="secondary-bg py-2 px-4">
@@ -87,7 +109,7 @@ class Login extends Component {
                                                         this.changeUsername
                                                     }
                                                     value={this.state.username}
-                                                    placeholder="Admin"
+                                                    placeholder="Username"
                                                     required
                                                 />
                                             </div>
@@ -117,6 +139,15 @@ class Login extends Component {
                                                     <i className="fas fa-sign-in-alt ml-2"></i>
                                                 </button>
                                             </div>
+                                            {this.state.errortext !== "" ? (
+                                                <div className="form-group">
+                                                    <p className="text-danger text-center small mb-0">
+                                                        {this.state.errortext}
+                                                    </p>
+                                                </div>
+                                            ) : (
+                                                ""
+                                            )}
                                         </form>
                                     </div>
                                 </div>
@@ -136,16 +167,16 @@ class Login extends Component {
                             <div className="col-md-6 ">
                                 <div className="d-flex justify-content-center justify-content-md-end ">
                                     <Link to="/" className="text-white">
-                                        <i class="fab fa-facebook-f mr-4"></i>
+                                        <i className="fab fa-facebook-f mr-4"></i>
                                     </Link>
                                     <Link to="/" className="text-white">
-                                        <i class="fab fa-twitter mr-4"></i>
+                                        <i className="fab fa-twitter mr-4"></i>
                                     </Link>
                                     <Link to="/" className="text-white">
-                                        <i class="fab fa-instagram mr-4"></i>
+                                        <i className="fab fa-instagram mr-4"></i>
                                     </Link>
                                     <Link to="/" className="text-white">
-                                        <i class="fab fa-linkedin-in mr-4"></i>
+                                        <i className="fab fa-linkedin-in mr-4"></i>
                                     </Link>
                                 </div>
                             </div>

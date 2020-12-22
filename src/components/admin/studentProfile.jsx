@@ -22,13 +22,10 @@ class StudentProfile extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="User Profiles" />
+                <Header name="User Profiles" togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    togglenav={this.toggleSideNav}
-                />
+                <SideNav shownav={this.state.showSideNav} />
 
                 <div
                     className={`section content ${
@@ -36,12 +33,6 @@ class StudentProfile extends Component {
                     }`}
                 >
                     <div className="container-fluid">
-                        <button
-                            className="btn btn-outline-secondary btn-sm d-block d-md-none mb-3"
-                            onClick={this.toggleSideNav}
-                        >
-                            <i className="fas fa-bars"></i>
-                        </button>
                         {/* Back button */}
                         {/* <div className="mb-4">
                             <Link to="/profiles">

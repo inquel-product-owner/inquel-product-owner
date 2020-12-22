@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import userimage from "../../assets/user.png";
 import { Link } from "react-router-dom";
 import profilepic from "../../assets/user.png";
 import Header from "./navbar";
@@ -23,13 +22,10 @@ class HodStudentList extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="User Profiles" />
+                <Header name="User Profiles" togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    togglenav={this.toggleSideNav}
-                />
+                <SideNav shownav={this.state.showSideNav} />
 
                 <div
                     className={`section content ${
@@ -37,12 +33,6 @@ class HodStudentList extends Component {
                     }`}
                 >
                     <div className="container-fluid">
-                        <button
-                            className="btn btn-outline-secondary btn-sm d-block d-md-none mb-3"
-                            onClick={this.toggleSideNav}
-                        >
-                            <i className="fas fa-bars"></i>
-                        </button>
                         {/* Back button */}
                         {/* <div className="mb-4">
                             <Link to="/profiles">
@@ -94,7 +84,7 @@ class HodStudentList extends Component {
                                             <td>001</td>
                                             <td>
                                                 <img
-                                                    src={userimage}
+                                                    src={profilepic}
                                                     alt="User profile pic"
                                                     width="20"
                                                 />{" "}
@@ -116,7 +106,7 @@ class HodStudentList extends Component {
                                             <td>002</td>
                                             <td>
                                                 <img
-                                                    src={userimage}
+                                                    src={profilepic}
                                                     alt="User profile pic"
                                                     width="20"
                                                 />{" "}
@@ -138,7 +128,7 @@ class HodStudentList extends Component {
                                             <td>003</td>
                                             <td>
                                                 <img
-                                                    src={userimage}
+                                                    src={profilepic}
                                                     alt="User profile pic"
                                                     width="20"
                                                 />{" "}
@@ -160,7 +150,7 @@ class HodStudentList extends Component {
                                             <td>004</td>
                                             <td>
                                                 <img
-                                                    src={userimage}
+                                                    src={profilepic}
                                                     alt="User profile pic"
                                                     width="20"
                                                 />{" "}
@@ -182,7 +172,7 @@ class HodStudentList extends Component {
                                             <td>005</td>
                                             <td>
                                                 <img
-                                                    src={userimage}
+                                                    src={profilepic}
                                                     alt="User profile pic"
                                                     width="20"
                                                 />{" "}
