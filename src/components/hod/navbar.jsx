@@ -13,11 +13,11 @@ class Header extends Component {
 
     handleLogout = () => {
         var url = baseUrl + adminPathUrl;
-        var authToken = localStorage.getItem("Inquel-Auth");
+        var authToken = localStorage.getItem("Authorization");
         var headers = {
             Accept: "application/json",
             "Content-Type": "application/json",
-            "Inquel-Auth": authToken,
+            "Authorization": authToken,
         };
 
         fetch(`${url}/logout/`, {
@@ -26,7 +26,7 @@ class Header extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                localStorage.removeItem("Inquel-Auth");
+                localStorage.removeItem("Authorization");
                 this.setState({
                     isLoggedOut: true,
                 });
@@ -39,7 +39,7 @@ class Header extends Component {
 
     render() {
         if (this.state.isLoggedOut) {
-            return <Redirect to="/admin/login" />;
+            return <Redirect to="/hod/login" />;
         }
         return (
             <Navbar
@@ -55,12 +55,12 @@ class Header extends Component {
                     >
                         <i className="fas fa-bars"></i>
                     </button>
-                    <Link to="/admin">
+                    <Link to="/hod">
                         <img src={logo} alt="Logo" width="120" height="auto" />
                     </Link>
                 </Navbar.Brand>
                 <div className="mx-auto">
-                    <h5 className="mb-0">{this.props.name}</h5>
+                    <h5 className="mb-0 primary-text font-weight-bold">{this.props.name}</h5>
                 </div>
                 <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                 <Navbar.Collapse
@@ -82,8 +82,7 @@ class Header extends Component {
                                     alt="User pic"
                                     width="25"
                                     className="profile-pic mr-1 mb-1"
-                                />{" "}
-                                Admin
+                                />
                             </Dropdown.Toggle>
 
                             <Dropdown.Menu>

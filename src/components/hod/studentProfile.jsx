@@ -25,7 +25,7 @@ class StudentProfile extends Component {
                 <Header name="User Profiles" togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
-                <SideNav shownav={this.state.showSideNav} activeLink="profiles" />
+                <SideNav shownav={this.state.showSideNav} />
 
                 <div
                     className={`section content ${
@@ -33,16 +33,6 @@ class StudentProfile extends Component {
                     }`}
                 >
                     <div className="container-fluid">
-                        {/* Back button */}
-                        {/* <div className="mb-4">
-                            <Link to="/profiles">
-                                <button className="btn btn-primary">
-                                    <i className="fas fa-chevron-left mr-1 fa-sm"></i>{" "}
-                                    Back
-                                </button>
-                            </Link>
-                        </div> */}
-
                         {/* Student details */}
                         <div className="row align-items-center mb-4">
                             <div className="col-md-6">
@@ -148,7 +138,7 @@ class StudentProfile extends Component {
                                             <td>212</td>
                                             <td>First Class</td>
                                             <td className="text-center">
-                                                <Link to="/admin/course/001">
+                                                <Link to="/hod/course/001">
                                                     <button className="btn btn-sm btn-primary">
                                                         <i className="fas fa-eye"></i>
                                                     </button>
@@ -165,7 +155,7 @@ class StudentProfile extends Component {
                                             <td>436</td>
                                             <td>Not Taken</td>
                                             <td className="text-center">
-                                                <Link to="/admin/course/001">
+                                                <Link to="/hod/course/001">
                                                     <button className="btn btn-sm btn-primary">
                                                         <i className="fas fa-eye"></i>
                                                     </button>
@@ -182,7 +172,7 @@ class StudentProfile extends Component {
                                             <td>128</td>
                                             <td>Distiction</td>
                                             <td className="text-center">
-                                                <Link to="/admin/course/001">
+                                                <Link to="/hod/course/001">
                                                     <button className="btn btn-sm btn-primary">
                                                         <i className="fas fa-eye"></i>
                                                     </button>

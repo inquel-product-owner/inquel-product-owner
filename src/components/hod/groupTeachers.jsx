@@ -1,10 +1,9 @@
 import React, { Component } from "react";
 import { Tab, Row, Col, Nav } from "react-bootstrap";
-import profilepic from "../../assets/user.png";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 
-class HodTeacherList extends Component {
+class GroupTeachers extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -22,10 +21,10 @@ class HodTeacherList extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="User Profiles" togglenav={this.toggleSideNav} />
+                <Header name="Group A" togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
-                <SideNav shownav={this.state.showSideNav} activeLink="profiles" />
+                <SideNav shownav={this.state.showSideNav} />
 
                 <div
                     className={`section content ${
@@ -33,56 +32,47 @@ class HodTeacherList extends Component {
                     }`}
                 >
                     <div className="container-fluid">
-                        {/* Back button */}
-                        {/* <div className="mb-4">
-                            <Link to="/profiles">
-                                <button className="btn btn-primary">
-                                    <i className="fas fa-chevron-left mr-1 fa-sm"></i>{" "}
-                                    Back
-                                </button>
-                            </Link>
-                        </div> */}
-
-                        {/* HOD Details */}
-                        <div className="row align-items-center mb-4">
-                            <div className="col-md-6">
-                                <div className="row align-items-center">
-                                    <div className="col-md-2 col-3">
-                                        <img
-                                            src={profilepic}
-                                            alt="Profile"
-                                            className="img-fluid profile-pic"
-                                        />
+                        {/* Filter area */}
+                        <div className="row align-items-center">
+                            <div className="col-md-2">
+                                <h5 className="primary-text">
+                                    Teacher Profile
+                                </h5>
+                            </div>
+                            <div className="col-md-10">
+                                <div className="row justify-content-center justify-content-md-end mb-4">
+                                    <div className="col-md-4 pr-md-0">
+                                        <form>
+                                            <div className="form-group">
+                                                <input
+                                                    type="search"
+                                                    name="search"
+                                                    id="search"
+                                                    className="form-control mb-md-0 mb-2"
+                                                    placeholder="Search"
+                                                />
+                                            </div>
+                                        </form>
                                     </div>
-                                    <div className="col-md-10 col-9 pl-0">
-                                        <h5 className="primary-text">
-                                            HOD Ram Profile
-                                        </h5>
-                                        <p className="mb-0">001</p>
+                                    <div className="col-md-4 text-md-right text-center">
+                                        <button className="btn btn-primary mr-md-2 mr-1">
+                                            Add
+                                        </button>
+                                        <button className="btn btn-primary mr-md-2 mr-1">
+                                            Delete
+                                        </button>
+                                        <button className="btn btn-primary mr-md-2 mr-1">
+                                            Enable
+                                        </button>
+                                        <button className="btn btn-primary">
+                                            Disable
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Teachers list */}
-                        <div className="row justify-content-center justify-content-between mb-4">
-                            <div className="col-md-3 mb-2 mb-md-0">
-                                <h5 className="primary-text font-weight-bold">
-                                    Teacher profiles
-                                </h5>
-                            </div>
-                            <div className="col-md-3">
-                                <form action="">
-                                    <input
-                                        type="search"
-                                        name="search"
-                                        id="search"
-                                        placeholder="Search Teacher"
-                                        className="form-control"
-                                    />
-                                </form>
-                            </div>
-                        </div>
+                        {/* Teacher list */}
                         <div className="card shadow-sm">
                             <div className="card-body">
                                 <Tab.Container
@@ -514,4 +504,4 @@ class HodTeacherList extends Component {
     }
 }
 
-export default HodTeacherList;
+export default GroupTeachers;

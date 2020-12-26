@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import Header from "./navbar";
 import SideNav from "./sidenav";
-import { Link,Redirect } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 class MasterData extends Component {
     constructor(props) {
@@ -41,9 +41,6 @@ class MasterData extends Component {
     };
 
     render() {
-        if (!localStorage.getItem("Inquel-Auth")) {
-            return <Redirect to="/login" />;
-        }
         return (
             <div className="wrapper">
 
@@ -51,7 +48,7 @@ class MasterData extends Component {
                 <Header name="Course Master Data" togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
-                <SideNav shownav={this.state.showSideNav} />
+                <SideNav shownav={this.state.showSideNav} activeLink="course" />
 
                 <div
                     className={`section content ${
@@ -61,13 +58,13 @@ class MasterData extends Component {
                     <div className="container-fluid">
 
                         <div className="d-flex flex-wrap mb-4">
-                            <Link to="/course-management">
-                                <button className="btn btn-outline-secondary btn-sm mb-2 mb-md-0 mr-2">
+                            <Link to="/admin/course-management">
+                                <button className="btn btn-outline-secondary btn-sm mr-1">
                                     Course Master Data{" "}
                                     <i className="fas fa-chevron-right fa-sm ml-2"></i>
                                 </button>
                             </Link>
-                            <Link to="/course-management/discounts">
+                            <Link to="/admin/course-management/discounts">
                                 <button className="btn btn-outline-secondary btn-sm">
                                     Discounts Configuration{" "}
                                     <i className="fas fa-chevron-right fa-sm ml-2"></i>

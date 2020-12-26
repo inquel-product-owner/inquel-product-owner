@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { Tabs, Tab, Modal } from "react-bootstrap";
-import { Link, Redirect } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Switch from "react-switch";
 import courseimg from "../../assets/code.jpg";
 
@@ -17,71 +17,63 @@ class SubscriptionModal extends Component {
             >
                 <Modal.Header closeButton>
                     <Modal.Title id="contained-modal-title-vcenter">
-                        Subscription Plans
+                        <h5 className="primary-text">Subscription Plans</h5>
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <div className="row">
-                        <div className="col-md-5">
-                            <div className="row mb-4">
-                                <div className="col-5">
-                                    <h6>Subscription ID</h6>
+                        <div className="col-md-5 mb-3 mb-md-0">
+                            <div className="row align-items-center mb-4">
+                                <div className="col-md-4 mb-2 mb-md-0">
+                                    <p className="mb-0">Subscription ID</p>
                                 </div>
-                                <div className="col-7">
-                                    <form action="">
-                                        <input
-                                            type="text"
-                                            name="subscriptionid"
-                                            id="subscriptionid"
-                                            className="form-control form-control-sm shadow-sm"
-                                        />
-                                    </form>
+                                <div className="col-md-8">
+                                    <input
+                                        type="text"
+                                        name="subscriptionid"
+                                        id="subscriptionid"
+                                        className="form-control form-control-sm shadow-sm"
+                                    />
                                 </div>
                             </div>
-                            <div className="row mb-4">
-                                <div className="col-5">
-                                    <h6>Title</h6>
+                            <div className="row align-items-center mb-4">
+                                <div className="col-md-4 mb-2 mb-md-0">
+                                    <p className="mb-0">Title</p>
                                 </div>
-                                <div className="col-7">
-                                    <form action="">
-                                        <input
-                                            type="text"
-                                            name="title"
-                                            id="title"
-                                            className="form-control form-control-sm shadow-sm"
-                                        />
-                                    </form>
+                                <div className="col-md-8">
+                                    <input
+                                        type="text"
+                                        name="title"
+                                        id="title"
+                                        className="form-control form-control-sm shadow-sm"
+                                    />
                                 </div>
                             </div>
-                            <div className="row mb-4">
-                                <div className="col-5">
-                                    <h6>Duration / Validity</h6>
+                            <div className="row align-items-center mb-4">
+                                <div className="col-md-4 mb-2 mb-md-0">
+                                    <p className="mb-0">Duration / Validity</p>
                                 </div>
-                                <div className="col-7">
-                                    <form action="">
-                                        <select
-                                            name="duration"
-                                            id="duration"
-                                            className="form-control form-control-sm shadow-sm"
-                                        >
-                                            <option value="05">05</option>
-                                        </select>
-                                    </form>
+                                <div className="col-md-8">
+                                    <select
+                                        name="duration"
+                                        id="duration"
+                                        className="form-control form-control-sm shadow-sm"
+                                    >
+                                        <option value="05">05</option>
+                                    </select>
                                 </div>
                             </div>
-                            <div className="row mb-4">
-                                <div className="col-5">
-                                    <h6>Pricing</h6>
+                            <div className="row align-items-center mb-4">
+                                <div className="col-md-4 mb-2 mb-md-0">
+                                    <p className="mb-0">Pricing</p>
                                 </div>
-                                <div className="col-7">
-                                    <form action="">
-                                        <input
-                                            type="text"
-                                            name="pricing"
-                                            id="pricing"
-                                            className="form-control form-control-sm shadow-sm"
-                                        />
-                                    </form>
+                                <div className="col-md-8">
+                                    <input
+                                        type="text"
+                                        name="pricing"
+                                        id="pricing"
+                                        className="form-control form-control-sm shadow-sm"
+                                    />
                                 </div>
                             </div>
                             <div className="form-check mb-4">
@@ -100,18 +92,16 @@ class SubscriptionModal extends Component {
                                 </label>
                             </div>
                             <div className="row">
-                                <div className="col-5">
-                                    <h6>Search terms</h6>
+                                <div className="col-md-4 mb-2 mb-md-0">
+                                    <p className="mb-0">Search terms</p>
                                 </div>
-                                <div className="col-7">
-                                    <form action="">
-                                        <textarea
-                                            name="searchterm"
-                                            id="searchterm"
-                                            rows="5"
-                                            className="form-control form-control-sm shadow-sm"
-                                        ></textarea>
-                                    </form>
+                                <div className="col-md-8">
+                                    <textarea
+                                        name="searchterm"
+                                        id="searchterm"
+                                        rows="5"
+                                        className="form-control form-control-sm shadow-sm"
+                                    ></textarea>
                                 </div>
                             </div>
                         </div>
@@ -150,7 +140,7 @@ class SubscriptionModal extends Component {
                                             </tbody>
                                         </table>
                                     </div>
-                                    <button className="btn btn-light btn-block btn-sm">
+                                    <button className="btn btn-light btn-block btn-sm my-3">
                                         Add
                                     </button>
                                     <div className="text-right">
@@ -196,13 +186,12 @@ class AddCourse extends Component {
                             <div className="row">
                                 <div className="col-md-6 mb-4">
                                     <div className="row align-items-center mb-3">
-                                        <div className="col-md-4">
+                                    <div className="col-md-4 mb-2 mb-md-0">
                                             <p className="small mb-0">
                                                 Category ID
                                             </p>
                                         </div>
                                         <div className="col-md-8">
-                                            <form action="">
                                                 <select
                                                     name="category"
                                                     id="category"
@@ -212,17 +201,15 @@ class AddCourse extends Component {
                                                         School
                                                     </option>
                                                 </select>
-                                            </form>
                                         </div>
                                     </div>
                                     <div className="row align-items-center mb-3">
-                                        <div className="col-md-4">
+                                    <div className="col-md-4 mb-2 mb-md-0">
                                             <p className="small mb-0">
                                                 Discipline
                                             </p>
                                         </div>
                                         <div className="col-md-8">
-                                            <form action="">
                                                 <select
                                                     name="discipline"
                                                     id="discipline"
@@ -232,17 +219,15 @@ class AddCourse extends Component {
                                                         None
                                                     </option>
                                                 </select>
-                                            </form>
                                         </div>
                                     </div>
                                     <div className="row align-items-center mb-3">
-                                        <div className="col-md-4">
+                                    <div className="col-md-4 mb-2 mb-md-0">
                                             <p className="small mb-0">
                                                 Subjects
                                             </p>
                                         </div>
                                         <div className="col-md-8">
-                                            <form action="">
                                                 <select
                                                     name="subject"
                                                     id="subject"
@@ -252,15 +237,13 @@ class AddCourse extends Component {
                                                         Maths
                                                     </option>
                                                 </select>
-                                            </form>
                                         </div>
                                     </div>
                                     <div className="row align-items-center">
-                                        <div className="col-md-4">
+                                    <div className="col-md-4 mb-2 mb-md-0">
                                             <p className="small mb-0">Type</p>
                                         </div>
                                         <div className="col-md-8">
-                                            <form action="">
                                                 <select
                                                     name="type"
                                                     id="type"
@@ -270,19 +253,17 @@ class AddCourse extends Component {
                                                         Premium
                                                     </option>
                                                 </select>
-                                            </form>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="col-md-6 mb-4">
                                     <div className="row align-items-center mb-3">
-                                        <div className="col-md-4">
+                                    <div className="col-md-4 mb-2 mb-md-0">
                                             <p className="small mb-0">
                                                 Sub Category
                                             </p>
                                         </div>
                                         <div className="col-md-8">
-                                            <form action="">
                                                 <select
                                                     name="subcategory"
                                                     id="subcategory"
@@ -292,15 +273,13 @@ class AddCourse extends Component {
                                                         SCH
                                                     </option>
                                                 </select>
-                                            </form>
                                         </div>
                                     </div>
                                     <div className="row align-items-center mb-3">
-                                        <div className="col-md-4">
+                                    <div className="col-md-4 mb-2 mb-md-0">
                                             <p className="small mb-0">Levels</p>
                                         </div>
                                         <div className="col-md-8">
-                                            <form action="">
                                                 <select
                                                     name="level"
                                                     id="level"
@@ -310,17 +289,15 @@ class AddCourse extends Component {
                                                         10th
                                                     </option>
                                                 </select>
-                                            </form>
                                         </div>
                                     </div>
                                     <div className="row align-items-center mb-3">
-                                        <div className="col-md-4">
+                                    <div className="col-md-4 mb-2 mb-md-0">
                                             <p className="small mb-0">
                                                 Board / University
                                             </p>
                                         </div>
                                         <div className="col-md-8">
-                                            <form action="">
                                                 <select
                                                     name="university"
                                                     id="university"
@@ -330,15 +307,13 @@ class AddCourse extends Component {
                                                         CBSE
                                                     </option>
                                                 </select>
-                                            </form>
                                         </div>
                                     </div>
                                     <div className="row align-items-center">
-                                        <div className="col-md-4">
+                                    <div className="col-md-4 mb-2 mb-md-0">
                                             <p className="small mb-0">HOD</p>
                                         </div>
                                         <div className="col-md-8">
-                                            <form action="">
                                                 <select
                                                     name="assignedhod"
                                                     id="assignedhod"
@@ -348,12 +323,10 @@ class AddCourse extends Component {
                                                         Ram
                                                     </option>
                                                 </select>
-                                            </form>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <form action="">
                                 <label htmlFor="courses">Courses</label>
                                 <textarea
                                     name="courses"
@@ -361,7 +334,6 @@ class AddCourse extends Component {
                                     rows="5"
                                     className="form-control shadow-sm"
                                 ></textarea>
-                            </form>
                             <div className="row mt-3">
                                 <div className="col-md-6">
                                     <div className="d-flex justify-content-between mb-2">
@@ -385,14 +357,12 @@ class AddCourse extends Component {
                                         />
                                     </div>
                                     <div className="form-group">
-                                        <form action="">
                                             <input
                                                 type="file"
                                                 name="image"
                                                 id="image"
                                                 className="form-control"
                                             />
-                                        </form>
                                     </div>
                                     <div className="form-check mb-3">
                                         <input
@@ -427,7 +397,6 @@ class AddCourse extends Component {
                                     </div>
                                 </div>
                                 <div className="col-md-6">
-                                    <form>
                                         <div className="form-group">
                                             <label htmlFor="searchterms">
                                                 Search terms
@@ -450,72 +419,65 @@ class AddCourse extends Component {
                                                 className="form-control shadow-sm"
                                             ></textarea>
                                         </div>
-                                    </form>
                                 </div>
                             </div>
                         </div>
                         <div className="col-md-6">
                             <h6 className="primary-text mb-3">Subscription</h6>
                             <div className="row align-items-center mb-4">
-                                <div className="col-md-4">
-                                    <p className="mb-0 font-weight-bold">
+                            <div className="col-md-4 mb-2 mb-md-0">
+                                    <p className="small mb-0">
                                         Subscription ID
                                     </p>
                                 </div>
                                 <div className="col-md-8">
-                                    <form action="">
                                         <input
                                             type="text"
                                             name="subscriptionid"
                                             id="subscriptionid"
                                             className="form-control shadow-sm"
                                         />
-                                    </form>
                                 </div>
                             </div>
                             <div className="row align-items-center mb-4">
-                                <div className="col-md-4">
-                                    <p className="mb-0 font-weight-bold">
+                            <div className="col-md-4 mb-2 mb-md-0">
+                                    <p className="mb-0 small">
                                         Subscription Title
                                     </p>
                                 </div>
                                 <div className="col-md-8">
-                                    <form action="">
                                         <input
                                             type="text"
                                             name="subscriptiontitle"
                                             id="subscriptiontitle"
                                             className="form-control shadow-sm"
                                         />
-                                    </form>
                                 </div>
                             </div>
                             <div className="row align-items-center mb-4">
-                                <div className="col-md-4">
-                                    <p className="mb-0 font-weight-bold">
+                            <div className="col-md-4 mb-2 mb-md-0">
+                                    <p className="mb-0 small">
                                         Subscription Description
                                     </p>
                                 </div>
                                 <div className="col-md-8">
-                                    <form action="">
                                         <input
                                             type="text"
                                             name="subscriptiondescription"
                                             id="subscriptiondescription"
                                             className="form-control shadow-sm"
                                         />
-                                    </form>
                                 </div>
                             </div>
                             <div className="row align-items-center mb-4">
-                                <div className="col-md-4">
-                                    <p className="mb-0 font-weight-bold">
+                            <div className="col-md-4 mb-2 mb-md-0">
+                                    <p className="mb-0 small">
                                         Duration
                                     </p>
                                 </div>
                                 <div className="col-md-8">
                                     <div className="row align-items-center">
-                                        <div className="col-3">
+                                        <div className="col-md-3 col-6">
                                             <select
                                                 name="durationmonth"
                                                 id="durationmonth"
@@ -524,7 +486,7 @@ class AddCourse extends Component {
                                                 <option value="05">05</option>
                                             </select>
                                         </div>
-                                        <div className="col-3">
+                                        <div className="col-md-3 col-6">
                                             <select
                                                 name="durationday"
                                                 id="durationday"
@@ -533,7 +495,7 @@ class AddCourse extends Component {
                                                 <option value="10">10</option>
                                             </select>
                                         </div>
-                                        <div className="col-6">
+                                        <div className="col-6 mt-2 mt-md-0">
                                             <p className="mb-0">
                                                 05 Months 10 Days
                                             </p>
@@ -542,8 +504,8 @@ class AddCourse extends Component {
                                 </div>
                             </div>
                             <div className="row align-items-center mb-4">
-                                <div className="col-md-4">
-                                    <p className="mb-0 font-weight-bold">
+                            <div className="col-md-4 mb-2 mb-md-0">
+                                    <p className="mb-0 small">
                                         Pricing
                                     </p>
                                 </div>
@@ -592,7 +554,7 @@ class AddCourse extends Component {
                                             </tbody>
                                         </table>
                                     </div>
-                                    <button className="btn btn-light btn-block btn-sm">
+                                    <button className="btn btn-light btn-block btn-sm my-3">
                                         Add
                                     </button>
                                     <div className="text-right">
@@ -609,13 +571,13 @@ class AddCourse extends Component {
                 <Modal.Footer>
                     <div className="d-flex justify-content-end flex-wrap">
                         <button
-                            className="btn btn-outline-dark mr-2"
+                            className="btn btn-outline-dark btn-sm mr-2"
                             onClick={this.props.onHide}
                         >
                             Cancel
                         </button>
-                        <button className="btn btn-primary mr-2">Save</button>
-                        <button className="btn btn-primary">Publish</button>
+                        <button className="btn btn-primary btn-sm mr-2">Save</button>
+                        <button className="btn btn-primary btn-sm">Publish</button>
                     </div>
                 </Modal.Footer>
             </Modal>
@@ -646,7 +608,7 @@ class ReminderCard extends Component {
                             <h6>Reminders</h6>
                         </div>
                         <div className="col-6 text-right">
-                            <Link to="/" className="text-warning small">
+                            <Link to="/admin" className="text-warning small">
                                 View all{" "}
                                 <i className="fas fa-chevron-right ml-2"></i>
                             </Link>
@@ -734,6 +696,7 @@ class VewCourseCard extends Component {
             subscriptionModalShow: !this.state.subscriptionModalShow,
         });
     };
+    
     render() {
         return (
             <>
@@ -874,7 +837,7 @@ class VewCourseCard extends Component {
                             </div>
                         </div>
                         <Link
-                            to="/course/001"
+                            to="/admin/course/001"
                             style={{
                                 textDecoration: "none",
                             }}
@@ -979,16 +942,13 @@ class Dashboard extends Component {
     };
 
     render() {
-        if (!localStorage.getItem("Inquel-Auth")) {
-            return <Redirect to="/login" />;
-        }
         return (
             <div className="wrapper">
                 {/* Navbar */}
                 <Header name="Admin" togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
-                <SideNav shownav={this.state.showSideNav} />
+                <SideNav shownav={this.state.showSideNav} activeLink="dashboard" />
 
                 <div
                     className={`section content ${
@@ -1069,37 +1029,39 @@ class Dashboard extends Component {
                                 {/* Filter area */}
                                 <div className="row justify-content-center justify-content-md-end mb-4">
                                     <div className="col-md-4 pr-md-0">
-                                    <form>
-                                        <div className="form-group">
-                                        <input
-                                            type="search"
-                                            name="search"
-                                            id="search"
-                                            className="form-control mb-md-0 mb-2"
-                                            placeholder="Search"
-                                        /></div>
-                                    </form>
+                                        <form>
+                                            <div className="form-group">
+                                                <input
+                                                    type="search"
+                                                    name="search"
+                                                    id="search"
+                                                    className="form-control mb-md-0 mb-2"
+                                                    placeholder="Search"
+                                                />
+                                            </div>
+                                        </form>
                                     </div>
                                     <div className="col-md-6 text-md-right text-center">
-                                    <button className="btn btn-primary-invert mr-md-3 mr-1">
-                                        Filter{" "}
-                                        <i className="fas fa-filter ml-1"></i>
-                                    </button>
-                                    <button
-                                        className="btn btn-primary mr-md-3 mr-1"
-                                        onClick={this.toggleCourseModal}
-                                    >
-                                        Add
-                                    </button>
-                                    <button className="btn btn-primary mr-md-3 mr-1">
-                                        Delete
-                                    </button>
-                                    <button className="btn btn-primary mr-md-3 mr-1">
-                                        Enable
-                                    </button>
-                                    <button className="btn btn-primary">
-                                        Disable
-                                    </button></div>
+                                        <button className="btn btn-primary-invert mr-md-3 mr-1">
+                                            Filter{" "}
+                                            <i className="fas fa-filter ml-1"></i>
+                                        </button>
+                                        <button
+                                            className="btn btn-primary mr-md-3 mr-1"
+                                            onClick={this.toggleCourseModal}
+                                        >
+                                            Add
+                                        </button>
+                                        <button className="btn btn-primary mr-md-3 mr-1">
+                                            Delete
+                                        </button>
+                                        <button className="btn btn-primary mr-md-3 mr-1">
+                                            Enable
+                                        </button>
+                                        <button className="btn btn-primary">
+                                            Disable
+                                        </button>
+                                    </div>
                                 </div>
 
                                 {/* Change view */}
@@ -1213,7 +1175,6 @@ class Dashboard extends Component {
                                                                     2000 INR
                                                                 </td>
                                                                 <td>
-                                                                    <Link to="/">
                                                                         <button
                                                                             className="btn btn-sm btn-primary"
                                                                             onClick={
@@ -1223,7 +1184,6 @@ class Dashboard extends Component {
                                                                         >
                                                                             View
                                                                         </button>
-                                                                    </Link>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1251,7 +1211,6 @@ class Dashboard extends Component {
                                                                     3000 INR
                                                                 </td>
                                                                 <td>
-                                                                    <Link to="/">
                                                                         <button
                                                                             className="btn btn-sm btn-primary"
                                                                             onClick={
@@ -1261,7 +1220,6 @@ class Dashboard extends Component {
                                                                         >
                                                                             View
                                                                         </button>
-                                                                    </Link>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1291,7 +1249,6 @@ class Dashboard extends Component {
                                                                     5000 INR
                                                                 </td>
                                                                 <td>
-                                                                    <Link to="/">
                                                                         <button
                                                                             className="btn btn-sm btn-primary"
                                                                             onClick={
@@ -1301,7 +1258,6 @@ class Dashboard extends Component {
                                                                         >
                                                                             View
                                                                         </button>
-                                                                    </Link>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1329,7 +1285,6 @@ class Dashboard extends Component {
                                                                     8000 INR
                                                                 </td>
                                                                 <td>
-                                                                    <Link to="/">
                                                                         <button
                                                                             className="btn btn-sm btn-primary"
                                                                             onClick={
@@ -1339,7 +1294,6 @@ class Dashboard extends Component {
                                                                         >
                                                                             View
                                                                         </button>
-                                                                    </Link>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1370,7 +1324,6 @@ class Dashboard extends Component {
                                                                     7000 INR
                                                                 </td>
                                                                 <td>
-                                                                    <Link to="/">
                                                                         <button
                                                                             className="btn btn-sm btn-primary"
                                                                             onClick={
@@ -1380,7 +1333,6 @@ class Dashboard extends Component {
                                                                         >
                                                                             View
                                                                         </button>
-                                                                    </Link>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1411,7 +1363,6 @@ class Dashboard extends Component {
                                                                     2000 INR
                                                                 </td>
                                                                 <td>
-                                                                    <Link to="/">
                                                                         <button
                                                                             className="btn btn-sm btn-primary"
                                                                             onClick={
@@ -1421,7 +1372,6 @@ class Dashboard extends Component {
                                                                         >
                                                                             View
                                                                         </button>
-                                                                    </Link>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1452,7 +1402,6 @@ class Dashboard extends Component {
                                                                     2000 INR
                                                                 </td>
                                                                 <td>
-                                                                    <Link to="/">
                                                                         <button
                                                                             className="btn btn-sm btn-primary"
                                                                             onClick={
@@ -1462,7 +1411,6 @@ class Dashboard extends Component {
                                                                         >
                                                                             View
                                                                         </button>
-                                                                    </Link>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1490,7 +1438,6 @@ class Dashboard extends Component {
                                                                     1000 INR
                                                                 </td>
                                                                 <td>
-                                                                    <Link to="/">
                                                                         <button
                                                                             className="btn btn-sm btn-primary"
                                                                             onClick={
@@ -1500,7 +1447,6 @@ class Dashboard extends Component {
                                                                         >
                                                                             View
                                                                         </button>
-                                                                    </Link>
                                                                 </td>
                                                             </tr>
                                                         </tbody>
@@ -1569,7 +1515,6 @@ class Dashboard extends Component {
                                                                     2000 INR
                                                                 </td>
                                                                 <td>
-                                                                    <Link to="/">
                                                                         <button
                                                                             className="btn btn-sm btn-primary"
                                                                             onClick={
@@ -1579,7 +1524,6 @@ class Dashboard extends Component {
                                                                         >
                                                                             View
                                                                         </button>
-                                                                    </Link>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1607,7 +1551,6 @@ class Dashboard extends Component {
                                                                     3000 INR
                                                                 </td>
                                                                 <td>
-                                                                    <Link to="/">
                                                                         <button
                                                                             className="btn btn-sm btn-primary"
                                                                             onClick={
@@ -1617,7 +1560,6 @@ class Dashboard extends Component {
                                                                         >
                                                                             View
                                                                         </button>
-                                                                    </Link>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1647,7 +1589,6 @@ class Dashboard extends Component {
                                                                     5000 INR
                                                                 </td>
                                                                 <td>
-                                                                    <Link to="/">
                                                                         <button
                                                                             className="btn btn-sm btn-primary"
                                                                             onClick={
@@ -1657,7 +1598,6 @@ class Dashboard extends Component {
                                                                         >
                                                                             View
                                                                         </button>
-                                                                    </Link>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1685,7 +1625,6 @@ class Dashboard extends Component {
                                                                     8000 INR
                                                                 </td>
                                                                 <td>
-                                                                    <Link to="/">
                                                                         <button
                                                                             className="btn btn-sm btn-primary"
                                                                             onClick={
@@ -1695,7 +1634,6 @@ class Dashboard extends Component {
                                                                         >
                                                                             View
                                                                         </button>
-                                                                    </Link>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1726,7 +1664,6 @@ class Dashboard extends Component {
                                                                     7000 INR
                                                                 </td>
                                                                 <td>
-                                                                    <Link to="/">
                                                                         <button
                                                                             className="btn btn-sm btn-primary"
                                                                             onClick={
@@ -1736,7 +1673,6 @@ class Dashboard extends Component {
                                                                         >
                                                                             View
                                                                         </button>
-                                                                    </Link>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1767,7 +1703,6 @@ class Dashboard extends Component {
                                                                     2000 INR
                                                                 </td>
                                                                 <td>
-                                                                    <Link to="/">
                                                                         <button
                                                                             className="btn btn-sm btn-primary"
                                                                             onClick={
@@ -1777,7 +1712,6 @@ class Dashboard extends Component {
                                                                         >
                                                                             View
                                                                         </button>
-                                                                    </Link>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1808,7 +1742,6 @@ class Dashboard extends Component {
                                                                     2000 INR
                                                                 </td>
                                                                 <td>
-                                                                    <Link to="/">
                                                                         <button
                                                                             className="btn btn-sm btn-primary"
                                                                             onClick={
@@ -1818,7 +1751,6 @@ class Dashboard extends Component {
                                                                         >
                                                                             View
                                                                         </button>
-                                                                    </Link>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1846,7 +1778,6 @@ class Dashboard extends Component {
                                                                     1000 INR
                                                                 </td>
                                                                 <td>
-                                                                    <Link to="/">
                                                                         <button
                                                                             className="btn btn-sm btn-primary"
                                                                             onClick={
@@ -1856,7 +1787,6 @@ class Dashboard extends Component {
                                                                         >
                                                                             View
                                                                         </button>
-                                                                    </Link>
                                                                 </td>
                                                             </tr>
                                                         </tbody>
@@ -1925,7 +1855,6 @@ class Dashboard extends Component {
                                                                     2000 INR
                                                                 </td>
                                                                 <td>
-                                                                    <Link to="/">
                                                                         <button
                                                                             className="btn btn-sm btn-primary"
                                                                             onClick={
@@ -1935,7 +1864,6 @@ class Dashboard extends Component {
                                                                         >
                                                                             View
                                                                         </button>
-                                                                    </Link>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1963,7 +1891,6 @@ class Dashboard extends Component {
                                                                     3000 INR
                                                                 </td>
                                                                 <td>
-                                                                    <Link to="/">
                                                                         <button
                                                                             className="btn btn-sm btn-primary"
                                                                             onClick={
@@ -1973,7 +1900,6 @@ class Dashboard extends Component {
                                                                         >
                                                                             View
                                                                         </button>
-                                                                    </Link>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -2003,7 +1929,6 @@ class Dashboard extends Component {
                                                                     5000 INR
                                                                 </td>
                                                                 <td>
-                                                                    <Link to="/">
                                                                         <button
                                                                             className="btn btn-sm btn-primary"
                                                                             onClick={
@@ -2013,7 +1938,6 @@ class Dashboard extends Component {
                                                                         >
                                                                             View
                                                                         </button>
-                                                                    </Link>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -2041,7 +1965,6 @@ class Dashboard extends Component {
                                                                     8000 INR
                                                                 </td>
                                                                 <td>
-                                                                    <Link to="/">
                                                                         <button
                                                                             className="btn btn-sm btn-primary"
                                                                             onClick={
@@ -2051,7 +1974,6 @@ class Dashboard extends Component {
                                                                         >
                                                                             View
                                                                         </button>
-                                                                    </Link>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -2082,7 +2004,6 @@ class Dashboard extends Component {
                                                                     7000 INR
                                                                 </td>
                                                                 <td>
-                                                                    <Link to="/">
                                                                         <button
                                                                             className="btn btn-sm btn-primary"
                                                                             onClick={
@@ -2092,7 +2013,6 @@ class Dashboard extends Component {
                                                                         >
                                                                             View
                                                                         </button>
-                                                                    </Link>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -2123,7 +2043,6 @@ class Dashboard extends Component {
                                                                     2000 INR
                                                                 </td>
                                                                 <td>
-                                                                    <Link to="/">
                                                                         <button
                                                                             className="btn btn-sm btn-primary"
                                                                             onClick={
@@ -2133,7 +2052,6 @@ class Dashboard extends Component {
                                                                         >
                                                                             View
                                                                         </button>
-                                                                    </Link>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -2164,7 +2082,6 @@ class Dashboard extends Component {
                                                                     2000 INR
                                                                 </td>
                                                                 <td>
-                                                                    <Link to="/">
                                                                         <button
                                                                             className="btn btn-sm btn-primary"
                                                                             onClick={
@@ -2174,7 +2091,6 @@ class Dashboard extends Component {
                                                                         >
                                                                             View
                                                                         </button>
-                                                                    </Link>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -2202,7 +2118,6 @@ class Dashboard extends Component {
                                                                     1000 INR
                                                                 </td>
                                                                 <td>
-                                                                    <Link to="/">
                                                                         <button
                                                                             className="btn btn-sm btn-primary"
                                                                             onClick={
@@ -2212,7 +2127,6 @@ class Dashboard extends Component {
                                                                         >
                                                                             View
                                                                         </button>
-                                                                    </Link>
                                                                 </td>
                                                             </tr>
                                                         </tbody>

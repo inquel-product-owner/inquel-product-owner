@@ -3,53 +3,46 @@ import { Link } from "react-router-dom";
 
 class SideNav extends Component {
     render() {
+        const active = this.props.activeLink;
         return (
             <div
                 id="sidebar"
-                className={`text-center ${
-                    this.props.shownav ? "active" : ""
-                }`}
+                className={`text-center ${this.props.shownav ? "active" : ""}`}
             >
-                {/* <button
-                    className="btn btn-light btn-sm mb-3 d-block d-md-none"
-                    onClick={this.props.togglenav}
-                >
-                    <i className="fas fa-times fa-sm"></i>
-                </button> */}
-                <Link to="/">
+                <Link to="/admin">
                     <button
-                        className="btn btn-primary-invert btn-sm mb-3"
-                        style={{
-                            width: "30px",
-                            height: "30px",
-                            borderRadius: "50%",
-                        }}
+                        className={`btn sidebar-btn ${
+                            active === "dashboard" ? "active" : ""
+                        } btn-sm mb-3`}
                     >
-                        D
+                        <i
+                            class="fas fa-tachometer-alt"
+                            style={{ marginLeft: "-1.5px" }}
+                        ></i>
                     </button>
                 </Link>
-                <Link to="/profiles">
-                    <button
-                        className="btn btn-primary-invert btn-sm mb-3"
-                        style={{
-                            width: "30px",
-                            height: "30px",
-                            borderRadius: "50%",
-                        }}
+                <Link to="/admin/profiles">
+                <button
+                        className={`btn sidebar-btn ${
+                            active === "profiles" ? "active" : ""
+                        } btn-sm mb-3`}
                     >
-                        P
+                        <i
+                            class="fas fa-users"
+                            style={{ marginLeft: "-1.5px" }}
+                        ></i>
                     </button>
                 </Link>
-                <Link to="/course-management">
-                    <button
-                        className="btn btn-primary-invert btn-sm mb-3"
-                        style={{
-                            width: "30px",
-                            height: "30px",
-                            borderRadius: "50%",
-                        }}
+                <Link to="/admin/course-management">
+                <button
+                        className={`btn sidebar-btn ${
+                            active === "course" ? "active" : ""
+                        } btn-sm mb-3`}
                     >
-                        C
+                        <i
+                            class="fas fa-graduation-cap"
+                            style={{ marginLeft: "-1.5px" }}
+                        ></i>
                     </button>
                 </Link>
             </div>

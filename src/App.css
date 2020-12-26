@@ -22,7 +22,7 @@ body {
 /* Text */
 
 .primary-text {
-    color: #621012;
+    color: #621012 !important;
 }
 
 .text-white {
@@ -36,6 +36,7 @@ body {
     background-color: white;
     border-radius: 8px;
     overflow: hidden;
+    text-decoration: none !important;
 }
 
 .card-header {
@@ -189,9 +190,7 @@ input[type="search"]:focus {
     cursor: pointer;
     font-weight: 600;
     font-size: 15px;
-    border-radius: 8px;
-    border-top-left-radius: 8px !important;
-    border-top-right-radius: 8px !important;
+    border-radius: 8px !important;
 }
 
 .nav-pills .nav-link.active,
@@ -236,7 +235,7 @@ input[type="search"]:focus {
 /* Section */
 
 .section {
-    padding-top: 6rem;
+    padding-top: 7rem;
     padding-bottom: 4rem;
     min-height: 100vh;
 }
@@ -260,7 +259,7 @@ input[type="search"]:focus {
     transition: all 0.3s;
     margin-left: 0;
     overflow-y: auto;
-    padding-top: 5rem;
+    padding-top: 6rem;
 }
 
 #sidebar.active {
@@ -274,6 +273,26 @@ input[type="search"]:focus {
     #sidebar.active {
         margin-left: 0;
     }
+}
+
+.sidebar-btn {
+    background-color: transparent;
+    color: #7c8188;
+    border-radius: 8px;
+    width: 30px;
+    height: 30px;
+}
+
+.sidebar-btn:hover {
+    background-color: #efd2ac;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    color: #621012;
+}
+
+.sidebar-btn.active {
+    background-color: #efd2ac;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    color: #621012;
 }
 
 /* MAIN CONTENT */

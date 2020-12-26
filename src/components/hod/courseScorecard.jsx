@@ -3,7 +3,7 @@ import Header from "./navbar";
 import SideNav from "./sidenav";
 import { Card, Accordion } from "react-bootstrap";
 
-class CourseView extends Component {
+class CourseScorecard extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -24,7 +24,7 @@ class CourseView extends Component {
                 <Header name="Course" togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
-                <SideNav shownav={this.state.showSideNav} activeLink="course" />
+                <SideNav shownav={this.state.showSideNav} />
 
                 <div
                     className={`section content ${
@@ -220,4 +220,4 @@ class CourseView extends Component {
     }
 }
 
-export default CourseView;
+export default CourseScorecard;

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Link,Redirect } from "react-router-dom";
+import { Link } from "react-router-dom";
 import profilepic from "../../assets/user.png";
 import Header from "./navbar";
 import SideNav from "./sidenav";
@@ -19,16 +19,13 @@ class HodStudentList extends Component {
     };
 
     render() {
-        if (!localStorage.getItem("Inquel-Auth")) {
-            return <Redirect to="/login" />;
-        }
         return (
             <div className="wrapper">
                 {/* Navbar */}
                 <Header name="User Profiles" togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
-                <SideNav shownav={this.state.showSideNav} />
+                <SideNav shownav={this.state.showSideNav} activeLink="profiles" />
 
                 <div
                     className={`section content ${
@@ -48,16 +45,16 @@ class HodStudentList extends Component {
 
                         {/* HOD Details */}
                         <div className="row align-items-center mb-4">
-                            <div className="col-md-6 mb-3 mb-md-0">
+                            <div className="col-md-6">
                                 <div className="row align-items-center">
-                                    <div className="col-2">
+                                    <div className="col-md-2 col-3">
                                         <img
                                             src={profilepic}
                                             alt="Profile"
                                             className="img-fluid profile-pic"
                                         />
                                     </div>
-                                    <div className="col-10">
+                                    <div className="col-md-10 col-9 pl-0">
                                         <h5 className="primary-text">
                                             HOD Ram Profile
                                         </h5>
@@ -98,7 +95,7 @@ class HodStudentList extends Component {
                                             <td>Engineering</td>
                                             <td>01.02.2020</td>
                                             <td>
-                                                <Link to="/student/001">
+                                                <Link to="/admin/student/001">
                                                     <button className="btn btn-sm btn-primary">
                                                         View
                                                     </button>
@@ -120,7 +117,7 @@ class HodStudentList extends Component {
                                             <td>Engineering</td>
                                             <td>01.02.2020</td>
                                             <td>
-                                                <Link to="/student/002">
+                                                <Link to="/admin/student/002">
                                                     <button className="btn btn-sm btn-primary">
                                                         View
                                                     </button>
@@ -142,7 +139,7 @@ class HodStudentList extends Component {
                                             <td>Engineering</td>
                                             <td>01.02.2020</td>
                                             <td>
-                                                <Link to="/student/003">
+                                                <Link to="/admin/student/003">
                                                     <button className="btn btn-sm btn-primary">
                                                         View
                                                     </button>
@@ -164,7 +161,7 @@ class HodStudentList extends Component {
                                             <td>Engineering</td>
                                             <td>01.02.2020</td>
                                             <td>
-                                                <Link to="/student/004">
+                                                <Link to="/admin/student/004">
                                                     <button className="btn btn-sm btn-primary">
                                                         View
                                                     </button>
@@ -186,7 +183,7 @@ class HodStudentList extends Component {
                                             <td>Engineering</td>
                                             <td>01.02.2020</td>
                                             <td>
-                                                <Link to="/student/005">
+                                                <Link to="/admin/student/005">
                                                     <button className="btn btn-sm btn-primary">
                                                         View
                                                     </button>

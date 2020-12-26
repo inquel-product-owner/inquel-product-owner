@@ -3,7 +3,7 @@ import Header from "./navbar";
 import SideNav from "./sidenav";
 import userimage from "../../assets/user.png";
 import { Tabs, Tab } from "react-bootstrap";
-import { Link, Redirect } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Modal } from "react-bootstrap";
 import Switch from "react-switch";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl.js";
@@ -239,9 +239,7 @@ class HodModal extends Component {
                         </div>
                         <div className="row mb-2">
                             <div className="col-md-6">
-                                <h6 className="primary-text mb-3">
-                                    Personal Details
-                                </h6>
+                                <h6 className="primary-text mb-3">Details</h6>
 
                                 <div className="form-group">
                                     <label htmlFor="category">
@@ -258,7 +256,7 @@ class HodModal extends Component {
                                         <option value="" disabled>
                                             Select a category
                                         </option>
-                                        <option value="DEG">School</option>
+                                        <option value="DEG">Degree</option>
                                     </select>
                                 </div>
                                 <div className="form-group">
@@ -765,16 +763,17 @@ class Profiles extends Component {
     };
 
     render() {
-        if (!localStorage.getItem("Inquel-Auth")) {
-            return <Redirect to="/login" />;
-        }
         return (
             <div className="wrapper">
                 {/* Navbar */}
                 <Header name="User Profiles" togglenav={this.toggleSideNav} />
+
                 {/* Sidebar */}
-                <SideNav shownav={this.state.showSideNav} />
-                div
+                <SideNav
+                    shownav={this.state.showSideNav}
+                    activeLink="profiles"
+                />
+
                 <div
                     className={`section content ${
                         this.state.showSideNav ? "active" : ""
@@ -909,7 +908,7 @@ class Profiles extends Component {
                                                                     </td>
                                                                     <td>
                                                                         <Link
-                                                                            to={`/hod/${list.id}`}
+                                                                            to={`/admin/hod/${list.id}`}
                                                                         >
                                                                             <button className="btn btn-sm btn-primary">
                                                                                 View
@@ -1003,7 +1002,7 @@ class Profiles extends Component {
                                                                     </td>
                                                                     <td>
                                                                         <Link
-                                                                            to={`/student/${list.id}`}
+                                                                            to={`/admin/student/${list.id}`}
                                                                         >
                                                                             <button className="btn btn-sm btn-primary">
                                                                                 View

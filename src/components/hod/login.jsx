@@ -2,9 +2,8 @@ import React, { Component } from "react";
 import { Navbar } from "react-bootstrap";
 import logo from "../../assets/IQ_Labs_V1.png";
 import { Link, Redirect } from "react-router-dom";
-import { baseUrl, adminPathUrl } from "../../shared/baseUrl.js";
 
-class Login extends Component {
+class HODLogin extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -26,7 +25,7 @@ class Login extends Component {
 
     handleSubmit = (event) => {
         event.preventDefault();
-        var url = `${baseUrl}${adminPathUrl}/login/`;
+        var url = "http://3.16.43.25:8000/52fd_1f4a/api/v1/admin/login/";
         console.log(
             "username: " +
                 this.state.username +
@@ -53,10 +52,7 @@ class Login extends Component {
                 console.log(result);
 
                 if (this.state.items.sts) {
-                    localStorage.setItem(
-                        "Inquel-Auth",
-                        `Token ${this.state.items.token}`
-                    );
+                    localStorage.setItem("Authorization", `Token ${this.state.items.token}`);
                     this.setState({
                         isloggedIn: true,
                     });
@@ -73,14 +69,14 @@ class Login extends Component {
     };
 
     render() {
-        if (localStorage.getItem("Inquel-Auth")) {
-            return <Redirect to="/admin" />;
+        if (localStorage.getItem("Authorization")) {
+            return <Redirect to="/hod" />;
         }
         return (
             <>
                 <Navbar className="secondary-bg py-2 px-4">
                     <Navbar.Brand>
-                        <Link to="/admin">
+                        <Link to="/">
                             <img src={logo} alt="Logo" width="50" height="50" />
                         </Link>
                     </Navbar.Brand>
@@ -96,7 +92,7 @@ class Login extends Component {
                                     <div className="card-body ">
                                         <h3 className="primary-text">LOGIN</h3>
                                         <p className="small mb-4">
-                                            Login as Admin
+                                            Login as HOD
                                         </p>
                                         <form onSubmit={this.handleSubmit}>
                                             <div className="form-group">
@@ -143,9 +139,11 @@ class Login extends Component {
                                                 </button>
                                             </div>
                                             {this.state.errortext !== "" ? (
-                                                <p className="text-danger text-center small mb-0">
-                                                    {this.state.errortext}
-                                                </p>
+                                                <div className="form-group">
+                                                    <p className="text-danger text-center small mb-0">
+                                                        {this.state.errortext}
+                                                    </p>
+                                                </div>
                                             ) : (
                                                 ""
                                             )}
@@ -167,16 +165,16 @@ class Login extends Component {
                             </div>
                             <div className="col-md-6 ">
                                 <div className="d-flex justify-content-center justify-content-md-end ">
-                                    <Link to="/admin" className="text-white">
+                                    <Link to="/" className="text-white">
                                         <i className="fab fa-facebook-f mr-4"></i>
                                     </Link>
-                                    <Link to="/admin" className="text-white">
+                                    <Link to="/" className="text-white">
                                         <i className="fab fa-twitter mr-4"></i>
                                     </Link>
-                                    <Link to="/admin" className="text-white">
+                                    <Link to="/" className="text-white">
                                         <i className="fab fa-instagram mr-4"></i>
                                     </Link>
-                                    <Link to="/admin" className="text-white">
+                                    <Link to="/" className="text-white">
                                         <i className="fab fa-linkedin-in mr-4"></i>
                                     </Link>
                                 </div>
@@ -189,4 +187,4 @@ class Login extends Component {
     }
 }
 
-export default Login;
+export default HODLogin;
