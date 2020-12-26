@@ -133,7 +133,6 @@ class CourseScorecard extends Component {
                                                 <Accordion.Collapse eventKey="0">
                                                     <Card className="pl-5">
                                                         <Card.Header
-                                                            eventKey="0"
                                                             className="bg-light my-2"
                                                         >
                                                             <div className="row">
@@ -162,7 +161,6 @@ class CourseScorecard extends Component {
                                                             </div>
                                                         </Card.Header>
                                                         <Card.Header
-                                                            eventKey="0"
                                                             className="bg-light"
                                                         >
                                                             <div className="row">

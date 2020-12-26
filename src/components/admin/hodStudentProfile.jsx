@@ -5,7 +5,7 @@ import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
 
-class StudentProfile extends Component {
+class HodStudentProfile extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -21,6 +21,7 @@ class StudentProfile extends Component {
     };
 
     componentDidMount = () => {
+        const hodId = this.props.match.params.hodId;
         const studentId = this.props.match.params.studentId;
         var url = baseUrl + adminPathUrl;
         var authToken = localStorage.getItem("Inquel-Auth");
@@ -30,7 +31,7 @@ class StudentProfile extends Component {
             "Inquel-Auth": authToken,
         };
 
-        fetch(`${url}/student/${studentId}/`, {
+        fetch(`${url}/hod/${hodId}/students/${studentId}/`, {
             headers: headers,
             method: "GET",
         })
@@ -235,4 +236,4 @@ class StudentProfile extends Component {
     }
 }
 
-export default StudentProfile;
+export default HodStudentProfile;

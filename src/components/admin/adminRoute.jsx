@@ -8,11 +8,12 @@ import HodProfile from "./hodProfile";
 import StudentProfile from "./studentProfile";
 import HodTeacherList from "./hodTeacherList";
 import HodStudentList from "./hodStudentList";
+import HodStudentProfile from "./hodStudentProfile";
 import CourseView from "./viewCourse";
 import DiscountConfiguration from "./discountConfiguration";
 import MasterData from "./masterData";
 
-import hodRoutes from '../hod/hodRoute';
+import hodRoutes from "../hod/hodRoute";
 
 const adminRoutes = (
     <>
@@ -41,21 +42,21 @@ const adminRoutes = (
         <Route
             exact
             path="/admin/hod/:hodId"
-            render={() =>
+            render={(props) =>
                 !localStorage.getItem("Inquel-Auth") ? (
                     <Redirect to="/admin/login" />
                 ) : (
-                    <HodProfile />
+                    <HodProfile {...props} />
                 )
             }
         />
         <Route
             path="/admin/student/:studentId"
-            render={() =>
+            render={(props) =>
                 !localStorage.getItem("Inquel-Auth") ? (
                     <Redirect to="/admin/login" />
                 ) : (
-                    <StudentProfile />
+                    <StudentProfile {...props} />
                 )
             }
         />
@@ -71,26 +72,36 @@ const adminRoutes = (
         />
         <Route
             path="/admin/hod/:hodId/teachers"
-            render={() =>
+            render={(props) =>
                 !localStorage.getItem("Inquel-Auth") ? (
                     <Redirect to="/admin/login" />
                 ) : (
-                    <HodTeacherList />
+                    <HodTeacherList {...props} />
                 )
             }
         />
         <Route
             path="/admin/hod/:hodId/students"
-            render={() =>
+            render={(props) =>
                 !localStorage.getItem("Inquel-Auth") ? (
                     <Redirect to="/admin/login" />
                 ) : (
-                    <HodStudentList />
+                    <HodStudentList {...props} />
                 )
             }
         />
         <Route
-        exact
+            path="/admin/hod/:hodId/student/:studentId"
+            render={(props) =>
+                !localStorage.getItem("Inquel-Auth") ? (
+                    <Redirect to="/admin/login" />
+                ) : (
+                    <HodStudentProfile {...props} />
+                )
+            }
+        />
+        <Route
+            exact
             path="/admin/course-management"
             render={() =>
                 !localStorage.getItem("Inquel-Auth") ? (

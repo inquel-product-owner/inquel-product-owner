@@ -5,15 +5,20 @@ import watermark from "../../assets/code.jpg";
 import Switch from "react-switch";
 import Header from "./navbar";
 import SideNav from "./sidenav";
-// import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
+import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
 
 class HodProfile extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            email: "",
-            username: "",
-            password: "",
+            hodItems: [],
+            permissions: [],
+            masterData: "",
+            selectedCategory: "",
+            selectedSubcategory: "",
+            selectedDiscipline: "",
+            selectedSubjects: "",
+            selectedBoard: "",
             category: "",
             subcategory: "",
             discipline: "",
@@ -38,77 +43,98 @@ class HodProfile extends Component {
         };
     }
 
-    // handleSubmit = (event) => {
-    //     event.preventDefault();
-    //     if (this.state.password.length < 12) {
-    //         this.setState({
-    //             errortext: "Password is too short",
-    //         });
-    //     } else {
-    //         var url = baseUrl + adminPathUrl;
-    //         var authToken = localStorage.getItem("Inquel-Auth");
-    //         var headers = {
-    //             Accept: "application/json",
-    //             "Content-Type": "application/json",
-    //             "Inquel-Auth": authToken,
-    //         };
-    //         var d = new Date();
-    //         var year = d.getFullYear();
-    //         var month = d.getMonth();
-    //         var day = d.getDate();
-    //         var date = `${year + parseInt(this.state.validity)}-${
-    //             month + 1
-    //         }-${day} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`;
+    handleConfiguration = () => {
+        const hodId = this.props.match.params.hodId;
+        var url = baseUrl + adminPathUrl;
+        var authToken = localStorage.getItem("Inquel-Auth");
+        var headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Inquel-Auth": authToken,
+        };
 
-    //         fetch(`${url}/create/hod/`, {
-    //             headers: headers,
-    //             method: "POST",
-    //             body: JSON.stringify({
-    //                 institute: {
-    //                     hods: {
-    //                         hod1: {
-    //                             email: this.state.email,
-    //                             username: this.state.username,
-    //                             password: this.state.password,
-    //                             category: this.state.category,
-    //                             subcategory: this.state.subcategory,
-    //                             discipline: this.state.discipline,
-    //                             board: this.state.board,
-    //                             valid_to: date,
-    //                             prog_sco_card: this.state.progressivescore,
-    //                             type_1_q: this.state.type1,
-    //                             type_2_q: this.state.type2,
-    //                             direct_q: this.state.directquestion,
-    //                             quiz: this.state.quiz,
-    //                             match: this.state.match,
-    //                             config_course: this.state.configure,
-    //                             sim_exam: this.state.simulationexam,
-    //                             lock_test: this.state.lockingoftest,
-    //                             copy_download: this.state.notesdownload,
-    //                             android_app: this.state.mobileapp,
-    //                         },
-    //                     },
-    //                 },
-    //             }),
-    //         })
-    //             .then((res) => res.json())
-    //             .then((result) => {
-    //                 console.log(result);
-    //                 if (result.sts) {
-    //                     this.setState({
-    //                         successtext: result.msg,
-    //                     });
-    //                 } else {
-    //                     this.setState({
-    //                         errortext: result.msg,
-    //                     });
-    //                 }
-    //             })
-    //             .catch((err) => {
-    //                 console.log(err);
-    //             });
-    //     }
-    // };
+        fetch(`${url}/hod/${hodId}/`, {
+            headers: headers,
+            method: "PUT",
+            body: JSON.stringify({
+                prog_sco_card: this.state.progressivescore,
+                type_1_q: this.state.type1,
+                type_2_q: this.state.type2,
+                direct_q: this.state.directquestion,
+                quiz: this.state.quiz,
+                match: this.state.match,
+                config_course: this.state.configure,
+                sim_exam: this.state.simulationexam,
+                lock_test: this.state.lockingoftest,
+                copy_download: this.state.notesdownload,
+                android_app: this.state.mobileapp,
+                summary: this.state.summary,
+            }),
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts) {
+                    this.setState({
+                        successtext: result.msg,
+                    });
+                } else {
+                    this.setState({
+                        errortext: result.msg,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    handleDetails = () => {
+        const hodId = this.props.match.params.hodId;
+        var url = baseUrl + adminPathUrl;
+        var authToken = localStorage.getItem("Inquel-Auth");
+        var headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Inquel-Auth": authToken,
+        };
+
+        var d = new Date();
+        var year = d.getFullYear();
+        var month = d.getMonth();
+        var day = d.getDate();
+        var date = `${year + parseInt(this.state.validity)}-${
+            month + 1
+        }-${day} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`;
+
+        fetch(`${url}/hod/${hodId}/`, {
+            headers: headers,
+            method: "PUT",
+            body: JSON.stringify({
+                category: this.state.category,
+                subcategory: this.state.subcategory,
+                discipline: this.state.discipline,
+                board: this.state.board,
+                valid_to: date,
+            }),
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts) {
+                    this.setState({
+                        successtext: result.msg,
+                    });
+                } else {
+                    this.setState({
+                        errortext: result.msg,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
 
     handleChange = (event) => {
         const target = event.target;
@@ -187,27 +213,62 @@ class HodProfile extends Component {
         });
     };
 
-    // componentDidMount = () => {
-    //     var url = baseUrl + adminPathUrl;
-    //     var authToken = localStorage.getItem("Inquel-Auth");
-    //     var headers = {
-    //         Accept: "application/json",
-    //         "Content-Type": "application/json",
-    //         "Inquel-Auth": authToken,
-    //     };
+    componentDidMount = () => {
+        const hodId = this.props.match.params.hodId;
+        var url = baseUrl + adminPathUrl;
+        var authToken = localStorage.getItem("Inquel-Auth");
+        var headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Inquel-Auth": authToken,
+        };
 
-    //     fetch(`${url}/hod/3/`, {
-    //         headers: headers,
-    //         method: "GET",
-    //     })
-    //         .then((res) => res.json())
-    //         .then((result) => {
-    //             console.log(result);
-    //         })
-    //         .catch((err) => {
-    //             console.log(err);
-    //         });
-    // };
+        Promise.all([
+            fetch(`${url}/hod/${hodId}/`, {
+                headers: headers,
+                method: "GET",
+            }).then((res) => res.json()),
+            fetch(`${url}/data/master/`, {
+                headers: headers,
+                method: "GET",
+            }).then((res) => res.json()),
+        ])
+            .then((result) => {
+                this.setState({
+                    hodItems: result[0],
+                    permissions: result[0].permissions[0],
+                    category: result[0].permissions[0].category,
+                    subcategory: result[0].permissions[0].subcategory,
+                    discipline: result[0].permissions[0].discipline,
+                    board: result[0].permissions[0].board,
+                    validity: result[0].permissions[0].valid_to,
+                    progressivescore: result[0].permissions[0].prog_sco_card,
+                    type1: result[0].permissions[0].type_1_q,
+                    type2: result[0].permissions[0].type_2_q,
+                    directquestion: result[0].permissions[0].direct_q,
+                    quiz: result[0].permissions[0].quiz,
+                    match: result[0].permissions[0].match,
+                    configure: result[0].permissions[0].config_course,
+                    summary: result[0].permissions[0].summary,
+                    simulationexam: result[0].permissions[0].sim_exam,
+                    lockingoftest: result[0].permissions[0].lock_test,
+                    notesdownload: result[0].permissions[0].copy_download,
+                    mobileapp: result[0].permissions[0].android_app,
+                    masterData: result[1].data.CATEGORY,
+                });
+                console.log(result);
+                console.log(this.state.masterData);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    dateValidity = (date) => {
+        var newDate = new Date(date);
+        var currentDate = new Date();
+        return newDate.getFullYear() - currentDate.getFullYear();
+    };
 
     render() {
         return (
@@ -216,7 +277,10 @@ class HodProfile extends Component {
                 <Header name="User Profiles" togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
-                <SideNav shownav={this.state.showSideNav} activeLink="profiles" />
+                <SideNav
+                    shownav={this.state.showSideNav}
+                    activeLink="profiles"
+                />
 
                 <div
                     className={`section content ${
@@ -226,32 +290,35 @@ class HodProfile extends Component {
                     <div className="container-fluid">
                         <div className="row">
                             <div className="col-md-9 mb-3 mb-md-0">
-                                {/* Back button */}
-                                {/* <div className="mb-4">
-                                    <Link to="/profiles">
-                                        <button className="btn btn-primary">
-                                            <i className="fas fa-chevron-left mr-1 fa-sm"></i>{" "}
-                                            Back
-                                        </button>
-                                    </Link>
-                                </div> */}
-
                                 {/* HOD Details */}
                                 <div className="row align-items-center mb-4">
                                     <div className="col-md-6 mb-3 mb-md-0">
                                         <div className="row align-items-center">
                                             <div className="col-3">
                                                 <img
-                                                    src={profilepic}
-                                                    alt="Profile"
+                                                    src={
+                                                        this.state.hodItems
+                                                            .profile_link !==
+                                                        null
+                                                            ? this.state
+                                                                  .hodItems
+                                                                  .profile_link
+                                                            : profilepic
+                                                    }
+                                                    alt={`${this.state.hodItems.first_name} ${this.state.hodItems.last_name}`}
                                                     className="img-fluid profile-pic"
                                                 />
                                             </div>
                                             <div className="col-9 pl-0">
                                                 <h5 className="primary-text">
-                                                    HOD Ram Profile
+                                                    {`${this.state.hodItems.first_name} ${this.state.hodItems.last_name}`}
                                                 </h5>
-                                                <p className="mb-0">001</p>
+                                                <p className="mb-0">
+                                                    {
+                                                        this.props.match.params
+                                                            .hodId
+                                                    }
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
@@ -259,7 +326,7 @@ class HodProfile extends Component {
                                         <div className="row">
                                             <div className="col-6">
                                                 <Link
-                                                    to="/admin/hod/001/students"
+                                                    to={`/admin/hod/${this.props.match.params.hodId}/students`}
                                                     style={{
                                                         textDecoration: "none",
                                                     }}
@@ -271,7 +338,7 @@ class HodProfile extends Component {
                                             </div>
                                             <div className="col-6">
                                                 <Link
-                                                    to="/admin/hod/001/teachers"
+                                                    to={`/admin/hod/${this.props.match.params.hodId}/teachers`}
                                                     style={{
                                                         textDecoration: "none",
                                                     }}
@@ -289,37 +356,55 @@ class HodProfile extends Component {
                                         <p className="mb-1 font-weight-bold">
                                             First Name
                                         </p>
-                                        <p className="mb-0">Jeevan</p>
+                                        <p className="mb-0">
+                                            {this.state.hodItems.first_name}
+                                        </p>
                                     </div>
                                     <div className="col-md-2 col-sm-4 col-6 mb-3">
                                         <p className="mb-1 font-weight-bold">
                                             Last Name
                                         </p>
-                                        <p className="mb-0">Jai</p>
+                                        <p className="mb-0">
+                                            {this.state.hodItems.last_name}
+                                        </p>
                                     </div>
                                     <div className="col-md-2 col-sm-4 col-6 mb-3">
                                         <p className="mb-1 font-weight-bold">
                                             Email ID
                                         </p>
-                                        <p className="mb-0">abc@xyz.com</p>
+                                        <p className="mb-0">
+                                            {this.state.hodItems.email}
+                                        </p>
                                     </div>
                                     <div className="col-md-2 col-sm-4 col-6 mb-3">
                                         <p className="mb-1 font-weight-bold">
                                             Mobile
                                         </p>
-                                        <p className="mb-0">1234567890</p>
+                                        <p className="mb-0">
+                                            {this.state.hodItems.phone_num}
+                                        </p>
                                     </div>
                                     <div className="col-md-2 col-sm-4 col-6 mb-3">
                                         <p className="mb-1 font-weight-bold">
                                             Office Number
                                         </p>
-                                        <p className="mb-0">1234</p>
+                                        <p className="mb-0">
+                                            {
+                                                this.state.hodItems
+                                                    .secondary_phone_num
+                                            }
+                                        </p>
                                     </div>
                                     <div className="col-md-2 col-sm-4 col-6 mb-3">
                                         <p className="mb-1 font-weight-bold">
                                             Institution
                                         </p>
-                                        <p className="mb-0">XYZ</p>
+                                        <p className="mb-0">
+                                            {
+                                                this.state.permissions
+                                                    .institution_name
+                                            }
+                                        </p>
                                     </div>
                                     <div className="col-md-2 col-sm-4 col-6 mb-3">
                                         <p className="mb-1 font-weight-bold">
@@ -505,7 +590,10 @@ class HodProfile extends Component {
                                                 </h6>
                                             </div>
                                             <div className="col-4 text-right">
-                                                <button className="btn btn-primary btn-sm">
+                                                <button
+                                                    className="btn btn-primary btn-sm"
+                                                    onClick={this.handleDetails}
+                                                >
                                                     Save
                                                 </button>
                                             </div>
@@ -527,11 +615,12 @@ class HodProfile extends Component {
                                                     value={this.state.category}
                                                     required
                                                 >
-                                                    <option value="" disabled>
-                                                        Select a category
-                                                    </option>
-                                                    <option value="DEG">
-                                                        Degree
+                                                    <option
+                                                        value={
+                                                            this.state.category
+                                                        }
+                                                    >
+                                                        {this.state.category}
                                                     </option>
                                                 </select>
                                             </div>
@@ -553,11 +642,13 @@ class HodProfile extends Component {
                                                     }
                                                     required
                                                 >
-                                                    <option value="" disabled>
-                                                        Select a sub-category
-                                                    </option>
-                                                    <option value="sch">
-                                                        SCH
+                                                    <option
+                                                        value={
+                                                            this.state
+                                                                .subcategory
+                                                        }
+                                                    >
+                                                        {this.state.subcategory}
                                                     </option>
                                                 </select>
                                             </div>
@@ -579,11 +670,13 @@ class HodProfile extends Component {
                                                     }
                                                     required
                                                 >
-                                                    <option value="" disabled>
-                                                        Select a discipline
-                                                    </option>
-                                                    <option value="none">
-                                                        None
+                                                    <option
+                                                        value={
+                                                            this.state
+                                                                .discipline
+                                                        }
+                                                    >
+                                                        {this.state.discipline}
                                                     </option>
                                                 </select>
                                             </div>
@@ -603,11 +696,12 @@ class HodProfile extends Component {
                                                     value={this.state.subject}
                                                     required
                                                 >
-                                                    <option value="" disabled>
-                                                        Select a subject
-                                                    </option>
-                                                    <option value="maths">
-                                                        Maths
+                                                    <option
+                                                        value={
+                                                            this.state.subject
+                                                        }
+                                                    >
+                                                        {this.state.subject}
                                                     </option>
                                                 </select>
                                             </div>
@@ -627,12 +721,10 @@ class HodProfile extends Component {
                                                     value={this.state.board}
                                                     required
                                                 >
-                                                    <option value="" disabled>
-                                                        Select a Board /
-                                                        University
-                                                    </option>
-                                                    <option value="cbse">
-                                                        CBSE
+                                                    <option
+                                                        value={this.state.board}
+                                                    >
+                                                        {this.state.board}
                                                     </option>
                                                 </select>
                                             </div>
@@ -652,11 +744,14 @@ class HodProfile extends Component {
                                                     value={this.state.validity}
                                                     required
                                                 >
-                                                    <option value="" disabled>
-                                                        Select a validity
-                                                    </option>
-                                                    <option value="1">
-                                                        1 year
+                                                    <option
+                                                        value={this.dateValidity(
+                                                            this.state.validity
+                                                        )}
+                                                    >
+                                                        {`${this.dateValidity(
+                                                            this.state.validity
+                                                        )} Year`}
                                                     </option>
                                                 </select>
                                             </div>
@@ -675,7 +770,12 @@ class HodProfile extends Component {
                                                 </h6>
                                             </div>
                                             <div className="col-4 text-right">
-                                                <button className="btn btn-primary btn-sm">
+                                                <button
+                                                    className="btn btn-primary btn-sm"
+                                                    onClick={
+                                                        this.handleConfiguration
+                                                    }
+                                                >
                                                     Save
                                                 </button>
                                             </div>

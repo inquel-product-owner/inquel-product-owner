@@ -16,7 +16,7 @@ class SideNav extends Component {
                         } btn-sm mb-3`}
                     >
                         <i
-                            class="fas fa-tachometer-alt"
+                            className="fas fa-tachometer-alt"
                             style={{ marginLeft: "-1.5px" }}
                         ></i>
                     </button>
@@ -28,7 +28,7 @@ class SideNav extends Component {
                         } btn-sm mb-3`}
                     >
                         <i
-                            class="fas fa-users"
+                            className="fas fa-users"
                             style={{ marginLeft: "-1.5px" }}
                         ></i>
                     </button>
@@ -40,7 +40,7 @@ class SideNav extends Component {
                         } btn-sm mb-3`}
                     >
                         <i
-                            class="fas fa-graduation-cap"
+                            className="fas fa-graduation-cap"
                             style={{ marginLeft: "-1.5px" }}
                         ></i>
                     </button>

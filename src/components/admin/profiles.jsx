@@ -82,6 +82,7 @@ class HodModal extends Component {
                                 quiz: this.state.quiz,
                                 match: this.state.match,
                                 config_course: this.state.configure,
+                                summary: this.state.summary,
                                 sim_exam: this.state.simulationexam,
                                 lock_test: this.state.lockingoftest,
                                 copy_download: this.state.notesdownload,
@@ -730,6 +731,12 @@ class Profiles extends Component {
         this.setState({ activeTab: key });
     };
 
+    dateConversion = (date) => {
+        var newDate = new Date(date).toLocaleDateString();
+        var datearray = newDate.split("/");
+        return datearray[1] + "/" + datearray[0] + "/" + datearray[2];
+    };
+
     componentDidMount = () => {
         var url = baseUrl + adminPathUrl;
         var authToken = localStorage.getItem("Inquel-Auth");
@@ -902,9 +909,9 @@ class Profiles extends Component {
                                                                         }
                                                                     </td>
                                                                     <td>
-                                                                        {new Date(
+                                                                        {this.dateConversion(
                                                                             list.date_joined
-                                                                        ).toLocaleDateString()}
+                                                                        )}
                                                                     </td>
                                                                     <td>
                                                                         <Link
@@ -996,9 +1003,9 @@ class Profiles extends Component {
                                                                         }
                                                                     </td>
                                                                     <td>
-                                                                        {new Date(
+                                                                        {this.dateConversion(
                                                                             list.date_joined
-                                                                        ).toLocaleDateString()}
+                                                                        )}
                                                                     </td>
                                                                     <td>
                                                                         <Link
