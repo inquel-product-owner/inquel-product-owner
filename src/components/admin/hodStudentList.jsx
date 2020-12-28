@@ -65,7 +65,7 @@ class HodStudentList extends Component {
                 headers: headers,
                 method: "GET",
             }).then((res) => res.json()),
-            fetch(`${url}/hod/${hodId}/students/`, {
+            fetch(`${url}/hod/${hodId}/student/`, {
                 headers: headers,
                 method: "GET",
             }).then((res) => res.json()),

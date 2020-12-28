@@ -37,7 +37,7 @@ class StudentProfile extends Component {
             .then((res) => res.json())
             .then((result) => {
                 this.setState({
-                    studentItems: result,
+                    studentItems: result.data,
                 });
                 console.log(result);
             })
@@ -70,13 +70,19 @@ class StudentProfile extends Component {
                                 <div className="row align-items-center">
                                     <div className="col-md-2 col-3">
                                         <img
-                                            src={profilepic}
-                                            alt="Profile"
+                                            src={
+                                                this.state.studentItems
+                                                    .profile_link !== null
+                                                    ? this.state.studentItems
+                                                          .profile_link
+                                                    : profilepic
+                                            }
+                                            alt={`${this.state.studentItems.first_name} ${this.state.studentItems.last_name}`}
                                             className="img-fluid profile-pic"
                                         />
                                     </div>
                                     <div className="col-md-10 col-9 pl-0">
-                                        <h5 className="primary-text">Jeevan</h5>
+                                        <h5 className="primary-text">{this.state.studentItems.first_name}</h5>
                                     </div>
                                 </div>
                             </div>
@@ -86,23 +92,31 @@ class StudentProfile extends Component {
                                 <p className="mb-1 font-weight-bold">
                                     First Name
                                 </p>
-                                <p className="mb-0">Jeevan</p>
+                                <p className="mb-0">
+                                    {this.state.studentItems.first_name}
+                                </p>
                             </div>
                             <div className="col-md-2 col-sm-4 col-6 mb-3">
                                 <p className="mb-1 font-weight-bold">
                                     Last Name
                                 </p>
-                                <p className="mb-0">Jai</p>
+                                <p className="mb-0">
+                                    {this.state.studentItems.last_name}
+                                </p>
                             </div>
                             <div className="col-md-2 col-sm-4 col-6 mb-3">
                                 <p className="mb-1 font-weight-bold">
                                     Email ID
                                 </p>
-                                <p className="mb-0">abc@xyz.com</p>
+                                <p className="mb-0">
+                                    {this.state.studentItems.email}
+                                </p>
                             </div>
                             <div className="col-md-2 col-sm-4 col-6 mb-3">
                                 <p className="mb-1 font-weight-bold">Mobile</p>
-                                <p className="mb-0">1234567890</p>
+                                <p className="mb-0">
+                                    {this.state.studentItems.phone_num}
+                                </p>
                             </div>
                             <div className="col-md-2 col-sm-4 col-6 mb-3">
                                 <p className="mb-1 font-weight-bold">

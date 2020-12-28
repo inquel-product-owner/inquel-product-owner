@@ -49,7 +49,7 @@ class HodTeacherList extends Component {
                 headers: headers,
                 method: "GET",
             }).then((res) => res.json()),
-            fetch(`${url}/hod/${hodId}/teachers/`, {
+            fetch(`${url}/hod/${hodId}/teacher/`, {
                 headers: headers,
                 method: "GET",
             }).then((res) => res.json()),
