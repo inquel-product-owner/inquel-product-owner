@@ -1,12 +1,15 @@
 import React from "react";
-import Main from "./components/admin/mainComponent";
 import "./App.css";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Switch, Redirect } from "react-router-dom";
+import adminRoutes from "./components/admin/adminRoute";
 
 function App() {
     return (
         <BrowserRouter>
-            <Main />
+            <Switch>
+                {adminRoutes}
+                <Redirect to="/" />
+            </Switch>
         </BrowserRouter>
     );
 }
