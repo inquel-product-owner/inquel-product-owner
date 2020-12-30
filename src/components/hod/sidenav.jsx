@@ -18,10 +18,10 @@ class SideNav extends Component {
                             ></i>
                         </button>
                     </Link>
-                    <Link to="/">
+                    <Link to="/hod/profile">
                         <button className="btn sidebar-btn btn-sm mb-3">
                             <i
-                                className="far fa-lightbulb"
+                                className="fas fa-users"
                                 style={{ marginLeft: "-1.5px" }}
                             ></i>
                         </button>

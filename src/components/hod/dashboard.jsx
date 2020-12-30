@@ -220,7 +220,7 @@ class Dashboard extends Component {
                                         <div className="row">
                                             <div className="col-md-4 mb-3">
                                                 <Link
-                                                    to="/hod"
+                                                    to="/hod/subject/001/review"
                                                     style={{
                                                         textDecoration: "none",
                                                     }}
@@ -245,7 +245,7 @@ class Dashboard extends Component {
                                             </div>
                                             <div className="col-md-4 mb-3">
                                                 <Link
-                                                    to="/hod"
+                                                    to="/hod/subject/001/review"
                                                     style={{
                                                         textDecoration: "none",
                                                     }}
@@ -270,7 +270,7 @@ class Dashboard extends Component {
                                             </div>
                                             <div className="col-md-4 mb-3">
                                                 <Link
-                                                    to="/hod"
+                                                    to="/hod/subject/001/review"
                                                     style={{
                                                         textDecoration: "none",
                                                     }}
