@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Redirect } from "react-router-dom";
+import { Route, Redirect, Switch } from "react-router-dom";
 
 import Dashboard from "./dashboard";
 import Login from "./login";
@@ -16,7 +16,7 @@ import MasterData from "./masterData";
 import hodRoutes from "../hod/hodRoute";
 
 const adminRoutes = (
-    <>
+    <Switch>
         <Route
             exact
             path="/admin"
@@ -122,7 +122,8 @@ const adminRoutes = (
             }
         />
         {hodRoutes}
-    </>
+        <Redirect to="/admin/login" />
+    </Switch>
 );
 
 export default adminRoutes;

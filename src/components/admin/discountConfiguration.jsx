@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet";
 
 class DiscountConfiguration extends Component {
     constructor(props) {
@@ -20,8 +21,14 @@ class DiscountConfiguration extends Component {
     render() {
         return (
             <div className="wrapper">
+                <Helmet>
+                    <title>Admin Course | IQLabs</title>
+                </Helmet>
                 {/* Navbar */}
-                <Header name="Discount Configuration" togglenav={this.toggleSideNav} />
+                <Header
+                    name="Discount Configuration"
+                    togglenav={this.toggleSideNav}
+                />
 
                 {/* Sidebar */}
                 <SideNav shownav={this.state.showSideNav} activeLink="course" />

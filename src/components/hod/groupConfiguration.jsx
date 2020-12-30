@@ -123,8 +123,22 @@ class GroupConfiguration extends Component {
                                             <td>Group A</td>
                                             <td>dd/mm/yyyy</td>
                                             <td>dd/mm/yyyy</td>
-                                            <td>12</td>
-                                            <td>56</td>
+                                            <td>
+                                                12{" "}
+                                                <Link to="/hod/group/001/teacher">
+                                                    <button className="btn btn-light btn-sm ml-1">
+                                                        <i className="fas fa-eye fa-sm"></i>
+                                                    </button>
+                                                </Link>
+                                            </td>
+                                            <td>
+                                                56{" "}
+                                                <Link to="/hod/group/001/student">
+                                                    <button className="btn btn-light btn-sm ml-1">
+                                                        <i className="fas fa-eye fa-sm"></i>
+                                                    </button>
+                                                </Link>
+                                            </td>
                                             <td className="text-center">
                                                 <Link to="/hod/group/001/details">
                                                     <button className="btn btn-sm btn-light shadow-sm">
@@ -139,8 +153,22 @@ class GroupConfiguration extends Component {
                                             <td>Group B</td>
                                             <td>dd/mm/yyyy</td>
                                             <td>dd/mm/yyyy</td>
-                                            <td>12</td>
-                                            <td>56</td>
+                                            <td>
+                                                12{" "}
+                                                <Link to="/hod/group/002/teacher">
+                                                    <button className="btn btn-light btn-sm ml-1">
+                                                        <i className="fas fa-eye fa-sm"></i>
+                                                    </button>
+                                                </Link>
+                                            </td>
+                                            <td>
+                                                56{" "}
+                                                <Link to="/hod/group/002/student">
+                                                    <button className="btn btn-light btn-sm ml-1">
+                                                        <i className="fas fa-eye fa-sm"></i>
+                                                    </button>
+                                                </Link>
+                                            </td>
                                             <td className="text-center">
                                                 <Link to="/hod/group/002/details">
                                                     <button className="btn btn-sm btn-light shadow-sm">
@@ -155,10 +183,24 @@ class GroupConfiguration extends Component {
                                             <td>Group C</td>
                                             <td>dd/mm/yyyy</td>
                                             <td>dd/mm/yyyy</td>
-                                            <td>12</td>
-                                            <td>56</td>
+                                            <td>
+                                                12{" "}
+                                                <Link to="/hod/group/003/teacher">
+                                                    <button className="btn btn-light btn-sm ml-1">
+                                                        <i className="fas fa-eye fa-sm"></i>
+                                                    </button>
+                                                </Link>
+                                            </td>
+                                            <td>
+                                                56{" "}
+                                                <Link to="/hod/group/003/student">
+                                                    <button className="btn btn-light btn-sm ml-1">
+                                                        <i className="fas fa-eye fa-sm"></i>
+                                                    </button>
+                                                </Link>
+                                            </td>
                                             <td className="text-center">
-                                                <Link to="/hod/group/002/details">
+                                                <Link to="/hod/group/003/details">
                                                     <button className="btn btn-sm btn-light shadow-sm">
                                                         <i className="fas fa-eye"></i>
                                                     </button>

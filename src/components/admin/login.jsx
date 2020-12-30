@@ -3,6 +3,7 @@ import { Navbar } from "react-bootstrap";
 import logo from "../../assets/IQ_Labs_V1.png";
 import { Link, Redirect } from "react-router-dom";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl.js";
+import { Helmet } from "react-helmet";
 
 class Login extends Component {
     constructor(props) {
@@ -78,6 +79,9 @@ class Login extends Component {
         }
         return (
             <>
+                <Helmet>
+                    <title>Admin Login | IQLabs</title>
+                </Helmet>
                 <Navbar className="secondary-bg py-2 px-4">
                     <Navbar.Brand>
                         <Link to="/admin">

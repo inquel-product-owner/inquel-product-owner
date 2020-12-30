@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet";
+import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
 
 class MasterData extends Component {
     constructor(props) {
@@ -11,6 +13,13 @@ class MasterData extends Component {
             activeType: "category",
             activeCategory: "",
             activeSubcategory: "",
+            category: [],
+            subcategory: [],
+            discipline: [],
+            levels: [],
+            subjects: [],
+            board: [],
+            type: [],
         };
     }
 
@@ -28,24 +37,117 @@ class MasterData extends Component {
         });
     };
 
+    componentDidMount = () => {
+        var url = baseUrl + adminPathUrl;
+        var authToken = localStorage.getItem("Inquel-Auth");
+        var headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Inquel-Auth": authToken,
+        };
+
+        fetch(`${url}/data/filter/`, {
+            headers: headers,
+            method: "GET",
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                this.setState({
+                    category: result.data.CATEGORY,
+                    board: result.data.BOARD,
+                    type: result.data.TYPE,
+                    activeCategory: "",
+                    activeSubcategory: "",
+                });
+                console.log(result);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     handleCategory = (event) => {
         this.setState({
             activeCategory: event.target.value,
         });
+        this.setState({
+            subcategory: [],
+            activeSubcategory: "",
+        });
+
+        var url = baseUrl + adminPathUrl;
+        var authToken = localStorage.getItem("Inquel-Auth");
+        var headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Inquel-Auth": authToken,
+        };
+
+        if (event.target.value !== "") {
+            fetch(`${url}/data/filter/?category=${event.target.value}`, {
+                headers: headers,
+                method: "GET",
+            })
+                .then((res) => res.json())
+                .then((result) => {
+                    this.setState({
+                        subcategory: result.data.sub_category,
+                    });
+                    console.log(result);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        }
     };
 
     handleSubcategory = (event) => {
         this.setState({
             activeSubcategory: event.target.value,
         });
+
+        var url = baseUrl + adminPathUrl;
+        var authToken = localStorage.getItem("Inquel-Auth");
+        var headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Inquel-Auth": authToken,
+        };
+
+        if (event.target.value !== "") {
+            fetch(
+                `${url}/data/filter/?category=${this.state.activeCategory}&sub_category=${event.target.value}`,
+                {
+                    headers: headers,
+                    method: "GET",
+                }
+            )
+                .then((res) => res.json())
+                .then((result) => {
+                    this.setState({
+                        discipline: result.data.DISCIPLINE,
+                        levels: result.data.LEVELS,
+                        subjects: result.data.SUBJECTS,
+                    });
+                    console.log(result);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        }
     };
 
     render() {
         return (
             <div className="wrapper">
-
+                <Helmet>
+                    <title>Admin Course | IQLabs</title>
+                </Helmet>
                 {/* Navbar */}
-                <Header name="Course Master Data" togglenav={this.toggleSideNav} />
+                <Header
+                    name="Course Master Data"
+                    togglenav={this.toggleSideNav}
+                />
 
                 {/* Sidebar */}
                 <SideNav shownav={this.state.showSideNav} activeLink="course" />
@@ -56,7 +158,6 @@ class MasterData extends Component {
                     }`}
                 >
                     <div className="container-fluid">
-
                         <div className="d-flex flex-wrap mb-4">
                             <Link to="/admin/course-management">
                                 <button className="btn btn-outline-secondary btn-sm mr-1">
@@ -108,26 +209,22 @@ class MasterData extends Component {
                                                     }
                                                 >
                                                     <option value="">
-                                                        Select category
+                                                        Select Category
                                                     </option>
-                                                    <option value="degree">
-                                                        Degree
-                                                    </option>
-                                                    <option value="competitive">
-                                                        Competitive
-                                                    </option>
-                                                    <option value="exam">
-                                                        Exam
-                                                    </option>
-                                                    <option value="school">
-                                                        School
-                                                    </option>
-                                                    <option value="puc">
-                                                        PUC
-                                                    </option>
-                                                    <option value="degree">
-                                                        Degree
-                                                    </option>
+                                                    {this.state.category.map(
+                                                        (list, index) => {
+                                                            return (
+                                                                <option
+                                                                    key={index}
+                                                                    value={
+                                                                        list.code
+                                                                    }
+                                                                >
+                                                                    {list.title}
+                                                                </option>
+                                                            );
+                                                        }
+                                                    )}
                                                 </select>
                                                 <button className="btn btn-light btn-sm btn-block mb-3">
                                                     Add +
@@ -146,18 +243,20 @@ class MasterData extends Component {
                                                     <option value="">
                                                         Select Sub category
                                                     </option>
-                                                    <option value="engineering">
-                                                        Engineering
-                                                    </option>
-                                                    <option value="medical">
-                                                        Medical
-                                                    </option>
-                                                    <option value="bsc">
-                                                        Bsc
-                                                    </option>
-                                                    <option value="bcom">
-                                                        Bcom
-                                                    </option>
+                                                    {this.state.subcategory.map(
+                                                        (list, index) => {
+                                                            return (
+                                                                <option
+                                                                    key={index}
+                                                                    value={
+                                                                        list.code
+                                                                    }
+                                                                >
+                                                                    {list.title}
+                                                                </option>
+                                                            );
+                                                        }
+                                                    )}
                                                 </select>
                                                 <button className="btn btn-light btn-sm btn-block">
                                                     Add +
@@ -182,23 +281,28 @@ class MasterData extends Component {
                                                     Discipline
                                                 </div>
                                                 <div className="card-body">
-                                                    <p className="mb-2">
-                                                        Electronics and
-                                                        communication
-                                                    </p>
-                                                    <div className="dropdown-divider"></div>
-                                                    <p className="mb-2">
-                                                        Computer science
-                                                    </p>
-                                                    <div className="dropdown-divider"></div>
-                                                    <p className="mb-2">
-                                                        Info science
-                                                    </p>
-                                                    <div className="dropdown-divider"></div>
-                                                    <p className="mb-2">
-                                                        Mechanical
-                                                    </p>
-                                                    <div className="dropdown-divider"></div>
+                                                    {this.state.discipline
+                                                        .length !== 0 ? (
+                                                        Object.values(
+                                                            this.state
+                                                                .discipline
+                                                        ).map((list, index) => {
+                                                            return (
+                                                                <div
+                                                                    key={index}
+                                                                >
+                                                                    <p className="mb-2">
+                                                                        {list}
+                                                                    </p>
+                                                                    <div className="dropdown-divider"></div>
+                                                                </div>
+                                                            );
+                                                        })
+                                                    ) : (
+                                                        <p>
+                                                            Data not available
+                                                        </p>
+                                                    )}
                                                     <button className="btn btn-light btn-sm btn-block">
                                                         Add +
                                                     </button>
@@ -211,22 +315,27 @@ class MasterData extends Component {
                                                     Level
                                                 </div>
                                                 <div className="card-body">
-                                                    <p className="mb-2">
-                                                        E&C 1st semester
-                                                    </p>
-                                                    <div className="dropdown-divider"></div>
-                                                    <p className="mb-2">
-                                                        E&C 2nd semester
-                                                    </p>
-                                                    <div className="dropdown-divider"></div>
-                                                    <p className="mb-2">
-                                                        E&C 3rd semester
-                                                    </p>
-                                                    <div className="dropdown-divider"></div>
-                                                    <p className="mb-2">
-                                                        E&C 4th semester
-                                                    </p>
-                                                    <div className="dropdown-divider"></div>
+                                                    {this.state.levels
+                                                        .length !== 0 ? (
+                                                        Object.values(
+                                                            this.state.levels
+                                                        ).map((list, index) => {
+                                                            return (
+                                                                <div
+                                                                    key={index}
+                                                                >
+                                                                    <p className="mb-2">
+                                                                        {list}
+                                                                    </p>
+                                                                    <div className="dropdown-divider"></div>
+                                                                </div>
+                                                            );
+                                                        })
+                                                    ) : (
+                                                        <p>
+                                                            Data not available
+                                                        </p>
+                                                    )}
                                                     <button className="btn btn-light btn-sm btn-block">
                                                         Add +
                                                     </button>
@@ -239,23 +348,27 @@ class MasterData extends Component {
                                                     Subject
                                                 </div>
                                                 <div className="card-body">
-                                                    <p className="mb-2">
-                                                        Digital signal
-                                                        processing
-                                                    </p>
-                                                    <div className="dropdown-divider"></div>
-                                                    <p className="mb-2">
-                                                        Basic Java
-                                                    </p>
-                                                    <div className="dropdown-divider"></div>
-                                                    <p className="mb-2">
-                                                        C, C++
-                                                    </p>
-                                                    <div className="dropdown-divider"></div>
-                                                    <p className="mb-2">
-                                                        Strength of materials
-                                                    </p>
-                                                    <div className="dropdown-divider"></div>
+                                                    {this.state.subjects
+                                                        .length !== 0 ? (
+                                                        Object.values(
+                                                            this.state.subjects
+                                                        ).map((list, index) => {
+                                                            return (
+                                                                <div
+                                                                    key={index}
+                                                                >
+                                                                    <p className="mb-2">
+                                                                        {list}
+                                                                    </p>
+                                                                    <div className="dropdown-divider"></div>
+                                                                </div>
+                                                            );
+                                                        })
+                                                    ) : (
+                                                        <p>
+                                                            Data not available
+                                                        </p>
+                                                    )}
                                                     <button className="btn btn-light btn-sm btn-block">
                                                         Add +
                                                     </button>
@@ -276,25 +389,31 @@ class MasterData extends Component {
                                                     Board / University
                                                 </div>
                                                 <div className="card-body">
-                                                    <p className="mb-2">
-                                                        Central board of
-                                                        secondary education
-                                                    </p>
-                                                    <div className="dropdown-divider"></div>
-                                                    <p className="mb-2">
-                                                        Indian certificate of
-                                                        secondary education
-                                                    </p>
-                                                    <div className="dropdown-divider"></div>
-                                                    <p className="mb-2">
-                                                        Karnataka secondary
-                                                        education board
-                                                    </p>
-                                                    <div className="dropdown-divider"></div>
-                                                    <p className="mb-2">
-                                                        Kuvempu university
-                                                    </p>
-                                                    <div className="dropdown-divider"></div>
+                                                    {this.state.board.length !==
+                                                    0 ? (
+                                                        this.state.board.map(
+                                                            (list, index) => {
+                                                                return (
+                                                                    <div
+                                                                        key={
+                                                                            index
+                                                                        }
+                                                                    >
+                                                                        <p className="mb-2">
+                                                                            {
+                                                                                list.title
+                                                                            }
+                                                                        </p>
+                                                                        <div className="dropdown-divider"></div>
+                                                                    </div>
+                                                                );
+                                                            }
+                                                        )
+                                                    ) : (
+                                                        <p>
+                                                            Data not available
+                                                        </p>
+                                                    )}
                                                     <button className="btn btn-light btn-sm btn-block">
                                                         Add +
                                                     </button>
@@ -315,22 +434,31 @@ class MasterData extends Component {
                                                     Course
                                                 </div>
                                                 <div className="card-body">
-                                                    <p className="mb-2">
-                                                        Premium
-                                                    </p>
-                                                    <div className="dropdown-divider"></div>
-                                                    <p className="mb-2">
-                                                        Complete reference
-                                                    </p>
-                                                    <div className="dropdown-divider"></div>
-                                                    <p className="mb-2">
-                                                        limited addition
-                                                    </p>
-                                                    <div className="dropdown-divider"></div>
-                                                    <p className="mb-2">
-                                                        Quiz and simulation exam
-                                                    </p>
-                                                    <div className="dropdown-divider"></div>
+                                                    {this.state.type.length !==
+                                                    0 ? (
+                                                        this.state.type.map(
+                                                            (list, index) => {
+                                                                return (
+                                                                    <div
+                                                                        key={
+                                                                            index
+                                                                        }
+                                                                    >
+                                                                        <p className="mb-2">
+                                                                            {
+                                                                                list.title
+                                                                            }
+                                                                        </p>
+                                                                        <div className="dropdown-divider"></div>
+                                                                    </div>
+                                                                );
+                                                            }
+                                                        )
+                                                    ) : (
+                                                        <p>
+                                                            Data not available
+                                                        </p>
+                                                    )}
                                                     <button className="btn btn-light btn-sm btn-block">
                                                         Add +
                                                     </button>

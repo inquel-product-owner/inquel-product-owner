@@ -91,12 +91,12 @@ class Group extends Component {
                                         <h4>Group A</h4>
                                     </div>
                                     <div className="col-9 text-right">
-                                        <Link to="/hod/group/001/students">
+                                        <Link to="/hod/group/001/student">
                                             <button className="btn btn-primary btn-sm mr-2">
                                                 Student
                                             </button>
                                         </Link>
-                                        <Link to="/hod/group/001/teachers">
+                                        <Link to="/hod/group/001/teacher">
                                             <button className="btn btn-primary btn-sm mr-2">
                                                 Teacher
                                             </button>
@@ -143,7 +143,7 @@ class Group extends Component {
                                                 <div className="row">
                                                     <div className="col-md-4 mb-3">
                                                         <Link
-                                                            to="/hod"
+                                                            to="/hod/subject/001/review"
                                                             style={{
                                                                 textDecoration:
                                                                     "none",
@@ -172,7 +172,7 @@ class Group extends Component {
                                                     </div>
                                                     <div className="col-md-4 mb-3">
                                                         <Link
-                                                            to="/hod"
+                                                            to="/hod/subject/001/review"
                                                             style={{
                                                                 textDecoration:
                                                                     "none",
@@ -200,7 +200,7 @@ class Group extends Component {
                                                     </div>
                                                     <div className="col-md-4 mb-3">
                                                         <Link
-                                                            to="/hod"
+                                                            to="/hod/subject/001/review"
                                                             style={{
                                                                 textDecoration:
                                                                     "none",
