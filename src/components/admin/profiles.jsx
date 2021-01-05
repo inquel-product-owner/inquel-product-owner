@@ -6,7 +6,7 @@ import { Tabs, Tab,Modal } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import Switch from "react-switch";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl.js";
-import { Helmet } from "react-helmet";
+import HODTable from '../table/hodTable';
 
 class HodModal extends Component {
     constructor(props) {
@@ -902,6 +902,8 @@ class Profiles extends Component {
     };
 
     componentDidMount = () => {
+        document.title = "Admin Profile | IQLabs";
+
         var url = baseUrl + adminPathUrl;
         var authToken = localStorage.getItem("Inquel-Auth");
         var headers = {
@@ -933,12 +935,13 @@ class Profiles extends Component {
             });
     };
 
+    triggerDelete=()=>{
+        this.refs.child.showConsole();
+    }
+
     render() {
         return (
             <div className="wrapper">
-                <Helmet>
-                    <title>Admin Profile | IQLabs</title>
-                </Helmet>
                 {/* Navbar */}
                 <Header name="User Profiles" togglenav={this.toggleSideNav} />
 
@@ -981,7 +984,7 @@ class Profiles extends Component {
                             ) : (
                                 ""
                             )}
-                            <button className="btn btn-primary mr-md-3 mr-1">
+                            <button className="btn btn-primary mr-md-3 mr-1" onClick={this.triggerDelete}>
                                 Delete
                             </button>
                             <button className="btn btn-primary mr-md-3 mr-1">
@@ -997,131 +1000,7 @@ class Profiles extends Component {
                         >
                             <Tab eventKey="hod" title="HOD">
                                 <div className="card shadow-sm">
-                                    <div className="table-responsive">
-                                        <table className="table">
-                                            <thead className="primary-text">
-                                                <tr>
-                                                    <th scope="col"></th>
-                                                    <th scope="col">Name</th>
-                                                    <th scope="col">
-                                                        Username
-                                                    </th>
-                                                    <th scope="col">
-                                                        Category
-                                                    </th>
-                                                    <th scope="col">
-                                                        Sub Category
-                                                    </th>
-                                                    <th scope="col">
-                                                        Discipline
-                                                    </th>
-                                                    <th scope="col">
-                                                        Board University
-                                                    </th>
-                                                    <th scope="col">
-                                                        Registered On
-                                                    </th>
-                                                    <th scope="col">Status</th>
-                                                    <th scope="col"></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {this.state.isLoaded ? (
-                                                    this.state.hodItems
-                                                        .length !== 0 ? (
-                                                        this.state.hodItems.map(
-                                                            (list, index) => {
-                                                                return (
-                                                                    <tr
-                                                                        key={
-                                                                            index
-                                                                        }
-                                                                    >
-                                                                        <td className="text-center">
-                                                                            <input
-                                                                                type="checkbox"
-                                                                                name="enable"
-                                                                                value={
-                                                                                    list.id
-                                                                                }
-                                                                            />
-                                                                        </td>
-                                                                        <td>
-                                                                            <img
-                                                                                src={
-                                                                                    list.profile_link !==
-                                                                                    null
-                                                                                        ? list.profile_link
-                                                                                        : userimage
-                                                                                }
-                                                                                alt="User profile pic"
-                                                                                width="20"
-                                                                            />{" "}
-                                                                            {`${list.first_name} ${list.last_name}`}
-                                                                        </td>
-                                                                        <td>
-                                                                            {
-                                                                                list.username
-                                                                            }
-                                                                        </td>
-                                                                        <td>
-                                                                            {
-                                                                                list.category
-                                                                            }
-                                                                        </td>
-                                                                        <td>
-                                                                            {
-                                                                                list.sub_category
-                                                                            }
-                                                                        </td>
-                                                                        <td>
-                                                                            {
-                                                                                list.discipline
-                                                                            }
-                                                                        </td>
-                                                                        <td>
-                                                                            {
-                                                                                list.board
-                                                                            }
-                                                                        </td>
-                                                                        <td>
-                                                                            {this.dateConversion(
-                                                                                list.date_joined
-                                                                            )}
-                                                                        </td>
-                                                                        <td>
-                                                                            {list.is_active ? (
-                                                                                <span className="text-success">
-                                                                                    Active
-                                                                                </span>
-                                                                            ) : (
-                                                                                <span className="text-danger">
-                                                                                    Not active
-                                                                                </span>
-                                                                            )}
-                                                                        </td>
-                                                                        <td>
-                                                                            <Link
-                                                                                to={`/admin/hod/${list.id}`}
-                                                                            >
-                                                                                <button className="btn btn-sm btn-primary">
-                                                                                    View
-                                                                                </button>
-                                                                            </Link>
-                                                                        </td>
-                                                                    </tr>
-                                                                );
-                                                            }
-                                                        )
-                                                    ) : (
-                                                        <EmptyData />
-                                                    )
-                                                ) : (
-                                                    <Loading />
-                                                )}
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                    <HODTable hodItems={this.state.hodItems} ref="child"/>
                                 </div>
                             </Tab>
                             <Tab eventKey="student" title="Student">

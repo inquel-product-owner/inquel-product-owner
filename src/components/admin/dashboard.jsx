@@ -5,7 +5,6 @@ import { Tabs, Tab, Modal } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import Switch from "react-switch";
 import courseimg from "../../assets/code.jpg";
-import { Helmet } from "react-helmet";
 
 class SubscriptionModal extends Component {
     render() {
@@ -936,12 +935,13 @@ class Dashboard extends Component {
         });
     };
 
+    componentDidMount = () => {
+        document.title = "Admin Dashboard | IQLabs";
+    };
+
     render() {
         return (
             <div className="wrapper">
-                <Helmet>
-                    <title>Admin Dashboard | IQLabs</title>
-                </Helmet>
                 {/* Navbar */}
                 <Header name="Admin" togglenav={this.toggleSideNav} />
 

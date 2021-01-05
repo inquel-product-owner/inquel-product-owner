@@ -1,7 +1,8 @@
 import React, { Component } from "react";
-import { Navbar } from "react-bootstrap";
+import { Navbar, Alert } from "react-bootstrap";
 import logo from "../../assets/IQ_Labs_V1.png";
 import { Link, Redirect } from "react-router-dom";
+import { baseUrl, accountsUrl } from "../../shared/baseUrl.js";
 
 class HODLogin extends Component {
     constructor(props) {
@@ -10,6 +11,7 @@ class HODLogin extends Component {
             username: "",
             password: "",
             errortext: "",
+            showErrorAlert: false,
             isloggedIn: "false",
             items: [],
         };
@@ -24,8 +26,11 @@ class HODLogin extends Component {
     };
 
     handleSubmit = (event) => {
+        this.setState({
+            errortext: "",
+        });
         event.preventDefault();
-        var url = "http://3.16.43.25:8000/52fd_1f4a/api/v1/admin/login/";
+        var url = `${baseUrl}${accountsUrl}/login/`;
         console.log(
             "username: " +
                 this.state.username +
@@ -52,7 +57,11 @@ class HODLogin extends Component {
                 console.log(result);
 
                 if (this.state.items.sts) {
-                    localStorage.setItem("Authorization", `Token ${this.state.items.token}`);
+                    localStorage.setItem(
+                        "Authorization",
+                        `Token ${this.state.items.token}`
+                    );
+                    localStorage.setItem("is_hod", this.state.items.is_hod);
                     this.setState({
                         isloggedIn: true,
                     });
@@ -60,6 +69,7 @@ class HODLogin extends Component {
                 if (!this.state.items.sts && this.state.items.msg) {
                     this.setState({
                         errortext: this.state.items.msg,
+                        showErrorAlert: true,
                     });
                 }
             })
@@ -69,7 +79,10 @@ class HODLogin extends Component {
     };
 
     render() {
-        if (localStorage.getItem("Authorization")) {
+        if (
+            localStorage.getItem("Authorization") &&
+            localStorage.getItem("is_hod")
+        ) {
             return <Redirect to="/hod" />;
         }
         return (
@@ -94,6 +107,18 @@ class HODLogin extends Component {
                                         <p className="small mb-4">
                                             Login as HOD
                                         </p>
+                                        <Alert
+                                            variant="danger"
+                                            show={this.state.showErrorAlert}
+                                            onClose={() => {
+                                                this.setState({
+                                                    showErrorAlert: false,
+                                                });
+                                            }}
+                                            dismissible
+                                        >
+                                            {this.state.errortext}
+                                        </Alert>
                                         <form onSubmit={this.handleSubmit}>
                                             <div className="form-group">
                                                 <label htmlFor="username">
@@ -103,7 +128,7 @@ class HODLogin extends Component {
                                                     type="text"
                                                     name="username"
                                                     id="username"
-                                                    className="form-control shadow-sm border-0 form-control-lg"
+                                                    className="form-control shadow border-0 form-control-lg"
                                                     onChange={
                                                         this.changeUsername
                                                     }
@@ -120,7 +145,7 @@ class HODLogin extends Component {
                                                     type="password"
                                                     name="password"
                                                     id="password"
-                                                    className="form-control shadow-sm border-0 form-control-lg"
+                                                    className="form-control shadow border-0 form-control-lg"
                                                     onChange={
                                                         this.changePassword
                                                     }
@@ -138,15 +163,6 @@ class HODLogin extends Component {
                                                     <i className="fas fa-sign-in-alt ml-2"></i>
                                                 </button>
                                             </div>
-                                            {this.state.errortext !== "" ? (
-                                                <div className="form-group">
-                                                    <p className="text-danger text-center small mb-0">
-                                                        {this.state.errortext}
-                                                    </p>
-                                                </div>
-                                            ) : (
-                                                ""
-                                            )}
                                         </form>
                                     </div>
                                 </div>

@@ -1,12 +1,14 @@
 import React, { Component } from "react";
 import Header from "./navbar";
 import SideNav from "./sidenav";
+import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
 
 class GroupDetails extends Component {
     constructor(props) {
         super(props);
         this.state = {
             showSideNav: false,
+            groupItem: [],
         };
     }
 
@@ -16,14 +18,49 @@ class GroupDetails extends Component {
         });
     };
 
+    componentDidMount = () => {
+        var url = baseUrl + hodUrl;
+        var authToken = localStorage.getItem("Authorization");
+        var headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: authToken,
+        };
+
+        fetch(`${url}/hod/group/${this.props.match.params.groupId}`, {
+            headers: headers,
+            method: "GET",
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                this.setState({
+                    groupItem: result.data,
+                });
+                console.log(result);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     render() {
+        document.title =
+            this.state.groupItem.length !== 0
+                ? this.state.groupItem.group_name + " Details | IQLabs"
+                : "Group Details | IQLabs";
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="Group A" togglenav={this.toggleSideNav} />
+                <Header
+                    name={this.state.groupItem.group_name}
+                    togglenav={this.toggleSideNav}
+                />
 
                 {/* Sidebar */}
-                <SideNav shownav={this.state.showSideNav} />
+                <SideNav
+                    shownav={this.state.showSideNav}
+                    activeLink="dashboard"
+                />
 
                 <div
                     className={`section content ${

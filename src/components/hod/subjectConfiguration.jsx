@@ -8,6 +8,7 @@ class SubjectConfiguration extends Component {
         super(props);
         this.state = {
             showSideNav: false,
+            subjectItem: []
         };
     }
 
@@ -18,13 +19,17 @@ class SubjectConfiguration extends Component {
     };
 
     render() {
+        document.title =
+            this.state.subjectItem.length !== 0
+                ? this.state.subjectItem.subject_name + " Configure | IQLabs"
+                : "Subject Configure | IQLabs";
         return (
             <div className="wrapper">
                 {/* Navbar */}
                 <Header name="Subject Name" togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
-                <SideNav shownav={this.state.showSideNav} />
+                <SideNav shownav={this.state.showSideNav} activeLink="dashboard" />
 
                 <div
                     className={`section content ${

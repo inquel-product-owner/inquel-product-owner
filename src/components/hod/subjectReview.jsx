@@ -8,6 +8,7 @@ class SubjectReview extends Component {
         super(props);
         this.state = {
             showSideNav: false,
+            subjectItem:[],
         };
     }
 
@@ -18,13 +19,17 @@ class SubjectReview extends Component {
     };
 
     render() {
+        document.title =
+            this.state.subjectItem.length !== 0
+                ? this.state.subjectItem.subject_name + " | IQLabs"
+                : "Subject | IQLabs";
         return (
             <div className="wrapper">
                 {/* Navbar */}
                 <Header name="Subject Name" togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
-                <SideNav shownav={this.state.showSideNav} />
+                <SideNav shownav={this.state.showSideNav} activeLink="dashboard" />
 
                 <div
                     className={`section content ${
@@ -43,12 +48,12 @@ class SubjectReview extends Component {
                                     Filter{" "}
                                     <i className="fas fa-filter ml-1"></i>
                                 </button>
-                                <Link to="/hod/subject/001/assign">
+                                <Link to={`/hod/subject/${this.props.match.params.subjectId}/assign`}>
                                     <button className="btn btn-primary mr-2">
                                         Add New
                                     </button>
                                 </Link>
-                                <Link to="/hod/subject/001/configure">
+                                <Link to={`/hod/subject/${this.props.match.params.subjectId}/configure`}>
                                     <button className="btn btn-primary">
                                         Configure Course
                                     </button>

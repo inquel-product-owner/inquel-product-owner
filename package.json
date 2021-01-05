@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@popperjs/core": "^2.5.4",
+    "@syncfusion/ej2-react-grids": "^18.4.32",
     "@testing-library/jest-dom": "^5.11.6",
     "@testing-library/react": "^11.2.2",
     "@testing-library/user-event": "^12.5.0",
@@ -12,7 +13,6 @@
     "react-bootstrap": "^1.4.0",
     "react-content-loader": "^5.1.4",
     "react-dom": "^17.0.1",
-    "react-helmet": "^6.1.0",
     "react-popper": "^2.2.4",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.1",
