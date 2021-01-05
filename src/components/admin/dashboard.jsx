@@ -186,154 +186,148 @@ class AddCourse extends Component {
                             <div className="row">
                                 <div className="col-md-6 mb-4">
                                     <div className="row align-items-center mb-3">
-                                    <div className="col-md-4 mb-2 mb-md-0">
+                                        <div className="col-md-4 mb-2 mb-md-0">
                                             <p className="small mb-0">
                                                 Category ID
                                             </p>
                                         </div>
                                         <div className="col-md-8">
-                                                <select
-                                                    name="category"
-                                                    id="category"
-                                                    className="form-control form-control-sm shadow-sm"
-                                                >
-                                                    <option value="school">
-                                                        School
-                                                    </option>
-                                                </select>
+                                            <select
+                                                name="category"
+                                                id="category"
+                                                className="form-control form-control-sm shadow-sm"
+                                            >
+                                                <option value="school">
+                                                    School
+                                                </option>
+                                            </select>
                                         </div>
                                     </div>
                                     <div className="row align-items-center mb-3">
-                                    <div className="col-md-4 mb-2 mb-md-0">
+                                        <div className="col-md-4 mb-2 mb-md-0">
                                             <p className="small mb-0">
                                                 Discipline
                                             </p>
                                         </div>
                                         <div className="col-md-8">
-                                                <select
-                                                    name="discipline"
-                                                    id="discipline"
-                                                    className="form-control form-control-sm shadow-sm"
-                                                >
-                                                    <option value="none">
-                                                        None
-                                                    </option>
-                                                </select>
+                                            <select
+                                                name="discipline"
+                                                id="discipline"
+                                                className="form-control form-control-sm shadow-sm"
+                                            >
+                                                <option value="none">
+                                                    None
+                                                </option>
+                                            </select>
                                         </div>
                                     </div>
                                     <div className="row align-items-center mb-3">
-                                    <div className="col-md-4 mb-2 mb-md-0">
+                                        <div className="col-md-4 mb-2 mb-md-0">
                                             <p className="small mb-0">
                                                 Subjects
                                             </p>
                                         </div>
                                         <div className="col-md-8">
-                                                <select
-                                                    name="subject"
-                                                    id="subject"
-                                                    className="form-control form-control-sm shadow-sm"
-                                                >
-                                                    <option value="maths">
-                                                        Maths
-                                                    </option>
-                                                </select>
+                                            <select
+                                                name="subject"
+                                                id="subject"
+                                                className="form-control form-control-sm shadow-sm"
+                                            >
+                                                <option value="maths">
+                                                    Maths
+                                                </option>
+                                            </select>
                                         </div>
                                     </div>
                                     <div className="row align-items-center">
-                                    <div className="col-md-4 mb-2 mb-md-0">
+                                        <div className="col-md-4 mb-2 mb-md-0">
                                             <p className="small mb-0">Type</p>
                                         </div>
                                         <div className="col-md-8">
-                                                <select
-                                                    name="type"
-                                                    id="type"
-                                                    className="form-control form-control-sm shadow-sm"
-                                                >
-                                                    <option value="premium">
-                                                        Premium
-                                                    </option>
-                                                </select>
+                                            <select
+                                                name="type"
+                                                id="type"
+                                                className="form-control form-control-sm shadow-sm"
+                                            >
+                                                <option value="premium">
+                                                    Premium
+                                                </option>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="col-md-6 mb-4">
                                     <div className="row align-items-center mb-3">
-                                    <div className="col-md-4 mb-2 mb-md-0">
+                                        <div className="col-md-4 mb-2 mb-md-0">
                                             <p className="small mb-0">
                                                 Sub Category
                                             </p>
                                         </div>
                                         <div className="col-md-8">
-                                                <select
-                                                    name="subcategory"
-                                                    id="subcategory"
-                                                    className="form-control form-control-sm shadow-sm"
-                                                >
-                                                    <option value="sch">
-                                                        SCH
-                                                    </option>
-                                                </select>
+                                            <select
+                                                name="subcategory"
+                                                id="subcategory"
+                                                className="form-control form-control-sm shadow-sm"
+                                            >
+                                                <option value="sch">SCH</option>
+                                            </select>
                                         </div>
                                     </div>
                                     <div className="row align-items-center mb-3">
-                                    <div className="col-md-4 mb-2 mb-md-0">
+                                        <div className="col-md-4 mb-2 mb-md-0">
                                             <p className="small mb-0">Levels</p>
                                         </div>
                                         <div className="col-md-8">
-                                                <select
-                                                    name="level"
-                                                    id="level"
-                                                    className="form-control form-control-sm shadow-sm"
-                                                >
-                                                    <option value="10">
-                                                        10th
-                                                    </option>
-                                                </select>
+                                            <select
+                                                name="level"
+                                                id="level"
+                                                className="form-control form-control-sm shadow-sm"
+                                            >
+                                                <option value="10">10th</option>
+                                            </select>
                                         </div>
                                     </div>
                                     <div className="row align-items-center mb-3">
-                                    <div className="col-md-4 mb-2 mb-md-0">
+                                        <div className="col-md-4 mb-2 mb-md-0">
                                             <p className="small mb-0">
                                                 Board / University
                                             </p>
                                         </div>
                                         <div className="col-md-8">
-                                                <select
-                                                    name="university"
-                                                    id="university"
-                                                    className="form-control form-control-sm shadow-sm"
-                                                >
-                                                    <option value="cbse">
-                                                        CBSE
-                                                    </option>
-                                                </select>
+                                            <select
+                                                name="university"
+                                                id="university"
+                                                className="form-control form-control-sm shadow-sm"
+                                            >
+                                                <option value="cbse">
+                                                    CBSE
+                                                </option>
+                                            </select>
                                         </div>
                                     </div>
                                     <div className="row align-items-center">
-                                    <div className="col-md-4 mb-2 mb-md-0">
+                                        <div className="col-md-4 mb-2 mb-md-0">
                                             <p className="small mb-0">HOD</p>
                                         </div>
                                         <div className="col-md-8">
-                                                <select
-                                                    name="assignedhod"
-                                                    id="assignedhod"
-                                                    className="form-control form-control-sm shadow-sm"
-                                                >
-                                                    <option value="ram">
-                                                        Ram
-                                                    </option>
-                                                </select>
+                                            <select
+                                                name="assignedhod"
+                                                id="assignedhod"
+                                                className="form-control form-control-sm shadow-sm"
+                                            >
+                                                <option value="ram">Ram</option>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                                <label htmlFor="courses">Courses</label>
-                                <textarea
-                                    name="courses"
-                                    id="courses"
-                                    rows="5"
-                                    className="form-control shadow-sm"
-                                ></textarea>
+                            <label htmlFor="courses">Courses</label>
+                            <textarea
+                                name="courses"
+                                id="courses"
+                                rows="5"
+                                className="form-control shadow-sm"
+                            ></textarea>
                             <div className="row mt-3">
                                 <div className="col-md-6">
                                     <div className="d-flex justify-content-between mb-2">
@@ -357,12 +351,12 @@ class AddCourse extends Component {
                                         />
                                     </div>
                                     <div className="form-group">
-                                            <input
-                                                type="file"
-                                                name="image"
-                                                id="image"
-                                                className="form-control"
-                                            />
+                                        <input
+                                            type="file"
+                                            name="image"
+                                            id="image"
+                                            className="form-control"
+                                        />
                                     </div>
                                     <div className="form-check mb-3">
                                         <input
@@ -397,83 +391,81 @@ class AddCourse extends Component {
                                     </div>
                                 </div>
                                 <div className="col-md-6">
-                                        <div className="form-group">
-                                            <label htmlFor="searchterms">
-                                                Search terms
-                                            </label>
-                                            <textarea
-                                                name="searchterms"
-                                                id="searchterms"
-                                                rows="3"
-                                                className="form-control shadow-sm"
-                                            ></textarea>
-                                        </div>
-                                        <div className="form-group">
-                                            <label htmlFor="recommendedcourse">
-                                                Recommended courses
-                                            </label>
-                                            <textarea
-                                                name="recommendedcourse"
-                                                id="recommendedcourse"
-                                                rows="3"
-                                                className="form-control shadow-sm"
-                                            ></textarea>
-                                        </div>
+                                    <div className="form-group">
+                                        <label htmlFor="searchterms">
+                                            Search terms
+                                        </label>
+                                        <textarea
+                                            name="searchterms"
+                                            id="searchterms"
+                                            rows="3"
+                                            className="form-control shadow-sm"
+                                        ></textarea>
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="recommendedcourse">
+                                            Recommended courses
+                                        </label>
+                                        <textarea
+                                            name="recommendedcourse"
+                                            id="recommendedcourse"
+                                            rows="3"
+                                            className="form-control shadow-sm"
+                                        ></textarea>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div className="col-md-6">
                             <h6 className="primary-text mb-3">Subscription</h6>
                             <div className="row align-items-center mb-4">
-                            <div className="col-md-4 mb-2 mb-md-0">
+                                <div className="col-md-4 mb-2 mb-md-0">
                                     <p className="small mb-0">
                                         Subscription ID
                                     </p>
                                 </div>
                                 <div className="col-md-8">
-                                        <input
-                                            type="text"
-                                            name="subscriptionid"
-                                            id="subscriptionid"
-                                            className="form-control shadow-sm"
-                                        />
+                                    <input
+                                        type="text"
+                                        name="subscriptionid"
+                                        id="subscriptionid"
+                                        className="form-control shadow-sm"
+                                    />
                                 </div>
                             </div>
                             <div className="row align-items-center mb-4">
-                            <div className="col-md-4 mb-2 mb-md-0">
+                                <div className="col-md-4 mb-2 mb-md-0">
                                     <p className="mb-0 small">
                                         Subscription Title
                                     </p>
                                 </div>
                                 <div className="col-md-8">
-                                        <input
-                                            type="text"
-                                            name="subscriptiontitle"
-                                            id="subscriptiontitle"
-                                            className="form-control shadow-sm"
-                                        />
+                                    <input
+                                        type="text"
+                                        name="subscriptiontitle"
+                                        id="subscriptiontitle"
+                                        className="form-control shadow-sm"
+                                    />
                                 </div>
                             </div>
                             <div className="row align-items-center mb-4">
-                            <div className="col-md-4 mb-2 mb-md-0">
+                                <div className="col-md-4 mb-2 mb-md-0">
                                     <p className="mb-0 small">
                                         Subscription Description
                                     </p>
                                 </div>
                                 <div className="col-md-8">
-                                        <input
-                                            type="text"
-                                            name="subscriptiondescription"
-                                            id="subscriptiondescription"
-                                            className="form-control shadow-sm"
-                                        />
+                                    <input
+                                        type="text"
+                                        name="subscriptiondescription"
+                                        id="subscriptiondescription"
+                                        className="form-control shadow-sm"
+                                    />
                                 </div>
                             </div>
                             <div className="row align-items-center mb-4">
-                            <div className="col-md-4 mb-2 mb-md-0">
-                                    <p className="mb-0 small">
-                                        Duration
-                                    </p>
+                                <div className="col-md-4 mb-2 mb-md-0">
+                                    <p className="mb-0 small">Duration</p>
                                 </div>
                                 <div className="col-md-8">
                                     <div className="row align-items-center">
@@ -504,10 +496,8 @@ class AddCourse extends Component {
                                 </div>
                             </div>
                             <div className="row align-items-center mb-4">
-                            <div className="col-md-4 mb-2 mb-md-0">
-                                    <p className="mb-0 small">
-                                        Pricing
-                                    </p>
+                                <div className="col-md-4 mb-2 mb-md-0">
+                                    <p className="mb-0 small">Pricing</p>
                                 </div>
                                 <div className="col-md-8">
                                     <form action="">
@@ -576,8 +566,12 @@ class AddCourse extends Component {
                         >
                             Cancel
                         </button>
-                        <button className="btn btn-primary btn-sm mr-2">Save</button>
-                        <button className="btn btn-primary btn-sm">Publish</button>
+                        <button className="btn btn-primary btn-sm mr-2">
+                            Save
+                        </button>
+                        <button className="btn btn-primary btn-sm">
+                            Publish
+                        </button>
                     </div>
                 </Modal.Footer>
             </Modal>
@@ -696,7 +690,7 @@ class VewCourseCard extends Component {
             subscriptionModalShow: !this.state.subscriptionModalShow,
         });
     };
-    
+
     render() {
         return (
             <>
@@ -941,6 +935,10 @@ class Dashboard extends Component {
         });
     };
 
+    componentDidMount = () => {
+        document.title = "Admin Dashboard | IQLabs";
+    };
+
     render() {
         return (
             <div className="wrapper">
@@ -948,7 +946,10 @@ class Dashboard extends Component {
                 <Header name="Admin" togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
-                <SideNav shownav={this.state.showSideNav} activeLink="dashboard" />
+                <SideNav
+                    shownav={this.state.showSideNav}
+                    activeLink="dashboard"
+                />
 
                 <div
                     className={`section content ${
@@ -1175,15 +1176,15 @@ class Dashboard extends Component {
                                                                     2000 INR
                                                                 </td>
                                                                 <td>
-                                                                        <button
-                                                                            className="btn btn-sm btn-primary"
-                                                                            onClick={
-                                                                                this
-                                                                                    .showViewCourseCard
-                                                                            }
-                                                                        >
-                                                                            View
-                                                                        </button>
+                                                                    <button
+                                                                        className="btn btn-sm btn-primary"
+                                                                        onClick={
+                                                                            this
+                                                                                .showViewCourseCard
+                                                                        }
+                                                                    >
+                                                                        View
+                                                                    </button>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1211,15 +1212,15 @@ class Dashboard extends Component {
                                                                     3000 INR
                                                                 </td>
                                                                 <td>
-                                                                        <button
-                                                                            className="btn btn-sm btn-primary"
-                                                                            onClick={
-                                                                                this
-                                                                                    .showViewCourseCard
-                                                                            }
-                                                                        >
-                                                                            View
-                                                                        </button>
+                                                                    <button
+                                                                        className="btn btn-sm btn-primary"
+                                                                        onClick={
+                                                                            this
+                                                                                .showViewCourseCard
+                                                                        }
+                                                                    >
+                                                                        View
+                                                                    </button>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1249,15 +1250,15 @@ class Dashboard extends Component {
                                                                     5000 INR
                                                                 </td>
                                                                 <td>
-                                                                        <button
-                                                                            className="btn btn-sm btn-primary"
-                                                                            onClick={
-                                                                                this
-                                                                                    .showViewCourseCard
-                                                                            }
-                                                                        >
-                                                                            View
-                                                                        </button>
+                                                                    <button
+                                                                        className="btn btn-sm btn-primary"
+                                                                        onClick={
+                                                                            this
+                                                                                .showViewCourseCard
+                                                                        }
+                                                                    >
+                                                                        View
+                                                                    </button>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1285,15 +1286,15 @@ class Dashboard extends Component {
                                                                     8000 INR
                                                                 </td>
                                                                 <td>
-                                                                        <button
-                                                                            className="btn btn-sm btn-primary"
-                                                                            onClick={
-                                                                                this
-                                                                                    .showViewCourseCard
-                                                                            }
-                                                                        >
-                                                                            View
-                                                                        </button>
+                                                                    <button
+                                                                        className="btn btn-sm btn-primary"
+                                                                        onClick={
+                                                                            this
+                                                                                .showViewCourseCard
+                                                                        }
+                                                                    >
+                                                                        View
+                                                                    </button>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1324,15 +1325,15 @@ class Dashboard extends Component {
                                                                     7000 INR
                                                                 </td>
                                                                 <td>
-                                                                        <button
-                                                                            className="btn btn-sm btn-primary"
-                                                                            onClick={
-                                                                                this
-                                                                                    .showViewCourseCard
-                                                                            }
-                                                                        >
-                                                                            View
-                                                                        </button>
+                                                                    <button
+                                                                        className="btn btn-sm btn-primary"
+                                                                        onClick={
+                                                                            this
+                                                                                .showViewCourseCard
+                                                                        }
+                                                                    >
+                                                                        View
+                                                                    </button>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1363,15 +1364,15 @@ class Dashboard extends Component {
                                                                     2000 INR
                                                                 </td>
                                                                 <td>
-                                                                        <button
-                                                                            className="btn btn-sm btn-primary"
-                                                                            onClick={
-                                                                                this
-                                                                                    .showViewCourseCard
-                                                                            }
-                                                                        >
-                                                                            View
-                                                                        </button>
+                                                                    <button
+                                                                        className="btn btn-sm btn-primary"
+                                                                        onClick={
+                                                                            this
+                                                                                .showViewCourseCard
+                                                                        }
+                                                                    >
+                                                                        View
+                                                                    </button>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1402,15 +1403,15 @@ class Dashboard extends Component {
                                                                     2000 INR
                                                                 </td>
                                                                 <td>
-                                                                        <button
-                                                                            className="btn btn-sm btn-primary"
-                                                                            onClick={
-                                                                                this
-                                                                                    .showViewCourseCard
-                                                                            }
-                                                                        >
-                                                                            View
-                                                                        </button>
+                                                                    <button
+                                                                        className="btn btn-sm btn-primary"
+                                                                        onClick={
+                                                                            this
+                                                                                .showViewCourseCard
+                                                                        }
+                                                                    >
+                                                                        View
+                                                                    </button>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1438,15 +1439,15 @@ class Dashboard extends Component {
                                                                     1000 INR
                                                                 </td>
                                                                 <td>
-                                                                        <button
-                                                                            className="btn btn-sm btn-primary"
-                                                                            onClick={
-                                                                                this
-                                                                                    .showViewCourseCard
-                                                                            }
-                                                                        >
-                                                                            View
-                                                                        </button>
+                                                                    <button
+                                                                        className="btn btn-sm btn-primary"
+                                                                        onClick={
+                                                                            this
+                                                                                .showViewCourseCard
+                                                                        }
+                                                                    >
+                                                                        View
+                                                                    </button>
                                                                 </td>
                                                             </tr>
                                                         </tbody>
@@ -1515,15 +1516,15 @@ class Dashboard extends Component {
                                                                     2000 INR
                                                                 </td>
                                                                 <td>
-                                                                        <button
-                                                                            className="btn btn-sm btn-primary"
-                                                                            onClick={
-                                                                                this
-                                                                                    .showViewCourseCard
-                                                                            }
-                                                                        >
-                                                                            View
-                                                                        </button>
+                                                                    <button
+                                                                        className="btn btn-sm btn-primary"
+                                                                        onClick={
+                                                                            this
+                                                                                .showViewCourseCard
+                                                                        }
+                                                                    >
+                                                                        View
+                                                                    </button>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1551,15 +1552,15 @@ class Dashboard extends Component {
                                                                     3000 INR
                                                                 </td>
                                                                 <td>
-                                                                        <button
-                                                                            className="btn btn-sm btn-primary"
-                                                                            onClick={
-                                                                                this
-                                                                                    .showViewCourseCard
-                                                                            }
-                                                                        >
-                                                                            View
-                                                                        </button>
+                                                                    <button
+                                                                        className="btn btn-sm btn-primary"
+                                                                        onClick={
+                                                                            this
+                                                                                .showViewCourseCard
+                                                                        }
+                                                                    >
+                                                                        View
+                                                                    </button>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1589,15 +1590,15 @@ class Dashboard extends Component {
                                                                     5000 INR
                                                                 </td>
                                                                 <td>
-                                                                        <button
-                                                                            className="btn btn-sm btn-primary"
-                                                                            onClick={
-                                                                                this
-                                                                                    .showViewCourseCard
-                                                                            }
-                                                                        >
-                                                                            View
-                                                                        </button>
+                                                                    <button
+                                                                        className="btn btn-sm btn-primary"
+                                                                        onClick={
+                                                                            this
+                                                                                .showViewCourseCard
+                                                                        }
+                                                                    >
+                                                                        View
+                                                                    </button>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1625,15 +1626,15 @@ class Dashboard extends Component {
                                                                     8000 INR
                                                                 </td>
                                                                 <td>
-                                                                        <button
-                                                                            className="btn btn-sm btn-primary"
-                                                                            onClick={
-                                                                                this
-                                                                                    .showViewCourseCard
-                                                                            }
-                                                                        >
-                                                                            View
-                                                                        </button>
+                                                                    <button
+                                                                        className="btn btn-sm btn-primary"
+                                                                        onClick={
+                                                                            this
+                                                                                .showViewCourseCard
+                                                                        }
+                                                                    >
+                                                                        View
+                                                                    </button>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1664,15 +1665,15 @@ class Dashboard extends Component {
                                                                     7000 INR
                                                                 </td>
                                                                 <td>
-                                                                        <button
-                                                                            className="btn btn-sm btn-primary"
-                                                                            onClick={
-                                                                                this
-                                                                                    .showViewCourseCard
-                                                                            }
-                                                                        >
-                                                                            View
-                                                                        </button>
+                                                                    <button
+                                                                        className="btn btn-sm btn-primary"
+                                                                        onClick={
+                                                                            this
+                                                                                .showViewCourseCard
+                                                                        }
+                                                                    >
+                                                                        View
+                                                                    </button>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1703,15 +1704,15 @@ class Dashboard extends Component {
                                                                     2000 INR
                                                                 </td>
                                                                 <td>
-                                                                        <button
-                                                                            className="btn btn-sm btn-primary"
-                                                                            onClick={
-                                                                                this
-                                                                                    .showViewCourseCard
-                                                                            }
-                                                                        >
-                                                                            View
-                                                                        </button>
+                                                                    <button
+                                                                        className="btn btn-sm btn-primary"
+                                                                        onClick={
+                                                                            this
+                                                                                .showViewCourseCard
+                                                                        }
+                                                                    >
+                                                                        View
+                                                                    </button>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1742,15 +1743,15 @@ class Dashboard extends Component {
                                                                     2000 INR
                                                                 </td>
                                                                 <td>
-                                                                        <button
-                                                                            className="btn btn-sm btn-primary"
-                                                                            onClick={
-                                                                                this
-                                                                                    .showViewCourseCard
-                                                                            }
-                                                                        >
-                                                                            View
-                                                                        </button>
+                                                                    <button
+                                                                        className="btn btn-sm btn-primary"
+                                                                        onClick={
+                                                                            this
+                                                                                .showViewCourseCard
+                                                                        }
+                                                                    >
+                                                                        View
+                                                                    </button>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1778,15 +1779,15 @@ class Dashboard extends Component {
                                                                     1000 INR
                                                                 </td>
                                                                 <td>
-                                                                        <button
-                                                                            className="btn btn-sm btn-primary"
-                                                                            onClick={
-                                                                                this
-                                                                                    .showViewCourseCard
-                                                                            }
-                                                                        >
-                                                                            View
-                                                                        </button>
+                                                                    <button
+                                                                        className="btn btn-sm btn-primary"
+                                                                        onClick={
+                                                                            this
+                                                                                .showViewCourseCard
+                                                                        }
+                                                                    >
+                                                                        View
+                                                                    </button>
                                                                 </td>
                                                             </tr>
                                                         </tbody>
@@ -1855,15 +1856,15 @@ class Dashboard extends Component {
                                                                     2000 INR
                                                                 </td>
                                                                 <td>
-                                                                        <button
-                                                                            className="btn btn-sm btn-primary"
-                                                                            onClick={
-                                                                                this
-                                                                                    .showViewCourseCard
-                                                                            }
-                                                                        >
-                                                                            View
-                                                                        </button>
+                                                                    <button
+                                                                        className="btn btn-sm btn-primary"
+                                                                        onClick={
+                                                                            this
+                                                                                .showViewCourseCard
+                                                                        }
+                                                                    >
+                                                                        View
+                                                                    </button>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1891,15 +1892,15 @@ class Dashboard extends Component {
                                                                     3000 INR
                                                                 </td>
                                                                 <td>
-                                                                        <button
-                                                                            className="btn btn-sm btn-primary"
-                                                                            onClick={
-                                                                                this
-                                                                                    .showViewCourseCard
-                                                                            }
-                                                                        >
-                                                                            View
-                                                                        </button>
+                                                                    <button
+                                                                        className="btn btn-sm btn-primary"
+                                                                        onClick={
+                                                                            this
+                                                                                .showViewCourseCard
+                                                                        }
+                                                                    >
+                                                                        View
+                                                                    </button>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1929,15 +1930,15 @@ class Dashboard extends Component {
                                                                     5000 INR
                                                                 </td>
                                                                 <td>
-                                                                        <button
-                                                                            className="btn btn-sm btn-primary"
-                                                                            onClick={
-                                                                                this
-                                                                                    .showViewCourseCard
-                                                                            }
-                                                                        >
-                                                                            View
-                                                                        </button>
+                                                                    <button
+                                                                        className="btn btn-sm btn-primary"
+                                                                        onClick={
+                                                                            this
+                                                                                .showViewCourseCard
+                                                                        }
+                                                                    >
+                                                                        View
+                                                                    </button>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -1965,15 +1966,15 @@ class Dashboard extends Component {
                                                                     8000 INR
                                                                 </td>
                                                                 <td>
-                                                                        <button
-                                                                            className="btn btn-sm btn-primary"
-                                                                            onClick={
-                                                                                this
-                                                                                    .showViewCourseCard
-                                                                            }
-                                                                        >
-                                                                            View
-                                                                        </button>
+                                                                    <button
+                                                                        className="btn btn-sm btn-primary"
+                                                                        onClick={
+                                                                            this
+                                                                                .showViewCourseCard
+                                                                        }
+                                                                    >
+                                                                        View
+                                                                    </button>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -2004,15 +2005,15 @@ class Dashboard extends Component {
                                                                     7000 INR
                                                                 </td>
                                                                 <td>
-                                                                        <button
-                                                                            className="btn btn-sm btn-primary"
-                                                                            onClick={
-                                                                                this
-                                                                                    .showViewCourseCard
-                                                                            }
-                                                                        >
-                                                                            View
-                                                                        </button>
+                                                                    <button
+                                                                        className="btn btn-sm btn-primary"
+                                                                        onClick={
+                                                                            this
+                                                                                .showViewCourseCard
+                                                                        }
+                                                                    >
+                                                                        View
+                                                                    </button>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -2043,15 +2044,15 @@ class Dashboard extends Component {
                                                                     2000 INR
                                                                 </td>
                                                                 <td>
-                                                                        <button
-                                                                            className="btn btn-sm btn-primary"
-                                                                            onClick={
-                                                                                this
-                                                                                    .showViewCourseCard
-                                                                            }
-                                                                        >
-                                                                            View
-                                                                        </button>
+                                                                    <button
+                                                                        className="btn btn-sm btn-primary"
+                                                                        onClick={
+                                                                            this
+                                                                                .showViewCourseCard
+                                                                        }
+                                                                    >
+                                                                        View
+                                                                    </button>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -2082,15 +2083,15 @@ class Dashboard extends Component {
                                                                     2000 INR
                                                                 </td>
                                                                 <td>
-                                                                        <button
-                                                                            className="btn btn-sm btn-primary"
-                                                                            onClick={
-                                                                                this
-                                                                                    .showViewCourseCard
-                                                                            }
-                                                                        >
-                                                                            View
-                                                                        </button>
+                                                                    <button
+                                                                        className="btn btn-sm btn-primary"
+                                                                        onClick={
+                                                                            this
+                                                                                .showViewCourseCard
+                                                                        }
+                                                                    >
+                                                                        View
+                                                                    </button>
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -2118,15 +2119,15 @@ class Dashboard extends Component {
                                                                     1000 INR
                                                                 </td>
                                                                 <td>
-                                                                        <button
-                                                                            className="btn btn-sm btn-primary"
-                                                                            onClick={
-                                                                                this
-                                                                                    .showViewCourseCard
-                                                                            }
-                                                                        >
-                                                                            View
-                                                                        </button>
+                                                                    <button
+                                                                        className="btn btn-sm btn-primary"
+                                                                        onClick={
+                                                                            this
+                                                                                .showViewCourseCard
+                                                                        }
+                                                                    >
+                                                                        View
+                                                                    </button>
                                                                 </td>
                                                             </tr>
                                                         </tbody>

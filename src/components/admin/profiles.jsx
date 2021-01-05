@@ -2,11 +2,11 @@ import React, { Component } from "react";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import userimage from "../../assets/user.png";
-import { Tabs, Tab } from "react-bootstrap";
+import { Tabs, Tab,Modal } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { Modal } from "react-bootstrap";
 import Switch from "react-switch";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl.js";
+import HODTable from '../table/hodTable';
 
 class HodModal extends Component {
     constructor(props) {
@@ -15,12 +15,16 @@ class HodModal extends Component {
             email: "",
             username: "",
             password: "",
-            category: "",
-            subcategory: "",
-            discipline: "",
-            subject: "",
-            board: "",
-            validity: "",
+            category: [],
+            subcategory: [],
+            discipline: [],
+            board: [],
+            selectedCategory: "",
+            selectedSubcategory: "",
+            selectedDiscipline: "",
+            selectedBoard: "",
+            selectedValid_from: "",
+            selectedValid_to: "",
             progressivescore: false,
             type1: false,
             type2: false,
@@ -52,13 +56,6 @@ class HodModal extends Component {
                 "Content-Type": "application/json",
                 "Inquel-Auth": authToken,
             };
-            var d = new Date();
-            var year = d.getFullYear();
-            var month = d.getMonth();
-            var day = d.getDate();
-            var date = `${year + parseInt(this.state.validity)}-${
-                month + 1
-            }-${day} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`;
 
             fetch(`${url}/create/hod/`, {
                 headers: headers,
@@ -70,11 +67,12 @@ class HodModal extends Component {
                                 email: this.state.email,
                                 username: this.state.username,
                                 password: this.state.password,
-                                category: this.state.category,
-                                subcategory: this.state.subcategory,
-                                discipline: this.state.discipline,
-                                board: this.state.board,
-                                valid_to: date,
+                                category: this.state.selectedCategory,
+                                sub_category: this.state.selectedSubcategory,
+                                discipline: this.state.selectedDiscipline,
+                                board: this.state.selectedBoard,
+                                valid_from: this.state.selectedValid_from,
+                                valid_to: this.state.selectedValid_to,
                                 prog_sco_card: this.state.progressivescore,
                                 type_1_q: this.state.type1,
                                 type_2_q: this.state.type2,
@@ -98,10 +96,12 @@ class HodModal extends Component {
                     if (result.sts) {
                         this.setState({
                             successtext: result.msg,
+                            errortext: "",
                         });
                     } else {
                         this.setState({
                             errortext: result.msg,
+                            successtext: "",
                         });
                     }
                 })
@@ -109,6 +109,143 @@ class HodModal extends Component {
                     console.log(err);
                 });
         }
+    };
+
+    componentDidMount = () => {
+        var url = baseUrl + adminPathUrl;
+        var authToken = localStorage.getItem("Inquel-Auth");
+        var headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Inquel-Auth": authToken,
+        };
+
+        fetch(`${url}/data/filter/`, {
+            headers: headers,
+            method: "GET",
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                this.setState({
+                    category: result.data.CATEGORY,
+                    board: result.data.BOARD,
+                    selectedCategory: "",
+                    selectedSubcategory: "",
+                });
+                console.log(result);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    handleCategory = (event) => {
+        this.setState({
+            selectedCategory: event.target.value,
+        });
+        this.setState({
+            subcategory: [],
+            discipline: [],
+            selectedSubcategory: "",
+            selectedDiscipline: "",
+        });
+
+        var url = baseUrl + adminPathUrl;
+        var authToken = localStorage.getItem("Inquel-Auth");
+        var headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Inquel-Auth": authToken,
+        };
+
+        if (event.target.value !== "") {
+            fetch(`${url}/data/filter/?category=${event.target.value}`, {
+                headers: headers,
+                method: "GET",
+            })
+                .then((res) => res.json())
+                .then((result) => {
+                    this.setState({
+                        subcategory: result.data.sub_category,
+                    });
+                    console.log(result);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        }
+    };
+
+    handleSubcategory = (event) => {
+        this.setState({
+            selectedSubcategory: event.target.value,
+        });
+        this.setState({
+            discipline: [],
+            selectedDiscipline: "",
+        });
+
+        var url = baseUrl + adminPathUrl;
+        var authToken = localStorage.getItem("Inquel-Auth");
+        var headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Inquel-Auth": authToken,
+        };
+
+        if (event.target.value !== "") {
+            fetch(
+                `${url}/data/filter/?category=${this.state.selectedCategory}&sub_category=${event.target.value}`,
+                {
+                    headers: headers,
+                    method: "GET",
+                }
+            )
+                .then((res) => res.json())
+                .then((result) => {
+                    this.setState({
+                        discipline: result.data.DISCIPLINE,
+                    });
+                    console.log(result);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        }
+    };
+
+    handleDiscipline = (event) => {
+        this.setState({
+            selectedDiscipline: event.target.value,
+        });
+    };
+
+    handleBoard = (event) => {
+        this.setState({
+            selectedBoard: event.target.value,
+        });
+    };
+
+    handleValid_from = (event) => {
+        var d = new Date(event.target.value).toLocaleDateString();
+        var datearray = d.split("/");
+        var year = datearray[2];
+        var month = datearray[0];
+        var day = datearray[1];
+        this.setState({
+            selectedValid_from: `${year}-${month}-${day} 00:00:00`,
+        });
+    };
+
+    handleValid_to = (event) => {
+        var d = new Date(event.target.value).toLocaleDateString();
+        var datearray = d.split("/");
+        var year = datearray[2];
+        var month = datearray[0];
+        var day = datearray[1];
+        this.setState({
+            selectedValid_to: `${year}-${month}-${day} 00:00:00`,
+        });
     };
 
     handleChange = (event) => {
@@ -196,7 +333,11 @@ class HodModal extends Component {
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <form action="" onSubmit={this.handleSubmit}>
+                    <form
+                        action=""
+                        onSubmit={this.handleSubmit}
+                        autoComplete="off"
+                    >
                         <div className="row mb-2">
                             <div className="form-group col-md-4">
                                 <label htmlFor="email">Email</label>
@@ -243,21 +384,29 @@ class HodModal extends Component {
                                 <h6 className="primary-text mb-3">Details</h6>
 
                                 <div className="form-group">
-                                    <label htmlFor="category">
-                                        Category ID
-                                    </label>
+                                    <label htmlFor="category">Category</label>
                                     <select
                                         name="category"
                                         id="category"
                                         className="form-control form-control-sm shadow-sm"
-                                        onChange={this.handleChange}
-                                        value={this.state.category}
+                                        onChange={this.handleCategory}
                                         required
                                     >
-                                        <option value="" disabled>
+                                        <option value="">
                                             Select a category
                                         </option>
-                                        <option value="DEG">Degree</option>
+                                        {this.state.category.map(
+                                            (list, index) => {
+                                                return (
+                                                    <option
+                                                        key={index}
+                                                        value={list.code}
+                                                    >
+                                                        {list.title}
+                                                    </option>
+                                                );
+                                            }
+                                        )}
                                     </select>
                                 </div>
                                 <div className="form-group">
@@ -268,14 +417,24 @@ class HodModal extends Component {
                                         name="subcategory"
                                         id="subcategory"
                                         className="form-control form-control-sm shadow-sm"
-                                        onChange={this.handleChange}
-                                        value={this.state.subcategory}
+                                        onChange={this.handleSubcategory}
                                         required
                                     >
-                                        <option value="" disabled>
+                                        <option value="">
                                             Select a sub-category
                                         </option>
-                                        <option value="sch">SCH</option>
+                                        {this.state.subcategory.map(
+                                            (list, index) => {
+                                                return (
+                                                    <option
+                                                        key={index}
+                                                        value={list.code}
+                                                    >
+                                                        {list.title}
+                                                    </option>
+                                                );
+                                            }
+                                        )}
                                     </select>
                                 </div>
                                 <div className="form-group">
@@ -286,30 +445,21 @@ class HodModal extends Component {
                                         name="discipline"
                                         id="discipline"
                                         className="form-control form-control-sm shadow-sm"
-                                        onChange={this.handleChange}
-                                        value={this.state.discipline}
+                                        onChange={this.handleDiscipline}
                                         required
                                     >
-                                        <option value="" disabled>
-                                            Select a discipline
+                                        <option value="">
+                                            Select discipline
                                         </option>
-                                        <option value="none">None</option>
-                                    </select>
-                                </div>
-                                <div className="form-group">
-                                    <label htmlFor="subject">Subjects</label>
-                                    <select
-                                        name="subject"
-                                        id="subject"
-                                        className="form-control form-control-sm shadow-sm"
-                                        onChange={this.handleChange}
-                                        value={this.state.subject}
-                                        required
-                                    >
-                                        <option value="" disabled>
-                                            Select a subject
-                                        </option>
-                                        <option value="maths">Maths</option>
+                                        {Object.entries(
+                                            this.state.discipline
+                                        ).map(([key, value], index) => {
+                                            return (
+                                                <option key={index} value={key}>
+                                                    {value}
+                                                </option>
+                                            );
+                                        })}
                                     </select>
                                 </div>
                                 <div className="form-group">
@@ -320,31 +470,45 @@ class HodModal extends Component {
                                         name="board"
                                         id="board"
                                         className="form-control form-control-sm shadow-sm"
-                                        onChange={this.handleChange}
-                                        value={this.state.board}
+                                        onChange={this.handleBoard}
                                         required
                                     >
-                                        <option value="" disabled>
+                                        <option value="">
                                             Select a Board / University
                                         </option>
-                                        <option value="cbse">CBSE</option>
+                                        {this.state.board.map((list, index) => {
+                                            return (
+                                                <option
+                                                    key={index}
+                                                    value={list.code}
+                                                >
+                                                    {list.title}
+                                                </option>
+                                            );
+                                        })}
                                     </select>
                                 </div>
                                 <div className="form-group">
-                                    <label htmlFor="validity">Validity</label>
-                                    <select
-                                        name="validity"
-                                        id="validity"
+                                    <label htmlFor="valid_from">
+                                        Valid From
+                                    </label>
+                                    <input
+                                        type="date"
+                                        name="valid_from"
+                                        id="valid_from"
                                         className="form-control form-control-sm shadow-sm"
-                                        onChange={this.handleChange}
-                                        value={this.state.validity}
-                                        required
-                                    >
-                                        <option value="" disabled>
-                                            Select a validity
-                                        </option>
-                                        <option value="1">1 year</option>
-                                    </select>
+                                        onChange={this.handleValid_from}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="valid_to">Valid To</label>
+                                    <input
+                                        type="date"
+                                        name="valid_to"
+                                        id="valid_to"
+                                        className="form-control form-control-sm shadow-sm"
+                                        onChange={this.handleValid_to}
+                                    />
                                 </div>
                             </div>
                             <div className="col-md-6">
@@ -690,14 +854,14 @@ function Loading() {
     return (
         <tr>
             <td className="text-center">Loading...</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+        </tr>
+    );
+}
+
+function EmptyData() {
+    return (
+        <tr>
+            <td>Data not available</td>
         </tr>
     );
 }
@@ -738,6 +902,8 @@ class Profiles extends Component {
     };
 
     componentDidMount = () => {
+        document.title = "Admin Profile | IQLabs";
+
         var url = baseUrl + adminPathUrl;
         var authToken = localStorage.getItem("Inquel-Auth");
         var headers = {
@@ -758,8 +924,8 @@ class Profiles extends Component {
         ])
             .then((result) => {
                 this.setState({
-                    hodItems: result[0].data,
-                    studentItems: result[1].data,
+                    hodItems: result[0].data.results,
+                    studentItems: result[1].data.results,
                     isLoaded: true,
                 });
                 console.log(result);
@@ -768,6 +934,10 @@ class Profiles extends Component {
                 console.log(err);
             });
     };
+
+    triggerDelete=()=>{
+        this.refs.child.showConsole();
+    }
 
     render() {
         return (
@@ -814,7 +984,7 @@ class Profiles extends Component {
                             ) : (
                                 ""
                             )}
-                            <button className="btn btn-primary mr-md-3 mr-1">
+                            <button className="btn btn-primary mr-md-3 mr-1" onClick={this.triggerDelete}>
                                 Delete
                             </button>
                             <button className="btn btn-primary mr-md-3 mr-1">
@@ -830,108 +1000,7 @@ class Profiles extends Component {
                         >
                             <Tab eventKey="hod" title="HOD">
                                 <div className="card shadow-sm">
-                                    <div className="table-responsive">
-                                        <table className="table">
-                                            <thead className="primary-text">
-                                                <tr>
-                                                    <th scope="col"></th>
-                                                    <th scope="col">ID</th>
-                                                    <th scope="col">Name</th>
-                                                    <th scope="col">
-                                                        Category
-                                                    </th>
-                                                    <th scope="col">
-                                                        Sub Category
-                                                    </th>
-                                                    <th scope="col">
-                                                        Discipline
-                                                    </th>
-                                                    <th scope="col">
-                                                        Board University
-                                                    </th>
-                                                    <th scope="col">
-                                                        Registered On
-                                                    </th>
-                                                    <th scope="col"></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {this.state.isLoaded ? (
-                                                    this.state.hodItems.map(
-                                                        (list, index) => {
-                                                            return (
-                                                                <tr key={index}>
-                                                                    <td className="text-center">
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            name="enable"
-                                                                            value={
-                                                                                list.id
-                                                                            }
-                                                                        />
-                                                                    </td>
-                                                                    <td>
-                                                                        {
-                                                                            list.id
-                                                                        }
-                                                                    </td>
-                                                                    <td>
-                                                                        <img
-                                                                            src={
-                                                                                list.profile_link !==
-                                                                                null
-                                                                                    ? list.profile_link
-                                                                                    : userimage
-                                                                            }
-                                                                            alt="User profile pic"
-                                                                            width="20"
-                                                                        />{" "}
-                                                                        {`${list.first_name} ${list.last_name}`}
-                                                                    </td>
-                                                                    <td>
-                                                                        {
-                                                                            list.category
-                                                                        }
-                                                                    </td>
-                                                                    <td>
-                                                                        {
-                                                                            list.sub_category
-                                                                        }
-                                                                    </td>
-                                                                    <td>
-                                                                        {
-                                                                            list.discipline
-                                                                        }
-                                                                    </td>
-                                                                    <td>
-                                                                        {
-                                                                            list.board
-                                                                        }
-                                                                    </td>
-                                                                    <td>
-                                                                        {this.dateConversion(
-                                                                            list.date_joined
-                                                                        )}
-                                                                    </td>
-                                                                    <td>
-                                                                        <Link
-                                                                            to={`/admin/hod/${list.id}`}
-                                                                        >
-                                                                            <button className="btn btn-sm btn-primary">
-                                                                                View
-                                                                            </button>
-                                                                        </Link>
-                                                                    </td>
-                                                                </tr>
-                                                            );
-                                                        }
-                                                    )
-                                                ) : (
-                                                    <Loading />
-                                                )}
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                    <HODTable hodItems={this.state.hodItems} ref="child"/>
                                 </div>
                             </Tab>
                             <Tab eventKey="student" title="Student">
@@ -941,8 +1010,10 @@ class Profiles extends Component {
                                             <thead className="primary-text">
                                                 <tr>
                                                     <th scope="col"></th>
-                                                    <th scope="col">ID</th>
                                                     <th scope="col">Name</th>
+                                                    <th scope="col">
+                                                        Username
+                                                    </th>
                                                     <th scope="col">Email</th>
                                                     <th scope="col">Contact</th>
                                                     <th scope="col">
@@ -951,74 +1022,95 @@ class Profiles extends Component {
                                                     <th scope="col">
                                                         Registered on
                                                     </th>
+                                                    <th scope="col">Status</th>
                                                     <th scope="col"></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 {this.state.isLoaded ? (
-                                                    this.state.studentItems.map(
-                                                        (list, index) => {
-                                                            return (
-                                                                <tr key={index}>
-                                                                    <td className="text-center">
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            name="enable"
-                                                                            value={
-                                                                                list.id
+                                                    this.state.studentItems
+                                                        .length !== 0 ? (
+                                                        this.state.studentItems.map(
+                                                            (list, index) => {
+                                                                return (
+                                                                    <tr
+                                                                        key={
+                                                                            index
+                                                                        }
+                                                                    >
+                                                                        <td className="text-center">
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                name="enable"
+                                                                                value={
+                                                                                    list.id
+                                                                                }
+                                                                            />
+                                                                        </td>
+                                                                        <td>
+                                                                            <img
+                                                                                src={
+                                                                                    list.profile_link !==
+                                                                                    null
+                                                                                        ? list.profile_link
+                                                                                        : userimage
+                                                                                }
+                                                                                alt="User profile pic"
+                                                                                width="20"
+                                                                            />{" "}
+                                                                            {`${list.first_name} ${list.last_name}`}
+                                                                        </td>
+                                                                        <td>
+                                                                            {
+                                                                                list.username
                                                                             }
-                                                                        />
-                                                                    </td>
-                                                                    <td>
-                                                                        {
-                                                                            list.id
-                                                                        }
-                                                                    </td>
-                                                                    <td>
-                                                                        <img
-                                                                            src={
-                                                                                list.profile_link !==
-                                                                                null
-                                                                                    ? list.profile_link
-                                                                                    : userimage
+                                                                        </td>
+                                                                        <td>
+                                                                            {
+                                                                                list.email
                                                                             }
-                                                                            alt="User profile pic"
-                                                                            width="20"
-                                                                        />{" "}
-                                                                        {`${list.first_name} ${list.last_name}`}
-                                                                    </td>
-                                                                    <td>
-                                                                        {
-                                                                            list.email
-                                                                        }
-                                                                    </td>
-                                                                    <td>
-                                                                        {
-                                                                            list.contact
-                                                                        }
-                                                                    </td>
-                                                                    <td>
-                                                                        {
-                                                                            list.category
-                                                                        }
-                                                                    </td>
-                                                                    <td>
-                                                                        {this.dateConversion(
-                                                                            list.date_joined
-                                                                        )}
-                                                                    </td>
-                                                                    <td>
-                                                                        <Link
-                                                                            to={`/admin/student/${list.id}`}
-                                                                        >
-                                                                            <button className="btn btn-sm btn-primary">
-                                                                                View
-                                                                            </button>
-                                                                        </Link>
-                                                                    </td>
-                                                                </tr>
-                                                            );
-                                                        }
+                                                                        </td>
+                                                                        <td>
+                                                                            {
+                                                                                list.contact
+                                                                            }
+                                                                        </td>
+                                                                        <td>
+                                                                            {
+                                                                                list.category
+                                                                            }
+                                                                        </td>
+                                                                        <td>
+                                                                            {this.dateConversion(
+                                                                                list.date_joined
+                                                                            )}
+                                                                        </td>
+                                                                        <td>
+                                                                            {list.is_active ? (
+                                                                                <span className="text-success">
+                                                                                    Active
+                                                                                </span>
+                                                                            ) : (
+                                                                                <span className="text-danger">
+                                                                                    Not active
+                                                                                </span>
+                                                                            )}
+                                                                        </td>
+                                                                        <td>
+                                                                            <Link
+                                                                                to={`/admin/student/${list.id}`}
+                                                                            >
+                                                                                <button className="btn btn-sm btn-primary">
+                                                                                    View
+                                                                                </button>
+                                                                            </Link>
+                                                                        </td>
+                                                                    </tr>
+                                                                );
+                                                            }
+                                                        )
+                                                    ) : (
+                                                        <EmptyData />
                                                     )
                                                 ) : (
                                                     <Loading />

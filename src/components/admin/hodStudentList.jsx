@@ -4,17 +4,12 @@ import profilepic from "../../assets/user.png";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
+import ProfileLoader from "../../shared/profileLoader";
 
 function Loading() {
     return (
         <tr>
             <td>Loading...</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
         </tr>
     );
 }
@@ -23,12 +18,6 @@ function EmptyData() {
     return (
         <tr>
             <td>Data not available</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
         </tr>
     );
 }
@@ -51,6 +40,8 @@ class HodStudentList extends Component {
     };
 
     componentDidMount = () => {
+        document.title = "Admin Profile | IQLabs";
+
         const hodId = this.props.match.params.hodId;
         var url = baseUrl + adminPathUrl;
         var authToken = localStorage.getItem("Inquel-Auth");
@@ -72,8 +63,8 @@ class HodStudentList extends Component {
         ])
             .then((result) => {
                 this.setState({
-                    hodItems: result[0],
-                    studentItems: result[1].data,
+                    hodItems: result[0].data,
+                    studentItems: result[1].data.results,
                     isLoaded: true,
                 });
                 console.log(result);
@@ -108,33 +99,37 @@ class HodStudentList extends Component {
                 >
                     <div className="container-fluid">
                         {/* HOD Details */}
-                        <div className="row align-items-center mb-4">
-                            <div className="col-md-6">
-                                <div className="row align-items-center">
-                                    <div className="col-md-2 col-3">
-                                        <img
-                                            src={
-                                                this.state.hodItems
-                                                    .profile_link !== null
-                                                    ? this.state.hodItems
-                                                          .profile_link
-                                                    : profilepic
-                                            }
-                                            alt={`${this.state.hodItems.first_name} ${this.state.hodItems.last_name}`}
-                                            className="img-fluid profile-pic"
-                                        />
-                                    </div>
-                                    <div className="col-md-10 col-9 pl-0">
-                                        <h5 className="primary-text">
-                                            {`${this.state.hodItems.first_name} ${this.state.hodItems.last_name}`}
-                                        </h5>
-                                        <p className="mb-0">
-                                            {this.props.match.params.hodId}
-                                        </p>
+                        {this.state.isLoaded ? (
+                            <div className="row align-items-center mb-4">
+                                <div className="col-md-6">
+                                    <div className="row align-items-center">
+                                        <div className="col-md-2 col-3">
+                                            <img
+                                                src={
+                                                    this.state.hodItems
+                                                        .profile_link !== null
+                                                        ? this.state.hodItems
+                                                              .profile_link
+                                                        : profilepic
+                                                }
+                                                alt={`${this.state.hodItems.first_name} ${this.state.hodItems.last_name}`}
+                                                className="img-fluid profile-pic"
+                                            />
+                                        </div>
+                                        <div className="col-md-10 col-9 pl-0">
+                                            <h5 className="primary-text">
+                                                {`${this.state.hodItems.first_name} ${this.state.hodItems.last_name}`}
+                                            </h5>
+                                            <p className="mb-0">
+                                                {this.props.match.params.hodId}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        ) : (
+                            <ProfileLoader />
+                        )}
 
                         {/* Student List */}
                         <div className="card shadow-sm">

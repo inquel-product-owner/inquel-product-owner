@@ -17,11 +17,18 @@ class DiscountConfiguration extends Component {
         });
     };
 
+    componentDidMount = () => {
+        document.title = "Admin Discount Configuration | IQLabs";
+    };
+
     render() {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="Discount Configuration" togglenav={this.toggleSideNav} />
+                <Header
+                    name="Discount Configuration"
+                    togglenav={this.toggleSideNav}
+                />
 
                 {/* Sidebar */}
                 <SideNav shownav={this.state.showSideNav} activeLink="course" />

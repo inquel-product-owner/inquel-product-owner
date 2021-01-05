@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Redirect } from "react-router-dom";
+import { Route, Redirect, Switch } from "react-router-dom";
 
 import Dashboard from "./dashboard";
 import Login from "./login";
@@ -12,11 +12,14 @@ import HodStudentProfile from "./hodStudentProfile";
 import CourseView from "./viewCourse";
 import DiscountConfiguration from "./discountConfiguration";
 import MasterData from "./masterData";
+import HODTable from "../table/hodTable";
 
 import hodRoutes from "../hod/hodRoute";
+import errorPage from '../404';
 
 const adminRoutes = (
-    <>
+    <Switch>
+        <Route exact path="/" component={HODTable} />
         <Route
             exact
             path="/admin"
@@ -122,7 +125,9 @@ const adminRoutes = (
             }
         />
         {hodRoutes}
-    </>
+        {/* <Redirect to="/admin/login" /> */}
+        <Route path="*" component={errorPage}/>
+    </Switch>
 );
 
 export default adminRoutes;

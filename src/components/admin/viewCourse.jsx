@@ -17,6 +17,10 @@ class CourseView extends Component {
         });
     };
 
+    componentDidMount = () => {
+        document.title = "Admin Course | IQLabs";
+    };
+
     render() {
         return (
             <div className="wrapper">
@@ -93,7 +97,9 @@ class CourseView extends Component {
                                                         <div className="col-md-5 mb-2 mb-md-0">
                                                             <div className="row">
                                                                 <div className="col-2">
-                                                                <span><i className="fas fa-plus-circle"></i></span>
+                                                                    <span>
+                                                                        <i className="fas fa-plus-circle"></i>
+                                                                    </span>
                                                                 </div>
                                                                 <div className="col-2">
                                                                     1
@@ -122,7 +128,9 @@ class CourseView extends Component {
                                                                     <div className="row">
                                                                         <div className="col-6"></div>
                                                                         <div className="col-6 text-right">
-                                                                            <span className="text-success"><i className="fas fa-check-circle"></i></span>
+                                                                            <span className="text-success">
+                                                                                <i className="fas fa-check-circle"></i>
+                                                                            </span>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -143,7 +151,8 @@ class CourseView extends Component {
                                                                             1.1
                                                                         </div>
                                                                         <div className="col-md-10 col-9">
-                                                                            Arithmatic progression
+                                                                            Arithmatic
+                                                                            progression
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -151,9 +160,13 @@ class CourseView extends Component {
                                                                     <div className="row justify-content-end">
                                                                         <div className="col-md-3 col-6 mb-2 mb-md-0">
                                                                             <div className="row">
-                                                                                <div className="col-6">2.4</div>
+                                                                                <div className="col-6">
+                                                                                    2.4
+                                                                                </div>
                                                                                 <div className="col-6 text-right">
-                                                                                <span className="text-muted"><i className="fas fa-check-circle"></i></span>
+                                                                                    <span className="text-muted">
+                                                                                        <i className="fas fa-check-circle"></i>
+                                                                                    </span>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
@@ -172,7 +185,11 @@ class CourseView extends Component {
                                                                             1.1.1
                                                                         </div>
                                                                         <div className="col-md-10 col-9">
-                                                                           Nth term of an AP
+                                                                            Nth
+                                                                            term
+                                                                            of
+                                                                            an
+                                                                            AP
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -180,9 +197,13 @@ class CourseView extends Component {
                                                                     <div className="row justify-content-end">
                                                                         <div className="col-md-3 col-6 mb-2 mb-md-0">
                                                                             <div className="row">
-                                                                                <div className="col-6">1.1.2</div>
+                                                                                <div className="col-6">
+                                                                                    1.1.2
+                                                                                </div>
                                                                                 <div className="col-6 text-right">
-                                                                                <span className="text-muted"><i className="fas fa-check-circle"></i></span>
+                                                                                    <span className="text-muted">
+                                                                                        <i className="fas fa-check-circle"></i>
+                                                                                    </span>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
@@ -203,9 +224,15 @@ class CourseView extends Component {
                                             <div className="card-header secondary-bg">
                                                 <div className="row align-items-center">
                                                     <div className="col-6">
-                                                        <p className="small mb-0">Semester Exams</p>
+                                                        <p className="small mb-0">
+                                                            Semester Exams
+                                                        </p>
                                                     </div>
-                                                    <div className="col-6 text-right"><button className="btn btn-primary btn-sm">Star</button></div>
+                                                    <div className="col-6 text-right">
+                                                        <button className="btn btn-primary btn-sm">
+                                                            Star
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

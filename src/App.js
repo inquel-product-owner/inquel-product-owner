@@ -1,6 +1,6 @@
 import React from "react";
 import "./App.css";
-import { BrowserRouter, Switch, Redirect } from "react-router-dom";
+import { BrowserRouter, Switch } from "react-router-dom";
 import adminRoutes from "./components/admin/adminRoute";
 
 function App() {
@@ -8,7 +8,6 @@ function App() {
         <BrowserRouter>
             <Switch>
                 {adminRoutes}
-                <Redirect to="/" />
             </Switch>
         </BrowserRouter>
     );

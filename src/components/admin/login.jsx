@@ -25,6 +25,9 @@ class Login extends Component {
     };
 
     handleSubmit = (event) => {
+        this.setState({
+            errortext: "",
+        });
         event.preventDefault();
         var url = `${baseUrl}${adminPathUrl}/login/`;
         console.log(
@@ -72,6 +75,10 @@ class Login extends Component {
             });
     };
 
+    componentDidMount = () => {
+        document.title = "Admin Login | IQLabs";
+    };
+
     render() {
         if (localStorage.getItem("Inquel-Auth")) {
             return <Redirect to="/admin" />;
@@ -107,7 +114,7 @@ class Login extends Component {
                                                     type="text"
                                                     name="username"
                                                     id="username"
-                                                    className="form-control shadow-sm border-0 form-control-lg"
+                                                    className="form-control shadow border-0 form-control-lg"
                                                     onChange={
                                                         this.changeUsername
                                                     }
@@ -124,7 +131,7 @@ class Login extends Component {
                                                     type="password"
                                                     name="password"
                                                     id="password"
-                                                    className="form-control shadow-sm border-0 form-control-lg"
+                                                    className="form-control shadow border-0 form-control-lg"
                                                     onChange={
                                                         this.changePassword
                                                     }
