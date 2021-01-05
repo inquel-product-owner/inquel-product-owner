@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
 
 class MasterData extends Component {
@@ -38,6 +37,8 @@ class MasterData extends Component {
     };
 
     componentDidMount = () => {
+        document.title = "Admin Master Data | IQLabs";
+
         var url = baseUrl + adminPathUrl;
         var authToken = localStorage.getItem("Inquel-Auth");
         var headers = {
@@ -140,9 +141,6 @@ class MasterData extends Component {
     render() {
         return (
             <div className="wrapper">
-                <Helmet>
-                    <title>Admin Course | IQLabs</title>
-                </Helmet>
                 {/* Navbar */}
                 <Header
                     name="Course Master Data"

@@ -3,7 +3,7 @@ import { Navbar, Nav, Dropdown } from "react-bootstrap";
 import { Link, Redirect } from "react-router-dom";
 import logo from "../../assets/IQ_Labs_V5.png";
 import userpic from "../../assets/user.png";
-import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
+import { baseUrl, accountsUrl } from "../../shared/baseUrl";
 
 class Header extends Component {
     constructor(props) {
@@ -12,7 +12,7 @@ class Header extends Component {
     }
 
     handleLogout = () => {
-        var url = baseUrl + adminPathUrl;
+        var url = baseUrl + accountsUrl;
         var authToken = localStorage.getItem("Authorization");
         var headers = {
             Accept: "application/json",
@@ -27,6 +27,7 @@ class Header extends Component {
             .then((res) => res.json())
             .then((result) => {
                 localStorage.removeItem("Authorization");
+                localStorage.removeItem("is_hod");
                 this.setState({
                     isLoggedOut: true,
                 });

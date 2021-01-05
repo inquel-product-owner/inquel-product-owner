@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 class SideNav extends Component {
     render() {
+        const active = this.props.activeLink;
         return (
             <div
                 id="sidebar"
@@ -11,7 +12,11 @@ class SideNav extends Component {
             >
                 <div style={{ height: "80%" }}>
                     <Link to="/hod">
-                        <button className="btn sidebar-btn active btn-sm mb-3">
+                        <button
+                            className={`btn sidebar-btn ${
+                                active === "dashboard" ? "active" : ""
+                            } btn-sm mb-3`}
+                        >
                             <i
                                 className="fas fa-home"
                                 style={{ marginLeft: "-1.5px" }}
@@ -19,7 +24,11 @@ class SideNav extends Component {
                         </button>
                     </Link>
                     <Link to="/hod/profile">
-                        <button className="btn sidebar-btn btn-sm mb-3">
+                        <button
+                            className={`btn sidebar-btn ${
+                                active === "profiles" ? "active" : ""
+                            } btn-sm mb-3`}
+                        >
                             <i
                                 className="fas fa-users"
                                 style={{ marginLeft: "-1.5px" }}

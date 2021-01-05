@@ -3,7 +3,6 @@ import profilepic from "../../assets/user.png";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
-import { Helmet } from "react-helmet";
 import ProfileLoader from "../../shared/profileLoader";
 
 class HodStudentProfile extends Component {
@@ -23,6 +22,8 @@ class HodStudentProfile extends Component {
     };
 
     componentDidMount = () => {
+        document.title = "Admin Profile | IQLabs";
+
         const hodId = this.props.match.params.hodId;
         const studentId = this.props.match.params.studentId;
         var url = baseUrl + adminPathUrl;
@@ -53,9 +54,6 @@ class HodStudentProfile extends Component {
     render() {
         return (
             <div className="wrapper">
-                <Helmet>
-                    <title>Admin Profile | IQLabs</title>
-                </Helmet>
                 {/* Navbar */}
                 <Header name="User Profiles" togglenav={this.toggleSideNav} />
 

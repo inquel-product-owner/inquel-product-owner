@@ -4,7 +4,6 @@ import profilepic from "../../assets/user.png";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
-import { Helmet } from "react-helmet";
 import ProfileLoader from "../../shared/profileLoader";
 
 function Loading() {
@@ -37,6 +36,8 @@ class HodTeacherList extends Component {
     };
 
     componentDidMount = () => {
+        document.title = "Admin Profile | IQLabs";
+
         const hodId = this.props.match.params.hodId;
         var url = baseUrl + adminPathUrl;
         var authToken = localStorage.getItem("Inquel-Auth");
@@ -72,9 +73,6 @@ class HodTeacherList extends Component {
     render() {
         return (
             <div className="wrapper">
-                <Helmet>
-                    <title>Admin Profile | IQLabs</title>
-                </Helmet>
                 {/* Navbar */}
                 <Header name="User Profiles" togglenav={this.toggleSideNav} />
 

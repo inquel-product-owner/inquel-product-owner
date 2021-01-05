@@ -1,0 +1,247 @@
+.fabric .empimg {
+    background-color: #0078d6;
+}
+.material .empimg {
+    background-color: #e3165b;
+}
+.highcontrast .empimg {
+    background-color: #ffd939;
+}
+_:-ms-fullscreen,
+:root .highcontrast .e-userimg.sf-icon-Male::before,
+_:-ms-fullscreen,
+:root .highcontrast .e-userimg.sf-icon-FeMale::before {
+    color: black;
+}
+.highcontrast .e-userimg.sf-icon-Male::before,
+.highcontrast .e-userimg.sf-icon-FeMale::before {
+    color: black;
+}
+.bootstrap .empimg {
+    background-color: #0078d6;
+}
+
+.bootstrap4 .empimg {
+    background-color: #0078d6;
+}
+
+#Emptext {
+    top: -12px;
+    left: 41px;
+    position: relative;
+}
+.empimg {
+    height: 27px;
+    width: 29px;
+    border-radius: 14px;
+}
+#overviewgrid.e-rtl #Emptext {
+    top: -12px;
+    left: -41px;
+    position: relative;
+}
+
+.e-userimg.sf-icon-Male::before,
+.e-userimg.sf-icon-FeMale::before {
+    font-size: 13px;
+}
+.e-userimg.sf-icon-Male,
+.e-userimg.sf-icon-FeMale {
+    margin: 0px 8px;
+    line-height: 26px;
+    color: white;
+    font-size: 13px;
+}
+
+.e-userimg.sf-icon-Male::before {
+    content: "\e700";
+}
+.e-userimg.sf-icon-FeMale::before {
+    content: "\e701";
+}
+
+.highcontrast #overviewgrid td.e-rowcell.e-selectionbackground.e-active {
+    background-color: transparent;
+    color: white;
+}
+
+.e-bigger #overviewgrid .statustxt {
+    position: relative;
+}
+
+.rating .star {
+    font-size: 132%;
+    color: lightgrey;
+}
+
+.rating .star.checked {
+    color: #ffa600;
+}
+
+.rating .star:before {
+    content: "★";
+}
+
+#overviewgrid td.e-rowcell.e-selectionbackground.e-active {
+    background-color: transparent;
+}
+
+.e-image {
+    height: 13px;
+    width: 14px;
+}
+
+td.e-rowcell .statustxt.e-activecolor {
+    color: #008000;
+    position: relative;
+    top: 10px;
+}
+
+td.e-rowcell .statustxt.e-inactivecolor {
+    color: #e60000;
+    position: relative;
+    top: 10px;
+}
+
+.statustemp.e-inactivecolor {
+    background-color: #ffd7cc;
+    width: 64px;
+}
+
+.statustemp.e-activecolor {
+    background-color: #ccffcc;
+    width: 57px;
+}
+
+.statustxt.e-activecolor {
+    color: #008000;
+}
+
+.statustxt.e-inactivecolor {
+    color: #e60000;
+}
+
+.statustemp {
+    position: relative;
+    height: 19px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.highcontrast #msg {
+    color: #ffffff;
+}
+
+#msg {
+    font-family: "Segoe UI", "GeezaPro", "DejaVu Serif", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    opacity: 0.95;
+    color: #333;
+    float: right;
+    margin-top: 3px;
+}
+
+@media only screen and (max-width: 370px) {
+    #msg {
+        float: left;
+        margin-top: 3px;
+    }
+    #overviewgrid {
+        margin-top: 36px;
+    }
+}
+
+#samplecontainer {
+    padding-top: 5px;
+}
+
+#myProgress {
+    position: relative;
+    height: 18px;
+    width: 10em;
+    text-align: left;
+    background-color: white;
+}
+.highcontrast #overviewgrid #myProgress {
+    background-color: black;
+}
+
+#myBar {
+    position: absolute;
+    width: 10%;
+    height: 100%;
+    background-color: #00b300;
+}
+#myBar.progressdisable {
+    background-color: #df2222;
+}
+#label {
+    position: relative;
+    left: 10px;
+    line-height: 18px;
+    font-size: 10px;
+    color: white;
+}
+
+.e-grid .e-headercelldiv {
+    color: #621012 !important;
+    font-size: 14px !important;
+}
+
+.e-pager .e-currentitem,
+.e-pager .e-currentitem:hover {
+    background: #621012 !important;
+}
+
+.e-checkbox-wrapper .e-frame.e-check,
+.e-css.e-checkbox-wrapper .e-frame.e-check {
+    background-color: #621012 !important;
+}
+
+.e-btn.e-flat.e-primary:active,
+.e-btn.e-flat.e-primary.e-active,
+.e-css.e-btn.e-flat.e-primary:active,
+.e-css.e-btn.e-flat.e-primary.e-active {
+    background-color: #efd2ac;
+    border-color: transparent;
+    color: #621012;
+}
+
+.e-btn.e-flat.e-primary:focus,
+.e-css.e-btn.e-flat.e-primary:focus {
+    background-color: #efd2ac;
+    border-color: transparent;
+    color: #621012;
+}
+
+.e-btn.e-flat.e-primary:hover,
+.e-css.e-btn.e-flat.e-primary:hover {
+    background-color: #efd2ac;
+    border-color: transparent;
+    color: #621012;
+}
+
+.e-btn.e-flat.e-primary,
+.e-css.e-btn.e-flat.e-primary {
+    background-color: transparent;
+    border-color: transparent;
+    color: #621012;
+}
+
+.e-grid .e-filtered::before {
+    color: red;
+}
+
+.e-input-group:not(.e-float-icon-left):not(.e-float-input)::before,
+.e-input-group:not(.e-float-icon-left):not(.e-float-input)::after,
+.e-input-group.e-float-icon-left:not(.e-float-input) .e-input-in-wrap::before,
+.e-input-group.e-float-icon-left:not(.e-float-input) .e-input-in-wrap::after,
+.e-input-group.e-control-wrapper:not(.e-float-icon-left):not(.e-float-input)::before,
+.e-input-group.e-control-wrapper:not(.e-float-icon-left):not(.e-float-input)::after,
+.e-input-group.e-control-wrapper.e-float-icon-left:not(.e-float-input)
+    .e-input-in-wrap::before,
+.e-input-group.e-control-wrapper.e-float-icon-left:not(.e-float-input)
+    .e-input-in-wrap::after {
+    background: #621012;
+}

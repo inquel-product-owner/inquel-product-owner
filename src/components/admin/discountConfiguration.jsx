@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet";
 
 class DiscountConfiguration extends Component {
     constructor(props) {
@@ -18,12 +17,13 @@ class DiscountConfiguration extends Component {
         });
     };
 
+    componentDidMount = () => {
+        document.title = "Admin Discount Configuration | IQLabs";
+    };
+
     render() {
         return (
             <div className="wrapper">
-                <Helmet>
-                    <title>Admin Course | IQLabs</title>
-                </Helmet>
                 {/* Navbar */}
                 <Header
                     name="Discount Configuration"

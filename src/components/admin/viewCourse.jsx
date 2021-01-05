@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { Card, Accordion } from "react-bootstrap";
-import { Helmet } from "react-helmet";
 
 class CourseView extends Component {
     constructor(props) {
@@ -18,12 +17,13 @@ class CourseView extends Component {
         });
     };
 
+    componentDidMount = () => {
+        document.title = "Admin Course | IQLabs";
+    };
+
     render() {
         return (
             <div className="wrapper">
-                <Helmet>
-                    <title>Admin Course | IQLabs</title>
-                </Helmet>
                 {/* Navbar */}
                 <Header name="Course" togglenav={this.toggleSideNav} />
 

@@ -1,11 +1,73 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import { Modal } from "react-bootstrap";
+import { Modal, Alert, Spinner } from "react-bootstrap";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import courseimg from "../../assets/code.jpg";
+import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
 
 class SubjectModal extends Component {
+    constructor() {
+        super();
+        this.state = {
+            subjectName: "",
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: false,
+        };
+    }
+
+    handleSubmit = (event) => {
+        event.preventDefault();
+        var url = baseUrl + hodUrl;
+        var authToken = localStorage.getItem("Authorization");
+        var headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: authToken,
+        };
+
+        this.setState({
+            showLoader: true,
+        });
+
+        fetch(`${url}/hod/create/subject/`, {
+            headers: headers,
+            method: "POST",
+            body: JSON.stringify({
+                subject_name: this.state.subjectName,
+            }),
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        showLoader: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    handleSubject = (event) => {
+        this.setState({
+            subjectName: event.target.value,
+        });
+    };
+
     render() {
         return (
             <Modal
@@ -16,20 +78,60 @@ class SubjectModal extends Component {
             >
                 <Modal.Header closeButton></Modal.Header>
                 <Modal.Body>
-                    <div className="form-group">
-                        <label htmlFor="subject">Subject name</label>
-                        <input
-                            type="text"
-                            name="subject"
-                            id="subject"
-                            className="form-control borders"
-                        />
-                    </div>
-                    <div className="form-group">
-                        <button className="btn btn-primary btn-sm btn-block">
-                            Create Subject
-                        </button>
-                    </div>
+                    <Alert
+                        variant="danger"
+                        show={this.state.showErrorAlert}
+                        onClose={() => {
+                            this.setState({
+                                showErrorAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.errorMsg}
+                    </Alert>
+                    <Alert
+                        variant="success"
+                        show={this.state.showSuccessAlert}
+                        onClose={() => {
+                            this.setState({
+                                showSuccessAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.successMsg}
+                    </Alert>
+                    <form onSubmit={this.handleSubmit}>
+                        <div className="form-group">
+                            <label htmlFor="subject">Subject name</label>
+                            <input
+                                type="text"
+                                name="subject"
+                                id="subject"
+                                className="form-control borders"
+                                onChange={this.handleSubject}
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <button className="btn btn-primary btn-sm btn-block">
+                                {this.state.showLoader ? (
+                                    <Spinner
+                                        as="span"
+                                        animation="border"
+                                        size="sm"
+                                        role="status"
+                                        aria-hidden="true"
+                                        className="mr-2"
+                                    />
+                                ) : (
+                                    ""
+                                )}
+                                Create Subject
+                            </button>
+                        </div>
+                    </form>
                 </Modal.Body>
             </Modal>
         );
@@ -42,6 +144,8 @@ class Dashboard extends Component {
         this.state = {
             showSideNav: false,
             subjectModalShow: false,
+            groupItem: [],
+            subjectItem: [],
         };
     }
 
@@ -57,6 +161,39 @@ class Dashboard extends Component {
         });
     };
 
+    componentDidMount = () => {
+        document.title = "HOD Dashboard | IQLabs";
+
+        var url = baseUrl + hodUrl;
+        var authToken = localStorage.getItem("Authorization");
+        var headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: authToken,
+        };
+
+        Promise.all([
+            fetch(`${url}/hod/groups/`, {
+                headers: headers,
+                method: "GET",
+            }).then((res) => res.json()),
+            fetch(`${url}/hod/subjects/`, {
+                headers: headers,
+                method: "GET",
+            }).then((res) => res.json()),
+        ])
+            .then((result) => {
+                this.setState({
+                    groupItem: result[0].data.results,
+                    subjectItem: result[1].data.results,
+                });
+                console.log(result);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     render() {
         return (
             <div className="wrapper">
@@ -64,7 +201,10 @@ class Dashboard extends Component {
                 <Header name="Dashboard" togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
-                <SideNav shownav={this.state.showSideNav} />
+                <SideNav
+                    shownav={this.state.showSideNav}
+                    activeLink="dashboard"
+                />
 
                 {/* Add Subject modal */}
                 <SubjectModal
@@ -110,78 +250,54 @@ class Dashboard extends Component {
                                 <div className="row justify-content-center">
                                     <div className="col-md-11">
                                         <div className="row">
-                                            <div className="col-md-4 mb-3">
-                                                <Link
-                                                    to="/hod/group/001"
-                                                    style={{
-                                                        textDecoration: "none",
-                                                    }}
-                                                >
-                                                    <div
-                                                        className="card"
-                                                        style={{
-                                                            cursor: "pointer",
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={courseimg}
-                                                            className="card-img-top"
-                                                            alt="Groups"
-                                                        />
-                                                        <div className="card-body primary-bg text-white text-center p-2">
-                                                            A
-                                                        </div>
-                                                    </div>
-                                                </Link>
-                                            </div>
-                                            <div className="col-md-4 mb-3">
-                                                <Link
-                                                    to="/hod/group/002"
-                                                    style={{
-                                                        textDecoration: "none",
-                                                    }}
-                                                >
-                                                    <div
-                                                        className="card"
-                                                        style={{
-                                                            cursor: "pointer",
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={courseimg}
-                                                            className="card-img-top"
-                                                            alt="Groups"
-                                                        />
-                                                        <div className="card-body primary-bg text-white text-center p-2">
-                                                            B
-                                                        </div>
-                                                    </div>
-                                                </Link>
-                                            </div>
-                                            <div className="col-md-4 mb-3">
-                                                <Link
-                                                    to="/hod/group/003"
-                                                    style={{
-                                                        textDecoration: "none",
-                                                    }}
-                                                >
-                                                    <div
-                                                        className="card"
-                                                        style={{
-                                                            cursor: "pointer",
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={courseimg}
-                                                            className="card-img-top"
-                                                            alt="Groups"
-                                                        />
-                                                        <div className="card-body primary-bg text-white text-center p-2">
-                                                            C
-                                                        </div>
-                                                    </div>
-                                                </Link>
-                                            </div>
+                                            {this.state.groupItem.length !==
+                                            0 ? (
+                                                this.state.groupItem.map(
+                                                    (list, index) => {
+                                                        return (
+                                                            <div
+                                                                className="col-md-4 mb-3"
+                                                                key={index}
+                                                            >
+                                                                <Link
+                                                                    to={`/hod/group/${list.id}`}
+                                                                    style={{
+                                                                        textDecoration:
+                                                                            "none",
+                                                                    }}
+                                                                >
+                                                                    <div
+                                                                        className="card"
+                                                                        style={{
+                                                                            cursor:
+                                                                                "pointer",
+                                                                        }}
+                                                                    >
+                                                                        <img
+                                                                            src={
+                                                                                courseimg
+                                                                            }
+                                                                            className="card-img-top"
+                                                                            alt={
+                                                                                list.group_name
+                                                                            }
+                                                                        />
+                                                                        <div className="card-body primary-bg text-white text-center p-2">
+                                                                            {
+                                                                                list.group_name
+                                                                            }
+                                                                        </div>
+                                                                    </div>
+                                                                </Link>
+                                                            </div>
+                                                        );
+                                                    }
+                                                )
+                                            ) : (
+                                                <div className="col-md-6">
+                                                    Data not available
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -218,88 +334,61 @@ class Dashboard extends Component {
                                 <div className="row justify-content-center">
                                     <div className="col-md-11">
                                         <div className="row">
-                                            <div className="col-md-4 mb-3">
-                                                <Link
-                                                    to="/hod/subject/001/review"
-                                                    style={{
-                                                        textDecoration: "none",
-                                                    }}
-                                                >
-                                                    <div
-                                                        className="card"
-                                                        style={{
-                                                            cursor: "pointer",
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={courseimg}
-                                                            className="card-img-top"
-                                                            alt="Subjects"
-                                                        />
-                                                        <div className="card-body primary-bg text-white text-center p-2">
-                                                            CBSE 10th Standard
-                                                            Chemistry
-                                                        </div>
-                                                    </div>
-                                                </Link>
-                                            </div>
-                                            <div className="col-md-4 mb-3">
-                                                <Link
-                                                    to="/hod/subject/001/review"
-                                                    style={{
-                                                        textDecoration: "none",
-                                                    }}
-                                                >
-                                                    <div
-                                                        className="card"
-                                                        style={{
-                                                            cursor: "pointer",
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={courseimg}
-                                                            className="card-img-top"
-                                                            alt="Subjects"
-                                                        />
-                                                        <div className="card-body primary-bg text-white text-center p-2">
-                                                            CBSE 9th Standard
-                                                            Chemistry
-                                                        </div>
-                                                    </div>
-                                                </Link>
-                                            </div>
-                                            <div className="col-md-4 mb-3">
-                                                <Link
-                                                    to="/hod/subject/001/review"
-                                                    style={{
-                                                        textDecoration: "none",
-                                                    }}
-                                                >
-                                                    <div
-                                                        className="card"
-                                                        style={{
-                                                            cursor: "pointer",
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={courseimg}
-                                                            className="card-img-top"
-                                                            alt="Subjects"
-                                                        />
-                                                        <div className="card-body primary-bg text-white text-center p-2">
-                                                            CBSE 8th Standard
-                                                            Chemistry
-                                                        </div>
-                                                    </div>
-                                                </Link>
-                                            </div>
+                                            {this.state.subjectItem.length !==
+                                            0 ? (
+                                                this.state.subjectItem.map(
+                                                    (list, index) => {
+                                                        return (
+                                                            <div
+                                                                className="col-md-4 mb-3"
+                                                                key={index}
+                                                            >
+                                                                <Link
+                                                                    to={`/hod/subject/${list.id}/review`}
+                                                                    style={{
+                                                                        textDecoration:
+                                                                            "none",
+                                                                    }}
+                                                                >
+                                                                    <div
+                                                                        className="card"
+                                                                        style={{
+                                                                            cursor:
+                                                                                "pointer",
+                                                                        }}
+                                                                    >
+                                                                        <img
+                                                                            src={
+                                                                                courseimg
+                                                                            }
+                                                                            className="card-img-top"
+                                                                            alt={
+                                                                                list.subject_name
+                                                                            }
+                                                                        />
+                                                                        <div className="card-body primary-bg text-white text-center p-2">
+                                                                            {
+                                                                                list.subject_name
+                                                                            }
+                                                                        </div>
+                                                                    </div>
+                                                                </Link>
+                                                            </div>
+                                                        );
+                                                    }
+                                                )
+                                            ) : (
+                                                <div className="col-md-6">
+                                                    Data not available
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Subject card */}
+                        {/* Course card */}
                         <div className="card shadow-sm mb-4">
                             <div className="card-header">
                                 <div className="row align-items-center">
