@@ -10,12 +10,14 @@ class StudentAssignModal extends Component {
     constructor() {
         super();
         this.state = {
-            subjectName: "",
+            studentId: [""],
+            studentItem: [],
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
             showLoader: false,
+            isLoaded: false,
         };
     }
 
@@ -31,14 +33,15 @@ class StudentAssignModal extends Component {
 
         this.setState({
             showLoader: true,
+            showErrorAlert: false,
+            showSuccessAlert: false,
         });
 
-        fetch(`${url}/hod/create/subject/`, {
+        fetch(`${url}/hod/group/${this.props.groupId}/assign/`, {
             headers: headers,
             method: "POST",
             body: JSON.stringify({
-                subject_name: this.state.subjectName,
-                group_id: this.props.groupId,
+                student_ids: this.state.studentId,
             }),
         })
             .then((res) => res.json())
@@ -63,10 +66,39 @@ class StudentAssignModal extends Component {
             });
     };
 
-    handleSubject = (event) => {
+    handleInputChange = (index, event) => {
+        let values = [...this.state.studentId];
+        values.push("");
+        values[index] = event.target.value;
         this.setState({
-            subjectName: event.target.value,
+            studentId: values,
         });
+    };
+
+    componentDidMount = () => {
+        var url = baseUrl + hodUrl;
+        var authToken = localStorage.getItem("Authorization");
+        var headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: authToken,
+        };
+
+        fetch(`${url}/hod/group/${this.props.groupId}/assign/`, {
+            headers: headers,
+            method: "GET",
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                this.setState({
+                    studentItem: result.data,
+                    isLoaded: true,
+                });
+                console.log(result);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     };
 
     render() {
@@ -108,22 +140,52 @@ class StudentAssignModal extends Component {
                             <thead className="primary-text">
                                 <tr>
                                     <th scope="col"></th>
-                                    <th scope="col">ID</th>
                                     <th scope="col">Name</th>
                                     <th scope="col">Username</th>
                                     <th scope="col">Email</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td className="text-center">
-                                        <input type="checkbox" name="enable" />
-                                    </td>
-                                    <td>001</td>
-                                    <td>Student 1</td>
-                                    <td>Student1</td>
-                                    <td>stu@acde.com</td>
-                                </tr>
+                                {this.state.isLoaded ? (
+                                    this.state.studentItem.length !== 0 ? (
+                                        this.state.studentItem.map(
+                                            (list, index) => {
+                                                return (
+                                                    <tr key={index}>
+                                                        <td className="text-center">
+                                                            <input
+                                                                type="checkbox"
+                                                                name="enable"
+                                                                value={list.id}
+                                                                onChange={(
+                                                                    event
+                                                                ) =>
+                                                                    this.handleInputChange(
+                                                                        index,
+                                                                        event
+                                                                    )
+                                                                }
+                                                            />
+                                                        </td>
+                                                        <td>
+                                                            {list.full_name}
+                                                        </td>
+                                                        <td>{list.username}</td>
+                                                        <td>{list.email}</td>
+                                                    </tr>
+                                                );
+                                            }
+                                        )
+                                    ) : (
+                                        <tr>
+                                            <td>Data not available</td>
+                                        </tr>
+                                    )
+                                ) : (
+                                    <tr>
+                                        <td>Loading...</td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
                     </div>
@@ -157,6 +219,8 @@ class GroupStudents extends Component {
             showSideNav: false,
             showStudentModal: false,
             groupItem: [],
+            studentItem: [],
+            isLoaded: false,
         };
     }
 
@@ -172,6 +236,12 @@ class GroupStudents extends Component {
         });
     };
 
+    dateConversion = (date) => {
+        var newDate = new Date(date).toLocaleDateString();
+        var datearray = newDate.split("/");
+        return datearray[1] + "/" + datearray[0] + "/" + datearray[2];
+    };
+
     componentDidMount = () => {
         var url = baseUrl + hodUrl;
         var authToken = localStorage.getItem("Authorization");
@@ -181,14 +251,24 @@ class GroupStudents extends Component {
             Authorization: authToken,
         };
 
-        fetch(`${url}/hod/group/${this.props.match.params.groupId}`, {
-            headers: headers,
-            method: "GET",
-        })
-            .then((res) => res.json())
+        Promise.all([
+            fetch(`${url}/hod/group/${this.props.match.params.groupId}`, {
+                headers: headers,
+                method: "GET",
+            }).then((res) => res.json()),
+            fetch(
+                `${url}/hod/group/${this.props.match.params.groupId}/student/`,
+                {
+                    headers: headers,
+                    method: "GET",
+                }
+            ).then((res) => res.json()),
+        ])
             .then((result) => {
                 this.setState({
-                    groupItem: result.data,
+                    groupItem: result[0].data,
+                    studentItem: result[1].data.results,
+                    isLoaded: true,
                 });
                 console.log(result);
             })
@@ -220,7 +300,7 @@ class GroupStudents extends Component {
                 <StudentAssignModal
                     show={this.state.showStudentModal}
                     onHide={this.toggleStudentModal}
-                    // groupId={this.props.match.params.groupId}
+                    groupId={this.props.match.params.groupId}
                 />
 
                 <div
@@ -289,100 +369,106 @@ class GroupStudents extends Component {
                                     <thead className="primary-text">
                                         <tr>
                                             <th scope="col"></th>
-                                            <th scope="col">ID</th>
                                             <th scope="col">Name</th>
+                                            <th scope="col">Username</th>
                                             <th scope="col">Email</th>
                                             <th scope="col">Contact</th>
                                             <th scope="col">Category</th>
                                             <th scope="col">Registered on</th>
+                                            <th scope="col">Status</th>
                                             <th scope="col"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td className="text-center">
-                                                <input
-                                                    type="checkbox"
-                                                    name="enable"
-                                                />
-                                            </td>
-                                            <td>001</td>
-                                            <td>
-                                                <img
-                                                    src={userimage}
-                                                    alt="User profile pic"
-                                                    width="20"
-                                                />{" "}
-                                                Student 1
-                                            </td>
-                                            <td>stu@acde.com</td>
-                                            <td>9876543210</td>
-                                            <td>Engineering</td>
-                                            <td>01/02/2020</td>
-                                            <td>
-                                                <Link to="/hod/student/001">
-                                                    <button className="btn btn-sm btn-primary">
-                                                        View
-                                                    </button>
-                                                </Link>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td className="text-center">
-                                                <input
-                                                    type="checkbox"
-                                                    name="enable"
-                                                />
-                                            </td>
-                                            <td>002</td>
-                                            <td>
-                                                <img
-                                                    src={userimage}
-                                                    alt="User profile pic"
-                                                    width="20"
-                                                />{" "}
-                                                Student 2
-                                            </td>
-                                            <td>stu@acde.com</td>
-                                            <td>9876543210</td>
-                                            <td>Engineering</td>
-                                            <td>01/02/2020</td>
-                                            <td>
-                                                <Link to="/hod/student/002">
-                                                    <button className="btn btn-sm btn-primary">
-                                                        View
-                                                    </button>
-                                                </Link>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td className="text-center">
-                                                <input
-                                                    type="checkbox"
-                                                    name="enable"
-                                                />
-                                            </td>
-                                            <td>003</td>
-                                            <td>
-                                                <img
-                                                    src={userimage}
-                                                    alt="User profile pic"
-                                                    width="20"
-                                                />{" "}
-                                                Student 3
-                                            </td>
-                                            <td>stu@acde.com</td>
-                                            <td>9876543210</td>
-                                            <td>Engineering</td>
-                                            <td>01/02/2020</td>
-                                            <td>
-                                                <Link to="/hod/student/003">
-                                                    <button className="btn btn-sm btn-primary">
-                                                        View
-                                                    </button>
-                                                </Link>
-                                            </td>
-                                        </tr>
+                                        {this.state.isLoaded ? (
+                                            this.state.studentItem.length !==
+                                            0 ? (
+                                                this.state.studentItem.map(
+                                                    (list, index) => {
+                                                        return (
+                                                            <tr key={index}>
+                                                                <td className="text-center">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        name="enable"
+                                                                        value={
+                                                                            list.id
+                                                                        }
+                                                                    />
+                                                                </td>
+                                                                <td>
+                                                                    <img
+                                                                        src={
+                                                                            list.profile_link !==
+                                                                            null
+                                                                                ? list.profile_link
+                                                                                : userimage
+                                                                        }
+                                                                        alt="User profile pic"
+                                                                        width="20"
+                                                                    />{" "}
+                                                                    {
+                                                                        list.full_name
+                                                                    }
+                                                                </td>
+                                                                <td>
+                                                                    {
+                                                                        list.username
+                                                                    }
+                                                                </td>
+                                                                <td>
+                                                                    {list.email}
+                                                                </td>
+                                                                <td>
+                                                                    {
+                                                                        list.contact
+                                                                    }
+                                                                </td>
+                                                                <td>
+                                                                    {
+                                                                        list.category
+                                                                    }
+                                                                </td>
+                                                                <td>
+                                                                    {this.dateConversion(
+                                                                        list.date_joined
+                                                                    )}
+                                                                </td>
+                                                                <td>
+                                                                    {list.is_active ? (
+                                                                        <span className="text-success">
+                                                                            Active
+                                                                        </span>
+                                                                    ) : (
+                                                                        <span className="text-danger">
+                                                                            Not
+                                                                            active
+                                                                        </span>
+                                                                    )}
+                                                                </td>
+                                                                <td>
+                                                                    <Link
+                                                                        to={`/hod/student/${list.id}`}
+                                                                    >
+                                                                        <button className="btn btn-sm btn-primary">
+                                                                            View
+                                                                        </button>
+                                                                    </Link>
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    }
+                                                )
+                                            ) : (
+                                                <tr>
+                                                    <td>Data not available</td>
+                                                </tr>
+                                            )
+                                        ) : (
+                                            <tr>
+                                                <td>Loading...</td>
+                                            </tr>
+                                        )}
                                     </tbody>
                                 </table>
                             </div>
