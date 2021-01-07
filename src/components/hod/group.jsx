@@ -31,6 +31,8 @@ class SubjectModal extends Component {
 
         this.setState({
             showLoader: true,
+            showErrorAlert: false,
+            showSuccessAlert: false,
         });
 
         fetch(`${url}/hod/create/subject/`, {
