@@ -56,6 +56,7 @@ class Login extends Component {
                 console.log(result);
 
                 if (this.state.items.sts) {
+                    localStorage.clear();
                     localStorage.setItem(
                         "Inquel-Auth",
                         `Token ${this.state.items.token}`

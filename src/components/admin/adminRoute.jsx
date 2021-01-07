@@ -15,7 +15,7 @@ import MasterData from "./masterData";
 // import HODTable from "../table/hodTable";
 
 import hodRoutes from "../hod/hodRoute";
-import errorPage from '../404';
+import errorPage from "../404";
 
 const adminRoutes = (
     <Switch>
@@ -125,8 +125,7 @@ const adminRoutes = (
             }
         />
         {hodRoutes}
-        {/* <Redirect to="/admin/login" /> */}
-        <Route path="*" component={errorPage}/>
+        <Route path="*" component={errorPage} />
     </Switch>
 );
 

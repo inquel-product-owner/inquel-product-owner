@@ -17,6 +17,7 @@ import SubjectConfiguration from "./subjectConfiguration";
 
 import EmailVerification from "./emailVerification";
 import errorPage from "../404";
+import studentRoutes from "../student/studentRoute";
 
 const hodRoutes = (
     <Switch>
@@ -108,24 +109,24 @@ const hodRoutes = (
         <Route
             exact
             path="/hod/student/:studentId"
-            render={() =>
+            render={(props) =>
                 !localStorage.getItem("Authorization") &&
                 !localStorage.getItem("is_hod") ? (
                     <Redirect to="/hod/login" />
                 ) : (
-                    <StudentProfile />
+                    <StudentProfile {...props} />
                 )
             }
         />
         <Route
             exact
             path="/hod/teacher/:teacherId"
-            render={() =>
+            render={(props) =>
                 !localStorage.getItem("Authorization") &&
                 !localStorage.getItem("is_hod") ? (
                     <Redirect to="/hod/login" />
                 ) : (
-                    <TeacherProfile />
+                    <TeacherProfile {...props} />
                 )
             }
         />
@@ -179,10 +180,10 @@ const hodRoutes = (
         />
         <Route
             exact
-            path="/hod/account/verification/:tokenId"
+            path="/hod/account/activation/:tokenId"
             render={(props) => <EmailVerification {...props} />}
         />
-        {/* <Redirect to="/admin/login" /> */}
+        {studentRoutes}
         <Route path="*" component={errorPage} />
     </Switch>
 );

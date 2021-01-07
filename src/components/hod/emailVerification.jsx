@@ -37,7 +37,6 @@ class EmailVerification extends Component {
             .then((res) => res.json())
             .then((result) => {
                 if (result.sts === true) {
-                    debugger;
                     this.setState({
                         validToken: true,
                     });
@@ -51,8 +50,6 @@ class EmailVerification extends Component {
             .catch((err) => {
                 console.log(err);
             });
-
-        return <Redirect to="/hod/login" />;
     };
 
     handlePassword = (event) => {

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import Header from "./navbar";
 import SideNav from "./sidenav";
-import { Tabs, Tab, Modal } from "react-bootstrap";
+import { Tabs, Tab, Modal, Alert, Spinner } from "react-bootstrap";
 import Switch from "react-switch";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl.js";
 import HODTable from "../table/hodTable";
@@ -37,16 +37,26 @@ class HodModal extends Component {
             simulationexam: false,
             lockingoftest: false,
             mobileapp: false,
-            errortext: "",
-            successtext: "",
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: false,
         };
     }
 
     handleSubmit = (event) => {
         event.preventDefault();
+        this.setState({
+            showLoader: true,
+            showErrorAlert: false,
+            showSuccessAlert: false,
+        });
         if (this.state.password.length < 12) {
             this.setState({
-                errortext: "Password is too short",
+                errorMsg: "Password is too short",
+                showErrorAlert: true,
+                showLoader: false,
             });
         } else {
             var url = baseUrl + adminPathUrl;
@@ -95,13 +105,15 @@ class HodModal extends Component {
                     console.log(result);
                     if (result.sts) {
                         this.setState({
-                            successtext: result.msg,
-                            errortext: "",
+                            successMsg: result.msg,
+                            showSuccessAlert: true,
+                            showLoader: false,
                         });
                     } else {
                         this.setState({
-                            errortext: result.msg,
-                            successtext: "",
+                            errorMsg: result.msg,
+                            showErrorAlert: true,
+                            showLoader: false,
                         });
                     }
                 })
@@ -333,6 +345,30 @@ class HodModal extends Component {
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                    <Alert
+                        variant="danger"
+                        show={this.state.showErrorAlert}
+                        onClose={() => {
+                            this.setState({
+                                showErrorAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.errorMsg}
+                    </Alert>
+                    <Alert
+                        variant="success"
+                        show={this.state.showSuccessAlert}
+                        onClose={() => {
+                            this.setState({
+                                showSuccessAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.successMsg}
+                    </Alert>
                     <form
                         action=""
                         onSubmit={this.handleSubmit}
@@ -815,34 +851,26 @@ class HodModal extends Component {
                                 </div>
                             </div>
                         </div>
-                        <div className="row justify-content-center">
-                            <div className="form-group col-md-6">
-                                <button
-                                    className="btn btn-primary btn-block"
-                                    type="submit"
-                                >
-                                    Create
-                                </button>
-                            </div>
+                        <div className="form-group">
+                            <button
+                                className="btn btn-primary btn-block"
+                                type="submit"
+                            >
+                                {this.state.showLoader ? (
+                                    <Spinner
+                                        as="span"
+                                        animation="border"
+                                        size="sm"
+                                        role="status"
+                                        aria-hidden="true"
+                                        className="mr-2"
+                                    />
+                                ) : (
+                                    ""
+                                )}
+                                Create
+                            </button>
                         </div>
-                        {this.state.errortext !== "" ? (
-                            <div className="form-group">
-                                <p className="text-danger text-center small mb-0">
-                                    {this.state.errortext}
-                                </p>
-                            </div>
-                        ) : (
-                            ""
-                        )}
-                        {this.state.successtext !== "" ? (
-                            <div className="form-group">
-                                <p className="text-success text-center small mb-0">
-                                    {this.state.successtext}
-                                </p>
-                            </div>
-                        ) : (
-                            ""
-                        )}
                     </form>
                 </Modal.Body>
             </Modal>
@@ -955,28 +983,28 @@ class Profiles extends Component {
                                     ""
                                 )}
                                 <div className="d-flex flex-wrap justify-content-center justify-content-md-end mb-4">
-                                        {this.state.activeTab === "hod" ? (
-                                            <button
-                                                className="btn btn-primary btn-sm mr-1"
-                                                onClick={this.toggleModal}
-                                            >
-                                                Add New
-                                            </button>
-                                        ) : (
-                                            ""
-                                        )}
+                                    {this.state.activeTab === "hod" ? (
                                         <button
                                             className="btn btn-primary btn-sm mr-1"
-                                            onClick={this.triggerDelete}
+                                            onClick={this.toggleModal}
                                         >
-                                            Delete
+                                            Add New
                                         </button>
-                                        <button className="btn btn-primary btn-sm mr-1">
-                                            Enable
-                                        </button>
-                                        <button className="btn btn-primary btn-sm">
-                                            Disable
-                                        </button>
+                                    ) : (
+                                        ""
+                                    )}
+                                    <button
+                                        className="btn btn-primary btn-sm mr-1"
+                                        onClick={this.triggerDelete}
+                                    >
+                                        Delete
+                                    </button>
+                                    <button className="btn btn-primary btn-sm mr-1">
+                                        Enable
+                                    </button>
+                                    <button className="btn btn-primary btn-sm">
+                                        Disable
+                                    </button>
                                 </div>
 
                                 <Tabs

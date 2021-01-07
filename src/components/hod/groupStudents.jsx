@@ -7,10 +7,10 @@ import SideNav from "./sidenav";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
 
 class StudentAssignModal extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
-            studentId: [""],
+            studentId: [],
             studentItem: [],
             errorMsg: "",
             successMsg: "",
@@ -37,7 +37,7 @@ class StudentAssignModal extends Component {
             showSuccessAlert: false,
         });
 
-        fetch(`${url}/hod/group/${this.props.groupId}/assign/`, {
+        fetch(`${url}/hod/group/${this.props.groupid}/assign/`, {
             headers: headers,
             method: "POST",
             body: JSON.stringify({
@@ -68,11 +68,17 @@ class StudentAssignModal extends Component {
 
     handleInputChange = (index, event) => {
         let values = [...this.state.studentId];
-        values.push("");
-        values[index] = event.target.value;
-        this.setState({
-            studentId: values,
-        });
+        if (event.target.checked) {
+            values.push(event.target.value.toString());
+            this.setState({
+                studentId: values,
+            });
+        } else {
+            values.splice(values.indexOf(event.target.value), 1);
+            this.setState({
+                studentId: values,
+            });
+        }
     };
 
     componentDidMount = () => {
@@ -84,7 +90,7 @@ class StudentAssignModal extends Component {
             Authorization: authToken,
         };
 
-        fetch(`${url}/hod/group/${this.props.groupId}/assign/`, {
+        fetch(`${url}/hod/group/${this.props.groupid}/assign/`, {
             headers: headers,
             method: "GET",
         })
@@ -191,7 +197,10 @@ class StudentAssignModal extends Component {
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <button className="btn btn-primary">
+                    <button
+                        className="btn btn-primary"
+                        onClick={this.handleSubmit}
+                    >
                         {this.state.showLoader ? (
                             <Spinner
                                 as="span"
@@ -297,11 +306,15 @@ class GroupStudents extends Component {
                 />
 
                 {/* Add Subject modal */}
-                <StudentAssignModal
-                    show={this.state.showStudentModal}
-                    onHide={this.toggleStudentModal}
-                    groupId={this.props.match.params.groupId}
-                />
+                {this.state.showStudentModal ? (
+                    <StudentAssignModal
+                        show={this.state.showStudentModal}
+                        onHide={this.toggleStudentModal}
+                        groupid={this.props.match.params.groupId}
+                    />
+                ) : (
+                    ""
+                )}
 
                 <div
                     className={`section content ${

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import { Modal } from "react-bootstrap";
+import { Modal, Alert, Spinner } from "react-bootstrap";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
@@ -12,8 +12,11 @@ class GroupModal extends Component {
             groupName: "",
             groupDesc: "",
             valid_to: "",
-            errortext: "",
-            successtext: "",
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: false,
         };
     }
 
@@ -50,6 +53,12 @@ class GroupModal extends Component {
             Authorization: authToken,
         };
 
+        this.setState({
+            showLoader: true,
+            showErrorAlert: false,
+            showSuccessAlert: false,
+        });
+
         fetch(`${url}/hod/create/group/`, {
             headers: headers,
             method: "POST",
@@ -64,13 +73,15 @@ class GroupModal extends Component {
                 console.log(result);
                 if (result.sts) {
                     this.setState({
-                        successtext: result.msg,
-                        errortext: "",
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        showLoader: false,
                     });
                 } else {
                     this.setState({
-                        errortext: result.msg,
-                        successtext: "",
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        showLoader: false,
                     });
                 }
             })
@@ -89,6 +100,30 @@ class GroupModal extends Component {
             >
                 <Modal.Header closeButton></Modal.Header>
                 <Modal.Body>
+                    <Alert
+                        variant="danger"
+                        show={this.state.showErrorAlert}
+                        onClose={() => {
+                            this.setState({
+                                showErrorAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.errorMsg}
+                    </Alert>
+                    <Alert
+                        variant="success"
+                        show={this.state.showSuccessAlert}
+                        onClose={() => {
+                            this.setState({
+                                showSuccessAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.successMsg}
+                    </Alert>
                     <form onSubmit={this.handleSubmit} autoComplete="off">
                         <div className="form-group">
                             <label htmlFor="gname">Group name</label>
@@ -122,28 +157,22 @@ class GroupModal extends Component {
                         </div>
                         <div className="form-group">
                             <button className="btn btn-primary btn-sm btn-block">
+                                {this.state.showLoader ? (
+                                    <Spinner
+                                        as="span"
+                                        animation="border"
+                                        size="sm"
+                                        role="status"
+                                        aria-hidden="true"
+                                        className="mr-2"
+                                    />
+                                ) : (
+                                    ""
+                                )}
                                 Create Group
                             </button>
                         </div>
                     </form>
-                    {this.state.errortext !== "" ? (
-                        <div className="form-group">
-                            <p className="text-danger text-center small mb-0">
-                                {this.state.errortext}
-                            </p>
-                        </div>
-                    ) : (
-                        ""
-                    )}
-                    {this.state.successtext !== "" ? (
-                        <div className="form-group">
-                            <p className="text-success text-center small mb-0">
-                                {this.state.successtext}
-                            </p>
-                        </div>
-                    ) : (
-                        ""
-                    )}
                 </Modal.Body>
             </Modal>
         );
