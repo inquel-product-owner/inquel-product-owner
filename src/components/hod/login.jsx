@@ -57,6 +57,7 @@ class HODLogin extends Component {
                 console.log(result);
 
                 if (this.state.items.sts) {
+                    localStorage.clear();
                     localStorage.setItem(
                         "Authorization",
                         `Token ${this.state.items.token}`

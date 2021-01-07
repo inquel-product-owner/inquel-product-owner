@@ -132,6 +132,10 @@ class StudentTable extends Component {
         }
     }
 
+    dataBound() {
+        this.gridInstance.autoFitColumns();
+    }
+
     rowSelected() {
         if (this.gridInstance) {
             // const selectedrowindex = this.gridInstance.getSelectedRowIndexes();
@@ -170,11 +174,12 @@ class StudentTable extends Component {
                         dataSource={this.props.studentItems}
                         enableHover={true}
                         rowHeight={50}
-                        height="500"
+                        height={500}
                         ref={(g) => {
                             this.gridInstance = g;
                         }}
                         queryCellInfo={this.onQueryCellInfo.bind(this)}
+                        dataBound={this.dataBound.bind(this)}
                         filterSettings={this.Filter}
                         allowFiltering={true}
                         allowSorting={true}
@@ -186,14 +191,12 @@ class StudentTable extends Component {
                         pageSettings={{ pageSize: 20, pageCount: 5 }}
                         rowSelected={this.rowSelected.bind(this)}
                         rowDeselected={this.rowDeselected.bind(this)}
-                        editSettings={this.editSettings}
                     >
                         <ColumnsDirective>
                             <ColumnDirective
                                 type="checkbox"
                                 allowSorting={false}
                                 allowFiltering={false}
-                                width="50"
                             ></ColumnDirective>
                             <ColumnDirective
                                 field="id"
@@ -206,7 +209,6 @@ class StudentTable extends Component {
                                 headerText="Name"
                                 clipMode="EllipsisWithTooltip"
                                 filter={this.excel}
-                                width="200"
                                 template={nameTemplate}
                             />
                             <ColumnDirective
@@ -214,28 +216,24 @@ class StudentTable extends Component {
                                 headerText="Username"
                                 clipMode="EllipsisWithTooltip"
                                 filter={this.excel}
-                                width="180"
                             />
                             <ColumnDirective
                                 field="email"
                                 headerText="Email"
                                 filter={this.excel}
                                 clipMode="EllipsisWithTooltip"
-                                width="180"
                             />
                             <ColumnDirective
                                 field="contact"
                                 headerText="Contact"
                                 filter={this.excel}
                                 clipMode="EllipsisWithTooltip"
-                                width="180"
                             ></ColumnDirective>
                             <ColumnDirective
                                 field="category"
                                 headerText="Category"
                                 filter={this.excel}
                                 clipMode="EllipsisWithTooltip"
-                                width="180"
                             ></ColumnDirective>
                             <ColumnDirective
                                 field="date_joined"
@@ -243,7 +241,6 @@ class StudentTable extends Component {
                                 headerText="Registered On"
                                 clipMode="EllipsisWithTooltip"
                                 template={dateTemplate}
-                                width="180"
                             ></ColumnDirective>
                             <ColumnDirective
                                 field="is_active"
@@ -251,14 +248,12 @@ class StudentTable extends Component {
                                 filter={this.status}
                                 clipMode="EllipsisWithTooltip"
                                 template={statusTemplate}
-                                width="150"
                             />
                             <ColumnDirective
                                 headerText="Action"
                                 allowSorting={false}
                                 allowFiltering={false}
                                 template={viewTemplate}
-                                width="120"
                             />
                         </ColumnsDirective>
                         <Inject
