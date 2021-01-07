@@ -121,10 +121,7 @@ class GroupTeachers extends Component {
                                             </div>
                                         </form>
                                     </div>
-                                    <div className="col-md-4 text-md-right text-center">
-                                        <button className="btn btn-primary mr-md-2 mr-1">
-                                            Add
-                                        </button>
+                                    <div className="col-md-3 text-md-right text-center">
                                         <button className="btn btn-primary mr-md-2 mr-1">
                                             Delete
                                         </button>
