@@ -57,7 +57,7 @@ class Header extends Component {
                         <i className="fas fa-bars"></i>
                     </button>
                     <Link to="/hod">
-                        <img src={logo} alt="Logo" width="120" height="auto" />
+                        <img src={logo} alt="Logo"/>
                     </Link>
                 </Navbar.Brand>
                 <div className="mx-auto">

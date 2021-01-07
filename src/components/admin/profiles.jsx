@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 import Header from "./navbar";
 import SideNav from "./sidenav";
-import userimage from "../../assets/user.png";
-import { Tabs, Tab,Modal } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Tabs, Tab, Modal } from "react-bootstrap";
 import Switch from "react-switch";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl.js";
-import HODTable from '../table/hodTable';
+import HODTable from "../table/hodTable";
+import Loading from "../../shared/loadingComponent";
+import StudentTable from "../table/studentTable";
 
 class HodModal extends Component {
     constructor(props) {
@@ -850,22 +850,6 @@ class HodModal extends Component {
     }
 }
 
-function Loading() {
-    return (
-        <tr>
-            <td className="text-center">Loading...</td>
-        </tr>
-    );
-}
-
-function EmptyData() {
-    return (
-        <tr>
-            <td>Data not available</td>
-        </tr>
-    );
-}
-
 class Profiles extends Component {
     constructor(props) {
         super(props);
@@ -875,8 +859,9 @@ class Profiles extends Component {
             activeTab: "hod",
             hodItems: [],
             studentItems: [],
-            isLoaded: false,
+            is_loading: true,
         };
+        this.gridRef = React.createRef();
     }
 
     toggleSideNav = () => {
@@ -926,7 +911,7 @@ class Profiles extends Component {
                 this.setState({
                     hodItems: result[0].data.results,
                     studentItems: result[1].data.results,
-                    isLoaded: true,
+                    is_loading: false,
                 });
                 console.log(result);
             })
@@ -935,9 +920,9 @@ class Profiles extends Component {
             });
     };
 
-    triggerDelete=()=>{
-        this.refs.child.showConsole();
-    }
+    triggerDelete = () => {
+        this.gridRef.current.showConsole();
+    };
 
     render() {
         return (
@@ -957,170 +942,69 @@ class Profiles extends Component {
                     }`}
                 >
                     <div className="container-fluid">
-                        <HodModal
-                            show={this.state.modalShow}
-                            onHide={this.toggleModal}
-                        />
-                        <div className="d-flex flex-wrap justify-content-center justify-content-md-end mb-4">
-                            <form>
-                                <input
-                                    type="search"
-                                    name="search"
-                                    id="search"
-                                    className="form-control mb-md-0 mb-2"
-                                    placeholder="Search"
-                                />
-                            </form>
-                            <button className="btn btn-primary-invert mx-md-3 mx-0 ml-2 ml-md-0 mb-md-0 mb-2">
-                                Filter <i className="fas fa-filter ml-1"></i>
-                            </button>
-                            {this.state.activeTab === "hod" ? (
-                                <button
-                                    className="btn btn-primary mr-md-3 mr-1"
-                                    onClick={this.toggleModal}
-                                >
-                                    Add New
-                                </button>
-                            ) : (
-                                ""
-                            )}
-                            <button className="btn btn-primary mr-md-3 mr-1" onClick={this.triggerDelete}>
-                                Delete
-                            </button>
-                            <button className="btn btn-primary mr-md-3 mr-1">
-                                Enable
-                            </button>
-                            <button className="btn btn-primary">Disable</button>
-                        </div>
+                        {this.state.is_loading ? (
+                            <Loading />
+                        ) : (
+                            <>
+                                {this.state.modalShow ? (
+                                    <HodModal
+                                        show={this.state.modalShow}
+                                        onHide={this.toggleModal}
+                                    />
+                                ) : (
+                                    ""
+                                )}
+                                <div className="d-flex flex-wrap justify-content-center justify-content-md-end mb-4">
+                                        {this.state.activeTab === "hod" ? (
+                                            <button
+                                                className="btn btn-primary btn-sm mr-1"
+                                                onClick={this.toggleModal}
+                                            >
+                                                Add New
+                                            </button>
+                                        ) : (
+                                            ""
+                                        )}
+                                        <button
+                                            className="btn btn-primary btn-sm mr-1"
+                                            onClick={this.triggerDelete}
+                                        >
+                                            Delete
+                                        </button>
+                                        <button className="btn btn-primary btn-sm mr-1">
+                                            Enable
+                                        </button>
+                                        <button className="btn btn-primary btn-sm">
+                                            Disable
+                                        </button>
+                                </div>
 
-                        <Tabs
-                            activeKey={this.state.activeTab}
-                            id="uncontrolled-tab-example"
-                            onSelect={this.handleSelect}
-                        >
-                            <Tab eventKey="hod" title="HOD">
-                                <div className="card shadow-sm">
-                                    <HODTable hodItems={this.state.hodItems} ref="child"/>
-                                </div>
-                            </Tab>
-                            <Tab eventKey="student" title="Student">
-                                <div className="card shadow-sm">
-                                    <div className="table-responsive">
-                                        <table className="table">
-                                            <thead className="primary-text">
-                                                <tr>
-                                                    <th scope="col"></th>
-                                                    <th scope="col">Name</th>
-                                                    <th scope="col">
-                                                        Username
-                                                    </th>
-                                                    <th scope="col">Email</th>
-                                                    <th scope="col">Contact</th>
-                                                    <th scope="col">
-                                                        Category
-                                                    </th>
-                                                    <th scope="col">
-                                                        Registered on
-                                                    </th>
-                                                    <th scope="col">Status</th>
-                                                    <th scope="col"></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {this.state.isLoaded ? (
+                                <Tabs
+                                    activeKey={this.state.activeTab}
+                                    id="uncontrolled-tab-example"
+                                    onSelect={this.handleSelect}
+                                >
+                                    <Tab eventKey="hod" title="HOD">
+                                        <div className="card shadow-sm">
+                                            <HODTable
+                                                hodItems={this.state.hodItems}
+                                                ref={this.gridRef}
+                                            />
+                                        </div>
+                                    </Tab>
+                                    <Tab eventKey="student" title="Student">
+                                        <div className="card shadow-sm">
+                                            <StudentTable
+                                                studentItems={
                                                     this.state.studentItems
-                                                        .length !== 0 ? (
-                                                        this.state.studentItems.map(
-                                                            (list, index) => {
-                                                                return (
-                                                                    <tr
-                                                                        key={
-                                                                            index
-                                                                        }
-                                                                    >
-                                                                        <td className="text-center">
-                                                                            <input
-                                                                                type="checkbox"
-                                                                                name="enable"
-                                                                                value={
-                                                                                    list.id
-                                                                                }
-                                                                            />
-                                                                        </td>
-                                                                        <td>
-                                                                            <img
-                                                                                src={
-                                                                                    list.profile_link !==
-                                                                                    null
-                                                                                        ? list.profile_link
-                                                                                        : userimage
-                                                                                }
-                                                                                alt="User profile pic"
-                                                                                width="20"
-                                                                            />{" "}
-                                                                            {`${list.first_name} ${list.last_name}`}
-                                                                        </td>
-                                                                        <td>
-                                                                            {
-                                                                                list.username
-                                                                            }
-                                                                        </td>
-                                                                        <td>
-                                                                            {
-                                                                                list.email
-                                                                            }
-                                                                        </td>
-                                                                        <td>
-                                                                            {
-                                                                                list.contact
-                                                                            }
-                                                                        </td>
-                                                                        <td>
-                                                                            {
-                                                                                list.category
-                                                                            }
-                                                                        </td>
-                                                                        <td>
-                                                                            {this.dateConversion(
-                                                                                list.date_joined
-                                                                            )}
-                                                                        </td>
-                                                                        <td>
-                                                                            {list.is_active ? (
-                                                                                <span className="text-success">
-                                                                                    Active
-                                                                                </span>
-                                                                            ) : (
-                                                                                <span className="text-danger">
-                                                                                    Not active
-                                                                                </span>
-                                                                            )}
-                                                                        </td>
-                                                                        <td>
-                                                                            <Link
-                                                                                to={`/admin/student/${list.id}`}
-                                                                            >
-                                                                                <button className="btn btn-sm btn-primary">
-                                                                                    View
-                                                                                </button>
-                                                                            </Link>
-                                                                        </td>
-                                                                    </tr>
-                                                                );
-                                                            }
-                                                        )
-                                                    ) : (
-                                                        <EmptyData />
-                                                    )
-                                                ) : (
-                                                    <Loading />
-                                                )}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </Tab>
-                        </Tabs>
+                                                }
+                                                ref={this.gridRef}
+                                            />
+                                        </div>
+                                    </Tab>
+                                </Tabs>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>

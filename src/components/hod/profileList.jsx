@@ -6,6 +6,7 @@ import { Tabs, Tab, Dropdown, Modal, Spinner, Alert } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
 
+// Student add modal
 class AddStudentModal extends Component {
     constructor() {
         super();
@@ -31,6 +32,8 @@ class AddStudentModal extends Component {
 
         this.setState({
             showLoader: true,
+            showErrorAlert: false,
+            showSuccessAlert: false,
         });
 
         fetch(`${url}/hod/create/student/`, {
@@ -48,7 +51,14 @@ class AddStudentModal extends Component {
                         successMsg: "Email added successfully!",
                         showSuccessAlert: true,
                         showLoader: false,
+                        email: [""],
                     });
+                    if (result.data.existing_email) {
+                        this.setState({
+                            errorMsg: result.data.existing_email,
+                            showErrorAlert: true,
+                        });
+                    }
                 } else {
                     this.setState({
                         errorMsg: result.data.existing_email,
@@ -106,10 +116,12 @@ class AddStudentModal extends Component {
                         }}
                         dismissible
                     >
-                        <h5>Existing email</h5>
-                        {this.state.errorMsg.map((email, index)=>{
-                            return(
-                                <p className="small mb-2" key={index}>{email}</p>
+                        <h6>Existing email</h6>
+                        {this.state.errorMsg.map((email, index) => {
+                            return (
+                                <p className="small mb-2" key={index}>
+                                    {email}
+                                </p>
                             );
                         })}
                     </Alert>
@@ -131,14 +143,14 @@ class AddStudentModal extends Component {
                             {this.state.email.map((inputField, index) => (
                                 <Fragment key={index}>
                                     <div className="col-9 mb-2">
-                                        <label htmlFor={`firstName${index}`}>
+                                        <label htmlFor={`semail${index}`}>
                                             {`Student email ${index + 1}`}
                                         </label>
                                         <input
                                             type="email"
                                             className="form-control borders"
-                                            id={`firstName${index}`}
-                                            name="firstName"
+                                            id={`semail${index}`}
+                                            name="semail"
                                             value={inputField}
                                             onChange={(event) =>
                                                 this.handleInputChange(
@@ -151,14 +163,14 @@ class AddStudentModal extends Component {
                                     </div>
                                     <div className="col-2 mb-2">
                                         <div
-                                            class="btn-group"
+                                            className="btn-group"
                                             role="group"
                                             aria-label="Basic example"
                                         >
                                             {index !== 0 ? (
                                                 <button
                                                     type="button"
-                                                    class="btn btn-secondary"
+                                                    className="btn btn-secondary"
                                                     onClick={() =>
                                                         this.handleRemoveFields(
                                                             index
@@ -172,7 +184,7 @@ class AddStudentModal extends Component {
                                             )}
                                             <button
                                                 type="button"
-                                                class="btn btn-secondary"
+                                                className="btn btn-secondary"
                                                 onClick={() =>
                                                     this.handleAddFields()
                                                 }
@@ -202,18 +214,20 @@ class AddStudentModal extends Component {
                             </button>
                         </div>
                     </form>
-                    <pre>{JSON.stringify(this.state.email, null, 2)}</pre>
                 </Modal.Body>
             </Modal>
         );
     }
 }
 
+// Teacher add modal
 class AddTeacherModal extends Component {
     constructor() {
         super();
         this.state = {
-            subjectName: "",
+            email: "",
+            username: "",
+            password: "",
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
@@ -222,7 +236,78 @@ class AddTeacherModal extends Component {
         };
     }
 
-    handleSubmit = () => {};
+    handleSubmit = (event) => {
+        event.preventDefault();
+        var url = baseUrl + hodUrl;
+        var authToken = localStorage.getItem("Authorization");
+        var headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: authToken,
+        };
+
+        this.setState({
+            showLoader: true,
+            showErrorAlert: false,
+            showSuccessAlert: false,
+        });
+
+        fetch(`${url}/hod/create/teacher/`, {
+            headers: headers,
+            method: "POST",
+            body: JSON.stringify({
+                username: this.state.username,
+                email: this.state.email,
+                password: this.state.password,
+            }),
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts) {
+                    this.setState({
+                        successMsg: "Teacher created successfully!",
+                        showSuccessAlert: true,
+                        showLoader: false,
+                        email: "",
+                        username: "",
+                        password: "",
+                    });
+                } else {
+                    if (result.username) {
+                        this.setState({
+                            errorMsg: result.username[0],
+                        });
+                    }
+                    if (result.password) {
+                        this.setState({
+                            errorMsg: result.password[0],
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.msg,
+                        });
+                    }
+                    this.setState({
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    handleChange = (event) => {
+        const target = event.target;
+        const value = target.value;
+        const name = target.name;
+
+        this.setState({
+            [name]: value,
+        });
+    };
 
     render() {
         return (
@@ -232,7 +317,7 @@ class AddTeacherModal extends Component {
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
-                <Modal.Header closeButton></Modal.Header>
+                <Modal.Header closeButton>Create Teacher</Modal.Header>
                 <Modal.Body>
                     <Alert
                         variant="danger"
@@ -258,20 +343,43 @@ class AddTeacherModal extends Component {
                     >
                         {this.state.successMsg}
                     </Alert>
+
                     <form onSubmit={this.handleSubmit} autoComplete="off">
                         <div className="form-group">
-                            <label htmlFor="subject">Subject name</label>
+                            <label htmlFor="email">Email</label>
                             <input
-                                type="text"
-                                name="subject"
-                                id="subject"
+                                type="email"
+                                name="email"
+                                id="email"
                                 className="form-control borders"
-                                onChange={this.handleSubject}
+                                onChange={this.handleChange}
                                 required
                             />
                         </div>
                         <div className="form-group">
-                            <button className="btn btn-primary btn-sm btn-block">
+                            <label htmlFor="username">Username</label>
+                            <input
+                                type="text"
+                                name="username"
+                                id="username"
+                                className="form-control borders"
+                                onChange={this.handleChange}
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="password">Password</label>
+                            <input
+                                type="password"
+                                name="password"
+                                id="password"
+                                className="form-control borders"
+                                onChange={this.handleChange}
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <button className="btn btn-primary btn-block mt-2">
                                 {this.state.showLoader ? (
                                     <Spinner
                                         as="span"
@@ -284,7 +392,7 @@ class AddTeacherModal extends Component {
                                 ) : (
                                     ""
                                 )}
-                                Create Subject
+                                Create teacher
                             </button>
                         </div>
                     </form>
@@ -302,6 +410,9 @@ class ProfileList extends Component {
             activeTab: "teacher",
             showStudentModal: false,
             showTeacherModal: false,
+            teacherItem: [],
+            studentItem: [],
+            isLoaded: false,
         };
     }
 
@@ -315,8 +426,44 @@ class ProfileList extends Component {
         this.setState({ activeTab: key });
     };
 
+    dateConversion = (date) => {
+        var newDate = new Date(date).toLocaleDateString();
+        var datearray = newDate.split("/");
+        return datearray[1] + "/" + datearray[0] + "/" + datearray[2];
+    };
+
     componentDidMount = () => {
         document.title = "HOD Profile List | IQLabs";
+
+        var url = baseUrl + hodUrl;
+        var authToken = localStorage.getItem("Authorization");
+        var headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: authToken,
+        };
+
+        Promise.all([
+            fetch(`${url}/hod/create/teacher/`, {
+                headers: headers,
+                method: "GET",
+            }).then((res) => res.json()),
+            fetch(`${url}/hod/create/student/`, {
+                headers: headers,
+                method: "GET",
+            }).then((res) => res.json()),
+        ])
+            .then((result) => {
+                this.setState({
+                    teacherItem: result[0].data.results,
+                    studentItem: result[1].data.results,
+                    isLoaded: true,
+                });
+                console.log(result);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     };
 
     handleProfileAdding = () => {
@@ -419,56 +566,107 @@ class ProfileList extends Component {
                                             <thead className="primary-text">
                                                 <tr>
                                                     <th scope="col"></th>
-                                                    <th scope="col">ID</th>
                                                     <th scope="col">Name</th>
                                                     <th scope="col">
-                                                        Category
+                                                        Username
                                                     </th>
+                                                    <th scope="col">Email</th>
                                                     <th scope="col">
-                                                        Sub Category
+                                                        Registered On
                                                     </th>
-                                                    <th scope="col">
-                                                        Discipline
-                                                    </th>
-                                                    <th scope="col">
-                                                        Board University
-                                                    </th>
-                                                    <th scope="col">
-                                                        Handling subject
-                                                    </th>
-                                                    <th scope="col"></th>
+                                                    <th scope="col">Status</th>
+                                                    <th scope="col">Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td className="text-center">
-                                                        <input
-                                                            type="checkbox"
-                                                            name="enable"
-                                                        />
-                                                    </td>
-                                                    <td>001</td>
-                                                    <td>
-                                                        <img
-                                                            src={userimage}
-                                                            alt="User profile pic"
-                                                            width="20"
-                                                        />{" "}
-                                                        Jeevan
-                                                    </td>
-                                                    <td>Degree</td>
-                                                    <td>Engineering</td>
-                                                    <td>Engineering</td>
-                                                    <td>Anna University</td>
-                                                    <td>Design</td>
-                                                    <td>
-                                                        <Link to="/hod/teacher/001">
-                                                            <button className="btn btn-sm btn-primary">
-                                                                View
-                                                            </button>
-                                                        </Link>
-                                                    </td>
-                                                </tr>
+                                                {this.state.isLoaded ? (
+                                                    this.state.teacherItem
+                                                        .length !== 0 ? (
+                                                        this.state.teacherItem.map(
+                                                            (list, index) => {
+                                                                return (
+                                                                    <tr
+                                                                        key={
+                                                                            index
+                                                                        }
+                                                                    >
+                                                                        <td className="text-center">
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                name="enable"
+                                                                                value={
+                                                                                    list.id
+                                                                                }
+                                                                            />
+                                                                        </td>
+                                                                        <td>
+                                                                            <img
+                                                                                src={
+                                                                                    list.profile_link !==
+                                                                                    null
+                                                                                        ? list.profile_link
+                                                                                        : userimage
+                                                                                }
+                                                                                alt="User profile pic"
+                                                                                width="20"
+                                                                            />{" "}
+                                                                            {
+                                                                                list.full_name
+                                                                            }
+                                                                        </td>
+                                                                        <td>
+                                                                            {
+                                                                                list.username
+                                                                            }
+                                                                        </td>
+                                                                        <td>
+                                                                            {
+                                                                                list.email
+                                                                            }
+                                                                        </td>
+                                                                        <td>
+                                                                            {this.dateConversion(
+                                                                                list.date_joined
+                                                                            )}
+                                                                        </td>
+                                                                        <td>
+                                                                            {list.is_active ? (
+                                                                                <span className="text-success">
+                                                                                    Active
+                                                                                </span>
+                                                                            ) : (
+                                                                                <span className="text-danger">
+                                                                                    Not
+                                                                                    active
+                                                                                </span>
+                                                                            )}
+                                                                        </td>
+                                                                        <td>
+                                                                            <Link
+                                                                                to={`/hod/teacher/${list.id}`}
+                                                                            >
+                                                                                <button className="btn btn-sm btn-primary">
+                                                                                    View
+                                                                                </button>
+                                                                            </Link>
+                                                                        </td>
+                                                                    </tr>
+                                                                );
+                                                            }
+                                                        )
+                                                    ) : (
+                                                        <tr>
+                                                            <td>
+                                                                Data not
+                                                                available
+                                                            </td>
+                                                        </tr>
+                                                    )
+                                                ) : (
+                                                    <tr>
+                                                        <td>Loading...</td>
+                                                    </tr>
+                                                )}
                                             </tbody>
                                         </table>
                                     </div>
@@ -481,46 +679,124 @@ class ProfileList extends Component {
                                             <thead className="primary-text">
                                                 <tr>
                                                     <th scope="col"></th>
-                                                    <th scope="col">ID</th>
                                                     <th scope="col">Name</th>
+                                                    <th scope="col">
+                                                        Username
+                                                    </th>
                                                     <th scope="col">Email</th>
                                                     <th scope="col">Contact</th>
                                                     <th scope="col">Groups</th>
                                                     <th scope="col">
                                                         Registered on
                                                     </th>
-                                                    <th scope="col"></th>
+                                                    <th scope="col">Status</th>
+                                                    <th scope="col">Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td className="text-center">
-                                                        <input
-                                                            type="checkbox"
-                                                            name="enable"
-                                                        />
-                                                    </td>
-                                                    <td>001</td>
-                                                    <td>
-                                                        <img
-                                                            src={userimage}
-                                                            alt="User profile pic"
-                                                            width="20"
-                                                        />{" "}
-                                                        Student 1
-                                                    </td>
-                                                    <td>stu@acde.com</td>
-                                                    <td>9876543210</td>
-                                                    <td>A</td>
-                                                    <td>01/02/2020</td>
-                                                    <td>
-                                                        <Link to="/hod/student/001">
-                                                            <button className="btn btn-sm btn-primary">
-                                                                View
-                                                            </button>
-                                                        </Link>
-                                                    </td>
-                                                </tr>
+                                                {this.state.isLoaded ? (
+                                                    this.state.studentItem
+                                                        .length !== 0 ? (
+                                                        this.state.studentItem.map(
+                                                            (list, index) => {
+                                                                return (
+                                                                    <tr
+                                                                        key={
+                                                                            index
+                                                                        }
+                                                                    >
+                                                                        <td className="text-center">
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                name="enable"
+                                                                                value={
+                                                                                    list.id
+                                                                                }
+                                                                            />
+                                                                        </td>
+                                                                        <td>
+                                                                            <img
+                                                                                src={
+                                                                                    list.profile_link !==
+                                                                                    null
+                                                                                        ? list.profile_link
+                                                                                        : userimage
+                                                                                }
+                                                                                alt="User profile pic"
+                                                                                width="20"
+                                                                            />{" "}
+                                                                            {
+                                                                                list.full_name
+                                                                            }
+                                                                        </td>
+                                                                        <td>
+                                                                            {
+                                                                                list.username
+                                                                            }
+                                                                        </td>
+                                                                        <td>
+                                                                            {
+                                                                                list.email
+                                                                            }
+                                                                        </td>
+                                                                        <td>
+                                                                            {
+                                                                                list.contact
+                                                                            }
+                                                                        </td>
+                                                                        <td>
+                                                                            {list.group ? (
+                                                                                list.group
+                                                                            ) : (
+                                                                                <span className="text-danger">
+                                                                                    Not
+                                                                                    assigned
+                                                                                </span>
+                                                                            )}
+                                                                        </td>
+                                                                        <td>
+                                                                            {this.dateConversion(
+                                                                                list.date_joined
+                                                                            )}
+                                                                        </td>
+                                                                        <td>
+                                                                            {list.is_active ? (
+                                                                                <span className="text-success">
+                                                                                    Active
+                                                                                </span>
+                                                                            ) : (
+                                                                                <span className="text-danger">
+                                                                                    Not
+                                                                                    active
+                                                                                </span>
+                                                                            )}
+                                                                        </td>
+                                                                        <td>
+                                                                            <Link
+                                                                                to={`/hod/student/${list.id}`}
+                                                                            >
+                                                                                <button className="btn btn-sm btn-primary">
+                                                                                    View
+                                                                                </button>
+                                                                            </Link>
+                                                                        </td>
+                                                                    </tr>
+                                                                );
+                                                            }
+                                                        )
+                                                    ) : (
+                                                        <tr>
+                                                            <td>
+                                                                Data not
+                                                                available
+                                                            </td>
+                                                        </tr>
+                                                    )
+                                                ) : (
+                                                    <tr>
+                                                        <td>Loading...</td>
+                                                    </tr>
+                                                )}
                                             </tbody>
                                         </table>
                                     </div>

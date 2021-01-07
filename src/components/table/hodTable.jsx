@@ -8,12 +8,12 @@ import {
     Sort,
     Toolbar,
     Page,
+    Resize,
 } from "@syncfusion/ej2-react-grids";
 import "./material.css";
 import "./grid-overview.css";
-// import { baseUrl, adminPathUrl } from "../../shared/baseUrl.js";
 import userimage from "../../assets/user.png";
-import {Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 function statusTemplate(props) {
     return (
@@ -68,9 +68,11 @@ function dateTemplate(props) {
 }
 
 function viewTemplate(props) {
-    return(
+    return (
         <Link to={`/admin/hod/${props.id}`}>
-            <button className="btn btn-primary btn-sm">View</button>
+            <button className="btn btn-link btn-sm">
+                <i className="fas fa-eye"></i>
+            </button>
         </Link>
     );
 }
@@ -102,39 +104,12 @@ class HODTable extends Component {
             itemTemplate: dateTemplate,
         };
         this.toolbarOptions = ["Search"];
-        this.editSettings = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: 'Batch' };
-        this.state = { hodItems: [] };
+        this.state = { hodItems: [], hodId: [] };
     }
 
-    showConsole=()=>{
+    showConsole = () => {
         console.log("I'm triggered");
-    }
-
-    // componentDidMount = () => {
-    //     var url = baseUrl + adminPathUrl;
-    //     var authToken = localStorage.getItem("Inquel-Auth");
-    //     var headers = {
-    //         Accept: "application/json",
-    //         "Content-Type": "application/json",
-    //         "Inquel-Auth": authToken,
-    //     };
-    //     this.gridInstance.showSpinner();
-    //     fetch(`${url}/hod/`, {
-    //         headers: headers,
-    //         method: "GET",
-    //     })
-    //         .then((res) => res.json())
-    //         .then((result) => {
-    //             this.setState({
-    //                 hodItems: result.data.results,
-    //             });
-    //             this.gridInstance.hideSpinner();
-    //             console.log(result);
-    //         })
-    //         .catch((err) => {
-    //             console.log(err);
-    //         });
-    // };
+    };
 
     onQueryCellInfo(args) {
         if (args.column.field === "is_active") {
@@ -159,9 +134,30 @@ class HODTable extends Component {
 
     rowSelected() {
         if (this.gridInstance) {
-            const selectedrowindex = this.gridInstance.getSelectedRowIndexes();
+            // const selectedrowindex = this.gridInstance.getSelectedRowIndexes();
             const selectedrecords = this.gridInstance.getSelectedRecords();
-            alert(selectedrowindex + " : " + JSON.stringify(selectedrecords));
+            let element = [];
+            for (let index = 0; index < selectedrecords.length; index++) {
+                element.push(selectedrecords[index].id.toString());
+            }
+            console.log(element);
+            this.setState({
+                hodId: element,
+            });
+        }
+    }
+
+    rowDeselected() {
+        if (this.gridInstance) {
+            const selectedrecords = this.gridInstance.getSelectedRecords();
+            let element = [];
+            for (let index = 0; index < selectedrecords.length; index++) {
+                element.push(selectedrecords[index].id.toString());
+            }
+            console.log(element);
+            this.setState({
+                hodId: element,
+            });
         }
     }
 
@@ -183,11 +179,13 @@ class HODTable extends Component {
                         allowFiltering={true}
                         allowSorting={true}
                         allowSelection={true}
+                        allowResizing={true}
                         selectionSettings={this.select}
                         toolbar={this.toolbarOptions}
                         allowPaging={true}
                         pageSettings={{ pageSize: 20, pageCount: 5 }}
                         rowSelected={this.rowSelected.bind(this)}
+                        rowDeselected={this.rowDeselected.bind(this)}
                         editSettings={this.editSettings}
                     >
                         <ColumnsDirective>
@@ -260,17 +258,19 @@ class HODTable extends Component {
                                 filter={this.status}
                                 clipMode="EllipsisWithTooltip"
                                 template={statusTemplate}
-                                width="180"
+                                width="150"
                             />
                             <ColumnDirective
                                 headerText="Action"
                                 allowSorting={false}
                                 allowFiltering={false}
                                 template={viewTemplate}
-                                width="150"
+                                width="120"
                             />
                         </ColumnsDirective>
-                        <Inject services={[Filter, Sort, Toolbar, Page]} />
+                        <Inject
+                            services={[Filter, Sort, Toolbar, Page, Resize]}
+                        />
                     </GridComponent>
                 </div>
                 <style>@import 'src/grid/Grid/style.css';</style>

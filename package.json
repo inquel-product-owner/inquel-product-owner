@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@agney/react-loading": "^0.1.2",
     "@popperjs/core": "^2.5.4",
     "@syncfusion/ej2-react-grids": "^18.4.32",
     "@testing-library/jest-dom": "^5.11.6",

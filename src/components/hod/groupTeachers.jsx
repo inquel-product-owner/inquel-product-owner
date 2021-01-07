@@ -4,12 +4,26 @@ import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
 
+function Loading() {
+    return <p>Loading...</p>;
+}
+
+function EmptyData() {
+    return (
+        <Nav.Item>
+            <Nav.Link eventKey="0">Data not available</Nav.Link>
+        </Nav.Item>
+    );
+}
+
 class GroupTeachers extends Component {
     constructor(props) {
         super(props);
         this.state = {
             showSideNav: false,
             groupItem: [],
+            teacherItems: [],
+            isLoaded: false,
         };
     }
 
@@ -17,6 +31,12 @@ class GroupTeachers extends Component {
         this.setState({
             showSideNav: !this.state.showSideNav,
         });
+    };
+
+    dateConversion = (date) => {
+        var newDate = new Date(date).toLocaleDateString();
+        var datearray = newDate.split("/");
+        return datearray[1] + "/" + datearray[0] + "/" + datearray[2];
     };
 
     componentDidMount = () => {
@@ -28,14 +48,24 @@ class GroupTeachers extends Component {
             Authorization: authToken,
         };
 
-        fetch(`${url}/hod/group/${this.props.match.params.groupId}`, {
-            headers: headers,
-            method: "GET",
-        })
-            .then((res) => res.json())
+        Promise.all([
+            fetch(`${url}/hod/group/${this.props.match.params.groupId}`, {
+                headers: headers,
+                method: "GET",
+            }).then((res) => res.json()),
+            fetch(
+                `${url}/hod/group/${this.props.match.params.groupId}/student/`,
+                {
+                    headers: headers,
+                    method: "GET",
+                }
+            ).then((res) => res.json()),
+        ])
             .then((result) => {
                 this.setState({
-                    groupItem: result.data,
+                    groupItem: result[0].data,
+                    teacherItems: result[1].data.results,
+                    isLoaded: true,
                 });
                 console.log(result);
             })
@@ -91,10 +121,7 @@ class GroupTeachers extends Component {
                                             </div>
                                         </form>
                                     </div>
-                                    <div className="col-md-4 text-md-right text-center">
-                                        <button className="btn btn-primary mr-md-2 mr-1">
-                                            Add
-                                        </button>
+                                    <div className="col-md-3 text-md-right text-center">
                                         <button className="btn btn-primary mr-md-2 mr-1">
                                             Delete
                                         </button>
@@ -122,412 +149,178 @@ class GroupTeachers extends Component {
                                                 variant="pills"
                                                 className="flex-column"
                                             >
-                                                <Nav.Item>
-                                                    <Nav.Link eventKey="1">
-                                                        Teacher 01
-                                                    </Nav.Link>
-                                                </Nav.Item>
-                                                <Nav.Item>
-                                                    <Nav.Link eventKey="2">
-                                                        Teacher 02
-                                                    </Nav.Link>
-                                                </Nav.Item>
-                                                <Nav.Item>
-                                                    <Nav.Link eventKey="3">
-                                                        Teacher 03
-                                                    </Nav.Link>
-                                                </Nav.Item>
+                                                {this.state.isLoaded ? (
+                                                    this.state.teacherItems
+                                                        .length !== 0 ? (
+                                                        this.state.teacherItems.map(
+                                                            (list, index) => {
+                                                                return (
+                                                                    <Nav.Item
+                                                                        key={
+                                                                            index
+                                                                        }
+                                                                    >
+                                                                        <Nav.Link
+                                                                            eventKey={
+                                                                                index
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                list.full_name
+                                                                            }
+                                                                        </Nav.Link>
+                                                                    </Nav.Item>
+                                                                );
+                                                            }
+                                                        )
+                                                    ) : (
+                                                        <EmptyData />
+                                                    )
+                                                ) : (
+                                                    <Loading />
+                                                )}
                                             </Nav>
                                         </Col>
                                         <Col sm={9}>
                                             <Tab.Content>
-                                                <Tab.Pane eventKey="1">
-                                                    <div className="card shadow-sm">
-                                                        <div className="table-responsive">
-                                                            <table className="table">
-                                                                <thead className="secondary-bg primary-text">
-                                                                    <tr>
-                                                                        <th scope="col">
-                                                                            Handling
-                                                                            standard
-                                                                        </th>
-                                                                        <th scope="col">
-                                                                            Handling
-                                                                        </th>
-                                                                        <th scope="col">
-                                                                            Chapters
-                                                                            Assigned
-                                                                        </th>
-                                                                        <th scope="col">
-                                                                            Exams
-                                                                        </th>
-                                                                        <th scope="col">
-                                                                            Quizes
-                                                                        </th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    <tr>
-                                                                        <td>
-                                                                            9th
-                                                                            Standard
-                                                                        </td>
-                                                                        <td>
-                                                                            Chemistry
-                                                                        </td>
-                                                                        <td>
-                                                                            <p>
-                                                                                Chapter
-                                                                                1
-                                                                            </p>
-                                                                            <p>
-                                                                                Chapter
-                                                                                2
-                                                                            </p>
-                                                                            <p className="mb-0">
-                                                                                Chapter
-                                                                                3
-                                                                            </p>
-                                                                        </td>
-                                                                        <td>
-                                                                            <p>
-                                                                                Simulation
-                                                                                1
-                                                                            </p>
-                                                                            <p>
-                                                                                Simulation
-                                                                                2
-                                                                            </p>
-                                                                            <p className="mb-0">
-                                                                                Simulation
-                                                                                3
-                                                                            </p>
-                                                                        </td>
-                                                                        <td>
-                                                                            <p>
-                                                                                Chapter
-                                                                                8
-                                                                            </p>
-                                                                            <p>
-                                                                                Chapter
-                                                                                9
-                                                                            </p>
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>
-                                                                            10th
-                                                                            Standard
-                                                                        </td>
-                                                                        <td>
-                                                                            Chemistry
-                                                                        </td>
-                                                                        <td>
-                                                                            <p>
-                                                                                Chapter
-                                                                                1
-                                                                            </p>
-                                                                            <p>
-                                                                                Chapter
-                                                                                2
-                                                                            </p>
-                                                                            <p>
-                                                                                Chapter
-                                                                                3
-                                                                            </p>
-                                                                            <p className="mb-0">
-                                                                                Chapter
-                                                                                4
-                                                                            </p>
-                                                                        </td>
-                                                                        <td>
-                                                                            <p>
-                                                                                Simulation
-                                                                                1
-                                                                            </p>
-                                                                            <p>
-                                                                                Simulation
-                                                                                2
-                                                                            </p>
-                                                                            <p className="mb-0">
-                                                                                Simulation
-                                                                                3
-                                                                            </p>
-                                                                        </td>
-                                                                        <td>
-                                                                            <p>
-                                                                                Chapter
-                                                                                8
-                                                                            </p>
-                                                                            <p>
-                                                                                Chapter
-                                                                                9
-                                                                            </p>
-                                                                        </td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                </Tab.Pane>
-                                                <Tab.Pane eventKey="2">
-                                                    <div className="card shadow-sm">
-                                                        <div className="table-responsive">
-                                                            <table className="table">
-                                                                <thead className="secondary-bg primary-text">
-                                                                    <tr>
-                                                                        <th scope="col">
-                                                                            Handling
-                                                                            standard
-                                                                        </th>
-                                                                        <th scope="col">
-                                                                            Handling
-                                                                        </th>
-                                                                        <th scope="col">
-                                                                            Chapters
-                                                                            Assigned
-                                                                        </th>
-                                                                        <th scope="col">
-                                                                            Exams
-                                                                        </th>
-                                                                        <th scope="col">
-                                                                            Quizes
-                                                                        </th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    <tr>
-                                                                        <td>
-                                                                            11th
-                                                                            Standard
-                                                                        </td>
-                                                                        <td>
-                                                                            Chemistry
-                                                                        </td>
-                                                                        <td>
-                                                                            <p>
-                                                                                Chapter
-                                                                                1
-                                                                            </p>
-                                                                            <p>
-                                                                                Chapter
-                                                                                2
-                                                                            </p>
-                                                                            <p className="mb-0">
-                                                                                Chapter
-                                                                                3
-                                                                            </p>
-                                                                        </td>
-                                                                        <td>
-                                                                            <p>
-                                                                                Simulation
-                                                                                1
-                                                                            </p>
-                                                                            <p>
-                                                                                Simulation
-                                                                                2
-                                                                            </p>
-                                                                            <p className="mb-0">
-                                                                                Simulation
-                                                                                3
-                                                                            </p>
-                                                                        </td>
-                                                                        <td>
-                                                                            <p>
-                                                                                Chapter
-                                                                                8
-                                                                            </p>
-                                                                            <p>
-                                                                                Chapter
-                                                                                9
-                                                                            </p>
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>
-                                                                            12th
-                                                                            Standard
-                                                                        </td>
-                                                                        <td>
-                                                                            Chemistry
-                                                                        </td>
-                                                                        <td>
-                                                                            <p>
-                                                                                Chapter
-                                                                                1
-                                                                            </p>
-                                                                            <p>
-                                                                                Chapter
-                                                                                2
-                                                                            </p>
-                                                                            <p>
-                                                                                Chapter
-                                                                                3
-                                                                            </p>
-                                                                            <p className="mb-0">
-                                                                                Chapter
-                                                                                4
-                                                                            </p>
-                                                                        </td>
-                                                                        <td>
-                                                                            <p>
-                                                                                Simulation
-                                                                                1
-                                                                            </p>
-                                                                            <p>
-                                                                                Simulation
-                                                                                2
-                                                                            </p>
-                                                                            <p className="mb-0">
-                                                                                Simulation
-                                                                                3
-                                                                            </p>
-                                                                        </td>
-                                                                        <td>
-                                                                            <p>
-                                                                                Chapter
-                                                                                8
-                                                                            </p>
-                                                                            <p>
-                                                                                Chapter
-                                                                                9
-                                                                            </p>
-                                                                        </td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                </Tab.Pane>
-                                                <Tab.Pane eventKey="3">
-                                                    <div className="card shadow-sm">
-                                                        <div className="table-responsive">
-                                                            <table className="table">
-                                                                <thead className="secondary-bg primary-text">
-                                                                    <tr>
-                                                                        <th scope="col">
-                                                                            Handling
-                                                                            standard
-                                                                        </th>
-                                                                        <th scope="col">
-                                                                            Handling
-                                                                        </th>
-                                                                        <th scope="col">
-                                                                            Chapters
-                                                                            Assigned
-                                                                        </th>
-                                                                        <th scope="col">
-                                                                            Exams
-                                                                        </th>
-                                                                        <th scope="col">
-                                                                            Quizes
-                                                                        </th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    <tr>
-                                                                        <td>
-                                                                            8th
-                                                                            Standard
-                                                                        </td>
-                                                                        <td>
-                                                                            Chemistry
-                                                                        </td>
-                                                                        <td>
-                                                                            <p>
-                                                                                Chapter
-                                                                                1
-                                                                            </p>
-                                                                            <p>
-                                                                                Chapter
-                                                                                2
-                                                                            </p>
-                                                                            <p className="mb-0">
-                                                                                Chapter
-                                                                                3
-                                                                            </p>
-                                                                        </td>
-                                                                        <td>
-                                                                            <p>
-                                                                                Simulation
-                                                                                1
-                                                                            </p>
-                                                                            <p>
-                                                                                Simulation
-                                                                                2
-                                                                            </p>
-                                                                            <p className="mb-0">
-                                                                                Simulation
-                                                                                3
-                                                                            </p>
-                                                                        </td>
-                                                                        <td>
-                                                                            <p>
-                                                                                Chapter
-                                                                                8
-                                                                            </p>
-                                                                            <p>
-                                                                                Chapter
-                                                                                9
-                                                                            </p>
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>
-                                                                            7th
-                                                                            Standard
-                                                                        </td>
-                                                                        <td>
-                                                                            Chemistry
-                                                                        </td>
-                                                                        <td>
-                                                                            <p>
-                                                                                Chapter
-                                                                                1
-                                                                            </p>
-                                                                            <p>
-                                                                                Chapter
-                                                                                2
-                                                                            </p>
-                                                                            <p>
-                                                                                Chapter
-                                                                                3
-                                                                            </p>
-                                                                            <p className="mb-0">
-                                                                                Chapter
-                                                                                4
-                                                                            </p>
-                                                                        </td>
-                                                                        <td>
-                                                                            <p>
-                                                                                Simulation
-                                                                                1
-                                                                            </p>
-                                                                            <p>
-                                                                                Simulation
-                                                                                2
-                                                                            </p>
-                                                                            <p className="mb-0">
-                                                                                Simulation
-                                                                                3
-                                                                            </p>
-                                                                        </td>
-                                                                        <td>
-                                                                            <p>
-                                                                                Chapter
-                                                                                8
-                                                                            </p>
-                                                                            <p>
-                                                                                Chapter
-                                                                                9
-                                                                            </p>
-                                                                        </td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                </Tab.Pane>
+                                                {this.state.teacherItems.map(
+                                                    (list, index) => {
+                                                        return (
+                                                            <Tab.Pane
+                                                                key={index}
+                                                                eventKey={index}
+                                                            >
+                                                                <div className="card shadow-sm">
+                                                                    <div className="table-responsive">
+                                                                        <table className="table">
+                                                                            <thead className="secondary-bg primary-text">
+                                                                                <tr>
+                                                                                    <th scope="col">
+                                                                                        Handling
+                                                                                        standard
+                                                                                    </th>
+                                                                                    <th scope="col">
+                                                                                        Handling
+                                                                                    </th>
+                                                                                    <th scope="col">
+                                                                                        Chapters
+                                                                                        Assigned
+                                                                                    </th>
+                                                                                    <th scope="col">
+                                                                                        Exams
+                                                                                    </th>
+                                                                                    <th scope="col">
+                                                                                        Quizes
+                                                                                    </th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                <tr>
+                                                                                    <td>
+                                                                                        9th
+                                                                                        Standard
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        Chemistry
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <p>
+                                                                                            Chapter
+                                                                                            1
+                                                                                        </p>
+                                                                                        <p>
+                                                                                            Chapter
+                                                                                            2
+                                                                                        </p>
+                                                                                        <p className="mb-0">
+                                                                                            Chapter
+                                                                                            3
+                                                                                        </p>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <p>
+                                                                                            Simulation
+                                                                                            1
+                                                                                        </p>
+                                                                                        <p>
+                                                                                            Simulation
+                                                                                            2
+                                                                                        </p>
+                                                                                        <p className="mb-0">
+                                                                                            Simulation
+                                                                                            3
+                                                                                        </p>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <p>
+                                                                                            Chapter
+                                                                                            8
+                                                                                        </p>
+                                                                                        <p>
+                                                                                            Chapter
+                                                                                            9
+                                                                                        </p>
+                                                                                    </td>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <td>
+                                                                                        10th
+                                                                                        Standard
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        Chemistry
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <p>
+                                                                                            Chapter
+                                                                                            1
+                                                                                        </p>
+                                                                                        <p>
+                                                                                            Chapter
+                                                                                            2
+                                                                                        </p>
+                                                                                        <p>
+                                                                                            Chapter
+                                                                                            3
+                                                                                        </p>
+                                                                                        <p className="mb-0">
+                                                                                            Chapter
+                                                                                            4
+                                                                                        </p>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <p>
+                                                                                            Simulation
+                                                                                            1
+                                                                                        </p>
+                                                                                        <p>
+                                                                                            Simulation
+                                                                                            2
+                                                                                        </p>
+                                                                                        <p className="mb-0">
+                                                                                            Simulation
+                                                                                            3
+                                                                                        </p>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <p>
+                                                                                            Chapter
+                                                                                            8
+                                                                                        </p>
+                                                                                        <p>
+                                                                                            Chapter
+                                                                                            9
+                                                                                        </p>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                </div>
+                                                            </Tab.Pane>
+                                                        );
+                                                    }
+                                                )}
                                             </Tab.Content>
                                         </Col>
                                     </Row>
