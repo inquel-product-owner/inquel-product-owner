@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Navbar, Alert } from "react-bootstrap";
-import logo from "../../assets/IQ_Labs_V1.png";
+import logo from "../../assets/IQ_Labs_V5.png";
 import { Link, Redirect } from "react-router-dom";
 import { baseUrl, accountsUrl } from "../../shared/baseUrl.js";
 
