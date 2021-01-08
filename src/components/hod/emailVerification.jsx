@@ -134,9 +134,13 @@ class EmailVerification extends Component {
                     if (result.sts === true) {
                         this.setState({
                             successMsg: result.msg,
-                            showSuccessAlert: true,
                             showLoader: false,
                         });
+                        setTimeout(() => {
+                            this.setState({
+                                showSuccessAlert: true,
+                            });
+                        }, 3000);
                     } else {
                         this.setState({
                             errors: result.msg,
