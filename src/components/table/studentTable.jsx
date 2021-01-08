@@ -69,7 +69,7 @@ function dateTemplate(props) {
 
 function viewTemplate(props) {
     return (
-        <Link to={`/admin/hod/${props.id}`}>
+        <Link to={`/admin/student/${props.id}`}>
             <button className="btn btn-link btn-sm">
                 <i className="fas fa-eye"></i>
             </button>
