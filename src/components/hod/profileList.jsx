@@ -54,10 +54,12 @@ class AddStudentModal extends Component {
                         email: [""],
                     });
                     if (result.data.existing_email) {
-                        this.setState({
-                            errorMsg: result.data.existing_email,
-                            showErrorAlert: true,
-                        });
+                        if (result.data.existing_email.length !== 0) {
+                            this.setState({
+                                errorMsg: result.data.existing_email,
+                                showErrorAlert: true,
+                            });
+                        }
                     }
                 } else {
                     this.setState({
