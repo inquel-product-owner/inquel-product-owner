@@ -176,7 +176,7 @@ class HODLogin extends Component {
                         <div className="row">
                             <div className="col-md-6">
                                 <p className="mb-3 mb-md-0 text-white text-center text-md-left">
-                                    &copy;2020 Inquel inc.Powered By Sachivara
+                                    &copy;2020 Inquel inc.Powered By Sachirva
                                     Technology Solutions
                                 </p>
                             </div>
