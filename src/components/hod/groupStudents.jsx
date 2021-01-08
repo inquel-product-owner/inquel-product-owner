@@ -37,7 +37,7 @@ class StudentAssignModal extends Component {
             showSuccessAlert: false,
         });
 
-        fetch(`${url}/hod/group/${this.props.groupid}/assign/`, {
+        fetch(`${url}/hod/group/${this.props.groupid}/assign/student/`, {
             headers: headers,
             method: "POST",
             body: JSON.stringify({

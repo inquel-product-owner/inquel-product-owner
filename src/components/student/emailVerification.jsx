@@ -9,7 +9,7 @@ class EmailVerify extends Component {
     }
     componentDidMount = () => {
         document.title = "Account verification | IQLabs";
-        var token = this.props.match.params.tokenId;
+        var authToken = this.props.match.params.tokenId;
         var url = baseUrl + accountsUrl;
         var headers = {
             Accept: "application/json",
@@ -18,9 +18,9 @@ class EmailVerify extends Component {
         fetch(`${url}/verify/`, {
             method: "POST",
             headers: headers,
-            body: {
-                token: token,
-            },
+            body: JSON.stringify({
+                token: authToken,
+            }),
         })
             .then((res) => res.json())
             .then((result) => {
