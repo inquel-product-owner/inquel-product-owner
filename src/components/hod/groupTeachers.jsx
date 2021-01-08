@@ -54,7 +54,7 @@ class GroupTeachers extends Component {
                 method: "GET",
             }).then((res) => res.json()),
             fetch(
-                `${url}/hod/group/${this.props.match.params.groupId}/student/`,
+                `${url}/hod/group/${this.props.match.params.groupId}/teacher/`,
                 {
                     headers: headers,
                     method: "GET",
