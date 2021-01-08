@@ -2,13 +2,19 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import Header from "./navbar";
 import SideNav from "./sidenav";
+import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
 
 class SubjectAssigning extends Component {
     constructor(props) {
         super(props);
         this.state = {
             showSideNav: false,
-            subjectItem:[],
+            teacherData: [],
+            chapterStatus: [],
+            courseStructure: "",
+            selectedState: "",
+            selectedTeacher: "",
+            subjectItem: [],
         };
     }
 
@@ -17,6 +23,65 @@ class SubjectAssigning extends Component {
             showSideNav: !this.state.showSideNav,
         });
     };
+
+    componentDidMount = () => {
+        var url = baseUrl + hodUrl;
+        var authToken = localStorage.getItem("Authorization");
+        var headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: authToken,
+        };
+
+        var subjectId = this.props.match.params.subjectId;
+
+        fetch(`${url}/hod/subject/${subjectId}/assign/teacher/`, {
+            headers: headers,
+            method: "GET",
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                this.setState({
+                    teacherData: result.data.teachers,
+                    chapterStatus: result.data.chapter_status.chapters,
+                    isLoaded: true,
+                });
+                console.log(result);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    handleSubmit=()=>{
+        // var url = baseUrl + hodUrl;
+        // var authToken = localStorage.getItem("Authorization");
+        // var headers = {
+        //     Accept: "application/json",
+        //     "Content-Type": "application/json",
+        //     Authorization: authToken,
+        // };
+
+        // var subjectId = this.props.match.params.subjectId;
+
+        // fetch(`${url}/hod/subject/${subjectId}/assign/teacher/`, {
+        //     headers: headers,
+        //     method: "GET",
+        // })
+        //     .then((res) => res.json())
+        //     .then((result) => {
+        //         this.setState({
+        //             teacherData: result.data.teachers,
+        //             chapterStatus: result.data.chapter_status.chapters,
+        //             isLoaded: true,
+        //         });
+        //         console.log(result);
+        //     })
+        //     .catch((err) => {
+        //         console.log(err);
+        //     });
+
+    }
 
     render() {
         document.title =
@@ -29,7 +94,10 @@ class SubjectAssigning extends Component {
                 <Header name="Subject Name" togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
-                <SideNav shownav={this.state.showSideNav} activeLink="dashboard" />
+                <SideNav
+                    shownav={this.state.showSideNav}
+                    activeLink="dashboard"
+                />
 
                 <div
                     className={`section content ${
@@ -48,7 +116,9 @@ class SubjectAssigning extends Component {
                                     Filter{" "}
                                     <i className="fas fa-filter ml-1"></i>
                                 </button>
-                                <Link to={`/hod/subject/${this.props.match.params.subjectId}/configure`}>
+                                <Link
+                                    to={`/hod/subject/${this.props.match.params.subjectId}/configure`}
+                                >
                                     <button className="btn btn-primary">
                                         Configure Course
                                     </button>
@@ -94,26 +164,28 @@ class SubjectAssigning extends Component {
                                                         className="form-control"
                                                     >
                                                         <option value="">
-                                                            Yet to start
+                                                            Select an option
                                                         </option>
-                                                        <option value="">
-                                                            Ready for review
-                                                        </option>
-                                                        <option value="">
-                                                            Approved
-                                                        </option>
-                                                        <option value="">
-                                                            In progress
-                                                        </option>
-                                                        <option value="">
-                                                            Review
-                                                        </option>
+                                                        {this.state.chapterStatus.map(
+                                                            (list, index) => {
+                                                                return (
+                                                                    <option
+                                                                        value={
+                                                                            list
+                                                                        }
+                                                                        key={index}
+                                                                    >
+                                                                        {list}
+                                                                    </option>
+                                                                );
+                                                            }
+                                                        )}
                                                     </select>
                                                 </div>
                                             </td>
                                             <td>
                                                 <div className="row">
-                                                    <div className="col-6">
+                                                    <div className="col-12">
                                                         <div className="form-group">
                                                             <select
                                                                 name="teacher"
@@ -123,20 +195,33 @@ class SubjectAssigning extends Component {
                                                                     Select
                                                                     teacher
                                                                 </option>
-                                                                <option value="">
-                                                                    Teacher 01
-                                                                </option>
-                                                                <option value="">
-                                                                    Teacher 02
-                                                                </option>
+                                                                {this.state.teacherData.map(
+                                                                    (
+                                                                        list,
+                                                                        index
+                                                                    ) => {
+                                                                        return (
+                                                                            <option
+                                                                                value={
+                                                                                    list.username
+                                                                                }
+                                                                                key={index}
+                                                                            >
+                                                                                {
+                                                                                    list.username
+                                                                                }
+                                                                            </option>
+                                                                        );
+                                                                    }
+                                                                )}
                                                             </select>
                                                         </div>
                                                     </div>
-                                                    <div className="col-6">
+                                                    {/* <div className="col-6">
                                                         <button className="btn btn-primary-invert btn-sm">
                                                             Not-Assigned
                                                         </button>
-                                                    </div>
+                                                    </div> */}
                                                 </div>
                                             </td>
                                             <td className="text-center">
@@ -155,7 +240,7 @@ class SubjectAssigning extends Component {
                                 </table>
                             </div>
                             <div className="card-body p-2">
-                                <button className="btn btn-light btn-block">
+                                <button className="btn btn-light btn-block" onSubmit={this.handleSubmit}>
                                     Add New +
                                 </button>
                             </div>
