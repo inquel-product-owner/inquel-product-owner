@@ -8,7 +8,7 @@ class SubjectReview extends Component {
         super(props);
         this.state = {
             showSideNav: false,
-            subjectItem:[],
+            subjectItem: [],
         };
     }
 
@@ -16,6 +16,10 @@ class SubjectReview extends Component {
         this.setState({
             showSideNav: !this.state.showSideNav,
         });
+    };
+
+    componentDidMount = () => {
+        console.log(this.props);
     };
 
     render() {
@@ -29,7 +33,10 @@ class SubjectReview extends Component {
                 <Header name="Subject Name" togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
-                <SideNav shownav={this.state.showSideNav} activeLink="dashboard" />
+                <SideNav
+                    shownav={this.state.showSideNav}
+                    activeLink="dashboard"
+                />
 
                 <div
                     className={`section content ${
@@ -48,12 +55,16 @@ class SubjectReview extends Component {
                                     Filter{" "}
                                     <i className="fas fa-filter ml-1"></i>
                                 </button>
-                                <Link to={`/hod/subject/${this.props.match.params.subjectId}/assign`}>
+                                <Link
+                                    to={`/hod/subject/${this.props.match.params.subjectId}/assign`}
+                                >
                                     <button className="btn btn-primary mr-2">
                                         Add New
                                     </button>
                                 </Link>
-                                <Link to={`/hod/subject/${this.props.match.params.subjectId}/configure`}>
+                                <Link
+                                    to={`/hod/subject/${this.props.match.params.subjectId}/configure`}
+                                >
                                     <button className="btn btn-primary">
                                         Configure Course
                                     </button>
