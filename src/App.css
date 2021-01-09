@@ -358,3 +358,21 @@ input[type="search"]:focus {
     z-index: 1000;
     position: absolute;
 }
+
+/* Alert */
+
+.alert {
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: 14px;
+}
+
+.alert-dismissible .close {
+    padding: 0.5rem 1rem;
+    top: -6%;
+    font-size: 22px;
+}
+
+.alert::first-letter {
+    text-transform: uppercase;
+}

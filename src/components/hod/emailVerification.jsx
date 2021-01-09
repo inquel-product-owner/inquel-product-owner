@@ -9,6 +9,7 @@ class EmailVerification extends Component {
         this.state = {
             firstName: "",
             lastName: "",
+            username:"",
             password: "",
             confirmPassword: "",
             isValid: false,

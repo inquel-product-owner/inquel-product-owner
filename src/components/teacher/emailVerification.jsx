@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Alert, Spinner } from "react-bootstrap";
 import { Redirect } from "react-router-dom";
-import { baseUrl, accountsUrl } from "../../shared/baseUrl.js";
+import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
 
 class EmailVerification extends Component {
     constructor() {
@@ -9,6 +9,7 @@ class EmailVerification extends Component {
         this.state = {
             firstName: "",
             lastName: "",
+            username:"",
             password: "",
             confirmPassword: "",
             isValid: false,
@@ -16,7 +17,7 @@ class EmailVerification extends Component {
             showErrorAlert: false,
             showSuccessAlert: false,
             showLoader: false,
-            errors: "",
+            errorMsg: "",
             successMsg: "",
             redirectLogin: false,
         };
@@ -26,7 +27,7 @@ class EmailVerification extends Component {
         document.title = "Account verification | IQLabs";
 
         var token = this.props.match.params.tokenId;
-        var url = baseUrl + accountsUrl;
+        var url = baseUrl + hodUrl;
         var headers = {
             Accept: "application/json",
             "Content-Type": "application/json",
@@ -97,13 +98,13 @@ class EmailVerification extends Component {
             !this.state.confirmPassword
         ) {
             this.setState({
-                errors: "All the fields are required",
+                errorMsg: "All the fields are required",
                 isValid: false,
                 showErrorAlert: true,
             });
         } else if (this.state.password !== this.state.confirmPassword) {
             this.setState({
-                errors: "Password doesn't match",
+                errorMsg: "Password doesn't match",
                 isValid: false,
                 showErrorAlert: true,
             });
@@ -112,7 +113,7 @@ class EmailVerification extends Component {
                 showLoader: true,
             });
             var token = this.props.match.params.tokenId;
-            var url = baseUrl + accountsUrl;
+            var url = baseUrl + hodUrl;
             var headers = {
                 Accept: "application/json",
                 "Content-Type": "application/json",
@@ -145,7 +146,7 @@ class EmailVerification extends Component {
                         }, 3000);
                     } else {
                         this.setState({
-                            errors: result.msg,
+                            errorMsg: result.msg,
                             showErrorAlert: true,
                             showLoader: false,
                         });
@@ -196,7 +197,7 @@ class EmailVerification extends Component {
                                         }}
                                         dismissible
                                     >
-                                        {this.state.errors}
+                                        {this.state.errorMsg}
                                     </Alert>
                                     <Alert
                                         variant="success"
@@ -212,7 +213,7 @@ class EmailVerification extends Component {
                                     </Alert>
 
                                     <h3 className="primary-text">
-                                        HOD Activation
+                                        Teacher Activation
                                     </h3>
                                     <p className="small mb-4">
                                         Please update your details

@@ -5,6 +5,7 @@ import Header from "./navbar";
 import SideNav from "./sidenav";
 import courseimg from "../../assets/code.jpg";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
+import SubjectReview from './subjectReview';
 
 class SubjectModal extends Component {
     constructor() {
@@ -295,6 +296,7 @@ class Group extends Component {
                                                         .length !== 0 ? (
                                                         this.state.groupItem.subjects.map(
                                                             (list, index) => {
+                                                                <SubjectReview subjectName={list.subject_name}/>
                                                                 return (
                                                                     <div
                                                                         className="col-md-4 mb-3"

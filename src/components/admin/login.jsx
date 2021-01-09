@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Navbar } from "react-bootstrap";
+import { Navbar, Spinner, Alert } from "react-bootstrap";
 import logo from "../../assets/IQ_Labs_V5.png";
 import { Link, Redirect } from "react-router-dom";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl.js";
@@ -10,9 +10,10 @@ class Login extends Component {
         this.state = {
             username: "",
             password: "",
-            errortext: "",
-            isloggedIn: "false",
+            errorMsg: "",
             items: [],
+            showLoader: false,
+            showErrorAlert: false,
         };
     }
 
@@ -25,10 +26,12 @@ class Login extends Component {
     };
 
     handleSubmit = (event) => {
-        this.setState({
-            errortext: "",
-        });
         event.preventDefault();
+        this.setState({
+            errorMsg: "",
+            showLoader: true,
+            showErrorAlert: false,
+        });
         var url = `${baseUrl}${adminPathUrl}/login/`;
         console.log(
             "username: " +
@@ -52,24 +55,22 @@ class Login extends Component {
             .then((result) => {
                 this.setState({
                     items: result,
+                    showLoader: false,
                 });
-                console.log(result);
-
                 if (this.state.items.sts) {
                     localStorage.clear();
                     localStorage.setItem(
                         "Inquel-Auth",
                         `Token ${this.state.items.token}`
                     );
-                    this.setState({
-                        isloggedIn: true,
-                    });
                 }
                 if (!this.state.items.sts && this.state.items.msg) {
                     this.setState({
-                        errortext: this.state.items.msg,
+                        errorMsg: this.state.items.msg,
+                        showErrorAlert: true,
                     });
                 }
+                console.log(result);
             })
             .catch((err) => {
                 console.log(err);
@@ -89,7 +90,7 @@ class Login extends Component {
                 <Navbar className="secondary-bg py-2 px-4">
                     <Navbar.Brand>
                         <Link to="/admin">
-                            <img src={logo} alt="Logo" width="50" height="50" />
+                            <img src={logo} alt="Logo" />
                         </Link>
                     </Navbar.Brand>
                 </Navbar>
@@ -106,6 +107,18 @@ class Login extends Component {
                                         <p className="small mb-4">
                                             Login as Admin
                                         </p>
+                                        <Alert
+                                            variant="danger"
+                                            show={this.state.showErrorAlert}
+                                            onClose={() => {
+                                                this.setState({
+                                                    showErrorAlert: false,
+                                                });
+                                            }}
+                                            dismissible
+                                        >
+                                            {this.state.errorMsg}
+                                        </Alert>
                                         <form onSubmit={this.handleSubmit}>
                                             <div className="form-group">
                                                 <label htmlFor="username">
@@ -146,17 +159,23 @@ class Login extends Component {
                                                     type="submit"
                                                     className="btn btn-primary btn-block"
                                                 >
-                                                    LOGIN{" "}
-                                                    <i className="fas fa-sign-in-alt ml-2"></i>
+                                                    {this.state.showLoader ? (
+                                                        <Spinner
+                                                            as="span"
+                                                            animation="border"
+                                                            size="sm"
+                                                            role="status"
+                                                            aria-hidden="true"
+                                                            className="mr-2"
+                                                        />
+                                                    ) : (
+                                                        <>
+                                                            LOGIN{" "}
+                                                            <i className="fas fa-sign-in-alt ml-2"></i>
+                                                        </>
+                                                    )}
                                                 </button>
                                             </div>
-                                            {this.state.errortext !== "" ? (
-                                                <p className="text-danger text-center small mb-0">
-                                                    {this.state.errortext}
-                                                </p>
-                                            ) : (
-                                                ""
-                                            )}
                                         </form>
                                     </div>
                                 </div>
