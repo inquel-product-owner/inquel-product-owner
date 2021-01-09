@@ -17,7 +17,7 @@ import SubjectConfiguration from "./subjectConfiguration";
 
 import EmailVerification from "./emailVerification";
 import errorPage from "../404";
-import studentRoutes from "../student/studentRoute";
+import teacherRoutes from "../teacher/teacherRoute";
 
 const hodRoutes = (
     <Switch>
@@ -183,7 +183,7 @@ const hodRoutes = (
             path="/hod/account/activation/:tokenId"
             render={(props) => <EmailVerification {...props} />}
         />
-        {studentRoutes}
+        {teacherRoutes}
         <Route path="*" component={errorPage} />
     </Switch>
 );
