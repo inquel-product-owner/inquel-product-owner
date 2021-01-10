@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+import { Spinner, Alert } from "react-bootstrap";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
@@ -12,15 +13,38 @@ class SubjectAssigning extends Component {
             teacherData: [],
             chapterStatus: [],
             courseStructure: "",
-            selectedState: "",
+            selectedStatus: "",
             selectedTeacher: "",
             subjectItem: [],
+            successMsg: "",
+            errorMsg: "",
+            showSuccessAlert: false,
+            showErrorAlert: false,
+            showLoader: false,
         };
     }
 
     toggleSideNav = () => {
         this.setState({
             showSideNav: !this.state.showSideNav,
+        });
+    };
+
+    handleCourse = (event) => {
+        this.setState({
+            courseStructure: event.target.value,
+        });
+    };
+
+    handleStatus = (event) => {
+        this.setState({
+            selectedStatus: event.target.value,
+        });
+    };
+
+    handleTeacher = (event) => {
+        this.setState({
+            selectedTeacher: event.target.value,
         });
     };
 
@@ -44,7 +68,6 @@ class SubjectAssigning extends Component {
                 this.setState({
                     teacherData: result.data.teachers,
                     chapterStatus: result.data.chapter_status.chapters,
-                    isLoaded: true,
                 });
                 console.log(result);
             })
@@ -53,35 +76,54 @@ class SubjectAssigning extends Component {
             });
     };
 
-    handleSubmit=()=>{
-        // var url = baseUrl + hodUrl;
-        // var authToken = localStorage.getItem("Authorization");
-        // var headers = {
-        //     Accept: "application/json",
-        //     "Content-Type": "application/json",
-        //     Authorization: authToken,
-        // };
+    handleSubmit = (event) => {
+        event.preventDefault();
+        this.setState({
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: true,
+        });
 
-        // var subjectId = this.props.match.params.subjectId;
+        var url = baseUrl + hodUrl;
+        var authToken = localStorage.getItem("Authorization");
+        var headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: authToken,
+        };
 
-        // fetch(`${url}/hod/subject/${subjectId}/assign/teacher/`, {
-        //     headers: headers,
-        //     method: "GET",
-        // })
-        //     .then((res) => res.json())
-        //     .then((result) => {
-        //         this.setState({
-        //             teacherData: result.data.teachers,
-        //             chapterStatus: result.data.chapter_status.chapters,
-        //             isLoaded: true,
-        //         });
-        //         console.log(result);
-        //     })
-        //     .catch((err) => {
-        //         console.log(err);
-        //     });
+        var subjectId = this.props.match.params.subjectId;
 
-    }
+        fetch(`${url}/hod/subject/${subjectId}/assign/teacher/`, {
+            headers: headers,
+            method: "POST",
+            body: JSON.stringify({
+                chapter_name: this.state.courseStructure,
+                chapter_status: this.state.selectedStatus,
+                teacher_id: this.state.selectedTeacher,
+            }),
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        showLoader: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
+                console.log(result);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
 
     render() {
         document.title =
@@ -126,125 +168,184 @@ class SubjectAssigning extends Component {
                             </div>
                         </div>
 
-                        <div className="card shadow-sm">
-                            <div className="table-responsive">
-                                <table className="table">
-                                    <thead className="secondary-bg">
-                                        <tr>
-                                            <th scope="col">
-                                                Course structure
-                                            </th>
-                                            <th scope="col">Status</th>
-                                            <th scope="col">
-                                                Teacher assigned
-                                            </th>
-                                            <th
-                                                scope="col"
-                                                className="text-center"
-                                            >
-                                                Disable / Enable / Delete
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr className="bg-light">
-                                            <td>
-                                                <div className="form-group">
-                                                    <input
-                                                        type="text"
-                                                        name="chapter"
-                                                        className="form-control"
-                                                    />
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div className="form-group">
-                                                    <select
-                                                        name="status"
-                                                        className="form-control"
-                                                    >
-                                                        <option value="">
-                                                            Select an option
-                                                        </option>
-                                                        {this.state.chapterStatus.map(
-                                                            (list, index) => {
-                                                                return (
-                                                                    <option
-                                                                        value={
-                                                                            list
-                                                                        }
-                                                                        key={index}
-                                                                    >
-                                                                        {list}
-                                                                    </option>
-                                                                );
+                        <form onSubmit={this.handleSubmit}>
+                            <div className="card shadow-sm">
+                                <div className="table-responsive">
+                                    <table className="table">
+                                        <thead className="secondary-bg">
+                                            <tr>
+                                                <th scope="col">
+                                                    Course structure
+                                                </th>
+                                                <th scope="col">Status</th>
+                                                <th scope="col">
+                                                    Teacher assigned
+                                                </th>
+                                                <th
+                                                    scope="col"
+                                                    className="text-center"
+                                                >
+                                                    Disable / Enable / Delete
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr className="bg-light">
+                                                <td>
+                                                    <div className="form-group">
+                                                        <input
+                                                            type="text"
+                                                            name="chapter"
+                                                            className="form-control"
+                                                            onChange={
+                                                                this
+                                                                    .handleCourse
                                                             }
-                                                        )}
-                                                    </select>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div className="row">
-                                                    <div className="col-12">
-                                                        <div className="form-group">
-                                                            <select
-                                                                name="teacher"
-                                                                className="form-control"
-                                                            >
-                                                                <option value="">
-                                                                    Select
-                                                                    teacher
-                                                                </option>
-                                                                {this.state.teacherData.map(
-                                                                    (
-                                                                        list,
-                                                                        index
-                                                                    ) => {
-                                                                        return (
-                                                                            <option
-                                                                                value={
-                                                                                    list.username
-                                                                                }
-                                                                                key={index}
-                                                                            >
-                                                                                {
-                                                                                    list.username
-                                                                                }
-                                                                            </option>
-                                                                        );
-                                                                    }
-                                                                )}
-                                                            </select>
-                                                        </div>
+                                                        />
                                                     </div>
-                                                    {/* <div className="col-6">
+                                                </td>
+                                                <td>
+                                                    <div className="form-group">
+                                                        <select
+                                                            name="status"
+                                                            className="form-control"
+                                                            onChange={
+                                                                this
+                                                                    .handleStatus
+                                                            }
+                                                        >
+                                                            <option value="">
+                                                                Select an option
+                                                            </option>
+                                                            {this.state.chapterStatus.map(
+                                                                (
+                                                                    list,
+                                                                    index
+                                                                ) => {
+                                                                    return (
+                                                                        <option
+                                                                            value={
+                                                                                list
+                                                                            }
+                                                                            key={
+                                                                                index
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                list
+                                                                            }
+                                                                        </option>
+                                                                    );
+                                                                }
+                                                            )}
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div className="row">
+                                                        <div className="col-12">
+                                                            <div className="form-group">
+                                                                <select
+                                                                    name="teacher"
+                                                                    className="form-control"
+                                                                    onChange={
+                                                                        this
+                                                                            .handleTeacher
+                                                                    }
+                                                                >
+                                                                    <option value="">
+                                                                        Select
+                                                                        teacher
+                                                                    </option>
+                                                                    {this.state.teacherData.map(
+                                                                        (
+                                                                            list,
+                                                                            index
+                                                                        ) => {
+                                                                            return (
+                                                                                <option
+                                                                                    value={
+                                                                                        list.id
+                                                                                    }
+                                                                                    key={
+                                                                                        index
+                                                                                    }
+                                                                                >
+                                                                                    {
+                                                                                        list.username
+                                                                                    }
+                                                                                </option>
+                                                                            );
+                                                                        }
+                                                                    )}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        {/* <div className="col-6">
                                                         <button className="btn btn-primary-invert btn-sm">
                                                             Not-Assigned
                                                         </button>
                                                     </div> */}
-                                                </div>
-                                            </td>
-                                            <td className="text-center">
-                                                <button className="btn btn-primary btn-sm mr-1">
-                                                    D
-                                                </button>
-                                                <button className="btn btn-primary btn-sm mr-1">
-                                                    E
-                                                </button>
-                                                <button className="btn btn-primary btn-sm">
-                                                    <i className="fas fa-trash-alt fa-sm"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                                    </div>
+                                                </td>
+                                                <td className="text-center">
+                                                    <button className="btn btn-primary btn-sm mr-1">
+                                                        D
+                                                    </button>
+                                                    <button className="btn btn-primary btn-sm mr-1">
+                                                        E
+                                                    </button>
+                                                    <button className="btn btn-primary btn-sm">
+                                                        <i className="fas fa-trash-alt fa-sm"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div className="card-body p-2">
+                                    <button className="btn btn-light btn-block">
+                                        {this.state.showLoader ? (
+                                            <Spinner
+                                                as="span"
+                                                animation="border"
+                                                size="sm"
+                                                role="status"
+                                                aria-hidden="true"
+                                                className="mr-2"
+                                            />
+                                        ) : (
+                                            ""
+                                        )}
+                                        Save
+                                    </button>
+                                    <Alert
+                                        variant="danger"
+                                        show={this.state.showErrorAlert}
+                                        onClose={() => {
+                                            this.setState({
+                                                showErrorAlert: false,
+                                            });
+                                        }}
+                                        dismissible
+                                    >
+                                        {this.state.errorMsg}
+                                    </Alert>
+                                    <Alert
+                                        variant="success"
+                                        show={this.state.showSuccessAlert}
+                                        onClose={() => {
+                                            this.setState({
+                                                showSuccessAlert: false,
+                                            });
+                                        }}
+                                        dismissible
+                                    >
+                                        {this.state.successMsg}
+                                    </Alert>
+                                </div>
                             </div>
-                            <div className="card-body p-2">
-                                <button className="btn btn-light btn-block" onSubmit={this.handleSubmit}>
-                                    Add New +
-                                </button>
-                            </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>

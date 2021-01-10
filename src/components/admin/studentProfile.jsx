@@ -12,7 +12,7 @@ class StudentProfile extends Component {
         this.state = {
             showSideNav: false,
             studentItems: [],
-            isLoaded: false
+            isLoaded: false,
         };
     }
 
@@ -42,7 +42,7 @@ class StudentProfile extends Component {
             .then((result) => {
                 this.setState({
                     studentItems: result.data,
-                    isLoaded: true
+                    isLoaded: true,
                 });
                 console.log(result);
             })
@@ -55,7 +55,7 @@ class StudentProfile extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="User Profiles" togglenav={this.toggleSideNav} />
+                <Header name="Student Profile" togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
                 <SideNav
@@ -72,6 +72,15 @@ class StudentProfile extends Component {
                         {/* Student details */}
                         {this.state.isLoaded ? (
                             <>
+                                {/* Back button */}
+                                <button
+                                    className="btn btn-primary-invert btn-sm mb-2"
+                                    onClick={this.props.history.goBack}
+                                >
+                                    <i className="fas fa-chevron-left fa-sm"></i>{" "}
+                                    Back
+                                </button>
+
                                 <div className="row align-items-center mb-4">
                                     <div className="col-md-6">
                                         <div className="row align-items-center">

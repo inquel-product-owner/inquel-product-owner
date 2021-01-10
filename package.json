@@ -14,9 +14,11 @@
     "react-bootstrap": "^1.4.0",
     "react-content-loader": "^5.1.4",
     "react-dom": "^17.0.1",
+    "react-js-pagination": "^3.0.3",
     "react-popper": "^2.2.4",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.1",
+    "react-select": "^3.1.1",
     "react-switch": "^5.0.1",
     "web-vitals": "^0.2.4"
   },

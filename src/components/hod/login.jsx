@@ -1,8 +1,123 @@
-import React, { Component } from "react";
-import { Navbar, Alert } from "react-bootstrap";
+import React, { Component, useState } from "react";
+import { Navbar, Alert, Spinner, Modal } from "react-bootstrap";
 import logo from "../../assets/IQ_Labs_V5.png";
 import { Link, Redirect } from "react-router-dom";
 import { baseUrl, accountsUrl } from "../../shared/baseUrl.js";
+
+function ForgotPasswordModal(props) {
+    const [email, setEmail] = useState("");
+    const [errorMsg, setErrorMsg] = useState("");
+    const [successMsg, setSuccessMsg] = useState("");
+    const [showErrorAlert, setErrorAlert] = useState(false);
+    const [showSuccessAlert, setSuccessAlert] = useState(false);
+    const [showLoader, setLoader] = useState(false);
+
+    function handleSubmit(event) {
+        event.preventDefault();
+        var url = baseUrl + accountsUrl;
+        var authToken = localStorage.getItem("Authorization");
+        var headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: authToken,
+        };
+
+        setLoader(true);
+        setErrorAlert(false);
+        setSuccessAlert(false);
+
+        fetch(`${url}/forgotpassword/`, {
+            headers: headers,
+            method: "POST",
+            body: JSON.stringify({
+                email: email,
+            }),
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts) {
+                    setSuccessMsg(result.msg);
+                    setSuccessAlert(true);
+                    setLoader(false);
+                } else {
+                    setErrorMsg(result.msg);
+                    setErrorAlert(true);
+                    setLoader(false);
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
+
+    return (
+        <Modal
+            {...props}
+            size="md"
+            aria-labelledby="contained-modal-title-vcenter"
+            centered
+        >
+            <Modal.Header closeButton className="primary-text h5">
+                Forgot password
+            </Modal.Header>
+            <Modal.Body>
+                <Alert
+                    variant="danger"
+                    show={showErrorAlert}
+                    onClose={() => {
+                        setErrorAlert(false);
+                    }}
+                    dismissible
+                >
+                    {errorMsg}
+                </Alert>
+                <Alert
+                    variant="success"
+                    show={showSuccessAlert}
+                    onClose={() => {
+                        setSuccessAlert(false);
+                    }}
+                    dismissible
+                >
+                    {successMsg}
+                </Alert>
+                <form onSubmit={handleSubmit} autoComplete="off">
+                    <div className="form-group">
+                        <label htmlFor="email">Email</label>
+                        <input
+                            type="email"
+                            name="email"
+                            id="email"
+                            className="form-control borders"
+                            onChange={(event) => {
+                                setEmail(event.target.value);
+                            }}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <button className="btn btn-primary btn-sm btn-block">
+                            {showLoader ? (
+                                <Spinner
+                                    as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    aria-hidden="true"
+                                    className="mr-2"
+                                />
+                            ) : (
+                                ""
+                            )}
+                            Send Email
+                        </button>
+                    </div>
+                </form>
+            </Modal.Body>
+        </Modal>
+    );
+}
 
 class HODLogin extends Component {
     constructor(props) {
@@ -10,10 +125,12 @@ class HODLogin extends Component {
         this.state = {
             username: "",
             password: "",
-            errortext: "",
-            showErrorAlert: false,
-            isloggedIn: "false",
+            errorMsg: "",
             items: [],
+            showLoader: false,
+            showErrorAlert: false,
+            showPassword: false,
+            showModal: false,
         };
     }
 
@@ -25,11 +142,25 @@ class HODLogin extends Component {
         this.setState({ password: event.target.value });
     };
 
-    handleSubmit = (event) => {
+    showPassword = () => {
         this.setState({
-            errortext: "",
+            showPassword: !this.state.showPassword,
         });
+    };
+
+    toggleModal = () => {
+        this.setState({
+            showModal: !this.state.showModal,
+        });
+    };
+
+    handleSubmit = (event) => {
         event.preventDefault();
+        this.setState({
+            errorMsg: "",
+            showLoader: true,
+            showErrorAlert: false,
+        });
         var url = `${baseUrl}${accountsUrl}/login/`;
         console.log(
             "username: " +
@@ -54,29 +185,33 @@ class HODLogin extends Component {
                 this.setState({
                     items: result,
                 });
-                console.log(result);
-
-                if (this.state.items.sts) {
+                if (result.sts) {
                     localStorage.clear();
                     localStorage.setItem(
                         "Authorization",
-                        `Token ${this.state.items.token}`
+                        `Token ${result.token}`
                     );
-                    localStorage.setItem("is_hod", this.state.items.is_hod);
+                    localStorage.setItem("is_hod", result.is_hod);
                     this.setState({
-                        isloggedIn: true,
+                        showLoader: false,
                     });
                 }
-                if (!this.state.items.sts && this.state.items.msg) {
+                if (!result.sts && result.msg) {
                     this.setState({
-                        errortext: this.state.items.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
+                        showLoader: false,
                     });
                 }
+                console.log(result);
             })
             .catch((err) => {
                 console.log(err);
             });
+    };
+
+    componentDidMount = () => {
+        document.title = "HOD Login | IQLabs";
     };
 
     render() {
@@ -88,10 +223,19 @@ class HODLogin extends Component {
         }
         return (
             <>
+                {this.state.showModal ? (
+                    <ForgotPasswordModal
+                        show={this.state.showModal}
+                        onHide={this.toggleModal}
+                    />
+                ) : (
+                    ""
+                )}
+
                 <Navbar className="secondary-bg py-2 px-4">
                     <Navbar.Brand>
                         <Link to="/">
-                            <img src={logo} alt="Logo" width="50" height="50" />
+                            <img src={logo} alt="Logo" />
                         </Link>
                     </Navbar.Brand>
                 </Navbar>
@@ -99,15 +243,11 @@ class HODLogin extends Component {
                     <div className="container">
                         <div className="row justify-content-center align-items-center">
                             <div className="col-md-5">
-                                <div
-                                    className="card shadow border-0 py-4"
-                                    style={{ borderRadius: "8px" }}
-                                >
+                                <div className="card shadow border-0 py-4">
                                     <div className="card-body ">
-                                        <h3 className="primary-text">LOGIN</h3>
-                                        <p className="small mb-4">
-                                            Login as HOD
-                                        </p>
+                                        <h3 className="primary-text mb-4">
+                                            LOGIN
+                                        </h3>
                                         <Alert
                                             variant="danger"
                                             show={this.state.showErrorAlert}
@@ -118,9 +258,12 @@ class HODLogin extends Component {
                                             }}
                                             dismissible
                                         >
-                                            {this.state.errortext}
+                                            {this.state.errorMsg}
                                         </Alert>
-                                        <form onSubmit={this.handleSubmit}>
+                                        <form
+                                            onSubmit={this.handleSubmit}
+                                            autoComplete="off"
+                                        >
                                             <div className="form-group">
                                                 <label htmlFor="username">
                                                     Username
@@ -129,7 +272,7 @@ class HODLogin extends Component {
                                                     type="text"
                                                     name="username"
                                                     id="username"
-                                                    className="form-control shadow border-0 form-control-lg"
+                                                    className="form-control form-shadow border-0 form-control-lg"
                                                     onChange={
                                                         this.changeUsername
                                                     }
@@ -142,26 +285,80 @@ class HODLogin extends Component {
                                                 <label htmlFor="password">
                                                     Password
                                                 </label>
-                                                <input
-                                                    type="password"
-                                                    name="password"
-                                                    id="password"
-                                                    className="form-control shadow border-0 form-control-lg"
-                                                    onChange={
-                                                        this.changePassword
-                                                    }
-                                                    value={this.state.password}
-                                                    placeholder="**********"
-                                                    required
-                                                />
+                                                <div
+                                                    className="input-group form-shadow"
+                                                    style={{
+                                                        borderRadius: "6px",
+                                                    }}
+                                                >
+                                                    <input
+                                                        type={
+                                                            this.state
+                                                                .showPassword
+                                                                ? "text"
+                                                                : "password"
+                                                        }
+                                                        name="password"
+                                                        id="password"
+                                                        className="form-control border-0 form-control-lg"
+                                                        onChange={
+                                                            this.changePassword
+                                                        }
+                                                        value={
+                                                            this.state.password
+                                                        }
+                                                        placeholder="**********"
+                                                        required
+                                                    />
+                                                    <div className="input-group-append">
+                                                        <button
+                                                            className="btn btn-link btn-sm bg-white shadow-none"
+                                                            type="button"
+                                                            id="button-addon2"
+                                                            onClick={
+                                                                this
+                                                                    .showPassword
+                                                            }
+                                                        >
+                                                            <i className="fas fa-eye"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="form-group">
+                                                <p className="small mb-0 text-right">
+                                                    {" "}
+                                                    <Link
+                                                        to="#"
+                                                        onClick={
+                                                            this.toggleModal
+                                                        }
+                                                        className="primary-text"
+                                                    >
+                                                        Forgot password?
+                                                    </Link>
+                                                </p>
                                             </div>
                                             <div className="form-group">
                                                 <button
                                                     type="submit"
                                                     className="btn btn-primary btn-block"
                                                 >
-                                                    LOGIN{" "}
-                                                    <i className="fas fa-sign-in-alt ml-2"></i>
+                                                    {this.state.showLoader ? (
+                                                        <Spinner
+                                                            as="span"
+                                                            animation="border"
+                                                            size="sm"
+                                                            role="status"
+                                                            aria-hidden="true"
+                                                            className="mr-2"
+                                                        />
+                                                    ) : (
+                                                        <>
+                                                            LOGIN{" "}
+                                                            <i className="fas fa-sign-in-alt ml-2"></i>
+                                                        </>
+                                                    )}
                                                 </button>
                                             </div>
                                         </form>
@@ -176,8 +373,15 @@ class HODLogin extends Component {
                         <div className="row">
                             <div className="col-md-6">
                                 <p className="mb-3 mb-md-0 text-white text-center text-md-left">
-                                    &copy;2020 Inquel inc.Powered By Sachirva
-                                    Technology Solutions
+                                    &copy;2020 Inquel inc. Powered By{" "}
+                                    <a
+                                        href="https://sachirva.com/"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="secondary-text"
+                                    >
+                                        Sachirva Technology Solutions
+                                    </a>
                                 </p>
                             </div>
                             <div className="col-md-6 ">
