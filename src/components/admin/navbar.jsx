@@ -83,7 +83,7 @@ class Header extends Component {
                                     width="25"
                                     className="profile-pic mr-1 mb-1"
                                 />{" "}
-                                Admin
+                                {localStorage.getItem('Username')}
                             </Dropdown.Toggle>
 
                             <Dropdown.Menu>

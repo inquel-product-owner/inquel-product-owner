@@ -48,6 +48,8 @@ class GroupTeachers extends Component {
             Authorization: authToken,
         };
 
+        console.log(`${url}/hod/group/${this.props.match.params.groupId}/teacher/`);
+
         Promise.all([
             fetch(`${url}/hod/group/${this.props.match.params.groupId}`, {
                 headers: headers,

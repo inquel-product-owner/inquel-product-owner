@@ -32,7 +32,7 @@ class SubscriptionModal extends Component {
                                         type="text"
                                         name="subscriptionid"
                                         id="subscriptionid"
-                                        className="form-control form-control-sm shadow-sm"
+                                        className="form-control form-control-sm form-shadow"
                                     />
                                 </div>
                             </div>
@@ -45,7 +45,7 @@ class SubscriptionModal extends Component {
                                         type="text"
                                         name="title"
                                         id="title"
-                                        className="form-control form-control-sm shadow-sm"
+                                        className="form-control form-control-sm form-shadow"
                                     />
                                 </div>
                             </div>
@@ -57,7 +57,7 @@ class SubscriptionModal extends Component {
                                     <select
                                         name="duration"
                                         id="duration"
-                                        className="form-control form-control-sm shadow-sm"
+                                        className="form-control form-control-sm form-shadow"
                                     >
                                         <option value="05">05</option>
                                     </select>
@@ -72,7 +72,7 @@ class SubscriptionModal extends Component {
                                         type="text"
                                         name="pricing"
                                         id="pricing"
-                                        className="form-control form-control-sm shadow-sm"
+                                        className="form-control form-control-sm form-shadow"
                                     />
                                 </div>
                             </div>
@@ -100,7 +100,7 @@ class SubscriptionModal extends Component {
                                         name="searchterm"
                                         id="searchterm"
                                         rows="5"
-                                        className="form-control form-control-sm shadow-sm"
+                                        className="form-control form-control-sm form-shadow"
                                     ></textarea>
                                 </div>
                             </div>
@@ -195,7 +195,7 @@ class AddCourse extends Component {
                                             <select
                                                 name="category"
                                                 id="category"
-                                                className="form-control form-control-sm shadow-sm"
+                                                className="form-control form-control-sm form-shadow"
                                             >
                                                 <option value="school">
                                                     School
@@ -213,7 +213,7 @@ class AddCourse extends Component {
                                             <select
                                                 name="discipline"
                                                 id="discipline"
-                                                className="form-control form-control-sm shadow-sm"
+                                                className="form-control form-control-sm form-shadow"
                                             >
                                                 <option value="none">
                                                     None
@@ -231,7 +231,7 @@ class AddCourse extends Component {
                                             <select
                                                 name="subject"
                                                 id="subject"
-                                                className="form-control form-control-sm shadow-sm"
+                                                className="form-control form-control-sm form-shadow"
                                             >
                                                 <option value="maths">
                                                     Maths
@@ -247,7 +247,7 @@ class AddCourse extends Component {
                                             <select
                                                 name="type"
                                                 id="type"
-                                                className="form-control form-control-sm shadow-sm"
+                                                className="form-control form-control-sm form-shadow"
                                             >
                                                 <option value="premium">
                                                     Premium
@@ -267,7 +267,7 @@ class AddCourse extends Component {
                                             <select
                                                 name="subcategory"
                                                 id="subcategory"
-                                                className="form-control form-control-sm shadow-sm"
+                                                className="form-control form-control-sm form-shadow"
                                             >
                                                 <option value="sch">SCH</option>
                                             </select>
@@ -281,7 +281,7 @@ class AddCourse extends Component {
                                             <select
                                                 name="level"
                                                 id="level"
-                                                className="form-control form-control-sm shadow-sm"
+                                                className="form-control form-control-sm form-shadow"
                                             >
                                                 <option value="10">10th</option>
                                             </select>
@@ -297,7 +297,7 @@ class AddCourse extends Component {
                                             <select
                                                 name="university"
                                                 id="university"
-                                                className="form-control form-control-sm shadow-sm"
+                                                className="form-control form-control-sm form-shadow"
                                             >
                                                 <option value="cbse">
                                                     CBSE
@@ -313,7 +313,7 @@ class AddCourse extends Component {
                                             <select
                                                 name="assignedhod"
                                                 id="assignedhod"
-                                                className="form-control form-control-sm shadow-sm"
+                                                className="form-control form-control-sm form-shadow"
                                             >
                                                 <option value="ram">Ram</option>
                                             </select>
@@ -326,7 +326,7 @@ class AddCourse extends Component {
                                 name="courses"
                                 id="courses"
                                 rows="5"
-                                className="form-control shadow-sm"
+                                className="form-control form-shadow"
                             ></textarea>
                             <div className="row mt-3">
                                 <div className="col-md-6">
@@ -378,7 +378,7 @@ class AddCourse extends Component {
                                             type="text"
                                             name="input1"
                                             id="input1"
-                                            className="form-control shadow-sm"
+                                            className="form-control form-shadow"
                                         />
                                     </div>
                                     <div className="form-group">
@@ -386,7 +386,7 @@ class AddCourse extends Component {
                                             type="text"
                                             name="input2"
                                             id="input2"
-                                            className="form-control shadow-sm"
+                                            className="form-control form-shadow"
                                         />
                                     </div>
                                 </div>
@@ -399,7 +399,7 @@ class AddCourse extends Component {
                                             name="searchterms"
                                             id="searchterms"
                                             rows="3"
-                                            className="form-control shadow-sm"
+                                            className="form-control form-shadow"
                                         ></textarea>
                                     </div>
                                     <div className="form-group">
@@ -410,7 +410,7 @@ class AddCourse extends Component {
                                             name="recommendedcourse"
                                             id="recommendedcourse"
                                             rows="3"
-                                            className="form-control shadow-sm"
+                                            className="form-control form-shadow"
                                         ></textarea>
                                     </div>
                                 </div>
@@ -429,7 +429,7 @@ class AddCourse extends Component {
                                         type="text"
                                         name="subscriptionid"
                                         id="subscriptionid"
-                                        className="form-control shadow-sm"
+                                        className="form-control form-shadow"
                                     />
                                 </div>
                             </div>
@@ -444,7 +444,7 @@ class AddCourse extends Component {
                                         type="text"
                                         name="subscriptiontitle"
                                         id="subscriptiontitle"
-                                        className="form-control shadow-sm"
+                                        className="form-control form-shadow"
                                     />
                                 </div>
                             </div>
@@ -459,7 +459,7 @@ class AddCourse extends Component {
                                         type="text"
                                         name="subscriptiondescription"
                                         id="subscriptiondescription"
-                                        className="form-control shadow-sm"
+                                        className="form-control form-shadow"
                                     />
                                 </div>
                             </div>
@@ -473,7 +473,7 @@ class AddCourse extends Component {
                                             <select
                                                 name="durationmonth"
                                                 id="durationmonth"
-                                                className="form-control shadow-sm"
+                                                className="form-control form-shadow"
                                             >
                                                 <option value="05">05</option>
                                             </select>
@@ -482,7 +482,7 @@ class AddCourse extends Component {
                                             <select
                                                 name="durationday"
                                                 id="durationday"
-                                                className="form-control shadow-sm"
+                                                className="form-control form-shadow"
                                             >
                                                 <option value="10">10</option>
                                             </select>
@@ -505,7 +505,7 @@ class AddCourse extends Component {
                                             type="text"
                                             name="pricing"
                                             id="pricing"
-                                            className="form-control shadow-sm"
+                                            className="form-control form-shadow"
                                         />
                                     </form>
                                 </div>
@@ -715,7 +715,7 @@ class VewCourseCard extends Component {
                                     <select
                                         name="category"
                                         id="category"
-                                        className="form-control form-control-sm shadow-sm"
+                                        className="form-control form-control-sm form-shadow"
                                     >
                                         <option value="school">School</option>
                                     </select>
@@ -733,7 +733,7 @@ class VewCourseCard extends Component {
                                     <select
                                         name="subcategory"
                                         id="subcategory"
-                                        className="form-control form-control-sm shadow-sm"
+                                        className="form-control form-control-sm form-shadow"
                                     >
                                         <option value="sch">SCH</option>
                                     </select>
@@ -751,7 +751,7 @@ class VewCourseCard extends Component {
                                     <select
                                         name="discipline"
                                         id="discipline"
-                                        className="form-control form-control-sm shadow-sm"
+                                        className="form-control form-control-sm form-shadow"
                                     >
                                         <option value="none">None</option>
                                     </select>
@@ -769,7 +769,7 @@ class VewCourseCard extends Component {
                                     <select
                                         name="level"
                                         id="level"
-                                        className="form-control form-control-sm shadow-sm"
+                                        className="form-control form-control-sm form-shadow"
                                     >
                                         <option value="10">10th</option>
                                     </select>
@@ -787,7 +787,7 @@ class VewCourseCard extends Component {
                                     <select
                                         name="subject"
                                         id="subject"
-                                        className="form-control form-control-sm shadow-sm"
+                                        className="form-control form-control-sm form-shadow"
                                     >
                                         <option value="maths">Maths</option>
                                     </select>
@@ -805,7 +805,7 @@ class VewCourseCard extends Component {
                                     <select
                                         name="university"
                                         id="university"
-                                        className="form-control form-control-sm shadow-sm"
+                                        className="form-control form-control-sm form-shadow"
                                     >
                                         <option value="cbse">CBSE</option>
                                     </select>
@@ -823,7 +823,7 @@ class VewCourseCard extends Component {
                                     <select
                                         name="type"
                                         id="type"
-                                        className="form-control form-control-sm shadow-sm"
+                                        className="form-control form-control-sm form-shadow"
                                     >
                                         <option value="premium">Premium</option>
                                     </select>
@@ -855,7 +855,7 @@ class VewCourseCard extends Component {
                                     <select
                                         name="assignedhod"
                                         id="assignedhod"
-                                        className="form-control form-control-sm shadow-sm"
+                                        className="form-control form-control-sm form-shadow"
                                     >
                                         <option value="ram">Ram</option>
                                     </select>
@@ -873,7 +873,7 @@ class VewCourseCard extends Component {
                                     <select
                                         name="status"
                                         id="status"
-                                        className="form-control form-control-sm shadow-sm"
+                                        className="form-control form-control-sm form-shadow"
                                     >
                                         <option value="published">
                                             Published

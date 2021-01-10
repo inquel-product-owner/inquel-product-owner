@@ -122,6 +122,8 @@ body {
 .btn-link {
     color: #621012;
     font-weight: 500;
+    outline: none;
+    box-shadow: none;
 }
 
 .btn-link:hover {
@@ -134,8 +136,7 @@ body {
 
 .form-control {
     outline: none;
-    border: none;
-    border: none;
+    border: 1px solid white;
     background-color: white;
     border-radius: 6px;
     font-size: 15px;
@@ -145,11 +146,26 @@ body {
     outline: none;
     background-color: white;
     box-shadow: none;
-    border: none;
+    border: 1px solid #621012;
 }
 
 .form-control::placeholder {
-    color: #8998ab;
+    color: #aeb2b6;
+}
+
+label {
+    font-size: 14px;
+}
+
+.form-shadow {
+    box-shadow: 0 0.05rem 0.125rem 0.1rem rgba(0, 0, 0, 0.075) !important;
+}
+
+.css-yk16xz-control {
+    border-radius: 6px !important;
+    border: none !important;
+    overflow: hidden;
+    box-shadow: 0 0.05rem 0.125rem 0.1rem rgba(0, 0, 0, 0.075) !important;
 }
 
 input[type="search"] {
@@ -248,6 +264,10 @@ input[type="search"]:focus {
 
 .border-primary {
     border: 1px solid #621012 !important;
+}
+
+.border-secondary {
+    border: 1px solid #cccccc;
 }
 
 /* Login */
@@ -375,4 +395,45 @@ input[type="search"]:focus {
 
 .alert::first-letter {
     text-transform: uppercase;
+}
+
+/* Modal */
+
+.modal-content {
+    border: none;
+    border-radius: 6px;
+}
+
+.modal-header {
+    padding: 0.8rem 0.8rem;
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.modal-backdrop.show {
+    opacity: 0.8;
+}
+
+/* Pagination */
+
+.pagination {
+    margin-bottom: 0;
+}
+
+.page-link {
+    color: #621012;
+    font-size: 14px;
+}
+
+.page-link:hover {
+    color: #621012;
+    background-color: #efd2ac;
+    border-color: #efd2ac;
+}
+
+.page-item.active .page-link {
+    z-index: 3;
+    color: #fff;
+    background-color: #621012;
+    border-color: #621012;
 }

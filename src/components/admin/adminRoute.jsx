@@ -12,14 +12,12 @@ import HodStudentProfile from "./hodStudentProfile";
 import CourseView from "./viewCourse";
 import DiscountConfiguration from "./discountConfiguration";
 import MasterData from "./masterData";
-// import HODTable from "../table/hodTable";
 
 import hodRoutes from "../hod/hodRoute";
 import errorPage from "../404";
 
 const adminRoutes = (
     <Switch>
-        {/* <Route exact path="/" component={HODTable} /> */}
         <Route
             exact
             path="/admin"
@@ -34,11 +32,11 @@ const adminRoutes = (
         <Route path="/admin/login" component={Login} />
         <Route
             path="/admin/profiles"
-            render={() =>
+            render={(props) =>
                 !localStorage.getItem("Inquel-Auth") ? (
                     <Redirect to="/admin/login" />
                 ) : (
-                    <Profiles />
+                    <Profiles {...props} />
                 )
             }
         />
@@ -65,11 +63,11 @@ const adminRoutes = (
         />
         <Route
             path="/admin/course/:courseId"
-            render={() =>
+            render={(props) =>
                 !localStorage.getItem("Inquel-Auth") ? (
                     <Redirect to="/admin/login" />
                 ) : (
-                    <CourseView />
+                    <CourseView {...props} />
                 )
             }
         />
@@ -106,21 +104,21 @@ const adminRoutes = (
         <Route
             exact
             path="/admin/course-management"
-            render={() =>
+            render={(props) =>
                 !localStorage.getItem("Inquel-Auth") ? (
                     <Redirect to="/admin/login" />
                 ) : (
-                    <MasterData />
+                    <MasterData {...props} />
                 )
             }
         />
         <Route
             path="/admin/course-management/discounts"
-            render={() =>
+            render={(props) =>
                 !localStorage.getItem("Inquel-Auth") ? (
                     <Redirect to="/admin/login" />
                 ) : (
-                    <DiscountConfiguration />
+                    <DiscountConfiguration {...props} />
                 )
             }
         />
