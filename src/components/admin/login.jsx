@@ -3,6 +3,7 @@ import { Navbar, Spinner, Alert } from "react-bootstrap";
 import logo from "../../assets/IQ_Labs_V5.png";
 import { Link, Redirect } from "react-router-dom";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl.js";
+import Header from './navbar';
 
 class Login extends Component {
     constructor(props) {
@@ -14,6 +15,7 @@ class Login extends Component {
             items: [],
             showLoader: false,
             showErrorAlert: false,
+            showPassword: false,
         };
     }
 
@@ -23,6 +25,12 @@ class Login extends Component {
 
     changePassword = (event) => {
         this.setState({ password: event.target.value });
+    };
+
+    showPassword = () => {
+        this.setState({
+            showPassword: !this.state.showPassword,
+        });
     };
 
     handleSubmit = (event) => {
@@ -55,19 +63,26 @@ class Login extends Component {
             .then((result) => {
                 this.setState({
                     items: result,
-                    showLoader: false,
                 });
-                if (this.state.items.sts) {
+                if (result.sts) {
                     localStorage.clear();
                     localStorage.setItem(
                         "Inquel-Auth",
-                        `Token ${this.state.items.token}`
+                        `Token ${result.token}`
                     );
-                }
-                if (!this.state.items.sts && this.state.items.msg) {
+                    localStorage.setItem(
+                        "Username",
+                        result.username
+                    );
                     this.setState({
-                        errorMsg: this.state.items.msg,
+                        showLoader: false,
+                    });
+                }
+                if (!result.sts && result.msg) {
+                    this.setState({
+                        errorMsg: result.msg,
                         showErrorAlert: true,
+                        showLoader: false,
                     });
                 }
                 console.log(result);
@@ -98,15 +113,11 @@ class Login extends Component {
                     <div className="container">
                         <div className="row justify-content-center align-items-center">
                             <div className="col-md-5">
-                                <div
-                                    className="card shadow border-0 py-4"
-                                    style={{ borderRadius: "8px" }}
-                                >
+                                <div className="card shadow border-0 py-4">
                                     <div className="card-body ">
-                                        <h3 className="primary-text">LOGIN</h3>
-                                        <p className="small mb-4">
-                                            Login as Admin
-                                        </p>
+                                        <h3 className="primary-text mb-4">
+                                            LOGIN
+                                        </h3>
                                         <Alert
                                             variant="danger"
                                             show={this.state.showErrorAlert}
@@ -119,7 +130,10 @@ class Login extends Component {
                                         >
                                             {this.state.errorMsg}
                                         </Alert>
-                                        <form onSubmit={this.handleSubmit}>
+                                        <form
+                                            onSubmit={this.handleSubmit}
+                                            autoComplete="off"
+                                        >
                                             <div className="form-group">
                                                 <label htmlFor="username">
                                                     Username
@@ -128,7 +142,7 @@ class Login extends Component {
                                                     type="text"
                                                     name="username"
                                                     id="username"
-                                                    className="form-control shadow border-0 form-control-lg"
+                                                    className="form-control form-shadow border-0 form-control-lg"
                                                     onChange={
                                                         this.changeUsername
                                                     }
@@ -141,18 +155,46 @@ class Login extends Component {
                                                 <label htmlFor="password">
                                                     Password
                                                 </label>
-                                                <input
-                                                    type="password"
-                                                    name="password"
-                                                    id="password"
-                                                    className="form-control shadow border-0 form-control-lg"
-                                                    onChange={
-                                                        this.changePassword
-                                                    }
-                                                    value={this.state.password}
-                                                    placeholder="**********"
-                                                    required
-                                                />
+                                                <div
+                                                    className="input-group form-shadow"
+                                                    style={{
+                                                        borderRadius: "6px",
+                                                        overflow: "hidden",
+                                                    }}
+                                                >
+                                                    <input
+                                                        type={
+                                                            this.state
+                                                                .showPassword
+                                                                ? "text"
+                                                                : "password"
+                                                        }
+                                                        name="password"
+                                                        id="password"
+                                                        className="form-control border-0 form-control-lg"
+                                                        onChange={
+                                                            this.changePassword
+                                                        }
+                                                        value={
+                                                            this.state.password
+                                                        }
+                                                        placeholder="**********"
+                                                        required
+                                                    />
+                                                    <div className="input-group-append">
+                                                        <button
+                                                            className="btn btn-link btn-sm bg-white shadow-none"
+                                                            type="button"
+                                                            id="button-addon2"
+                                                            onClick={
+                                                                this
+                                                                    .showPassword
+                                                            }
+                                                        >
+                                                            <i className="fas fa-eye"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             </div>
                                             <div className="form-group">
                                                 <button
@@ -188,8 +230,15 @@ class Login extends Component {
                         <div className="row">
                             <div className="col-md-6">
                                 <p className="mb-3 mb-md-0 text-white text-center text-md-left">
-                                    &copy;2020 Inquel inc.Powered By Sachirva
-                                    Technology Solutions
+                                    &copy;2020 Inquel inc. Powered By{" "}
+                                    <a
+                                        href="https://sachirva.com/"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="secondary-text"
+                                    >
+                                        Sachirva Technology Solutions
+                                    </a>
                                 </p>
                             </div>
                             <div className="col-md-6 ">

@@ -7,7 +7,6 @@ import {
     Inject,
     Sort,
     Toolbar,
-    Page,
     Resize,
 } from "@syncfusion/ej2-react-grids";
 import "./material.css";
@@ -187,8 +186,6 @@ class StudentTable extends Component {
                         allowResizing={true}
                         selectionSettings={this.select}
                         toolbar={this.toolbarOptions}
-                        allowPaging={true}
-                        pageSettings={{ pageSize: 20, pageCount: 5 }}
                         rowSelected={this.rowSelected.bind(this)}
                         rowDeselected={this.rowDeselected.bind(this)}
                     >
@@ -257,7 +254,7 @@ class StudentTable extends Component {
                             />
                         </ColumnsDirective>
                         <Inject
-                            services={[Filter, Sort, Toolbar, Page, Resize]}
+                            services={[Filter, Sort, Toolbar, Resize]}
                         />
                     </GridComponent>
                 </div>

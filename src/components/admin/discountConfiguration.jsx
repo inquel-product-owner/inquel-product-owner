@@ -39,6 +39,15 @@ class DiscountConfiguration extends Component {
                     }`}
                 >
                     <div className="container-fluid">
+                        
+                        {/* Back button */}
+                        <button
+                            className="btn btn-primary-invert btn-sm mb-2"
+                            onClick={this.props.history.goBack}
+                        >
+                            <i className="fas fa-chevron-left fa-sm"></i> Back
+                        </button>
+
                         <div className="row mb-3">
                             <div className="col-md-6 order-md-1 order-2">
                                 <h5 className="primary-text">

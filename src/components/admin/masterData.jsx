@@ -156,6 +156,14 @@ class MasterData extends Component {
                     }`}
                 >
                     <div className="container-fluid">
+                        {/* Back button */}
+                        <button
+                            className="btn btn-primary-invert btn-sm mb-2"
+                            onClick={this.props.history.goBack}
+                        >
+                            <i className="fas fa-chevron-left fa-sm"></i> Back
+                        </button>
+
                         <div className="d-flex flex-wrap mb-4">
                             <Link to="/admin/course-management">
                                 <button className="btn btn-outline-secondary btn-sm mr-1">

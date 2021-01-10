@@ -11,7 +11,7 @@ class HodStudentProfile extends Component {
         this.state = {
             showSideNav: false,
             studentItems: [],
-            isLoaded: false
+            isLoaded: false,
         };
     }
 
@@ -42,7 +42,7 @@ class HodStudentProfile extends Component {
             .then((result) => {
                 this.setState({
                     studentItems: result.data,
-                    isLoaded: true
+                    isLoaded: true,
                 });
                 console.log(result);
             })
@@ -55,7 +55,7 @@ class HodStudentProfile extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="User Profiles" togglenav={this.toggleSideNav} />
+                <Header name="Student Profile" togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
                 <SideNav
@@ -72,6 +72,15 @@ class HodStudentProfile extends Component {
                         {/* Student details */}
                         {this.state.isLoaded ? (
                             <>
+                                {/* Back button */}
+                                <button
+                                    className="btn btn-primary-invert btn-sm mb-2"
+                                    onClick={this.props.history.goBack}
+                                >
+                                    <i className="fas fa-chevron-left fa-sm"></i>{" "}
+                                    Back
+                                </button>
+
                                 <div className="row align-items-center mb-4">
                                     <div className="col-md-6">
                                         <div className="row align-items-center">
@@ -179,92 +188,6 @@ class HodStudentProfile extends Component {
                         ) : (
                             <ProfileLoader />
                         )}
-
-                        {/* Course list */}
-                        {/* <div className="card shadow-sm">
-                            <div className="table-responsive">
-                                <table className="table">
-                                    <thead className="primary-text">
-                                        <tr>
-                                            <th scope="col">
-                                                Courses subscribed
-                                            </th>
-                                            <th scope="col">Valid from</th>
-                                            <th scope="col">Valid to</th>
-                                            <th scope="col">Status</th>
-                                            <th scope="col">Amount paid</th>
-                                            <th scope="col">
-                                                Discount Applied
-                                            </th>
-                                            <th scope="col">Quiz Points</th>
-                                            <th scope="col">Simulation</th>
-                                            <th
-                                                scope="col"
-                                                className="text-center"
-                                            >
-                                                Scorecard
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                Mathematics 10th CBSE (Full
-                                                course)
-                                            </td>
-                                            <td>05/10/2020</td>
-                                            <td>10/10/2020</td>
-                                            <td>Persuing</td>
-                                            <td>2560</td>
-                                            <td>SP2020210001</td>
-                                            <td>212</td>
-                                            <td>First Class</td>
-                                            <td className="text-center">
-                                                <Link to="/admin/course/001">
-                                                    <button className="btn btn-sm btn-primary">
-                                                        <i className="fas fa-eye"></i>
-                                                    </button>
-                                                </Link>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Physics</td>
-                                            <td>10/10/2020</td>
-                                            <td>02/03/2020</td>
-                                            <td>Persuing</td>
-                                            <td>3871</td>
-                                            <td>SP2020210001</td>
-                                            <td>436</td>
-                                            <td>Not Taken</td>
-                                            <td className="text-center">
-                                                <Link to="/admin/course/001">
-                                                    <button className="btn btn-sm btn-primary">
-                                                        <i className="fas fa-eye"></i>
-                                                    </button>
-                                                </Link>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Chemistry</td>
-                                            <td>03/01/2020</td>
-                                            <td>07/07/2020</td>
-                                            <td>Completed</td>
-                                            <td>9568</td>
-                                            <td>SP2020210001</td>
-                                            <td>128</td>
-                                            <td>Distiction</td>
-                                            <td className="text-center">
-                                                <Link to="/admin/course/001">
-                                                    <button className="btn btn-sm btn-primary">
-                                                        <i className="fas fa-eye"></i>
-                                                    </button>
-                                                </Link>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div> */}
                     </div>
                 </div>
             </div>
