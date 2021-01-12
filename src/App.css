@@ -50,7 +50,6 @@ body {
     border: none;
     background-color: white;
     border-radius: 8px;
-    overflow: hidden;
     text-decoration: none !important;
 }
 
@@ -58,11 +57,25 @@ body {
     background-color: white;
     border: none;
     color: #621012;
+    border-top-left-radius: 8px !important;
+    border-top-right-radius: 8px !important;
+}
+
+.card-img-top {
+    border-top-left-radius: 8px !important;
+    border-top-right-radius: 8px !important;
+}
+
+.card-body {
+    border-bottom-left-radius: 8px !important;
+    border-bottom-right-radius: 8px !important;
 }
 
 .card-footer {
     background-color: white;
     border: none;
+    border-bottom-left-radius: 8px !important;
+    border-bottom-right-radius: 8px !important;
 }
 
 /* Button */
@@ -146,7 +159,7 @@ body {
     outline: none;
     background-color: white;
     box-shadow: none;
-    border: 1px solid #621012;
+    border: 1px solid white;
 }
 
 .form-control::placeholder {
@@ -188,6 +201,9 @@ input[type="search"]:focus {
 
 .table {
     margin-bottom: 0;
+    border-top-left-radius: 8px !important;
+    border-top-right-radius: 8px !important;
+    overflow: hidden;
 }
 
 .table th {
@@ -369,7 +385,7 @@ input[type="search"]:focus {
     height: 100%;
     top: 0;
     left: 0;
-    background: #f8f8f8ad;
+    background: #f8f8f8d5;
 }
 
 .fp-container .fp-loader {
@@ -436,4 +452,11 @@ input[type="search"]:focus {
     color: #fff;
     background-color: #621012;
     border-color: #621012;
+}
+
+/* table-grid */
+
+.e-toolbar-items {
+    border-top-left-radius: 8px !important;
+    border-top-right-radius: 8px !important;
 }

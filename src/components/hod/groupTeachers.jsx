@@ -48,8 +48,6 @@ class GroupTeachers extends Component {
             Authorization: authToken,
         };
 
-        console.log(`${url}/hod/group/${this.props.match.params.groupId}/teacher/`);
-
         Promise.all([
             fetch(`${url}/hod/group/${this.props.match.params.groupId}`, {
                 headers: headers,
@@ -143,7 +141,7 @@ class GroupTeachers extends Component {
                             <div className="card-body">
                                 <Tab.Container
                                     id="left-tabs-example"
-                                    defaultActiveKey="1"
+                                    defaultActiveKey="0"
                                 >
                                     <Row>
                                         <Col sm={3} className="mb-3 mb-md-0">
@@ -156,6 +154,7 @@ class GroupTeachers extends Component {
                                                         .length !== 0 ? (
                                                         this.state.teacherItems.map(
                                                             (list, index) => {
+                                                                console.log(index)
                                                                 return (
                                                                     <Nav.Item
                                                                         key={
@@ -185,143 +184,114 @@ class GroupTeachers extends Component {
                                         </Col>
                                         <Col sm={9}>
                                             <Tab.Content>
-                                                {this.state.teacherItems.map(
-                                                    (list, index) => {
-                                                        return (
-                                                            <Tab.Pane
-                                                                key={index}
-                                                                eventKey={index}
-                                                            >
-                                                                <div className="card shadow-sm">
-                                                                    <div className="table-responsive">
-                                                                        <table className="table">
-                                                                            <thead className="secondary-bg primary-text">
-                                                                                <tr>
-                                                                                    <th scope="col">
-                                                                                        Handling
-                                                                                        standard
-                                                                                    </th>
-                                                                                    <th scope="col">
-                                                                                        Handling
-                                                                                    </th>
-                                                                                    <th scope="col">
-                                                                                        Chapters
-                                                                                        Assigned
-                                                                                    </th>
-                                                                                    <th scope="col">
-                                                                                        Exams
-                                                                                    </th>
-                                                                                    <th scope="col">
-                                                                                        Quizes
-                                                                                    </th>
-                                                                                </tr>
-                                                                            </thead>
-                                                                            <tbody>
-                                                                                <tr>
-                                                                                    <td>
-                                                                                        9th
-                                                                                        Standard
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        Chemistry
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        <p>
-                                                                                            Chapter
-                                                                                            1
-                                                                                        </p>
-                                                                                        <p>
-                                                                                            Chapter
-                                                                                            2
-                                                                                        </p>
-                                                                                        <p className="mb-0">
-                                                                                            Chapter
-                                                                                            3
-                                                                                        </p>
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        <p>
-                                                                                            Simulation
-                                                                                            1
-                                                                                        </p>
-                                                                                        <p>
-                                                                                            Simulation
-                                                                                            2
-                                                                                        </p>
-                                                                                        <p className="mb-0">
-                                                                                            Simulation
-                                                                                            3
-                                                                                        </p>
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        <p>
-                                                                                            Chapter
-                                                                                            8
-                                                                                        </p>
-                                                                                        <p>
-                                                                                            Chapter
-                                                                                            9
-                                                                                        </p>
-                                                                                    </td>
-                                                                                </tr>
-                                                                                <tr>
-                                                                                    <td>
-                                                                                        10th
-                                                                                        Standard
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        Chemistry
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        <p>
-                                                                                            Chapter
-                                                                                            1
-                                                                                        </p>
-                                                                                        <p>
-                                                                                            Chapter
-                                                                                            2
-                                                                                        </p>
-                                                                                        <p>
-                                                                                            Chapter
-                                                                                            3
-                                                                                        </p>
-                                                                                        <p className="mb-0">
-                                                                                            Chapter
-                                                                                            4
-                                                                                        </p>
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        <p>
-                                                                                            Simulation
-                                                                                            1
-                                                                                        </p>
-                                                                                        <p>
-                                                                                            Simulation
-                                                                                            2
-                                                                                        </p>
-                                                                                        <p className="mb-0">
-                                                                                            Simulation
-                                                                                            3
-                                                                                        </p>
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        <p>
-                                                                                            Chapter
-                                                                                            8
-                                                                                        </p>
-                                                                                        <p>
-                                                                                            Chapter
-                                                                                            9
-                                                                                        </p>
-                                                                                    </td>
-                                                                                </tr>
-                                                                            </tbody>
-                                                                        </table>
+                                                {this.state.isLoaded ? (
+                                                    this.state.teacherItems.map(
+                                                        (list, index) => {
+                                                            console.log(index)
+                                                            return (
+                                                                <Tab.Pane
+                                                                    key={index}
+                                                                    eventKey={
+                                                                        index
+                                                                    }
+                                                                >
+                                                                    <div className="card shadow-sm">
+                                                                        <div className="table-responsive">
+                                                                            <table className="table">
+                                                                                <thead className="secondary-bg primary-text">
+                                                                                    <tr>
+                                                                                        <th scope="col">
+                                                                                            Handling
+                                                                                            Group
+                                                                                        </th>
+                                                                                        <th scope="col">
+                                                                                            <div className="row">
+                                                                                                <div className="col-6">
+                                                                                                    Handling
+                                                                                                    Subject
+                                                                                                </div>
+                                                                                                <div className="col-6">
+                                                                                                    Handling
+                                                                                                    Chapters
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </th>
+                                                                                        <th scope="col">
+                                                                                            Exams
+                                                                                        </th>
+                                                                                        <th scope="col">
+                                                                                            Quizes
+                                                                                        </th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                    {list.handling.map(
+                                                                                        (
+                                                                                            item,
+                                                                                            index
+                                                                                        ) => {
+                                                                                            return (
+                                                                                                <tr
+                                                                                                    key={
+                                                                                                        index
+                                                                                                    }
+                                                                                                >
+                                                                                                    <td>
+                                                                                                        {item.group_name ===
+                                                                                                        "independent"
+                                                                                                            ? ""
+                                                                                                            : item.group_name}
+                                                                                                    </td>
+                                                                                                    <td>
+                                                                                                        {item.subjects.map(
+                                                                                                            (
+                                                                                                                subject
+                                                                                                            ) => {
+                                                                                                                return (
+                                                                                                                    <div className="row">
+                                                                                                                        <p className="col-6">
+                                                                                                                            {
+                                                                                                                                subject.subject_name
+                                                                                                                            }
+                                                                                                                        </p>
+                                                                                                                        <div className="col-6">
+                                                                                                                            {subject.chapters.map(
+                                                                                                                                (
+                                                                                                                                    chapter
+                                                                                                                                ) => {
+                                                                                                                                    return (
+                                                                                                                                        <p>
+                                                                                                                                            {
+                                                                                                                                                chapter.chapter_name
+                                                                                                                                            }
+                                                                                                                                        </p>
+                                                                                                                                    );
+                                                                                                                                }
+                                                                                                                            )}
+                                                                                                                        </div>
+                                                                                                                    </div>
+                                                                                                                );
+                                                                                                            }
+                                                                                                        )}
+                                                                                                    </td>
+                                                                                                    <td>
+                                                                                                    </td>
+                                                                                                    <td>
+                                                                                                    </td>
+                                                                                                </tr>
+                                                                                            );
+                                                                                        }
+                                                                                    )}
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </div>
                                                                     </div>
-                                                                </div>
-                                                            </Tab.Pane>
-                                                        );
-                                                    }
+                                                                </Tab.Pane>
+                                                            );
+                                                        }
+                                                    )
+                                                ) : (
+                                                    <Loading />
                                                 )}
                                             </Tab.Content>
                                         </Col>

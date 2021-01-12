@@ -62,7 +62,7 @@ class DiscountConfiguration extends Component {
                                     </button>
                                 </Link>
                                 <Link to="/admin/course-management/discounts">
-                                    <button className="btn btn-outline-secondary btn-sm">
+                                    <button className="btn btn-secondary btn-sm">
                                         Discounts Configuration{" "}
                                         <i className="fas fa-chevron-right fa-sm ml-2"></i>
                                     </button>

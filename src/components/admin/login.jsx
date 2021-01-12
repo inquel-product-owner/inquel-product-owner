@@ -113,7 +113,7 @@ class Login extends Component {
                     <div className="container">
                         <div className="row justify-content-center align-items-center">
                             <div className="col-md-5">
-                                <div className="card shadow border-0 py-4">
+                                <div className="card shadow py-4">
                                     <div className="card-body ">
                                         <h3 className="primary-text mb-4">
                                             LOGIN
@@ -142,7 +142,7 @@ class Login extends Component {
                                                     type="text"
                                                     name="username"
                                                     id="username"
-                                                    className="form-control form-shadow border-0 form-control-lg"
+                                                    className="form-control form-shadow form-control-lg"
                                                     onChange={
                                                         this.changeUsername
                                                     }
@@ -171,7 +171,7 @@ class Login extends Component {
                                                         }
                                                         name="password"
                                                         id="password"
-                                                        className="form-control border-0 form-control-lg"
+                                                        className="form-control form-control-lg"
                                                         onChange={
                                                             this.changePassword
                                                         }

@@ -747,8 +747,8 @@ class ProfileList extends Component {
                                                                             }
                                                                         </td>
                                                                         <td>
-                                                                            {list.group ? (
-                                                                                list.group
+                                                                            {list.group_name ? (
+                                                                                list.group_name
                                                                             ) : (
                                                                                 <span className="text-danger">
                                                                                     Not

@@ -4,11 +4,7 @@ import profilepic from "../../assets/user.png";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
-import ProfileLoader from "../../shared/profileLoader";
-
-function Loading() {
-    return <p>Loading...</p>;
-}
+import Loading from "../../shared/loadingComponent";
 
 function EmptyData() {
     return (
@@ -25,7 +21,7 @@ class HodTeacherList extends Component {
             showSideNav: false,
             teacherItems: [],
             hodItems: [],
-            isLoaded: false,
+            page_loading: true,
         };
     }
 
@@ -61,7 +57,7 @@ class HodTeacherList extends Component {
                 this.setState({
                     hodItems: result[0].data,
                     teacherItems: result[1].data.results,
-                    isLoaded: true,
+                    page_loading: false,
                 });
                 console.log(result);
             })
@@ -74,7 +70,10 @@ class HodTeacherList extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="HOD Teacher List" togglenav={this.toggleSideNav} />
+                <Header
+                    name="HOD Teacher List"
+                    togglenav={this.toggleSideNav}
+                />
 
                 {/* Sidebar */}
                 <SideNav
@@ -88,54 +87,45 @@ class HodTeacherList extends Component {
                     }`}
                 >
                     <div className="container-fluid">
-                        {/* HOD Details */}
-                        {this.state.isLoaded ? (
-                            <>
-                                {/* Back button */}
-                                <button
-                                    className="btn btn-primary-invert btn-sm mb-2"
-                                    onClick={this.props.history.goBack}
-                                >
-                                    <i className="fas fa-chevron-left fa-sm"></i>{" "}
-                                    Back
-                                </button>
+                        {/* Loading component */}
+                        {this.state.page_loading ? <Loading /> : ""}
+                        
+                        {/* Back button */}
+                        <button
+                            className="btn btn-primary-invert btn-sm mb-2"
+                            onClick={this.props.history.goBack}
+                        >
+                            <i className="fas fa-chevron-left fa-sm"></i> Back
+                        </button>
 
-                                <div className="row align-items-center mb-4">
-                                    <div className="col-md-6">
-                                        <div className="row align-items-center">
-                                            <div className="col-md-2 col-3">
-                                                <img
-                                                    src={
-                                                        this.state.hodItems
-                                                            .profile_link !==
-                                                        null
-                                                            ? this.state
-                                                                  .hodItems
-                                                                  .profile_link
-                                                            : profilepic
-                                                    }
-                                                    alt={`${this.state.hodItems.first_name} ${this.state.hodItems.last_name}`}
-                                                    className="img-fluid profile-pic"
-                                                />
-                                            </div>
-                                            <div className="col-md-10 col-9 pl-0">
-                                                <h5 className="primary-text">
-                                                    {`${this.state.hodItems.first_name} ${this.state.hodItems.last_name}`}
-                                                </h5>
-                                                <p className="mb-0">
-                                                    {
-                                                        this.props.match.params
-                                                            .hodId
-                                                    }
-                                                </p>
-                                            </div>
-                                        </div>
+                        {/* HOD Details */}
+                        <div className="row align-items-center mb-4">
+                            <div className="col-md-6">
+                                <div className="row align-items-center">
+                                    <div className="col-md-2 col-3">
+                                        <img
+                                            src={
+                                                this.state.hodItems
+                                                    .profile_link !== null
+                                                    ? this.state.hodItems
+                                                          .profile_link
+                                                    : profilepic
+                                            }
+                                            alt={`${this.state.hodItems.first_name} ${this.state.hodItems.last_name}`}
+                                            className="img-fluid profile-pic"
+                                        />
+                                    </div>
+                                    <div className="col-md-10 col-9 pl-0">
+                                        <h5 className="primary-text">
+                                            {`${this.state.hodItems.first_name} ${this.state.hodItems.last_name}`}
+                                        </h5>
+                                        <p className="mb-0">
+                                            {this.props.match.params.hodId}
+                                        </p>
                                     </div>
                                 </div>
-                            </>
-                        ) : (
-                            <ProfileLoader />
-                        )}
+                            </div>
+                        </div>
 
                         {/* Teachers list */}
                         <div className="row justify-content-center justify-content-between mb-4">
@@ -168,33 +158,29 @@ class HodTeacherList extends Component {
                                                 variant="pills"
                                                 className="flex-column"
                                             >
-                                                {this.state.isLoaded ? (
-                                                    this.state.teacherItems
-                                                        .length !== 0 ? (
-                                                        this.state.teacherItems.map(
-                                                            (list, index) => {
-                                                                return (
-                                                                    <Nav.Item
-                                                                        key={
+                                                {this.state.teacherItems
+                                                    .length !== 0 ? (
+                                                    this.state.teacherItems.map(
+                                                        (list, index) => {
+                                                            return (
+                                                                <Nav.Item
+                                                                    key={index}
+                                                                >
+                                                                    <Nav.Link
+                                                                        eventKey={
                                                                             index
                                                                         }
                                                                     >
-                                                                        <Nav.Link
-                                                                            eventKey={
-                                                                                index
-                                                                            }
-                                                                        >
-                                                                            {`${list.first_name} ${list.last_name}`}
-                                                                        </Nav.Link>
-                                                                    </Nav.Item>
-                                                                );
-                                                            }
-                                                        )
-                                                    ) : (
-                                                        <EmptyData />
+                                                                        {list.full_name
+                                                                            ? list.full_name
+                                                                            : "No name"}
+                                                                    </Nav.Link>
+                                                                </Nav.Item>
+                                                            );
+                                                        }
                                                     )
                                                 ) : (
-                                                    <Loading />
+                                                    <EmptyData />
                                                 )}
                                             </Nav>
                                         </Col>
@@ -214,14 +200,19 @@ class HodTeacherList extends Component {
                                                                                 <tr>
                                                                                     <th scope="col">
                                                                                         Handling
-                                                                                        standard
+                                                                                        Group
                                                                                     </th>
                                                                                     <th scope="col">
-                                                                                        Handling
-                                                                                    </th>
-                                                                                    <th scope="col">
-                                                                                        Chapters
-                                                                                        Assigned
+                                                                                        <div className="row">
+                                                                                            <div className="col-6">
+                                                                                                Handling
+                                                                                                Subject
+                                                                                            </div>
+                                                                                            <div className="col-6">
+                                                                                                Handling
+                                                                                                Chapters
+                                                                                            </div>
+                                                                                        </div>
                                                                                     </th>
                                                                                     <th scope="col">
                                                                                         Exams
@@ -232,104 +223,61 @@ class HodTeacherList extends Component {
                                                                                 </tr>
                                                                             </thead>
                                                                             <tbody>
-                                                                                <tr>
-                                                                                    <td>
-                                                                                        9th
-                                                                                        Standard
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        Chemistry
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        <p>
-                                                                                            Chapter
-                                                                                            1
-                                                                                        </p>
-                                                                                        <p>
-                                                                                            Chapter
-                                                                                            2
-                                                                                        </p>
-                                                                                        <p className="mb-0">
-                                                                                            Chapter
-                                                                                            3
-                                                                                        </p>
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        <p>
-                                                                                            Simulation
-                                                                                            1
-                                                                                        </p>
-                                                                                        <p>
-                                                                                            Simulation
-                                                                                            2
-                                                                                        </p>
-                                                                                        <p className="mb-0">
-                                                                                            Simulation
-                                                                                            3
-                                                                                        </p>
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        <p>
-                                                                                            Chapter
-                                                                                            8
-                                                                                        </p>
-                                                                                        <p>
-                                                                                            Chapter
-                                                                                            9
-                                                                                        </p>
-                                                                                    </td>
-                                                                                </tr>
-                                                                                <tr>
-                                                                                    <td>
-                                                                                        10th
-                                                                                        Standard
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        Chemistry
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        <p>
-                                                                                            Chapter
-                                                                                            1
-                                                                                        </p>
-                                                                                        <p>
-                                                                                            Chapter
-                                                                                            2
-                                                                                        </p>
-                                                                                        <p>
-                                                                                            Chapter
-                                                                                            3
-                                                                                        </p>
-                                                                                        <p className="mb-0">
-                                                                                            Chapter
-                                                                                            4
-                                                                                        </p>
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        <p>
-                                                                                            Simulation
-                                                                                            1
-                                                                                        </p>
-                                                                                        <p>
-                                                                                            Simulation
-                                                                                            2
-                                                                                        </p>
-                                                                                        <p className="mb-0">
-                                                                                            Simulation
-                                                                                            3
-                                                                                        </p>
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        <p>
-                                                                                            Chapter
-                                                                                            8
-                                                                                        </p>
-                                                                                        <p>
-                                                                                            Chapter
-                                                                                            9
-                                                                                        </p>
-                                                                                    </td>
-                                                                                </tr>
+                                                                                {list.handling.map(
+                                                                                    (
+                                                                                        item,
+                                                                                        index
+                                                                                    ) => {
+                                                                                        return (
+                                                                                            <tr
+                                                                                                key={
+                                                                                                    index
+                                                                                                }
+                                                                                            >
+                                                                                                <td>
+                                                                                                    {item.group_name ===
+                                                                                                    "independent"
+                                                                                                        ? ""
+                                                                                                        : item.group_name}
+                                                                                                </td>
+                                                                                                <td>
+                                                                                                    {item.subjects.map(
+                                                                                                        (
+                                                                                                            subject
+                                                                                                        ) => {
+                                                                                                            return (
+                                                                                                                <div className="row">
+                                                                                                                    <p className="col-6">
+                                                                                                                        {
+                                                                                                                            subject.subject_name
+                                                                                                                        }
+                                                                                                                    </p>
+                                                                                                                    <div className="col-6">
+                                                                                                                        {subject.chapters.map(
+                                                                                                                            (
+                                                                                                                                chapter
+                                                                                                                            ) => {
+                                                                                                                                return (
+                                                                                                                                    <p>
+                                                                                                                                        {
+                                                                                                                                            chapter.chapter_name
+                                                                                                                                        }
+                                                                                                                                    </p>
+                                                                                                                                );
+                                                                                                                            }
+                                                                                                                        )}
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                                                                            );
+                                                                                                        }
+                                                                                                    )}
+                                                                                                </td>
+                                                                                                <td></td>
+                                                                                                <td></td>
+                                                                                            </tr>
+                                                                                        );
+                                                                                    }
+                                                                                )}
                                                                             </tbody>
                                                                         </table>
                                                                     </div>
