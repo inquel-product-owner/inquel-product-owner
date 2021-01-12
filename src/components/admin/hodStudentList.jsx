@@ -1,26 +1,11 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
 import profilepic from "../../assets/user.png";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
-import ProfileLoader from "../../shared/profileLoader";
-
-function Loading() {
-    return (
-        <tr>
-            <td>Loading...</td>
-        </tr>
-    );
-}
-
-function EmptyData() {
-    return (
-        <tr>
-            <td>Data not available</td>
-        </tr>
-    );
-}
+import Loading from "../../shared/loadingComponent";
+import Paginations from "../../shared/pagination";
+import StudentTable from "../table/studentTable";
 
 class HodStudentList extends Component {
     constructor(props) {
@@ -29,7 +14,9 @@ class HodStudentList extends Component {
             showSideNav: false,
             studentItems: [],
             hodItems: [],
-            isLoaded: false,
+            page_loading: true,
+            activeStudentPage: 1,
+            totalStudentCount: 0,
         };
     }
 
@@ -65,7 +52,7 @@ class HodStudentList extends Component {
                 this.setState({
                     hodItems: result[0].data,
                     studentItems: result[1].data.results,
-                    isLoaded: true,
+                    page_loading: false,
                 });
                 console.log(result);
             })
@@ -74,17 +61,18 @@ class HodStudentList extends Component {
             });
     };
 
-    dateConversion = (date) => {
-        var newDate = new Date(date).toLocaleDateString();
-        var datearray = newDate.split("/");
-        return datearray[1] + "/" + datearray[0] + "/" + datearray[2];
-    };
+    handleStudentPageChange(pageNumber) {
+        this.setState({ activeStudentPage: pageNumber, page_loading: true });
+    }
 
     render() {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="HOD Student List" togglenav={this.toggleSideNav} />
+                <Header
+                    name="HOD Student List"
+                    togglenav={this.toggleSideNav}
+                />
 
                 {/* Sidebar */}
                 <SideNav
@@ -98,133 +86,62 @@ class HodStudentList extends Component {
                     }`}
                 >
                     <div className="container-fluid">
-                        {/* HOD Details */}
-                        {this.state.isLoaded ? (
-                            <>
-                                {/* Back button */}
-                                <button
-                                    className="btn btn-primary-invert btn-sm mb-2"
-                                    onClick={this.props.history.goBack}
-                                >
-                                    <i className="fas fa-chevron-left fa-sm"></i>{" "}
-                                    Back
-                                </button>
+                        {/* Loading component */}
+                        {this.state.page_loading ? <Loading /> : ""}
+                        
+                        {/* Back button */}
+                        <button
+                            className="btn btn-primary-invert btn-sm mb-2"
+                            onClick={this.props.history.goBack}
+                        >
+                            <i className="fas fa-chevron-left fa-sm"></i> Back
+                        </button>
 
-                                <div className="row align-items-center mb-4">
-                                    <div className="col-md-6">
-                                        <div className="row align-items-center">
-                                            <div className="col-md-2 col-3">
-                                                <img
-                                                    src={
-                                                        this.state.hodItems
-                                                            .profile_link !==
-                                                        null
-                                                            ? this.state
-                                                                  .hodItems
-                                                                  .profile_link
-                                                            : profilepic
-                                                    }
-                                                    alt={`${this.state.hodItems.first_name} ${this.state.hodItems.last_name}`}
-                                                    className="img-fluid profile-pic"
-                                                />
-                                            </div>
-                                            <div className="col-md-10 col-9 pl-0">
-                                                <h5 className="primary-text">
-                                                    {`${this.state.hodItems.first_name} ${this.state.hodItems.last_name}`}
-                                                </h5>
-                                                <p className="mb-0">
-                                                    {
-                                                        this.props.match.params
-                                                            .hodId
-                                                    }
-                                                </p>
-                                            </div>
-                                        </div>
+                        <div className="row align-items-center mb-4">
+                            <div className="col-md-6">
+                                <div className="row align-items-center">
+                                    <div className="col-md-2 col-3">
+                                        <img
+                                            src={
+                                                this.state.hodItems
+                                                    .profile_link !== null
+                                                    ? this.state.hodItems
+                                                          .profile_link
+                                                    : profilepic
+                                            }
+                                            alt={`${this.state.hodItems.first_name} ${this.state.hodItems.last_name}`}
+                                            className="img-fluid profile-pic"
+                                        />
+                                    </div>
+                                    <div className="col-md-10 col-9 pl-0">
+                                        <h5 className="primary-text">
+                                            {`${this.state.hodItems.first_name} ${this.state.hodItems.last_name}`}
+                                        </h5>
+                                        <p className="mb-0">
+                                            {this.props.match.params.hodId}
+                                        </p>
                                     </div>
                                 </div>
-                            </>
-                        ) : (
-                            <ProfileLoader />
-                        )}
+                            </div>
+                        </div>
 
                         {/* Student List */}
                         <div className="card shadow-sm">
-                            <div className="table-responsive">
-                                <table className="table">
-                                    <thead className="primary-text">
-                                        <tr>
-                                            <th scope="col">ID</th>
-                                            <th scope="col">Name</th>
-                                            <th scope="col">Email</th>
-                                            <th scope="col">Contact</th>
-                                            <th scope="col">Category</th>
-                                            <th scope="col">Registered on</th>
-                                            <th scope="col"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {this.state.isLoaded ? (
-                                            this.state.studentItems.length !==
-                                            0 ? (
-                                                this.state.studentItems.map(
-                                                    (list, index) => {
-                                                        return (
-                                                            <tr key={index}>
-                                                                <td>
-                                                                    {list.id}
-                                                                </td>
-                                                                <td>
-                                                                    {/* <img
-                                                                    src={
-                                                                        list.profile_link !==
-                                                                        null
-                                                                            ? list.profile_link
-                                                                            : profilepic
-                                                                    }
-                                                                    alt="User profile pic"
-                                                                    width="20"
-                                                                />{" "} */}
-                                                                    {`${list.first_name} ${list.last_name}`}
-                                                                </td>
-                                                                <td>
-                                                                    {list.email}
-                                                                </td>
-                                                                <td>
-                                                                    {
-                                                                        list.contact
-                                                                    }
-                                                                </td>
-                                                                <td>
-                                                                    {
-                                                                        list.category
-                                                                    }
-                                                                </td>
-                                                                <td>
-                                                                    {this.dateConversion(
-                                                                        list.date_joined
-                                                                    )}
-                                                                </td>
-                                                                <td>
-                                                                    <Link
-                                                                        to={`/admin/hod/${this.props.match.params.hodId}/student/${list.id}`}
-                                                                    >
-                                                                        <button className="btn btn-sm btn-primary">
-                                                                            View
-                                                                        </button>
-                                                                    </Link>
-                                                                </td>
-                                                            </tr>
-                                                        );
-                                                    }
-                                                )
-                                            ) : (
-                                                <EmptyData />
-                                            )
-                                        ) : (
-                                            <Loading />
-                                        )}
-                                    </tbody>
-                                </table>
+                            <StudentTable
+                                studentItems={this.state.studentItems}
+                                path={`admin/hod/${this.props.match.params.hodId}`}
+                                ref={this.gridRef}
+                            />
+                            <div className="card-body p-3">
+                                <Paginations
+                                    activePage={this.state.activeStudentPage}
+                                    totalItemsCount={
+                                        this.state.totalStudentCount
+                                    }
+                                    onChange={this.handleStudentPageChange.bind(
+                                        this
+                                    )}
+                                />
                             </div>
                         </div>
                     </div>

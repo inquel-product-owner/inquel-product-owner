@@ -1,14 +1,15 @@
 import React, { Component } from "react";
 import { Tabs, Tab, Modal, Alert, Spinner } from "react-bootstrap";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl.js";
-import Switch from "react-switch";
 import Select from "react-select";
+import Switch from "react-switch";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import HODTable from "../table/hodTable";
 import Loading from "../../shared/loadingComponent";
 import StudentTable from "../table/studentTable";
 import Paginations from "../../shared/pagination";
+import ReactSwitch from "../../shared/switchComponent";
 
 class Profiles extends Component {
     constructor(props) {
@@ -23,7 +24,7 @@ class Profiles extends Component {
             activeTab: "hod",
             hodItems: [],
             studentItems: [],
-            is_loading: true,
+            page_loading: true,
             email: "",
             username: "",
             password: "",
@@ -57,6 +58,8 @@ class Profiles extends Component {
             is_formSubmited: false,
             subcategory_loading: false,
             discipline_loading: false,
+            showPassword: false,
+            selectAll: false,
         };
         this.authToken = localStorage.getItem("Inquel-Auth");
         this.headers = {
@@ -85,12 +88,6 @@ class Profiles extends Component {
         this.props.history.push({ hash: key });
     };
 
-    dateConversion = (date) => {
-        var newDate = new Date(date).toLocaleDateString();
-        var datearray = newDate.split("/");
-        return datearray[1] + "/" + datearray[0] + "/" + datearray[2];
-    };
-
     // Fetch HOD List
     loadHodData = () => {
         fetch(`${this.url}/hod/?page=${this.state.activeHODPage}`, {
@@ -102,7 +99,7 @@ class Profiles extends Component {
                 this.setState({
                     hodItems: result.data.results,
                     totalHODCount: result.data.count,
-                    is_loading: false,
+                    page_loading: false,
                 });
                 console.log(result);
             })
@@ -122,6 +119,7 @@ class Profiles extends Component {
                 this.setState({
                     studentItems: result.data.results,
                     totalStudentCount: result.data.count,
+                    page_loading: false,
                 });
                 console.log(result);
             })
@@ -153,6 +151,12 @@ class Profiles extends Component {
 
     componentDidMount = () => {
         document.title = "Admin Profile | IQLabs";
+
+        if (!this.props.location.hash) {
+            this.setState({ activeTab: "hod" });
+        } else {
+            this.setState({ activeTab: this.props.location.hash.substring(1) });
+        }
 
         this.loadHodData();
         this.loadStudentData();
@@ -424,12 +428,36 @@ class Profiles extends Component {
     };
 
     handleHODPageChange(pageNumber) {
-        this.setState({ activeHODPage: pageNumber });
+        this.setState({ activeHODPage: pageNumber, page_loading: true });
     }
 
     handleStudentPageChange(pageNumber) {
-        this.setState({ activeStudentPage: pageNumber });
+        this.setState({ activeStudentPage: pageNumber, page_loading: true });
     }
+
+    showPassword = () => {
+        this.setState({
+            showPassword: !this.state.showPassword,
+        });
+    };
+
+    handleSelectAll = () => {
+        this.setState({
+            selectAll: !this.state.selectAll,
+            progressivescore: !this.state.selectAll,
+            type1: !this.state.selectAll,
+            type2: !this.state.selectAll,
+            quiz: !this.state.selectAll,
+            match: !this.state.selectAll,
+            notesdownload: !this.state.selectAll,
+            summary: !this.state.selectAll,
+            directquestion: !this.state.selectAll,
+            configure: !this.state.selectAll,
+            simulationexam: !this.state.selectAll,
+            lockingoftest: !this.state.selectAll,
+            mobileapp: !this.state.selectAll,
+        });
+    };
 
     render() {
         return (
@@ -456,885 +484,674 @@ class Profiles extends Component {
                     }`}
                 >
                     <div className="container-fluid">
-                        {this.state.is_loading ? (
-                            <Loading />
-                        ) : (
-                            <>
-                                {this.state.modalShow ? (
-                                    <Modal
-                                        show={this.state.modalShow}
-                                        onHide={this.toggleModal}
-                                        size="lg"
-                                        aria-labelledby="contained-modal-title-vcenter"
-                                        centered
+                        {/* Loading component */}
+                        {this.state.page_loading ? <Loading /> : ""}
+
+                        {/* Back button */}
+                        <button
+                            className="btn btn-primary-invert btn-sm mb-2 mb-md-0"
+                            onClick={this.props.history.goBack}
+                        >
+                            <i className="fas fa-chevron-left fa-sm"></i> Back
+                        </button>
+
+                        {this.state.modalShow ? (
+                            <Modal
+                                show={this.state.modalShow}
+                                onHide={this.toggleModal}
+                                size="lg"
+                                aria-labelledby="contained-modal-title-vcenter"
+                                centered
+                            >
+                                <Modal.Header
+                                    closeButton
+                                    className="primary-text h5"
+                                >
+                                    Add HOD
+                                </Modal.Header>
+                                <Modal.Body>
+                                    <Alert
+                                        variant="danger"
+                                        show={this.state.showErrorAlert}
+                                        onClose={() => {
+                                            this.setState({
+                                                showErrorAlert: false,
+                                            });
+                                        }}
+                                        dismissible
                                     >
-                                        <Modal.Header
-                                            closeButton
-                                            className="primary-text h5"
-                                        >
-                                            Add HOD
-                                        </Modal.Header>
-                                        <Modal.Body>
-                                            <Alert
-                                                variant="danger"
-                                                show={this.state.showErrorAlert}
-                                                onClose={() => {
-                                                    this.setState({
-                                                        showErrorAlert: false,
-                                                    });
-                                                }}
-                                                dismissible
-                                            >
-                                                {this.state.errorMsg}
-                                            </Alert>
-                                            <Alert
-                                                variant="success"
-                                                show={
-                                                    this.state.showSuccessAlert
-                                                }
-                                                onClose={() => {
-                                                    this.setState({
-                                                        showSuccessAlert: false,
-                                                    });
-                                                }}
-                                                dismissible
-                                            >
-                                                {this.state.successMsg}
-                                            </Alert>
-                                            <form
-                                                action=""
-                                                onSubmit={this.handleSubmit}
-                                                autoComplete="off"
-                                            >
-                                                <div className="row mb-2">
-                                                    <div className="form-group col-md-4">
-                                                        <label htmlFor="email">
-                                                            Email
-                                                        </label>
-                                                        <input
-                                                            type="email"
-                                                            name="email"
-                                                            id="email"
-                                                            className="form-control form-shadow"
-                                                            placeholder="Enter email"
-                                                            onChange={
+                                        {this.state.errorMsg}
+                                    </Alert>
+                                    <Alert
+                                        variant="success"
+                                        show={this.state.showSuccessAlert}
+                                        onClose={() => {
+                                            this.setState({
+                                                showSuccessAlert: false,
+                                            });
+                                        }}
+                                        dismissible
+                                    >
+                                        {this.state.successMsg}
+                                    </Alert>
+                                    <form
+                                        action=""
+                                        onSubmit={this.handleSubmit}
+                                        autoComplete="off"
+                                    >
+                                        <div className="row mb-2">
+                                            <div className="form-group col-md-4">
+                                                <label htmlFor="email">
+                                                    Email
+                                                </label>
+                                                <input
+                                                    type="email"
+                                                    name="email"
+                                                    id="email"
+                                                    className="form-control form-shadow"
+                                                    placeholder="Enter email"
+                                                    onChange={this.handleChange}
+                                                    value={this.state.email}
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="form-group col-md-4">
+                                                <label htmlFor="username">
+                                                    Username
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    name="username"
+                                                    id="username"
+                                                    className="form-control form-shadow"
+                                                    placeholder="Enter username"
+                                                    onChange={this.handleChange}
+                                                    value={this.state.username}
+                                                    required
+                                                />
+                                            </div>
+                                            <div className="form-group col-md-4">
+                                                <label htmlFor="password">
+                                                    Password
+                                                </label>
+                                                <div
+                                                    className="input-group form-shadow"
+                                                    style={{
+                                                        borderRadius: "6px",
+                                                    }}
+                                                >
+                                                    <input
+                                                        type={
+                                                            this.state
+                                                                .showPassword
+                                                                ? "text"
+                                                                : "password"
+                                                        }
+                                                        name="password"
+                                                        id="password"
+                                                        className="form-control"
+                                                        onChange={
+                                                            this.handleChange
+                                                        }
+                                                        value={
+                                                            this.state.password
+                                                        }
+                                                        placeholder="**********"
+                                                        required
+                                                    />
+                                                    <div className="input-group-append">
+                                                        <button
+                                                            className="btn btn-link btn-sm bg-white shadow-none"
+                                                            type="button"
+                                                            onClick={
                                                                 this
-                                                                    .handleChange
+                                                                    .showPassword
                                                             }
-                                                            value={
-                                                                this.state.email
-                                                            }
-                                                            required
-                                                        />
-                                                    </div>
-                                                    <div className="form-group col-md-4">
-                                                        <label htmlFor="username">
-                                                            Username
-                                                        </label>
-                                                        <input
-                                                            type="text"
-                                                            name="username"
-                                                            id="username"
-                                                            className="form-control form-shadow"
-                                                            placeholder="Enter username"
-                                                            onChange={
-                                                                this
-                                                                    .handleChange
-                                                            }
-                                                            value={
-                                                                this.state
-                                                                    .username
-                                                            }
-                                                            required
-                                                        />
-                                                    </div>
-                                                    <div className="form-group col-md-4">
-                                                        <label htmlFor="password">
-                                                            Password
-                                                        </label>
-                                                        <input
-                                                            type="password"
-                                                            name="password"
-                                                            id="password"
-                                                            className="form-control form-shadow"
-                                                            placeholder="Enter password"
-                                                            onChange={
-                                                                this
-                                                                    .handleChange
-                                                            }
-                                                            value={
-                                                                this.state
-                                                                    .password
-                                                            }
-                                                            required
-                                                        />
+                                                        >
+                                                            <i className="fas fa-eye"></i>
+                                                        </button>
                                                     </div>
                                                 </div>
-                                                <div className="row mb-2">
-                                                    <div className="col-md-6">
-                                                        <h6 className="primary-text mb-3">
-                                                            Details
-                                                        </h6>
+                                            </div>
+                                        </div>
+                                        <div className="row mb-2">
+                                            <div className="col-md-6">
+                                                <h6 className="primary-text mb-3">
+                                                    Details
+                                                </h6>
 
-                                                        <div className="form-group">
-                                                            <label htmlFor="category">
-                                                                Category
-                                                            </label>
-                                                            <Select
-                                                                className="basic-single"
-                                                                placeholder="Select category"
-                                                                isSearchable={
-                                                                    true
-                                                                }
-                                                                name="category"
-                                                                options={this.state.category.map(
-                                                                    function (
-                                                                        list
-                                                                    ) {
-                                                                        return {
-                                                                            value:
-                                                                                list.code,
-                                                                            label:
-                                                                                list.title,
-                                                                        };
-                                                                    }
-                                                                )}
-                                                                onChange={
-                                                                    this
-                                                                        .handleCategory
-                                                                }
-                                                                required
-                                                            />
-                                                        </div>
-                                                        <div className="form-group">
-                                                            <label htmlFor="subcategory">
-                                                                Sub Category
-                                                            </label>
-                                                            <Select
-                                                                className="basic-single"
-                                                                placeholder="Select subcategory"
-                                                                isDisabled={
-                                                                    this.state
-                                                                        .selectedCategory ===
-                                                                    ""
-                                                                        ? true
-                                                                        : false
-                                                                }
-                                                                isLoading={
-                                                                    this.state
-                                                                        .subcategory_loading
-                                                                        ? true
-                                                                        : false
-                                                                }
-                                                                isSearchable={
-                                                                    true
-                                                                }
-                                                                name="subcategory"
-                                                                options={this.state.subcategory.map(
-                                                                    function (
-                                                                        list
-                                                                    ) {
-                                                                        return {
-                                                                            value:
-                                                                                list.code,
-                                                                            label:
-                                                                                list.title,
-                                                                        };
-                                                                    }
-                                                                )}
-                                                                onChange={
-                                                                    this
-                                                                        .handleSubcategory
-                                                                }
-                                                                required
-                                                            />
-                                                        </div>
-                                                        <div className="form-group">
-                                                            <label htmlFor="discipline">
-                                                                Discipline
-                                                            </label>
-                                                            <Select
-                                                                className="basic-single"
-                                                                placeholder="Select discipline"
-                                                                isDisabled={
-                                                                    this.state
-                                                                        .selectedSubcategory ===
-                                                                    ""
-                                                                        ? true
-                                                                        : false
-                                                                }
-                                                                isLoading={
-                                                                    this.state
-                                                                        .discipline_loading
-                                                                        ? true
-                                                                        : false
-                                                                }
-                                                                isSearchable={
-                                                                    true
-                                                                }
-                                                                name="discipline"
-                                                                options={Object.entries(
-                                                                    this.state
-                                                                        .discipline
-                                                                ).map(
-                                                                    ([
-                                                                        key,
-                                                                        value,
-                                                                    ]) => {
-                                                                        return {
-                                                                            value: key,
-                                                                            label: value,
-                                                                        };
-                                                                    }
-                                                                )}
-                                                                onChange={
-                                                                    this
-                                                                        .handleDiscipline
-                                                                }
-                                                                required
-                                                            />
-                                                        </div>
-                                                        <div className="form-group">
-                                                            <label htmlFor="board">
-                                                                Board /
-                                                                University
-                                                            </label>
-                                                            <Select
-                                                                className="basic-single"
-                                                                placeholder="Select board"
-                                                                value={null}
-                                                                isSearchable={
-                                                                    true
-                                                                }
-                                                                name="board"
-                                                                options={this.state.board.map(
-                                                                    function (
-                                                                        list
-                                                                    ) {
-                                                                        return {
-                                                                            value:
-                                                                                list.code,
-                                                                            label:
-                                                                                list.title,
-                                                                        };
-                                                                    }
-                                                                )}
-                                                                onChange={
-                                                                    this
-                                                                        .handleBoard
-                                                                }
-                                                                required
-                                                            />
-                                                        </div>
-                                                        <div className="form-group">
-                                                            <label htmlFor="valid_from">
-                                                                Valid From
-                                                            </label>
-                                                            <input
-                                                                type="date"
-                                                                name="valid_from"
-                                                                id="valid_from"
-                                                                className="form-control form-shadow"
-                                                                onChange={
-                                                                    this
-                                                                        .handleValid_from
-                                                                }
-                                                            />
-                                                        </div>
-                                                        <div className="form-group">
-                                                            <label htmlFor="valid_to">
-                                                                Valid To
-                                                            </label>
-                                                            <input
-                                                                type="date"
-                                                                name="valid_to"
-                                                                id="valid_to"
-                                                                className="form-control form-shadow"
-                                                                onChange={
-                                                                    this
-                                                                        .handleValid_to
-                                                                }
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-md-6">
-                                                        <h6 className="primary-text mb-3">
-                                                            Configuration
-                                                        </h6>
-                                                        <div className="row mb-3">
-                                                            <div className="col-9">
-                                                                <p className="primary-text small mb-0 font-weight-bold">
-                                                                    Progressive
-                                                                    Score
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-3 text-right">
-                                                                <Switch
-                                                                    checked={
-                                                                        this
-                                                                            .state
-                                                                            .progressivescore
-                                                                    }
-                                                                    onChange={
-                                                                        this
-                                                                            .handlePSChange
-                                                                    }
-                                                                    onColor="#efd2ac"
-                                                                    onHandleColor="#621012"
-                                                                    handleDiameter={
-                                                                        12
-                                                                    }
-                                                                    uncheckedIcon={
-                                                                        false
-                                                                    }
-                                                                    checkedIcon={
-                                                                        false
-                                                                    }
-                                                                    boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
-                                                                    activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
-                                                                    height={18}
-                                                                    width={35}
-                                                                    className="react-switch"
-                                                                    name="progressivescore"
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                        <div className="row mb-3">
-                                                            <div className="col-9">
-                                                                <p className="primary-text small mb-0 font-weight-bold">
-                                                                    Type 1
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-3 text-right">
-                                                                <Switch
-                                                                    checked={
-                                                                        this
-                                                                            .state
-                                                                            .type1
-                                                                    }
-                                                                    onChange={
-                                                                        this
-                                                                            .handleType1Change
-                                                                    }
-                                                                    onColor="#efd2ac"
-                                                                    onHandleColor="#621012"
-                                                                    handleDiameter={
-                                                                        12
-                                                                    }
-                                                                    uncheckedIcon={
-                                                                        false
-                                                                    }
-                                                                    checkedIcon={
-                                                                        false
-                                                                    }
-                                                                    boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
-                                                                    activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
-                                                                    height={18}
-                                                                    width={35}
-                                                                    className="react-switch"
-                                                                    name="type1"
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                        <div className="row mb-3">
-                                                            <div className="col-9">
-                                                                <p className="primary-text small mb-0 font-weight-bold">
-                                                                    Type 2
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-3 text-right">
-                                                                <Switch
-                                                                    checked={
-                                                                        this
-                                                                            .state
-                                                                            .type2
-                                                                    }
-                                                                    onChange={
-                                                                        this
-                                                                            .handleType2Change
-                                                                    }
-                                                                    onColor="#efd2ac"
-                                                                    onHandleColor="#621012"
-                                                                    handleDiameter={
-                                                                        12
-                                                                    }
-                                                                    uncheckedIcon={
-                                                                        false
-                                                                    }
-                                                                    checkedIcon={
-                                                                        false
-                                                                    }
-                                                                    boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
-                                                                    activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
-                                                                    height={18}
-                                                                    width={35}
-                                                                    className="react-switch"
-                                                                    name="type2"
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                        <div className="row mb-3">
-                                                            <div className="col-9">
-                                                                <p className="primary-text small mb-0 font-weight-bold">
-                                                                    Quiz
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-3 text-right">
-                                                                <Switch
-                                                                    checked={
-                                                                        this
-                                                                            .state
-                                                                            .quiz
-                                                                    }
-                                                                    onChange={
-                                                                        this
-                                                                            .handleQuizChange
-                                                                    }
-                                                                    onColor="#efd2ac"
-                                                                    onHandleColor="#621012"
-                                                                    handleDiameter={
-                                                                        12
-                                                                    }
-                                                                    uncheckedIcon={
-                                                                        false
-                                                                    }
-                                                                    checkedIcon={
-                                                                        false
-                                                                    }
-                                                                    boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
-                                                                    activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
-                                                                    height={18}
-                                                                    width={35}
-                                                                    className="react-switch"
-                                                                    name="quiz"
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                        <div className="row mb-3">
-                                                            <div className="col-9">
-                                                                <p className="primary-text small mb-0 font-weight-bold">
-                                                                    Match
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-3 text-right">
-                                                                <Switch
-                                                                    checked={
-                                                                        this
-                                                                            .state
-                                                                            .match
-                                                                    }
-                                                                    onChange={
-                                                                        this
-                                                                            .handleMatchChange
-                                                                    }
-                                                                    onColor="#efd2ac"
-                                                                    onHandleColor="#621012"
-                                                                    handleDiameter={
-                                                                        12
-                                                                    }
-                                                                    uncheckedIcon={
-                                                                        false
-                                                                    }
-                                                                    checkedIcon={
-                                                                        false
-                                                                    }
-                                                                    boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
-                                                                    activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
-                                                                    height={18}
-                                                                    width={35}
-                                                                    className="react-switch"
-                                                                    name="match"
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                        <div className="row mb-3">
-                                                            <div className="col-9">
-                                                                <p className="primary-text small mb-0 font-weight-bold">
-                                                                    Notes
-                                                                    download
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-3 text-right">
-                                                                <Switch
-                                                                    checked={
-                                                                        this
-                                                                            .state
-                                                                            .notesdownload
-                                                                    }
-                                                                    onChange={
-                                                                        this
-                                                                            .handleNotesChange
-                                                                    }
-                                                                    onColor="#efd2ac"
-                                                                    onHandleColor="#621012"
-                                                                    handleDiameter={
-                                                                        12
-                                                                    }
-                                                                    uncheckedIcon={
-                                                                        false
-                                                                    }
-                                                                    checkedIcon={
-                                                                        false
-                                                                    }
-                                                                    boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
-                                                                    activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
-                                                                    height={18}
-                                                                    width={35}
-                                                                    className="react-switch"
-                                                                    name="notesdownload"
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                        <div className="row mb-3">
-                                                            <div className="col-9">
-                                                                <p className="primary-text small mb-0 font-weight-bold">
-                                                                    Summary
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-3 text-right">
-                                                                <Switch
-                                                                    checked={
-                                                                        this
-                                                                            .state
-                                                                            .summary
-                                                                    }
-                                                                    onChange={
-                                                                        this
-                                                                            .handleSummaryChange
-                                                                    }
-                                                                    onColor="#efd2ac"
-                                                                    onHandleColor="#621012"
-                                                                    handleDiameter={
-                                                                        12
-                                                                    }
-                                                                    uncheckedIcon={
-                                                                        false
-                                                                    }
-                                                                    checkedIcon={
-                                                                        false
-                                                                    }
-                                                                    boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
-                                                                    activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
-                                                                    height={18}
-                                                                    width={35}
-                                                                    className="react-switch"
-                                                                    name="summary"
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                        <div className="row mb-3">
-                                                            <div className="col-9">
-                                                                <p className="primary-text small mb-0 font-weight-bold">
-                                                                    Direct
-                                                                    Questions
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-3 text-right">
-                                                                <Switch
-                                                                    checked={
-                                                                        this
-                                                                            .state
-                                                                            .directquestion
-                                                                    }
-                                                                    onChange={
-                                                                        this
-                                                                            .handleDQChange
-                                                                    }
-                                                                    onColor="#efd2ac"
-                                                                    onHandleColor="#621012"
-                                                                    handleDiameter={
-                                                                        12
-                                                                    }
-                                                                    uncheckedIcon={
-                                                                        false
-                                                                    }
-                                                                    checkedIcon={
-                                                                        false
-                                                                    }
-                                                                    boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
-                                                                    activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
-                                                                    height={18}
-                                                                    width={35}
-                                                                    className="react-switch"
-                                                                    name="directquestion"
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                        <div className="row mb-3">
-                                                            <div className="col-9">
-                                                                <p className="primary-text small mb-0 font-weight-bold">
-                                                                    Configure
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-3 text-right">
-                                                                <Switch
-                                                                    checked={
-                                                                        this
-                                                                            .state
-                                                                            .configure
-                                                                    }
-                                                                    onChange={
-                                                                        this
-                                                                            .handleConfigureChange
-                                                                    }
-                                                                    onColor="#efd2ac"
-                                                                    onHandleColor="#621012"
-                                                                    handleDiameter={
-                                                                        12
-                                                                    }
-                                                                    uncheckedIcon={
-                                                                        false
-                                                                    }
-                                                                    checkedIcon={
-                                                                        false
-                                                                    }
-                                                                    boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
-                                                                    activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
-                                                                    height={18}
-                                                                    width={35}
-                                                                    className="react-switch"
-                                                                    name="configure"
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                        <div className="row mb-3">
-                                                            <div className="col-9">
-                                                                <p className="primary-text small mb-0 font-weight-bold">
-                                                                    Simulation
-                                                                    Exam
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-3 text-right">
-                                                                <Switch
-                                                                    checked={
-                                                                        this
-                                                                            .state
-                                                                            .simulationexam
-                                                                    }
-                                                                    onChange={
-                                                                        this
-                                                                            .handleSimulationChange
-                                                                    }
-                                                                    onColor="#efd2ac"
-                                                                    onHandleColor="#621012"
-                                                                    handleDiameter={
-                                                                        12
-                                                                    }
-                                                                    uncheckedIcon={
-                                                                        false
-                                                                    }
-                                                                    checkedIcon={
-                                                                        false
-                                                                    }
-                                                                    boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
-                                                                    activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
-                                                                    height={18}
-                                                                    width={35}
-                                                                    className="react-switch"
-                                                                    name="simulationexam"
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                        <div className="row mb-3">
-                                                            <div className="col-9">
-                                                                <p className="primary-text small mb-0 font-weight-bold">
-                                                                    Locking of
-                                                                    Tests
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-3 text-right">
-                                                                <Switch
-                                                                    checked={
-                                                                        this
-                                                                            .state
-                                                                            .lockingoftest
-                                                                    }
-                                                                    onChange={
-                                                                        this
-                                                                            .handleLockingoftestChange
-                                                                    }
-                                                                    onColor="#efd2ac"
-                                                                    onHandleColor="#621012"
-                                                                    handleDiameter={
-                                                                        12
-                                                                    }
-                                                                    uncheckedIcon={
-                                                                        false
-                                                                    }
-                                                                    checkedIcon={
-                                                                        false
-                                                                    }
-                                                                    boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
-                                                                    activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
-                                                                    height={18}
-                                                                    width={35}
-                                                                    className="react-switch"
-                                                                    name="lockingoftest"
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                        <div className="row">
-                                                            <div className="col-9">
-                                                                <p className="primary-text small mb-0 font-weight-bold">
-                                                                    Mobile App
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-3 text-right">
-                                                                <Switch
-                                                                    checked={
-                                                                        this
-                                                                            .state
-                                                                            .mobileapp
-                                                                    }
-                                                                    onChange={
-                                                                        this
-                                                                            .handleMobileappChange
-                                                                    }
-                                                                    onColor="#efd2ac"
-                                                                    onHandleColor="#621012"
-                                                                    handleDiameter={
-                                                                        12
-                                                                    }
-                                                                    uncheckedIcon={
-                                                                        false
-                                                                    }
-                                                                    checkedIcon={
-                                                                        false
-                                                                    }
-                                                                    boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
-                                                                    activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
-                                                                    height={18}
-                                                                    width={35}
-                                                                    className="react-switch"
-                                                                    name="mobileapp"
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                                <div className="form-group">
+                                                    <label htmlFor="category">
+                                                        Category
+                                                    </label>
+                                                    <Select
+                                                        className="basic-single"
+                                                        placeholder="Select category"
+                                                        isSearchable={true}
+                                                        name="category"
+                                                        options={this.state.category.map(
+                                                            function (list) {
+                                                                return {
+                                                                    value:
+                                                                        list.code,
+                                                                    label:
+                                                                        list.title,
+                                                                };
+                                                            }
+                                                        )}
+                                                        onChange={
+                                                            this.handleCategory
+                                                        }
+                                                        required
+                                                    />
                                                 </div>
                                                 <div className="form-group">
-                                                    <button
-                                                        className="btn btn-primary btn-block"
-                                                        type="submit"
-                                                    >
-                                                        {this.state
-                                                            .showLoader ? (
-                                                            <Spinner
-                                                                as="span"
-                                                                animation="border"
-                                                                size="sm"
-                                                                role="status"
-                                                                aria-hidden="true"
-                                                                className="mr-2"
-                                                            />
-                                                        ) : (
+                                                    <label htmlFor="subcategory">
+                                                        Sub Category
+                                                    </label>
+                                                    <Select
+                                                        className="basic-single"
+                                                        placeholder="Select subcategory"
+                                                        isDisabled={
+                                                            this.state
+                                                                .selectedCategory ===
                                                             ""
+                                                                ? true
+                                                                : false
+                                                        }
+                                                        isLoading={
+                                                            this.state
+                                                                .subcategory_loading
+                                                                ? true
+                                                                : false
+                                                        }
+                                                        isSearchable={true}
+                                                        name="subcategory"
+                                                        options={this.state.subcategory.map(
+                                                            function (list) {
+                                                                return {
+                                                                    value:
+                                                                        list.code,
+                                                                    label:
+                                                                        list.title,
+                                                                };
+                                                            }
                                                         )}
-                                                        Create
-                                                    </button>
+                                                        onChange={
+                                                            this
+                                                                .handleSubcategory
+                                                        }
+                                                        required
+                                                    />
                                                 </div>
-                                            </form>
-                                        </Modal.Body>
-                                    </Modal>
-                                ) : (
-                                    ""
-                                )}
-
-                                {/* Back button */}
-                                <button
-                                    className="btn btn-primary-invert btn-sm mb-2 mb-md-0"
-                                    onClick={this.props.history.goBack}
-                                >
-                                    <i className="fas fa-chevron-left fa-sm"></i>{" "}
-                                    Back
-                                </button>
-
-                                <div className="d-flex flex-wrap justify-content-center justify-content-md-end mb-4">
-                                    {this.state.activeTab === "hod" ? (
-                                        <button
-                                            className="btn btn-primary btn-sm mr-1"
-                                            onClick={this.toggleModal}
-                                        >
-                                            Add New
-                                        </button>
-                                    ) : (
-                                        ""
-                                    )}
-                                    <button
-                                        className="btn btn-primary btn-sm mr-1"
-                                        onClick={this.triggerDelete}
-                                    >
-                                        Delete
-                                    </button>
-                                    <button className="btn btn-primary btn-sm mr-1">
-                                        Enable
-                                    </button>
-                                    <button className="btn btn-primary btn-sm">
-                                        Disable
-                                    </button>
-                                </div>
-
-                                <Tabs
-                                    activeKey={
-                                        !this.props.location.hash
-                                            ? "hod"
-                                            : this.props.location.hash.substring(
-                                                  1
-                                              )
-                                    }
-                                    id="uncontrolled-tab-example"
-                                    onSelect={this.handleSelect}
-                                >
-                                    {/* HOD Table */}
-                                    <Tab eventKey="hod" title="HOD">
-                                        <div className="card shadow-sm">
-                                            <HODTable
-                                                hodItems={this.state.hodItems}
-                                                ref={this.gridRef}
-                                            />
-                                            <div className="card-body p-3">
-                                                <Paginations
-                                                    activePage={
-                                                        this.state.activeHODPage
-                                                    }
-                                                    totalItemsCount={
-                                                        this.state.totalHODCount
-                                                    }
-                                                    onChange={this.handleHODPageChange.bind(
-                                                        this
-                                                    )}
-                                                />
+                                                <div className="form-group">
+                                                    <label htmlFor="discipline">
+                                                        Discipline
+                                                    </label>
+                                                    <Select
+                                                        className="basic-single"
+                                                        placeholder="Select discipline"
+                                                        isDisabled={
+                                                            this.state
+                                                                .selectedSubcategory ===
+                                                            ""
+                                                                ? true
+                                                                : false
+                                                        }
+                                                        isLoading={
+                                                            this.state
+                                                                .discipline_loading
+                                                                ? true
+                                                                : false
+                                                        }
+                                                        isSearchable={true}
+                                                        name="discipline"
+                                                        options={Object.entries(
+                                                            this.state
+                                                                .discipline
+                                                        ).map(
+                                                            ([key, value]) => {
+                                                                return {
+                                                                    value: key,
+                                                                    label: value,
+                                                                };
+                                                            }
+                                                        )}
+                                                        onChange={
+                                                            this
+                                                                .handleDiscipline
+                                                        }
+                                                        required
+                                                    />
+                                                </div>
+                                                <div className="form-group">
+                                                    <label htmlFor="board">
+                                                        Board / University
+                                                    </label>
+                                                    <Select
+                                                        className="basic-single"
+                                                        placeholder="Select board"
+                                                        isSearchable={true}
+                                                        name="board"
+                                                        options={this.state.board.map(
+                                                            function (list) {
+                                                                return {
+                                                                    value:
+                                                                        list.code,
+                                                                    label:
+                                                                        list.title,
+                                                                };
+                                                            }
+                                                        )}
+                                                        onChange={
+                                                            this.handleBoard
+                                                        }
+                                                        required
+                                                    />
+                                                </div>
+                                                <div className="form-group">
+                                                    <label htmlFor="valid_from">
+                                                        Valid From
+                                                    </label>
+                                                    <input
+                                                        type="date"
+                                                        name="valid_from"
+                                                        id="valid_from"
+                                                        className="form-control form-shadow"
+                                                        onChange={
+                                                            this
+                                                                .handleValid_from
+                                                        }
+                                                    />
+                                                </div>
+                                                <div className="form-group">
+                                                    <label htmlFor="valid_to">
+                                                        Valid To
+                                                    </label>
+                                                    <input
+                                                        type="date"
+                                                        name="valid_to"
+                                                        id="valid_to"
+                                                        className="form-control form-shadow"
+                                                        onChange={
+                                                            this.handleValid_to
+                                                        }
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-md-6">
+                                                <div className="row align-items-center mb-3">
+                                                    <div className="col-6">
+                                                        <h6 className="primary-text">
+                                                            Configuration
+                                                        </h6>
+                                                    </div>
+                                                    <div className="col-6 text-right align-items-center">
+                                                        <label
+                                                            htmlFor="select-all"
+                                                            className="mr-2 mb-0"
+                                                        >
+                                                            Select All
+                                                        </label>
+                                                        <Switch
+                                                            checked={
+                                                                this.state
+                                                                    .selectAll
+                                                            }
+                                                            onChange={
+                                                                this
+                                                                    .handleSelectAll
+                                                            }
+                                                            onColor="#efd2ac"
+                                                            onHandleColor="#621012"
+                                                            handleDiameter={12}
+                                                            uncheckedIcon={
+                                                                false
+                                                            }
+                                                            checkedIcon={false}
+                                                            boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
+                                                            activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
+                                                            height={18}
+                                                            width={35}
+                                                            className="react-switch"
+                                                            id="select-all"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="row mb-3">
+                                                    <div className="col-9">
+                                                        <p className="primary-text small mb-0 font-weight-bold">
+                                                            Progressive Score
+                                                        </p>
+                                                    </div>
+                                                    <div className="col-3 text-right">
+                                                        <ReactSwitch
+                                                            checked={
+                                                                this.state
+                                                                    .progressivescore
+                                                            }
+                                                            onChange={
+                                                                this
+                                                                    .handlePSChange
+                                                            }
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="row mb-3">
+                                                    <div className="col-9">
+                                                        <p className="primary-text small mb-0 font-weight-bold">
+                                                            Type 1
+                                                        </p>
+                                                    </div>
+                                                    <div className="col-3 text-right">
+                                                        <ReactSwitch
+                                                            checked={
+                                                                this.state.type1
+                                                            }
+                                                            onChange={
+                                                                this
+                                                                    .handleType1Change
+                                                            }
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="row mb-3">
+                                                    <div className="col-9">
+                                                        <p className="primary-text small mb-0 font-weight-bold">
+                                                            Type 2
+                                                        </p>
+                                                    </div>
+                                                    <div className="col-3 text-right">
+                                                        <ReactSwitch
+                                                            checked={
+                                                                this.state.type2
+                                                            }
+                                                            onChange={
+                                                                this
+                                                                    .handleType2Change
+                                                            }
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="row mb-3">
+                                                    <div className="col-9">
+                                                        <p className="primary-text small mb-0 font-weight-bold">
+                                                            Quiz
+                                                        </p>
+                                                    </div>
+                                                    <div className="col-3 text-right">
+                                                        <ReactSwitch
+                                                            checked={
+                                                                this.state.quiz
+                                                            }
+                                                            onChange={
+                                                                this
+                                                                    .handleQuizChange
+                                                            }
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="row mb-3">
+                                                    <div className="col-9">
+                                                        <p className="primary-text small mb-0 font-weight-bold">
+                                                            Match
+                                                        </p>
+                                                    </div>
+                                                    <div className="col-3 text-right">
+                                                        <ReactSwitch
+                                                            checked={
+                                                                this.state.match
+                                                            }
+                                                            onChange={
+                                                                this
+                                                                    .handleMatchChange
+                                                            }
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="row mb-3">
+                                                    <div className="col-9">
+                                                        <p className="primary-text small mb-0 font-weight-bold">
+                                                            Notes download
+                                                        </p>
+                                                    </div>
+                                                    <div className="col-3 text-right">
+                                                        <ReactSwitch
+                                                            checked={
+                                                                this.state
+                                                                    .notesdownload
+                                                            }
+                                                            onChange={
+                                                                this
+                                                                    .handleNotesChange
+                                                            }
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="row mb-3">
+                                                    <div className="col-9">
+                                                        <p className="primary-text small mb-0 font-weight-bold">
+                                                            Summary
+                                                        </p>
+                                                    </div>
+                                                    <div className="col-3 text-right">
+                                                        <ReactSwitch
+                                                            checked={
+                                                                this.state
+                                                                    .summary
+                                                            }
+                                                            onChange={
+                                                                this
+                                                                    .handleSummaryChange
+                                                            }
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="row mb-3">
+                                                    <div className="col-9">
+                                                        <p className="primary-text small mb-0 font-weight-bold">
+                                                            Direct Questions
+                                                        </p>
+                                                    </div>
+                                                    <div className="col-3 text-right">
+                                                        <ReactSwitch
+                                                            checked={
+                                                                this.state
+                                                                    .directquestion
+                                                            }
+                                                            onChange={
+                                                                this
+                                                                    .handleDQChange
+                                                            }
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="row mb-3">
+                                                    <div className="col-9">
+                                                        <p className="primary-text small mb-0 font-weight-bold">
+                                                            Configure
+                                                        </p>
+                                                    </div>
+                                                    <div className="col-3 text-right">
+                                                        <ReactSwitch
+                                                            checked={
+                                                                this.state
+                                                                    .configure
+                                                            }
+                                                            onChange={
+                                                                this
+                                                                    .handleConfigureChange
+                                                            }
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="row mb-3">
+                                                    <div className="col-9">
+                                                        <p className="primary-text small mb-0 font-weight-bold">
+                                                            Simulation Exam
+                                                        </p>
+                                                    </div>
+                                                    <div className="col-3 text-right">
+                                                        <ReactSwitch
+                                                            checked={
+                                                                this.state
+                                                                    .simulationexam
+                                                            }
+                                                            onChange={
+                                                                this
+                                                                    .handleSimulationChange
+                                                            }
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="row mb-3">
+                                                    <div className="col-9">
+                                                        <p className="primary-text small mb-0 font-weight-bold">
+                                                            Locking of Tests
+                                                        </p>
+                                                    </div>
+                                                    <div className="col-3 text-right">
+                                                        <ReactSwitch
+                                                            checked={
+                                                                this.state
+                                                                    .lockingoftest
+                                                            }
+                                                            onChange={
+                                                                this
+                                                                    .handleLockingoftestChange
+                                                            }
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="row">
+                                                    <div className="col-9">
+                                                        <p className="primary-text small mb-0 font-weight-bold">
+                                                            Mobile App
+                                                        </p>
+                                                    </div>
+                                                    <div className="col-3 text-right">
+                                                        <ReactSwitch
+                                                            checked={
+                                                                this.state
+                                                                    .mobileapp
+                                                            }
+                                                            onChange={
+                                                                this
+                                                                    .handleMobileappChange
+                                                            }
+                                                        />
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </Tab>
-
-                                    {/* Student table */}
-                                    <Tab eventKey="student" title="Student">
-                                        <div className="card shadow-sm">
-                                            <StudentTable
-                                                studentItems={
-                                                    this.state.studentItems
-                                                }
-                                                ref={this.gridRef}
-                                            />
-                                            <div className="card-body p-3">
-                                                <Paginations
-                                                    activePage={
-                                                        this.state.activeStudentPage
-                                                    }
-                                                    totalItemsCount={
-                                                        this.state.totalStudentCount
-                                                    }
-                                                    onChange={this.handleStudentPageChange.bind(
-                                                        this
-                                                    )}
-                                                />
-                                            </div>
+                                        <div className="form-group">
+                                            <button
+                                                className="btn btn-primary btn-block"
+                                                type="submit"
+                                            >
+                                                {this.state.showLoader ? (
+                                                    <Spinner
+                                                        as="span"
+                                                        animation="border"
+                                                        size="sm"
+                                                        role="status"
+                                                        aria-hidden="true"
+                                                        className="mr-2"
+                                                    />
+                                                ) : (
+                                                    ""
+                                                )}
+                                                Create
+                                            </button>
                                         </div>
-                                    </Tab>
-                                </Tabs>
-                            </>
+                                    </form>
+                                </Modal.Body>
+                            </Modal>
+                        ) : (
+                            ""
                         )}
+
+                        <div className="d-flex flex-wrap justify-content-center justify-content-md-end mb-4">
+                            {this.state.activeTab === "hod" ? (
+                                <button
+                                    className="btn btn-primary btn-sm mr-1"
+                                    onClick={this.toggleModal}
+                                >
+                                    Add New
+                                </button>
+                            ) : (
+                                ""
+                            )}
+                            <button
+                                className="btn btn-primary btn-sm mr-1"
+                                onClick={this.triggerDelete}
+                            >
+                                Delete
+                            </button>
+                            <button className="btn btn-primary btn-sm mr-1">
+                                Enable
+                            </button>
+                            <button className="btn btn-primary btn-sm">
+                                Disable
+                            </button>
+                        </div>
+
+                        <Tabs
+                            activeKey={
+                                !this.props.location.hash
+                                    ? "hod"
+                                    : this.props.location.hash.substring(1)
+                            }
+                            id="uncontrolled-tab-example"
+                            onSelect={this.handleSelect}
+                        >
+                            {/* HOD Table */}
+                            <Tab eventKey="hod" title="HOD">
+                                <div className="card shadow-sm">
+                                    <HODTable
+                                        hodItems={this.state.hodItems}
+                                        ref={this.gridRef}
+                                    />
+                                    <div className="card-body p-3">
+                                        <Paginations
+                                            activePage={
+                                                this.state.activeHODPage
+                                            }
+                                            totalItemsCount={
+                                                this.state.totalHODCount
+                                            }
+                                            onChange={this.handleHODPageChange.bind(
+                                                this
+                                            )}
+                                        />
+                                    </div>
+                                </div>
+                            </Tab>
+
+                            {/* Student table */}
+                            <Tab eventKey="student" title="Student">
+                                <div className="card shadow-sm">
+                                    <StudentTable
+                                        studentItems={this.state.studentItems}
+                                        path="admin"
+                                        ref={this.gridRef}
+                                    />
+                                    <div className="card-body p-3">
+                                        <Paginations
+                                            activePage={
+                                                this.state.activeStudentPage
+                                            }
+                                            totalItemsCount={
+                                                this.state.totalStudentCount
+                                            }
+                                            onChange={this.handleStudentPageChange.bind(
+                                                this
+                                            )}
+                                        />
+                                    </div>
+                                </div>
+                            </Tab>
+                        </Tabs>
                     </div>
                 </div>
             </div>

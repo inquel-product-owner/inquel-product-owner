@@ -2,7 +2,9 @@ import React, { Component } from "react";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { Link } from "react-router-dom";
+import Select from "react-select";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
+import Loading from "../../shared/loadingComponent";
 
 class MasterData extends Component {
     constructor(props) {
@@ -19,6 +21,15 @@ class MasterData extends Component {
             subjects: [],
             board: [],
             type: [],
+            subcategory_loading: false,
+            page_loading: false,
+        };
+        this.url = baseUrl + adminPathUrl;
+        this.authToken = localStorage.getItem("Inquel-Auth");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Inquel-Auth": this.authToken,
         };
     }
 
@@ -30,7 +41,7 @@ class MasterData extends Component {
 
     handleType = (event) => {
         this.setState({
-            activeType: event.target.value,
+            activeType: event.value,
             activeCategory: "",
             activeSubcategory: "",
         });
@@ -39,16 +50,8 @@ class MasterData extends Component {
     componentDidMount = () => {
         document.title = "Admin Master Data | IQLabs";
 
-        var url = baseUrl + adminPathUrl;
-        var authToken = localStorage.getItem("Inquel-Auth");
-        var headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            "Inquel-Auth": authToken,
-        };
-
-        fetch(`${url}/data/filter/`, {
-            headers: headers,
+        fetch(`${this.url}/data/filter/`, {
+            headers: this.headers,
             method: "GET",
         })
             .then((res) => res.json())
@@ -69,30 +72,23 @@ class MasterData extends Component {
 
     handleCategory = (event) => {
         this.setState({
-            activeCategory: event.target.value,
-        });
-        this.setState({
+            activeCategory: event.value,
             subcategory: [],
+            discipline: [],
             activeSubcategory: "",
+            subcategory_loading: true,
         });
 
-        var url = baseUrl + adminPathUrl;
-        var authToken = localStorage.getItem("Inquel-Auth");
-        var headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            "Inquel-Auth": authToken,
-        };
-
-        if (event.target.value !== "") {
-            fetch(`${url}/data/filter/?category=${event.target.value}`, {
-                headers: headers,
+        if (event.value !== "") {
+            fetch(`${this.url}/data/filter/?category=${event.value}`, {
+                headers: this.headers,
                 method: "GET",
             })
                 .then((res) => res.json())
                 .then((result) => {
                     this.setState({
                         subcategory: result.data.sub_category,
+                        subcategory_loading: false,
                     });
                     console.log(result);
                 })
@@ -104,7 +100,8 @@ class MasterData extends Component {
 
     handleSubcategory = (event) => {
         this.setState({
-            activeSubcategory: event.target.value,
+            activeSubcategory: event.value,
+            page_loading: true,
         });
 
         var url = baseUrl + adminPathUrl;
@@ -115,9 +112,9 @@ class MasterData extends Component {
             "Inquel-Auth": authToken,
         };
 
-        if (event.target.value !== "") {
+        if (event.value !== "") {
             fetch(
-                `${url}/data/filter/?category=${this.state.activeCategory}&sub_category=${event.target.value}`,
+                `${url}/data/filter/?category=${this.state.activeCategory}&sub_category=${event.value}`,
                 {
                     headers: headers,
                     method: "GET",
@@ -129,6 +126,7 @@ class MasterData extends Component {
                         discipline: result.data.DISCIPLINE,
                         levels: result.data.LEVELS,
                         subjects: result.data.SUBJECTS,
+                        page_loading: false,
                     });
                     console.log(result);
                 })
@@ -156,6 +154,9 @@ class MasterData extends Component {
                     }`}
                 >
                     <div className="container-fluid">
+                        {/* Loading component */}
+                        {this.state.page_loading ? <Loading /> : ""}
+                        
                         {/* Back button */}
                         <button
                             className="btn btn-primary-invert btn-sm mb-2"
@@ -166,7 +167,7 @@ class MasterData extends Component {
 
                         <div className="d-flex flex-wrap mb-4">
                             <Link to="/admin/course-management">
-                                <button className="btn btn-outline-secondary btn-sm mr-1">
+                                <button className="btn btn-secondary btn-sm mr-1">
                                     Course Master Data{" "}
                                     <i className="fas fa-chevron-right fa-sm ml-2"></i>
                                 </button>
@@ -184,93 +185,104 @@ class MasterData extends Component {
                             <div className="col-md-3 mb-3 mb-md-0">
                                 <div className="card shadow-sm">
                                     <div className="card-body">
-                                        <label htmlFor="select1">
-                                            Select option
-                                        </label>
-                                        <select
-                                            name="select1"
-                                            id="select1"
-                                            className="form-control shadow-sm mb-3"
-                                            onChange={this.handleType}
-                                        >
-                                            <option value="category">
-                                                Categories
-                                            </option>
-                                            <option value="board">Board</option>
-                                            <option value="types">Types</option>
-                                        </select>
+                                        <div className="form-group">
+                                            <label htmlFor="select1">
+                                                Option
+                                            </label>
+                                            <Select
+                                                className="basic-single"
+                                                placeholder="Select option"
+                                                isSearchable={true}
+                                                name="option"
+                                                options={[
+                                                    {
+                                                        label: "Categories",
+                                                        value: "category",
+                                                    },
+                                                    {
+                                                        label: "Board",
+                                                        value: "board",
+                                                    },
+                                                    {
+                                                        label: "Types",
+                                                        value: "types",
+                                                    },
+                                                ]}
+                                                onChange={this.handleType}
+                                            />
+                                        </div>
 
-                                        {this.state.activeType ===
-                                        "category" ? (
-                                            <div>
-                                                <label htmlFor="select2">
-                                                    Category
-                                                </label>
-                                                <select
-                                                    name="select2"
-                                                    id="select2"
-                                                    className="form-control shadow-sm mb-3"
-                                                    onChange={
-                                                        this.handleCategory
+                                        <div className="form-group">
+                                            <label htmlFor="category">
+                                                Category
+                                            </label>
+                                            <Select
+                                                className="basic-single"
+                                                placeholder="Select category"
+                                                isDisabled={
+                                                    this.state.activeType ===
+                                                    "category"
+                                                        ? false
+                                                        : true
+                                                }
+                                                isSearchable={true}
+                                                name="category"
+                                                options={this.state.category.map(
+                                                    function (list) {
+                                                        return {
+                                                            value: list.code,
+                                                            label: list.title,
+                                                        };
                                                     }
-                                                >
-                                                    <option value="">
-                                                        Select Category
-                                                    </option>
-                                                    {this.state.category.map(
-                                                        (list, index) => {
-                                                            return (
-                                                                <option
-                                                                    key={index}
-                                                                    value={
-                                                                        list.code
-                                                                    }
-                                                                >
-                                                                    {list.title}
-                                                                </option>
-                                                            );
-                                                        }
-                                                    )}
-                                                </select>
-                                                <button className="btn btn-light btn-sm btn-block mb-3">
-                                                    Add +
-                                                </button>
-                                                <label htmlFor="select3">
-                                                    Sub-category
-                                                </label>
-                                                <select
-                                                    name="select3"
-                                                    id="select3"
-                                                    className="form-control shadow-sm mb-3"
-                                                    onChange={
-                                                        this.handleSubcategory
+                                                )}
+                                                onChange={this.handleCategory}
+                                                required
+                                            />
+                                        </div>
+
+                                        <button className="btn btn-light btn-sm btn-block mb-2">
+                                            Add +
+                                        </button>
+
+                                        <div className="form-group">
+                                            <label htmlFor="select3">
+                                                Sub Category
+                                            </label>
+                                            <Select
+                                                className="basic-single"
+                                                placeholder="Select subcategory"
+                                                isDisabled={
+                                                    this.state
+                                                        .activeCategory === ""
+                                                        ? true
+                                                        : false
+                                                }
+                                                isLoading={
+                                                    this.state
+                                                        .subcategory_loading
+                                                        ? true
+                                                        : false
+                                                }
+                                                isSearchable={true}
+                                                name="subcategory"
+                                                options={this.state.subcategory.map(
+                                                    function (list) {
+                                                        return {
+                                                            value: list.code,
+                                                            label: list.title,
+                                                        };
                                                     }
-                                                >
-                                                    <option value="">
-                                                        Select Sub category
-                                                    </option>
-                                                    {this.state.subcategory.map(
-                                                        (list, index) => {
-                                                            return (
-                                                                <option
-                                                                    key={index}
-                                                                    value={
-                                                                        list.code
-                                                                    }
-                                                                >
-                                                                    {list.title}
-                                                                </option>
-                                                            );
-                                                        }
-                                                    )}
-                                                </select>
-                                                <button className="btn btn-light btn-sm btn-block">
-                                                    Add +
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            ""
-                                        )}
+                                                )}
+                                                onChange={
+                                                    this.handleSubcategory
+                                                }
+                                                required
+                                            />
+                                        </div>
+
+                                        <button className="btn btn-light btn-sm btn-block">
+                                            Add +
+                                        </button>
                                     </div>
                                 </div>
                             </div>

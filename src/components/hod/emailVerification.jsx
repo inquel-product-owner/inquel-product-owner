@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Alert, Spinner } from "react-bootstrap";
 import { Redirect } from "react-router-dom";
 import { baseUrl, accountsUrl } from "../../shared/baseUrl.js";
+import Loading from "../../shared/loadingComponent";
 
 class EmailVerification extends Component {
     constructor() {
@@ -9,16 +10,19 @@ class EmailVerification extends Component {
         this.state = {
             firstName: "",
             lastName: "",
-            username:"",
+            username: "",
             password: "",
             confirmPassword: "",
-            isValid: false,
             validToken: true,
             showErrorAlert: false,
             showSuccessAlert: false,
             showLoader: false,
             errors: "",
             successMsg: "",
+            showPassword: false,
+            showConfirmPassword: false,
+            redirectLogin: false,
+            page_loading: true,
         };
     }
 
@@ -40,10 +44,12 @@ class EmailVerification extends Component {
                 if (result.sts === true) {
                     this.setState({
                         validToken: true,
+                        page_loading: false,
                     });
                 } else {
                     this.setState({
                         validToken: false,
+                        page_loading: false,
                     });
                 }
                 console.log(result);
@@ -98,13 +104,11 @@ class EmailVerification extends Component {
         ) {
             this.setState({
                 errors: "All the fields are required",
-                isValid: false,
                 showErrorAlert: true,
             });
         } else if (this.state.password !== this.state.confirmPassword) {
             this.setState({
                 errors: "Password doesn't match",
-                isValid: false,
                 showErrorAlert: true,
             });
         } else {
@@ -135,11 +139,12 @@ class EmailVerification extends Component {
                     if (result.sts === true) {
                         this.setState({
                             successMsg: result.msg,
+                            showSuccessAlert: true,
                             showLoader: false,
                         });
                         setTimeout(() => {
                             this.setState({
-                                showSuccessAlert: true,
+                                redirectLogin: true,
                             });
                         }, 3000);
                     } else {
@@ -157,171 +162,247 @@ class EmailVerification extends Component {
         }
     };
 
+    showPassword = () => {
+        this.setState({
+            showPassword: !this.state.showPassword,
+        });
+    };
+
+    showConfirmPassword = () => {
+        this.setState({
+            showConfirmPassword: !this.state.showConfirmPassword,
+        });
+    };
+
     render() {
-        if (this.state.showSuccessAlert) {
+        if (this.state.redirectLogin) {
             return <Redirect to="/hod/login" />;
         }
         return (
             <div className="container-fluid ">
-                <div
-                    className="row justify-content-center py-3 align-items-center"
-                    style={{ minHeight: "100vh" }}
-                >
-                    <div className="col-md-4">
-                        {!this.state.validToken ? (
-                            <div className="card shadow">
-                                <div
-                                    className="card-body text-center"
-                                    style={{ padding: "4rem" }}
-                                >
-                                    <h2 className="display-4 text-danger mb-3">
-                                        <i className="fas fa-times-circle"></i>
-                                    </h2>
-                                    <p className="h3 mb-0">
-                                        Invalid activation link!
-                                    </p>
+                {this.state.page_loading ? (
+                    <Loading />
+                ) : (
+                    <div
+                        className="row justify-content-center py-3 align-items-center"
+                        style={{ minHeight: "100vh" }}
+                    >
+                        <div className="col-md-4">
+                            {!this.state.validToken ? (
+                                <div className="card shadow">
+                                    <div
+                                        className="card-body text-center"
+                                        style={{ padding: "4rem" }}
+                                    >
+                                        <h2 className="display-4 text-danger mb-3">
+                                            <i className="fas fa-times-circle"></i>
+                                        </h2>
+                                        <p className="h3 mb-0">
+                                            Invalid activation link!
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
-                        ) : (
-                            <div className="card shadow">
-                                <div className="card-body">
-                                    <Alert
-                                        variant="danger"
-                                        show={this.state.showErrorAlert}
-                                        onClose={() => {
-                                            this.setState({
-                                                showErrorAlert: false,
-                                            });
-                                        }}
-                                        dismissible
-                                    >
-                                        {this.state.errors}
-                                    </Alert>
-                                    <Alert
-                                        variant="success"
-                                        show={this.state.showSuccessAlert}
-                                        onClose={() => {
-                                            this.setState({
-                                                showSuccessAlert: false,
-                                            });
-                                        }}
-                                        dismissible
-                                    >
-                                        {this.state.successMsg}
-                                    </Alert>
-
-                                    <h3 className="primary-text">
-                                        HOD Activation
-                                    </h3>
-                                    <p className="small mb-4">
-                                        Please update your details
-                                    </p>
-                                    <form onSubmit={this.handleSubmit}>
-                                        <div className="form-group ">
-                                            <label htmlFor="firstname">
-                                                First Name:
-                                            </label>
-
-                                            <input
-                                                type="text"
-                                                name="firstname"
-                                                value={this.state.firstName}
-                                                onChange={this.handleFirstName}
-                                                className="form-control shadow-sm"
-                                                placeholder="Enter First Name"
-                                                id="firstname"
-                                            />
-                                        </div>
-                                        <div className="form-group ">
-                                            <label htmlFor="lastname">
-                                                Last Name:
-                                            </label>
-
-                                            <input
-                                                type="text"
-                                                name="lastname"
-                                                value={this.state.lastName}
-                                                onChange={this.handleLastName}
-                                                className="form-control shadow-sm"
-                                                placeholder="Enter Last Name"
-                                                id="lastname"
-                                            />
-                                        </div>
-                                        <div className="form-group ">
-                                            <label htmlFor="username">
-                                                Username:
-                                            </label>
-
-                                            <input
-                                                type="text"
-                                                name="username"
-                                                value={this.state.username}
-                                                onChange={this.handleusername}
-                                                className="form-control shadow-sm"
-                                                placeholder="Enter username"
-                                                id="username"
-                                            />
-                                        </div>
-
-                                        <div className="form-group ">
-                                            <label htmlFor="password">
-                                                Enter Password:
-                                            </label>
-
-                                            <input
-                                                type="password"
-                                                name="password"
-                                                value={this.state.password}
-                                                onChange={this.handlePassword}
-                                                className="form-control shadow-sm"
-                                                placeholder="Enter password"
-                                                id="password"
-                                            />
-                                        </div>
-
-                                        <div className="form-group">
-                                            <label htmlFor="confirm_password">
-                                                Confirm Password:
-                                            </label>
-
-                                            <input
-                                                type="password"
-                                                name="confirm_password"
-                                                value={
-                                                    this.state.confirmPassword
-                                                }
-                                                onChange={
-                                                    this.handleConfirmPassword
-                                                }
-                                                className="form-control shadow-sm"
-                                                placeholder="Enter confirm password"
-                                                id="confirm_password"
-                                            />
-                                        </div>
-                                        <button
-                                            className="btn btn-primary btn-block"
-                                            onClick={this.validate}
+                            ) : (
+                                <div className="card shadow">
+                                    <div className="card-body">
+                                        <Alert
+                                            variant="danger"
+                                            show={this.state.showErrorAlert}
+                                            onClose={() => {
+                                                this.setState({
+                                                    showErrorAlert: false,
+                                                });
+                                            }}
+                                            dismissible
                                         >
-                                            {this.state.showLoader ? (
-                                                <Spinner
-                                                    as="span"
-                                                    animation="border"
-                                                    size="sm"
-                                                    role="status"
-                                                    aria-hidden="true"
-                                                    className="mr-2"
+                                            {this.state.errors}
+                                        </Alert>
+                                        <Alert
+                                            variant="success"
+                                            show={this.state.showSuccessAlert}
+                                            onClose={() => {
+                                                this.setState({
+                                                    showSuccessAlert: false,
+                                                });
+                                            }}
+                                            dismissible
+                                        >
+                                            {this.state.successMsg}
+                                        </Alert>
+
+                                        <h3 className="primary-text">
+                                            HOD Activation
+                                        </h3>
+                                        <p className="small mb-4">
+                                            Please update your details
+                                        </p>
+                                        <form onSubmit={this.handleSubmit} autoComplete="off">
+                                            <div className="form-group ">
+                                                <label htmlFor="firstname">
+                                                    First Name:
+                                                </label>
+
+                                                <input
+                                                    type="text"
+                                                    name="firstname"
+                                                    value={this.state.firstName}
+                                                    onChange={
+                                                        this.handleFirstName
+                                                    }
+                                                    className="form-control form-shadow"
+                                                    placeholder="Enter First Name"
+                                                    id="firstname"
                                                 />
-                                            ) : (
-                                                ""
-                                            )}
-                                            Submit
-                                        </button>
-                                    </form>
+                                            </div>
+                                            <div className="form-group ">
+                                                <label htmlFor="lastname">
+                                                    Last Name:
+                                                </label>
+
+                                                <input
+                                                    type="text"
+                                                    name="lastname"
+                                                    value={this.state.lastName}
+                                                    onChange={
+                                                        this.handleLastName
+                                                    }
+                                                    className="form-control form-shadow"
+                                                    placeholder="Enter Last Name"
+                                                    id="lastname"
+                                                />
+                                            </div>
+                                            <div className="form-group ">
+                                                <label htmlFor="username">
+                                                    Username:
+                                                </label>
+
+                                                <input
+                                                    type="text"
+                                                    name="username"
+                                                    value={this.state.username}
+                                                    onChange={
+                                                        this.handleusername
+                                                    }
+                                                    className="form-control form-shadow"
+                                                    placeholder="Enter username"
+                                                    id="username"
+                                                />
+                                            </div>
+
+                                            <div className="form-group ">
+                                                <label htmlFor="password">
+                                                    Enter Password:
+                                                </label>
+                                                <div
+                                                    className="input-group form-shadow"
+                                                    style={{
+                                                        borderRadius: "6px",
+                                                    }}
+                                                >
+                                                    <input
+                                                        type={
+                                                            this.state
+                                                                .showPassword
+                                                                ? "text"
+                                                                : "password"
+                                                        }
+                                                        name="password"
+                                                        id="password"
+                                                        className="form-control"
+                                                        onChange={
+                                                            this.handlePassword
+                                                        }
+                                                        value={
+                                                            this.state.password
+                                                        }
+                                                        placeholder="**********"
+                                                        required
+                                                    />
+                                                    <div className="input-group-append">
+                                                        <button
+                                                            className="btn btn-link btn-sm bg-white shadow-none"
+                                                            type="button"
+                                                            onClick={
+                                                                this
+                                                                    .showPassword
+                                                            }
+                                                        >
+                                                            <i className="fas fa-eye"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label htmlFor="confirm_password">
+                                                    Confirm Password:
+                                                </label>
+                                                <div
+                                                    className="input-group form-shadow"
+                                                    style={{
+                                                        borderRadius: "6px",
+                                                    }}
+                                                >
+                                                    <input
+                                                        type={
+                                                            this.state
+                                                                .showConfirmPassword
+                                                                ? "text"
+                                                                : "password"
+                                                        }
+                                                        name="confirm_password"
+                                                        id="confirm_password"
+                                                        className="form-control"
+                                                        onChange={
+                                                            this
+                                                                .handleConfirmPassword
+                                                        }
+                                                        value={
+                                                            this.state
+                                                                .confirmPassword
+                                                        }
+                                                        placeholder="**********"
+                                                        required
+                                                    />
+                                                    <div className="input-group-append">
+                                                        <button
+                                                            className="btn btn-link btn-sm bg-white shadow-none"
+                                                            type="button"
+                                                            onClick={
+                                                                this
+                                                                    .showConfirmPassword
+                                                            }
+                                                        >
+                                                            <i className="fas fa-eye"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <button
+                                                className="btn btn-primary btn-block"
+                                                onClick={this.validate}
+                                            >
+                                                {this.state.showLoader ? (
+                                                    <Spinner
+                                                        as="span"
+                                                        animation="border"
+                                                        size="sm"
+                                                        role="status"
+                                                        aria-hidden="true"
+                                                        className="mr-2"
+                                                    />
+                                                ) : (
+                                                    ""
+                                                )}
+                                                Submit
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
         );
     }

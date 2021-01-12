@@ -1,13 +1,13 @@
 import React from "react";
 import "./App.css";
 import { BrowserRouter, Switch } from "react-router-dom";
-import adminRoutes from "./components/admin/adminRoute";
+import mainRoutes from "./components/mainRoute";
 
 function App() {
     return (
         <BrowserRouter>
             <Switch>
-                {adminRoutes}
+                {mainRoutes}
             </Switch>
         </BrowserRouter>
     );

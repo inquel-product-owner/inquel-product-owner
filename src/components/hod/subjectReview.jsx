@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import Header from "./navbar";
 import SideNav from "./sidenav";
+import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
 
 class SubjectReview extends Component {
     constructor(props) {
@@ -9,7 +10,15 @@ class SubjectReview extends Component {
         this.state = {
             showSideNav: false,
             subjectItem: [],
+            chapterData: [],
         };
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
+        this.url = baseUrl + hodUrl;
     }
 
     toggleSideNav = () => {
@@ -19,7 +28,24 @@ class SubjectReview extends Component {
     };
 
     componentDidMount = () => {
-        console.log(this.props);
+        fetch(
+            `${this.url}/hod/subjects/${this.props.match.params.subjectId}/chapters/`,
+            {
+                headers: this.headers,
+                method: "GET",
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                this.setState({
+                    subjectItem: result.data,
+                    chapterData: result.data.chapters,
+                });
+                console.log(result);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     };
 
     render() {
@@ -30,7 +56,10 @@ class SubjectReview extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="Subject Name" togglenav={this.toggleSideNav} />
+                <Header
+                    name={this.state.subjectItem.subject_name}
+                    togglenav={this.toggleSideNav}
+                />
 
                 {/* Sidebar */}
                 <SideNav
@@ -47,7 +76,7 @@ class SubjectReview extends Component {
                         <div className="row align-items-center mb-3">
                             <div className="col-md-6">
                                 <h5 className="primary-text">
-                                    Subject: Mathematics | 10th class
+                                    {this.state.subjectItem.subject_name}
                                 </h5>
                             </div>
                             <div className="col-md-6 text-center text-md-right">
@@ -94,62 +123,84 @@ class SubjectReview extends Component {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>
-                                                <Link
-                                                    to="/hod"
-                                                    className="text-dark"
-                                                >
-                                                    Chapter 01
-                                                </Link>
-                                            </td>
-                                            <td>Ready for review</td>
-                                            <td>Teacher 01</td>
-                                            <td>
-                                                <button className="btn btn-primary-invert btn-sm">
-                                                    Re assign
-                                                </button>
-                                            </td>
-                                            <td className="text-center">
-                                                <button className="btn btn-primary btn-sm mr-1">
-                                                    D
-                                                </button>
-                                                <button className="btn btn-primary btn-sm mr-1">
-                                                    E
-                                                </button>
-                                                <button className="btn btn-primary btn-sm">
-                                                    <i className="fas fa-trash-alt fa-sm"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <Link
-                                                    to="/hod"
-                                                    className="text-dark"
-                                                >
-                                                    Chapter 02
-                                                </Link>
-                                            </td>
-                                            <td>Yet to start</td>
-                                            <td>None</td>
-                                            <td>
-                                                <button className="btn btn-primary-invert btn-sm">
-                                                    Assign
-                                                </button>
-                                            </td>
-                                            <td className="text-center">
-                                                <button className="btn btn-primary btn-sm mr-1">
-                                                    D
-                                                </button>
-                                                <button className="btn btn-primary btn-sm mr-1">
-                                                    E
-                                                </button>
-                                                <button className="btn btn-primary btn-sm">
-                                                    <i className="fas fa-trash-alt fa-sm"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
+                                        {this.state.chapterData.length !== 0
+                                            ? this.state.chapterData.map(
+                                                  (list, index) => {
+                                                      return (
+                                                          <tr key={index}>
+                                                              <td>
+                                                                  <Link
+                                                                      to={`/chapter/${this.props.match.params.subjectId}/${list.chapter_name}`}
+                                                                      className="primary-text"
+                                                                  >
+                                                                      {
+                                                                          list.chapter_name
+                                                                      }
+                                                                  </Link>
+                                                              </td>
+                                                              <td>
+                                                                  {list.chapter_status ===
+                                                                  "Yet to start" ? (
+                                                                      <span className="text-danger">
+                                                                          {
+                                                                              list.chapter_status
+                                                                          }
+                                                                      </span>
+                                                                  ) : list.chapter_status ===
+                                                                    "Approved" ? (
+                                                                      <span className="text-success">
+                                                                          {
+                                                                              list.chapter_status
+                                                                          }
+                                                                      </span>
+                                                                  ) : list.chapter_status ===
+                                                                    "In progress" ? (
+                                                                      <span className="text-warning">
+                                                                          {
+                                                                              list.chapter_status
+                                                                          }
+                                                                      </span>
+                                                                  ) : list.chapter_status ===
+                                                                        "Review" &&
+                                                                    list.chapter_status ===
+                                                                        "Ready for review" ? (
+                                                                      <span className="text-primary">
+                                                                          {
+                                                                              list.chapter_status
+                                                                          }
+                                                                      </span>
+                                                                  ) : (
+                                                                      list.chapter_status
+                                                                  )}
+                                                              </td>
+                                                              <td>
+                                                                  {
+                                                                      list
+                                                                          .teacher
+                                                                          .full_name
+                                                                  }
+                                                              </td>
+                                                              <td>
+                                                                  <button className="btn btn-primary-invert btn-sm">
+                                                                      Re assign
+                                                                  </button>
+                                                              </td>
+                                                              <td className="text-center">
+                                                                  <button className="btn btn-primary btn-sm mr-1">
+                                                                      D
+                                                                  </button>
+                                                                  <button className="btn btn-primary btn-sm mr-1">
+                                                                      E
+                                                                  </button>
+                                                                  <button className="btn btn-primary btn-sm">
+                                                                      <i className="fas fa-trash-alt fa-sm"></i>
+                                                                  </button>
+                                                              </td>
+                                                          </tr>
+                                                      );
+                                                  }
+                                              )
+                                            : ""}
                                     </tbody>
                                 </table>
                             </div>
