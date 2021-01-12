@@ -90,7 +90,7 @@ class StudentAssignModal extends Component {
             Authorization: authToken,
         };
 
-        fetch(`${url}/hod/group/${this.props.groupid}/assign/`, {
+        fetch(`${url}/hod/group/${this.props.groupid}/assign/student/`, {
             headers: headers,
             method: "GET",
         })

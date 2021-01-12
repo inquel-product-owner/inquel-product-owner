@@ -173,7 +173,6 @@ class HODTable extends Component {
                         dataSource={this.props.hodItems}
                         enableHover={true}
                         rowHeight={50}
-                        height={500}
                         ref={(g) => {
                             this.gridInstance = g;
                         }}
@@ -257,6 +256,8 @@ class HODTable extends Component {
                                 allowSorting={false}
                                 allowFiltering={false}
                                 template={viewTemplate}
+                                clipMode="EllipsisWithTooltip"
+                                width="130"
                             />
                         </ColumnsDirective>
                         <Inject

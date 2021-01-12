@@ -159,6 +159,13 @@ class SubjectAssigning extends Component {
                                     <i className="fas fa-filter ml-1"></i>
                                 </button>
                                 <Link
+                                    to={`/hod/subject/${this.props.match.params.subjectId}/review`}
+                                >
+                                    <button className="btn btn-primary mr-2">
+                                        Review
+                                    </button>
+                                </Link>
+                                <Link
                                     to={`/hod/subject/${this.props.match.params.subjectId}/configure`}
                                 >
                                     <button className="btn btn-primary">
@@ -321,6 +328,7 @@ class SubjectAssigning extends Component {
                                     </button>
                                     <Alert
                                         variant="danger"
+                                        className="mt-3"
                                         show={this.state.showErrorAlert}
                                         onClose={() => {
                                             this.setState({
@@ -333,6 +341,7 @@ class SubjectAssigning extends Component {
                                     </Alert>
                                     <Alert
                                         variant="success"
+                                        className="mt-3"
                                         show={this.state.showSuccessAlert}
                                         onClose={() => {
                                             this.setState({

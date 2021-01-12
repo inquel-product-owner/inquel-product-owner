@@ -89,7 +89,7 @@ function ForgotPasswordModal(props) {
                             type="email"
                             name="email"
                             id="email"
-                            className="form-control borders"
+                            className="form-control borders form-control-lg"
                             onChange={(event) => {
                                 setEmail(event.target.value);
                             }}
@@ -243,7 +243,7 @@ class HODLogin extends Component {
                     <div className="container">
                         <div className="row justify-content-center align-items-center">
                             <div className="col-md-5">
-                                <div className="card shadow border-0 py-4">
+                                <div className="card shadow py-4">
                                     <div className="card-body ">
                                         <h3 className="primary-text mb-4">
                                             LOGIN
@@ -272,7 +272,7 @@ class HODLogin extends Component {
                                                     type="text"
                                                     name="username"
                                                     id="username"
-                                                    className="form-control form-shadow border-0 form-control-lg"
+                                                    className="form-control form-shadow form-control-lg"
                                                     onChange={
                                                         this.changeUsername
                                                     }
@@ -300,7 +300,7 @@ class HODLogin extends Component {
                                                         }
                                                         name="password"
                                                         id="password"
-                                                        className="form-control border-0 form-control-lg"
+                                                        className="form-control form-control-lg"
                                                         onChange={
                                                             this.changePassword
                                                         }

@@ -66,16 +66,6 @@ function dateTemplate(props) {
     return datearray[1] + "/" + datearray[0] + "/" + datearray[2];
 }
 
-function viewTemplate(props) {
-    return (
-        <Link to={`/admin/student/${props.id}`}>
-            <button className="btn btn-link btn-sm">
-                <i className="fas fa-eye"></i>
-            </button>
-        </Link>
-    );
-}
-
 class StudentTable extends Component {
     constructor() {
         super(...arguments);
@@ -103,7 +93,6 @@ class StudentTable extends Component {
             itemTemplate: dateTemplate,
         };
         this.toolbarOptions = ["Search"];
-        this.state = { hodItems: [], hodId: [] };
     }
 
     showConsole = () => {
@@ -164,6 +153,16 @@ class StudentTable extends Component {
         }
     }
 
+    viewTemplate = (props) => {
+        return (
+            <Link to={`/${this.props.path}/student/${props.id}`}>
+                <button className="btn btn-link btn-sm">
+                    <i className="fas fa-eye"></i>
+                </button>
+            </Link>
+        );
+    };
+
     render() {
         return (
             <div className="control-pane">
@@ -173,7 +172,6 @@ class StudentTable extends Component {
                         dataSource={this.props.studentItems}
                         enableHover={true}
                         rowHeight={50}
-                        height={500}
                         ref={(g) => {
                             this.gridInstance = g;
                         }}
@@ -250,12 +248,11 @@ class StudentTable extends Component {
                                 headerText="Action"
                                 allowSorting={false}
                                 allowFiltering={false}
-                                template={viewTemplate}
+                                template={this.viewTemplate}
+                                width="130"
                             />
                         </ColumnsDirective>
-                        <Inject
-                            services={[Filter, Sort, Toolbar, Resize]}
-                        />
+                        <Inject services={[Filter, Sort, Toolbar, Resize]} />
                     </GridComponent>
                 </div>
                 <style>@import 'src/grid/Grid/style.css';</style>

@@ -703,7 +703,7 @@ class VewCourseCard extends Component {
                         <h6 className="primary-text font-weight-bold mb-3">
                             Course Name
                         </h6>
-                        <p className="primary-text small">Configuration</p>
+                        <p className="primary-text">Configuration</p>
                         <div className="row align-items-center mb-3">
                             <div className="col-md-5">
                                 <p className="primary-text small mb-0 font-weight-bold">
