@@ -455,9 +455,6 @@ class HodProfile extends Component {
                     }`}
                 >
                     <div className="container-fluid">
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
-
                         {/* Back button */}
                         <button
                             className="btn btn-primary-invert btn-sm mb-2"
@@ -476,11 +473,15 @@ class HodProfile extends Component {
                                                 <img
                                                     src={
                                                         this.state.hodItems
-                                                            .profile_link !==
-                                                        null
+                                                            .length !== 0
                                                             ? this.state
                                                                   .hodItems
-                                                                  .profile_link
+                                                                  .profile_link !==
+                                                              null
+                                                                ? this.state
+                                                                      .hodItems
+                                                                      .profile_link
+                                                                : profilepic
                                                             : profilepic
                                                     }
                                                     alt={`${this.state.hodItems.first_name} ${this.state.hodItems.last_name}`}
@@ -489,7 +490,10 @@ class HodProfile extends Component {
                                             </div>
                                             <div className="col-9 pl-0">
                                                 <h5 className="primary-text">
-                                                    {`${this.state.hodItems.first_name} ${this.state.hodItems.last_name}`}
+                                                    {this.state.hodItems
+                                                        .length !== 0
+                                                        ? `${this.state.hodItems.first_name} ${this.state.hodItems.last_name}`
+                                                        : ""}
                                                 </h5>
                                                 <p className="mb-0">
                                                     {
@@ -497,20 +501,25 @@ class HodProfile extends Component {
                                                             .hodId
                                                     }{" "}
                                                     {this.state.hodItems
-                                                        .is_active ? (
-                                                        <Badge
-                                                            variant="success"
-                                                            className="ml-1"
-                                                        >
-                                                            Active
-                                                        </Badge>
+                                                        .length !== 0 ? (
+                                                        this.state.hodItems
+                                                            .is_active ? (
+                                                            <Badge
+                                                                variant="success"
+                                                                className="ml-1"
+                                                            >
+                                                                Active
+                                                            </Badge>
+                                                        ) : (
+                                                            <Badge
+                                                                variant="danger"
+                                                                className="ml-1"
+                                                            >
+                                                                Not active
+                                                            </Badge>
+                                                        )
                                                     ) : (
-                                                        <Badge
-                                                            variant="danger"
-                                                            className="ml-1"
-                                                        >
-                                                            Not active
-                                                        </Badge>
+                                                        ""
                                                     )}
                                                 </p>
                                             </div>
@@ -1284,6 +1293,8 @@ class HodProfile extends Component {
                                 </div>
                             </div>
                         </div>
+                        {/* Loading component */}
+                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
             </div>

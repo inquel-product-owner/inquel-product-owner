@@ -484,9 +484,6 @@ class Profiles extends Component {
                     }`}
                 >
                     <div className="container-fluid">
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
-
                         {/* Back button */}
                         <button
                             className="btn btn-primary-invert btn-sm mb-2 mb-md-0"
@@ -1152,6 +1149,8 @@ class Profiles extends Component {
                                 </div>
                             </Tab>
                         </Tabs>
+                        {/* Loading component */}
+                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
             </div>

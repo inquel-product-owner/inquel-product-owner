@@ -32,6 +32,14 @@ class CourseScorecard extends Component {
                     }`}
                 >
                     <div className="container-fluid">
+                        {/* Back button */}
+                        <button
+                            className="btn btn-primary-invert btn-sm mb-2"
+                            onClick={this.props.history.goBack}
+                        >
+                            <i className="fas fa-chevron-left fa-sm"></i> Back
+                        </button>
+
                         <div className="row align-items-center mb-4">
                             <div className="col-md-6">
                                 <h5 className="primary-text">
@@ -93,7 +101,9 @@ class CourseScorecard extends Component {
                                                         <div className="col-md-5 mb-2 mb-md-0">
                                                             <div className="row">
                                                                 <div className="col-2">
-                                                                <span><i className="fas fa-plus-circle"></i></span>
+                                                                    <span>
+                                                                        <i className="fas fa-plus-circle"></i>
+                                                                    </span>
                                                                 </div>
                                                                 <div className="col-2">
                                                                     1
@@ -122,7 +132,9 @@ class CourseScorecard extends Component {
                                                                     <div className="row">
                                                                         <div className="col-6"></div>
                                                                         <div className="col-6 text-right">
-                                                                            <span className="text-success"><i className="fas fa-check-circle"></i></span>
+                                                                            <span className="text-success">
+                                                                                <i className="fas fa-check-circle"></i>
+                                                                            </span>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -132,9 +144,7 @@ class CourseScorecard extends Component {
                                                 </Accordion.Toggle>
                                                 <Accordion.Collapse eventKey="0">
                                                     <Card className="pl-5">
-                                                        <Card.Header
-                                                            className="bg-light my-2"
-                                                        >
+                                                        <Card.Header className="bg-light my-2">
                                                             <div className="row">
                                                                 <div className="col-md-5 mb-2 mb-md-0">
                                                                     <div className="row">
@@ -142,7 +152,8 @@ class CourseScorecard extends Component {
                                                                             1.1
                                                                         </div>
                                                                         <div className="col-md-10 col-9">
-                                                                            Arithmatic progression
+                                                                            Arithmatic
+                                                                            progression
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -150,9 +161,13 @@ class CourseScorecard extends Component {
                                                                     <div className="row justify-content-end">
                                                                         <div className="col-md-3 col-6 mb-2 mb-md-0">
                                                                             <div className="row">
-                                                                                <div className="col-6">2.4</div>
+                                                                                <div className="col-6">
+                                                                                    2.4
+                                                                                </div>
                                                                                 <div className="col-6 text-right">
-                                                                                <span className="text-muted"><i className="fas fa-check-circle"></i></span>
+                                                                                    <span className="text-muted">
+                                                                                        <i className="fas fa-check-circle"></i>
+                                                                                    </span>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
@@ -160,9 +175,7 @@ class CourseScorecard extends Component {
                                                                 </div>
                                                             </div>
                                                         </Card.Header>
-                                                        <Card.Header
-                                                            className="bg-light"
-                                                        >
+                                                        <Card.Header className="bg-light">
                                                             <div className="row">
                                                                 <div className="col-md-5 mb-2 mb-md-0">
                                                                     <div className="row">
@@ -170,7 +183,11 @@ class CourseScorecard extends Component {
                                                                             1.1.1
                                                                         </div>
                                                                         <div className="col-md-10 col-9">
-                                                                           Nth term of an AP
+                                                                            Nth
+                                                                            term
+                                                                            of
+                                                                            an
+                                                                            AP
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -178,9 +195,13 @@ class CourseScorecard extends Component {
                                                                     <div className="row justify-content-end">
                                                                         <div className="col-md-3 col-6 mb-2 mb-md-0">
                                                                             <div className="row">
-                                                                                <div className="col-6">1.1.2</div>
+                                                                                <div className="col-6">
+                                                                                    1.1.2
+                                                                                </div>
                                                                                 <div className="col-6 text-right">
-                                                                                <span className="text-muted"><i className="fas fa-check-circle"></i></span>
+                                                                                    <span className="text-muted">
+                                                                                        <i className="fas fa-check-circle"></i>
+                                                                                    </span>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
@@ -201,9 +222,15 @@ class CourseScorecard extends Component {
                                             <div className="card-header secondary-bg">
                                                 <div className="row align-items-center">
                                                     <div className="col-6">
-                                                        <p className="small mb-0">Semester Exams</p>
+                                                        <p className="small mb-0">
+                                                            Semester Exams
+                                                        </p>
                                                     </div>
-                                                    <div className="col-6 text-right"><button className="btn btn-primary btn-sm">Star</button></div>
+                                                    <div className="col-6 text-right">
+                                                        <button className="btn btn-primary btn-sm">
+                                                            Star
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

@@ -68,6 +68,14 @@ class TeacherProfile extends Component {
                     }`}
                 >
                     <div className="container-fluid">
+                        {/* Back button */}
+                        <button
+                            className="btn btn-primary-invert btn-sm mb-2"
+                            onClick={this.props.history.goBack}
+                        >
+                            <i className="fas fa-chevron-left fa-sm"></i> Back
+                        </button>
+                        
                         {/* Teacher Details */}
                         {this.state.isLoaded ? (
                             <>

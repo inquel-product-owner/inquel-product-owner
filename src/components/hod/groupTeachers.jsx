@@ -99,6 +99,14 @@ class GroupTeachers extends Component {
                     }`}
                 >
                     <div className="container-fluid">
+                        {/* Back button */}
+                        <button
+                            className="btn btn-primary-invert btn-sm mb-2"
+                            onClick={this.props.history.goBack}
+                        >
+                            <i className="fas fa-chevron-left fa-sm"></i> Back
+                        </button>
+                        
                         {/* Filter area */}
                         <div className="row align-items-center">
                             <div className="col-md-2">
