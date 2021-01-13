@@ -69,9 +69,6 @@ class StudentProfile extends Component {
                     }`}
                 >
                     <div className="container-fluid">
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
-                        
                         {/* Back button */}
                         <button
                             className="btn btn-primary-invert btn-sm mb-2"
@@ -88,9 +85,13 @@ class StudentProfile extends Component {
                                         <img
                                             src={
                                                 this.state.studentItems
-                                                    .profile_link !== null
+                                                    .length !== 0
                                                     ? this.state.studentItems
-                                                          .profile_link
+                                                          .profile_link !== null
+                                                        ? this.state
+                                                              .studentItems
+                                                              .profile_link
+                                                        : profilepic
                                                     : profilepic
                                             }
                                             alt={
@@ -102,8 +103,15 @@ class StudentProfile extends Component {
                                     </div>
                                     <div className="col-md-10 col-9 pl-0">
                                         <h5 className="primary-text">
-                                            {this.state.studentItems.full_name}
+                                            {this.state.studentItems.length !==
+                                            0
+                                                ? this.state.studentItems
+                                                      .full_name
+                                                : ""}
                                         </h5>
+                                        <p className="mb-0">
+                                            {this.props.match.params.studentId}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -263,6 +271,8 @@ class StudentProfile extends Component {
                                 </table>
                             </div>
                         </div>
+                        {/* Loading component */}
+                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
             </div>

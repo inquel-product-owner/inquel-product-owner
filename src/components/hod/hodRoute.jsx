@@ -49,12 +49,12 @@ const hodRoutes = (
         <Route
             exact
             path="/hod/groups/configuration"
-            render={() =>
+            render={(props) =>
                 !localStorage.getItem("Authorization") &&
                 !localStorage.getItem("is_hod") ? (
                     <Redirect to="/hod/login" />
                 ) : (
-                    <GroupConfiguration />
+                    <GroupConfiguration {...props} />
                 )
             }
         />
@@ -66,7 +66,7 @@ const hodRoutes = (
                 !localStorage.getItem("is_hod") ? (
                     <Redirect to="/hod/login" />
                 ) : (
-                    <GroupDetails {...props}/>
+                    <GroupDetails {...props} />
                 )
             }
         />
@@ -97,12 +97,12 @@ const hodRoutes = (
         <Route
             exact
             path="/hod/profile"
-            render={() =>
+            render={(props) =>
                 !localStorage.getItem("Authorization") &&
                 !localStorage.getItem("is_hod") ? (
                     <Redirect to="/hod/login" />
                 ) : (
-                    <ProfileList />
+                    <ProfileList {...props} />
                 )
             }
         />
@@ -133,12 +133,12 @@ const hodRoutes = (
         <Route
             exact
             path="/hod/course/:courseId"
-            render={() =>
+            render={(props) =>
                 !localStorage.getItem("Authorization") &&
                 !localStorage.getItem("is_hod") ? (
                     <Redirect to="/hod/login" />
                 ) : (
-                    <CourseScorecard />
+                    <CourseScorecard {...props} />
                 )
             }
         />

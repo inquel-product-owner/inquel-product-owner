@@ -258,6 +258,14 @@ class GroupConfiguration extends Component {
                     }`}
                 >
                     <div className="container-fluid">
+                        {/* Back button */}
+                        <button
+                            className="btn btn-primary-invert btn-sm mb-2"
+                            onClick={this.props.history.goBack}
+                        >
+                            <i className="fas fa-chevron-left fa-sm"></i> Back
+                        </button>
+                        
                         <h5 className="primary-text mb-3">Configuration</h5>
                         <div className="card shadow-sm">
                             <div className="table-responsive">
