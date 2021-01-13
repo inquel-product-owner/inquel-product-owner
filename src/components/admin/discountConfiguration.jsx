@@ -39,7 +39,6 @@ class DiscountConfiguration extends Component {
                     }`}
                 >
                     <div className="container-fluid">
-                        
                         {/* Back button */}
                         <button
                             className="btn btn-primary-invert btn-sm mb-2"

@@ -87,9 +87,6 @@ class HodTeacherList extends Component {
                     }`}
                 >
                     <div className="container-fluid">
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
-                        
                         {/* Back button */}
                         <button
                             className="btn btn-primary-invert btn-sm mb-2"
@@ -105,10 +102,12 @@ class HodTeacherList extends Component {
                                     <div className="col-md-2 col-3">
                                         <img
                                             src={
-                                                this.state.hodItems
-                                                    .profile_link !== null
+                                                this.state.hodItems.length !== 0
                                                     ? this.state.hodItems
-                                                          .profile_link
+                                                          .profile_link !== null
+                                                        ? this.state.hodItems
+                                                              .profile_link
+                                                        : profilepic
                                                     : profilepic
                                             }
                                             alt={`${this.state.hodItems.first_name} ${this.state.hodItems.last_name}`}
@@ -117,7 +116,9 @@ class HodTeacherList extends Component {
                                     </div>
                                     <div className="col-md-10 col-9 pl-0">
                                         <h5 className="primary-text">
-                                            {`${this.state.hodItems.first_name} ${this.state.hodItems.last_name}`}
+                                            {this.state.hodItems.length !== 0
+                                                ? `${this.state.hodItems.first_name} ${this.state.hodItems.last_name}`
+                                                : ""}
                                         </h5>
                                         <p className="mb-0">
                                             {this.props.match.params.hodId}
@@ -292,6 +293,8 @@ class HodTeacherList extends Component {
                                 </Tab.Container>
                             </div>
                         </div>
+                        {/* Loading component */}
+                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
             </div>

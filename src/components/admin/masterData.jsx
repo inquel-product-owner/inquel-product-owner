@@ -154,9 +154,6 @@ class MasterData extends Component {
                     }`}
                 >
                     <div className="container-fluid">
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
-                        
                         {/* Back button */}
                         <button
                             className="btn btn-primary-invert btn-sm mb-2"
@@ -489,6 +486,8 @@ class MasterData extends Component {
                                 )}
                             </div>
                         </div>
+                        {/* Loading component */}
+                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
             </div>
