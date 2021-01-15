@@ -3,10 +3,7 @@ import { Tab, Row, Col, Nav } from "react-bootstrap";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
-
-function Loading() {
-    return <p>Loading...</p>;
-}
+import Loading from "../../shared/loadingComponent";
 
 function EmptyData() {
     return (
@@ -23,7 +20,7 @@ class GroupTeachers extends Component {
             showSideNav: false,
             groupItem: [],
             teacherItems: [],
-            isLoaded: false,
+            page_loading: true,
         };
     }
 
@@ -31,12 +28,6 @@ class GroupTeachers extends Component {
         this.setState({
             showSideNav: !this.state.showSideNav,
         });
-    };
-
-    dateConversion = (date) => {
-        var newDate = new Date(date).toLocaleDateString();
-        var datearray = newDate.split("/");
-        return datearray[1] + "/" + datearray[0] + "/" + datearray[2];
     };
 
     componentDidMount = () => {
@@ -65,7 +56,7 @@ class GroupTeachers extends Component {
                 this.setState({
                     groupItem: result[0].data,
                     teacherItems: result[1].data.results,
-                    isLoaded: true,
+                    page_loading: false,
                 });
                 console.log(result);
             })
@@ -77,8 +68,8 @@ class GroupTeachers extends Component {
     render() {
         document.title =
             this.state.groupItem.length !== 0
-                ? this.state.groupItem.group_name + " Teacher List| IQLabs"
-                : "Group Teacher List | IQLabs";
+                ? this.state.groupItem.group_name + " Teacher List - HOD | IQLabs"
+                : "Group Teacher List - HOD | IQLabs";
         return (
             <div className="wrapper">
                 {/* Navbar */}
@@ -106,7 +97,7 @@ class GroupTeachers extends Component {
                         >
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
-                        
+
                         {/* Filter area */}
                         <div className="row align-items-center">
                             <div className="col-md-2">
@@ -157,149 +148,135 @@ class GroupTeachers extends Component {
                                                 variant="pills"
                                                 className="flex-column"
                                             >
-                                                {this.state.isLoaded ? (
-                                                    this.state.teacherItems
-                                                        .length !== 0 ? (
-                                                        this.state.teacherItems.map(
-                                                            (list, index) => {
-                                                                console.log(index)
-                                                                return (
-                                                                    <Nav.Item
-                                                                        key={
+                                                {this.state.teacherItems
+                                                    .length !== 0 ? (
+                                                    this.state.teacherItems.map(
+                                                        (list, index) => {
+                                                            console.log(index);
+                                                            return (
+                                                                <Nav.Item
+                                                                    key={index}
+                                                                >
+                                                                    <Nav.Link
+                                                                        eventKey={
                                                                             index
                                                                         }
                                                                     >
-                                                                        <Nav.Link
-                                                                            eventKey={
-                                                                                index
-                                                                            }
-                                                                        >
-                                                                            {
-                                                                                list.full_name
-                                                                            }
-                                                                        </Nav.Link>
-                                                                    </Nav.Item>
-                                                                );
-                                                            }
-                                                        )
-                                                    ) : (
-                                                        <EmptyData />
+                                                                        {
+                                                                            list.full_name
+                                                                        }
+                                                                    </Nav.Link>
+                                                                </Nav.Item>
+                                                            );
+                                                        }
                                                     )
                                                 ) : (
-                                                    <Loading />
+                                                    <EmptyData />
                                                 )}
                                             </Nav>
                                         </Col>
                                         <Col sm={9}>
                                             <Tab.Content>
-                                                {this.state.isLoaded ? (
-                                                    this.state.teacherItems.map(
-                                                        (list, index) => {
-                                                            console.log(index)
-                                                            return (
-                                                                <Tab.Pane
-                                                                    key={index}
-                                                                    eventKey={
-                                                                        index
-                                                                    }
-                                                                >
-                                                                    <div className="card shadow-sm">
-                                                                        <div className="table-responsive">
-                                                                            <table className="table">
-                                                                                <thead className="secondary-bg primary-text">
-                                                                                    <tr>
-                                                                                        <th scope="col">
-                                                                                            Handling
-                                                                                            Group
-                                                                                        </th>
-                                                                                        <th scope="col">
-                                                                                            <div className="row">
-                                                                                                <div className="col-6">
-                                                                                                    Handling
-                                                                                                    Subject
-                                                                                                </div>
-                                                                                                <div className="col-6">
-                                                                                                    Handling
-                                                                                                    Chapters
-                                                                                                </div>
+                                                {this.state.teacherItems.map(
+                                                    (list, index) => {
+                                                        console.log(index);
+                                                        return (
+                                                            <Tab.Pane
+                                                                key={index}
+                                                                eventKey={index}
+                                                            >
+                                                                <div className="card shadow-sm">
+                                                                    <div className="table-responsive">
+                                                                        <table className="table">
+                                                                            <thead className="secondary-bg primary-text">
+                                                                                <tr>
+                                                                                    <th scope="col">
+                                                                                        Handling
+                                                                                        Group
+                                                                                    </th>
+                                                                                    <th scope="col">
+                                                                                        <div className="row">
+                                                                                            <div className="col-6">
+                                                                                                Handling
+                                                                                                Subject
                                                                                             </div>
-                                                                                        </th>
-                                                                                        <th scope="col">
-                                                                                            Exams
-                                                                                        </th>
-                                                                                        <th scope="col">
-                                                                                            Quizes
-                                                                                        </th>
-                                                                                    </tr>
-                                                                                </thead>
-                                                                                <tbody>
-                                                                                    {list.handling.map(
-                                                                                        (
-                                                                                            item,
-                                                                                            index
-                                                                                        ) => {
-                                                                                            return (
-                                                                                                <tr
-                                                                                                    key={
-                                                                                                        index
-                                                                                                    }
-                                                                                                >
-                                                                                                    <td>
-                                                                                                        {item.group_name ===
-                                                                                                        "independent"
-                                                                                                            ? ""
-                                                                                                            : item.group_name}
-                                                                                                    </td>
-                                                                                                    <td>
-                                                                                                        {item.subjects.map(
-                                                                                                            (
-                                                                                                                subject
-                                                                                                            ) => {
-                                                                                                                return (
-                                                                                                                    <div className="row">
-                                                                                                                        <p className="col-6">
-                                                                                                                            {
-                                                                                                                                subject.subject_name
+                                                                                            <div className="col-6">
+                                                                                                Handling
+                                                                                                Chapters
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </th>
+                                                                                    <th scope="col">
+                                                                                        Exams
+                                                                                    </th>
+                                                                                    <th scope="col">
+                                                                                        Quizes
+                                                                                    </th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                {list.handling.map(
+                                                                                    (
+                                                                                        item,
+                                                                                        index
+                                                                                    ) => {
+                                                                                        return (
+                                                                                            <tr
+                                                                                                key={
+                                                                                                    index
+                                                                                                }
+                                                                                            >
+                                                                                                <td>
+                                                                                                    {item.group_name ===
+                                                                                                    "independent"
+                                                                                                        ? ""
+                                                                                                        : item.group_name}
+                                                                                                </td>
+                                                                                                <td>
+                                                                                                    {item.subjects.map(
+                                                                                                        (
+                                                                                                            subject
+                                                                                                        ) => {
+                                                                                                            return (
+                                                                                                                <div className="row">
+                                                                                                                    <p className="col-6">
+                                                                                                                        {
+                                                                                                                            subject.subject_name
+                                                                                                                        }
+                                                                                                                    </p>
+                                                                                                                    <div className="col-6">
+                                                                                                                        {subject.chapters.map(
+                                                                                                                            (
+                                                                                                                                chapter
+                                                                                                                            ) => {
+                                                                                                                                return (
+                                                                                                                                    <p>
+                                                                                                                                        {
+                                                                                                                                            chapter.chapter_name
+                                                                                                                                        }
+                                                                                                                                    </p>
+                                                                                                                                );
                                                                                                                             }
-                                                                                                                        </p>
-                                                                                                                        <div className="col-6">
-                                                                                                                            {subject.chapters.map(
-                                                                                                                                (
-                                                                                                                                    chapter
-                                                                                                                                ) => {
-                                                                                                                                    return (
-                                                                                                                                        <p>
-                                                                                                                                            {
-                                                                                                                                                chapter.chapter_name
-                                                                                                                                            }
-                                                                                                                                        </p>
-                                                                                                                                    );
-                                                                                                                                }
-                                                                                                                            )}
-                                                                                                                        </div>
+                                                                                                                        )}
                                                                                                                     </div>
-                                                                                                                );
-                                                                                                            }
-                                                                                                        )}
-                                                                                                    </td>
-                                                                                                    <td>
-                                                                                                    </td>
-                                                                                                    <td>
-                                                                                                    </td>
-                                                                                                </tr>
-                                                                                            );
-                                                                                        }
-                                                                                    )}
-                                                                                </tbody>
-                                                                            </table>
-                                                                        </div>
+                                                                                                                </div>
+                                                                                                            );
+                                                                                                        }
+                                                                                                    )}
+                                                                                                </td>
+                                                                                                <td></td>
+                                                                                                <td></td>
+                                                                                            </tr>
+                                                                                        );
+                                                                                    }
+                                                                                )}
+                                                                            </tbody>
+                                                                        </table>
                                                                     </div>
-                                                                </Tab.Pane>
-                                                            );
-                                                        }
-                                                    )
-                                                ) : (
-                                                    <Loading />
+                                                                </div>
+                                                            </Tab.Pane>
+                                                        );
+                                                    }
                                                 )}
                                             </Tab.Content>
                                         </Col>
@@ -307,6 +284,8 @@ class GroupTeachers extends Component {
                                 </Tab.Container>
                             </div>
                         </div>
+                        {/* Loading component */}
+                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
             </div>

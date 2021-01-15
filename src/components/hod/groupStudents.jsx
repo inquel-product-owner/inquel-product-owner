@@ -1,10 +1,11 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
 import { Dropdown, Modal, Alert, Spinner } from "react-bootstrap";
-import userimage from "../../assets/user.png";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
+import Loading from "../../shared/loadingComponent";
+import Paginations from "../../shared/pagination";
+import StudentTable from "../table/studentTable";
 
 class StudentAssignModal extends Component {
     constructor(props) {
@@ -37,7 +38,7 @@ class StudentAssignModal extends Component {
             showSuccessAlert: false,
         });
 
-        fetch(`${url}/hod/group/${this.props.groupid}/assign/student/`, {
+        fetch(`${url}/hod/group/${this.props.groupId}/assign/student/`, {
             headers: headers,
             method: "POST",
             body: JSON.stringify({
@@ -53,6 +54,7 @@ class StudentAssignModal extends Component {
                         showSuccessAlert: true,
                         showLoader: false,
                     });
+                    this.props.formSubmission(true);
                 } else {
                     this.setState({
                         errorMsg: result.msg,
@@ -90,7 +92,7 @@ class StudentAssignModal extends Component {
             Authorization: authToken,
         };
 
-        fetch(`${url}/hod/group/${this.props.groupid}/assign/student/`, {
+        fetch(`${url}/hod/group/${this.props.groupId}/assign/student/`, {
             headers: headers,
             method: "GET",
         })
@@ -110,7 +112,8 @@ class StudentAssignModal extends Component {
     render() {
         return (
             <Modal
-                {...this.props}
+                show={this.props.show}
+                onHide={this.props.onHide}
                 size="lg"
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
@@ -229,7 +232,16 @@ class GroupStudents extends Component {
             showStudentModal: false,
             groupItem: [],
             studentItem: [],
-            isLoaded: false,
+            activeStudentPage: 1,
+            totalStudentCount: 0,
+            page_loading: true,
+        };
+        this.url = baseUrl + hodUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
         };
     }
 
@@ -245,39 +257,20 @@ class GroupStudents extends Component {
         });
     };
 
-    dateConversion = (date) => {
-        var newDate = new Date(date).toLocaleDateString();
-        var datearray = newDate.split("/");
-        return datearray[1] + "/" + datearray[0] + "/" + datearray[2];
-    };
-
-    componentDidMount = () => {
-        var url = baseUrl + hodUrl;
-        var authToken = localStorage.getItem("Authorization");
-        var headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: authToken,
-        };
-
-        Promise.all([
-            fetch(`${url}/hod/group/${this.props.match.params.groupId}`, {
-                headers: headers,
+    loadStudentData = () => {
+        fetch(
+            `${this.url}/hod/group/${this.props.match.params.groupId}/student/?page=${this.state.activeStudentPage}`,
+            {
+                headers: this.headers,
                 method: "GET",
-            }).then((res) => res.json()),
-            fetch(
-                `${url}/hod/group/${this.props.match.params.groupId}/student/`,
-                {
-                    headers: headers,
-                    method: "GET",
-                }
-            ).then((res) => res.json()),
-        ])
+            }
+        )
+            .then((res) => res.json())
             .then((result) => {
                 this.setState({
-                    groupItem: result[0].data,
-                    studentItem: result[1].data.results,
-                    isLoaded: true,
+                    studentItem: result.data.results,
+                    totalStudentCount: result.data.count,
+                    page_loading: false,
                 });
                 console.log(result);
             })
@@ -286,11 +279,61 @@ class GroupStudents extends Component {
             });
     };
 
+    componentDidMount = () => {
+        fetch(`${this.url}/hod/group/${this.props.match.params.groupId}`, {
+            headers: this.headers,
+            method: "GET",
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                this.setState({
+                    groupItem: result.data,
+                });
+                console.log(result);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+
+        this.loadStudentData();
+    };
+
+    componentDidUpdate = (prevProps, prevState) => {
+        if (
+            prevState.is_formSubmited !== this.state.is_formSubmited &&
+            this.state.is_formSubmited === true
+        ) {
+            this.loadStudentData();
+            this.setState({
+                is_formSubmited: false,
+            });
+        }
+
+        if (prevState.activeStudentPage !== this.state.activeStudentPage) {
+            this.loadStudentData();
+            this.setState({
+                page_loading: true,
+            });
+        }
+    };
+
+    formSubmission = (is_formSubmited) => {
+        if (is_formSubmited) {
+            this.setState({
+                is_formSubmited: true,
+            });
+        }
+    };
+
+    handleStudentPageChange(pageNumber) {
+        this.setState({ activeStudentPage: pageNumber });
+    }
+
     render() {
         document.title =
             this.state.groupItem.length !== 0
-                ? this.state.groupItem.group_name + " Student List| IQLabs"
-                : "Group Student List | IQLabs";
+                ? this.state.groupItem.group_name + " Student List - HOD | IQLabs"
+                : "Group Student List - HOD | IQLabs";
         return (
             <div className="wrapper">
                 {/* Navbar */}
@@ -310,7 +353,8 @@ class GroupStudents extends Component {
                     <StudentAssignModal
                         show={this.state.showStudentModal}
                         onHide={this.toggleStudentModal}
-                        groupid={this.props.match.params.groupId}
+                        groupId={this.props.match.params.groupId}
+                        formSubmission={this.formSubmission}
                     />
                 ) : (
                     ""
@@ -329,7 +373,7 @@ class GroupStudents extends Component {
                         >
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
-                        
+
                         {/* Filter area */}
                         <div className="row align-items-center">
                             <div className="col-md-2">
@@ -338,33 +382,21 @@ class GroupStudents extends Component {
                                 </h5>
                             </div>
                             <div className="col-md-10">
-                                <div className="d-flex flex-wrap justify-content-center justify-content-md-end mb-4">
-                                    <form>
-                                        <input
-                                            type="search"
-                                            name="search"
-                                            id="search"
-                                            className="form-control mb-md-0 mb-2"
-                                            placeholder="Search"
-                                        />
-                                    </form>
-                                    <button className="btn btn-primary-invert mx-md-3 mx-0 ml-2 ml-md-0 mb-md-0 mb-2">
-                                        Filter{" "}
-                                        <i className="fas fa-filter ml-1"></i>
-                                    </button>
+                                <div className="d-flex flex-wrap justify-content-end mb-4">
                                     <button
-                                        className="btn btn-primary mr-md-2 mr-1"
+                                        className="btn btn-primary btn-sm mr-1"
                                         onClick={this.toggleStudentModal}
                                     >
                                         Add New
                                     </button>
-                                    <button className="btn btn-primary mr-md-2 mr-1">
+                                    <button className="btn btn-primary btn-sm mr-1">
                                         Remove
                                     </button>
                                     <Dropdown>
                                         <Dropdown.Toggle
                                             variant="primary"
                                             id="dropdown-basic"
+                                            className="btn-sm"
                                         >
                                             Notify
                                         </Dropdown.Toggle>
@@ -385,115 +417,25 @@ class GroupStudents extends Component {
 
                         {/* Student list */}
                         <div className="card shadow-sm">
-                            <div className="table-responsive">
-                                <table className="table">
-                                    <thead className="primary-text">
-                                        <tr>
-                                            <th scope="col"></th>
-                                            <th scope="col">Name</th>
-                                            <th scope="col">Username</th>
-                                            <th scope="col">Email</th>
-                                            <th scope="col">Contact</th>
-                                            <th scope="col">Category</th>
-                                            <th scope="col">Registered on</th>
-                                            <th scope="col">Status</th>
-                                            <th scope="col"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {this.state.isLoaded ? (
-                                            this.state.studentItem.length !==
-                                            0 ? (
-                                                this.state.studentItem.map(
-                                                    (list, index) => {
-                                                        return (
-                                                            <tr key={index}>
-                                                                <td className="text-center">
-                                                                    <input
-                                                                        type="checkbox"
-                                                                        name="enable"
-                                                                        value={
-                                                                            list.id
-                                                                        }
-                                                                    />
-                                                                </td>
-                                                                <td>
-                                                                    <img
-                                                                        src={
-                                                                            list.profile_link !==
-                                                                            null
-                                                                                ? list.profile_link
-                                                                                : userimage
-                                                                        }
-                                                                        alt="User profile pic"
-                                                                        width="20"
-                                                                    />{" "}
-                                                                    {
-                                                                        list.full_name
-                                                                    }
-                                                                </td>
-                                                                <td>
-                                                                    {
-                                                                        list.username
-                                                                    }
-                                                                </td>
-                                                                <td>
-                                                                    {list.email}
-                                                                </td>
-                                                                <td>
-                                                                    {
-                                                                        list.contact
-                                                                    }
-                                                                </td>
-                                                                <td>
-                                                                    {
-                                                                        list.category
-                                                                    }
-                                                                </td>
-                                                                <td>
-                                                                    {this.dateConversion(
-                                                                        list.date_joined
-                                                                    )}
-                                                                </td>
-                                                                <td>
-                                                                    {list.is_active ? (
-                                                                        <span className="text-success">
-                                                                            Active
-                                                                        </span>
-                                                                    ) : (
-                                                                        <span className="text-danger">
-                                                                            Not
-                                                                            active
-                                                                        </span>
-                                                                    )}
-                                                                </td>
-                                                                <td>
-                                                                    <Link
-                                                                        to={`/hod/student/${list.id}`}
-                                                                    >
-                                                                        <button className="btn btn-sm btn-primary">
-                                                                            View
-                                                                        </button>
-                                                                    </Link>
-                                                                </td>
-                                                            </tr>
-                                                        );
-                                                    }
-                                                )
-                                            ) : (
-                                                <tr>
-                                                    <td>Data not available</td>
-                                                </tr>
-                                            )
-                                        ) : (
-                                            <tr>
-                                                <td>Loading...</td>
-                                            </tr>
-                                        )}
-                                    </tbody>
-                                </table>
+                            <StudentTable
+                                studentItems={this.state.studentItem}
+                                path="hod"
+                                category={true}
+                            />
+                            <div className="card-body p-3">
+                                <Paginations
+                                    activePage={this.state.activeStudentPage}
+                                    totalItemsCount={
+                                        this.state.totalStudentCount
+                                    }
+                                    onChange={this.handleStudentPageChange.bind(
+                                        this
+                                    )}
+                                />
                             </div>
                         </div>
+                        {/* Loading component */}
+                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
             </div>

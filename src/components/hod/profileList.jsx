@@ -1,10 +1,12 @@
 import React, { Component, Fragment } from "react";
 import Header from "./navbar";
 import SideNav from "./sidenav";
-import userimage from "../../assets/user.png";
 import { Tabs, Tab, Dropdown, Modal, Spinner, Alert } from "react-bootstrap";
-import { Link } from "react-router-dom";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
+import Loading from "../../shared/loadingComponent";
+import TeacherTable from "../table/teacherTable";
+import StudentTable from "../table/studentTable";
+import Paginations from "../../shared/pagination";
 
 // Student add modal
 class AddStudentModal extends Component {
@@ -53,6 +55,7 @@ class AddStudentModal extends Component {
                         showLoader: false,
                         email: [""],
                     });
+                    this.props.studentFormSubmission(true);
                     if (result.data.existing_email) {
                         if (result.data.existing_email.length !== 0) {
                             this.setState({
@@ -101,7 +104,8 @@ class AddStudentModal extends Component {
     render() {
         return (
             <Modal
-                {...this.props}
+                show={this.props.show}
+                onHide={this.props.onHide}
                 size="md"
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
@@ -275,6 +279,7 @@ class AddTeacherModal extends Component {
                         username: "",
                         password: "",
                     });
+                    this.props.teacherFormSubmission(true);
                 } else {
                     if (result.username) {
                         this.setState({
@@ -314,7 +319,8 @@ class AddTeacherModal extends Component {
     render() {
         return (
             <Modal
-                {...this.props}
+                show={this.props.show}
+                onHide={this.props.onHide}
                 size="md"
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
@@ -408,13 +414,26 @@ class ProfileList extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            activeTeacherPage: 1,
+            totalTeacherCount: 0,
+            activeStudentPage: 1,
+            totalStudentCount: 0,
             showSideNav: false,
             activeTab: "teacher",
             showStudentModal: false,
             showTeacherModal: false,
-            teacherItem: [],
-            studentItem: [],
-            isLoaded: false,
+            teacherItems: [],
+            studentItems: [],
+            page_loading: true,
+            is_teacherFormSubmited: false,
+            is_studentFormSubmited: false,
+        };
+        this.url = baseUrl + hodUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
         };
     }
 
@@ -426,46 +445,100 @@ class ProfileList extends Component {
 
     handleSelect = (key) => {
         this.setState({ activeTab: key });
+        this.props.history.push({ hash: key });
     };
 
-    dateConversion = (date) => {
-        var newDate = new Date(date).toLocaleDateString();
-        var datearray = newDate.split("/");
-        return datearray[1] + "/" + datearray[0] + "/" + datearray[2];
-    };
-
-    componentDidMount = () => {
-        document.title = "HOD Profile List | IQLabs";
-
-        var url = baseUrl + hodUrl;
-        var authToken = localStorage.getItem("Authorization");
-        var headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: authToken,
-        };
-
-        Promise.all([
-            fetch(`${url}/hod/create/teacher/`, {
-                headers: headers,
+    loadTeacherData = () => {
+        fetch(
+            `${this.url}/hod/create/teacher/?page=${this.state.activeTeacherPage}`,
+            {
+                headers: this.headers,
                 method: "GET",
-            }).then((res) => res.json()),
-            fetch(`${url}/hod/create/student/`, {
-                headers: headers,
-                method: "GET",
-            }).then((res) => res.json()),
-        ])
+            }
+        )
+            .then((res) => res.json())
             .then((result) => {
                 this.setState({
-                    teacherItem: result[0].data.results,
-                    studentItem: result[1].data.results,
-                    isLoaded: true,
+                    teacherItems: result.data.results,
+                    totalTeacherCount: result.data.count,
+                    page_loading: false,
                 });
                 console.log(result);
             })
             .catch((err) => {
                 console.log(err);
             });
+    };
+
+    loadStudentData = () => {
+        fetch(
+            `${this.url}/hod/create/student/?page=${this.state.activeStudentPage}`,
+            {
+                headers: this.headers,
+                method: "GET",
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                this.setState({
+                    studentItems: result.data.results,
+                    totalStudentCount: result.data.count,
+                    page_loading: false,
+                });
+                console.log(result);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    componentDidMount = () => {
+        if (!this.props.location.hash) {
+            this.setState({ activeTab: "teacher" });
+        } else {
+            this.setState({ activeTab: this.props.location.hash.substring(1) });
+        }
+
+        this.loadTeacherData();
+        this.loadStudentData();
+    };
+
+    componentDidUpdate = (prevProps, prevState) => {
+        if (
+            prevState.is_teacherFormSubmited !==
+                this.state.is_teacherFormSubmited &&
+            this.state.is_teacherFormSubmited === true
+        ) {
+            this.loadTeacherData();
+            this.setState({
+                is_teacherFormSubmited: false,
+            });
+        }
+
+        if (
+            prevState.is_studentFormSubmited !==
+                this.state.is_studentFormSubmited &&
+            this.state.is_studentFormSubmited === true
+        ) {
+            this.loadStudentData();
+            this.setState({
+                is_studentFormSubmited: false,
+            });
+        }
+
+        if (prevState.activeTeacherPage !== this.state.activeTeacherPage) {
+            this.loadTeacherData();
+            this.setState({
+                page_loading: true,
+            });
+        }
+
+        if (prevState.activeStudentPage !== this.state.activeStudentPage) {
+            this.loadStudentData();
+            this.setState({
+                page_loading: true,
+            });
+        }
     };
 
     handleProfileAdding = () => {
@@ -480,11 +553,46 @@ class ProfileList extends Component {
         }
     };
 
+    teacherFormSubmission = (is_teacherFormSubmited) => {
+        if (is_teacherFormSubmited) {
+            this.setState({
+                is_teacherFormSubmited: true,
+            });
+        }
+    };
+
+    studentFormSubmission = (is_studentFormSubmited) => {
+        if (is_studentFormSubmited) {
+            this.setState({
+                is_studentFormSubmited: true,
+            });
+        }
+    };
+
+    handleTeacherPageChange(pageNumber) {
+        this.setState({ activeTeacherPage: pageNumber });
+    }
+
+    handleStudentPageChange(pageNumber) {
+        this.setState({ activeStudentPage: pageNumber });
+    }
+
     render() {
+        document.title =
+            this.state.activeTab === "teacher"
+                ? "Teacher Profiles - HOD | IQLabs"
+                : "Student Profiles - HOD | IQLabs";
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="User Profiles" togglenav={this.toggleSideNav} />
+                <Header
+                    name={
+                        this.state.activeTab === "teacher"
+                            ? "Teacher Profiles"
+                            : "Student Profiles"
+                    }
+                    togglenav={this.toggleSideNav}
+                />
 
                 {/* Sidebar */}
                 <SideNav
@@ -496,12 +604,14 @@ class ProfileList extends Component {
                 <AddStudentModal
                     show={this.state.showStudentModal}
                     onHide={this.handleProfileAdding}
+                    studentFormSubmission={this.studentFormSubmission}
                 />
 
                 {/* Add Teacher modal */}
                 <AddTeacherModal
                     show={this.state.showTeacherModal}
                     onHide={this.handleProfileAdding}
+                    teacherFormSubmission={this.teacherFormSubmission}
                 />
 
                 <div
@@ -517,39 +627,28 @@ class ProfileList extends Component {
                         >
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
-                        
-                        <div className="d-flex flex-wrap justify-content-center justify-content-md-end mb-4">
-                            <form>
-                                <input
-                                    type="search"
-                                    name="search"
-                                    id="search"
-                                    className="form-control mb-md-0 mb-2"
-                                    placeholder="Search"
-                                />
-                            </form>
-                            <button className="btn btn-primary-invert mx-md-3 mx-0 ml-2 ml-md-0 mb-md-0 mb-2">
-                                Filter <i className="fas fa-filter ml-1"></i>
-                            </button>
+
+                        <div className="d-flex flex-wrap justify-content-end mb-3">
                             <button
-                                className="btn btn-primary mr-md-2 mr-1"
+                                className="btn btn-primary btn-sm mr-1"
                                 onClick={this.handleProfileAdding}
                             >
                                 Add New
                             </button>
-                            <button className="btn btn-primary mr-md-2 mr-1">
+                            <button className="btn btn-primary btn-sm mr-1">
                                 Delete
                             </button>
-                            <button className="btn btn-primary mr-md-2 mr-1">
+                            <button className="btn btn-primary btn-sm mr-1">
                                 Enable
                             </button>
-                            <button className="btn btn-primary mr-md-2 mr-1">
+                            <button className="btn btn-primary btn-sm mr-1">
                                 Disable
                             </button>
                             <Dropdown>
                                 <Dropdown.Toggle
                                     variant="primary"
                                     id="dropdown-basic"
+                                    className="btn-sm"
                                 >
                                     Notify
                                 </Dropdown.Toggle>
@@ -565,254 +664,63 @@ class ProfileList extends Component {
                         </div>
 
                         <Tabs
-                            activeKey={this.state.activeTab}
+                            activeKey={
+                                !this.props.location.hash
+                                    ? "teacher"
+                                    : this.props.location.hash.substring(1)
+                            }
                             id="uncontrolled-tab-example"
                             onSelect={this.handleSelect}
                         >
                             <Tab eventKey="teacher" title="Teacher">
                                 <div className="card shadow-sm">
-                                    <div className="table-responsive">
-                                        <table className="table">
-                                            <thead className="primary-text">
-                                                <tr>
-                                                    <th scope="col"></th>
-                                                    <th scope="col">Name</th>
-                                                    <th scope="col">
-                                                        Username
-                                                    </th>
-                                                    <th scope="col">Email</th>
-                                                    <th scope="col">
-                                                        Registered On
-                                                    </th>
-                                                    <th scope="col">Status</th>
-                                                    <th scope="col">Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {this.state.isLoaded ? (
-                                                    this.state.teacherItem
-                                                        .length !== 0 ? (
-                                                        this.state.teacherItem.map(
-                                                            (list, index) => {
-                                                                return (
-                                                                    <tr
-                                                                        key={
-                                                                            index
-                                                                        }
-                                                                    >
-                                                                        <td className="text-center">
-                                                                            <input
-                                                                                type="checkbox"
-                                                                                name="enable"
-                                                                                value={
-                                                                                    list.id
-                                                                                }
-                                                                            />
-                                                                        </td>
-                                                                        <td>
-                                                                            <img
-                                                                                src={
-                                                                                    list.profile_link !==
-                                                                                    null
-                                                                                        ? list.profile_link
-                                                                                        : userimage
-                                                                                }
-                                                                                alt="User profile pic"
-                                                                                width="20"
-                                                                            />{" "}
-                                                                            {
-                                                                                list.full_name
-                                                                            }
-                                                                        </td>
-                                                                        <td>
-                                                                            {
-                                                                                list.username
-                                                                            }
-                                                                        </td>
-                                                                        <td>
-                                                                            {
-                                                                                list.email
-                                                                            }
-                                                                        </td>
-                                                                        <td>
-                                                                            {this.dateConversion(
-                                                                                list.date_joined
-                                                                            )}
-                                                                        </td>
-                                                                        <td>
-                                                                            {list.is_active ? (
-                                                                                <span className="text-success">
-                                                                                    Active
-                                                                                </span>
-                                                                            ) : (
-                                                                                <span className="text-danger">
-                                                                                    Not
-                                                                                    active
-                                                                                </span>
-                                                                            )}
-                                                                        </td>
-                                                                        <td>
-                                                                            <Link
-                                                                                to={`/hod/teacher/${list.id}`}
-                                                                            >
-                                                                                <button className="btn btn-sm btn-primary">
-                                                                                    View
-                                                                                </button>
-                                                                            </Link>
-                                                                        </td>
-                                                                    </tr>
-                                                                );
-                                                            }
-                                                        )
-                                                    ) : (
-                                                        <tr>
-                                                            <td>
-                                                                Data not
-                                                                available
-                                                            </td>
-                                                        </tr>
-                                                    )
-                                                ) : (
-                                                    <tr>
-                                                        <td>Loading...</td>
-                                                    </tr>
-                                                )}
-                                            </tbody>
-                                        </table>
+                                    <TeacherTable
+                                        teacherItems={this.state.teacherItems}
+                                        ref={this.gridRef}
+                                        path="hod"
+                                    />
+                                    <div className="card-body p-3">
+                                        <Paginations
+                                            activePage={
+                                                this.state.activeTeacherPage
+                                            }
+                                            totalItemsCount={
+                                                this.state.totalTeacherCount
+                                            }
+                                            onChange={this.handleTeacherPageChange.bind(
+                                                this
+                                            )}
+                                        />
                                     </div>
                                 </div>
                             </Tab>
+
                             <Tab eventKey="student" title="Student">
                                 <div className="card shadow-sm">
-                                    <div className="table-responsive">
-                                        <table className="table">
-                                            <thead className="primary-text">
-                                                <tr>
-                                                    <th scope="col"></th>
-                                                    <th scope="col">Name</th>
-                                                    <th scope="col">
-                                                        Username
-                                                    </th>
-                                                    <th scope="col">Email</th>
-                                                    <th scope="col">Contact</th>
-                                                    <th scope="col">Groups</th>
-                                                    <th scope="col">
-                                                        Registered on
-                                                    </th>
-                                                    <th scope="col">Status</th>
-                                                    <th scope="col">Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {this.state.isLoaded ? (
-                                                    this.state.studentItem
-                                                        .length !== 0 ? (
-                                                        this.state.studentItem.map(
-                                                            (list, index) => {
-                                                                return (
-                                                                    <tr
-                                                                        key={
-                                                                            index
-                                                                        }
-                                                                    >
-                                                                        <td className="text-center">
-                                                                            <input
-                                                                                type="checkbox"
-                                                                                name="enable"
-                                                                                value={
-                                                                                    list.id
-                                                                                }
-                                                                            />
-                                                                        </td>
-                                                                        <td>
-                                                                            <img
-                                                                                src={
-                                                                                    list.profile_link !==
-                                                                                    null
-                                                                                        ? list.profile_link
-                                                                                        : userimage
-                                                                                }
-                                                                                alt="User profile pic"
-                                                                                width="20"
-                                                                            />{" "}
-                                                                            {
-                                                                                list.full_name
-                                                                            }
-                                                                        </td>
-                                                                        <td>
-                                                                            {
-                                                                                list.username
-                                                                            }
-                                                                        </td>
-                                                                        <td>
-                                                                            {
-                                                                                list.email
-                                                                            }
-                                                                        </td>
-                                                                        <td>
-                                                                            {
-                                                                                list.contact
-                                                                            }
-                                                                        </td>
-                                                                        <td>
-                                                                            {list.group_name ? (
-                                                                                list.group_name
-                                                                            ) : (
-                                                                                <span className="text-danger">
-                                                                                    Not
-                                                                                    assigned
-                                                                                </span>
-                                                                            )}
-                                                                        </td>
-                                                                        <td>
-                                                                            {this.dateConversion(
-                                                                                list.date_joined
-                                                                            )}
-                                                                        </td>
-                                                                        <td>
-                                                                            {list.is_active ? (
-                                                                                <span className="text-success">
-                                                                                    Active
-                                                                                </span>
-                                                                            ) : (
-                                                                                <span className="text-danger">
-                                                                                    Not
-                                                                                    active
-                                                                                </span>
-                                                                            )}
-                                                                        </td>
-                                                                        <td>
-                                                                            <Link
-                                                                                to={`/hod/student/${list.id}`}
-                                                                            >
-                                                                                <button className="btn btn-sm btn-primary">
-                                                                                    View
-                                                                                </button>
-                                                                            </Link>
-                                                                        </td>
-                                                                    </tr>
-                                                                );
-                                                            }
-                                                        )
-                                                    ) : (
-                                                        <tr>
-                                                            <td>
-                                                                Data not
-                                                                available
-                                                            </td>
-                                                        </tr>
-                                                    )
-                                                ) : (
-                                                    <tr>
-                                                        <td>Loading...</td>
-                                                    </tr>
-                                                )}
-                                            </tbody>
-                                        </table>
+                                    <StudentTable
+                                        studentItems={this.state.studentItems}
+                                        path="hod"
+                                        group={true}
+                                        ref={this.gridRef}
+                                    />
+                                    <div className="card-body p-3">
+                                        <Paginations
+                                            activePage={
+                                                this.state.activeStudentPage
+                                            }
+                                            totalItemsCount={
+                                                this.state.totalStudentCount
+                                            }
+                                            onChange={this.handleStudentPageChange.bind(
+                                                this
+                                            )}
+                                        />
                                     </div>
                                 </div>
                             </Tab>
                         </Tabs>
+                        {/* Loading component */}
+                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
             </div>

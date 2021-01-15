@@ -17,6 +17,10 @@ class CourseScorecard extends Component {
         });
     };
 
+    componentDidMount = () => {
+        document.title = "Course - HOD | IQLabs";
+    };
+
     render() {
         return (
             <div className="wrapper">

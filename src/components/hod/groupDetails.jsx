@@ -46,8 +46,8 @@ class GroupDetails extends Component {
     render() {
         document.title =
             this.state.groupItem.length !== 0
-                ? this.state.groupItem.group_name + " Details | IQLabs"
-                : "Group Details | IQLabs";
+                ? this.state.groupItem.group_name + " Details - HOD | IQLabs"
+                : "Group Details - HOD | IQLabs";
         return (
             <div className="wrapper">
                 {/* Navbar */}

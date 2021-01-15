@@ -11,6 +11,55 @@ import {
 } from "@syncfusion/ej2-react-grids";
 import "./material.css";
 import "./grid-overview.css";
+import { Link } from "react-router-dom";
+
+function valid_fromDate(props) {
+    var newDate = new Date(props.valid_from).toLocaleDateString();
+    var datearray = newDate.split("/");
+    return datearray[1] + "/" + datearray[0] + "/" + datearray[2];
+}
+
+function valid_toDate(props) {
+    var newDate = new Date(props.valid_to).toLocaleDateString();
+    var datearray = newDate.split("/");
+    return datearray[1] + "/" + datearray[0] + "/" + datearray[2];
+}
+
+function teacherView(props) {
+    return (
+        <>
+            <span>{props.teachers.length}</span>
+            <Link to={`/hod/group/${props.id}/teacher`}>
+                <button className="btn btn-light btn-sm ml-2 shadow-sm">
+                    <i className="fas fa-eye fa-sm"></i>
+                </button>
+            </Link>
+        </>
+    );
+}
+
+function studentView(props) {
+    return (
+        <>
+            <span>{props.students.length}</span>
+            <Link to={`/hod/group/${props.id}/student`}>
+                <button className="btn btn-light btn-sm ml-2 shadow-sm">
+                    <i className="fas fa-eye fa-sm"></i>
+                </button>
+            </Link>
+        </>
+    );
+}
+
+function detailsView(props) {
+    return (
+        <Link to={`/hod/group/${props.id}/details`}>
+            <button className="btn btn-light btn-sm shadow-sm">
+                <i className="fas fa-eye fa-sm"></i>
+            </button>
+        </Link>
+    );
+}
 
 class GroupTable extends Component {
     constructor() {
@@ -30,7 +79,60 @@ class GroupTable extends Component {
             type: "Multiple",
             checkboxOnly: true,
         };
+        this.valid_from = {
+            type: "Excel",
+            itemTemplate: valid_fromDate,
+        };
+        this.valid_to = {
+            type: "Excel",
+            itemTemplate: valid_toDate,
+        };
         this.toolbarOptions = ["Search"];
+        this.state = {
+            groupId: [],
+        };
+    }
+
+    rowSelected() {
+        if (this.gridInstance) {
+            const selectedrecords = this.gridInstance.getSelectedRecords();
+            let element = [];
+            for (let index = 0; index < selectedrecords.length; index++) {
+                element.push(selectedrecords[index].id.toString());
+            }
+            console.log(element);
+            this.setState({
+                groupId: element,
+            });
+        }
+    }
+
+    rowDeselected() {
+        if (this.gridInstance) {
+            const selectedrecords = this.gridInstance.getSelectedRecords();
+            let element = [];
+            for (let index = 0; index < selectedrecords.length; index++) {
+                element.push(selectedrecords[index].id.toString());
+            }
+            console.log(element);
+            this.setState({
+                groupId: element,
+            });
+        }
+    }
+
+    viewTemplate = (props) => {
+        return (
+            <Link to={`/${this.props.path}/group/${props.id}`}>
+                <button className="btn btn-link btn-sm">
+                    <i className="fas fa-eye"></i>
+                </button>
+            </Link>
+        );
+    };
+
+    dataBound() {
+        this.gridInstance.autoFitColumns();
     }
 
     render() {
@@ -42,20 +144,32 @@ class GroupTable extends Component {
                         dataSource={this.props.groupItems}
                         enableHover={true}
                         rowHeight={50}
-                        width={'100%'}
+                        width={"100%"}
                         ref={(g) => {
                             this.gridInstance = g;
                         }}
+                        dataBound={this.dataBound.bind(this)}
                         filterSettings={this.Filter}
                         allowFiltering={true}
                         allowSorting={true}
                         allowSelection={true}
                         allowTextWrap={true}
-                        allowResizing={true}
+                        // allowResizing={true}
                         selectionSettings={this.select}
                         toolbar={this.toolbarOptions}
+                        rowSelected={this.rowSelected.bind(this)}
+                        rowDeselected={this.rowDeselected.bind(this)}
                     >
                         <ColumnsDirective>
+                            {this.props.check ? (
+                                <ColumnDirective
+                                    type="checkbox"
+                                    allowSorting={false}
+                                    allowFiltering={false}
+                                ></ColumnDirective>
+                            ) : (
+                                ""
+                            )}
                             <ColumnDirective
                                 field="id"
                                 headerText="Group ID"
@@ -75,6 +189,72 @@ class GroupTable extends Component {
                                 allowSorting={false}
                                 allowFiltering={false}
                             />
+                            {this.props.valid_from ? (
+                                <ColumnDirective
+                                    field="valid_from"
+                                    headerText="Valid from"
+                                    filter={this.valid_from}
+                                    clipMode="EllipsisWithTooltip"
+                                    template={valid_fromDate}
+                                />
+                            ) : (
+                                ""
+                            )}
+                            {this.props.valid_to ? (
+                                <ColumnDirective
+                                    field="valid_to"
+                                    headerText="Valid to"
+                                    filter={this.valid_to}
+                                    clipMode="EllipsisWithTooltip"
+                                    template={valid_toDate}
+                                />
+                            ) : (
+                                ""
+                            )}
+                            {this.props.teacher ? (
+                                <ColumnDirective
+                                    headerText="Teacher"
+                                    allowSorting={false}
+                                    allowFiltering={false}
+                                    template={teacherView}
+                                    width="130"
+                                />
+                            ) : (
+                                ""
+                            )}
+                            {this.props.student ? (
+                                <ColumnDirective
+                                    headerText="Student"
+                                    allowSorting={false}
+                                    allowFiltering={false}
+                                    template={studentView}
+                                    width="130"
+                                />
+                            ) : (
+                                ""
+                            )}
+                            {this.props.details ? (
+                                <ColumnDirective
+                                    headerText="Details"
+                                    allowSorting={false}
+                                    allowFiltering={false}
+                                    template={detailsView}
+                                    width="130"
+                                />
+                            ) : (
+                                ""
+                            )}
+                            {this.props.view ? (
+                                <ColumnDirective
+                                    headerText="Action"
+                                    allowSorting={false}
+                                    allowFiltering={false}
+                                    template={this.viewTemplate}
+                                    width="130"
+                                />
+                            ) : (
+                                ""
+                            )}
                         </ColumnsDirective>
                         <Inject services={[Filter, Sort, Toolbar, Resize]} />
                     </GridComponent>

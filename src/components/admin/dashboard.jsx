@@ -936,7 +936,7 @@ class Dashboard extends Component {
     };
 
     componentDidMount = () => {
-        document.title = "Admin Dashboard | IQLabs";
+        document.title = "Dashboard - Admin | IQLabs";
     };
 
     render() {

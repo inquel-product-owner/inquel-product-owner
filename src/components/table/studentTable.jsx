@@ -93,6 +93,9 @@ class StudentTable extends Component {
             itemTemplate: dateTemplate,
         };
         this.toolbarOptions = ["Search"];
+        this.state = {
+            studentId: [],
+        };
     }
 
     showConsole = () => {
@@ -134,7 +137,7 @@ class StudentTable extends Component {
             }
             console.log(element);
             this.setState({
-                hodId: element,
+                studentId: element,
             });
         }
     }
@@ -148,7 +151,7 @@ class StudentTable extends Component {
             }
             console.log(element);
             this.setState({
-                hodId: element,
+                studentId: element,
             });
         }
     }
@@ -181,7 +184,7 @@ class StudentTable extends Component {
                         allowFiltering={true}
                         allowSorting={true}
                         allowSelection={true}
-                        allowResizing={true}
+                        // allowResizing={true}
                         selectionSettings={this.select}
                         toolbar={this.toolbarOptions}
                         rowSelected={this.rowSelected.bind(this)}
@@ -224,12 +227,26 @@ class StudentTable extends Component {
                                 filter={this.excel}
                                 clipMode="EllipsisWithTooltip"
                             ></ColumnDirective>
-                            <ColumnDirective
-                                field="category"
-                                headerText="Category"
-                                filter={this.excel}
-                                clipMode="EllipsisWithTooltip"
-                            ></ColumnDirective>
+                            {this.props.category ? (
+                                <ColumnDirective
+                                    field="category"
+                                    headerText="Category"
+                                    filter={this.excel}
+                                    clipMode="EllipsisWithTooltip"
+                                ></ColumnDirective>
+                            ) : (
+                                ""
+                            )}
+                            {this.props.group ? (
+                                <ColumnDirective
+                                    field="group_name"
+                                    headerText="Group"
+                                    filter={this.excel}
+                                    clipMode="EllipsisWithTooltip"
+                                ></ColumnDirective>
+                            ) : (
+                                ""
+                            )}
                             <ColumnDirective
                                 field="date_joined"
                                 filter={this.date}

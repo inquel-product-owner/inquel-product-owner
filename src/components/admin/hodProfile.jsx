@@ -219,6 +219,8 @@ class HodProfile extends Component {
                 console.log(result);
                 this.setState({
                     group: result.data.results,
+                    totalGroupCount: result.data.count,
+                    page_loading: false,
                 });
             })
             .catch((err) => {
@@ -227,7 +229,7 @@ class HodProfile extends Component {
     };
 
     componentDidMount = () => {
-        document.title = "Admin Profile | IQLabs";
+        document.title = "HOD Profile - Admin | IQLabs";
 
         this.loadHodData();
         this.loadGroupData();
@@ -250,7 +252,10 @@ class HodProfile extends Component {
     };
 
     componentDidUpdate = (prevProps, prevState) => {
-        if (prevState.is_formSubmited !== this.state.is_formSubmited) {
+        if (
+            prevState.is_formSubmited !== this.state.is_formSubmited &&
+            this.state.is_formSubmited === true
+        ) {
             this.loadHodData();
             this.setState({
                 is_formSubmited: false,
@@ -258,7 +263,10 @@ class HodProfile extends Component {
         }
 
         if (prevState.activeGroupPage !== this.state.activeGroupPage) {
-            this.loadHodData();
+            this.loadGroupData();
+            this.setState({
+                page_loading: true,
+            });
         }
     };
 
@@ -726,7 +734,12 @@ class HodProfile extends Component {
                                     <div className="card-header pb-0">
                                         <h5>Groups</h5>
                                     </div>
-                                    <GroupTable groupItems={this.state.group} />
+                                    <GroupTable
+                                        groupItems={this.state.group}
+                                        path="hod"
+                                        view={false}
+                                        check={false}
+                                    />
                                     <div className="card-body p-3">
                                         <Paginations
                                             activePage={

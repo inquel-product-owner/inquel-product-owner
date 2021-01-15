@@ -21,8 +21,8 @@ class SubjectConfiguration extends Component {
     render() {
         document.title =
             this.state.subjectItem.length !== 0
-                ? this.state.subjectItem.subject_name + " Configure | IQLabs"
-                : "Subject Configure | IQLabs";
+                ? this.state.subjectItem.subject_name + " Configure - HOD | IQLabs"
+                : "Subject Configure - HOD | IQLabs";
         return (
             <div className="wrapper">
                 {/* Navbar */}

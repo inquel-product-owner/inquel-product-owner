@@ -3,14 +3,16 @@ import { Link } from "react-router-dom";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
+import Loading from "../../shared/loadingComponent";
 
 class SubjectReview extends Component {
     constructor(props) {
         super(props);
         this.state = {
             showSideNav: false,
-            subjectItem: [],
+            subjectItems: [],
             chapterData: [],
+            page_loading: true,
         };
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
@@ -38,8 +40,9 @@ class SubjectReview extends Component {
             .then((res) => res.json())
             .then((result) => {
                 this.setState({
-                    subjectItem: result.data,
+                    subjectItems: result.data,
                     chapterData: result.data.chapters,
+                    page_loading: false,
                 });
                 console.log(result);
             })
@@ -50,14 +53,14 @@ class SubjectReview extends Component {
 
     render() {
         document.title =
-            this.state.subjectItem.length !== 0
-                ? this.state.subjectItem.subject_name + " | IQLabs"
-                : "Subject | IQLabs";
+            this.state.subjectItems.length !== 0
+                ? this.state.subjectItems.subject_name + " - HOD | IQLabs"
+                : "Subject - HOD | IQLabs";
         return (
             <div className="wrapper">
                 {/* Navbar */}
                 <Header
-                    name={this.state.subjectItem.subject_name}
+                    name={this.state.subjectItems.subject_name}
                     togglenav={this.toggleSideNav}
                 />
 
@@ -80,11 +83,11 @@ class SubjectReview extends Component {
                         >
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
-                        
+
                         <div className="row align-items-center mb-3">
                             <div className="col-md-6">
                                 <h5 className="primary-text">
-                                    {this.state.subjectItem.subject_name}
+                                    {this.state.subjectItems.subject_name}
                                 </h5>
                             </div>
                             <div className="col-md-6 text-center text-md-right">
@@ -213,6 +216,8 @@ class SubjectReview extends Component {
                                 </table>
                             </div>
                         </div>
+                        {/* Loading component */}
+                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
             </div>
