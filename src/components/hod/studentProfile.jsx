@@ -4,7 +4,7 @@ import profilepic from "../../assets/user.png";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, hodUrl } from "../../shared/baseUrl";
-import ProfileLoader from "../../shared/profileLoader";
+import Loading from "../../shared/loadingComponent";
 
 class StudentProfile extends Component {
     constructor(props) {
@@ -12,7 +12,7 @@ class StudentProfile extends Component {
         this.state = {
             showSideNav: false,
             studentItems: [],
-            isLoaded: false,
+            page_loading: true,
         };
     }
 
@@ -23,7 +23,7 @@ class StudentProfile extends Component {
     };
 
     componentDidMount = () => {
-        document.title = "HOD Student Profile | IQLabs";
+        document.title = "Student Profile - HOD | IQLabs";
 
         const studentId = this.props.match.params.studentId;
         var url = baseUrl + hodUrl;
@@ -42,7 +42,7 @@ class StudentProfile extends Component {
             .then((result) => {
                 this.setState({
                     studentItems: result.data,
-                    isLoaded: true,
+                    page_loading: false,
                 });
                 console.log(result);
             })
@@ -55,7 +55,7 @@ class StudentProfile extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="User Profiles" togglenav={this.toggleSideNav} />
+                <Header name="Student Profile" togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
                 <SideNav
@@ -76,125 +76,104 @@ class StudentProfile extends Component {
                         >
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
-                        
+
                         {/* Student details */}
-                        {this.state.isLoaded ? (
-                            <>
-                                <div className="row align-items-center mb-4">
-                                    <div className="col-md-6">
-                                        <div className="row align-items-center">
-                                            <div className="col-md-2 col-3">
-                                                <img
-                                                    src={
-                                                        this.state.studentItems
-                                                            .profile_link !==
-                                                        null
-                                                            ? this.state
-                                                                  .studentItems
-                                                                  .profile_link
-                                                            : profilepic
-                                                    }
-                                                    alt={
-                                                        this.state.studentItems
-                                                            .full_name
-                                                    }
-                                                    className="img-fluid profile-pic"
-                                                />
-                                            </div>
-                                            <div className="col-md-10 col-9 pl-0">
-                                                <h5 className="primary-text">
-                                                    {
-                                                        this.state.studentItems
-                                                            .full_name
-                                                    }
-                                                </h5>
-                                            </div>
-                                        </div>
+                        <div className="row align-items-center mb-4">
+                            <div className="col-md-6">
+                                <div className="row align-items-center">
+                                    <div className="col-md-2 col-3">
+                                        <img
+                                            src={
+                                                this.state.studentItems
+                                                    .profile_link !== null
+                                                    ? this.state.studentItems
+                                                          .profile_link
+                                                    : profilepic
+                                            }
+                                            alt={
+                                                this.state.studentItems
+                                                    .full_name
+                                            }
+                                            className="img-fluid profile-pic"
+                                        />
+                                    </div>
+                                    <div className="col-md-10 col-9 pl-0">
+                                        <h5 className="primary-text">
+                                            {this.state.studentItems.full_name}
+                                        </h5>
                                     </div>
                                 </div>
-                                <div className="row mb-4">
-                                    <div className="col-md-2 col-sm-4 col-6 mb-3">
-                                        <p className="mb-1 font-weight-bold">
-                                            First Name
-                                        </p>
-                                        <p className="mb-0">
-                                            {this.state.studentItems.first_name}
-                                        </p>
-                                    </div>
-                                    <div className="col-md-2 col-sm-4 col-6 mb-3">
-                                        <p className="mb-1 font-weight-bold">
-                                            Last Name
-                                        </p>
-                                        <p className="mb-0">
-                                            {this.state.studentItems.last_name}
-                                        </p>
-                                    </div>
-                                    <div className="col-md-2 col-sm-4 col-6 mb-3">
-                                        <p className="mb-1 font-weight-bold">
-                                            Email ID
-                                        </p>
-                                        <p className="mb-0">
-                                            {this.state.studentItems.email}
-                                        </p>
-                                    </div>
-                                    <div className="col-md-2 col-sm-4 col-6 mb-3">
-                                        <p className="mb-1 font-weight-bold">
-                                            Mobile
-                                        </p>
-                                        <p className="mb-0">
-                                            {this.state.studentItems.phone_num}
-                                        </p>
-                                    </div>
-                                    <div className="col-md-2 col-sm-4 col-6 mb-3">
-                                        <p className="mb-1 font-weight-bold">
-                                            Institution
-                                        </p>
-                                        <p className="mb-0">XYZ</p>
-                                    </div>
-                                    <div className="col-md-2 col-sm-4 col-6">
-                                        <p className="mb-1 font-weight-bold">
-                                            Standard
-                                        </p>
-                                        <p className="mb-0">XYZ</p>
-                                    </div>
-                                    <div className="col-md-2 col-sm-4 col-6 mb-3">
-                                        <p className="mb-1 font-weight-bold">
-                                            Referral
-                                        </p>
-                                        <p className="mb-0">XYZ</p>
-                                    </div>
-                                    <div className="col-md-2 col-sm-4 col-6 mb-3">
-                                        <p className="mb-1 font-weight-bold">
-                                            Address
-                                        </p>
-                                        <p className="mb-1 font-weight-bold">
-                                            City
-                                        </p>
-                                        <p className="mb-0">Bangalore</p>
-                                    </div>
-                                    <div className="col-md-2 col-sm-4 col-6 mb-3">
-                                        <p className="mb-1 font-weight-bold">
-                                            District
-                                        </p>
-                                        <p className="mb-0">Bangalore</p>
-                                    </div>
-                                    <div className="col-md-2 col-sm-4 col-6 mb-3">
-                                        <p className="mb-1 font-weight-bold">
-                                            State
-                                        </p>
-                                        <p className="mb-0">Karnataka</p>
-                                    </div>
-                                    <div className="col-md-2 col-sm-4 col-6">
-                                        <p className="mb-1 font-weight-bold">
-                                            Country
-                                        </p>
-                                        <p className="mb-0">India</p>
-                                    </div>
-                                </div>
-                            </>
-                        ) : (
-                            <ProfileLoader />
-                        )}
+                            </div>
+                        </div>
+                        <div className="row mb-4">
+                            <div className="col-md-2 col-sm-4 col-6 mb-3">
+                                <p className="mb-1 font-weight-bold">
+                                    First Name
+                                </p>
+                                <p className="mb-0">
+                                    {this.state.studentItems.first_name}
+                                </p>
+                            </div>
+                            <div className="col-md-2 col-sm-4 col-6 mb-3">
+                                <p className="mb-1 font-weight-bold">
+                                    Last Name
+                                </p>
+                                <p className="mb-0">
+                                    {this.state.studentItems.last_name}
+                                </p>
+                            </div>
+                            <div className="col-md-2 col-sm-4 col-6 mb-3">
+                                <p className="mb-1 font-weight-bold">
+                                    Email ID
+                                </p>
+                                <p className="mb-0">
+                                    {this.state.studentItems.email}
+                                </p>
+                            </div>
+                            <div className="col-md-2 col-sm-4 col-6 mb-3">
+                                <p className="mb-1 font-weight-bold">Mobile</p>
+                                <p className="mb-0">
+                                    {this.state.studentItems.phone_num}
+                                </p>
+                            </div>
+                            <div className="col-md-2 col-sm-4 col-6 mb-3">
+                                <p className="mb-1 font-weight-bold">
+                                    Institution
+                                </p>
+                                <p className="mb-0">XYZ</p>
+                            </div>
+                            <div className="col-md-2 col-sm-4 col-6">
+                                <p className="mb-1 font-weight-bold">
+                                    Standard
+                                </p>
+                                <p className="mb-0">XYZ</p>
+                            </div>
+                            <div className="col-md-2 col-sm-4 col-6 mb-3">
+                                <p className="mb-1 font-weight-bold">
+                                    Referral
+                                </p>
+                                <p className="mb-0">XYZ</p>
+                            </div>
+                            <div className="col-md-2 col-sm-4 col-6 mb-3">
+                                <p className="mb-1 font-weight-bold">Address</p>
+                                <p className="mb-1 font-weight-bold">City</p>
+                                <p className="mb-0">Bangalore</p>
+                            </div>
+                            <div className="col-md-2 col-sm-4 col-6 mb-3">
+                                <p className="mb-1 font-weight-bold">
+                                    District
+                                </p>
+                                <p className="mb-0">Bangalore</p>
+                            </div>
+                            <div className="col-md-2 col-sm-4 col-6 mb-3">
+                                <p className="mb-1 font-weight-bold">State</p>
+                                <p className="mb-0">Karnataka</p>
+                            </div>
+                            <div className="col-md-2 col-sm-4 col-6">
+                                <p className="mb-1 font-weight-bold">Country</p>
+                                <p className="mb-0">India</p>
+                            </div>
+                        </div>
 
                         {/* Course list */}
                         <div className="card shadow-sm">
@@ -281,6 +260,8 @@ class StudentProfile extends Component {
                                 </table>
                             </div>
                         </div>
+                        {/* Loading component */}
+                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
             </div>

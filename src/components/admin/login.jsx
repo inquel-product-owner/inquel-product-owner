@@ -3,7 +3,6 @@ import { Navbar, Spinner, Alert } from "react-bootstrap";
 import logo from "../../assets/IQ_Labs_V5.png";
 import { Link, Redirect } from "react-router-dom";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl.js";
-import Header from './navbar';
 
 class Login extends Component {
     constructor(props) {
@@ -70,10 +69,7 @@ class Login extends Component {
                         "Inquel-Auth",
                         `Token ${result.token}`
                     );
-                    localStorage.setItem(
-                        "Username",
-                        result.username
-                    );
+                    localStorage.setItem("Username", result.username);
                     this.setState({
                         showLoader: false,
                     });
@@ -93,7 +89,7 @@ class Login extends Component {
     };
 
     componentDidMount = () => {
-        document.title = "Admin Login | IQLabs";
+        document.title = "Login - Admin | IQLabs";
     };
 
     render() {
@@ -104,7 +100,7 @@ class Login extends Component {
             <>
                 <Navbar className="secondary-bg py-2 px-4">
                     <Navbar.Brand>
-                        <Link to="/admin">
+                        <Link to="/">
                             <img src={logo} alt="Logo" />
                         </Link>
                     </Navbar.Brand>

@@ -32,7 +32,7 @@ class HodTeacherList extends Component {
     };
 
     componentDidMount = () => {
-        document.title = "Admin Profile | IQLabs";
+        document.title = "Teacher Profile - Admin | IQLabs";
 
         const hodId = this.props.match.params.hodId;
         var url = baseUrl + adminPathUrl;

@@ -128,8 +128,8 @@ class SubjectAssigning extends Component {
     render() {
         document.title =
             this.state.subjectItem.length !== 0
-                ? this.state.subjectItem.subject_name + " Assign | IQLabs"
-                : "Subject Assign | IQLabs";
+                ? this.state.subjectItem.subject_name + " Assign - HOD | IQLabs"
+                : "Subject Assign - HOD | IQLabs";
         return (
             <div className="wrapper">
                 {/* Navbar */}

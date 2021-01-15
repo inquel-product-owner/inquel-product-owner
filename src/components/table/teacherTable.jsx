@@ -66,17 +66,7 @@ function dateTemplate(props) {
     return datearray[1] + "/" + datearray[0] + "/" + datearray[2];
 }
 
-function viewTemplate(props) {
-    return (
-        <Link to={`/admin/hod/${props.id}`}>
-            <button className="btn btn-link btn-sm">
-                <i className="fas fa-eye"></i>
-            </button>
-        </Link>
-    );
-}
-
-class HODTable extends Component {
+class TeacherTable extends Component {
     constructor() {
         super(...arguments);
         this.fields = { text: "text", value: "value" };
@@ -103,7 +93,9 @@ class HODTable extends Component {
             itemTemplate: dateTemplate,
         };
         this.toolbarOptions = ["Search"];
-        this.state = { hodId: [] };
+        this.state = {
+            teacherId: [],
+        };
     }
 
     showConsole = () => {
@@ -145,7 +137,7 @@ class HODTable extends Component {
             }
             console.log(element);
             this.setState({
-                hodId: element,
+                teacherId: element,
             });
         }
     }
@@ -159,10 +151,20 @@ class HODTable extends Component {
             }
             console.log(element);
             this.setState({
-                hodId: element,
+                teacherId: element,
             });
         }
     }
+
+    viewTemplate = (props) => {
+        return (
+            <Link to={`/${this.props.path}/teacher/${props.id}`}>
+                <button className="btn btn-link btn-sm">
+                    <i className="fas fa-eye"></i>
+                </button>
+            </Link>
+        );
+    };
 
     render() {
         return (
@@ -170,7 +172,7 @@ class HODTable extends Component {
                 <div className="control-section">
                     <GridComponent
                         id="overviewgrid"
-                        dataSource={this.props.hodItems}
+                        dataSource={this.props.teacherItems}
                         enableHover={true}
                         rowHeight={50}
                         ref={(g) => {
@@ -182,7 +184,7 @@ class HODTable extends Component {
                         allowFiltering={true}
                         allowSorting={true}
                         allowSelection={true}
-                        allowResizing={true}
+                        // allowResizing={true}
                         selectionSettings={this.select}
                         toolbar={this.toolbarOptions}
                         rowSelected={this.rowSelected.bind(this)}
@@ -197,7 +199,7 @@ class HODTable extends Component {
                             <ColumnDirective
                                 field="id"
                                 visible={false}
-                                headerText="HOD ID"
+                                headerText="Teacher ID"
                                 isPrimaryKey={true}
                             ></ColumnDirective>
                             <ColumnDirective
@@ -214,29 +216,11 @@ class HODTable extends Component {
                                 filter={this.excel}
                             />
                             <ColumnDirective
-                                field="category"
-                                headerText="Category"
+                                field="email"
+                                headerText="Email"
                                 filter={this.excel}
                                 clipMode="EllipsisWithTooltip"
                             />
-                            <ColumnDirective
-                                field="sub_category"
-                                headerText="Sub category"
-                                filter={this.excel}
-                                clipMode="EllipsisWithTooltip"
-                            ></ColumnDirective>
-                            <ColumnDirective
-                                field="discipline"
-                                headerText="Discipline"
-                                filter={this.excel}
-                                clipMode="EllipsisWithTooltip"
-                            ></ColumnDirective>
-                            <ColumnDirective
-                                field="board"
-                                headerText="Board University"
-                                filter={this.excel}
-                                clipMode="EllipsisWithTooltip"
-                            ></ColumnDirective>
                             <ColumnDirective
                                 field="date_joined"
                                 filter={this.date}
@@ -255,14 +239,11 @@ class HODTable extends Component {
                                 headerText="Action"
                                 allowSorting={false}
                                 allowFiltering={false}
-                                template={viewTemplate}
-                                clipMode="EllipsisWithTooltip"
+                                template={this.viewTemplate}
                                 width="130"
                             />
                         </ColumnsDirective>
-                        <Inject
-                            services={[Filter, Sort, Toolbar, Resize]}
-                        />
+                        <Inject services={[Filter, Sort, Toolbar, Resize]} />
                     </GridComponent>
                 </div>
                 <style>@import 'src/grid/Grid/style.css';</style>
@@ -271,4 +252,4 @@ class HODTable extends Component {
     }
 }
 
-export default HODTable;
+export default TeacherTable;

@@ -119,7 +119,7 @@ function ForgotPasswordModal(props) {
     );
 }
 
-class HODLogin extends Component {
+class TeacherLogin extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -191,7 +191,7 @@ class HODLogin extends Component {
                         "Authorization",
                         `Token ${result.token}`
                     );
-                    localStorage.setItem("is_hod", result.is_hod);
+                    localStorage.setItem("is_teacher", result.is_teacher);
                     localStorage.setItem("Username", result.username);
                     this.setState({
                         showLoader: false,
@@ -212,15 +212,15 @@ class HODLogin extends Component {
     };
 
     componentDidMount = () => {
-        document.title = "Login - HOD | IQLabs";
+        document.title = "Teacher Login | IQLabs";
     };
 
     render() {
         if (
             localStorage.getItem("Authorization") &&
-            localStorage.getItem("is_hod")
+            localStorage.getItem("is_teacher")
         ) {
-            return <Redirect to="/hod" />;
+            return <Redirect to="/teacher" />;
         }
         return (
             <>
@@ -409,4 +409,4 @@ class HODLogin extends Component {
     }
 }
 
-export default HODLogin;
+export default TeacherLogin;

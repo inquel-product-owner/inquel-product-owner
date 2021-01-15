@@ -23,7 +23,7 @@ class StudentProfile extends Component {
     };
 
     componentDidMount = () => {
-        document.title = "Admin Profile | IQLabs";
+        document.title = "Student Profile - Admin | IQLabs";
 
         const studentId = this.props.match.params.studentId;
         var url = baseUrl + adminPathUrl;

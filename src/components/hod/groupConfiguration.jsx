@@ -1,9 +1,11 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
 import { Modal, Alert, Spinner } from "react-bootstrap";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
+import Loading from "../../shared/loadingComponent";
+import GroupTable from "../table/groupTable";
+import Paginations from "../../shared/pagination";
 
 class GroupModal extends Component {
     constructor() {
@@ -77,6 +79,7 @@ class GroupModal extends Component {
                         showSuccessAlert: true,
                         showLoader: false,
                     });
+                    this.props.formSubmission(true);
                 } else {
                     this.setState({
                         errorMsg: result.msg,
@@ -93,7 +96,8 @@ class GroupModal extends Component {
     render() {
         return (
             <Modal
-                {...this.props}
+                show={this.props.show}
+                onHide={this.props.onHide}
                 size="md"
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
@@ -186,6 +190,17 @@ class GroupConfiguration extends Component {
             showSideNav: false,
             groupModalShow: false,
             groupItem: [],
+            activeGroupPage: 1,
+            totalGroupCount: 0,
+            page_loading: true,
+            is_formSubmited: false,
+        };
+        this.url = baseUrl + hodUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
         };
     }
 
@@ -201,25 +216,17 @@ class GroupConfiguration extends Component {
         });
     };
 
-    componentDidMount = () => {
-        document.title = "HOD Group Configurations | IQLabs";
-
-        var url = baseUrl + hodUrl;
-        var authToken = localStorage.getItem("Authorization");
-        var headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: authToken,
-        };
-
-        fetch(`${url}/hod/groups/`, {
-            headers: headers,
+    loadGroupData = () => {
+        fetch(`${this.url}/hod/groups/?page=${this.state.activeGroupPage}`, {
+            headers: this.headers,
             method: "GET",
         })
             .then((res) => res.json())
             .then((result) => {
                 this.setState({
                     groupItem: result.data.results,
+                    totalGroupCount: result.data.count,
+                    page_loading: false,
                 });
                 console.log(result);
             })
@@ -228,11 +235,42 @@ class GroupConfiguration extends Component {
             });
     };
 
-    dateConversion = (date) => {
-        var newDate = new Date(date).toLocaleDateString();
-        var datearray = newDate.split("/");
-        return datearray[1] + "/" + datearray[0] + "/" + datearray[2];
+    componentDidMount = () => {
+        document.title = "Group Configurations - HOD | IQLabs";
+
+        this.loadGroupData();
     };
+
+    componentDidUpdate = (prevProps, prevState) => {
+        if (
+            prevState.is_formSubmited !== this.state.is_formSubmited &&
+            this.state.is_formSubmited === true
+        ) {
+            this.loadGroupData();
+            this.setState({
+                is_formSubmited: false,
+            });
+        }
+
+        if (prevState.activeGroupPage !== this.state.activeGroupPage) {
+            this.loadGroupData();
+            this.setState({
+                page_loading: true,
+            });
+        }
+    };
+
+    formSubmission = (is_formSubmited) => {
+        if (is_formSubmited) {
+            this.setState({
+                is_formSubmited: true,
+            });
+        }
+    };
+
+    handleGroupPageChange(pageNumber) {
+        this.setState({ activeGroupPage: pageNumber });
+    }
 
     render() {
         return (
@@ -250,6 +288,7 @@ class GroupConfiguration extends Component {
                 <GroupModal
                     show={this.state.groupModalShow}
                     onHide={this.addGroupModal}
+                    formSubmission={this.formSubmission}
                 />
 
                 <div
@@ -265,173 +304,43 @@ class GroupConfiguration extends Component {
                         >
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
-                        
-                        <h5 className="primary-text mb-3">Configuration</h5>
-                        <div className="card shadow-sm">
-                            <div className="table-responsive">
-                                <table className="table table-xl">
-                                    <thead className="text-white primary-bg">
-                                        <tr>
-                                            <th scope="col">Sl.No</th>
-                                            <th scope="col">Group Name</th>
-                                            <th scope="col">Description</th>
-                                            <th scope="col">Valid From</th>
-                                            <th scope="col">Valid To</th>
-                                            <th scope="col">Teachers</th>
-                                            <th scope="col">Students</th>
-                                            <th
-                                                scope="col"
-                                                className="text-center"
-                                            >
-                                                Details
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {this.state.groupItem.length !== 0 ? (
-                                            this.state.groupItem.map(
-                                                (list, index) => {
-                                                    return (
-                                                        <tr key={index}>
-                                                            <td>{index + 1}</td>
-                                                            <td>
-                                                                {
-                                                                    list.group_name
-                                                                }
-                                                            </td>
-                                                            <td>
-                                                                {
-                                                                    list.group_description
-                                                                }
-                                                            </td>
-                                                            <td>
-                                                                {this.dateConversion(
-                                                                    list.valid_from
-                                                                )}
-                                                            </td>
-                                                            <td>
-                                                                {this.dateConversion(
-                                                                    list.valid_to
-                                                                )}
-                                                            </td>
-                                                            <td>
-                                                                {
-                                                                    list
-                                                                        .teachers
-                                                                        .length
-                                                                }{" "}
-                                                                <Link
-                                                                    to={`/hod/group/${list.id}/teacher`}
-                                                                >
-                                                                    <button className="btn btn-light btn-sm ml-1">
-                                                                        <i className="fas fa-eye fa-sm"></i>
-                                                                    </button>
-                                                                </Link>
-                                                            </td>
-                                                            <td>
-                                                                {
-                                                                    list
-                                                                        .students
-                                                                        .length
-                                                                }{" "}
-                                                                <Link
-                                                                    to={`/hod/group/${list.id}/student`}
-                                                                >
-                                                                    <button className="btn btn-light btn-sm ml-1">
-                                                                        <i className="fas fa-eye fa-sm"></i>
-                                                                    </button>
-                                                                </Link>
-                                                            </td>
-                                                            <td className="text-center">
-                                                                <Link
-                                                                    to={`/hod/group/${list.id}/details`}
-                                                                >
-                                                                    <button className="btn btn-sm btn-light shadow-sm">
-                                                                        <i className="fas fa-eye"></i>
-                                                                    </button>
-                                                                </Link>
-                                                            </td>
-                                                        </tr>
-                                                    );
-                                                }
-                                            )
-                                        ) : (
-                                            <tr>
-                                                <td>Data not available</td>
-                                            </tr>
-                                        )}
-                                        {/* <tr>
-                                            <td>2</td>
-                                            <td>B</td>
-                                            <td>Group B</td>
-                                            <td>dd/mm/yyyy</td>
-                                            <td>dd/mm/yyyy</td>
-                                            <td>
-                                                12{" "}
-                                                <Link to="/hod/group/002/teacher">
-                                                    <button className="btn btn-light btn-sm ml-1">
-                                                        <i className="fas fa-eye fa-sm"></i>
-                                                    </button>
-                                                </Link>
-                                            </td>
-                                            <td>
-                                                56{" "}
-                                                <Link to="/hod/group/002/student">
-                                                    <button className="btn btn-light btn-sm ml-1">
-                                                        <i className="fas fa-eye fa-sm"></i>
-                                                    </button>
-                                                </Link>
-                                            </td>
-                                            <td className="text-center">
-                                                <Link to="/hod/group/002/details">
-                                                    <button className="btn btn-sm btn-light shadow-sm">
-                                                        <i className="fas fa-eye"></i>
-                                                    </button>
-                                                </Link>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>3</td>
-                                            <td>C</td>
-                                            <td>Group C</td>
-                                            <td>dd/mm/yyyy</td>
-                                            <td>dd/mm/yyyy</td>
-                                            <td>
-                                                12{" "}
-                                                <Link to="/hod/group/003/teacher">
-                                                    <button className="btn btn-light btn-sm ml-1">
-                                                        <i className="fas fa-eye fa-sm"></i>
-                                                    </button>
-                                                </Link>
-                                            </td>
-                                            <td>
-                                                56{" "}
-                                                <Link to="/hod/group/003/student">
-                                                    <button className="btn btn-light btn-sm ml-1">
-                                                        <i className="fas fa-eye fa-sm"></i>
-                                                    </button>
-                                                </Link>
-                                            </td>
-                                            <td className="text-center">
-                                                <Link to="/hod/group/003/details">
-                                                    <button className="btn btn-sm btn-light shadow-sm">
-                                                        <i className="fas fa-eye"></i>
-                                                    </button>
-                                                </Link>
-                                            </td>
-                                        </tr> */}
-                                    </tbody>
-                                </table>
+
+                        <div className="row align-items-center mb-3 mt-2">
+                            <div className="col-6">
+                                <h5 className="primary-text">Configuration</h5>
                             </div>
-                            <div className="card-body">
+                            <div className="col-6 text-right">
                                 <button
-                                    className="btn btn-light btn-sm btn-block shadow-sm"
+                                    className="btn btn-primary btn-sm"
                                     onClick={this.addGroupModal}
                                 >
-                                    Add
+                                    Add new
                                 </button>
                             </div>
                         </div>
+
+                        <div className="card shadow-sm">
+                            <GroupTable
+                                groupItems={this.state.groupItem}
+                                path="hod"
+                                valid_from={true}
+                                valid_to={true}
+                                teacher={true}
+                                student={true}
+                                details={true}
+                            />
+                            <div className="card-body p-3">
+                                <Paginations
+                                    activePage={this.state.activeGroupPage}
+                                    totalItemsCount={this.state.totalGroupCount}
+                                    onChange={this.handleGroupPageChange.bind(
+                                        this
+                                    )}
+                                />
+                            </div>
+                        </div>
+                        {/* Loading component */}
+                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
             </div>

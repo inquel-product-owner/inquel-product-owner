@@ -18,7 +18,7 @@ class CourseView extends Component {
     };
 
     componentDidMount = () => {
-        document.title = "Admin Course | IQLabs";
+        document.title = "Course - Admin | IQLabs";
     };
 
     render() {

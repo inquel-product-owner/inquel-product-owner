@@ -18,7 +18,7 @@ class DiscountConfiguration extends Component {
     };
 
     componentDidMount = () => {
-        document.title = "Admin Discount Configuration | IQLabs";
+        document.title = "Discount Configuration - Admin | IQLabs";
     };
 
     render() {

@@ -5,6 +5,10 @@ import Header from "./navbar";
 import SideNav from "./sidenav";
 import courseimg from "../../assets/code.jpg";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
+import Loading from "../../shared/loadingComponent";
+import GroupTable from "../table/groupTable";
+import SubjectTable from "../table/subjectTable";
+import Paginations from "../../shared/pagination";
 
 class SubjectModal extends Component {
     constructor() {
@@ -49,6 +53,7 @@ class SubjectModal extends Component {
                         showSuccessAlert: true,
                         showLoader: false,
                     });
+                    this.props.formSubmission(true);
                 } else {
                     this.setState({
                         errorMsg: result.msg,
@@ -71,7 +76,8 @@ class SubjectModal extends Component {
     render() {
         return (
             <Modal
-                {...this.props}
+                show={this.props.show}
+                onHide={this.props.onHide}
                 size="md"
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
@@ -102,7 +108,7 @@ class SubjectModal extends Component {
                     >
                         {this.state.successMsg}
                     </Alert>
-                    <form onSubmit={this.handleSubmit}>
+                    <form onSubmit={this.handleSubmit} autoComplete="off">
                         <div className="form-group">
                             <label htmlFor="subject">Subject name</label>
                             <input
@@ -144,8 +150,21 @@ class Dashboard extends Component {
         this.state = {
             showSideNav: false,
             subjectModalShow: false,
-            groupItem: [],
-            subjectItem: [],
+            groupItems: [],
+            subjectItems: [],
+            activeGroupPage: 1,
+            totalGroupCount: 0,
+            activeSubjectPage: 1,
+            totalSubjectCount: 0,
+            page_loading: true,
+            is_formSubmited: false,
+        };
+        this.url = baseUrl + hodUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
         };
     }
 
@@ -161,31 +180,17 @@ class Dashboard extends Component {
         });
     };
 
-    componentDidMount = () => {
-        document.title = "HOD Dashboard | IQLabs";
-
-        var url = baseUrl + hodUrl;
-        var authToken = localStorage.getItem("Authorization");
-        var headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: authToken,
-        };
-
-        Promise.all([
-            fetch(`${url}/hod/groups/`, {
-                headers: headers,
-                method: "GET",
-            }).then((res) => res.json()),
-            fetch(`${url}/hod/subjects/`, {
-                headers: headers,
-                method: "GET",
-            }).then((res) => res.json()),
-        ])
+    loadGroupData = () => {
+        fetch(`${this.url}/hod/groups/?page=${this.state.activeGroupPage}`, {
+            headers: this.headers,
+            method: "GET",
+        })
+            .then((res) => res.json())
             .then((result) => {
                 this.setState({
-                    groupItem: result[0].data.results,
-                    subjectItem: result[1].data.results,
+                    groupItems: result.data.results,
+                    totalGroupCount: result.data.count,
+                    page_loading: false,
                 });
                 console.log(result);
             })
@@ -193,6 +198,77 @@ class Dashboard extends Component {
                 console.log(err);
             });
     };
+
+    loadSubjectData = () => {
+        fetch(
+            `${this.url}/hod/subjects/?page=${this.state.activeSubjectPage}`,
+            {
+                headers: this.headers,
+                method: "GET",
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                this.setState({
+                    subjectItems: result.data.results,
+                    totalSubjectCount: result.data.count,
+                    page_loading: false,
+                });
+                console.log(result);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    componentDidMount = () => {
+        document.title = "Dashboard - HOD | IQLabs";
+
+        this.loadGroupData();
+        this.loadSubjectData();
+    };
+
+    componentDidUpdate = (prevProps, prevState) => {
+        if (
+            prevState.is_formSubmited !== this.state.is_formSubmited &&
+            this.state.is_formSubmited === true
+        ) {
+            this.loadSubjectData();
+            this.setState({
+                is_formSubmited: false,
+            });
+        }
+
+        if (prevState.activeGroupPage !== this.state.activeGroupPage) {
+            this.loadGroupData();
+            this.setState({
+                page_loading: true,
+            });
+        }
+
+        if (prevState.activeSubjectPage !== this.state.activeSubjectPage) {
+            this.loadSubjectData();
+            this.setState({
+                page_loading: true,
+            });
+        }
+    };
+
+    formSubmission = (is_formSubmited) => {
+        if (is_formSubmited) {
+            this.setState({
+                is_formSubmited: true,
+            });
+        }
+    };
+
+    handleGroupPageChange(pageNumber) {
+        this.setState({ activeGroupPage: pageNumber });
+    }
+
+    handleSubjectPageChange(pageNumber) {
+        this.setState({ activeSubjectPage: pageNumber });
+    }
 
     render() {
         return (
@@ -210,6 +286,7 @@ class Dashboard extends Component {
                 <SubjectModal
                     show={this.state.subjectModalShow}
                     onHide={this.addSubjectModal}
+                    formSubmission={this.formSubmission}
                 />
 
                 <div
@@ -246,61 +323,20 @@ class Dashboard extends Component {
                                     </div>
                                 </div>
                             </div>
-                            <div className="card-body">
-                                <div className="row justify-content-center">
-                                    <div className="col-md-11">
-                                        <div className="row">
-                                            {this.state.groupItem.length !==
-                                            0 ? (
-                                                this.state.groupItem.map(
-                                                    (list, index) => {
-                                                        return (
-                                                            <div
-                                                                className="col-md-4 mb-3"
-                                                                key={index}
-                                                            >
-                                                                <Link
-                                                                    to={`/hod/group/${list.id}`}
-                                                                    style={{
-                                                                        textDecoration:
-                                                                            "none",
-                                                                    }}
-                                                                >
-                                                                    <div
-                                                                        className="card"
-                                                                        style={{
-                                                                            cursor:
-                                                                                "pointer",
-                                                                        }}
-                                                                    >
-                                                                        <img
-                                                                            src={
-                                                                                courseimg
-                                                                            }
-                                                                            className="card-img-top"
-                                                                            alt={
-                                                                                list.group_name
-                                                                            }
-                                                                        />
-                                                                        <div className="card-body primary-bg text-white text-center p-2">
-                                                                            {
-                                                                                list.group_name
-                                                                            }
-                                                                        </div>
-                                                                    </div>
-                                                                </Link>
-                                                            </div>
-                                                        );
-                                                    }
-                                                )
-                                            ) : (
-                                                <div className="col-md-6">
-                                                    Data not available
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
+                            <GroupTable
+                                groupItems={this.state.groupItems}
+                                path="hod"
+                                view={true}
+                                check={true}
+                            />
+                            <div className="card-body p-3">
+                                <Paginations
+                                    activePage={this.state.activeGroupPage}
+                                    totalItemsCount={this.state.totalGroupCount}
+                                    onChange={this.handleGroupPageChange.bind(
+                                        this
+                                    )}
+                                />
                             </div>
                         </div>
 
@@ -330,61 +366,20 @@ class Dashboard extends Component {
                                     </div>
                                 </div>
                             </div>
-                            <div className="card-body">
-                                <div className="row justify-content-center">
-                                    <div className="col-md-11">
-                                        <div className="row">
-                                            {this.state.subjectItem.length !==
-                                            0 ? (
-                                                this.state.subjectItem.map(
-                                                    (list, index) => {
-                                                        return (
-                                                            <div
-                                                                className="col-md-4 mb-3"
-                                                                key={index}
-                                                            >
-                                                                <Link
-                                                                    to={`/hod/subject/${list.id}/review`}
-                                                                    style={{
-                                                                        textDecoration:
-                                                                            "none",
-                                                                    }}
-                                                                >
-                                                                    <div
-                                                                        className="card"
-                                                                        style={{
-                                                                            cursor:
-                                                                                "pointer",
-                                                                        }}
-                                                                    >
-                                                                        <img
-                                                                            src={
-                                                                                courseimg
-                                                                            }
-                                                                            className="card-img-top"
-                                                                            alt={
-                                                                                list.subject_name
-                                                                            }
-                                                                        />
-                                                                        <div className="card-body primary-bg text-white text-center p-2">
-                                                                            {
-                                                                                list.subject_name
-                                                                            }
-                                                                        </div>
-                                                                    </div>
-                                                                </Link>
-                                                            </div>
-                                                        );
-                                                    }
-                                                )
-                                            ) : (
-                                                <div className="col-md-6">
-                                                    Data not available
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
+                            <SubjectTable
+                                subjectItems={this.state.subjectItems}
+                                path="hod"
+                            />
+                            <div className="card-body p-3">
+                                <Paginations
+                                    activePage={this.state.activeSubjectPage}
+                                    totalItemsCount={
+                                        this.state.totalSubjectCount
+                                    }
+                                    onChange={this.handleSubjectPageChange.bind(
+                                        this
+                                    )}
+                                />
                             </div>
                         </div>
 
@@ -492,6 +487,8 @@ class Dashboard extends Component {
                                 </div>
                             </div>
                         </div>
+                        {/* Loading component */}
+                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
             </div>
