@@ -3,7 +3,7 @@ import { Navbar, Nav, Dropdown } from "react-bootstrap";
 import { Link, Redirect } from "react-router-dom";
 import logo from "../../assets/IQ_Labs_V5.png";
 import userpic from "../../assets/user.png";
-import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
+import { baseUrl, accountsUrl } from "../../shared/baseUrl";
 
 class Header extends Component {
     constructor(props) {
@@ -12,12 +12,12 @@ class Header extends Component {
     }
 
     handleLogout = () => {
-        var url = baseUrl + adminPathUrl;
-        var authToken = localStorage.getItem("Inquel-Auth");
+        var url = baseUrl + accountsUrl;
+        var authToken = localStorage.getItem("Authorization");
         var headers = {
             Accept: "application/json",
             "Content-Type": "application/json",
-            "Inquel-Auth": authToken,
+            Authorization: authToken,
         };
 
         fetch(`${url}/logout/`, {
@@ -39,7 +39,7 @@ class Header extends Component {
 
     render() {
         if (this.state.isLoggedOut) {
-            return <Redirect to="/admin/login" />;
+            return <Redirect to="/teacher/login" />;
         }
         return (
             <Navbar
@@ -60,7 +60,9 @@ class Header extends Component {
                     </Link>
                 </Navbar.Brand>
                 <div className="mx-auto">
-                    <h5 className="mb-0">{this.props.name}</h5>
+                    <h5 className="mb-0 primary-text font-weight-bold">
+                        {this.props.name}
+                    </h5>
                 </div>
                 <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                 <Navbar.Collapse

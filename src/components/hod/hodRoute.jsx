@@ -144,7 +144,7 @@ const hodRoutes = (
         />
         <Route
             exact
-            path="/hod/subject/:subjectId/review"
+            path="/hod/subject/:subjectId"
             render={(props) =>
                 !localStorage.getItem("Authorization") &&
                 !localStorage.getItem("is_hod") ? (

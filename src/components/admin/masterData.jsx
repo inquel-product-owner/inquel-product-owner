@@ -48,7 +48,7 @@ class MasterData extends Component {
     };
 
     componentDidMount = () => {
-        document.title = "Admin Master Data | IQLabs";
+        document.title = "Master Data - Admin | IQLabs";
 
         fetch(`${this.url}/data/filter/`, {
             headers: this.headers,

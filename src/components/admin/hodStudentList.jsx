@@ -18,6 +18,14 @@ class HodStudentList extends Component {
             activeStudentPage: 1,
             totalStudentCount: 0,
         };
+        this.hodId = this.props.match.params.hodId;
+        this.url = baseUrl + adminPathUrl;
+        this.authToken = localStorage.getItem("Inquel-Auth");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Inquel-Auth": this.authToken,
+        };
     }
 
     toggleSideNav = () => {
@@ -26,32 +34,19 @@ class HodStudentList extends Component {
         });
     };
 
-    componentDidMount = () => {
-        document.title = "Admin Profile | IQLabs";
-
-        const hodId = this.props.match.params.hodId;
-        var url = baseUrl + adminPathUrl;
-        var authToken = localStorage.getItem("Inquel-Auth");
-        var headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            "Inquel-Auth": authToken,
-        };
-
-        Promise.all([
-            fetch(`${url}/hod/${hodId}/`, {
-                headers: headers,
+    loadStudentData = () => {
+        fetch(
+            `${this.url}/hod/${this.hodId}/student/?page=${this.state.activeStudentPage}`,
+            {
+                headers: this.headers,
                 method: "GET",
-            }).then((res) => res.json()),
-            fetch(`${url}/hod/${hodId}/student/`, {
-                headers: headers,
-                method: "GET",
-            }).then((res) => res.json()),
-        ])
+            }
+        )
+            .then((res) => res.json())
             .then((result) => {
                 this.setState({
-                    hodItems: result[0].data,
-                    studentItems: result[1].data.results,
+                    studentItems: result.data.results,
+                    totalStudentCount: result.data.count,
                     page_loading: false,
                 });
                 console.log(result);
@@ -61,8 +56,39 @@ class HodStudentList extends Component {
             });
     };
 
+    componentDidMount = () => {
+        document.title = "HOD Student list - Admin | IQLabs";
+
+        fetch(`${this.url}/hod/${this.hodId}/`, {
+            headers: this.headers,
+            method: "GET",
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                this.setState({
+                    hodItems: result.data,
+                    page_loading: false,
+                });
+                console.log(result);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+
+        this.loadStudentData();
+    };
+
+    componentDidUpdate = (prevProps, prevState) => {
+        if (prevState.activeStudentPage !== this.state.activeStudentPage) {
+            this.loadStudentData();
+            this.setState({
+                page_loading: true,
+            });
+        }
+    };
+
     handleStudentPageChange(pageNumber) {
-        this.setState({ activeStudentPage: pageNumber, page_loading: true });
+        this.setState({ activeStudentPage: pageNumber });
     }
 
     render() {
@@ -131,7 +157,7 @@ class HodStudentList extends Component {
                             <StudentTable
                                 studentItems={this.state.studentItems}
                                 path={`admin/hod/${this.props.match.params.hodId}`}
-                                ref={this.gridRef}
+                                category={true}
                             />
                             <div className="card-body p-3">
                                 <Paginations

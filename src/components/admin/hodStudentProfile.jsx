@@ -22,7 +22,7 @@ class HodStudentProfile extends Component {
     };
 
     componentDidMount = () => {
-        document.title = "Admin Profile | IQLabs";
+        document.title = "Student Profile - Admin | IQLabs";
 
         const hodId = this.props.match.params.hodId;
         const studentId = this.props.match.params.studentId;
