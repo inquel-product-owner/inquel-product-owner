@@ -1,30 +1,29 @@
-import React, { Component } from "react";
-import { Dropdown, Modal, Alert, Spinner } from "react-bootstrap";
+import React, { Component, Fragment } from "react";
 import Header from "./navbar";
 import SideNav from "./sidenav";
-import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
+import { Dropdown, Modal, Spinner, Alert } from "react-bootstrap";
+import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import Loading from "../sharedComponents/loader";
-import Paginations from "../sharedComponents/pagination";
 import StudentTable from "../table/studentTable";
+import Paginations from "../sharedComponents/pagination";
 
-class StudentAssignModal extends Component {
-    constructor(props) {
-        super(props);
+// Student add modal
+class AddStudentModal extends Component {
+    constructor() {
+        super();
         this.state = {
-            studentId: [],
-            studentItem: [],
-            errorMsg: "",
+            email: [""],
+            errorMsg: [],
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
             showLoader: false,
-            isLoaded: false,
         };
     }
 
     handleSubmit = (event) => {
         event.preventDefault();
-        var url = baseUrl + hodUrl;
+        var url = baseUrl + teacherUrl;
         var authToken = localStorage.getItem("Authorization");
         var headers = {
             Accept: "application/json",
@@ -38,11 +37,11 @@ class StudentAssignModal extends Component {
             showSuccessAlert: false,
         });
 
-        fetch(`${url}/hod/group/${this.props.groupId}/assign/student/`, {
+        fetch(`${url}/teacher/create/student/`, {
             headers: headers,
             method: "POST",
             body: JSON.stringify({
-                student_ids: this.state.studentId,
+                students: this.state.email,
             }),
         })
             .then((res) => res.json())
@@ -50,14 +49,23 @@ class StudentAssignModal extends Component {
                 console.log(result);
                 if (result.sts) {
                     this.setState({
-                        successMsg: result.msg,
+                        successMsg: "Email added successfully!",
                         showSuccessAlert: true,
                         showLoader: false,
+                        email: [""],
                     });
                     this.props.formSubmission(true);
+                    if (result.data.existing_email) {
+                        if (result.data.existing_email.length !== 0) {
+                            this.setState({
+                                errorMsg: result.data.existing_email,
+                                showErrorAlert: true,
+                            });
+                        }
+                    }
                 } else {
                     this.setState({
-                        errorMsg: result.msg,
+                        errorMsg: result.data.existing_email,
                         showErrorAlert: true,
                         showLoader: false,
                     });
@@ -69,44 +77,27 @@ class StudentAssignModal extends Component {
     };
 
     handleInputChange = (index, event) => {
-        let values = [...this.state.studentId];
-        if (event.target.checked) {
-            values.push(event.target.value.toString());
-            this.setState({
-                studentId: values,
-            });
-        } else {
-            values.splice(values.indexOf(event.target.value), 1);
-            this.setState({
-                studentId: values,
-            });
-        }
+        let values = [...this.state.email];
+        values[index] = event.target.value;
+        this.setState({
+            email: values,
+        });
     };
 
-    componentDidMount = () => {
-        var url = baseUrl + hodUrl;
-        var authToken = localStorage.getItem("Authorization");
-        var headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: authToken,
-        };
+    handleAddFields = () => {
+        const values = [...this.state.email];
+        values.push("");
+        this.setState({
+            email: values,
+        });
+    };
 
-        fetch(`${url}/hod/group/${this.props.groupId}/assign/student/`, {
-            headers: headers,
-            method: "GET",
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                this.setState({
-                    studentItem: result.data,
-                    isLoaded: true,
-                });
-                console.log(result);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+    handleRemoveFields = (index) => {
+        const values = [...this.state.email];
+        values.splice(index, 1);
+        this.setState({
+            email: values,
+        });
     };
 
     render() {
@@ -114,7 +105,7 @@ class StudentAssignModal extends Component {
             <Modal
                 show={this.props.show}
                 onHide={this.props.onHide}
-                size="lg"
+                size="md"
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
@@ -130,7 +121,14 @@ class StudentAssignModal extends Component {
                         }}
                         dismissible
                     >
-                        {this.state.errorMsg}
+                        <h6>Existing email</h6>
+                        {this.state.errorMsg.map((email, index) => {
+                            return (
+                                <p className="small mb-2" key={index}>
+                                    {email}
+                                </p>
+                            );
+                        })}
                     </Alert>
                     <Alert
                         variant="success"
@@ -144,99 +142,103 @@ class StudentAssignModal extends Component {
                     >
                         {this.state.successMsg}
                     </Alert>
-                    <div className="table-responsive">
-                        <table className="table">
-                            <thead className="primary-text">
-                                <tr>
-                                    <th scope="col"></th>
-                                    <th scope="col">Name</th>
-                                    <th scope="col">Username</th>
-                                    <th scope="col">Email</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {this.state.isLoaded ? (
-                                    this.state.studentItem.length !== 0 ? (
-                                        this.state.studentItem.map(
-                                            (list, index) => {
-                                                return (
-                                                    <tr key={index}>
-                                                        <td className="text-center">
-                                                            <input
-                                                                type="checkbox"
-                                                                name="enable"
-                                                                value={list.id}
-                                                                onChange={(
-                                                                    event
-                                                                ) =>
-                                                                    this.handleInputChange(
-                                                                        index,
-                                                                        event
-                                                                    )
-                                                                }
-                                                            />
-                                                        </td>
-                                                        <td>
-                                                            {list.full_name}
-                                                        </td>
-                                                        <td>{list.username}</td>
-                                                        <td>{list.email}</td>
-                                                    </tr>
-                                                );
+
+                    <form onSubmit={this.handleSubmit} autoComplete="off">
+                        <div className="row align-items-end">
+                            {this.state.email.map((inputField, index) => (
+                                <Fragment key={index}>
+                                    <div className="col-9 mb-2">
+                                        <label htmlFor={`semail${index}`}>
+                                            {`Student email ${index + 1}`}
+                                        </label>
+                                        <input
+                                            type="email"
+                                            className="form-control borders"
+                                            id={`semail${index}`}
+                                            name="semail"
+                                            value={inputField}
+                                            onChange={(event) =>
+                                                this.handleInputChange(
+                                                    index,
+                                                    event
+                                                )
                                             }
-                                        )
-                                    ) : (
-                                        <tr>
-                                            <td>Data not available</td>
-                                        </tr>
-                                    )
+                                            required
+                                        />
+                                    </div>
+                                    <div className="col-2 mb-2">
+                                        <div
+                                            className="btn-group"
+                                            role="group"
+                                            aria-label="Basic example"
+                                        >
+                                            {index !== 0 ? (
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-secondary"
+                                                    onClick={() =>
+                                                        this.handleRemoveFields(
+                                                            index
+                                                        )
+                                                    }
+                                                >
+                                                    -
+                                                </button>
+                                            ) : (
+                                                ""
+                                            )}
+                                            <button
+                                                type="button"
+                                                className="btn btn-secondary"
+                                                onClick={() =>
+                                                    this.handleAddFields()
+                                                }
+                                            >
+                                                +
+                                            </button>
+                                        </div>
+                                    </div>
+                                </Fragment>
+                            ))}
+                        </div>
+                        <div className="form-group">
+                            <button className="btn btn-primary btn-sm btn-block mt-2">
+                                {this.state.showLoader ? (
+                                    <Spinner
+                                        as="span"
+                                        animation="border"
+                                        size="sm"
+                                        role="status"
+                                        aria-hidden="true"
+                                        className="mr-2"
+                                    />
                                 ) : (
-                                    <tr>
-                                        <td>Loading...</td>
-                                    </tr>
+                                    ""
                                 )}
-                            </tbody>
-                        </table>
-                    </div>
+                                Add student
+                            </button>
+                        </div>
+                    </form>
                 </Modal.Body>
-                <Modal.Footer>
-                    <button
-                        className="btn btn-primary"
-                        onClick={this.handleSubmit}
-                    >
-                        {this.state.showLoader ? (
-                            <Spinner
-                                as="span"
-                                animation="border"
-                                size="sm"
-                                role="status"
-                                aria-hidden="true"
-                                className="mr-2"
-                            />
-                        ) : (
-                            ""
-                        )}
-                        Assign
-                    </button>
-                </Modal.Footer>
             </Modal>
         );
     }
 }
 
-class GroupStudents extends Component {
+class StudentList extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
-            showStudentModal: false,
-            groupItem: [],
-            studentItem: [],
             activeStudentPage: 1,
             totalStudentCount: 0,
+            showSideNav: false,
+            showModal: false,
+            activeTab: "teacher",
+            studentItems: [],
             page_loading: true,
+            is_formSubmited: false,
         };
-        this.url = baseUrl + hodUrl;
+        this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
             Accept: "application/json",
@@ -251,15 +253,15 @@ class GroupStudents extends Component {
         });
     };
 
-    toggleStudentModal = () => {
+    toggleModal = () => {
         this.setState({
-            showStudentModal: !this.state.showStudentModal,
+            showModal: !this.state.showModal,
         });
     };
 
     loadStudentData = () => {
         fetch(
-            `${this.url}/hod/group/${this.props.match.params.groupId}/student/?page=${this.state.activeStudentPage}`,
+            `${this.url}/teacher/student/?page=${this.state.activeStudentPage}`,
             {
                 headers: this.headers,
                 method: "GET",
@@ -268,7 +270,7 @@ class GroupStudents extends Component {
             .then((res) => res.json())
             .then((result) => {
                 this.setState({
-                    studentItem: result.data.results,
+                    studentItems: result.data.results,
                     totalStudentCount: result.data.count,
                     page_loading: false,
                 });
@@ -280,21 +282,6 @@ class GroupStudents extends Component {
     };
 
     componentDidMount = () => {
-        fetch(`${this.url}/hod/group/${this.props.match.params.groupId}`, {
-            headers: this.headers,
-            method: "GET",
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                this.setState({
-                    groupItem: result.data,
-                });
-                console.log(result);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-
         this.loadStudentData();
     };
 
@@ -330,35 +317,27 @@ class GroupStudents extends Component {
     }
 
     render() {
-        document.title =
-            this.state.groupItem.length !== 0
-                ? this.state.groupItem.group_name + " Student List - HOD | IQLabs"
-                : "Group Student List - HOD | IQLabs";
+        document.title = "Student Profiles - Teacher | IQLabs";
         return (
             <div className="wrapper">
                 {/* Navbar */}
                 <Header
-                    name={this.state.groupItem.group_name}
+                    name={this.state.activeTab === "Student Profiles"}
                     togglenav={this.toggleSideNav}
                 />
 
                 {/* Sidebar */}
                 <SideNav
                     shownav={this.state.showSideNav}
-                    activeLink="dashboard"
+                    activeLink="profiles"
                 />
 
-                {/* Add Subject modal */}
-                {this.state.showStudentModal ? (
-                    <StudentAssignModal
-                        show={this.state.showStudentModal}
-                        onHide={this.toggleStudentModal}
-                        groupId={this.props.match.params.groupId}
-                        formSubmission={this.formSubmission}
-                    />
-                ) : (
-                    ""
-                )}
+                {/* Add Student modal */}
+                <AddStudentModal
+                    show={this.state.showModal}
+                    onHide={this.toggleModal}
+                    formSubmission={this.formSubmission}
+                />
 
                 <div
                     className={`section content ${
@@ -385,12 +364,18 @@ class GroupStudents extends Component {
                                 <div className="d-flex flex-wrap justify-content-end mb-4">
                                     <button
                                         className="btn btn-primary btn-sm mr-1"
-                                        onClick={this.toggleStudentModal}
+                                        onClick={this.toggleModal}
                                     >
                                         Add New
                                     </button>
                                     <button className="btn btn-primary btn-sm mr-1">
-                                        Remove
+                                        Delete
+                                    </button>
+                                    <button className="btn btn-primary btn-sm mr-1">
+                                        Enable
+                                    </button>
+                                    <button className="btn btn-primary btn-sm mr-1">
+                                        Disable
                                     </button>
                                     <Dropdown>
                                         <Dropdown.Toggle
@@ -415,12 +400,12 @@ class GroupStudents extends Component {
                             </div>
                         </div>
 
-                        {/* Student list */}
                         <div className="card shadow-sm">
                             <StudentTable
-                                studentItems={this.state.studentItem}
-                                path="hod"
-                                category={true}
+                                studentItems={this.state.studentItems}
+                                path="teacher"
+                                group={true}
+                                ref={this.gridRef}
                             />
                             <div className="card-body p-3">
                                 <Paginations
@@ -443,4 +428,4 @@ class GroupStudents extends Component {
     }
 }
 
-export default GroupStudents;
+export default StudentList;

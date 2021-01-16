@@ -4,7 +4,7 @@ import SideNav from "./sidenav";
 import { Link } from "react-router-dom";
 import Select from "react-select";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
-import Loading from "../../shared/loadingComponent";
+import Loading from "../sharedComponents/loader";
 
 class MasterData extends Component {
     constructor(props) {

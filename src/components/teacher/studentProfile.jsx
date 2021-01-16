@@ -23,7 +23,7 @@ class StudentProfile extends Component {
     };
 
     componentDidMount = () => {
-        document.title = "Student Profile - HOD | IQLabs";
+        document.title = "Student Profile - Teacher | IQLabs";
 
         const studentId = this.props.match.params.studentId;
         var url = baseUrl + hodUrl;
@@ -34,7 +34,7 @@ class StudentProfile extends Component {
             Authorization: authToken,
         };
 
-        fetch(`${url}/hod/student/${studentId}/`, {
+        fetch(`${url}/teacher/student/${studentId}/`, {
             headers: headers,
             method: "GET",
         })
@@ -215,7 +215,7 @@ class StudentProfile extends Component {
                                             <td>212</td>
                                             <td>First Class</td>
                                             <td className="text-center">
-                                                <Link to="/hod/course/001">
+                                                <Link to="/teacher/course/001">
                                                     <button className="btn btn-sm btn-primary">
                                                         <i className="fas fa-eye"></i>
                                                     </button>
@@ -232,7 +232,7 @@ class StudentProfile extends Component {
                                             <td>436</td>
                                             <td>Not Taken</td>
                                             <td className="text-center">
-                                                <Link to="/hod/course/001">
+                                                <Link to="/teacher/course/001">
                                                     <button className="btn btn-sm btn-primary">
                                                         <i className="fas fa-eye"></i>
                                                     </button>
@@ -249,7 +249,7 @@ class StudentProfile extends Component {
                                             <td>128</td>
                                             <td>Distiction</td>
                                             <td className="text-center">
-                                                <Link to="/hod/course/001">
+                                                <Link to="/teacher/course/001">
                                                     <button className="btn btn-sm btn-primary">
                                                         <i className="fas fa-eye"></i>
                                                     </button>

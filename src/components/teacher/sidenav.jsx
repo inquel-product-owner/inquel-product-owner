@@ -23,7 +23,7 @@ class SideNav extends Component {
                             ></i>
                         </button>
                     </Link>
-                    <Link to="/teacher/profile">
+                    <Link to="/teacher/student">
                         <button
                             className={`btn sidebar-btn ${
                                 active === "profiles" ? "active" : ""

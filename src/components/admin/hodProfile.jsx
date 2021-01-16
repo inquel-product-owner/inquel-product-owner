@@ -7,10 +7,10 @@ import Select from "react-select";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
 import Header from "./navbar";
 import SideNav from "./sidenav";
-import Loading from "../../shared/loadingComponent";
+import Loading from "../sharedComponents/loader";
 import GroupTable from "../table/groupTable";
-import Paginations from "../../shared/pagination";
-import ReactSwitch from "../../shared/switchComponent";
+import Paginations from "../sharedComponents/pagination";
+import ReactSwitch from "../sharedComponents/switchComponent";
 
 class HodProfile extends Component {
     constructor(props) {

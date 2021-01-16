@@ -2,9 +2,9 @@ import React, { Component } from "react";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
-import Loading from "../../shared/loadingComponent";
+import Loading from "../sharedComponents/loader";
 import GroupTable from "../table/groupTable";
-import Paginations from "../../shared/pagination";
+import Paginations from "../sharedComponents/pagination";
 
 class Dashboard extends Component {
     constructor(props) {

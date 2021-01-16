@@ -5,10 +5,10 @@ import Header from "./navbar";
 import SideNav from "./sidenav";
 import courseimg from "../../assets/code.jpg";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
-import Loading from "../../shared/loadingComponent";
+import Loading from "../sharedComponents/loader";
 import GroupTable from "../table/groupTable";
 import SubjectTable from "../table/subjectTable";
-import Paginations from "../../shared/pagination";
+import Paginations from "../sharedComponents/pagination";
 
 class SubjectModal extends Component {
     constructor() {

@@ -6,10 +6,10 @@ import Switch from "react-switch";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import HODTable from "../table/hodTable";
-import Loading from "../../shared/loadingComponent";
+import Loading from "../sharedComponents/loader";
 import StudentTable from "../table/studentTable";
-import Paginations from "../../shared/pagination";
-import ReactSwitch from "../../shared/switchComponent";
+import Paginations from "../sharedComponents/pagination";
+import ReactSwitch from "../sharedComponents/switchComponent";
 
 class HODModal extends Component {
     constructor(props) {

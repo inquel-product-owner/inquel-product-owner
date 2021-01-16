@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
-import Loading from "../../shared/loadingComponent";
+import Loading from "../sharedComponents/loader";
 
 class SubjectReview extends Component {
     constructor(props) {
