@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Dropdown, Modal, Alert, Spinner } from "react-bootstrap";
 import Header from "./navbar";
 import SideNav from "./sidenav";
-import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
+import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import Loading from "../sharedComponents/loader";
 import Paginations from "../sharedComponents/pagination";
 import StudentTable from "../table/studentTable";
@@ -24,7 +24,7 @@ class StudentAssignModal extends Component {
 
     handleSubmit = (event) => {
         event.preventDefault();
-        var url = baseUrl + hodUrl;
+        var url = baseUrl + teacherUrl;
         var authToken = localStorage.getItem("Authorization");
         var headers = {
             Accept: "application/json",
@@ -38,7 +38,7 @@ class StudentAssignModal extends Component {
             showSuccessAlert: false,
         });
 
-        fetch(`${url}/hod/group/${this.props.groupId}/assign/student/`, {
+        fetch(`${url}/teacher/group/${this.props.groupId}/assign/student/`, {
             headers: headers,
             method: "POST",
             body: JSON.stringify({
@@ -84,7 +84,7 @@ class StudentAssignModal extends Component {
     };
 
     componentDidMount = () => {
-        var url = baseUrl + hodUrl;
+        var url = baseUrl + teacherUrl;
         var authToken = localStorage.getItem("Authorization");
         var headers = {
             Accept: "application/json",
@@ -92,7 +92,7 @@ class StudentAssignModal extends Component {
             Authorization: authToken,
         };
 
-        fetch(`${url}/hod/group/${this.props.groupId}/assign/student/`, {
+        fetch(`${url}/teacher/group/${this.props.groupId}/assign/student/`, {
             headers: headers,
             method: "GET",
         })
@@ -234,9 +234,9 @@ class GroupStudents extends Component {
             studentItem: [],
             activeStudentPage: 1,
             totalStudentCount: 0,
-            page_loading: true,
+            page_loading: false,
         };
-        this.url = baseUrl + hodUrl;
+        this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
             Accept: "application/json",
@@ -259,7 +259,7 @@ class GroupStudents extends Component {
 
     loadStudentData = () => {
         fetch(
-            `${this.url}/hod/group/${this.props.match.params.groupId}/student/?page=${this.state.activeStudentPage}`,
+            `${this.url}/teacher/group/${this.props.match.params.groupId}/student/?page=${this.state.activeStudentPage}`,
             {
                 headers: this.headers,
                 method: "GET",
@@ -280,21 +280,6 @@ class GroupStudents extends Component {
     };
 
     componentDidMount = () => {
-        fetch(`${this.url}/hod/group/${this.props.match.params.groupId}`, {
-            headers: this.headers,
-            method: "GET",
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                this.setState({
-                    groupItem: result.data,
-                });
-                console.log(result);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-
         this.loadStudentData();
     };
 
@@ -332,8 +317,8 @@ class GroupStudents extends Component {
     render() {
         document.title =
             this.state.groupItem.length !== 0
-                ? this.state.groupItem.group_name + " Student List - HOD | IQLabs"
-                : "Group Student List - HOD | IQLabs";
+                ? this.state.groupItem.group_name + " Student List - Teacher | IQLabs"
+                : "Group Student List - Teacher | IQLabs";
         return (
             <div className="wrapper">
                 {/* Navbar */}
@@ -390,7 +375,13 @@ class GroupStudents extends Component {
                                         Add New
                                     </button>
                                     <button className="btn btn-primary btn-sm mr-1">
-                                        Remove
+                                        Delete
+                                    </button>
+                                    <button className="btn btn-primary btn-sm mr-1">
+                                        Enable
+                                    </button>
+                                    <button className="btn btn-primary btn-sm mr-1">
+                                        Disable
                                     </button>
                                     <Dropdown>
                                         <Dropdown.Toggle
@@ -419,8 +410,7 @@ class GroupStudents extends Component {
                         <div className="card shadow-sm">
                             <StudentTable
                                 studentItems={this.state.studentItem}
-                                path="hod"
-                                category={true}
+                                path="teacher"
                             />
                             <div className="card-body p-3">
                                 <Paginations

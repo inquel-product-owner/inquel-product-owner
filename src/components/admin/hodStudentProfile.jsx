@@ -3,7 +3,7 @@ import profilepic from "../../assets/user.png";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
-import Loading from "../../shared/loadingComponent";
+import Loading from "../sharedComponents/loader";
 
 class HodStudentProfile extends Component {
     constructor(props) {

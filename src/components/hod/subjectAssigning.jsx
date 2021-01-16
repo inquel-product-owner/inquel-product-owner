@@ -211,7 +211,7 @@ class SubjectAssigning extends Component {
                                                         <input
                                                             type="text"
                                                             name="chapter"
-                                                            className="form-control"
+                                                            className="form-control shadow-sm"
                                                             onChange={
                                                                 this
                                                                     .handleCourse
@@ -223,7 +223,7 @@ class SubjectAssigning extends Component {
                                                     <div className="form-group">
                                                         <select
                                                             name="status"
-                                                            className="form-control"
+                                                            className="form-control shadow-sm"
                                                             onChange={
                                                                 this
                                                                     .handleStatus
@@ -262,7 +262,7 @@ class SubjectAssigning extends Component {
                                                             <div className="form-group">
                                                                 <select
                                                                     name="teacher"
-                                                                    className="form-control"
+                                                                    className="form-control shadow-sm"
                                                                     onChange={
                                                                         this
                                                                             .handleTeacher
@@ -319,7 +319,7 @@ class SubjectAssigning extends Component {
                                     </table>
                                 </div>
                                 <div className="card-body p-2">
-                                    <button className="btn btn-light btn-block">
+                                    <button className="btn btn-light btn-block shadow-sm">
                                         {this.state.showLoader ? (
                                             <Spinner
                                                 as="span"

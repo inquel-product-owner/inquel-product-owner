@@ -4,7 +4,7 @@ import profilepic from "../../assets/user.png";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
-import Loading from "../../shared/loadingComponent";
+import Loading from "../sharedComponents/loader";
 
 function EmptyData() {
     return (
@@ -224,61 +224,84 @@ class HodTeacherList extends Component {
                                                                                 </tr>
                                                                             </thead>
                                                                             <tbody>
-                                                                                {list.handling.map(
-                                                                                    (
-                                                                                        item,
-                                                                                        index
-                                                                                    ) => {
-                                                                                        return (
-                                                                                            <tr
-                                                                                                key={
-                                                                                                    index
-                                                                                                }
-                                                                                            >
-                                                                                                <td>
-                                                                                                    {item.group_name ===
-                                                                                                    "independent"
-                                                                                                        ? ""
-                                                                                                        : item.group_name}
-                                                                                                </td>
-                                                                                                <td>
-                                                                                                    {item.subjects.map(
-                                                                                                        (
-                                                                                                            subject
-                                                                                                        ) => {
-                                                                                                            return (
-                                                                                                                <div className="row">
-                                                                                                                    <p className="col-6">
-                                                                                                                        {
-                                                                                                                            subject.subject_name
-                                                                                                                        }
-                                                                                                                    </p>
-                                                                                                                    <div className="col-6">
-                                                                                                                        {subject.chapters.map(
-                                                                                                                            (
-                                                                                                                                chapter
-                                                                                                                            ) => {
-                                                                                                                                return (
-                                                                                                                                    <p>
-                                                                                                                                        {
-                                                                                                                                            chapter.chapter_name
-                                                                                                                                        }
-                                                                                                                                    </p>
-                                                                                                                                );
-                                                                                                                            }
-                                                                                                                        )}
-                                                                                                                    </div>
-                                                                                                                </div>
-                                                                                                            );
-                                                                                                        }
-                                                                                                    )}
-                                                                                                </td>
-                                                                                                <td></td>
-                                                                                                <td></td>
-                                                                                            </tr>
-                                                                                        );
-                                                                                    }
-                                                                                )}
+                                                                                {list
+                                                                                    .handling
+                                                                                    .length !==
+                                                                                0
+                                                                                    ? list.handling.map(
+                                                                                          (
+                                                                                              item,
+                                                                                              index
+                                                                                          ) => {
+                                                                                              return (
+                                                                                                  <tr
+                                                                                                      key={
+                                                                                                          index
+                                                                                                      }
+                                                                                                  >
+                                                                                                      <td>
+                                                                                                          {item.group_name ===
+                                                                                                          "independent"
+                                                                                                              ? ""
+                                                                                                              : item.group_name}
+                                                                                                      </td>
+                                                                                                      <td>
+                                                                                                          {item.subjects
+                                                                                                              ? item.subjects.map(
+                                                                                                                    (
+                                                                                                                        subject,
+                                                                                                                        index
+                                                                                                                    ) => {
+                                                                                                                        return (
+                                                                                                                            <div
+                                                                                                                                className="row"
+                                                                                                                                key={
+                                                                                                                                    index
+                                                                                                                                }
+                                                                                                                            >
+                                                                                                                                <p className="col-6">
+                                                                                                                                    {
+                                                                                                                                        subject.subject_name
+                                                                                                                                    }
+                                                                                                                                </p>
+                                                                                                                                <div className="col-6">
+                                                                                                                                    {subject
+                                                                                                                                        .chapters
+                                                                                                                                        .length !==
+                                                                                                                                    0
+                                                                                                                                        ? subject.chapters.map(
+                                                                                                                                              (
+                                                                                                                                                  chapter,
+                                                                                                                                                  index
+                                                                                                                                              ) => {
+                                                                                                                                                  return (
+                                                                                                                                                      <p
+                                                                                                                                                          key={
+                                                                                                                                                              index
+                                                                                                                                                          }
+                                                                                                                                                      >
+                                                                                                                                                          {
+                                                                                                                                                              chapter.chapter_name
+                                                                                                                                                          }
+                                                                                                                                                      </p>
+                                                                                                                                                  );
+                                                                                                                                              }
+                                                                                                                                          )
+                                                                                                                                        : ""}
+                                                                                                                                </div>
+                                                                                                                            </div>
+                                                                                                                        );
+                                                                                                                    }
+                                                                                                                )
+                                                                                                              : ""}
+                                                                                                      </td>
+                                                                                                      <td></td>
+                                                                                                      <td></td>
+                                                                                                  </tr>
+                                                                                              );
+                                                                                          }
+                                                                                      )
+                                                                                    : ""}
                                                                             </tbody>
                                                                         </table>
                                                                     </div>
