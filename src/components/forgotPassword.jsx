@@ -3,7 +3,7 @@ import { Component } from "react";
 import { Redirect } from "react-router-dom";
 import { Alert, Spinner } from "react-bootstrap";
 import { baseUrl, accountsUrl } from "../shared/baseUrl.js";
-import Loading from "../shared/loadingComponent";
+import Loading from "./sharedComponents/loader";
 import logo from "../assets/IQ_Labs_V5.png";
 
 export default class ForgotPassword extends Component {

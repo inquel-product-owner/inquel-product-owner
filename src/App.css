@@ -460,3 +460,50 @@ input[type="search"]:focus {
     border-top-left-radius: 8px !important;
     border-top-right-radius: 8px !important;
 }
+
+/* carousel */
+
+.alice-carousel__prev-btn,
+.alice-carousel__next-btn {
+    position: absolute;
+    top: 30%;
+}
+
+.alice-carousel__prev-btn {
+    left: 0;
+    text-align: left;
+}
+
+.alice-carousel__next-btn {
+    right: 0;
+    text-align: right;
+}
+
+.alice-carousel__prev-btn-item,
+.alice-carousel__next-btn-item {
+    font-weight: 1000;
+    background-color: #621012;
+    padding: 3px 10px;
+    border-radius: 50%;
+    color: white;
+}
+
+.alice-carousel__prev-btn-item:hover,
+.alice-carousel__next-btn-item:hover {
+    color: white;
+}
+
+.alice-carousel__prev-btn [data-area]::after {
+    content: "\f104";
+    font-family: "Font Awesome 5 Free";
+}
+
+.alice-carousel__next-btn [data-area]::after {
+    content: "\f105";
+    font-family: "Font Awesome 5 Free";
+}
+
+.alice-carousel__dots-item:not(.__custom):hover,
+.alice-carousel__dots-item:not(.__custom).__active {
+    background-color: #621012;
+}

@@ -3,9 +3,9 @@ import { Modal, Alert, Spinner } from "react-bootstrap";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
-import Loading from "../../shared/loadingComponent";
+import Loading from "../sharedComponents/loader";
 import GroupTable from "../table/groupTable";
-import Paginations from "../../shared/pagination";
+import Paginations from "../sharedComponents/pagination";
 
 class GroupModal extends Component {
     constructor() {

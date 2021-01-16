@@ -2,11 +2,11 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import Header from "./navbar";
 import SideNav from "./sidenav";
-import courseimg from "../../assets/code.jpg";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
-import Loading from "../../shared/loadingComponent";
-import Paginations from "../../shared/pagination";
+import Loading from "../sharedComponents/loader";
+import Paginations from "../sharedComponents/pagination";
 import SubjectTable from "../table/subjectTable";
+import CarouselCard from "../sharedComponents/owlCarousel";
 
 class Group extends Component {
     constructor(props) {
@@ -112,123 +112,93 @@ class Group extends Component {
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
 
-                        <div
-                            className="card"
-                            style={{ backgroundColor: "transparent" }}
-                        >
-                            <div
-                                className="card-header pb-0"
-                                style={{ backgroundColor: "transparent" }}
-                            >
+                        <div className="row align-items-center mb-3">
+                            <div className="col-3">
+                                <h4>{this.state.groupItem.group_name}</h4>
+                            </div>
+                            <div className="col-9 text-right">
+                                <Link
+                                    to={`/teacher/group/${this.props.match.params.groupId}/student`}
+                                >
+                                    <button className="btn btn-primary btn-sm">
+                                        Students
+                                    </button>
+                                </Link>
+                            </div>
+                        </div>
+
+                        {/* Subject list */}
+                        <div className="card shadow-sm mb-4">
+                            <div className="card-header">
                                 <div className="row align-items-center">
-                                    <div className="col-3">
-                                        <h4>
-                                            {this.state.groupItem.group_name}
-                                        </h4>
+                                    <div className="col-md-3">
+                                        <h5>Subjects</h5>
                                     </div>
-                                    <div className="col-9 text-right">
-                                        <Link
-                                            to={`/teacher/group/${this.props.match.params.groupId}/student`}
-                                        >
+                                    <div className="col-md-9 text-right">
+                                        <Link to="">
                                             <button className="btn btn-primary btn-sm">
-                                                Students
+                                                View all
+                                            </button>
+                                        </Link>
+                                    </div>
+                                </div>
+                            </div>
+                            <SubjectTable
+                                subjectItems={this.state.groupItem}
+                                path="teacher"
+                            />
+                            <div className="card-body p-3">
+                                <Paginations
+                                    activePage={this.state.activeSubjectPage}
+                                    totalItemsCount={
+                                        this.state.totalSubjectCount
+                                    }
+                                    onChange={this.handleSubjectPageChange.bind(
+                                        this
+                                    )}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Exams carousel */}
+                        <div className="card shadow-sm mb-4">
+                            <div className="card-header">
+                                <div className="row align-items-center">
+                                    <div className="col-md-3">
+                                        <h5>Exams</h5>
+                                    </div>
+                                    <div className="col-md-9 text-right">
+                                        <Link to="">
+                                            <button className="btn btn-primary btn-sm">
+                                                View all
                                             </button>
                                         </Link>
                                     </div>
                                 </div>
                             </div>
                             <div className="card-body">
-                                <div className="card shadow-sm mb-4">
-                                    <div className="card-header">
-                                        <div className="row align-items-center">
-                                            <div className="col-md-3">
-                                                <h5>Subjects</h5>
-                                            </div>
-                                            <div className="col-md-9 text-right">
-                                                <button
-                                                    className="btn btn-primary btn-sm"
-                                                >
-                                                    View
-                                                </button>
-                                            </div>
-                                        </div>
+                                <CarouselCard />
+                            </div>
+                        </div>
+
+                        {/* Quiz carousel */}
+                        <div className="card shadow-sm mb-4">
+                            <div className="card-header">
+                                <div className="row align-items-center">
+                                    <div className="col-md-3">
+                                        <h5>Quiz</h5>
                                     </div>
-                                    <SubjectTable
-                                        subjectItem={this.state.groupItem}
-                                        path={{ basePath: "teacher", subPath: "" }}
-                                    />
-                                    <div className="card-body p-3">
-                                        <Paginations
-                                            activePage={
-                                                this.state.activeSubjectPage
-                                            }
-                                            totalItemsCount={
-                                                this.state.totalSubjectCount
-                                            }
-                                            onChange={this.handleSubjectPageChange.bind(
-                                                this
-                                            )}
-                                        />
+                                    <div className="col-md-9 text-right">
+                                        <Link to="">
+                                            <button className="btn btn-primary btn-sm">
+                                                View all
+                                            </button>
+                                        </Link>
                                     </div>
-                                    {/* <div className="card-body">
-                                        <div className="row justify-content-center">
-                                            <div className="col-md-11">
-                                                <div className="row">
-                                                    {this.state.groupItem
-                                                        .length !== 0 ? (
-                                                        this.state.groupItem.map(
-                                                            (list, index) => {
-                                                                return (
-                                                                    <div
-                                                                        className="col-md-4 mb-3"
-                                                                        key={
-                                                                            index
-                                                                        }
-                                                                    >
-                                                                        <Link
-                                                                            to={`/hod/subject/${list.id}/review`}
-                                                                            style={{
-                                                                                textDecoration:
-                                                                                    "none",
-                                                                            }}
-                                                                        >
-                                                                            <div
-                                                                                className="card"
-                                                                                style={{
-                                                                                    cursor:
-                                                                                        "pointer",
-                                                                                }}
-                                                                            >
-                                                                                <img
-                                                                                    src={
-                                                                                        courseimg
-                                                                                    }
-                                                                                    className="card-img-top"
-                                                                                    alt={
-                                                                                        list.subject_name
-                                                                                    }
-                                                                                />
-                                                                                <div className="card-body primary-bg text-white text-center p-2">
-                                                                                    {
-                                                                                        list.subject_name
-                                                                                    }
-                                                                                </div>
-                                                                            </div>
-                                                                        </Link>
-                                                                    </div>
-                                                                );
-                                                            }
-                                                        )
-                                                    ) : (
-                                                        <div className="col-md-6">
-                                                            Data not available
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div> */}
                                 </div>
+                            </div>
+                            <div className="card-body">
+                                <CarouselCard />
                             </div>
                         </div>
                         {/* Loading component */}

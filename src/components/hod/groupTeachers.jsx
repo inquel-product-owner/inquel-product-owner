@@ -3,7 +3,7 @@ import { Tab, Row, Col, Nav } from "react-bootstrap";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
-import Loading from "../../shared/loadingComponent";
+import Loading from "../sharedComponents/loader";
 
 function EmptyData() {
     return (
@@ -68,7 +68,8 @@ class GroupTeachers extends Component {
     render() {
         document.title =
             this.state.groupItem.length !== 0
-                ? this.state.groupItem.group_name + " Teacher List - HOD | IQLabs"
+                ? this.state.groupItem.group_name +
+                  " Teacher List - HOD | IQLabs"
                 : "Group Teacher List - HOD | IQLabs";
         return (
             <div className="wrapper">
@@ -106,28 +107,28 @@ class GroupTeachers extends Component {
                                 </h5>
                             </div>
                             <div className="col-md-10">
-                                <div className="row justify-content-center justify-content-md-end mb-4">
-                                    <div className="col-md-4 pr-md-0">
+                                <div className="row justify-content-end mb-4">
+                                    <div className="col-md-3 pr-md-0">
                                         <form>
                                             <div className="form-group">
                                                 <input
                                                     type="search"
                                                     name="search"
                                                     id="search"
-                                                    className="form-control mb-md-0 mb-2"
+                                                    className="form-control"
                                                     placeholder="Search"
                                                 />
                                             </div>
                                         </form>
                                     </div>
-                                    <div className="col-md-3 text-md-right text-center">
-                                        <button className="btn btn-primary mr-md-2 mr-1">
+                                    <div className="col-md-3 justify-content-between">
+                                        <button className="btn btn-primary btn-sm mr-1">
                                             Delete
                                         </button>
-                                        <button className="btn btn-primary mr-md-2 mr-1">
+                                        <button className="btn btn-primary btn-sm mr-1">
                                             Enable
                                         </button>
-                                        <button className="btn btn-primary">
+                                        <button className="btn btn-primary btn-sm">
                                             Disable
                                         </button>
                                     </div>
@@ -152,7 +153,6 @@ class GroupTeachers extends Component {
                                                     .length !== 0 ? (
                                                     this.state.teacherItems.map(
                                                         (list, index) => {
-                                                            console.log(index);
                                                             return (
                                                                 <Nav.Item
                                                                     key={index}
@@ -179,7 +179,6 @@ class GroupTeachers extends Component {
                                             <Tab.Content>
                                                 {this.state.teacherItems.map(
                                                     (list, index) => {
-                                                        console.log(index);
                                                         return (
                                                             <Tab.Pane
                                                                 key={index}
@@ -235,10 +234,16 @@ class GroupTeachers extends Component {
                                                                                                 <td>
                                                                                                     {item.subjects.map(
                                                                                                         (
-                                                                                                            subject
+                                                                                                            subject,
+                                                                                                            index
                                                                                                         ) => {
                                                                                                             return (
-                                                                                                                <div className="row">
+                                                                                                                <div
+                                                                                                                    className="row"
+                                                                                                                    key={
+                                                                                                                        index
+                                                                                                                    }
+                                                                                                                >
                                                                                                                     <p className="col-6">
                                                                                                                         {
                                                                                                                             subject.subject_name
@@ -247,10 +252,15 @@ class GroupTeachers extends Component {
                                                                                                                     <div className="col-6">
                                                                                                                         {subject.chapters.map(
                                                                                                                             (
-                                                                                                                                chapter
+                                                                                                                                chapter,
+                                                                                                                                index
                                                                                                                             ) => {
                                                                                                                                 return (
-                                                                                                                                    <p>
+                                                                                                                                    <p
+                                                                                                                                        key={
+                                                                                                                                            index
+                                                                                                                                        }
+                                                                                                                                    >
                                                                                                                                         {
                                                                                                                                             chapter.chapter_name
                                                                                                                                         }

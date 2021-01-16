@@ -212,7 +212,7 @@ class TeacherLogin extends Component {
     };
 
     componentDidMount = () => {
-        document.title = "Teacher Login | IQLabs";
+        document.title = "Login - Teacher | IQLabs";
     };
 
     render() {
@@ -244,7 +244,7 @@ class TeacherLogin extends Component {
                     <div className="container">
                         <div className="row justify-content-center align-items-center">
                             <div className="col-md-5">
-                                <div className="card shadow py-4">
+                                <div className="card shadow py-2">
                                     <div className="card-body ">
                                         <h3 className="primary-text mb-4">
                                             LOGIN
@@ -363,6 +363,24 @@ class TeacherLogin extends Component {
                                                 </button>
                                             </div>
                                         </form>
+                                        <p className="small text-center mb-0">or</p>
+                                        <div className="d-flex justify-content-around mb-3">
+                                            <button className="btn btn-primary btn-sm">
+                                                <i className="fab fa-google"></i>
+                                            </button>
+                                            <button className="btn btn-primary btn-sm">
+                                                <i className="fab fa-facebook"></i>
+                                            </button>
+                                        </div>
+                                        <p className="text-center small mb-0">
+                                            Don't have an account?{" "}
+                                            <Link
+                                                to=""
+                                                className="primary-text font-weight-bold"
+                                            >
+                                                Join Inquel Online Learning
+                                            </Link>{" "}
+                                        </p>
                                     </div>
                                 </div>
                             </div>

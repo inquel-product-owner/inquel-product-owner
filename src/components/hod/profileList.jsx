@@ -3,10 +3,10 @@ import Header from "./navbar";
 import SideNav from "./sidenav";
 import { Tabs, Tab, Dropdown, Modal, Spinner, Alert } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
-import Loading from "../../shared/loadingComponent";
+import Loading from "../sharedComponents/loader";
 import TeacherTable from "../table/teacherTable";
 import StudentTable from "../table/studentTable";
-import Paginations from "../../shared/pagination";
+import Paginations from "../sharedComponents/pagination";
 
 // Student add modal
 class AddStudentModal extends Component {

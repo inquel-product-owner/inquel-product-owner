@@ -2,7 +2,8 @@ import React, { Component } from "react";
 import { Alert, Spinner } from "react-bootstrap";
 import { Redirect } from "react-router-dom";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
-import Loading from "../../shared/loadingComponent";
+import Loading from "../sharedComponents/loader";
+import logo from "../../assets/IQ_Labs_V5.png";
 
 class EmailVerification extends Component {
     constructor() {
@@ -207,6 +208,16 @@ class EmailVerification extends Component {
                                 </div>
                             ) : (
                                 <div className="card shadow">
+                                    <div className="card-header">
+                                        <div className="text-center">
+                                            <img
+                                                src={logo}
+                                                alt="IQLABS academy logo"
+                                                width="100"
+                                                height="auto"
+                                            />
+                                        </div>
+                                    </div>
                                     <div className="card-body">
                                         <Alert
                                             variant="danger"
@@ -239,7 +250,10 @@ class EmailVerification extends Component {
                                         <p className="small mb-4">
                                             Please update your details
                                         </p>
-                                        <form onSubmit={this.handleSubmit} autoComplete="off">
+                                        <form
+                                            onSubmit={this.handleSubmit}
+                                            autoComplete="off"
+                                        >
                                             <div className="form-group ">
                                                 <label htmlFor="firstname">
                                                     First Name:
