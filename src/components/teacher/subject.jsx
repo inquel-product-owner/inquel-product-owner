@@ -192,7 +192,7 @@ class SubjectChapters extends Component {
             showSideNav: false,
             showModal: false,
             subjectItems: [],
-            page_loading: false,
+            page_loading: true,
             is_formSubmitted: false,
         };
         this.url = baseUrl + teacherUrl;
@@ -216,7 +216,7 @@ class SubjectChapters extends Component {
         });
     };
 
-    componentDidMount = () => {
+    loadChapterData = () => {
         fetch(
             `${this.url}/teacher/subject/${this.props.match.params.subjectId}/`,
             {
@@ -235,6 +235,22 @@ class SubjectChapters extends Component {
             .catch((err) => {
                 console.log(err);
             });
+    };
+
+    componentDidMount = () => {
+        this.loadChapterData();
+    };
+
+    componentDidUpdate = (prevProps, prevState) => {
+        if (
+            prevState.is_formSubmitted !== this.state.is_formSubmitted &&
+            this.state.is_formSubmitted === true
+        ) {
+            this.loadChapterData();
+            this.setState({
+                is_formSubmitted: false,
+            });
+        }
     };
 
     formSubmission = (is_formSubmitted) => {
@@ -290,7 +306,7 @@ class SubjectChapters extends Component {
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
 
-                        {/* Filter area */}
+                        {/* Header area */}
                         <div className="row align-items-center">
                             <div className="col-md-2">
                                 <h5 className="primary-text">
@@ -320,6 +336,7 @@ class SubjectChapters extends Component {
                                             <th scope="col">
                                                 Chapter structure
                                             </th>
+                                            <th scope="col">Weightage</th>
                                             <th scope="col">Summary</th>
                                             <th
                                                 scope="col"
@@ -330,26 +347,46 @@ class SubjectChapters extends Component {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>Chapter - 01</td>
-                                            <td>
-                                                <Link
-                                                    to={`/teacher/subject/${this.props.match.params.subjectId}/chapter-01/summary`}
-                                                    className="primary-text"
-                                                >
-                                                    <i className="fas fa-plus-circle fa-2x"></i>
-                                                </Link>
-                                            </td>
-                                            <td className="text-right">
-                                                <Link
-                                                    to={`/teacher/subject/${this.props.match.params.subjectId}/chapter-01`}
-                                                >
-                                                    <button className="btn btn-primary btn-sm">
-                                                        Add +
-                                                    </button>
-                                                </Link>
-                                            </td>
-                                        </tr>
+                                        {this.state.subjectItems.length !==
+                                        0 ? (
+                                            this.state.subjectItems.map(
+                                                (list, index) => {
+                                                    return (
+                                                        <tr key={index}>
+                                                            <td>
+                                                                {
+                                                                    list.chapter_name
+                                                                }
+                                                            </td>
+                                                            <td>
+                                                                {list.weightage}
+                                                            </td>
+                                                            <td>
+                                                                <Link
+                                                                    to={`/teacher/subject/${this.props.match.params.subjectId}/${list.chapter_name}/summary`}
+                                                                    className="primary-text"
+                                                                >
+                                                                    <i className="fas fa-plus-circle fa-2x"></i>
+                                                                </Link>
+                                                            </td>
+                                                            <td className="text-right">
+                                                                <Link
+                                                                    to={`/teacher/subject/${this.props.match.params.subjectId}/${list.chapter_name}`}
+                                                                >
+                                                                    <button className="btn btn-primary btn-sm">
+                                                                        Add +
+                                                                    </button>
+                                                                </Link>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                }
+                                            )
+                                        ) : (
+                                            <tr>
+                                                <td>Data not available</td>
+                                            </tr>
+                                        )}
                                     </tbody>
                                 </table>
                             </div>
