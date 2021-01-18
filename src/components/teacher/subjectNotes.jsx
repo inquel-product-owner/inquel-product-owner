@@ -2,8 +2,6 @@ import React, { Component } from "react";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import Switch from "react-switch";
-// import CKEditor from "@ckeditor/ckeditor5-react";
-// import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import CKEditor from "ckeditor4-react";
 
 class SubjectNotes extends Component {
@@ -12,7 +10,11 @@ class SubjectNotes extends Component {
         this.state = {
             showSideNav: false,
             limited: false,
+            title: "",
+            content: "",
         };
+        this.chapterName = this.props.match.params.chapterName;
+        this.topicName = this.props.match.params.topicName;
     }
 
     toggleSideNav = () => {
@@ -28,12 +30,41 @@ class SubjectNotes extends Component {
     };
 
     componentDidMount = () => {
-        document.title = "Notes - Teacher | IQLabs";
+        document.title = `${this.chapterName} Notes - Teacher | IQLabs`;
     };
 
-    onEditorChange(evt) {
-        console.log(evt.editor.getData());
-    }
+    onEditorChange = (evt) => {
+        this.setState({
+            content: evt.editor.getData(),
+        });
+    };
+
+    handleTitle = (event) => {
+        this.setState({
+            title: event.target.value,
+        });
+    };
+
+    handleSubmit = () => {
+        fetch(
+            `${this.url}/teacher/subject/${this.props.match.params.subjectId}/notes/`,
+            {
+                headers: this.headers,
+                method: "POST",
+                body: JSON.stringify({
+                    limited: this.state.limited,
+                    notes_name: this.state.notes,
+                }),
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
 
     render() {
         return (
@@ -66,15 +97,21 @@ class SubjectNotes extends Component {
                                 <div className="row align-items-center">
                                     <div className="col-md-6">
                                         <p className="small mb-0">
-                                            Notes: Chemical Reactions and
-                                            Equations
+                                            <span className="font-weight-bold">
+                                                Notes:
+                                            </span>{" "}
+                                            {this.chapterName} |{" "}
+                                            {this.topicName}
                                         </p>
                                     </div>
                                     <div className="col-md-6 d-flex align-items-center justify-content-end">
                                         <button className="btn btn-primary btn-sm mr-3">
                                             Preview
                                         </button>
-                                        <button className="btn btn-primary btn-sm mr-3">
+                                        <button
+                                            className="btn btn-primary btn-sm mr-3"
+                                            onClick={this.handleSubmit}
+                                        >
                                             Save
                                         </button>
                                         <div className="d-flex justify-content-end">
@@ -102,12 +139,22 @@ class SubjectNotes extends Component {
                             </div>
                         </div>
 
+                        <div className="card shadow-sm mb-3">
+                            <div className="card-body">
+                                <input
+                                    type="text"
+                                    name="title"
+                                    id="title"
+                                    className="form-control form-shadow"
+                                    placeholder="Notes title"
+                                    onChange={this.handleTitle}
+                                />
+                            </div>
+                        </div>
+
                         {/* Editor */}
                         <div className="card shadow-sm">
-                            <CKEditor
-                                data="<p>Sample data</p>"
-                                onChange={this.onEditorChange}
-                            />
+                            <CKEditor data="" onChange={this.onEditorChange} />
                         </div>
                     </div>
                 </div>

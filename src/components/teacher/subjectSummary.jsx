@@ -3,6 +3,7 @@ import Header from "./navbar";
 import SideNav from "./sidenav";
 import Switch from "react-switch";
 import CKEditor from "ckeditor4-react";
+import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 
 class SubjectSummary extends Component {
     constructor(props) {
@@ -10,6 +11,15 @@ class SubjectSummary extends Component {
         this.state = {
             showSideNav: false,
             limited: false,
+            title: "",
+            content: "",
+        };
+        this.url = baseUrl + teacherUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
         };
     }
 
@@ -26,12 +36,43 @@ class SubjectSummary extends Component {
     };
 
     componentDidMount = () => {
-        document.title = "Notes - Teacher | IQLabs";
+        document.title = "Summary - Teacher | IQLabs";
     };
 
-    onEditorChange(evt) {
-        console.log(evt.editor.getData());
-    }
+    onEditorChange = (evt) => {
+        this.setState({
+            content: evt.editor.getData(),
+        });
+    };
+
+    handleTitle = (event) => {
+        this.setState({
+            title: event.target.value,
+        });
+    };
+
+    handleSubmit = () => {
+        fetch(
+            `${this.url}/teacher/subject/${this.props.match.params.subjectId}/summary/`,
+            {
+                headers: this.headers,
+                method: "POST",
+                body: JSON.stringify({
+                    limited: this.state.limited,
+                    summary_name: this.state.title,
+                    summary_content: this.state.content,
+                    chapter_name: this.props.match.params.chapterName,
+                }),
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
 
     render() {
         return (
@@ -64,15 +105,23 @@ class SubjectSummary extends Component {
                                 <div className="row align-items-center">
                                     <div className="col-md-6">
                                         <p className="small mb-0">
-                                            Summary: Chemical Reactions and
-                                            Equations
+                                            <span className="font-weight-bold">
+                                                Summary:
+                                            </span>{" "}
+                                            {
+                                                this.props.match.params
+                                                    .chapterName
+                                            }
                                         </p>
                                     </div>
                                     <div className="col-md-6 d-flex align-items-center justify-content-end">
                                         <button className="btn btn-primary btn-sm mr-3">
                                             Preview
                                         </button>
-                                        <button className="btn btn-primary btn-sm mr-3">
+                                        <button
+                                            className="btn btn-primary btn-sm mr-3"
+                                            onClick={this.handleSubmit}
+                                        >
                                             Save
                                         </button>
                                         <div className="d-flex justify-content-end">
@@ -100,12 +149,22 @@ class SubjectSummary extends Component {
                             </div>
                         </div>
 
+                        <div className="card shadow-sm mb-3">
+                            <div className="card-body">
+                                <input
+                                    type="text"
+                                    name="title"
+                                    id="title"
+                                    className="form-control form-shadow"
+                                    placeholder="Summary title"
+                                    onChange={this.handleTitle}
+                                />
+                            </div>
+                        </div>
+
                         {/* Editor */}
                         <div className="card shadow-sm">
-                            <CKEditor
-                                data="<p>Sample data</p>"
-                                onChange={this.onEditorChange}
-                            />
+                            <CKEditor data="" onChange={this.onEditorChange} />
                         </div>
                     </div>
                 </div>
