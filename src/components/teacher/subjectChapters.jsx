@@ -10,9 +10,10 @@ class Chapters extends Component {
         super(props);
         this.state = {
             showSideNav: false,
+            collapsed: false,
         };
         this.subjectId = this.props.match.params.subjectId;
-        this.chapterId = this.props.match.params.chapterId;
+        this.chapterName = this.props.match.params.chapterName;
     }
 
     toggleSideNav = () => {
@@ -21,8 +22,14 @@ class Chapters extends Component {
         });
     };
 
+    toggleCollapse = () => {
+        this.setState({
+            collapsed: !this.state.collapsed,
+        });
+    };
+
     componentDidMount = () => {
-        document.title = "Chapter - Teacher | IQLabs";
+        document.title = `${this.chapterName} - Teacher | IQLabs`;
     };
 
     render() {
@@ -90,32 +97,30 @@ class Chapters extends Component {
                         <div className="card shadow-sm mb-3">
                             <div className="card-header secondary-bg primary-text font-weight-bold">
                                 <div className="row">
-                                    <div className="col-md-4 mb-2 mb-md-0">
+                                    <div className="col-md-5 mb-2 mb-md-0">
                                         Topic structure
                                     </div>
-                                    <div className="col-1 mb-2 mb-md-0">
-                                        Weightage
-                                    </div>
-                                    <div className="col-1 mb-2 mb-md-0">
-                                        Notes
-                                    </div>
-                                    <div className="col-1 mb-2 mb-md-0">
-                                        Summary
-                                    </div>
-                                    <div className="col-1 mb-2 mb-md-0">
-                                        Match
-                                    </div>
-                                    <div className="col-1 mb-2 mb-md-0">
-                                        Flashcards
-                                    </div>
-                                    <div className="col-1 mb-2 mb-md-0">
-                                        Type 1 Q
-                                    </div>
-                                    <div className="col-1 mb-2 mb-md-0">
-                                        Type 2 Q
-                                    </div>
-                                    <div className="col-1 mb-2 mb-md-0">
-                                        Next topic
+                                    <div className="col-md-7 small primary-text font-weight-bold">
+                                        <div className="row">
+                                            <div className="col-md-2 mb-2 mb-md-0">
+                                                Notes
+                                            </div>
+                                            <div className="col-md-2 mb-2 mb-md-0">
+                                                Match
+                                            </div>
+                                            <div className="col-md-2 mb-2 mb-md-0">
+                                                Concept
+                                            </div>
+                                            <div className="col-md-2 mb-2 mb-md-0">
+                                                Type 1 Q
+                                            </div>
+                                            <div className="col-md-2 mb-2 mb-md-0">
+                                                Type 2 Q
+                                            </div>
+                                            <div className="col-md-2 mb-2 mb-md-0">
+                                                Next topic
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -126,37 +131,27 @@ class Chapters extends Component {
                                             as={Card.Header}
                                             eventKey="0"
                                             className="secondary-bg"
+                                            style={{ cursor: "pointer" }}
+                                            onClick={this.toggleCollapse}
                                         >
                                             <div className="row align-items-center">
                                                 <div className="col-md-4 mb-2 mb-md-0">
-                                                    <div className="row">
-                                                        <div className="col-2">
+                                                    <div className="row align-items-center">
+                                                        <div className="col-1">
                                                             <span>
-                                                                <i className="fas fa-plus-circle"></i>
+                                                                {this.state
+                                                                    .collapsed ? (
+                                                                    <i className="fas fa-plus-circle"></i>
+                                                                ) : (
+                                                                    <i className="fas fa-minus-circle"></i>
+                                                                )}
                                                             </span>
                                                         </div>
-                                                        <div className="col-2">
+                                                        <div className="col-1 small font-weight-bold">
                                                             1
                                                         </div>
-                                                        <div className="col-8">
-                                                            Chapter - 01
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-md-8">
-                                                    <div className="row align-items-center">
-                                                        <div className="col-2 mb-2 mb-md-0">
-                                                            12
-                                                        </div>
-                                                        <div className="col-1 mb-2 mb-md-0"></div>
-                                                        <div className="col-2 mb-2 mb-md-0">
-                                                            <Link
-                                                                to={`/teacher/subject/${this.subjectId}/chapter-01/summary`}
-                                                            >
-                                                                <button className="btn btn-sm btn-primary">
-                                                                    <i className="fas fa-file-medical fa-sm"></i>
-                                                                </button>
-                                                            </Link>
+                                                        <div className="col-8 small font-weight-bold">
+                                                            {this.chapterName}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -165,9 +160,15 @@ class Chapters extends Component {
 
                                         <Accordion.Collapse eventKey="0">
                                             <Card className="pl-5">
-                                                <Card.Header className="bg-light my-2">
-                                                    <div className="row">
-                                                        <div className="col-md-4 mb-2 mb-md-0">
+                                                <Card.Header
+                                                    className="my-2 small"
+                                                    style={{
+                                                        backgroundColor:
+                                                            "#fff9f0",
+                                                    }}
+                                                >
+                                                    <div className="row align-items-center">
+                                                        <div className="col-md-5 mb-2 mb-md-0">
                                                             <div className="row">
                                                                 <div className="col-md-2 col-3">
                                                                     1.1
@@ -179,52 +180,48 @@ class Chapters extends Component {
                                                             </div>
                                                         </div>
 
-                                                        <div className="col-md-8">
+                                                        <div className="col-md-7">
                                                             <div className="row align-items-center">
-                                                                <div className="col-1 mb-2 mb-md-0"></div>
-                                                                <div className="col-2 mb-2 mb-md-0">
+                                                                <div className="col-md-2 mb-2 mb-md-0">
                                                                     <Link
-                                                                        to={`/teacher/subject/${this.subjectId}/chapter-01/arithmatic/notes`}
+                                                                        to={`/teacher/subject/${this.subjectId}/${this.chapterName}/arithmatic/notes`}
                                                                     >
                                                                         <button className="btn btn-sm btn-primary">
                                                                             <i className="fas fa-file-upload fa-sm"></i>
                                                                         </button>
                                                                     </Link>
                                                                 </div>
-                                                                <div className="col-1 mb-2 mb-md-0"></div>
-                                                                <div className="col-2 mb-2 mb-md-0">
+                                                                <div className="col-md-2 mb-2 mb-md-0">
                                                                     <Link to="">
                                                                         <button className="btn btn-primary btn-sm">
-                                                                            Add
-                                                                            +
+                                                                            View
                                                                         </button>
                                                                     </Link>
                                                                 </div>
-                                                                <div className="col-2 mb-2 mb-md-0">
+                                                                <div className="col-md-2 mb-2 mb-md-0">
                                                                     <Link to="">
                                                                         <button className="btn btn-primary btn-sm">
-                                                                            Add
-                                                                            +
+                                                                            View
                                                                         </button>
                                                                     </Link>
                                                                 </div>
-                                                                <div className="col-2 mb-2 mb-md-0">
-                                                                    <Link to="">
+                                                                <div className="col-md-2 mb-2 mb-md-0">
+                                                                    <Link
+                                                                        to={`/teacher/subject/${this.subjectId}/${this.chapterName}/arithmatic/type1`}
+                                                                    >
                                                                         <button className="btn btn-primary btn-sm">
-                                                                            Add
-                                                                            +
+                                                                            View
                                                                         </button>
                                                                     </Link>
                                                                 </div>
-                                                                <div className="col-1 mb-2 mb-md-0">
+                                                                <div className="col-md-2 mb-2 mb-md-0">
                                                                     <Link to="">
                                                                         <button className="btn btn-primary btn-sm">
-                                                                            Add
-                                                                            +
+                                                                            View
                                                                         </button>
                                                                     </Link>
                                                                 </div>
-                                                                <div className="col-1 mb-2 mb-md-0">
+                                                                <div className="col-md-2 text-center mb-2 mb-md-0">
                                                                     2.4
                                                                 </div>
                                                             </div>
@@ -232,9 +229,15 @@ class Chapters extends Component {
                                                     </div>
                                                 </Card.Header>
 
-                                                <Card.Header className="bg-light">
-                                                    <div className="row">
-                                                        <div className="col-md-4 mb-2 mb-md-0">
+                                                <Card.Header
+                                                    className="small"
+                                                    style={{
+                                                        backgroundColor:
+                                                            "#fff9f0",
+                                                    }}
+                                                >
+                                                    <div className="row align-items-center">
+                                                        <div className="col-md-5 mb-2 mb-md-0">
                                                             <div className="row">
                                                                 <div className="col-md-2 col-3">
                                                                     1.1.1
@@ -246,52 +249,48 @@ class Chapters extends Component {
                                                             </div>
                                                         </div>
 
-                                                        <div className="col-md-8">
+                                                        <div className="col-md-7">
                                                             <div className="row align-items-center">
-                                                                <div className="col-1 mb-2 mb-md-0"></div>
-                                                                <div className="col-2 mb-2 mb-md-0">
+                                                                <div className="col-md-2 mb-2 mb-md-0">
                                                                     <Link
-                                                                        to={`/teacher/subject/${this.subjectId}/chapter-01/arithmatic/notes`}
+                                                                        to={`/teacher/subject/${this.subjectId}/${this.chapterName}/arithmatic/notes`}
                                                                     >
                                                                         <button className="btn btn-sm btn-primary">
                                                                             <i className="fas fa-file-upload fa-sm"></i>
                                                                         </button>
                                                                     </Link>
                                                                 </div>
-                                                                <div className="col-1 mb-2 mb-md-0"></div>
-                                                                <div className="col-2 mb-2 mb-md-0">
+                                                                <div className="col-md-2 mb-2 mb-md-0">
                                                                     <Link to="">
                                                                         <button className="btn btn-primary btn-sm">
-                                                                            Add
-                                                                            +
+                                                                            View
                                                                         </button>
                                                                     </Link>
                                                                 </div>
-                                                                <div className="col-2 mb-2 mb-md-0">
+                                                                <div className="col-md-2 mb-2 mb-md-0">
                                                                     <Link to="">
                                                                         <button className="btn btn-primary btn-sm">
-                                                                            Add
-                                                                            +
+                                                                            View
                                                                         </button>
                                                                     </Link>
                                                                 </div>
-                                                                <div className="col-2 mb-2 mb-md-0">
-                                                                    <Link to="">
+                                                                <div className="col-md-2 mb-2 mb-md-0">
+                                                                    <Link
+                                                                        to={`/teacher/subject/${this.subjectId}/${this.chapterName}/arithmatic/type1`}
+                                                                    >
                                                                         <button className="btn btn-primary btn-sm">
-                                                                            Add
-                                                                            +
+                                                                            View
                                                                         </button>
                                                                     </Link>
                                                                 </div>
-                                                                <div className="col-1 mb-2 mb-md-0">
+                                                                <div className="col-md-2 mb-2 mb-md-0">
                                                                     <Link to="">
                                                                         <button className="btn btn-primary btn-sm">
-                                                                            Add
-                                                                            +
+                                                                            View
                                                                         </button>
                                                                     </Link>
                                                                 </div>
-                                                                <div className="col-1 mb-2 mb-md-0">
+                                                                <div className="col-md-2 text-center mb-2 mb-md-0">
                                                                     2.4
                                                                 </div>
                                                             </div>

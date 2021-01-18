@@ -13,6 +13,7 @@ import SubjectChapters from "./subject";
 import Chapters from "./subjectChapters";
 import SubjectNotes from "./subjectNotes";
 import SubjectSummary from "./subjectSummary";
+import SubjectType1 from "./subjectType1";
 
 const teacherRoutes = (
     <Switch>
@@ -102,6 +103,18 @@ const teacherRoutes = (
         />
         <Route
             exact
+            path="/teacher/subject/:subjectId/:chapterName/summary"
+            render={(props) =>
+                !localStorage.getItem("Authorization") &&
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <SubjectSummary {...props} />
+                )
+            }
+        />
+        <Route
+            exact
             path="/teacher/subject/:subjectId/:chapterName/:topicName/notes"
             render={(props) =>
                 !localStorage.getItem("Authorization") &&
@@ -114,13 +127,13 @@ const teacherRoutes = (
         />
         <Route
             exact
-            path="/teacher/subject/:subjectId/:chapterName/summary"
+            path="/teacher/subject/:subjectId/:chapterName/:topicName/type1"
             render={(props) =>
                 !localStorage.getItem("Authorization") &&
                 !localStorage.getItem("is_teacher") ? (
                     <Redirect to="/teacher/login" />
                 ) : (
-                    <SubjectSummary {...props} />
+                    <SubjectType1 {...props} />
                 )
             }
         />
