@@ -145,16 +145,21 @@ class AddStudentModal extends Component {
                     </Alert>
 
                     <form onSubmit={this.handleSubmit} autoComplete="off">
-                        <div className="row align-items-end">
-                            {this.state.email.map((inputField, index) => (
-                                <Fragment key={index}>
-                                    <div className="col-9 mb-2">
-                                        <label htmlFor={`semail${index}`}>
-                                            {`Student email ${index + 1}`}
-                                        </label>
+                        {this.state.email.map((inputField, index) => (
+                            <Fragment key={index}>
+                                <div className="form-group">
+                                    <label htmlFor={`semail${index}`}>
+                                        {`Student email ${index + 1}`}
+                                    </label>
+                                    <div
+                                        className="input-group borders"
+                                        style={{
+                                            borderRadius: "6px",
+                                        }}
+                                    >
                                         <input
                                             type="email"
-                                            className="form-control borders"
+                                            className="form-control"
                                             id={`semail${index}`}
                                             name="semail"
                                             value={inputField}
@@ -166,42 +171,42 @@ class AddStudentModal extends Component {
                                             }
                                             required
                                         />
-                                    </div>
-                                    <div className="col-2 mb-2">
-                                        <div
-                                            className="btn-group"
-                                            role="group"
-                                            aria-label="Basic example"
-                                        >
-                                            {index !== 0 ? (
+                                        <div className="input-group-append">
+                                            <div
+                                                className="btn-group"
+                                                role="group"
+                                                aria-label="Basic example"
+                                            >
+                                                {index !== 0 ? (
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-light shadow-none font-weight-bold"
+                                                        onClick={() =>
+                                                            this.handleRemoveFields(
+                                                                index
+                                                            )
+                                                        }
+                                                    >
+                                                        -
+                                                    </button>
+                                                ) : (
+                                                    ""
+                                                )}
                                                 <button
                                                     type="button"
-                                                    className="btn btn-secondary"
+                                                    className="btn btn-light shadow-none font-weight-bold"
                                                     onClick={() =>
-                                                        this.handleRemoveFields(
-                                                            index
-                                                        )
+                                                        this.handleAddFields()
                                                     }
                                                 >
-                                                    -
+                                                    +
                                                 </button>
-                                            ) : (
-                                                ""
-                                            )}
-                                            <button
-                                                type="button"
-                                                className="btn btn-secondary"
-                                                onClick={() =>
-                                                    this.handleAddFields()
-                                                }
-                                            >
-                                                +
-                                            </button>
+                                            </div>
                                         </div>
                                     </div>
-                                </Fragment>
-                            ))}
-                        </div>
+                                </div>
+                            </Fragment>
+                        ))}
                         <div className="form-group">
                             <button className="btn btn-primary btn-sm btn-block mt-2">
                                 {this.state.showLoader ? (
@@ -239,6 +244,7 @@ class AddTeacherModal extends Component {
             showErrorAlert: false,
             showSuccessAlert: false,
             showLoader: false,
+            showPassword: false,
         };
     }
 
@@ -270,7 +276,7 @@ class AddTeacherModal extends Component {
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
-                if (result.sts) {
+                if (result.sts === true) {
                     this.setState({
                         successMsg: "Teacher created successfully!",
                         showSuccessAlert: true,
@@ -281,21 +287,17 @@ class AddTeacherModal extends Component {
                     });
                     this.props.teacherFormSubmission(true);
                 } else {
+                    var errorMessage = "";
                     if (result.username) {
-                        this.setState({
-                            errorMsg: result.username[0],
-                        });
+                        errorMessage = result.username[0];
                     }
                     if (result.password) {
-                        this.setState({
-                            errorMsg: result.password[0],
-                        });
+                        errorMessage = result.password[0];
                     } else {
-                        this.setState({
-                            errorMsg: result.msg,
-                        });
+                        errorMessage = result.msg;
                     }
                     this.setState({
+                        errorMsg: errorMessage,
                         showErrorAlert: true,
                         showLoader: false,
                     });
@@ -313,6 +315,12 @@ class AddTeacherModal extends Component {
 
         this.setState({
             [name]: value,
+        });
+    };
+
+    showPassword = () => {
+        this.setState({
+            showPassword: !this.state.showPassword,
         });
     };
 
@@ -377,14 +385,36 @@ class AddTeacherModal extends Component {
                         </div>
                         <div className="form-group">
                             <label htmlFor="password">Password</label>
-                            <input
-                                type="password"
-                                name="password"
-                                id="password"
-                                className="form-control borders"
-                                onChange={this.handleChange}
-                                required
-                            />
+                            <div
+                                className="input-group borders"
+                                style={{
+                                    borderRadius: "6px",
+                                }}
+                            >
+                                <input
+                                    type={
+                                        this.state.showPassword
+                                            ? "text"
+                                            : "password"
+                                    }
+                                    name="password"
+                                    id="password"
+                                    className="form-control"
+                                    onChange={this.handleChange}
+                                    placeholder="**********"
+                                    required
+                                />
+                                <div className="input-group-append">
+                                    <button
+                                        className="btn btn-link btn-sm bg-white shadow-none"
+                                        type="button"
+                                        id="button-addon2"
+                                        onClick={this.showPassword}
+                                    >
+                                        <i className="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         <div className="form-group">
                             <button className="btn btn-primary btn-block mt-2">

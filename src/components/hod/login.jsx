@@ -162,13 +162,6 @@ class HODLogin extends Component {
             showErrorAlert: false,
         });
         var url = `${baseUrl}${accountsUrl}/login/`;
-        console.log(
-            "username: " +
-                this.state.username +
-                " and " +
-                "password " +
-                this.state.password
-        );
         fetch(url, {
             headers: {
                 Accept: "application/json",

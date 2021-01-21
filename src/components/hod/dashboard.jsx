@@ -47,7 +47,7 @@ class SubjectModal extends Component {
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
-                if (result.sts) {
+                if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,
                         showSuccessAlert: true,

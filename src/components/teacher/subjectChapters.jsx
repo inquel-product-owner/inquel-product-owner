@@ -1,19 +1,170 @@
 import React, { Component } from "react";
 import Header from "./navbar";
 import SideNav from "./sidenav";
-import { Card, Accordion } from "react-bootstrap";
+import { Card, Accordion, Modal, Alert, Spinner } from "react-bootstrap";
 import Select from "react-select";
 import { Link } from "react-router-dom";
+import Loading from "../sharedComponents/loader";
+import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
+
+class TopicModal extends Component {
+    constructor() {
+        super();
+        this.state = {
+            topic_name: "",
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: false,
+        };
+        this.url = baseUrl + teacherUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
+    }
+
+    handleSubmit = (event) => {
+        event.preventDefault();
+
+        this.setState({
+            showLoader: true,
+            showErrorAlert: false,
+            showSuccessAlert: false,
+        });
+
+        fetch(
+            `${this.url}/teacher/subject/${this.props.subjectId}/chapter/topics/`,
+            {
+                headers: this.headers,
+                method: "POST",
+                body: JSON.stringify({
+                    topic_name: this.state.topic_name,
+                }),
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        showLoader: false,
+                    });
+                    this.props.formSubmission(true);
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    handleTopic = (event) => {
+        this.setState({
+            topic_name: event.target.value,
+        });
+    };
+
+    render() {
+        return (
+            <Modal
+                show={this.props.show}
+                onHide={this.props.onHide}
+                size="md"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Header closeButton>Create topic</Modal.Header>
+                <Modal.Body>
+                    <Alert
+                        variant="danger"
+                        show={this.state.showErrorAlert}
+                        onClose={() => {
+                            this.setState({
+                                showErrorAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.errorMsg}
+                    </Alert>
+                    <Alert
+                        variant="success"
+                        show={this.state.showSuccessAlert}
+                        onClose={() => {
+                            this.setState({
+                                showSuccessAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.successMsg}
+                    </Alert>
+
+                    <form onSubmit={this.handleSubmit} autoComplete="off">
+                        <div className="form-group">
+                            <input
+                                type="text"
+                                name="topic"
+                                className="form-control borders"
+                                onChange={this.handleTopic}
+                                placeholder="Topic name"
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <button className="btn btn-primary btn-block mt-2">
+                                {this.state.showLoader ? (
+                                    <Spinner
+                                        as="span"
+                                        animation="border"
+                                        size="sm"
+                                        role="status"
+                                        aria-hidden="true"
+                                        className="mr-2"
+                                    />
+                                ) : (
+                                    ""
+                                )}
+                                Add
+                            </button>
+                        </div>
+                    </form>
+                </Modal.Body>
+            </Modal>
+        );
+    }
+}
 
 class Chapters extends Component {
     constructor(props) {
         super(props);
         this.state = {
             showSideNav: false,
+            showModal: false,
             collapsed: false,
+            chapterList: [],
+            chapterName: "",
+            page_loading: true,
         };
         this.subjectId = this.props.match.params.subjectId;
-        this.chapterName = this.props.match.params.chapterName;
+        this.url = baseUrl + teacherUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
     }
 
     toggleSideNav = () => {
@@ -28,11 +179,91 @@ class Chapters extends Component {
         });
     };
 
+    toggleModal = () => {
+        this.setState({
+            showModal: !this.state.showModal,
+        });
+    };
+
+    loadChapterData = () => {
+        fetch(`${this.url}/teacher/subject/${this.subjectId}/chapter/`, {
+            headers: this.headers,
+            method: "GET",
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                this.setState({
+                    subjectItems: result.data.results,
+                    page_loading: false,
+                });
+                console.log(result);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     componentDidMount = () => {
-        document.title = `${this.chapterName} - Teacher | IQLabs`;
+        this.setState({
+            chapterName: this.props.match.params.chapterName,
+        });
+
+        fetch(`${this.url}/teacher/subject/${this.subjectId}/`, {
+            headers: this.headers,
+            method: "GET",
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                this.setState({
+                    chapterList: result.data.results,
+                    page_loading: false,
+                });
+                console.log(result);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+
+        this.loadChapterData();
+    };
+
+    componentDidUpdate = (prevProps, prevState) => {
+        if (this.props.match.params.chapterName !== this.state.chapterName) {
+            this.setState({
+                chapterName: this.props.match.params.chapterName,
+            });
+        }
+
+        if (
+            prevState.is_formSubmitted !== this.state.is_formSubmitted &&
+            this.state.is_formSubmitted === true
+        ) {
+            this.loadChapterData();
+            this.setState({
+                is_formSubmitted: false,
+            });
+        }
+    };
+
+    formSubmission = (is_formSubmitted) => {
+        if (is_formSubmitted) {
+            this.setState({
+                is_formSubmitted: true,
+            });
+        }
+    };
+
+    handleSelect = (event) => {
+        this.props.history.push({
+            pathname: `/teacher/subject/${this.subjectId}/${event.value}`,
+        });
+        this.setState({
+            chapterName: event.value,
+        });
     };
 
     render() {
+        document.title = `${this.state.chapterName} - Teacher | IQLabs`;
         return (
             <div className="wrapper">
                 {/* Navbar */}
@@ -43,6 +274,18 @@ class Chapters extends Component {
                     shownav={this.state.showSideNav}
                     activeLink="dashboard"
                 />
+
+                {/* Topic modal */}
+                {this.state.showModal ? (
+                    <TopicModal
+                        show={this.state.showModal}
+                        onHide={this.toggleModal}
+                        formSubmission={this.formSubmission}
+                        subjectId={this.subjectId}
+                    />
+                ) : (
+                    ""
+                )}
 
                 <div
                     className={`section content ${
@@ -62,19 +305,19 @@ class Chapters extends Component {
                             <div className="col-md-4">
                                 <Select
                                     className="basic-single"
-                                    placeholder="Select chapter"
+                                    placeholder={this.state.chapterName}
+                                    value={[]}
                                     isSearchable={true}
-                                    name="subcategory"
-                                    options={[
-                                        {
-                                            label: "Chapter - 01",
-                                            value: "chapter - 01",
-                                        },
-                                        {
-                                            label: "Chapter - 02",
-                                            value: "chapter - 02",
-                                        },
-                                    ]}
+                                    name="chapter"
+                                    options={this.state.chapterList.map(
+                                        function (list) {
+                                            return {
+                                                value: list.chapter_name,
+                                                label: list.chapter_name,
+                                            };
+                                        }
+                                    )}
+                                    onChange={this.handleSelect}
                                     required
                                 />
                             </div>
@@ -151,7 +394,10 @@ class Chapters extends Component {
                                                             1
                                                         </div>
                                                         <div className="col-8 small font-weight-bold">
-                                                            {this.chapterName}
+                                                            {
+                                                                this.state
+                                                                    .chapterName
+                                                            }
                                                         </div>
                                                     </div>
                                                 </div>
@@ -184,7 +430,7 @@ class Chapters extends Component {
                                                             <div className="row align-items-center">
                                                                 <div className="col-md-2 mb-2 mb-md-0">
                                                                     <Link
-                                                                        to={`/teacher/subject/${this.subjectId}/${this.chapterName}/arithmatic/notes`}
+                                                                        to={`/teacher/subject/${this.subjectId}/${this.props.match.params.chapterName}/arithmatic/notes`}
                                                                     >
                                                                         <button className="btn btn-sm btn-primary">
                                                                             <i className="fas fa-file-upload fa-sm"></i>
@@ -199,7 +445,9 @@ class Chapters extends Component {
                                                                     </Link>
                                                                 </div>
                                                                 <div className="col-md-2 mb-2 mb-md-0">
-                                                                    <Link to="">
+                                                                    <Link
+                                                                        to={`/teacher/subject/${this.subjectId}/${this.props.match.params.chapterName}/arithmatic/concepts`}
+                                                                    >
                                                                         <button className="btn btn-primary btn-sm">
                                                                             View
                                                                         </button>
@@ -207,7 +455,7 @@ class Chapters extends Component {
                                                                 </div>
                                                                 <div className="col-md-2 mb-2 mb-md-0">
                                                                     <Link
-                                                                        to={`/teacher/subject/${this.subjectId}/${this.chapterName}/arithmatic/type1`}
+                                                                        to={`/teacher/subject/${this.subjectId}/${this.props.match.params.chapterName}/arithmatic/type1`}
                                                                     >
                                                                         <button className="btn btn-primary btn-sm">
                                                                             View
@@ -253,7 +501,7 @@ class Chapters extends Component {
                                                             <div className="row align-items-center">
                                                                 <div className="col-md-2 mb-2 mb-md-0">
                                                                     <Link
-                                                                        to={`/teacher/subject/${this.subjectId}/${this.chapterName}/arithmatic/notes`}
+                                                                        to={`/teacher/subject/${this.subjectId}/${this.props.match.params.chapterName}/arithmatic/notes`}
                                                                     >
                                                                         <button className="btn btn-sm btn-primary">
                                                                             <i className="fas fa-file-upload fa-sm"></i>
@@ -268,7 +516,9 @@ class Chapters extends Component {
                                                                     </Link>
                                                                 </div>
                                                                 <div className="col-md-2 mb-2 mb-md-0">
-                                                                    <Link to="">
+                                                                    <Link
+                                                                        to={`/teacher/subject/${this.subjectId}/${this.props.match.params.chapterName}/arithmatic/concepts`}
+                                                                    >
                                                                         <button className="btn btn-primary btn-sm">
                                                                             View
                                                                         </button>
@@ -276,7 +526,7 @@ class Chapters extends Component {
                                                                 </div>
                                                                 <div className="col-md-2 mb-2 mb-md-0">
                                                                     <Link
-                                                                        to={`/teacher/subject/${this.subjectId}/${this.chapterName}/arithmatic/type1`}
+                                                                        to={`/teacher/subject/${this.subjectId}/${this.props.match.params.chapterName}/arithmatic/type1`}
                                                                     >
                                                                         <button className="btn btn-primary btn-sm">
                                                                             View
@@ -301,6 +551,15 @@ class Chapters extends Component {
                                         </Accordion.Collapse>
                                     </Card>
                                 </Accordion>
+                            </div>
+
+                            <div className="card-body pt-0">
+                                <button
+                                    className="btn btn-light btn-block shadow-sm"
+                                    onClick={this.toggleModal}
+                                >
+                                    Add +
+                                </button>
                             </div>
                         </div>
 
@@ -329,6 +588,8 @@ class Chapters extends Component {
                                 </p>
                             </div>
                         </div>
+                        {/* Loading component */}
+                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
             </div>
