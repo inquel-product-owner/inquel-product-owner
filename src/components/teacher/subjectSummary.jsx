@@ -3,6 +3,7 @@ import Header from "./navbar";
 import SideNav from "./sidenav";
 import Switch from "react-switch";
 import CKEditor from "ckeditor4-react";
+import { Alert, Spinner } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 
 class SubjectSummary extends Component {
@@ -13,7 +14,13 @@ class SubjectSummary extends Component {
             limited: false,
             title: "",
             content: "",
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: false,
         };
+        this.chapterName = this.props.match.params.chapterName;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
@@ -36,7 +43,7 @@ class SubjectSummary extends Component {
     };
 
     componentDidMount = () => {
-        document.title = "Summary - Teacher | IQLabs";
+        document.title = `${this.chapterName} Summary - Teacher | IQLabs`;
     };
 
     onEditorChange = (evt) => {
@@ -52,6 +59,12 @@ class SubjectSummary extends Component {
     };
 
     handleSubmit = () => {
+        this.setState({
+            showLoader: true,
+            showErrorAlert: false,
+            showSuccessAlert: false,
+        });
+
         fetch(
             `${this.url}/teacher/subject/${this.props.match.params.subjectId}/summary/`,
             {
@@ -67,9 +80,25 @@ class SubjectSummary extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        showLoader: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
                 console.log(result);
             })
             .catch((err) => {
+                this.setState({
+                    showLoader: false,
+                });
                 console.log(err);
             });
     };
@@ -122,6 +151,18 @@ class SubjectSummary extends Component {
                                             className="btn btn-primary btn-sm mr-3"
                                             onClick={this.handleSubmit}
                                         >
+                                            {this.state.showLoader ? (
+                                                <Spinner
+                                                    as="span"
+                                                    animation="border"
+                                                    size="sm"
+                                                    role="status"
+                                                    aria-hidden="true"
+                                                    className="mr-2"
+                                                />
+                                            ) : (
+                                                ""
+                                            )}
                                             Save
                                         </button>
                                         <div className="d-flex justify-content-end">
@@ -148,6 +189,33 @@ class SubjectSummary extends Component {
                                 </div>
                             </div>
                         </div>
+
+                        <Alert
+                            variant="danger"
+                            show={this.state.showErrorAlert}
+                            onClose={() => {
+                                this.setState({
+                                    showErrorAlert: false,
+                                });
+                            }}
+                            className="my-2"
+                            dismissible
+                        >
+                            {this.state.errorMsg}
+                        </Alert>
+                        <Alert
+                            variant="success"
+                            show={this.state.showSuccessAlert}
+                            onClose={() => {
+                                this.setState({
+                                    showSuccessAlert: false,
+                                });
+                            }}
+                            className="my-2"
+                            dismissible
+                        >
+                            {this.state.successMsg}
+                        </Alert>
 
                         <div className="card shadow-sm mb-3">
                             <div className="card-body">

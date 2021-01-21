@@ -40,13 +40,6 @@ class Login extends Component {
             showErrorAlert: false,
         });
         var url = `${baseUrl}${adminPathUrl}/login/`;
-        console.log(
-            "username: " +
-                this.state.username +
-                " and " +
-                "password " +
-                this.state.password
-        );
         fetch(url, {
             headers: {
                 Accept: "application/json",

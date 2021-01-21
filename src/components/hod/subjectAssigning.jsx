@@ -15,6 +15,7 @@ class SubjectAssigning extends Component {
             courseStructure: "",
             selectedStatus: "",
             selectedTeacher: "",
+            weightage: "",
             subjectItem: [],
             successMsg: "",
             errorMsg: "",
@@ -33,6 +34,12 @@ class SubjectAssigning extends Component {
     handleCourse = (event) => {
         this.setState({
             courseStructure: event.target.value,
+        });
+    };
+
+    handleWeightage = (event) => {
+        this.setState({
+            weightage: event.target.value,
         });
     };
 
@@ -101,6 +108,7 @@ class SubjectAssigning extends Component {
                 chapter_name: this.state.courseStructure,
                 chapter_status: this.state.selectedStatus,
                 teacher_id: this.state.selectedTeacher,
+                weightage: this.state.weightage,
             }),
         })
             .then((res) => res.json())
@@ -154,36 +162,36 @@ class SubjectAssigning extends Component {
                         >
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
-                        
+
                         <div className="row align-items-center mb-3">
                             <div className="col-md-6">
-                                <h5 className="primary-text">
-                                    Subject: Mathematics | 10th class
+                                <h5 className="primary-text mb-0">
+                                    {this.props.subjectName}
                                 </h5>
                             </div>
                             <div className="col-md-6 text-center text-md-right">
-                                <button className="btn btn-primary-invert mr-2">
+                                <button className="btn btn-primary-invert btn-sm mr-2">
                                     Filter{" "}
                                     <i className="fas fa-filter ml-1"></i>
                                 </button>
                                 <Link
                                     to={`/hod/subject/${this.props.match.params.subjectId}/review`}
                                 >
-                                    <button className="btn btn-primary mr-2">
+                                    <button className="btn btn-primary btn-sm mr-2">
                                         Review
                                     </button>
                                 </Link>
                                 <Link
                                     to={`/hod/subject/${this.props.match.params.subjectId}/configure`}
                                 >
-                                    <button className="btn btn-primary">
+                                    <button className="btn btn-primary btn-sm">
                                         Configure Course
                                     </button>
                                 </Link>
                             </div>
                         </div>
 
-                        <form onSubmit={this.handleSubmit}>
+                        <form onSubmit={this.handleSubmit} autoComplete="off">
                             <div className="card shadow-sm">
                                 <div className="table-responsive">
                                     <table className="table">
@@ -196,6 +204,7 @@ class SubjectAssigning extends Component {
                                                 <th scope="col">
                                                     Teacher assigned
                                                 </th>
+                                                <th scope="col">Weightage</th>
                                                 <th
                                                     scope="col"
                                                     className="text-center"
@@ -301,6 +310,19 @@ class SubjectAssigning extends Component {
                                                             Not-Assigned
                                                         </button>
                                                     </div> */}
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div className="form-group">
+                                                        <input
+                                                            type="text"
+                                                            name="weightage"
+                                                            className="form-control shadow-sm"
+                                                            onChange={
+                                                                this
+                                                                    .handleWeightage
+                                                            }
+                                                        />
                                                     </div>
                                                 </td>
                                                 <td className="text-center">

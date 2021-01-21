@@ -347,24 +347,24 @@ class HodProfile extends Component {
     };
 
     handleValid_from = (event) => {
-        var d = new Date(event.target.value).toLocaleDateString();
-        var datearray = d.split("/");
-        var year = datearray[2];
-        var month = datearray[0];
-        var day = datearray[1];
+        // var d = new Date(event.target.value).toLocaleDateString();
+        // var datearray = d.split("/");
+        // var year = datearray[2];
+        // var month = datearray[0];
+        // var day = datearray[1];
         this.setState({
-            selectedValid_from: `${year}-${month}-${day} 00:00:00`,
+            selectedValid_from: `${event.target.value} 00:00:00`,
         });
     };
 
     handleValid_to = (event) => {
-        var d = new Date(event.target.value).toLocaleDateString();
-        var datearray = d.split("/");
-        var year = datearray[2];
-        var month = datearray[0];
-        var day = datearray[1];
+        // var d = new Date(event.target.value).toLocaleDateString();
+        // var datearray = d.split("/");
+        // var year = datearray[2];
+        // var month = datearray[0];
+        // var day = datearray[1];
         this.setState({
-            selectedValid_to: `${year}-${month}-${day} 00:00:00`,
+            selectedValid_to: `${event.target.value} 00:00:00`,
         });
     };
 

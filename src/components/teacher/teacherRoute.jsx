@@ -14,6 +14,7 @@ import Chapters from "./subjectChapters";
 import SubjectNotes from "./subjectNotes";
 import SubjectSummary from "./subjectSummary";
 import SubjectType1 from "./subjectType1";
+import SubjectConcepts from "./subjectConcepts";
 
 const teacherRoutes = (
     <Switch>
@@ -21,7 +22,7 @@ const teacherRoutes = (
             exact
             path="/teacher"
             render={() =>
-                !localStorage.getItem("Authorization") &&
+                !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
                     <Redirect to="/teacher/login" />
                 ) : (
@@ -33,7 +34,7 @@ const teacherRoutes = (
             exact
             path="/teacher/group/:groupId"
             render={(props) =>
-                !localStorage.getItem("Authorization") &&
+                !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
                     <Redirect to="/teacher/login" />
                 ) : (
@@ -45,7 +46,7 @@ const teacherRoutes = (
             exact
             path="/teacher/group/:groupId/student"
             render={(props) =>
-                !localStorage.getItem("Authorization") &&
+                !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
                     <Redirect to="/teacher/login" />
                 ) : (
@@ -57,7 +58,7 @@ const teacherRoutes = (
             exact
             path="/teacher/student"
             render={(props) =>
-                !localStorage.getItem("Authorization") &&
+                !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
                     <Redirect to="/teacher/login" />
                 ) : (
@@ -69,7 +70,7 @@ const teacherRoutes = (
             exact
             path="/teacher/student/:studentId"
             render={(props) =>
-                !localStorage.getItem("Authorization") &&
+                !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
                     <Redirect to="/teacher/login" />
                 ) : (
@@ -81,7 +82,7 @@ const teacherRoutes = (
             exact
             path="/teacher/subject/:subjectId"
             render={(props) =>
-                !localStorage.getItem("Authorization") &&
+                !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
                     <Redirect to="/teacher/login" />
                 ) : (
@@ -93,7 +94,7 @@ const teacherRoutes = (
             exact
             path="/teacher/subject/:subjectId/:chapterName"
             render={(props) =>
-                !localStorage.getItem("Authorization") &&
+                !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
                     <Redirect to="/teacher/login" />
                 ) : (
@@ -105,7 +106,7 @@ const teacherRoutes = (
             exact
             path="/teacher/subject/:subjectId/:chapterName/summary"
             render={(props) =>
-                !localStorage.getItem("Authorization") &&
+                !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
                     <Redirect to="/teacher/login" />
                 ) : (
@@ -117,7 +118,7 @@ const teacherRoutes = (
             exact
             path="/teacher/subject/:subjectId/:chapterName/:topicName/notes"
             render={(props) =>
-                !localStorage.getItem("Authorization") &&
+                !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
                     <Redirect to="/teacher/login" />
                 ) : (
@@ -129,11 +130,23 @@ const teacherRoutes = (
             exact
             path="/teacher/subject/:subjectId/:chapterName/:topicName/type1"
             render={(props) =>
-                !localStorage.getItem("Authorization") &&
+                !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
                     <Redirect to="/teacher/login" />
                 ) : (
                     <SubjectType1 {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/teacher/subject/:subjectId/:chapterName/:topicName/concepts"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <SubjectConcepts {...props} />
                 )
             }
         />
