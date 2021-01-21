@@ -415,8 +415,30 @@ class SubjectConcepts extends Component {
         const keyboards = [...this.state.keyboards];
         const flip = [...this.state.flippedState];
         flip.push(flip[index]);
-        keyboards.push(keyboards[index]);
-        values.push(values[index]);
+        keyboards.push({
+            all: keyboards[index].all,
+            chemistry: keyboards[index].chemistry,
+            physics: keyboards[index].physics,
+            maths: keyboards[index].maths,
+        });
+        values.push({
+            chapter_name: this.props.match.params.chapterName,
+            topic_name: this.props.match.params.topicName,
+            content: {
+                terms: values[index].content.terms,
+                definition: values[index].content.definition,
+                images: [{ title: "", url: "" }],
+                video: { title: "", url: "", pasteUrl: "" },
+                audio: [
+                    { title: "", url: "" },
+                    { title: "", url: "" },
+                ],
+            },
+            settings: {
+                virtual_keyboard: values[index].settings.virtual_keyboard,
+                limited: values[index].settings.limited,
+            },
+        });
         this.setState({
             concepts: values,
             keyboards: keyboards,
@@ -510,7 +532,12 @@ class SubjectConcepts extends Component {
                                                             type="button"
                                                             className="btn btn-light bg-white btn-block shadow-sm mr-2"
                                                         >
-                                                            {`0${c_index + 1}`}
+                                                            {c_index <= 8
+                                                                ? `0${
+                                                                      c_index +
+                                                                      1
+                                                                  }`
+                                                                : c_index + 1}
                                                         </button>
                                                     </div>
                                                     <div className="col-md-12 col-3 mb-1">
@@ -1001,9 +1028,6 @@ class SubjectConcepts extends Component {
                                                 <Card.Body className="p-3">
                                                     {/* ---------- Audio ---------- */}
                                                     <div className="form-group">
-                                                        <p className="mb-2">
-                                                            Audio
-                                                        </p>
                                                         {this.state.activeConceptData.content.audio.map(
                                                             (
                                                                 options,
