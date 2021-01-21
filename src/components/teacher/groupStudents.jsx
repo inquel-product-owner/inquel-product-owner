@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Dropdown, Modal, Alert, Spinner } from "react-bootstrap";
+import { Dropdown } from "react-bootstrap";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
@@ -7,229 +7,11 @@ import Loading from "../sharedComponents/loader";
 import Paginations from "../sharedComponents/pagination";
 import StudentTable from "../table/studentTable";
 
-// class StudentAssignModal extends Component {
-//     constructor(props) {
-//         super(props);
-//         this.state = {
-//             studentId: [],
-//             studentItem: [],
-//             errorMsg: "",
-//             successMsg: "",
-//             showErrorAlert: false,
-//             showSuccessAlert: false,
-//             showLoader: false,
-//             isLoaded: false,
-//         };
-//     }
-
-//     handleSubmit = (event) => {
-//         event.preventDefault();
-//         var url = baseUrl + teacherUrl;
-//         var authToken = localStorage.getItem("Authorization");
-//         var headers = {
-//             Accept: "application/json",
-//             "Content-Type": "application/json",
-//             Authorization: authToken,
-//         };
-
-//         this.setState({
-//             showLoader: true,
-//             showErrorAlert: false,
-//             showSuccessAlert: false,
-//         });
-
-//         fetch(`${url}/teacher/group/${this.props.groupId}/assign/student/`, {
-//             headers: headers,
-//             method: "POST",
-//             body: JSON.stringify({
-//                 student_ids: this.state.studentId,
-//             }),
-//         })
-//             .then((res) => res.json())
-//             .then((result) => {
-//                 console.log(result);
-//                 if (result.sts) {
-//                     this.setState({
-//                         successMsg: result.msg,
-//                         showSuccessAlert: true,
-//                         showLoader: false,
-//                     });
-//                     this.props.formSubmission(true);
-//                 } else {
-//                     this.setState({
-//                         errorMsg: result.msg,
-//                         showErrorAlert: true,
-//                         showLoader: false,
-//                     });
-//                 }
-//             })
-//             .catch((err) => {
-//                 console.log(err);
-//             });
-//     };
-
-//     handleInputChange = (index, event) => {
-//         let values = [...this.state.studentId];
-//         if (event.target.checked) {
-//             values.push(event.target.value.toString());
-//             this.setState({
-//                 studentId: values,
-//             });
-//         } else {
-//             values.splice(values.indexOf(event.target.value), 1);
-//             this.setState({
-//                 studentId: values,
-//             });
-//         }
-//     };
-
-//     componentDidMount = () => {
-//         var url = baseUrl + teacherUrl;
-//         var authToken = localStorage.getItem("Authorization");
-//         var headers = {
-//             Accept: "application/json",
-//             "Content-Type": "application/json",
-//             Authorization: authToken,
-//         };
-
-//         fetch(`${url}/teacher/group/${this.props.groupId}/assign/student/`, {
-//             headers: headers,
-//             method: "GET",
-//         })
-//             .then((res) => res.json())
-//             .then((result) => {
-//                 this.setState({
-//                     studentItem: result.data,
-//                     isLoaded: true,
-//                 });
-//                 console.log(result);
-//             })
-//             .catch((err) => {
-//                 console.log(err);
-//             });
-//     };
-
-//     render() {
-//         return (
-//             <Modal
-//                 show={this.props.show}
-//                 onHide={this.props.onHide}
-//                 size="lg"
-//                 aria-labelledby="contained-modal-title-vcenter"
-//                 centered
-//             >
-//                 <Modal.Header closeButton></Modal.Header>
-//                 <Modal.Body>
-//                     <Alert
-//                         variant="danger"
-//                         show={this.state.showErrorAlert}
-//                         onClose={() => {
-//                             this.setState({
-//                                 showErrorAlert: false,
-//                             });
-//                         }}
-//                         dismissible
-//                     >
-//                         {this.state.errorMsg}
-//                     </Alert>
-//                     <Alert
-//                         variant="success"
-//                         show={this.state.showSuccessAlert}
-//                         onClose={() => {
-//                             this.setState({
-//                                 showSuccessAlert: false,
-//                             });
-//                         }}
-//                         dismissible
-//                     >
-//                         {this.state.successMsg}
-//                     </Alert>
-//                     <div className="table-responsive">
-//                         <table className="table">
-//                             <thead className="primary-text">
-//                                 <tr>
-//                                     <th scope="col"></th>
-//                                     <th scope="col">Name</th>
-//                                     <th scope="col">Username</th>
-//                                     <th scope="col">Email</th>
-//                                 </tr>
-//                             </thead>
-//                             <tbody>
-//                                 {this.state.isLoaded ? (
-//                                     this.state.studentItem.length !== 0 ? (
-//                                         this.state.studentItem.map(
-//                                             (list, index) => {
-//                                                 return (
-//                                                     <tr key={index}>
-//                                                         <td className="text-center">
-//                                                             <input
-//                                                                 type="checkbox"
-//                                                                 name="enable"
-//                                                                 value={list.id}
-//                                                                 onChange={(
-//                                                                     event
-//                                                                 ) =>
-//                                                                     this.handleInputChange(
-//                                                                         index,
-//                                                                         event
-//                                                                     )
-//                                                                 }
-//                                                             />
-//                                                         </td>
-//                                                         <td>
-//                                                             {list.full_name}
-//                                                         </td>
-//                                                         <td>{list.username}</td>
-//                                                         <td>{list.email}</td>
-//                                                     </tr>
-//                                                 );
-//                                             }
-//                                         )
-//                                     ) : (
-//                                         <tr>
-//                                             <td>Data not available</td>
-//                                         </tr>
-//                                     )
-//                                 ) : (
-//                                     <tr>
-//                                         <td>Loading...</td>
-//                                     </tr>
-//                                 )}
-//                             </tbody>
-//                         </table>
-//                     </div>
-//                 </Modal.Body>
-//                 <Modal.Footer>
-//                     <button
-//                         className="btn btn-primary"
-//                         onClick={this.handleSubmit}
-//                     >
-//                         {this.state.showLoader ? (
-//                             <Spinner
-//                                 as="span"
-//                                 animation="border"
-//                                 size="sm"
-//                                 role="status"
-//                                 aria-hidden="true"
-//                                 className="mr-2"
-//                             />
-//                         ) : (
-//                             ""
-//                         )}
-//                         Assign
-//                     </button>
-//                 </Modal.Footer>
-//             </Modal>
-//         );
-//     }
-// }
-
 class GroupStudents extends Component {
     constructor(props) {
         super(props);
         this.state = {
             showSideNav: false,
-            // showStudentModal: false,
             groupItem: [],
             studentItem: [],
             activeStudentPage: 1,
@@ -333,18 +115,6 @@ class GroupStudents extends Component {
                     activeLink="dashboard"
                 />
 
-                {/* Add Subject modal */}
-                {/* {this.state.showStudentModal ? (
-                    <StudentAssignModal
-                        show={this.state.showStudentModal}
-                        onHide={this.toggleStudentModal}
-                        groupId={this.props.match.params.groupId}
-                        formSubmission={this.formSubmission}
-                    />
-                ) : (
-                    ""
-                )} */}
-
                 <div
                     className={`section content ${
                         this.state.showSideNav ? "active" : ""
@@ -368,12 +138,6 @@ class GroupStudents extends Component {
                             </div>
                             <div className="col-md-10">
                                 <div className="d-flex flex-wrap justify-content-end mb-4">
-                                    {/* <button
-                                        className="btn btn-primary btn-sm mr-1"
-                                        onClick={this.toggleStudentModal}
-                                    >
-                                        Add New
-                                    </button> */}
                                     <button className="btn btn-primary btn-sm mr-1">
                                         Delete
                                     </button>
