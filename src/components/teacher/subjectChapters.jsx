@@ -420,8 +420,7 @@ class Chapters extends Component {
                                                                     1.1
                                                                 </div>
                                                                 <div className="col-md-10 col-9">
-                                                                    Arithmatic
-                                                                    progression
+                                                                    Topic 01
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -491,8 +490,7 @@ class Chapters extends Component {
                                                                     1.1.1
                                                                 </div>
                                                                 <div className="col-md-10 col-9">
-                                                                    Nth term of
-                                                                    an AP
+                                                                    Sub topic 01
                                                                 </div>
                                                             </div>
                                                         </div>
