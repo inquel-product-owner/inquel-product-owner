@@ -534,20 +534,55 @@ class SubjectType1 extends Component {
     copyQuestions = (index) => {
         const values = [...this.state.questions];
         const keyboards = [...this.state.keyboards];
-        keyboards.push(keyboards[index]);
-        values.push(values[index]);
+        keyboards.push({
+            all: keyboards[index].all,
+            chemistry: keyboards[index].chemistry,
+            physics: keyboards[index].physics,
+            maths: keyboards[index].maths,
+        });
+        values.push({
+            chapter_name: this.chapterName,
+            topic_name: this.topicName,
+            question: values[index].question,
+            content: {
+                fill_in: values[index].content.fill_in,
+                options: values[index].content.options,
+                explanation: values[index].content.explanation,
+                images: [{ title: "", url: "" }],
+                video: { title: "", url: "", pasteUrl: "" },
+                audio: [
+                    { title: "", url: "" },
+                    { title: "", url: "" },
+                ],
+            },
+            properties: {
+                marks: values[index].properties.marks,
+                complexity: values[index].properties.complexity,
+                priority: values[index].properties.priority,
+                theme: values[index].properties.theme,
+                test: values[index].properties.test,
+                semester: values[index].properties.semester,
+                quiz: values[index].properties.quiz,
+                learn: values[index].properties.learn,
+            },
+            settings: {
+                virtual_keyboard: values[index].settings.virtual_keyboard,
+                limited: values[index].settings.limited,
+            },
+        });
         this.setState({
             questions: values,
             keyboards: keyboards,
         });
     };
 
-    editQuestion = (index, question) => {
+    editQuestion = (index) => {
+        const values = [...this.state.questions];
         let keyboards = [...this.state.keyboards];
         this.setState({
             showEdit_option: true,
             activeQuestion: index,
-            activeQuestionData: question,
+            activeQuestionData: values[index],
             activeKeyboards: keyboards[index],
             showErrorAlert: false,
             showSuccessAlert: false,
@@ -648,9 +683,13 @@ class SubjectType1 extends Component {
                                                                 type="button"
                                                                 className="btn btn-light bg-white btn-block shadow-sm mr-2"
                                                             >
-                                                                {`0${
-                                                                    q_index + 1
-                                                                }`}
+                                                                {q_index <= 8
+                                                                    ? `0${
+                                                                          q_index +
+                                                                          1
+                                                                      }`
+                                                                    : q_index +
+                                                                      1}
                                                             </button>
                                                         </div>
                                                         <div className="col-md-12 col-3 mb-1">
@@ -659,8 +698,7 @@ class SubjectType1 extends Component {
                                                                 className="btn btn-light bg-white btn-block shadow-sm mr-2"
                                                                 onClick={() =>
                                                                     this.editQuestion(
-                                                                        q_index,
-                                                                        question
+                                                                        q_index
                                                                     )
                                                                 }
                                                             >
