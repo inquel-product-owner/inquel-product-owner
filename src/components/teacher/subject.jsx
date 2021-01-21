@@ -11,6 +11,7 @@ class ChapterModal extends Component {
         super();
         this.state = {
             chapter_name: "",
+            weightage: "",
             chapter_status: "",
             status: [],
             errorMsg: "",
@@ -60,6 +61,7 @@ class ChapterModal extends Component {
             body: JSON.stringify({
                 chapter_name: this.state.chapter_name,
                 chapter_status: this.state.chapter_status,
+                weightage: this.state.weightage,
             }),
         })
             .then((res) => res.json())
@@ -88,6 +90,12 @@ class ChapterModal extends Component {
     handleCourse = (event) => {
         this.setState({
             chapter_name: event.target.value,
+        });
+    };
+
+    handleWeightage = (event) => {
+        this.setState({
+            weightage: event.target.value,
         });
     };
 
@@ -141,6 +149,16 @@ class ChapterModal extends Component {
                                 className="form-control borders"
                                 onChange={this.handleCourse}
                                 placeholder="Chapter name"
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <input
+                                type="text"
+                                name="weightage"
+                                className="form-control borders"
+                                onChange={this.handleWeightage}
+                                placeholder="Weightage"
                                 required
                             />
                         </div>
@@ -374,7 +392,7 @@ class SubjectChapters extends Component {
                                                                     to={`/teacher/subject/${this.props.match.params.subjectId}/${list.chapter_name}`}
                                                                 >
                                                                     <button className="btn btn-primary btn-sm">
-                                                                        Add +
+                                                                        Add
                                                                     </button>
                                                                 </Link>
                                                             </td>

@@ -149,8 +149,17 @@ class EmailVerification extends Component {
                             });
                         }, 3000);
                     } else {
+                        var errorMessage = "";
+                        if (result.username) {
+                            errorMessage = result.username[0];
+                        }
+                        if (result.password) {
+                            errorMessage = result.password[0];
+                        } else {
+                            errorMessage = result.msg;
+                        }
                         this.setState({
-                            errors: result.msg,
+                            errorMsg: errorMessage,
                             showErrorAlert: true,
                             showLoader: false,
                         });

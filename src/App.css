@@ -145,6 +145,14 @@ body {
     text-decoration: none;
 }
 
+.btn-link:active {
+    text-decoration: none;
+}
+
+.btn-link:focus {
+    text-decoration: none;
+}
+
 /* Form */
 
 .form-control {
@@ -283,7 +291,7 @@ input[type="search"]:focus {
 }
 
 .border-secondary {
-    border: 1px solid #cccccc;
+    border: 1px solid #ced4da !important;
 }
 
 /* Login */
@@ -454,6 +462,12 @@ input[type="search"]:focus {
     border-color: #621012;
 }
 
+.page-item.disabled .page-link {
+    pointer-events: all;
+    cursor: not-allowed !important;
+    background-color: #f5f5f5;
+}
+
 /* table-grid */
 
 .e-toolbar-items {
@@ -506,4 +520,31 @@ input[type="search"]:focus {
 .alice-carousel__dots-item:not(.__custom):hover,
 .alice-carousel__dots-item:not(.__custom).__active {
     background-color: #621012;
+}
+
+/* Accordion */
+
+.accordion > .card:not(:last-of-type) {
+    border-bottom: 8px;
+    border-bottom-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-top-left-radius: 8px;
+}
+
+.accordion > .card:not(:first-of-type) {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+/* Content edit options */
+
+@media screen and (min-width: 769px) {
+    .content-edit {
+        position: fixed;
+        right: 0;
+        transition: all 0.3s;
+        height: 80vh;
+        overflow-y: auto;
+    }
 }

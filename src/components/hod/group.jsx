@@ -48,7 +48,7 @@ class SubjectModal extends Component {
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
-                if (result.sts) {
+                if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,
                         showSuccessAlert: true,
@@ -187,6 +187,7 @@ class Group extends Component {
             .then((res) => res.json())
             .then((result) => {
                 this.setState({
+                    groupItems: result.data,
                     subjectItems: result.data.subjects,
                     totalSubjectCount: result.data.subjects.length,
                     page_loading: false,
@@ -199,21 +200,6 @@ class Group extends Component {
     };
 
     componentDidMount = () => {
-        fetch(`${this.url}/hod/group/${this.props.match.params.groupId}`, {
-            headers: this.headers,
-            method: "GET",
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                this.setState({
-                    groupItems: result.data,
-                });
-                console.log(result);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-
         this.loadSubjectData();
     };
 
@@ -268,12 +254,13 @@ class Group extends Component {
                 />
 
                 {/* Add Subject modal */}
+                {this.state.subjectModalShow?(
                 <SubjectModal
                     show={this.state.subjectModalShow}
                     onHide={this.addSubjectModal}
                     groupId={this.props.match.params.groupId}
                     formSubmission={this.formSubmission}
-                />
+                />):''}
 
                 <div
                     className={`section content ${

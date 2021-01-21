@@ -86,26 +86,26 @@ class SubjectReview extends Component {
 
                         <div className="row align-items-center mb-3">
                             <div className="col-md-6">
-                                <h5 className="primary-text">
+                                <h5 className="primary-text mb-0">
                                     {this.state.subjectItems.subject_name}
                                 </h5>
                             </div>
                             <div className="col-md-6 text-center text-md-right">
-                                <button className="btn btn-primary-invert mr-2">
+                                <button className="btn btn-primary-invert btn-sm mr-2">
                                     Filter{" "}
                                     <i className="fas fa-filter ml-1"></i>
                                 </button>
                                 <Link
                                     to={`/hod/subject/${this.props.match.params.subjectId}/assign`}
                                 >
-                                    <button className="btn btn-primary mr-2">
+                                    <button className="btn btn-primary btn-sm mr-2">
                                         Add New
                                     </button>
                                 </Link>
                                 <Link
                                     to={`/hod/subject/${this.props.match.params.subjectId}/configure`}
                                 >
-                                    <button className="btn btn-primary">
+                                    <button className="btn btn-primary btn-sm">
                                         Configure Course
                                     </button>
                                 </Link>
@@ -172,9 +172,14 @@ class SubjectReview extends Component {
                                                                           }
                                                                       </span>
                                                                   ) : list.chapter_status ===
-                                                                        "Review" &&
-                                                                    list.chapter_status ===
-                                                                        "Ready for review" ? (
+                                                                    "Review" ? (
+                                                                      <span className="text-primary">
+                                                                          {
+                                                                              list.chapter_status
+                                                                          }
+                                                                      </span>
+                                                                  ) : list.chapter_status ===
+                                                                    "Ready for review" ? (
                                                                       <span className="text-primary">
                                                                           {
                                                                               list.chapter_status

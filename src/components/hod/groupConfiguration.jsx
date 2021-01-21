@@ -35,13 +35,13 @@ class GroupModal extends Component {
     };
 
     handleValid_to = (event) => {
-        var d = new Date(event.target.value).toLocaleDateString();
-        var datearray = d.split("/");
-        var year = datearray[2];
-        var month = datearray[0];
-        var day = datearray[1];
+        // var d = new Date(event.target.value).toLocaleDateString();
+        // var datearray = d.split("/");
+        // var year = datearray[2];
+        // var month = datearray[0];
+        // var day = datearray[1];
         this.setState({
-            valid_to: `${year}-${month}-${day} 00:00:00`,
+            valid_to: `${event.target.value} 00:00:00`,
         });
     };
 
@@ -73,7 +73,7 @@ class GroupModal extends Component {
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
-                if (result.sts) {
+                if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,
                         showSuccessAlert: true,
