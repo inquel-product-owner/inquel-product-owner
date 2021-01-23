@@ -548,3 +548,21 @@ input[type="search"]:focus {
         overflow-y: auto;
     }
 }
+
+.preview-img-sm {
+    width: 35px;
+    height: 35px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    cursor: zoom-in;
+    border-radius: 50%;
+}
+
+.preview-img-lg {
+    width: 100%;
+    height: 170px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}

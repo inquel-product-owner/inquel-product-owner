@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 
 class SideNav extends Component {
     render() {
@@ -12,62 +13,98 @@ class SideNav extends Component {
             >
                 <div style={{ height: "80%" }}>
                     <Link to="/teacher">
-                        <button
-                            className={`btn sidebar-btn ${
-                                active === "dashboard" ? "active" : ""
-                            } btn-sm mb-3`}
+                        <OverlayTrigger
+                            key="right"
+                            placement="right"
+                            overlay={<Tooltip id="tooltip">Dashboard</Tooltip>}
                         >
-                            <i
-                                className="fas fa-home"
-                                style={{ marginLeft: "-1.5px" }}
-                            ></i>
-                        </button>
+                            <button
+                                className={`btn sidebar-btn ${
+                                    active === "dashboard" ? "active" : ""
+                                } btn-sm mb-3`}
+                            >
+                                <i
+                                    className="fas fa-home"
+                                    style={{ marginLeft: "-1.5px" }}
+                                ></i>
+                            </button>
+                        </OverlayTrigger>
                     </Link>
                     <Link to="/teacher/student">
-                        <button
-                            className={`btn sidebar-btn ${
-                                active === "profiles" ? "active" : ""
-                            } btn-sm mb-3`}
+                        <OverlayTrigger
+                            key="right"
+                            placement="right"
+                            overlay={<Tooltip id="tooltip">Profiles</Tooltip>}
                         >
-                            <i
-                                className="fas fa-users"
-                                style={{ marginLeft: "-1.5px" }}
-                            ></i>
-                        </button>
+                            <button
+                                className={`btn sidebar-btn ${
+                                    active === "profiles" ? "active" : ""
+                                } btn-sm mb-3`}
+                            >
+                                <i
+                                    className="fas fa-users"
+                                    style={{ marginLeft: "-1.5px" }}
+                                ></i>
+                            </button>
+                        </OverlayTrigger>
                     </Link>
                     <Link to="/">
-                        <button className="btn sidebar-btn btn-sm mb-3">
-                            <i
-                                className="far fa-sticky-note"
-                                style={{ marginLeft: "-1.5px" }}
-                            ></i>
-                        </button>
+                        <OverlayTrigger
+                            key="right"
+                            placement="right"
+                            overlay={<Tooltip id="tooltip">Notes</Tooltip>}
+                        >
+                            <button className="btn sidebar-btn btn-sm mb-3">
+                                <i
+                                    className="far fa-sticky-note"
+                                    style={{ marginLeft: "-1.5px" }}
+                                ></i>
+                            </button>
+                        </OverlayTrigger>
                     </Link>
                     <Link to="/">
-                        <button className="btn sidebar-btn btn-sm mb-3">
-                            <i
-                                className="far fa-clipboard"
-                                style={{ marginLeft: "-1.5px" }}
-                            ></i>
-                        </button>
+                        <OverlayTrigger
+                            key="right"
+                            placement="right"
+                            overlay={<Tooltip id="tooltip">Clipboard</Tooltip>}
+                        >
+                            <button className="btn sidebar-btn btn-sm mb-3">
+                                <i
+                                    className="far fa-clipboard"
+                                    style={{ marginLeft: "-1.5px" }}
+                                ></i>
+                            </button>
+                        </OverlayTrigger>
                     </Link>
                 </div>
                 <div style={{ height: "20%" }}>
                     <Link to="/">
-                        <button className="btn sidebar-btn btn-sm mb-3">
-                            <i
-                                className="far fa-question-circle"
-                                style={{ marginLeft: "-1.5px" }}
-                            ></i>
-                        </button>
+                        <OverlayTrigger
+                            key="right"
+                            placement="right"
+                            overlay={<Tooltip id="tooltip">Help</Tooltip>}
+                        >
+                            <button className="btn sidebar-btn btn-sm mb-3">
+                                <i
+                                    className="far fa-question-circle"
+                                    style={{ marginLeft: "-1.5px" }}
+                                ></i>
+                            </button>
+                        </OverlayTrigger>
                     </Link>
                     <Link to="/">
-                        <button className="btn sidebar-btn btn-sm">
-                            <i
-                                className="fas fa-cog"
-                                style={{ marginLeft: "-1.5px" }}
-                            ></i>
-                        </button>
+                        <OverlayTrigger
+                            key="right"
+                            placement="right"
+                            overlay={<Tooltip id="tooltip">Settings</Tooltip>}
+                        >
+                            <button className="btn sidebar-btn btn-sm">
+                                <i
+                                    className="fas fa-cog"
+                                    style={{ marginLeft: "-1.5px" }}
+                                ></i>
+                            </button>
+                        </OverlayTrigger>
                     </Link>
                 </div>
             </div>
