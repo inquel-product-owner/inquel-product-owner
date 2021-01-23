@@ -23,13 +23,17 @@ class SubjectConcepts extends Component {
             showSuccessAlert: false,
             showLoader: false,
             showVirtual_keyboard: true,
-            isFlipped: false,
+            isForm_submitted: false,
 
             activeConcept: "",
             activeConceptData: [],
             activeKeyboards: [],
-            activeFlippedState: [],
-            flippedState: [{ isFlipped: false }],
+            selectedImageQuestion: "",
+            selectedImageData: [],
+            selectedImage: "",
+            concepts_random_id: "",
+            flipState: [false],
+
             keyboards: [
                 { all: false, chemistry: false, physics: false, maths: false },
             ],
@@ -41,11 +45,18 @@ class SubjectConcepts extends Component {
                     content: {
                         terms: "<p>Terms goes here</p>",
                         definition: "<p>Definition goes here</p>",
-                        images: [{ title: "", url: "" }],
-                        video: { title: "", url: "", pasteUrl: "" },
+                        images: [
+                            { title: "", file_name: "", image: null, path: "" },
+                        ],
+                        video: {
+                            title: "",
+                            file_name: "",
+                            video: null,
+                            pasteUrl: "",
+                        },
                         audio: [
-                            { title: "", url: "" },
-                            { title: "", url: "" },
+                            { title: "", file_name: "", audio: null },
+                            { title: "", file_name: "", audio: null },
                         ],
                     },
                     settings: {
@@ -95,17 +106,22 @@ class SubjectConcepts extends Component {
                 if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,
+                        concepts_random_id: result.concepts_random_id,
                         showSuccessAlert: true,
+                        showLoader: false,
+                        isForm_submitted: true,
                     });
-                    setTimeout(() => {
-                        this.setState({
-                            showLoader: false,
-                            showEdit_option: false,
-                        });
-                    }, 3000);
                 } else {
+                    if (result.detail) {
+                        this.setState({
+                            errorMsg: result.detail,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.msg,
+                        });
+                    }
                     this.setState({
-                        errorMsg: result.msg,
                         showErrorAlert: true,
                         showLoader: false,
                     });
@@ -114,6 +130,103 @@ class SubjectConcepts extends Component {
             .catch((err) => {
                 console.log(err);
             });
+    };
+
+    componentDidUpdate = (prevProps, prevState) => {
+        if (
+            prevState.isForm_submitted !== this.state.isForm_submitted &&
+            this.state.isForm_submitted === true
+        ) {
+            this.setState({
+                showLoader: true,
+                showErrorAlert: false,
+                showSuccessAlert: false,
+                isForm_submitted: false,
+            });
+
+            const conceptValues = this.state.activeConceptData;
+
+            let form_data = new FormData();
+
+            form_data.append(
+                "concepts_video_1_title",
+                conceptValues.content.video.title
+            );
+            form_data.append(
+                "concepts_video_1",
+                conceptValues.content.video.video
+            );
+            form_data.append("chapter_name", this.chapterName);
+            form_data.append("topic_name", this.topicName);
+            form_data.append(
+                "concepts_random_id",
+                this.state.concepts_random_id
+            );
+
+            for (let i = 0; i < conceptValues.content.images; i++) {
+                form_data.append(
+                    `concepts_image_${i + 1}_title`,
+                    conceptValues.content.images[i].title
+                );
+                form_data.append(
+                    `concepts_image_${i + 1}`,
+                    conceptValues.content.images[i].image
+                );
+            }
+
+            for (let i = 0; i < conceptValues.content.audio; i++) {
+                form_data.append(
+                    `concepts_audio_${i + 1}_title`,
+                    conceptValues.content.audio[i].title
+                );
+                form_data.append(
+                    `concepts_audio_${i + 1}`,
+                    conceptValues.content.audio[i].audio
+                );
+            }
+
+            fetch(
+                `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/files/`,
+                {
+                    headers: {
+                        Accept: "application/json",
+                        "Content-Type": "multipart/form-data",
+                        Authorization: this.authToken,
+                    },
+                    method: "POST",
+                    body: form_data,
+                }
+            )
+                .then((res) => res.json())
+                .then((result) => {
+                    console.log(result);
+                    console.log(form_data);
+                    if (result.sts === true) {
+                        this.setState({
+                            successMsg: result.msg,
+                            showSuccessAlert: true,
+                            showLoader: false,
+                        });
+                    } else {
+                        if (result.detail) {
+                            this.setState({
+                                errorMsg: result.detail,
+                            });
+                        } else {
+                            this.setState({
+                                errorMsg: result.msg,
+                            });
+                        }
+                        this.setState({
+                            showErrorAlert: true,
+                            showLoader: false,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        }
     };
 
     onEditorChange = (evt) => {
@@ -149,7 +262,9 @@ class SubjectConcepts extends Component {
         const values = [...this.state.concepts];
         values[this.state.activeConcept].content.images.push({
             title: "",
-            url: "",
+            file_name: "",
+            image: null,
+            path: "",
         });
         this.setState({
             concepts: values,
@@ -166,14 +281,33 @@ class SubjectConcepts extends Component {
 
     handleImageFile = (index, event) => {
         let values = [...this.state.concepts];
-        var files = event.target.files;
-        var filesArray = [].slice.call(files);
-        filesArray.forEach((e) => {
-            values[this.state.activeConcept].content.images[index].url = e.name;
-        });
+        values[this.state.activeConcept].content.images[index].file_name =
+            event.target.files[0].name;
+        values[this.state.activeConcept].content.images[
+            index
+        ].path = URL.createObjectURL(event.target.files[0]);
+        values[this.state.activeConcept].content.images[index].image =
+            event.target.files[0];
         this.setState({
             concepts: values,
         });
+    };
+
+    changeImage = (image_index, q_index) => {
+        const images = [...this.state.concepts];
+        if (this.state.selectedImage === image_index) {
+            this.setState({
+                selectedImage: "",
+                selectedImageQuestion: "",
+                selectedImageData: [],
+            });
+        } else {
+            this.setState({
+                selectedImage: image_index,
+                selectedImageQuestion: q_index,
+                selectedImageData: images[q_index].content.images[image_index],
+            });
+        }
     };
 
     // -------------------------- Video --------------------------
@@ -189,11 +323,10 @@ class SubjectConcepts extends Component {
 
     handleVideoFile = (event) => {
         let values = [...this.state.concepts];
-        var files = event.target.files;
-        var filesArray = [].slice.call(files);
-        filesArray.forEach((e) => {
-            values[this.state.activeConcept].content.video.url = e.name;
-        });
+        values[this.state.activeConcept].content.video.file_name =
+            event.target.files[0].name;
+        values[this.state.activeConcept].content.video.video =
+            event.target.files[0];
         values[this.state.activeConcept].content.video.pasteUrl = "";
         this.setState({
             concepts: values,
@@ -204,7 +337,7 @@ class SubjectConcepts extends Component {
         const values = [...this.state.concepts];
         values[this.state.activeConcept].content.video.pasteUrl =
             event.target.value;
-        values[this.state.activeConcept].content.video.url = "";
+        values[this.state.activeConcept].content.video.file_name = "";
         this.setState({
             concepts: values,
         });
@@ -223,11 +356,10 @@ class SubjectConcepts extends Component {
 
     handleAudioFile = (index, event) => {
         const values = [...this.state.concepts];
-        var files = event.target.files;
-        var filesArray = [].slice.call(files);
-        filesArray.forEach((e) => {
-            values[this.state.activeConcept].content.audio[index].url = e.name;
-        });
+        values[this.state.activeConcept].content.audio[index].file_name =
+            event.target.files[0].name;
+        values[this.state.activeConcept].content.audio[index].audio =
+            event.target.files[0];
         this.setState({
             concepts: values,
         });
@@ -358,8 +490,8 @@ class SubjectConcepts extends Component {
     addNewConcept = () => {
         const values = [...this.state.concepts];
         const keyboards = [...this.state.keyboards];
-        const flip = [...this.state.flippedState];
-        flip.push({ isFlipped: false });
+        const flips = [...this.state.flipState];
+        flips.push(false);
         keyboards.push({
             all: false,
             chemistry: false,
@@ -372,11 +504,16 @@ class SubjectConcepts extends Component {
             content: {
                 terms: "<p>Terms goes here</p>",
                 definition: "<p>Definition goes here</p>",
-                images: [{ title: "", url: "" }],
-                video: { title: "", url: "", pasteUrl: "" },
+                images: [{ title: "", file_name: "", image: null, path: "" }],
+                video: {
+                    title: "",
+                    file_name: "",
+                    video: null,
+                    pasteUrl: "",
+                },
                 audio: [
-                    { title: "", url: "" },
-                    { title: "", url: "" },
+                    { title: "", file_name: "", audio: null },
+                    { title: "", file_name: "", audio: null },
                 ],
             },
             settings: {
@@ -387,21 +524,21 @@ class SubjectConcepts extends Component {
         this.setState({
             concepts: values,
             keyboards: keyboards,
-            flippedState: flip,
+            flipState: flips,
         });
     };
 
     removingConcept = (index) => {
         const values = [...this.state.concepts];
         const keyboards = [...this.state.keyboards];
-        const flip = [...this.state.flippedState];
-        flip.splice(index, 1);
+        const flips = [...this.state.flipState];
+        flips.splice(index, 1);
         keyboards.splice(index, 1);
         values.splice(index, 1);
         this.setState({
             concepts: values,
             keyboards: keyboards,
-            flippedState: flip,
+            flipState: flips,
             showEdit_option: false,
             contentCollapsed: true,
             imageCollapsed: true,
@@ -413,8 +550,8 @@ class SubjectConcepts extends Component {
     copyConcept = (index) => {
         const values = [...this.state.concepts];
         const keyboards = [...this.state.keyboards];
-        const flip = [...this.state.flippedState];
-        flip.push(flip[index]);
+        const flips = [...this.state.flipState];
+        flips.push(flips[index]);
         keyboards.push({
             all: keyboards[index].all,
             chemistry: keyboards[index].chemistry,
@@ -422,17 +559,14 @@ class SubjectConcepts extends Component {
             maths: keyboards[index].maths,
         });
         values.push({
-            chapter_name: this.props.match.params.chapterName,
-            topic_name: this.props.match.params.topicName,
+            chapter_name: this.chapterName,
+            topic_name: this.topicName,
             content: {
                 terms: values[index].content.terms,
                 definition: values[index].content.definition,
-                images: [{ title: "", url: "" }],
-                video: { title: "", url: "", pasteUrl: "" },
-                audio: [
-                    { title: "", url: "" },
-                    { title: "", url: "" },
-                ],
+                images: values[index].content.images,
+                video: values[index].content.video,
+                audio: values[index].content.audio,
             },
             settings: {
                 virtual_keyboard: values[index].settings.virtual_keyboard,
@@ -442,7 +576,7 @@ class SubjectConcepts extends Component {
         this.setState({
             concepts: values,
             keyboards: keyboards,
-            flippedState: flip,
+            flipState: flips,
         });
     };
 
@@ -460,6 +594,14 @@ class SubjectConcepts extends Component {
 
     componentDidMount = () => {
         document.title = `${this.chapterName} Concepts - Teacher | IQLabs`;
+    };
+
+    handleFlip = (index) => {
+        const flips = [...this.state.flipState];
+        flips[index] = !flips[index];
+        this.setState({
+            flipState: flips,
+        });
     };
 
     render() {
@@ -590,62 +732,191 @@ class SubjectConcepts extends Component {
 
                                             {/* ---------- Concept preview ---------- */}
                                             <div className="col-md-11 pl-md-0">
-                                                <div className="card shadow-sm">
-                                                    <div
-                                                        className="card-body"
-                                                        onClick={() => {
-                                                            this.setState({
-                                                                isFlipped: !this
-                                                                    .state
-                                                                    .isFlipped,
-                                                            });
-                                                        }}
-                                                    >
-                                                        {/* {let flip = [
-                                                                    ...this
-                                                                        .state
-                                                                        .flippedState,
-                                                                ]} */}
-                                                        <ReactCardFlip
-                                                            isFlipped={
+                                                <ReactCardFlip
+                                                    isFlipped={
+                                                        this.state.flipState[
+                                                            c_index
+                                                        ]
+                                                    }
+                                                    flipDirection="vertical"
+                                                >
+                                                    <div className="card shadow-sm">
+                                                        <div className="card-body">
+                                                            <div className="row">
+                                                                {/* terms */}
+                                                                <div
+                                                                    className={`${
+                                                                        this
+                                                                            .state
+                                                                            .selectedImageData
+                                                                            .length !==
+                                                                            0 &&
+                                                                        this
+                                                                            .state
+                                                                            .selectedImageQuestion ===
+                                                                            c_index
+                                                                            ? "col-md-8"
+                                                                            : "col-md-11 pr-md-0"
+                                                                    }`}
+                                                                >
+                                                                    {/* Front-view */}
+                                                                    <div className="card">
+                                                                        <div
+                                                                            className="card-body"
+                                                                            onClick={() =>
+                                                                                this.handleFlip(
+                                                                                    c_index
+                                                                                )
+                                                                            }
+                                                                            dangerouslySetInnerHTML={{
+                                                                                __html:
+                                                                                    concept
+                                                                                        .content
+                                                                                        .terms,
+                                                                            }}
+                                                                        ></div>
+                                                                    </div>
+                                                                </div>
+                                                                {/* image preview */}
+                                                                {this.state
+                                                                    .selectedImageData
+                                                                    .length !==
+                                                                    0 &&
                                                                 this.state
-                                                                    .isFlipped
-                                                            }
-                                                            flipDirection="vertical"
-                                                        >
-                                                            {/* Front-view */}
-                                                            <div className="card">
-                                                                <div
-                                                                    className="card-body location-front-item"
-                                                                    dangerouslySetInnerHTML={{
-                                                                        __html:
-                                                                            concept
-                                                                                .content
-                                                                                .terms,
-                                                                    }}
-                                                                ></div>
-                                                                {/* <img
-                                                                    src="https://iqlabs-media-type1.s3.us-east-2.amazonaws.com/media/localhost.jpg"
-                                                                    alt="sometext"
-                                                                    width="300"
-                                                                    height="auto"
-                                                                /> */}
+                                                                    .selectedImageQuestion ===
+                                                                    c_index ? (
+                                                                    <div className="col-md-3 mb-2 mb-md-0 pr-md-0">
+                                                                        <div
+                                                                            className="card preview-img-lg bg-light shadow-sm"
+                                                                            style={{
+                                                                                backgroundImage: `url(${this.state.selectedImageData.path})`,
+                                                                            }}
+                                                                        ></div>
+                                                                    </div>
+                                                                ) : (
+                                                                    ""
+                                                                )}
+                                                                <div className="col-md-1 d-flex justify-content-md-center justify-content-around flex-wrap">
+                                                                    {concept.content.images.map(
+                                                                        (
+                                                                            images,
+                                                                            index
+                                                                        ) => {
+                                                                            return images.path !==
+                                                                                "" ? (
+                                                                                <div
+                                                                                    key={
+                                                                                        index
+                                                                                    }
+                                                                                    className="card preview-img-sm bg-light shadow-sm"
+                                                                                    style={{
+                                                                                        backgroundImage: `url(${images.path})`,
+                                                                                    }}
+                                                                                    onClick={() =>
+                                                                                        this.changeImage(
+                                                                                            index,
+                                                                                            c_index
+                                                                                        )
+                                                                                    }
+                                                                                ></div>
+                                                                            ) : (
+                                                                                ""
+                                                                            );
+                                                                        }
+                                                                    )}
+                                                                </div>
                                                             </div>
-                                                            {/* Back-view */}
-                                                            <div className="card">
-                                                                <div
-                                                                    className="card-body location-back-item"
-                                                                    dangerouslySetInnerHTML={{
-                                                                        __html:
-                                                                            concept
-                                                                                .content
-                                                                                .definition,
-                                                                    }}
-                                                                ></div>
-                                                            </div>
-                                                        </ReactCardFlip>
+                                                        </div>
                                                     </div>
-                                                </div>
+                                                    <div className="card shadow-sm">
+                                                        <div className="card-body">
+                                                            <div className="row">
+                                                                {/* definition */}
+                                                                <div
+                                                                    className={`${
+                                                                        this
+                                                                            .state
+                                                                            .selectedImageData
+                                                                            .length !==
+                                                                            0 &&
+                                                                        this
+                                                                            .state
+                                                                            .selectedImageQuestion ===
+                                                                            c_index
+                                                                            ? "col-md-8"
+                                                                            : "col-md-11 pr-md-0"
+                                                                    }`}
+                                                                >
+                                                                    {/* Back-view */}
+                                                                    <div className="card">
+                                                                        <div
+                                                                            className="card-body"
+                                                                            onClick={() =>
+                                                                                this.handleFlip(
+                                                                                    c_index
+                                                                                )
+                                                                            }
+                                                                            dangerouslySetInnerHTML={{
+                                                                                __html:
+                                                                                    concept
+                                                                                        .content
+                                                                                        .definition,
+                                                                            }}
+                                                                        ></div>
+                                                                    </div>
+                                                                </div>
+                                                                {/* image preview */}
+                                                                {this.state
+                                                                    .selectedImageData
+                                                                    .length !==
+                                                                    0 &&
+                                                                this.state
+                                                                    .selectedImageQuestion ===
+                                                                    c_index ? (
+                                                                    <div className="col-md-3 mb-2 mb-md-0 pr-md-0">
+                                                                        <div
+                                                                            className="card preview-img-lg bg-light shadow-sm"
+                                                                            style={{
+                                                                                backgroundImage: `url(${this.state.selectedImageData.path})`,
+                                                                            }}
+                                                                        ></div>
+                                                                    </div>
+                                                                ) : (
+                                                                    ""
+                                                                )}
+                                                                <div className="col-md-1 d-flex justify-content-md-center justify-content-around flex-wrap">
+                                                                    {concept.content.images.map(
+                                                                        (
+                                                                            images,
+                                                                            index
+                                                                        ) => {
+                                                                            return images.path !==
+                                                                                "" ? (
+                                                                                <div
+                                                                                    key={
+                                                                                        index
+                                                                                    }
+                                                                                    className="card preview-img-sm bg-light shadow-sm"
+                                                                                    style={{
+                                                                                        backgroundImage: `url(${images.path})`,
+                                                                                    }}
+                                                                                    onClick={() =>
+                                                                                        this.changeImage(
+                                                                                            index,
+                                                                                            c_index
+                                                                                        )
+                                                                                    }
+                                                                                ></div>
+                                                                            ) : (
+                                                                                ""
+                                                                            );
+                                                                        }
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </ReactCardFlip>
                                             </div>
                                         </div>
                                     );
@@ -663,9 +934,6 @@ class SubjectConcepts extends Component {
                             {this.state.showEdit_option ? (
                                 <div className="col-md-3 content-edit">
                                     <div className="d-flex justify-content-between align-items-center mb-2">
-                                        <div className="primary-text small font-weight-bold">
-                                            Edit
-                                        </div>
                                         <button
                                             className="btn btn-primary btn-sm"
                                             onClick={this.handleSubmit}
@@ -682,7 +950,17 @@ class SubjectConcepts extends Component {
                                             ) : (
                                                 ""
                                             )}
-                                            Save & Close
+                                            Save
+                                        </button>
+                                        <button
+                                            className="btn btn-link btn-sm"
+                                            onClick={() => {
+                                                this.setState({
+                                                    showEdit_option: false,
+                                                });
+                                            }}
+                                        >
+                                            Close
                                         </button>
                                     </div>
 
@@ -795,7 +1073,7 @@ class SubjectConcepts extends Component {
                                                 <div className="d-flex justify-content-between align-items-center">
                                                     Image / Video
                                                     {this.state
-                                                        .contentCollapsed ? (
+                                                        .imageCollapsed ? (
                                                         <i className="fas fa-angle-right "></i>
                                                     ) : (
                                                         <i className="fas fa-angle-down "></i>
@@ -826,10 +1104,11 @@ class SubjectConcepts extends Component {
                                                                         }}
                                                                     >
                                                                         <input
-                                                                            type="text  "
+                                                                            type="text"
                                                                             className="form-control form-control-sm"
                                                                             id={`image${index}`}
                                                                             name="image"
+                                                                            autoComplete="off"
                                                                             placeholder={`Image title 0${
                                                                                 index +
                                                                                 1
@@ -884,6 +1163,7 @@ class SubjectConcepts extends Component {
                                                                             type="file"
                                                                             className="custom-file-input"
                                                                             id={`file${index}`}
+                                                                            accept="image/*"
                                                                             aria-describedby="inputGroupFileAddon01"
                                                                             onChange={(
                                                                                 event
@@ -898,10 +1178,10 @@ class SubjectConcepts extends Component {
                                                                             className="custom-file-label"
                                                                             htmlFor={`file${index}`}
                                                                         >
-                                                                            {options.url ===
+                                                                            {options.file_name ===
                                                                             ""
                                                                                 ? "Choose file"
-                                                                                : options.url}
+                                                                                : options.file_name}
                                                                         </label>
                                                                     </div>
                                                                 </Fragment>
@@ -938,6 +1218,7 @@ class SubjectConcepts extends Component {
                                                             name="video"
                                                             id="video"
                                                             placeholder="Video title"
+                                                            autoComplete="off"
                                                             className="form-control form-control-sm border-secondary mb-1"
                                                             onChange={
                                                                 this
@@ -949,6 +1230,7 @@ class SubjectConcepts extends Component {
                                                                 type="file"
                                                                 className="custom-file-input"
                                                                 id="video"
+                                                                accept="video/*"
                                                                 aria-describedby="inputGroupFileAddon01"
                                                                 onChange={(
                                                                     event
@@ -966,13 +1248,14 @@ class SubjectConcepts extends Component {
                                                                     .activeConceptData
                                                                     .content
                                                                     .video
-                                                                    .url === ""
+                                                                    .file_name ===
+                                                                ""
                                                                     ? "Choose file"
                                                                     : this.state
                                                                           .activeConceptData
                                                                           .content
                                                                           .video
-                                                                          .url}
+                                                                          .file_name}
                                                             </label>
                                                         </div>
                                                         <p className="text-center small font-weight-bold mb-2">
@@ -1016,7 +1299,7 @@ class SubjectConcepts extends Component {
                                                 <div className="d-flex justify-content-between align-items-center">
                                                     Audio
                                                     {this.state
-                                                        .contentCollapsed ? (
+                                                        .audioCollapsed ? (
                                                         <i className="fas fa-angle-right "></i>
                                                     ) : (
                                                         <i className="fas fa-angle-down "></i>
@@ -1037,10 +1320,11 @@ class SubjectConcepts extends Component {
                                                                     key={index}
                                                                 >
                                                                     <input
-                                                                        type="text  "
+                                                                        type="text"
                                                                         className="form-control form-control-sm border-secondary mb-1"
                                                                         id={`audio${index}`}
                                                                         name="audio"
+                                                                        autoComplete="off"
                                                                         placeholder={`Audio title 0${
                                                                             index +
                                                                             1
@@ -1062,6 +1346,7 @@ class SubjectConcepts extends Component {
                                                                             type="file"
                                                                             className="custom-file-input"
                                                                             id={`audio${index}`}
+                                                                            accept="audio/*"
                                                                             aria-describedby="inputGroupFileAddon01"
                                                                             onChange={(
                                                                                 event
@@ -1076,10 +1361,10 @@ class SubjectConcepts extends Component {
                                                                             className="custom-file-label"
                                                                             htmlFor={`audio${index}`}
                                                                         >
-                                                                            {options.url ===
+                                                                            {options.file_name ===
                                                                             ""
                                                                                 ? "Choose file"
-                                                                                : options.url}
+                                                                                : options.file_name}
                                                                         </label>
                                                                     </div>
                                                                 </Fragment>

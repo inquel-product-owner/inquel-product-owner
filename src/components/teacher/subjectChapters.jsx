@@ -185,24 +185,6 @@ class Chapters extends Component {
         });
     };
 
-    loadChapterData = () => {
-        fetch(`${this.url}/teacher/subject/${this.subjectId}/chapter/`, {
-            headers: this.headers,
-            method: "GET",
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                this.setState({
-                    subjectItems: result.data.results,
-                    page_loading: false,
-                });
-                console.log(result);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
     componentDidMount = () => {
         this.setState({
             chapterName: this.props.match.params.chapterName,
@@ -223,8 +205,6 @@ class Chapters extends Component {
             .catch((err) => {
                 console.log(err);
             });
-
-        this.loadChapterData();
     };
 
     componentDidUpdate = (prevProps, prevState) => {

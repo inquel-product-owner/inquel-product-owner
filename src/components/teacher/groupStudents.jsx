@@ -16,7 +16,7 @@ class GroupStudents extends Component {
             studentItem: [],
             activeStudentPage: 1,
             totalStudentCount: 0,
-            page_loading: false,
+            page_loading: true,
         };
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
@@ -41,7 +41,7 @@ class GroupStudents extends Component {
 
     loadStudentData = () => {
         fetch(
-            `${this.url}/teacher/group/${this.props.match.params.groupId}/student/?page=${this.state.activeStudentPage}`,
+            `${this.url}/teacher/student/?group=${this.props.match.params.groupId}&page=${this.state.activeStudentPage}`,
             {
                 headers: this.headers,
                 method: "GET",
