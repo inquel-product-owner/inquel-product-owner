@@ -10,11 +10,18 @@ import GroupStudents from "./groupStudents";
 import StudentList from "./studentList";
 import StudentProfile from "./studentProfile";
 import SubjectChapters from "./subject";
-import Chapters from "./subjectChapters";
-import SubjectNotes from "./subjectNotes";
-import SubjectSummary from "./subjectSummary";
-import SubjectType1 from "./subjectType1";
-import SubjectConcepts from "./subjectConcepts";
+import Chapters from "./chapters";
+import SubjectNotes from "./notes";
+import SubjectSummary from "./summary";
+import SubjectType1 from "./type1";
+import SubjectConcepts from "./concepts";
+import CycleTestAuto from "./cycleTest-auto";
+import CyleTestDirect from "./cycleTest-direct";
+import CycleTestAutoQA from "./cycleTest-autoQA";
+import SemesterAuto from "./semester-auto";
+import SemesterAutoQA from "./semester-autoQA";
+import SemesterDirect from "./semester-direct";
+import EvaluateStudents from "./evaluateStudents";
 
 const teacherRoutes = (
     <Switch>
@@ -75,6 +82,18 @@ const teacherRoutes = (
                     <Redirect to="/teacher/login" />
                 ) : (
                     <StudentProfile {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/teacher/student/:studentId/direct-test"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <EvaluateStudents {...props} />
                 )
             }
         />
@@ -150,7 +169,90 @@ const teacherRoutes = (
                 )
             }
         />
-        <Route exact path="/teacher/login" component={TeacherLogin} />
+        <Route
+            exact
+            path="/teacher/subject/:subjectId/semester/:semesterId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <SemesterAuto {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/teacher/subject/:subjectId/semester/:semesterId/section/:sectionId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <SemesterAutoQA {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/teacher/subject/:subjectId/semester/:semesterId/direct-test"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <SemesterDirect {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/teacher/subject/:subjectId/:chapterName/cycle-test/:cycle_testId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <CycleTestAuto {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/teacher/subject/:subjectId/:chapterName/cycle-test/:cycle_testId/section/:sectionId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <CycleTestAutoQA {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/teacher/subject/:subjectId/:chapterName/cycle-test/:cycle_testId/direct-test"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <CyleTestDirect {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/teacher/login"
+            render={() =>
+                localStorage.getItem("Authorization") &&
+                localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher" />
+                ) : (
+                    <TeacherLogin />
+                )
+            }
+        />
         <Route
             exact
             path="/teacher/account/activation/:tokenId"

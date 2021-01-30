@@ -98,6 +98,11 @@ class StudentAssignModal extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
+                if (result.data) {
+                    this.setState({
+                        studentItem: result.data,
+                    });
+                }
                 this.setState({
                     studentItem: result.data,
                     isLoaded: true,
@@ -322,6 +327,11 @@ class GroupStudents extends Component {
             this.setState({
                 is_formSubmited: true,
             });
+            setTimeout(() => {
+                this.setState({
+                    showStudentModal: false,
+                });
+            }, 1000);
         }
     };
 
@@ -332,7 +342,8 @@ class GroupStudents extends Component {
     render() {
         document.title =
             this.state.groupItem.length !== 0
-                ? this.state.groupItem.group_name + " Student List - HOD | IQLabs"
+                ? this.state.groupItem.group_name +
+                  " Student List - HOD | IQLabs"
                 : "Group Student List - HOD | IQLabs";
         return (
             <div className="wrapper">

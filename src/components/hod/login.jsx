@@ -40,6 +40,7 @@ function ForgotPasswordModal(props) {
                     setSuccessMsg(result.msg);
                     setSuccessAlert(true);
                     setLoader(false);
+                    props.formSubmission(true);
                 } else {
                     setErrorMsg(result.msg);
                     setErrorAlert(true);
@@ -204,6 +205,16 @@ class HODLogin extends Component {
             });
     };
 
+    formSubmission = (is_formSubmited) => {
+        if (is_formSubmited) {
+            setTimeout(() => {
+                this.setState({
+                    showModal: false,
+                });
+            }, 2000);
+        }
+    };
+
     componentDidMount = () => {
         document.title = "Login - HOD | IQLabs";
     };
@@ -221,6 +232,7 @@ class HODLogin extends Component {
                     <ForgotPasswordModal
                         show={this.state.showModal}
                         onHide={this.toggleModal}
+                        formSubmission={this.formSubmission}
                     />
                 ) : (
                     ""
@@ -314,7 +326,12 @@ class HODLogin extends Component {
                                                                     .showPassword
                                                             }
                                                         >
-                                                            <i className="fas fa-eye"></i>
+                                                            {this.state
+                                                                .showPassword ? (
+                                                                <i className="far fa-eye-slash"></i>
+                                                            ) : (
+                                                                <i className="far fa-eye"></i>
+                                                            )}
                                                         </button>
                                                     </div>
                                                 </div>

@@ -240,11 +240,6 @@ class HODModal extends Component {
     };
 
     handleValid_to = (event) => {
-        // var d = new Date(event.target.value).toLocaleDateString();
-        // var datearray = d.split("/");
-        // var year = datearray[2];
-        // var month = datearray[0];
-        // var day = datearray[1];
         this.setState({
             selectedValid_to: `${event.target.value} 00:00:00`,
         });
@@ -442,7 +437,11 @@ class HODModal extends Component {
                                             type="button"
                                             onClick={this.showPassword}
                                         >
-                                            <i className="fas fa-eye"></i>
+                                            {this.state.showPassword ? (
+                                                <i className="far fa-eye-slash"></i>
+                                            ) : (
+                                                <i className="far fa-eye"></i>
+                                            )}
                                         </button>
                                     </div>
                                 </div>
@@ -933,6 +932,11 @@ class Profiles extends Component {
             this.setState({
                 is_formSubmited: true,
             });
+            setTimeout(() => {
+                this.setState({
+                    modalShow: false,
+                });
+            }, 1000);
         }
     };
 

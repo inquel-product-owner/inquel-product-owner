@@ -29,7 +29,17 @@ const adminRoutes = (
                 )
             }
         />
-        <Route path="/admin/login" component={Login} />
+        <Route
+            exact
+            path="/admin/login"
+            render={() =>
+                localStorage.getItem("Inquel-Auth") ? (
+                    <Redirect to="/admin" />
+                ) : (
+                    <Login />
+                )
+            }
+        />
         <Route
             path="/admin/profiles"
             render={(props) =>

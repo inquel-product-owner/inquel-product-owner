@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from "react";
+import axios from "axios";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import CKEditor from "ckeditor4-react";
@@ -138,10 +139,7 @@ class SubjectType1 extends Component {
                         console.log(result);
                         if (result.sts === true) {
                             this.setState({
-                                successMsg: result.msg,
                                 question_random_id: result.question_random_id,
-                                showSuccessAlert: true,
-                                showLoader: false,
                                 isForm_submitted: true,
                             });
                         } else {
@@ -187,14 +185,6 @@ class SubjectType1 extends Component {
 
             let form_data = new FormData();
 
-            form_data.append(
-                "type1_video_1_title",
-                questionValues.content.video.title
-            );
-            form_data.append(
-                "type1_video_1",
-                questionValues.content.video.video
-            );
             form_data.append("chapter_name", this.chapterName);
             form_data.append("topic_name", this.topicName);
             form_data.append(
@@ -202,61 +192,81 @@ class SubjectType1 extends Component {
                 this.state.question_random_id
             );
 
-            for (let i = 0; i < questionValues.content.images; i++) {
+            if (questionValues.content.video.video !== null) {
                 form_data.append(
-                    `type1_image_${i + 1}_title`,
-                    questionValues.content.images[i].title
+                    "type1_video_1_title",
+                    questionValues.content.video.title
                 );
                 form_data.append(
-                    `type1_image_${i + 1}`,
-                    questionValues.content.images[i].image
-                );
-            }
-
-            for (let i = 0; i < questionValues.content.audio; i++) {
-                form_data.append(
-                    `type1_audio_${i + 1}_title`,
-                    questionValues.content.audio[i].title
-                );
-                form_data.append(
-                    `type1_audio_${i + 1}`,
-                    questionValues.content.audio[i].audio
+                    "type1_video_1",
+                    questionValues.content.video.video
                 );
             }
 
-            console.log(form_data);
-
-            fetch(
-                `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/files/`,
-                {
-                    headers: {
-                        Accept: "application/json",
-                        "Content-Type": "multipart/form-data",
-                        Authorization: this.authToken,
-                    },
-                    method: "POST",
-                    body: form_data,
+            for (let i = 0; i < questionValues.content.images.length; i++) {
+                if (questionValues.content.images[i].image !== null) {
+                    form_data.append(
+                        `type1_image_${i + 1}_title`,
+                        questionValues.content.images[i].title
+                    );
+                    form_data.append(
+                        `type1_image_${i + 1}`,
+                        questionValues.content.images[i].image
+                    );
+                } else {
+                    continue;
                 }
-            )
-                .then((res) => res.json())
+            }
+
+            for (let i = 0; i < questionValues.content.audio.length; i++) {
+                if (questionValues.content.audio[i].audio !== null) {
+                    form_data.append(
+                        `type1_audio_${i + 1}_title`,
+                        questionValues.content.audio[i].title
+                    );
+                    form_data.append(
+                        `type1_audio_${i + 1}`,
+                        questionValues.content.audio[i].audio
+                    );
+                } else {
+                    continue;
+                }
+            }
+
+            const options = {
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "multipart/form-data",
+                    Authorization: this.authToken,
+                },
+            };
+
+            axios
+                .post(
+                    `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/files/`,
+                    form_data,
+                    options
+                )
                 .then((result) => {
                     console.log(result);
-                    console.log(form_data);
-                    if (result.sts === true) {
+                    for (var p of form_data) {
+                        console.log(p);
+                    }
+                    if (result.data.sts === true) {
                         this.setState({
-                            successMsg: result.msg,
+                            successMsg: result.data.msg,
                             showSuccessAlert: true,
                             showLoader: false,
                             question_random_id: "",
                         });
                     } else {
-                        if (result.detail) {
+                        if (result.data.detail) {
                             this.setState({
-                                errorMsg: result.detail,
+                                errorMsg: result.data.detail,
                             });
                         } else {
                             this.setState({
-                                errorMsg: result.msg,
+                                errorMsg: result.data.msg,
                             });
                         }
                         this.setState({
@@ -374,12 +384,6 @@ class SubjectType1 extends Component {
 
     handleImageFile = (index, event) => {
         const values = [...this.state.questions];
-        // var files = event.target.files;
-        // var filesArray = [].slice.call(files);
-        // filesArray.forEach((e) => {
-        //     values[this.state.activeQuestion].content.images[index].file_name =
-        //         e.name;
-        // });
         values[this.state.activeQuestion].content.images[index].file_name =
             event.target.files[0].name;
         values[this.state.activeQuestion].content.images[
