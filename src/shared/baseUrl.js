@@ -6,3 +6,5 @@ export const adminPathUrl = "52fd_1f4a/api/v1/admin";
 export const hodUrl = "424f_0659/api/v1";
 
 export const teacherUrl = "3a3c_a1a6/api/v1";
+
+export const studentUrl = "5ddf_cae2/api/v1";

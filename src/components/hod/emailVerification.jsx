@@ -152,14 +152,21 @@ class EmailVerification extends Component {
                         var errorMessage = "";
                         if (result.username) {
                             errorMessage = result.username[0];
-                        }
-                        if (result.password) {
+                            this.setState({
+                                errorMsg: errorMessage,
+                            });
+                        } else if (result.password) {
                             errorMessage = result.password[0];
+                            this.setState({
+                                errorMsg: errorMessage,
+                            });
                         } else {
                             errorMessage = result.msg;
+                            this.setState({
+                                errorMsg: errorMessage,
+                            });
                         }
                         this.setState({
-                            errorMsg: errorMessage,
                             showErrorAlert: true,
                             showLoader: false,
                         });
@@ -350,7 +357,12 @@ class EmailVerification extends Component {
                                                                     .showPassword
                                                             }
                                                         >
-                                                            <i className="fas fa-eye"></i>
+                                                            {this.state
+                                                                .showPassword ? (
+                                                                <i className="far fa-eye-slash"></i>
+                                                            ) : (
+                                                                <i className="far fa-eye"></i>
+                                                            )}
                                                         </button>
                                                     </div>
                                                 </div>
@@ -396,7 +408,12 @@ class EmailVerification extends Component {
                                                                     .showConfirmPassword
                                                             }
                                                         >
-                                                            <i className="fas fa-eye"></i>
+                                                            {this.state
+                                                                .showConfirmPassword ? (
+                                                                <i className="far fa-eye-slash"></i>
+                                                            ) : (
+                                                                <i className="far fa-eye"></i>
+                                                            )}
                                                         </button>
                                                     </div>
                                                 </div>

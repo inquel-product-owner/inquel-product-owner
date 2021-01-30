@@ -258,7 +258,12 @@ export default class ForgotPassword extends Component {
                                                                         .showPassword
                                                                 }
                                                             >
-                                                                <i className="fas fa-eye"></i>
+                                                                {this.state
+                                                                    .showPassword ? (
+                                                                    <i className="far fa-eye-slash"></i>
+                                                                ) : (
+                                                                    <i className="far fa-eye"></i>
+                                                                )}
                                                             </button>
                                                         </div>
                                                     </div>
@@ -305,7 +310,12 @@ export default class ForgotPassword extends Component {
                                                                         .showConfirmPassword
                                                                 }
                                                             >
-                                                                <i className="fas fa-eye"></i>
+                                                                {this.state
+                                                                    .showConfirmPassword ? (
+                                                                    <i className="far fa-eye-slash"></i>
+                                                                ) : (
+                                                                    <i className="far fa-eye"></i>
+                                                                )}
                                                             </button>
                                                         </div>
                                                     </div>

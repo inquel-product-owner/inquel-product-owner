@@ -33,7 +33,18 @@ const hodRoutes = (
                 )
             }
         />
-        <Route exact path="/hod/login" component={HODLogin} />
+        <Route
+            exact
+            path="/hod/login"
+            render={() =>
+                localStorage.getItem("Authorization") &&
+                localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod" />
+                ) : (
+                    <HODLogin />
+                )
+            }
+        />
         <Route
             exact
             path="/hod/group/:groupId"

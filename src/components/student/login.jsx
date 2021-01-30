@@ -1,10 +1,128 @@
-import React, { Component } from "react";
-import { Navbar, Spinner, Alert } from "react-bootstrap";
+import React, { Component, useState } from "react";
+import { Navbar, Alert, Spinner, Modal } from "react-bootstrap";
 import logo from "../../assets/IQ_Labs_V5.png";
 import { Link, Redirect } from "react-router-dom";
-import { baseUrl, adminPathUrl } from "../../shared/baseUrl.js";
+import { baseUrl, accountsUrl } from "../../shared/baseUrl.js";
 
-class Login extends Component {
+function ForgotPasswordModal(props) {
+    const [email, setEmail] = useState("");
+    const [errorMsg, setErrorMsg] = useState("");
+    const [successMsg, setSuccessMsg] = useState("");
+    const [showErrorAlert, setErrorAlert] = useState(false);
+    const [showSuccessAlert, setSuccessAlert] = useState(false);
+    const [showLoader, setLoader] = useState(false);
+
+    function handleSubmit(event) {
+        event.preventDefault();
+        var url = baseUrl + accountsUrl;
+        var authToken = localStorage.getItem("Authorization");
+        var headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: authToken,
+        };
+
+        setLoader(true);
+        setErrorAlert(false);
+        setSuccessAlert(false);
+
+        fetch(`${url}/forgotpassword/`, {
+            headers: headers,
+            method: "POST",
+            body: JSON.stringify({
+                email: email,
+            }),
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts) {
+                    setSuccessMsg(result.msg);
+                    setSuccessAlert(true);
+                    setLoader(false);
+                    setTimeout(() => {
+                        props.formSubmission(true);
+                    }, 2500);
+                } else {
+                    setErrorMsg(result.msg);
+                    setErrorAlert(true);
+                    setLoader(false);
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
+
+    return (
+        <Modal
+            {...props}
+            size="md"
+            aria-labelledby="contained-modal-title-vcenter"
+            centered
+        >
+            <Modal.Header closeButton className="primary-text h5">
+                Forgot password
+            </Modal.Header>
+            <Modal.Body>
+                <Alert
+                    variant="danger"
+                    show={showErrorAlert}
+                    onClose={() => {
+                        setErrorAlert(false);
+                    }}
+                    dismissible
+                >
+                    {errorMsg}
+                </Alert>
+                <Alert
+                    variant="success"
+                    show={showSuccessAlert}
+                    onClose={() => {
+                        setSuccessAlert(false);
+                    }}
+                    dismissible
+                >
+                    {successMsg}
+                </Alert>
+                <form onSubmit={handleSubmit} autoComplete="off">
+                    <div className="form-group">
+                        <label htmlFor="email">Email</label>
+                        <input
+                            type="email"
+                            name="email"
+                            id="email"
+                            className="form-control borders form-control-lg"
+                            onChange={(event) => {
+                                setEmail(event.target.value);
+                            }}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <button className="btn btn-primary btn-sm btn-block">
+                            {showLoader ? (
+                                <Spinner
+                                    as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    aria-hidden="true"
+                                    className="mr-2"
+                                />
+                            ) : (
+                                ""
+                            )}
+                            Send Email
+                        </button>
+                    </div>
+                </form>
+            </Modal.Body>
+        </Modal>
+    );
+}
+
+class StudentLogin extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -15,6 +133,8 @@ class Login extends Component {
             showLoader: false,
             showErrorAlert: false,
             showPassword: false,
+            showModal: false,
+            is_formSubmitted: false,
         };
     }
 
@@ -32,6 +152,12 @@ class Login extends Component {
         });
     };
 
+    toggleModal = () => {
+        this.setState({
+            showModal: !this.state.showModal,
+        });
+    };
+
     handleSubmit = (event) => {
         event.preventDefault();
         this.setState({
@@ -39,7 +165,7 @@ class Login extends Component {
             showLoader: true,
             showErrorAlert: false,
         });
-        var url = `${baseUrl}${adminPathUrl}/login/`;
+        var url = `${baseUrl}${accountsUrl}/login/`;
         fetch(url, {
             headers: {
                 Accept: "application/json",
@@ -59,9 +185,10 @@ class Login extends Component {
                 if (result.sts) {
                     localStorage.clear();
                     localStorage.setItem(
-                        "Inquel-Auth",
+                        "Authorization",
                         `Token ${result.token}`
                     );
+                    localStorage.setItem("is_student", result.is_student);
                     localStorage.setItem("Username", result.username);
                     this.setState({
                         showLoader: false,
@@ -82,15 +209,48 @@ class Login extends Component {
     };
 
     componentDidMount = () => {
-        document.title = "Login - Admin | IQLabs";
+        document.title = "Login - Student | IQLabs";
+    };
+
+    componentDidUpdate = (prevProps, prevState) => {
+        if (
+            prevState.is_formSubmitted !== this.state.is_formSubmitted &&
+            this.state.is_formSubmitted === true
+        ) {
+            this.setState({
+                showModal: !this.state.showModal,
+                is_formSubmitted: false,
+            });
+        }
+    };
+
+    formSubmission = (is_formSubmitted) => {
+        if (is_formSubmitted) {
+            this.setState({
+                is_formSubmitted: true,
+            });
+        }
     };
 
     render() {
-        if (localStorage.getItem("Inquel-Auth")) {
-            return <Redirect to="/admin" />;
+        if (
+            localStorage.getItem("Authorization") &&
+            localStorage.getItem("is_student")
+        ) {
+            return <Redirect to="/student" />;
         }
         return (
             <>
+                {this.state.showModal ? (
+                    <ForgotPasswordModal
+                        show={this.state.showModal}
+                        onHide={this.toggleModal}
+                        formSubmission={this.formSubmission}
+                    />
+                ) : (
+                    ""
+                )}
+
                 <Navbar className="secondary-bg py-2 px-4">
                     <Navbar.Brand>
                         <Link to="/">
@@ -102,7 +262,7 @@ class Login extends Component {
                     <div className="container">
                         <div className="row justify-content-center align-items-center">
                             <div className="col-md-5">
-                                <div className="card shadow py-4">
+                                <div className="card shadow py-2">
                                     <div className="card-body ">
                                         <h3 className="primary-text mb-4">
                                             LOGIN
@@ -129,7 +289,7 @@ class Login extends Component {
                                                 </label>
                                                 <input
                                                     type="text"
-                                                    name="username"
+                                                    name="student_username"
                                                     id="username"
                                                     className="form-control form-shadow form-control-lg"
                                                     onChange={
@@ -148,7 +308,6 @@ class Login extends Component {
                                                     className="input-group form-shadow"
                                                     style={{
                                                         borderRadius: "6px",
-                                                        overflow: "hidden",
                                                     }}
                                                 >
                                                     <input
@@ -158,7 +317,7 @@ class Login extends Component {
                                                                 ? "text"
                                                                 : "password"
                                                         }
-                                                        name="password"
+                                                        name="student_password"
                                                         id="password"
                                                         className="form-control form-control-lg"
                                                         onChange={
@@ -191,6 +350,20 @@ class Login extends Component {
                                                 </div>
                                             </div>
                                             <div className="form-group">
+                                                <p className="small mb-0 text-right">
+                                                    {" "}
+                                                    <Link
+                                                        to="#"
+                                                        onClick={
+                                                            this.toggleModal
+                                                        }
+                                                        className="primary-text"
+                                                    >
+                                                        Forgot password?
+                                                    </Link>
+                                                </p>
+                                            </div>
+                                            <div className="form-group">
                                                 <button
                                                     type="submit"
                                                     className="btn btn-primary btn-block"
@@ -213,6 +386,26 @@ class Login extends Component {
                                                 </button>
                                             </div>
                                         </form>
+                                        <p className="small text-center mb-0">
+                                            or
+                                        </p>
+                                        <div className="d-flex justify-content-around mb-3">
+                                            <button className="btn btn-primary btn-sm">
+                                                <i className="fab fa-google"></i>
+                                            </button>
+                                            <button className="btn btn-primary btn-sm">
+                                                <i className="fab fa-facebook"></i>
+                                            </button>
+                                        </div>
+                                        <p className="text-center small mb-0">
+                                            Don't have an account?{" "}
+                                            <Link
+                                                to=""
+                                                className="primary-text font-weight-bold"
+                                            >
+                                                Join Inquel Online Learning
+                                            </Link>{" "}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -237,16 +430,16 @@ class Login extends Component {
                             </div>
                             <div className="col-md-6 ">
                                 <div className="d-flex justify-content-center justify-content-md-end ">
-                                    <Link to="/admin" className="text-white">
+                                    <Link to="/" className="text-white">
                                         <i className="fab fa-facebook-f mr-4"></i>
                                     </Link>
-                                    <Link to="/admin" className="text-white">
+                                    <Link to="/" className="text-white">
                                         <i className="fab fa-twitter mr-4"></i>
                                     </Link>
-                                    <Link to="/admin" className="text-white">
+                                    <Link to="/" className="text-white">
                                         <i className="fab fa-instagram mr-4"></i>
                                     </Link>
-                                    <Link to="/admin" className="text-white">
+                                    <Link to="/" className="text-white">
                                         <i className="fab fa-linkedin-in mr-4"></i>
                                     </Link>
                                 </div>
@@ -259,4 +452,4 @@ class Login extends Component {
     }
 }
 
-export default Login;
+export default StudentLogin;

@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from "react";
+import axios from "axios";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import CKEditor from "ckeditor4-react";
@@ -92,44 +93,47 @@ class SubjectConcepts extends Component {
             showSuccessAlert: false,
         });
 
-        fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/`,
-            {
-                headers: this.headers,
-                method: "POST",
-                body: JSON.stringify(this.state.activeConceptData),
-            }
-        )
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    this.setState({
-                        successMsg: result.msg,
-                        concepts_random_id: result.concepts_random_id,
-                        showSuccessAlert: true,
-                        showLoader: false,
-                        isForm_submitted: true,
-                    });
-                } else {
-                    if (result.detail) {
+        if (this.state.concepts_random_id === "") {
+            fetch(
+                `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/`,
+                {
+                    headers: this.headers,
+                    method: "POST",
+                    body: JSON.stringify(this.state.activeConceptData),
+                }
+            )
+                .then((res) => res.json())
+                .then((result) => {
+                    console.log(result);
+                    if (result.sts === true) {
                         this.setState({
-                            errorMsg: result.detail,
+                            concepts_random_id: result.concepts_random_id,
+                            isForm_submitted: true,
                         });
                     } else {
+                        if (result.detail) {
+                            this.setState({
+                                errorMsg: result.detail,
+                            });
+                        } else {
+                            this.setState({
+                                errorMsg: result.msg,
+                            });
+                        }
                         this.setState({
-                            errorMsg: result.msg,
+                            showErrorAlert: true,
+                            showLoader: false,
                         });
                     }
-                    this.setState({
-                        showErrorAlert: true,
-                        showLoader: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        } else {
+            this.setState({
+                isForm_submitted: true,
             });
+        }
     };
 
     componentDidUpdate = (prevProps, prevState) => {
@@ -148,14 +152,6 @@ class SubjectConcepts extends Component {
 
             let form_data = new FormData();
 
-            form_data.append(
-                "concepts_video_1_title",
-                conceptValues.content.video.title
-            );
-            form_data.append(
-                "concepts_video_1",
-                conceptValues.content.video.video
-            );
             form_data.append("chapter_name", this.chapterName);
             form_data.append("topic_name", this.topicName);
             form_data.append(
@@ -163,58 +159,81 @@ class SubjectConcepts extends Component {
                 this.state.concepts_random_id
             );
 
-            for (let i = 0; i < conceptValues.content.images; i++) {
+            if (conceptValues.content.video.video !== null) {
                 form_data.append(
-                    `concepts_image_${i + 1}_title`,
-                    conceptValues.content.images[i].title
+                    "concepts_video_1_title",
+                    conceptValues.content.video.title
                 );
                 form_data.append(
-                    `concepts_image_${i + 1}`,
-                    conceptValues.content.images[i].image
-                );
-            }
-
-            for (let i = 0; i < conceptValues.content.audio; i++) {
-                form_data.append(
-                    `concepts_audio_${i + 1}_title`,
-                    conceptValues.content.audio[i].title
-                );
-                form_data.append(
-                    `concepts_audio_${i + 1}`,
-                    conceptValues.content.audio[i].audio
+                    "concepts_video_1",
+                    conceptValues.content.video.video
                 );
             }
 
-            fetch(
-                `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/files/`,
-                {
-                    headers: {
-                        Accept: "application/json",
-                        "Content-Type": "multipart/form-data",
-                        Authorization: this.authToken,
-                    },
-                    method: "POST",
-                    body: form_data,
+            for (let i = 0; i < conceptValues.content.images.length; i++) {
+                if (conceptValues.content.images[i].image !== null) {
+                    form_data.append(
+                        `concepts_image_${i + 1}_title`,
+                        conceptValues.content.images[i].title
+                    );
+                    form_data.append(
+                        `concepts_image_${i + 1}`,
+                        conceptValues.content.images[i].image
+                    );
+                } else {
+                    continue;
                 }
-            )
-                .then((res) => res.json())
+            }
+
+            for (let i = 0; i < conceptValues.content.audio.length; i++) {
+                if (conceptValues.content.audio[i].audio !== null) {
+                    form_data.append(
+                        `concepts_audio_${i + 1}_title`,
+                        conceptValues.content.audio[i].title
+                    );
+                    form_data.append(
+                        `concepts_audio_${i + 1}`,
+                        conceptValues.content.audio[i].audio
+                    );
+                } else {
+                    continue;
+                }
+            }
+
+            const options = {
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "multipart/form-data",
+                    Authorization: this.authToken,
+                },
+            };
+
+            axios
+                .post(
+                    `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/files/`,
+                    form_data,
+                    options
+                )
                 .then((result) => {
                     console.log(result);
-                    console.log(form_data);
-                    if (result.sts === true) {
+                    for (var p of form_data) {
+                        console.log(p);
+                    }
+                    if (result.data.sts === true) {
                         this.setState({
-                            successMsg: result.msg,
+                            successMsg: result.data.msg,
                             showSuccessAlert: true,
                             showLoader: false,
+                            concepts_random_id: "",
                         });
                     } else {
-                        if (result.detail) {
+                        if (result.data.detail) {
                             this.setState({
-                                errorMsg: result.detail,
+                                errorMsg: result.data.detail,
                             });
                         } else {
                             this.setState({
-                                errorMsg: result.msg,
+                                errorMsg: result.data.msg,
                             });
                         }
                         this.setState({

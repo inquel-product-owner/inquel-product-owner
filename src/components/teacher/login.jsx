@@ -40,6 +40,7 @@ function ForgotPasswordModal(props) {
                     setSuccessMsg(result.msg);
                     setSuccessAlert(true);
                     setLoader(false);
+                    props.formSubmission(true);
                 } else {
                     setErrorMsg(result.msg);
                     setErrorAlert(true);
@@ -208,6 +209,16 @@ class TeacherLogin extends Component {
         document.title = "Login - Teacher | IQLabs";
     };
 
+    formSubmission = (is_formSubmited) => {
+        if (is_formSubmited) {
+            setTimeout(() => {
+                this.setState({
+                    showModal: false,
+                });
+            }, 2000);
+        }
+    };
+
     render() {
         if (
             localStorage.getItem("Authorization") &&
@@ -221,6 +232,7 @@ class TeacherLogin extends Component {
                     <ForgotPasswordModal
                         show={this.state.showModal}
                         onHide={this.toggleModal}
+                        formSubmission={this.formSubmission}
                     />
                 ) : (
                     ""
@@ -314,7 +326,12 @@ class TeacherLogin extends Component {
                                                                     .showPassword
                                                             }
                                                         >
-                                                            <i className="fas fa-eye"></i>
+                                                            {this.state
+                                                                .showPassword ? (
+                                                                <i className="far fa-eye-slash"></i>
+                                                            ) : (
+                                                                <i className="far fa-eye"></i>
+                                                            )}
                                                         </button>
                                                     </div>
                                                 </div>
@@ -356,7 +373,9 @@ class TeacherLogin extends Component {
                                                 </button>
                                             </div>
                                         </form>
-                                        <p className="small text-center mb-0">or</p>
+                                        <p className="small text-center mb-0">
+                                            or
+                                        </p>
                                         <div className="d-flex justify-content-around mb-3">
                                             <button className="btn btn-primary btn-sm">
                                                 <i className="fab fa-google"></i>

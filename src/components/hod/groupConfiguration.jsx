@@ -35,11 +35,6 @@ class GroupModal extends Component {
     };
 
     handleValid_to = (event) => {
-        // var d = new Date(event.target.value).toLocaleDateString();
-        // var datearray = d.split("/");
-        // var year = datearray[2];
-        // var month = datearray[0];
-        // var day = datearray[1];
         this.setState({
             valid_to: `${event.target.value} 00:00:00`,
         });
@@ -265,6 +260,11 @@ class GroupConfiguration extends Component {
             this.setState({
                 is_formSubmited: true,
             });
+            setTimeout(() => {
+                this.setState({
+                    groupModalShow: false,
+                });
+            }, 1000);
         }
     };
 

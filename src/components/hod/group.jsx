@@ -227,6 +227,11 @@ class Group extends Component {
             this.setState({
                 is_formSubmited: true,
             });
+            setTimeout(() => {
+                this.setState({
+                    subjectModalShow: false,
+                });
+            }, 1000);
         }
     };
 
