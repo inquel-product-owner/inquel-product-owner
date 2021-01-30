@@ -30,6 +30,10 @@ body {
     background-color: #efd2ac !important;
 }
 
+.light-bg {
+    background-color: #fff9f0 !important;
+}
+
 /* Text */
 
 .primary-text {
@@ -49,7 +53,7 @@ body {
 .card {
     border: none;
     background-color: white;
-    border-radius: 8px;
+    border-radius: 8px !important;
     text-decoration: none !important;
 }
 
@@ -151,6 +155,15 @@ body {
 
 .btn-link:focus {
     text-decoration: none;
+}
+
+.btn-tomato {
+    background-color: #ffa88b;
+    color: black;
+}
+
+.btn-tomato:hover {
+    background-color: #ff9673;
 }
 
 /* Form */
@@ -256,7 +269,7 @@ input[type="search"]:focus {
     color: #4b4b4b;
     cursor: pointer;
     font-weight: 600;
-    font-size: 15px;
+    font-size: 14px;
     border-radius: 8px !important;
 }
 
@@ -264,6 +277,13 @@ input[type="search"]:focus {
 .nav-pills .show > .nav-link {
     color: #621012;
     background-color: #efd2ac;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.nav-pills .grey-item .nav-link.active,
+.nav-pills .grey-item .show > .nav-link {
+    color: black;
+    background-color: #ddd;
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 }
 
@@ -556,7 +576,7 @@ input[type="search"]:focus {
     background-repeat: no-repeat;
     background-size: cover;
     cursor: zoom-in;
-    border-radius: 50%;
+    border-radius: 50% !important;
 }
 
 .preview-img-lg {

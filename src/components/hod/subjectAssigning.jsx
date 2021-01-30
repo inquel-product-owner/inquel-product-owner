@@ -175,7 +175,7 @@ class SubjectAssigning extends Component {
                                     <i className="fas fa-filter ml-1"></i>
                                 </button>
                                 <Link
-                                    to={`/hod/subject/${this.props.match.params.subjectId}/review`}
+                                    to={`/hod/subject/${this.props.match.params.subjectId}`}
                                 >
                                     <button className="btn btn-primary btn-sm mr-2">
                                         Review
@@ -305,11 +305,6 @@ class SubjectAssigning extends Component {
                                                                 </select>
                                                             </div>
                                                         </div>
-                                                        {/* <div className="col-6">
-                                                        <button className="btn btn-primary-invert btn-sm">
-                                                            Not-Assigned
-                                                        </button>
-                                                    </div> */}
                                                     </div>
                                                 </td>
                                                 <td>
@@ -326,13 +321,13 @@ class SubjectAssigning extends Component {
                                                     </div>
                                                 </td>
                                                 <td className="text-center">
-                                                    <button className="btn btn-primary btn-sm mr-1">
+                                                    <button type="button" className="btn btn-primary btn-sm mr-1">
                                                         D
                                                     </button>
-                                                    <button className="btn btn-primary btn-sm mr-1">
+                                                    <button type="button" className="btn btn-primary btn-sm mr-1">
                                                         E
                                                     </button>
-                                                    <button className="btn btn-primary btn-sm">
+                                                    <button type="button" className="btn btn-primary btn-sm">
                                                         <i className="fas fa-trash-alt fa-sm"></i>
                                                     </button>
                                                 </td>
@@ -341,7 +336,7 @@ class SubjectAssigning extends Component {
                                     </table>
                                 </div>
                                 <div className="card-body p-2">
-                                    <button className="btn btn-light btn-block shadow-sm">
+                                    <button type="submit" className="btn btn-light btn-block shadow-sm">
                                         {this.state.showLoader ? (
                                             <Spinner
                                                 as="span"

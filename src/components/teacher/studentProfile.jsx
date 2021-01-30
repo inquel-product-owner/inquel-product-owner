@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import profilepic from "../../assets/user.png";
 import Header from "./navbar";
 import SideNav from "./sidenav";
-import { baseUrl, hodUrl } from "../../shared/baseUrl";
+import { baseUrl, teacherUrl } from "../../shared/baseUrl";
 import Loading from "../sharedComponents/loader";
 
 class StudentProfile extends Component {
@@ -26,7 +26,7 @@ class StudentProfile extends Component {
         document.title = "Student Profile - Teacher | IQLabs";
 
         const studentId = this.props.match.params.studentId;
-        var url = baseUrl + hodUrl;
+        var url = baseUrl + teacherUrl;
         var authToken = localStorage.getItem("Authorization");
         var headers = {
             Accept: "application/json",
@@ -55,7 +55,7 @@ class StudentProfile extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="Student Profile" togglenav={this.toggleSideNav} />
+                <Header name="Group" togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
                 <SideNav
@@ -187,11 +187,6 @@ class StudentProfile extends Component {
                                             <th scope="col">Valid from</th>
                                             <th scope="col">Valid to</th>
                                             <th scope="col">Status</th>
-                                            <th scope="col">Amount paid</th>
-                                            <th scope="col">
-                                                Discount Applied
-                                            </th>
-                                            <th scope="col">Quiz Points</th>
                                             <th scope="col">Simulation</th>
                                             <th
                                                 scope="col"
@@ -210,9 +205,6 @@ class StudentProfile extends Component {
                                             <td>05/10/2020</td>
                                             <td>10/10/2020</td>
                                             <td>Persuing</td>
-                                            <td>2560</td>
-                                            <td>SP2020210001</td>
-                                            <td>212</td>
                                             <td>First Class</td>
                                             <td className="text-center">
                                                 <Link to="/teacher/course/001">
@@ -227,9 +219,6 @@ class StudentProfile extends Component {
                                             <td>10/10/2020</td>
                                             <td>02/03/2020</td>
                                             <td>Persuing</td>
-                                            <td>3871</td>
-                                            <td>SP2020210001</td>
-                                            <td>436</td>
                                             <td>Not Taken</td>
                                             <td className="text-center">
                                                 <Link to="/teacher/course/001">
@@ -244,9 +233,6 @@ class StudentProfile extends Component {
                                             <td>03/01/2020</td>
                                             <td>07/07/2020</td>
                                             <td>Completed</td>
-                                            <td>9568</td>
-                                            <td>SP2020210001</td>
-                                            <td>128</td>
                                             <td>Distiction</td>
                                             <td className="text-center">
                                                 <Link to="/teacher/course/001">

@@ -66,28 +66,11 @@ class GroupStudents extends Component {
     };
 
     componentDidUpdate = (prevProps, prevState) => {
-        if (
-            prevState.is_formSubmited !== this.state.is_formSubmited &&
-            this.state.is_formSubmited === true
-        ) {
-            this.loadStudentData();
-            this.setState({
-                is_formSubmited: false,
-            });
-        }
 
         if (prevState.activeStudentPage !== this.state.activeStudentPage) {
             this.loadStudentData();
             this.setState({
                 page_loading: true,
-            });
-        }
-    };
-
-    formSubmission = (is_formSubmited) => {
-        if (is_formSubmited) {
-            this.setState({
-                is_formSubmited: true,
             });
         }
     };

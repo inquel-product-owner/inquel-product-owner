@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 class CarouselCard extends Component {
     constructor() {
         super();
+        this.state = { width: "" };
         this.responsive = {
             0: {
                 items: 1,
@@ -19,10 +20,17 @@ class CarouselCard extends Component {
         };
     }
 
+    componentDidMount = () => {
+        this.setState({
+            width: window.innerWidth,
+        });
+    };
+
     render() {
         return (
             <AliceCarousel
                 mouseDragEnabled={true}
+                disableDotsControls={this.state.width < 768 ? true : false}
                 responsive={this.responsive}
                 infinite={true}
             >

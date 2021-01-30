@@ -114,7 +114,12 @@ class ChapterModal extends Component {
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
-                <Modal.Header closeButton>Add chapter</Modal.Header>
+                <Modal.Header
+                    closeButton
+                    className="primary-text font-weight-bold"
+                >
+                    Add chapter
+                </Modal.Header>
                 <Modal.Body>
                     <Alert
                         variant="danger"
@@ -203,16 +208,166 @@ class ChapterModal extends Component {
     }
 }
 
+class SemesterModal extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            semester_name: "",
+            chapter_names: this.props.chapter_names,
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: false,
+        };
+        this.url = baseUrl + teacherUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
+    }
+
+    handleSubmit = (event) => {
+        event.preventDefault();
+
+        this.setState({
+            showLoader: true,
+            showErrorAlert: false,
+            showSuccessAlert: false,
+        });
+
+        fetch(`${this.url}/teacher/subject/${this.props.subjectId}/semester/`, {
+            headers: this.headers,
+            method: "POST",
+            body: JSON.stringify({
+                semester_name: this.state.semester_name,
+                chapter_names: this.state.chapter_names,
+            }),
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        showLoader: false,
+                        chapter_names: [],
+                    });
+                    this.props.formSubmission(true);
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    handleSemester = (event) => {
+        this.setState({
+            semester_name: event.target.value,
+        });
+    };
+
+    render() {
+        return (
+            <Modal
+                show={this.props.show}
+                onHide={this.props.onHide}
+                size="md"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Header
+                    closeButton
+                    className="primary-text font-weight-bold"
+                >
+                    Add Semester
+                </Modal.Header>
+                <Modal.Body>
+                    <Alert
+                        variant="danger"
+                        show={this.state.showErrorAlert}
+                        onClose={() => {
+                            this.setState({
+                                showErrorAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.errorMsg}
+                    </Alert>
+                    <Alert
+                        variant="success"
+                        show={this.state.showSuccessAlert}
+                        onClose={() => {
+                            this.setState({
+                                showSuccessAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.successMsg}
+                    </Alert>
+
+                    <form onSubmit={this.handleSubmit} autoComplete="off">
+                        <div className="form-group">
+                            <input
+                                type="text"
+                                name="semester"
+                                className="form-control borders"
+                                onChange={this.handleSemester}
+                                placeholder="Semester name"
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <button className="btn btn-primary btn-block mt-2">
+                                {this.state.showLoader ? (
+                                    <Spinner
+                                        as="span"
+                                        animation="border"
+                                        size="sm"
+                                        role="status"
+                                        aria-hidden="true"
+                                        className="mr-2"
+                                    />
+                                ) : (
+                                    ""
+                                )}
+                                Add
+                            </button>
+                        </div>
+                    </form>
+                </Modal.Body>
+            </Modal>
+        );
+    }
+}
+
 class SubjectChapters extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             showSideNav: false,
             showModal: false,
+            showSemesterModal: false,
             subjectItems: [],
+            semesterItems: [],
+            chapter_names: [],
+            semester_chapters: [],
             page_loading: true,
-            is_formSubmitted: false,
+            is_chapterSubmitted: false,
+            is_semesterSubmitted: false,
         };
+        this.subjectId = this.props.match.params.subjectId;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
@@ -234,14 +389,30 @@ class SubjectChapters extends Component {
         });
     };
 
-    loadChapterData = () => {
-        fetch(
-            `${this.url}/teacher/subject/${this.props.match.params.subjectId}/`,
-            {
-                headers: this.headers,
-                method: "GET",
+    toggleSemesterModal = () => {
+        const chapter_names = this.state.chapter_names;
+        for (let i = 0; i < this.state.subjectItems.length; i++) {
+            if (
+                !this.state.semester_chapters.includes(
+                    this.state.subjectItems[i].chapter_name
+                )
+            ) {
+                chapter_names.push(this.state.subjectItems[i].chapter_name);
+            } else {
+                continue;
             }
-        )
+        }
+        this.setState({
+            showSemesterModal: !this.state.showSemesterModal,
+            chapter_names: chapter_names,
+        });
+    };
+
+    loadChapterData = () => {
+        fetch(`${this.url}/teacher/subject/${this.subjectId}/`, {
+            headers: this.headers,
+            method: "GET",
+        })
             .then((res) => res.json())
             .then((result) => {
                 this.setState({
@@ -255,42 +426,93 @@ class SubjectChapters extends Component {
             });
     };
 
+    loadSemesterData = () => {
+        fetch(`${this.url}/teacher/subject/${this.subjectId}/semester/`, {
+            headers: this.headers,
+            method: "GET",
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                const chapters = [];
+                for (let i = 0; i < result.data.length; i++) {
+                    for (let j = 0; j < result.data[i].chapters.length; j++) {
+                        chapters.push(result.data[i].chapters[j]);
+                    }
+                }
+                this.setState({
+                    semesterItems: result.data,
+                    semester_chapters: chapters,
+                    page_loading: false,
+                });
+                console.log(result);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     componentDidMount = () => {
+        document.title = "Subject name - Teacher | IQLabs";
+
         this.loadChapterData();
+        this.loadSemesterData();
     };
 
     componentDidUpdate = (prevProps, prevState) => {
         if (
-            prevState.is_formSubmitted !== this.state.is_formSubmitted &&
-            this.state.is_formSubmitted === true
+            prevState.is_chapterSubmitted !== this.state.is_chapterSubmitted &&
+            this.state.is_chapterSubmitted === true
         ) {
             this.loadChapterData();
             this.setState({
-                is_formSubmitted: false,
+                is_chapterSubmitted: false,
+            });
+        }
+
+        if (
+            prevState.is_semesterSubmitted !==
+                this.state.is_semesterSubmitted &&
+            this.state.is_semesterSubmitted === true
+        ) {
+            this.loadSemesterData();
+            this.loadChapterData();
+            this.setState({
+                is_semesterSubmitted: false,
             });
         }
     };
 
-    formSubmission = (is_formSubmitted) => {
-        if (is_formSubmitted) {
+    chapterFormSubmission = (is_chapterSubmitted) => {
+        if (is_chapterSubmitted) {
             this.setState({
-                is_formSubmitted: true,
+                is_chapterSubmitted: true,
             });
+            setTimeout(() => {
+                this.setState({
+                    showModal: false,
+                });
+            }, 1500);
+        }
+    };
+
+    semesterFormSubmission = (is_semesterSubmitted) => {
+        if (is_semesterSubmitted) {
+            this.setState({
+                is_semesterSubmitted: true,
+            });
+            setTimeout(() => {
+                this.setState({
+                    showSemesterModal: false,
+                });
+            }, 1500);
         }
     };
 
     render() {
-        // document.title =
-        //     this.state.subjectItems.length !== 0
-        //         ? this.state.subjectItems.subject_name + " - Teacher | IQLabs"
-        //         : "Subjects - Teacher | IQLabs";
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header
-                    // name={this.state.subjectItems.subject_name}
-                    togglenav={this.toggleSideNav}
-                />
+                <Header name="Subject name" togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
                 <SideNav
@@ -303,8 +525,21 @@ class SubjectChapters extends Component {
                     <ChapterModal
                         show={this.state.showModal}
                         onHide={this.toggleModal}
-                        formSubmission={this.formSubmission}
-                        subjectId={this.props.match.params.subjectId}
+                        formSubmission={this.chapterFormSubmission}
+                        subjectId={this.subjectId}
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Semester modal */}
+                {this.state.showSemesterModal ? (
+                    <SemesterModal
+                        show={this.state.showSemesterModal}
+                        onHide={this.toggleSemesterModal}
+                        formSubmission={this.semesterFormSubmission}
+                        chapter_names={this.state.chapter_names}
+                        subjectId={this.subjectId}
                     />
                 ) : (
                     ""
@@ -327,30 +562,23 @@ class SubjectChapters extends Component {
                         {/* Header area */}
                         <div className="row align-items-center">
                             <div className="col-md-2">
-                                <h5 className="primary-text">
-                                    {/* {this.state.subjectItems.subject_name} */}
-                                </h5>
+                                <h5 className="primary-text">Subject name</h5>
                             </div>
                             <div className="col-md-10">
                                 <div className="d-flex flex-wrap justify-content-end mb-4">
-                                    <button className="btn btn-primary btn-sm mr-1">
+                                    <button className="btn btn-primary btn-sm">
                                         Publish
-                                    </button>
-                                    <button className="btn btn-primary btn-sm mr-1">
-                                        Download template
-                                    </button>
-                                    <button className="btn btn-primary btn-sm mr-1">
-                                        Upload template
                                     </button>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="card shadow-sm">
+                        <div className="card shadow-sm mb-3">
                             <div className="table-responsive">
                                 <table className="table">
                                     <thead className="primary-bg text-white">
                                         <tr>
+                                            <th></th>
                                             <th scope="col">
                                                 Chapter structure
                                             </th>
@@ -365,58 +593,161 @@ class SubjectChapters extends Component {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {this.state.subjectItems.length !==
-                                        0 ? (
-                                            this.state.subjectItems.map(
-                                                (list, index) => {
-                                                    return (
-                                                        <tr key={index}>
-                                                            <td>
-                                                                {
-                                                                    list.chapter_name
-                                                                }
-                                                            </td>
-                                                            <td>
-                                                                {list.weightage}
-                                                            </td>
-                                                            <td>
-                                                                <Link
-                                                                    to={`/teacher/subject/${this.props.match.params.subjectId}/${list.chapter_name}/summary`}
-                                                                    className="primary-text"
-                                                                >
-                                                                    <i className="fas fa-plus-circle fa-2x"></i>
-                                                                </Link>
-                                                            </td>
-                                                            <td className="text-right">
-                                                                <Link
-                                                                    to={`/teacher/subject/${this.props.match.params.subjectId}/${list.chapter_name}`}
-                                                                >
-                                                                    <button className="btn btn-primary btn-sm">
-                                                                        Add
-                                                                    </button>
-                                                                </Link>
-                                                            </td>
-                                                        </tr>
-                                                    );
-                                                }
-                                            )
-                                        ) : (
-                                            <tr>
-                                                <td>Data not available</td>
-                                            </tr>
-                                        )}
+                                        {/* Assigned chapter list to a semester */}
+                                        {this.state.semesterItems.length !== 0
+                                            ? this.state.semesterItems.map(
+                                                  (data, index) => {
+                                                      return (
+                                                          <React.Fragment
+                                                              key={index}
+                                                          >
+                                                              {this.state.subjectItems.map(
+                                                                  (
+                                                                      chapter,
+                                                                      index
+                                                                  ) => {
+                                                                      return data.chapters.includes(
+                                                                          chapter.chapter_name
+                                                                      ) ? (
+                                                                          <tr
+                                                                              key={
+                                                                                  index
+                                                                              }
+                                                                          >
+                                                                              <td>
+                                                                                  <button className="btn btn-primary-invert shadow-sm btn-sm">
+                                                                                      <i className="fas fa-minus-circle"></i>
+                                                                                  </button>
+                                                                              </td>
+                                                                              <td>
+                                                                                  {
+                                                                                      chapter.chapter_name
+                                                                                  }
+                                                                              </td>
+                                                                              <td>
+                                                                                  {
+                                                                                      chapter.weightage
+                                                                                  }
+                                                                              </td>
+                                                                              <td>
+                                                                                  <Link
+                                                                                      to={`/teacher/subject/${this.subjectId}/${chapter.chapter_name}/summary`}
+                                                                                      className="primary-text"
+                                                                                  >
+                                                                                      <i className="fas fa-plus-circle fa-2x"></i>
+                                                                                  </Link>
+                                                                              </td>
+                                                                              <td className="text-right">
+                                                                                  <Link
+                                                                                      to={`/teacher/subject/${this.subjectId}/${chapter.chapter_name}`}
+                                                                                  >
+                                                                                      <button className="btn btn-primary btn-sm">
+                                                                                          Add
+                                                                                      </button>
+                                                                                  </Link>
+                                                                              </td>
+                                                                          </tr>
+                                                                      ) : null;
+                                                                  }
+                                                              )}
+                                                              <tr key={index}>
+                                                                  <td>
+                                                                      <button className="btn btn-primary-invert shadow-sm btn-sm">
+                                                                          <i className="fas fa-minus-circle"></i>
+                                                                      </button>
+                                                                  </td>
+                                                                  <td>
+                                                                      {
+                                                                          data.semester_name
+                                                                      }
+                                                                  </td>
+                                                                  <td></td>
+                                                                  <td></td>
+                                                                  <td className="text-right">
+                                                                      <Link
+                                                                          to={`/teacher/subject/${this.subjectId}/semester/${data.semester_id}`}
+                                                                      >
+                                                                          <button className="btn btn-primary btn-sm mr-2">
+                                                                              Auto
+                                                                          </button>
+                                                                      </Link>
+                                                                      <Link
+                                                                          to={`/teacher/subject/${this.subjectId}/semester/${data.semester_id}/direct-test`}
+                                                                      >
+                                                                          <button className="btn btn-primary btn-sm">
+                                                                              Direct
+                                                                              Test
+                                                                          </button>
+                                                                      </Link>
+                                                                  </td>
+                                                              </tr>
+                                                          </React.Fragment>
+                                                      );
+                                                  }
+                                              )
+                                            : null}
+                                        {/* Unassigned chapter list */}
+                                        {this.state.subjectItems.length !== 0
+                                            ? this.state.subjectItems.map(
+                                                  (chapter, index) => {
+                                                      return !this.state.semester_chapters.includes(
+                                                          chapter.chapter_name
+                                                      ) ? (
+                                                          <tr key={index}>
+                                                              <td>
+                                                                  <button className="btn btn-primary-invert shadow-sm btn-sm">
+                                                                      <i className="fas fa-minus-circle"></i>
+                                                                  </button>
+                                                              </td>
+                                                              <td>
+                                                                  {
+                                                                      chapter.chapter_name
+                                                                  }
+                                                              </td>
+                                                              <td>
+                                                                  {
+                                                                      chapter.weightage
+                                                                  }
+                                                              </td>
+                                                              <td>
+                                                                  <Link
+                                                                      to={`/teacher/subject/${this.subjectId}/${chapter.chapter_name}/summary`}
+                                                                      className="primary-text"
+                                                                  >
+                                                                      <i className="fas fa-plus-circle fa-2x"></i>
+                                                                  </Link>
+                                                              </td>
+                                                              <td className="text-right">
+                                                                  <Link
+                                                                      to={`/teacher/subject/${this.subjectId}/${chapter.chapter_name}`}
+                                                                  >
+                                                                      <button className="btn btn-primary btn-sm">
+                                                                          Add
+                                                                      </button>
+                                                                  </Link>
+                                                              </td>
+                                                          </tr>
+                                                      ) : null;
+                                                  }
+                                              )
+                                            : null}
                                     </tbody>
                                 </table>
                             </div>
-                            <div className="card-body">
-                                <button
-                                    className="btn btn-light btn-block shadow-sm"
-                                    onClick={this.toggleModal}
-                                >
-                                    Add +
-                                </button>
-                            </div>
                         </div>
+
+                        <button
+                            className="btn btn-tomato btn-block shadow-sm mb-2"
+                            onClick={this.toggleModal}
+                        >
+                            Add chapter
+                        </button>
+                        <button
+                            className="btn btn-tomato btn-block shadow-sm"
+                            onClick={this.toggleSemesterModal}
+                        >
+                            Add Semester Exam
+                        </button>
                         {/* Loading component */}
                         {this.state.page_loading ? <Loading /> : ""}
                     </div>

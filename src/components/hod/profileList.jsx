@@ -48,7 +48,7 @@ class AddStudentModal extends Component {
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
-                if (result.sts) {
+                if (result.sts === true) {
                     this.setState({
                         successMsg: "Email added successfully!",
                         showSuccessAlert: true,
@@ -290,14 +290,21 @@ class AddTeacherModal extends Component {
                     var errorMessage = "";
                     if (result.username) {
                         errorMessage = result.username[0];
-                    }
-                    if (result.password) {
+                        this.setState({
+                            errorMsg: errorMessage,
+                        });
+                    } else if (result.password) {
                         errorMessage = result.password[0];
+                        this.setState({
+                            errorMsg: errorMessage,
+                        });
                     } else {
                         errorMessage = result.msg;
+                        this.setState({
+                            errorMsg: errorMessage,
+                        });
                     }
                     this.setState({
-                        errorMsg: errorMessage,
                         showErrorAlert: true,
                         showLoader: false,
                     });
@@ -411,7 +418,11 @@ class AddTeacherModal extends Component {
                                         id="button-addon2"
                                         onClick={this.showPassword}
                                     >
-                                        <i className="fas fa-eye"></i>
+                                        {this.state.showPassword ? (
+                                            <i className="far fa-eye-slash"></i>
+                                        ) : (
+                                            <i className="far fa-eye"></i>
+                                        )}
                                     </button>
                                 </div>
                             </div>
@@ -588,6 +599,11 @@ class ProfileList extends Component {
             this.setState({
                 is_teacherFormSubmited: true,
             });
+            setTimeout(() => {
+                this.setState({
+                    showTeacherModal: false,
+                });
+            }, 1000);
         }
     };
 
@@ -596,6 +612,11 @@ class ProfileList extends Component {
             this.setState({
                 is_studentFormSubmited: true,
             });
+            setTimeout(() => {
+                this.setState({
+                    showStudentModal: false,
+                });
+            }, 1000);
         }
     };
 
