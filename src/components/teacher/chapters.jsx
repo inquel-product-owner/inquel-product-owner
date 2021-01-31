@@ -401,13 +401,12 @@ class Chapters extends Component {
                 console.log(result);
                 if (result.sts === true) {
                     const chapters = this.state.chapters;
-                    if (result.data.length !== 0) {
-                        chapters.chapter_structure =
-                            result.data.chapter_structure;
-                        chapters.topic_id = result.data.topic_id
-                            ? result.data.topic_id
-                            : "";
-                    }
+                    chapters.chapter_structure = result.data.chapter_structure
+                        ? result.data.chapter_structure
+                        : [];
+                    chapters.topic_id = result.data.topic_id
+                        ? result.data.topic_id
+                        : "";
                     this.setState({
                         chapters: chapters,
                         page_loading: false,
@@ -477,6 +476,7 @@ class Chapters extends Component {
                 {
                     chapterName: this.props.match.params.chapterName,
                     chapters: chapters,
+                    page_loading: true,
                 },
                 () => {
                     this.loadChapterData();
@@ -544,6 +544,7 @@ class Chapters extends Component {
             {
                 chapterName: event.value,
                 chapters: chapters,
+                page_loading: true,
             },
             () => {
                 this.loadChapterData();
