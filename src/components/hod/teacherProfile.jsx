@@ -4,6 +4,8 @@ import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, hodUrl } from "../../shared/baseUrl";
 import Loading from "../sharedComponents/loader";
+import GroupTable from "../table/groupTable";
+import Paginations from "../sharedComponents/pagination";
 
 class TeacherProfile extends Component {
     constructor(props) {
@@ -11,7 +13,18 @@ class TeacherProfile extends Component {
         this.state = {
             showSideNav: false,
             teacherItems: [],
+            groupItems: [],
+            activeGroupPage: 1,
+            totalGroupCount: 0,
             page_loading: true,
+        };
+        this.teacherId = this.props.match.params.teacherId;
+        this.url = baseUrl + hodUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
         };
     }
 
@@ -24,23 +37,16 @@ class TeacherProfile extends Component {
     componentDidMount = () => {
         document.title = "Teacher Profile - HOD | IQLabs";
 
-        const teacherId = this.props.match.params.teacherId;
-        var url = baseUrl + hodUrl;
-        var authToken = localStorage.getItem("Authorization");
-        var headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: authToken,
-        };
-
-        fetch(`${url}/hod/teacher/${teacherId}/`, {
-            headers: headers,
+        fetch(`${this.url}/hod/teacher/${this.teacherId}/`, {
+            headers: this.headers,
             method: "GET",
         })
             .then((res) => res.json())
             .then((result) => {
                 this.setState({
                     teacherItems: result.data,
+                    groupItems: result.data.results ? result.data.results : [],
+                    totalGroupCount: result.data.count ? result.data.count : 0,
                     page_loading: false,
                 });
                 console.log(result);
@@ -49,6 +55,10 @@ class TeacherProfile extends Component {
                 console.log(err);
             });
     };
+
+    handleGroupPageChange(pageNumber) {
+        this.setState({ activeGroupPage: pageNumber });
+    }
 
     render() {
         return (
@@ -170,45 +180,19 @@ class TeacherProfile extends Component {
                             <div className="card-header">
                                 <h5>Handling Groups</h5>
                             </div>
-                            <div className="card-body">
-                                <div className="row">
-                                    <div className="col-md-4 mb-3 mb-md-0">
-                                        <div className="card shadow">
-                                            <div className="card-body text-center">
-                                                Add +
-                                            </div>
-                                            <div className="card-footer primary-bg">
-                                                <p className="text-white text-center small mb-0">
-                                                    A
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4 mb-3 mb-md-0">
-                                        <div className="card shadow">
-                                            <div className="card-body text-center">
-                                                Add +
-                                            </div>
-                                            <div className="card-footer primary-bg">
-                                                <p className="text-white text-center small mb-0">
-                                                    B
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-md-4">
-                                        <div className="card shadow">
-                                            <div className="card-body text-center">
-                                                Add +
-                                            </div>
-                                            <div className="card-footer primary-bg">
-                                                <p className="text-white text-center small mb-0">
-                                                    C
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                            <GroupTable
+                                groupItems={this.state.groupItems}
+                                path="hod"
+                                view={true}
+                            />
+                            <div className="card-body p-3">
+                                <Paginations
+                                    activePage={this.state.activeGroupPage}
+                                    totalItemsCount={this.state.totalGroupCount}
+                                    onChange={this.handleGroupPageChange.bind(
+                                        this
+                                    )}
+                                />
                             </div>
                         </div>
                         {/* Loading component */}
