@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from "react";
+import axios from "axios";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import CKEditor from "ckeditor4-react";
@@ -23,12 +24,15 @@ class SubjectType1 extends Component {
             showVirtual_keyboard: true,
             themeData: [],
             complexityData: [],
+            isForm_submitted: false,
 
             activeQuestion: "",
             activeQuestionData: [],
             activeKeyboards: [],
             selectedImageQuestion: "",
             selectedImageData: [],
+            selectedImage: "",
+            question_random_id: "",
 
             keyboards: [
                 { all: false, chemistry: false, physics: false, maths: false },
@@ -51,10 +55,15 @@ class SubjectType1 extends Component {
                         images: [
                             { title: "", file_name: "", image: null, path: "" },
                         ],
-                        video: { title: "", file_name: "", pasteUrl: "" },
+                        video: {
+                            title: "",
+                            file_name: "",
+                            video: null,
+                            pasteUrl: "",
+                        },
                         audio: [
-                            { title: "", file_name: "" },
-                            { title: "", file_name: "" },
+                            { title: "", file_name: "", audio: null },
+                            { title: "", file_name: "", audio: null },
                         ],
                     },
                     properties: {
@@ -101,36 +110,175 @@ class SubjectType1 extends Component {
             showSuccessAlert: false,
         });
 
-        fetch(`${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/`, {
-            headers: this.headers,
-            method: "POST",
-            body: JSON.stringify(this.state.activeQuestionData),
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    this.setState({
-                        successMsg: result.msg,
-                        showSuccessAlert: true,
-                    });
-                    setTimeout(() => {
-                        this.setState({
-                            showLoader: false,
-                            showEdit_option: false,
-                        });
-                    }, 3000);
-                } else {
-                    this.setState({
-                        errorMsg: result.msg,
-                        showErrorAlert: true,
-                        showLoader: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
+        const questionValues = this.state.activeQuestionData;
+        if (
+            questionValues.question === "" ||
+            questionValues.properties.complexity === "" ||
+            questionValues.properties.theme === "" ||
+            questionValues.properties.marks === "" ||
+            questionValues.properties.priority === "" ||
+            questionValues.settings.virtual_keyboard.length === 0
+        ) {
+            this.setState({
+                errorMsg: "All the fields are required",
+                showErrorAlert: true,
+                showLoader: false,
             });
+        } else {
+            if (this.state.question_random_id === "") {
+                fetch(
+                    `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/`,
+                    {
+                        headers: this.headers,
+                        method: "POST",
+                        body: JSON.stringify(this.state.activeQuestionData),
+                    }
+                )
+                    .then((res) => res.json())
+                    .then((result) => {
+                        console.log(result);
+                        if (result.sts === true) {
+                            this.setState({
+                                question_random_id: result.question_random_id,
+                                isForm_submitted: true,
+                            });
+                        } else {
+                            if (result.detail) {
+                                this.setState({
+                                    errorMsg: result.detail,
+                                });
+                            } else {
+                                this.setState({
+                                    errorMsg: result.msg,
+                                });
+                            }
+                            this.setState({
+                                showErrorAlert: true,
+                                showLoader: false,
+                            });
+                        }
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+            } else {
+                this.setState({
+                    isForm_submitted: true,
+                });
+            }
+        }
+    };
+
+    componentDidUpdate = (prevProps, prevState) => {
+        if (
+            prevState.isForm_submitted !== this.state.isForm_submitted &&
+            this.state.isForm_submitted === true
+        ) {
+            this.setState({
+                showLoader: true,
+                showErrorAlert: false,
+                showSuccessAlert: false,
+                isForm_submitted: false,
+            });
+
+            const questionValues = this.state.activeQuestionData;
+
+            let form_data = new FormData();
+
+            form_data.append("chapter_name", this.chapterName);
+            form_data.append("topic_name", this.topicName);
+            form_data.append(
+                "question_random_id",
+                this.state.question_random_id
+            );
+
+            if (questionValues.content.video.video !== null) {
+                form_data.append(
+                    "type1_video_1_title",
+                    questionValues.content.video.title
+                );
+                form_data.append(
+                    "type1_video_1",
+                    questionValues.content.video.video
+                );
+            }
+
+            for (let i = 0; i < questionValues.content.images.length; i++) {
+                if (questionValues.content.images[i].image !== null) {
+                    form_data.append(
+                        `type1_image_${i + 1}_title`,
+                        questionValues.content.images[i].title
+                    );
+                    form_data.append(
+                        `type1_image_${i + 1}`,
+                        questionValues.content.images[i].image
+                    );
+                } else {
+                    continue;
+                }
+            }
+
+            for (let i = 0; i < questionValues.content.audio.length; i++) {
+                if (questionValues.content.audio[i].audio !== null) {
+                    form_data.append(
+                        `type1_audio_${i + 1}_title`,
+                        questionValues.content.audio[i].title
+                    );
+                    form_data.append(
+                        `type1_audio_${i + 1}`,
+                        questionValues.content.audio[i].audio
+                    );
+                } else {
+                    continue;
+                }
+            }
+
+            const options = {
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "multipart/form-data",
+                    Authorization: this.authToken,
+                },
+            };
+
+            axios
+                .post(
+                    `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/files/`,
+                    form_data,
+                    options
+                )
+                .then((result) => {
+                    console.log(result);
+                    for (var p of form_data) {
+                        console.log(p);
+                    }
+                    if (result.data.sts === true) {
+                        this.setState({
+                            successMsg: result.data.msg,
+                            showSuccessAlert: true,
+                            showLoader: false,
+                            question_random_id: "",
+                        });
+                    } else {
+                        if (result.data.detail) {
+                            this.setState({
+                                errorMsg: result.data.detail,
+                            });
+                        } else {
+                            this.setState({
+                                errorMsg: result.data.msg,
+                            });
+                        }
+                        this.setState({
+                            showErrorAlert: true,
+                            showLoader: false,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        }
     };
 
     onEditorChange = (evt) => {
@@ -236,12 +384,6 @@ class SubjectType1 extends Component {
 
     handleImageFile = (index, event) => {
         const values = [...this.state.questions];
-        // var files = event.target.files;
-        // var filesArray = [].slice.call(files);
-        // filesArray.forEach((e) => {
-        //     values[this.state.activeQuestion].content.images[index].file_name =
-        //         e.name;
-        // });
         values[this.state.activeQuestion].content.images[index].file_name =
             event.target.files[0].name;
         values[this.state.activeQuestion].content.images[
@@ -256,10 +398,19 @@ class SubjectType1 extends Component {
 
     changeImage = (image_index, q_index) => {
         const images = [...this.state.questions];
-        this.setState({
-            selectedImageQuestion: q_index,
-            selectedImageData: images[q_index].content.images[image_index],
-        });
+        if (this.state.selectedImage === image_index) {
+            this.setState({
+                selectedImage: "",
+                selectedImageQuestion: "",
+                selectedImageData: [],
+            });
+        } else {
+            this.setState({
+                selectedImage: image_index,
+                selectedImageQuestion: q_index,
+                selectedImageData: images[q_index].content.images[image_index],
+            });
+        }
     };
 
     // -------------------------- Video --------------------------
@@ -275,11 +426,10 @@ class SubjectType1 extends Component {
 
     handleVideoFile = (event) => {
         let values = [...this.state.questions];
-        var files = event.target.files;
-        var filesArray = [].slice.call(files);
-        filesArray.forEach((e) => {
-            values[this.state.activeQuestion].content.video.file_name = e.name;
-        });
+        values[this.state.activeQuestion].content.video.file_name =
+            event.target.files[0].name;
+        values[this.state.activeQuestion].content.video.video =
+            event.target.files[0];
         values[this.state.activeQuestion].content.video.pasteUrl = "";
         this.setState({
             questions: values,
@@ -309,12 +459,10 @@ class SubjectType1 extends Component {
 
     handleAudioFile = (index, event) => {
         const values = [...this.state.questions];
-        var files = event.target.files;
-        var filesArray = [].slice.call(files);
-        filesArray.forEach((e) => {
-            values[this.state.activeQuestion].content.audio[index].file_name =
-                e.name;
-        });
+        values[this.state.activeQuestion].content.audio[index].file_name =
+            event.target.files[0].name;
+        values[this.state.activeQuestion].content.audio[index].audio =
+            event.target.files[0];
         this.setState({
             questions: values,
         });
@@ -512,10 +660,15 @@ class SubjectType1 extends Component {
                 ],
                 explanation: "",
                 images: [{ title: "", file_name: "", image: null, path: "" }],
-                video: { title: "", file_name: "", pasteUrl: "" },
+                video: {
+                    title: "",
+                    file_name: "",
+                    video: null,
+                    pasteUrl: "",
+                },
                 audio: [
-                    { title: "", file_name: "" },
-                    { title: "", file_name: "" },
+                    { title: "", file_name: "", audio: null },
+                    { title: "", file_name: "", audio: null },
                 ],
             },
             properties: {
@@ -766,7 +919,21 @@ class SubjectType1 extends Component {
                                                         <div className="card-body">
                                                             <div className="row">
                                                                 {/* Questions & options */}
-                                                                <div className="col-md-9">
+                                                                <div
+                                                                    className={`${
+                                                                        this
+                                                                            .state
+                                                                            .selectedImageData
+                                                                            .length !==
+                                                                            0 &&
+                                                                        this
+                                                                            .state
+                                                                            .selectedImageQuestion ===
+                                                                            q_index
+                                                                            ? "col-md-8"
+                                                                            : "col-md-11 pr-md-0"
+                                                                    }`}
+                                                                >
                                                                     <div className="form-group">
                                                                         <div className="card form-shadow">
                                                                             <div
@@ -817,66 +984,57 @@ class SubjectType1 extends Component {
                                                                     )}
                                                                 </div>
                                                                 {/* image preview */}
-                                                                <div className="col-md-3 pl-md-0">
-                                                                    <div className="row">
-                                                                        <div className="col-9 pr-0">
-                                                                            {this
-                                                                                .state
-                                                                                .selectedImageData
-                                                                                .length !==
-                                                                                0 &&
-                                                                            this
-                                                                                .state
-                                                                                .selectedImageQuestion ===
-                                                                                q_index ? (
+                                                                {this.state
+                                                                    .selectedImageData
+                                                                    .length !==
+                                                                    0 &&
+                                                                this.state
+                                                                    .selectedImageQuestion ===
+                                                                    q_index ? (
+                                                                    <div className="col-md-3 mb-2 mb-md-0 pr-md-0">
+                                                                        <div
+                                                                            className="card preview-img-lg bg-light shadow-sm"
+                                                                            style={{
+                                                                                backgroundImage: `url(${this.state.selectedImageData.path})`,
+                                                                            }}
+                                                                        ></div>
+                                                                    </div>
+                                                                ) : (
+                                                                    ""
+                                                                )}
+                                                                <div className="col-md-1 d-flex justify-content-md-center justify-content-around flex-wrap">
+                                                                    {question.content.images.map(
+                                                                        (
+                                                                            images,
+                                                                            index
+                                                                        ) => {
+                                                                            return images.path !==
+                                                                                "" ? (
                                                                                 <div
-                                                                                    className="card preview-img-lg bg-light shadow-sm"
+                                                                                    key={
+                                                                                        index
+                                                                                    }
+                                                                                    className="card preview-img-sm bg-light shadow-sm"
                                                                                     style={{
-                                                                                        backgroundImage: `url(${this.state.selectedImageData.path})`,
+                                                                                        backgroundImage: `url(${images.path})`,
                                                                                     }}
+                                                                                    onClick={() =>
+                                                                                        this.changeImage(
+                                                                                            index,
+                                                                                            q_index
+                                                                                        )
+                                                                                    }
                                                                                 ></div>
                                                                             ) : (
-                                                                                <div className="card preview-img-lg bg-light shadow-sm"></div>
-                                                                            )}
-                                                                        </div>
-                                                                        <div className="col-3">
-                                                                            <div className="row">
-                                                                                {question.content.images.map(
-                                                                                    (
-                                                                                        images,
+                                                                                <div
+                                                                                    key={
                                                                                         index
-                                                                                    ) => {
-                                                                                        return (
-                                                                                            <div
-                                                                                                className="col-12 mb-2"
-                                                                                                key={
-                                                                                                    index
-                                                                                                }
-                                                                                            >
-                                                                                                {images.path !==
-                                                                                                "" ? (
-                                                                                                    <div
-                                                                                                        className="card preview-img-sm bg-light shadow-sm"
-                                                                                                        style={{
-                                                                                                            backgroundImage: `url(${images.path})`,
-                                                                                                        }}
-                                                                                                        onClick={() =>
-                                                                                                            this.changeImage(
-                                                                                                                index,
-                                                                                                                q_index
-                                                                                                            )
-                                                                                                        }
-                                                                                                    ></div>
-                                                                                                ) : (
-                                                                                                    <div className="card preview-img-sm bg-light shadow-sm"></div>
-                                                                                                )}
-                                                                                            </div>
-                                                                                        );
                                                                                     }
-                                                                                )}
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
+                                                                                    className="card preview-img-sm bg-light shadow-sm"
+                                                                                ></div>
+                                                                            );
+                                                                        }
+                                                                    )}
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -899,9 +1057,6 @@ class SubjectType1 extends Component {
                             {this.state.showEdit_option ? (
                                 <div className="col-md-3 content-edit">
                                     <div className="d-flex justify-content-between align-items-center mb-2">
-                                        <div className="primary-text small font-weight-bold">
-                                            Edit
-                                        </div>
                                         <button
                                             className="btn btn-primary btn-sm"
                                             onClick={this.handleSubmit}
@@ -918,7 +1073,17 @@ class SubjectType1 extends Component {
                                             ) : (
                                                 ""
                                             )}
-                                            Save & Close
+                                            Save
+                                        </button>
+                                        <button
+                                            className="btn btn-link btn-sm"
+                                            onClick={() => {
+                                                this.setState({
+                                                    showEdit_option: false,
+                                                });
+                                            }}
+                                        >
+                                            Close
                                         </button>
                                     </div>
 
@@ -1144,7 +1309,7 @@ class SubjectType1 extends Component {
                                                     {/* ---------- Explanation ---------- */}
                                                     <div className="form-group">
                                                         <label>
-                                                            Explaination
+                                                            Explanation
                                                         </label>
                                                         <CKEditor
                                                             data={
@@ -1181,7 +1346,7 @@ class SubjectType1 extends Component {
                                                                         }}
                                                                     >
                                                                         <input
-                                                                            type="text  "
+                                                                            type="text"
                                                                             className="form-control form-control-sm"
                                                                             id={`image${index}`}
                                                                             name="image"
@@ -1240,6 +1405,7 @@ class SubjectType1 extends Component {
                                                                             type="file"
                                                                             className="custom-file-input"
                                                                             id={`file${index}`}
+                                                                            accept="image/*"
                                                                             aria-describedby="inputGroupFileAddon01"
                                                                             onChange={(
                                                                                 event
@@ -1306,6 +1472,7 @@ class SubjectType1 extends Component {
                                                                 type="file"
                                                                 className="custom-file-input"
                                                                 id="video"
+                                                                accept="video/*"
                                                                 aria-describedby="inputGroupFileAddon01"
                                                                 onChange={(
                                                                     event
@@ -1371,7 +1538,7 @@ class SubjectType1 extends Component {
                                                                     key={index}
                                                                 >
                                                                     <input
-                                                                        type="text  "
+                                                                        type="text"
                                                                         className="form-control form-control-sm border-secondary mb-1"
                                                                         id={`audio${index}`}
                                                                         name="audio"
@@ -1397,6 +1564,7 @@ class SubjectType1 extends Component {
                                                                             type="file"
                                                                             className="custom-file-input"
                                                                             id={`audio${index}`}
+                                                                            accept="audio/*"
                                                                             aria-describedby="inputGroupFileAddon01"
                                                                             onChange={(
                                                                                 event
@@ -1640,7 +1808,7 @@ class SubjectType1 extends Component {
                                                                                             checked={
                                                                                                 options
                                                                                             }
-                                                                                            onClick={() =>
+                                                                                            onChange={() =>
                                                                                                 this.handleAttemptSequence(
                                                                                                     index,
                                                                                                     "test"
@@ -1668,7 +1836,7 @@ class SubjectType1 extends Component {
                                                                                             checked={
                                                                                                 options
                                                                                             }
-                                                                                            onClick={() =>
+                                                                                            onChange={() =>
                                                                                                 this.handleAttemptSequence(
                                                                                                     index,
                                                                                                     "semester"
@@ -1696,7 +1864,7 @@ class SubjectType1 extends Component {
                                                                                             checked={
                                                                                                 options
                                                                                             }
-                                                                                            onClick={() =>
+                                                                                            onChange={() =>
                                                                                                 this.handleAttemptSequence(
                                                                                                     index,
                                                                                                     "quiz"

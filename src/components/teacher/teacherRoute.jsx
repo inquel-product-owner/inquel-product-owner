@@ -195,7 +195,7 @@ const teacherRoutes = (
         />
         <Route
             exact
-            path="/teacher/subject/:subjectId/semester/:semesterId/direct-test"
+            path="/teacher/subject/:subjectId/semester/:semesterId/direct"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
@@ -207,7 +207,7 @@ const teacherRoutes = (
         />
         <Route
             exact
-            path="/teacher/subject/:subjectId/:chapterName/cycle-test/:cycle_testId"
+            path="/teacher/subject/:subjectId/:chapterName/cycle/:cycle_testId"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
@@ -219,7 +219,7 @@ const teacherRoutes = (
         />
         <Route
             exact
-            path="/teacher/subject/:subjectId/:chapterName/cycle-test/:cycle_testId/section/:sectionId"
+            path="/teacher/subject/:subjectId/:chapterName/cycle/:cycle_testId/section/:sectionId"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
@@ -231,7 +231,7 @@ const teacherRoutes = (
         />
         <Route
             exact
-            path="/teacher/subject/:subjectId/:chapterName/cycle-test/:cycle_testId/direct-test"
+            path="/teacher/subject/:subjectId/:chapterName/cycle/:cycle_testId/direct"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (

@@ -166,7 +166,7 @@ class TopicModal extends Component {
                             />
                         </div>
                         <div className="form-group">
-                            <button className="btn btn-primary btn-block mt-2">
+                            <button className="btn btn-primary btn-sm btn-block">
                                 {this.state.showLoader ? (
                                     <Spinner
                                         as="span"
@@ -309,7 +309,7 @@ class CycleTestModal extends Component {
                             />
                         </div>
                         <div className="form-group">
-                            <button className="btn btn-primary btn-block mt-2">
+                            <button className="btn btn-primary btn-sm btn-block">
                                 {this.state.showLoader ? (
                                     <Spinner
                                         as="span"
@@ -572,7 +572,7 @@ class Chapters extends Component {
                     </button>
                     <Card.Header className="small light-bg w-100">
                         <div className="row align-items-center">
-                            <div className="col-md-5 mb-2 mb-md-0">
+                            <div className="col-md-4 mb-2 mb-md-0">
                                 <div className="row">
                                     <div className="col-md-2 col-3">
                                         {data.topic_num}
@@ -583,7 +583,7 @@ class Chapters extends Component {
                                 </div>
                             </div>
 
-                            <div className="col-md-7">
+                            <div className="col-md-8">
                                 <div className="row align-items-center">
                                     <div className="col-md-2 mb-2 mb-md-0">
                                         <Link
@@ -597,7 +597,7 @@ class Chapters extends Component {
                                     <div className="col-md-2 mb-2 mb-md-0">
                                         <Link to="">
                                             <button className="btn btn-primary btn-sm">
-                                                View
+                                                View / Edit
                                             </button>
                                         </Link>
                                     </div>
@@ -606,7 +606,7 @@ class Chapters extends Component {
                                             to={`/teacher/subject/${this.subjectId}/${this.state.chapterName}/${data.topic_name}/concepts`}
                                         >
                                             <button className="btn btn-primary btn-sm">
-                                                View
+                                                View / Edit
                                             </button>
                                         </Link>
                                     </div>
@@ -615,14 +615,14 @@ class Chapters extends Component {
                                             to={`/teacher/subject/${this.subjectId}/${this.state.chapterName}/${data.topic_name}/type1`}
                                         >
                                             <button className="btn btn-primary btn-sm">
-                                                View
+                                                View / Edit
                                             </button>
                                         </Link>
                                     </div>
                                     <div className="col-md-2 mb-2 mb-md-0">
                                         <Link to="">
                                             <button className="btn btn-primary btn-sm">
-                                                View
+                                                View / Edit
                                             </button>
                                         </Link>
                                     </div>
@@ -726,11 +726,11 @@ class Chapters extends Component {
                         <div className="card shadow-sm mb-3">
                             <div className="card-header secondary-bg primary-text font-weight-bold">
                                 <div className="row">
-                                    <div className="col-md-5 mb-2 mb-md-0">
+                                    <div className="col-md-4 mb-2 mb-md-0">
                                         Topic structure
                                     </div>
-                                    <div className="col-md-7 small primary-text font-weight-bold">
-                                        <div className="row">
+                                    <div className="col-md-8 small primary-text font-weight-bold">
+                                        <div className="row justify-content-end">
                                             <div className="col-md-2 mb-2 mb-md-0">
                                                 Notes
                                             </div>
@@ -827,21 +827,31 @@ class Chapters extends Component {
                                                                               </p>
                                                                           </div>
                                                                           <div className="col-md-6 text-right">
-                                                                              <Link
-                                                                                  to={`/teacher/subject/${this.subjectId}/${this.state.chapterName}/cycle-test/${data.cycle_test_id}`}
-                                                                              >
-                                                                                  <button className="btn btn-primary btn-sm mr-2">
-                                                                                      Auto
-                                                                                  </button>
-                                                                              </Link>
-                                                                              <Link
-                                                                                  to={`/teacher/subject/${this.subjectId}/${this.state.chapterName}/cycle-test/${data.cycle_test_id}/direct-test`}
-                                                                              >
-                                                                                  <button className="btn btn-primary btn-sm">
-                                                                                      Direct
-                                                                                      Test
-                                                                                  </button>
-                                                                              </Link>
+                                                                              {!data.direct_question || data.direct_question ===
+                                                                              false ? (
+                                                                                  <Link
+                                                                                      to={`/teacher/subject/${this.subjectId}/${this.state.chapterName}/cycle/${data.cycle_test_id}`}
+                                                                                  >
+                                                                                      <button className="btn btn-primary btn-sm mr-2">
+                                                                                          Auto
+                                                                                      </button>
+                                                                                  </Link>
+                                                                              ) : (
+                                                                                  ""
+                                                                              )}
+                                                                              {!data.direct_question || data.direct_question ===
+                                                                              true ? (
+                                                                                  <Link
+                                                                                      to={`/teacher/subject/${this.subjectId}/${this.state.chapterName}/cycle/${data.cycle_test_id}/direct`}
+                                                                                  >
+                                                                                      <button className="btn btn-primary btn-sm">
+                                                                                          Direct
+                                                                                          Test
+                                                                                      </button>
+                                                                                  </Link>
+                                                                              ) : (
+                                                                                  ""
+                                                                              )}
                                                                           </div>
                                                                       </div>
                                                                   </div>

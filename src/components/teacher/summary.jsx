@@ -3,10 +3,11 @@ import axios from "axios";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import Switch from "react-switch";
-import CKEditor from "ckeditor4-react-advanced";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { Modal, Alert, Spinner } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
+import CKeditor from "../sharedComponents/CKeditor";
+import Loading from "../sharedComponents/loader";
 
 class ImageUploadModal extends Component {
     constructor(props) {
@@ -45,45 +46,86 @@ class ImageUploadModal extends Component {
             },
         };
 
-        axios
-            .post(
-                `${this.url}/teacher/subject/${this.subjectId}/summary/files/`,
-                form_data,
-                options
-            )
-            .then((result) => {
-                console.log(result);
-                if (result.data.url && result.data.sts === true) {
-                    const image = this.state.image;
-                    image.push({
-                        file_name: event.target.files[0].name,
-                        path: result.data.url,
-                    });
-                    this.setState({
-                        successMsg: result.data.msg,
-                        showSuccessAlert: true,
-                        showLoader: false,
-                        image: image,
-                    });
-                } else {
-                    if (result.data.detail) {
+        let extension = event.target.files[0].name.split(".");
+        let format = ["jpg", "jpeg", "png", "webp"];
+
+        if (!format.includes(extension[extension.length - 1].toLowerCase())) {
+            this.setState({
+                errorMsg: "Invalid file format!",
+                showErrorAlert: true,
+                showLoader: false,
+            });
+        } else if (event.target.files[0].size > 5000000) {
+            this.setState({
+                errorMsg: "File sixe exceeds more then 5MB!",
+                showErrorAlert: true,
+                showLoader: false,
+            });
+        } else {
+            axios
+                .post(
+                    `${this.url}/teacher/subject/${this.subjectId}/summary/files/`,
+                    form_data,
+                    options
+                )
+                .then((result) => {
+                    console.log(result);
+                    if (result.data.url && result.data.sts === true) {
+                        const image = this.state.image;
+                        image.push({
+                            file_name: event.target.files[0].name,
+                            path: result.data.url,
+                        });
                         this.setState({
-                            errorMsg: result.data.detail,
+                            successMsg: result.data.msg,
+                            showSuccessAlert: true,
+                            showLoader: false,
+                            image: image,
                         });
                     } else {
+                        if (result.data.detail) {
+                            this.setState({
+                                errorMsg: result.data.detail,
+                            });
+                        } else {
+                            this.setState({
+                                errorMsg: result.data.msg,
+                            });
+                        }
                         this.setState({
-                            errorMsg: result.data.msg,
+                            showErrorAlert: true,
+                            showLoader: false,
                         });
                     }
-                    this.setState({
-                        showErrorAlert: true,
-                        showLoader: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        }
+    };
+
+    componentDidUpdate = (prevProps, prevState) => {
+        if (
+            prevState.showSuccessAlert !== this.state.showSuccessAlert &&
+            this.state.showSuccessAlert === true
+        ) {
+            setTimeout(() => {
+                this.setState({
+                    showSuccessAlert: false,
+                });
+            }, 2000);
+        }
+
+        if (
+            prevState.showErrorAlert !== this.state.showErrorAlert &&
+            this.state.showErrorAlert === true
+        ) {
+            setTimeout(() => {
+                this.setState({
+                    showErrorAlert: false,
+                });
+            }, 3000);
+        }
     };
 
     render() {
@@ -139,7 +181,7 @@ class ImageUploadModal extends Component {
                         {this.state.successMsg}
                     </Alert>
 
-                    <div className="custom-file mb-2">
+                    <div className="custom-file">
                         <input
                             type="file"
                             className="custom-file-input"
@@ -152,43 +194,57 @@ class ImageUploadModal extends Component {
                             Choose file
                         </label>
                     </div>
+                    <small
+                        className="form-text text-muted mb-2"
+                        style={{ marginTop: "0px" }}
+                    >
+                        Select only .png .jpg .jpeg .webp format. Max size is
+                        5MB
+                    </small>
+
                     {this.state.image.length !== 0
                         ? this.state.image.map((image, index) => {
                               return (
                                   <div
-                                      className="d-flex align-items-center mb-2"
+                                      className="row align-items-center mb-2"
                                       key={index}
                                   >
-                                      <p className="small text-primary text-break mb-0 mr-3">
-                                          {image.file_name}
-                                      </p>
-                                      <CopyToClipboard
-                                          text={image.path}
-                                          onCopy={() => {
-                                              this.setState({
-                                                  copiedImage: index,
-                                              });
-                                              setTimeout(() => {
+                                      <div className="col-md-2">
+                                          <img
+                                              src={image.path}
+                                              alt={image.file_name}
+                                              className="img-fluid rounded shadow-sm"
+                                          />
+                                      </div>
+                                      <div className="col-md-10">
+                                          <CopyToClipboard
+                                              text={image.path}
+                                              onCopy={() => {
                                                   this.setState({
-                                                      copiedImage: "",
+                                                      copiedImage: index,
                                                   });
-                                              }, 3000);
-                                          }}
-                                      >
-                                          <button className="btn btn-light btn-sm">
-                                              <i className="far fa-copy"></i>
-                                              {this.state.copiedImage ===
-                                              index ? (
-                                                  <span className="ml-2">
-                                                      Copied
-                                                  </span>
-                                              ) : (
-                                                  <span className="ml-2">
-                                                      Copy image link
-                                                  </span>
-                                              )}
-                                          </button>
-                                      </CopyToClipboard>
+                                                  setTimeout(() => {
+                                                      this.setState({
+                                                          copiedImage: "",
+                                                      });
+                                                  }, 3000);
+                                              }}
+                                          >
+                                              <button className="btn btn-light btn-sm">
+                                                  <i className="far fa-copy"></i>
+                                                  {this.state.copiedImage ===
+                                                  index ? (
+                                                      <span className="ml-2">
+                                                          Copied
+                                                      </span>
+                                                  ) : (
+                                                      <span className="ml-2">
+                                                          Copy image link
+                                                      </span>
+                                                  )}
+                                              </button>
+                                          </CopyToClipboard>
+                                      </div>
                                   </div>
                               );
                           })
@@ -208,12 +264,14 @@ class SubjectSummary extends Component {
             limited: false,
             title: "",
             content: "",
+            summary_id: "",
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
             showLoader: false,
             image: [],
+            page_loading: true,
         };
         this.subjectId = this.props.match.params.subjectId;
         this.chapterName = this.props.match.params.chapterName;
@@ -244,10 +302,45 @@ class SubjectSummary extends Component {
         });
     };
 
+    loadSummaryData = () => {
+        fetch(
+            `${this.url}/teacher/subject/${this.subjectId}/summary/?chapter_name=${this.chapterName}`,
+            {
+                method: "GET",
+                headers: this.headers,
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                this.setState({
+                    title: result.data[0].summary_name
+                        ? result.data[0].summary_name
+                        : "",
+                    content: result.data[0].summary_content
+                        ? result.data[0].summary_content
+                        : "",
+                    limited: result.data[0].limited
+                        ? result.data[0].limited
+                        : false,
+                    summary_id: result.data[0].summary_id
+                        ? result.data[0].summary_id
+                        : "",
+                    page_loading: false,
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    page_loading: false,
+                });
+            });
+    };
+
     componentDidMount = () => {
         document.title = `${this.chapterName} Summary - Teacher | IQLabs`;
 
-        // CKEditor.editorUrl = '../../ckeditor/ckeditor.js';
+        this.loadSummaryData();
     };
 
     onEditorChange = (evt) => {
@@ -268,7 +361,26 @@ class SubjectSummary extends Component {
             showErrorAlert: false,
             showSuccessAlert: false,
         });
+        if (this.state.title === "") {
+            this.setState({
+                errorMsg: "Please add summary title",
+                showErrorAlert: true,
+            });
+        } else if (this.state.content === "") {
+            this.setState({
+                errorMsg: "Please add summary data",
+                showErrorAlert: true,
+            });
+        } else {
+            if (this.state.summary_id === "") {
+                this.handlePOST();
+            } else {
+                this.handlePATCH();
+            }
+        }
+    };
 
+    handlePOST = () => {
         fetch(`${this.url}/teacher/subject/${this.subjectId}/summary/`, {
             headers: this.headers,
             method: "POST",
@@ -282,11 +394,59 @@ class SubjectSummary extends Component {
             .then((res) => res.json())
             .then((result) => {
                 if (result.sts === true) {
+                    this.setState(
+                        {
+                            successMsg: result.msg,
+                            showSuccessAlert: true,
+                            showLoader: false,
+                        },
+                        () => {
+                            setTimeout(() => {
+                                this.loadSummaryData();
+                            }, 1000);
+                        }
+                    );
+                } else {
                     this.setState({
-                        successMsg: result.msg,
-                        showSuccessAlert: true,
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
                         showLoader: false,
                     });
+                }
+                console.log(result);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    handlePATCH = () => {
+        fetch(`${this.url}/teacher/subject/${this.subjectId}/summary/`, {
+            headers: this.headers,
+            method: "PATCH",
+            body: JSON.stringify({
+                limited: this.state.limited,
+                summary_name: this.state.title,
+                summary_content: this.state.content,
+                summary_id: this.state.summary_id,
+                chapter_name: this.chapterName,
+            }),
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    this.setState(
+                        {
+                            successMsg: result.msg,
+                            showSuccessAlert: true,
+                            showLoader: false,
+                        },
+                        () => {
+                            setTimeout(() => {
+                                this.loadSummaryData();
+                            }, 1000);
+                        }
+                    );
                 } else {
                     this.setState({
                         errorMsg: result.msg,
@@ -440,6 +600,7 @@ class SubjectSummary extends Component {
                                     type="text"
                                     name="title"
                                     id="title"
+                                    value={this.state.title}
                                     className="form-control border-secondary"
                                     placeholder="Add summary title"
                                     onChange={this.handleTitle}
@@ -451,94 +612,13 @@ class SubjectSummary extends Component {
 
                         {/* Editor */}
                         <div className="card shadow-sm">
-                            <CKEditor
-                                data=""
+                            <CKeditor
+                                data={this.state.content}
                                 onChange={this.onEditorChange}
-                                config={{
-                                    toolbar: [
-                                        [
-                                            "Source",
-                                            "-",
-                                            "Save",
-                                            "NewPage",
-                                            "Preview",
-                                            "Print",
-                                            "-",
-                                            "Templates",
-                                        ],
-                                        [
-                                            "Cut",
-                                            "Copy",
-                                            "Paste",
-                                            "PasteText",
-                                            "PasteFromWord",
-                                            "-",
-                                            "Undo",
-                                            "Redo",
-                                        ],
-                                        [
-                                            "Find",
-                                            "Replace",
-                                            "SelectAll",
-                                            "Scayt",
-                                        ],
-                                        ["Maximize"],
-                                        [
-                                            "Form",
-                                            "Checkbox",
-                                            "Radio",
-                                            "TextField",
-                                            "Textarea",
-                                            "Select",
-                                            "Button",
-                                            "ImageButton",
-                                            "HiddenField",
-                                        ],
-                                        [
-                                            "Image",
-                                            "Flash",
-                                            "Table",
-                                            "HorizontalRule",
-                                            "Smiley",
-                                            "SpecialChar",
-                                            "PageBreak",
-                                            "Iframe",
-                                        ],
-                                        ["Link", "Unlink", "Anchor"],
-                                        [
-                                            "Bold",
-                                            "Italic",
-                                            "Underline",
-                                            "Strike",
-                                            "Subscript",
-                                            "Superscript",
-                                        ],
-                                        ["Font", "FontSize"],
-                                        ["TextColor", "BGColor"],
-                                        [
-                                            "JustifyLeft",
-                                            "JustifyCenter",
-                                            "JustifyRight",
-                                            "JustifyBlock",
-                                            "-",
-                                            "NumberedList",
-                                            "BulletedList",
-                                            "-",
-                                            "Outdent",
-                                            "Indent",
-                                            "-",
-                                            "Blockquote",
-                                            "CreateDiv",
-                                            "-",
-                                            "BidiLtr",
-                                            "BidiRtl",
-                                            "Language",
-                                        ],
-                                    ],
-                                    height: "350px",
-                                }}
                             />
                         </div>
+                        {/* Loading component */}
+                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
             </div>

@@ -175,7 +175,6 @@ class CycleTestAuto extends Component {
             is_formSubmitted: false,
         };
         this.subjectId = this.props.match.params.subjectId;
-        this.chapterName = this.props.match.params.chapterName;
         this.cycle_testId = this.props.match.params.cycle_testId;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
@@ -198,10 +197,35 @@ class CycleTestAuto extends Component {
         });
     };
 
+    loadAutoTestData = () => {
+        fetch(
+            `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/filter/?chapter_name=${this.state.chapterName}`,
+            {
+                method: "GET",
+                headers: this.headers,
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                this.setState({
+                    page_loading: false,
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     componentDidMount = () => {
-        this.setState({
-            chapterName: this.props.match.params.chapterName,
-        });
+        this.setState(
+            {
+                chapterName: this.props.match.params.chapterName,
+            },
+            () => {
+                this.loadAutoTestData();
+            }
+        );
 
         fetch(`${this.url}/teacher/subject/${this.subjectId}/`, {
             headers: this.headers,
@@ -211,7 +235,6 @@ class CycleTestAuto extends Component {
             .then((result) => {
                 this.setState({
                     chapterList: result.data.results,
-                    page_loading: false,
                 });
                 console.log(result);
             })
@@ -222,20 +245,26 @@ class CycleTestAuto extends Component {
 
     componentDidUpdate = (prevProps, prevState) => {
         if (this.props.match.params.chapterName !== this.state.chapterName) {
-            this.setState({
-                chapterName: this.props.match.params.chapterName,
-            });
+            this.setState(
+                {
+                    chapterName: this.props.match.params.chapterName,
+                    page_loading: true,
+                },
+                () => {
+                    this.loadAutoTestData();
+                }
+            );
         }
 
-        if (
-            prevState.is_formSubmitted !== this.state.is_formSubmitted &&
-            this.state.is_formSubmitted === true
-        ) {
-            this.loadChapterData();
-            this.setState({
-                is_formSubmitted: false,
-            });
-        }
+        // if (
+        //     prevState.is_formSubmitted !== this.state.is_formSubmitted &&
+        //     this.state.is_formSubmitted === true
+        // ) {
+        //     this.loadChapterData();
+        //     this.setState({
+        //         is_formSubmitted: false,
+        //     });
+        // }
     };
 
     formSubmission = (is_formSubmitted) => {
@@ -248,20 +277,19 @@ class CycleTestAuto extends Component {
 
     handleSelect = (event) => {
         this.props.history.push({
-            pathname: `/teacher/subject/${this.subjectId}/${event.value}/cycle-test/${this.cycle_testId}`,
+            pathname: `/teacher/subject/${this.subjectId}/${event.value}/cycle/${this.cycle_testId}`,
         });
-        this.setState({
-            chapterName: event.value,
-        });
+        this.setState(
+            {
+                chapterName: event.value,
+                page_loading: true,
+            },
+            () => {
+                this.loadAutoTestData();
+            }
+        );
     };
 
-    handleSection_id = (index, event) => {
-        const section = [...this.state.sections];
-        section[index].section_id = event.target.value;
-        this.setState({
-            sections: section,
-        });
-    };
     handleSection_name = (index, event) => {
         const section = [...this.state.sections];
         section[index].section_name = event.target.value;
@@ -316,6 +344,14 @@ class CycleTestAuto extends Component {
             marks: "",
             total_marks: "",
         });
+        this.setState({
+            sections: sections,
+        });
+    };
+
+    removeSection = (index) => {
+        const sections = [...this.state.sections];
+        sections.splice(index, 1);
         this.setState({
             sections: sections,
         });
@@ -394,11 +430,12 @@ class CycleTestAuto extends Component {
                                         />
                                     </div>
                                     <div className="col-md-4">
-                                        <div className="card shadow-sm">
-                                            <div className="card-body text-center py-2">
-                                                180 mins
-                                            </div>
-                                        </div>
+                                        <input
+                                            type="text"
+                                            name="duration"
+                                            className="form-control form-shadow"
+                                            placeholder="Enter time duration"
+                                        />
                                     </div>
                                     <div className="col-md-4">
                                         <select
@@ -440,7 +477,7 @@ class CycleTestAuto extends Component {
                                 <table className="table">
                                     <thead className="primary-bg text-white">
                                         <tr>
-                                            <th scope="col">Section</th>
+                                            <th scope="col"></th>
                                             <th scope="col">
                                                 Section Description
                                             </th>
@@ -452,6 +489,7 @@ class CycleTestAuto extends Component {
                                             <th scope="col">Marks</th>
                                             <th scope="col">Total Marks</th>
                                             <th scope="col">View</th>
+                                            <th scope="col"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -459,25 +497,17 @@ class CycleTestAuto extends Component {
                                             (section, index) => {
                                                 return (
                                                     <tr key={index}>
-                                                        <td width="80px">
-                                                            <input
-                                                                type="text"
-                                                                className="form-control form-shadow"
-                                                                placeholder={
-                                                                    index + 1
-                                                                }
-                                                                value={
-                                                                    section.section_id
-                                                                }
-                                                                onChange={(
-                                                                    event
-                                                                ) =>
-                                                                    this.handleSection_id(
-                                                                        index,
-                                                                        event
+                                                        <td>
+                                                            <button
+                                                                className="btn btn-primary-invert shadow-sm btn-sm"
+                                                                onClick={() =>
+                                                                    this.removeSection(
+                                                                        index
                                                                     )
                                                                 }
-                                                            />
+                                                            >
+                                                                <i className="fas fa-minus-circle"></i>
+                                                            </button>
                                                         </td>
                                                         <td>
                                                             <input
@@ -593,13 +623,17 @@ class CycleTestAuto extends Component {
                                                         </td>
                                                         <td>
                                                             <Link
-                                                                to={`/teacher/subject/${this.subjectId}/${this.state.chapterName}/cycle-test/${this.cycle_testId}/section/${index}`}
+                                                                to={`/teacher/subject/${this.subjectId}/${this.state.chapterName}/cycle/${this.cycle_testId}/section/${index}`}
                                                             >
                                                                 <button className="btn btn-link shadow-sm">
                                                                     <i className="fas fa-eye"></i>
                                                                 </button>
                                                             </Link>
                                                         </td>
+                                                        <td>
+                                                            <button className="btn btn-link shadow-sm">
+                                                                Save
+                                                            </button></td>
                                                     </tr>
                                                 );
                                             }
