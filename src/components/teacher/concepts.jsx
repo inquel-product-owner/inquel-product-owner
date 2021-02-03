@@ -2,37 +2,37 @@ import React, { Component, Fragment } from "react";
 import axios from "axios";
 import Header from "./navbar";
 import SideNav from "./sidenav";
-import CKEditor from "ckeditor4-react";
+import CKeditor from "../sharedComponents/CKeditor";
 import ReactSwitch from "../sharedComponents/switchComponent";
 import { Accordion, Card, Alert, Spinner } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import ReactCardFlip from "react-card-flip";
+import Loading from "../sharedComponents/loader";
 
 class SubjectConcepts extends Component {
     constructor(props) {
         super(props);
         this.state = {
             showSideNav: false,
-            contentCollapsed: true,
-            imageCollapsed: true,
-            audioCollapsed: true,
-            settingsCollapsed: true,
-            showEdit_option: false,
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
             showLoader: false,
+            page_loading: true,
+
+            contentCollapsed: true,
+            imageCollapsed: true,
+            audioCollapsed: true,
+            settingsCollapsed: true,
+            showEdit_option: false,
             showVirtual_keyboard: true,
             isForm_submitted: false,
 
             activeConcept: "",
-            activeConceptData: [],
-            activeKeyboards: [],
             selectedImageQuestion: "",
             selectedImageData: [],
             selectedImage: "",
-            concepts_random_id: "",
             flipState: [false],
 
             keyboards: [
@@ -43,6 +43,9 @@ class SubjectConcepts extends Component {
                 {
                     chapter_name: this.props.match.params.chapterName,
                     topic_name: this.props.match.params.topicName,
+                    concepts_random_id: "",
+                    old_concept: true,
+                    old_image: false,
                     content: {
                         terms: "<p>Terms goes here</p>",
                         definition: "<p>Definition goes here</p>",
@@ -86,6 +89,32 @@ class SubjectConcepts extends Component {
         });
     };
 
+    loadConceptData = () => {
+        fetch(
+            `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/`,
+            {
+                method: "GET",
+                headers: this.headers,
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                this.setState({
+                    page_loading: false,
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    componentDidMount = () => {
+        document.title = `${this.chapterName} Concepts - Teacher | IQLabs`;
+
+        this.loadConceptData();
+    };
+
     handleSubmit = () => {
         this.setState({
             showLoader: true,
@@ -93,49 +122,142 @@ class SubjectConcepts extends Component {
             showSuccessAlert: false,
         });
 
-        if (this.state.concepts_random_id === "") {
-            fetch(
-                `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/`,
-                {
-                    headers: this.headers,
-                    method: "POST",
-                    body: JSON.stringify(this.state.activeConceptData),
-                }
-            )
-                .then((res) => res.json())
-                .then((result) => {
-                    console.log(result);
-                    if (result.sts === true) {
-                        this.setState({
-                            concepts_random_id: result.concepts_random_id,
-                            isForm_submitted: true,
-                        });
-                    } else {
-                        if (result.detail) {
-                            this.setState({
-                                errorMsg: result.detail,
-                            });
-                        } else {
-                            this.setState({
-                                errorMsg: result.msg,
-                            });
-                        }
-                        this.setState({
-                            showErrorAlert: true,
-                            showLoader: false,
-                        });
-                    }
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-        } else {
+        const data = [...this.state.concepts];
+
+        if (data[this.state.activeConcept].content.terms === "") {
             this.setState({
-                isForm_submitted: true,
+                errorMsg: "Terms is required",
+                showErrorAlert: true,
+                showLoader: false,
             });
+        } else if (data[this.state.activeConcept].content.definition === "") {
+            this.setState({
+                errorMsg: "Definition is required",
+                showErrorAlert: true,
+                showLoader: false,
+            });
+        } else if (
+            data[this.state.activeConcept].settings.virtual_keyboard.length ===
+            0
+        ) {
+            this.setState({
+                errorMsg: "Please select a Virtual keyboard",
+                showErrorAlert: true,
+                showLoader: false,
+            });
+        } else {
+            if (data[this.state.activeConcept].old_concept === true) {
+                if (data[this.state.activeConcept].concepts_random_id === "") {
+                    delete data[this.state.activeConcept].concepts_random_id;
+                    if (data[this.state.activeConcept].old_concept) {
+                        delete data[this.state.activeConcept].old_concept;
+                    }
+                    if (!data[this.state.activeConcept].old_image) {
+                        delete data[this.state.activeConcept].old_image;
+                    }
+                    this.handlePOST(data);
+                } else {
+                    if (data[this.state.activeConcept].old_concept) {
+                        delete data[this.state.activeConcept].old_concept;
+                    }
+                    if (data[this.state.activeConcept].old_image) {
+                        delete data[this.state.activeConcept].old_image;
+                    }
+                    this.handlePUT(data);
+                }
+            } else {
+                this.setState({
+                    isForm_submitted: true,
+                });
+            }
         }
     };
 
+    handlePOST = (data) => {
+        fetch(
+            `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/`,
+            {
+                headers: this.headers,
+                method: "POST",
+                body: JSON.stringify(data[this.state.activeConcept]),
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    data[this.state.activeConcept].concepts_random_id =
+                        result.concepts_random_id;
+                    data[this.state.activeConcept].old_concept = false;
+                    data[this.state.activeConcept].old_image = false;
+                    this.setState({
+                        concepts: data,
+                        isForm_submitted: true,
+                    });
+                } else {
+                    if (result.detail) {
+                        this.setState({
+                            errorMsg: result.detail,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.msg,
+                        });
+                    }
+                    this.setState({
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    handlePUT = (data) => {
+        fetch(
+            `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/`,
+            {
+                headers: this.headers,
+                method: "PUT",
+                body: JSON.stringify(data[this.state.activeConcept]),
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    data[this.state.activeConcept].concepts_random_id =
+                        result.concepts_random_id;
+                    data[this.state.activeConcept].old_concept = false;
+                    data[this.state.activeConcept].old_image = true;
+                    this.setState({
+                        concepts: data,
+                        isForm_submitted: true,
+                    });
+                } else {
+                    if (result.detail) {
+                        this.setState({
+                            errorMsg: result.detail,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.msg,
+                        });
+                    }
+                    this.setState({
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    // Run the image API once the question is added
     componentDidUpdate = (prevProps, prevState) => {
         if (
             prevState.isForm_submitted !== this.state.isForm_submitted &&
@@ -148,7 +270,7 @@ class SubjectConcepts extends Component {
                 isForm_submitted: false,
             });
 
-            const conceptValues = this.state.activeConceptData;
+            const conceptValues = [...this.state.concepts];
 
             let form_data = new FormData();
 
@@ -156,44 +278,69 @@ class SubjectConcepts extends Component {
             form_data.append("topic_name", this.topicName);
             form_data.append(
                 "concepts_random_id",
-                this.state.concepts_random_id
+                conceptValues[this.state.activeConcept].concepts_random_id
             );
 
-            if (conceptValues.content.video.video !== null) {
+            if (
+                conceptValues[this.state.activeConcept].content.video.video !==
+                null
+            ) {
                 form_data.append(
                     "concepts_video_1_title",
-                    conceptValues.content.video.title
+                    conceptValues[this.state.activeConcept].content.video.title
                 );
                 form_data.append(
                     "concepts_video_1",
-                    conceptValues.content.video.video
+                    conceptValues[this.state.activeConcept].content.video.video
                 );
             }
 
-            for (let i = 0; i < conceptValues.content.images.length; i++) {
-                if (conceptValues.content.images[i].image !== null) {
+            for (
+                let i = 0;
+                i <
+                conceptValues[this.state.activeConcept].content.images.length;
+                i++
+            ) {
+                if (
+                    conceptValues[this.state.activeConcept].content.images[i]
+                        .image !== null
+                ) {
                     form_data.append(
                         `concepts_image_${i + 1}_title`,
-                        conceptValues.content.images[i].title
+                        conceptValues[this.state.activeConcept].content.images[
+                            i
+                        ].title
                     );
                     form_data.append(
                         `concepts_image_${i + 1}`,
-                        conceptValues.content.images[i].image
+                        conceptValues[this.state.activeConcept].content.images[
+                            i
+                        ].image
                     );
                 } else {
                     continue;
                 }
             }
 
-            for (let i = 0; i < conceptValues.content.audio.length; i++) {
-                if (conceptValues.content.audio[i].audio !== null) {
+            for (
+                let i = 0;
+                i <
+                conceptValues[this.state.activeConcept].content.audio.length;
+                i++
+            ) {
+                if (
+                    conceptValues[this.state.activeConcept].content.audio[i]
+                        .audio !== null
+                ) {
                     form_data.append(
                         `concepts_audio_${i + 1}_title`,
-                        conceptValues.content.audio[i].title
+                        conceptValues[this.state.activeConcept].content.audio[i]
+                            .title
                     );
                     form_data.append(
                         `concepts_audio_${i + 1}`,
-                        conceptValues.content.audio[i].audio
+                        conceptValues[this.state.activeConcept].content.audio[i]
+                            .audio
                     );
                 } else {
                     continue;
@@ -208,45 +355,126 @@ class SubjectConcepts extends Component {
                 },
             };
 
-            axios
-                .post(
-                    `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/files/`,
-                    form_data,
-                    options
-                )
-                .then((result) => {
-                    console.log(result);
-                    for (var p of form_data) {
-                        console.log(p);
+            let files_arr = [];
+            for (var p of form_data) {
+                files_arr.push(p);
+            }
+
+            if (files_arr.length !== 3) {
+                if (
+                    conceptValues[this.state.activeConcept].old_image === false
+                ) {
+                    this.handleImgPOST(options, form_data, conceptValues);
+                } else {
+                    this.handleImgPATCH(options, form_data, conceptValues);
+                }
+            } else {
+                conceptValues[this.state.activeConcept].old_concept = true;
+                this.setState(
+                    {
+                        concepts: conceptValues,
+                        successMsg: "Concepts added",
+                        showSuccessAlert: true,
+                        showLoader: false,
+                        page_loading: true,
+                    },
+                    () => {
+                        this.loadConceptData();
                     }
-                    if (result.data.sts === true) {
-                        this.setState({
+                );
+            }
+        }
+    };
+
+    handleImgPOST = (options, form_data, conceptValues) => {
+        axios
+            .post(
+                `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/files/`,
+                form_data,
+                options
+            )
+            .then((result) => {
+                console.log(result);
+                if (result.data.sts === true) {
+                    conceptValues[this.state.activeConcept].old_concept = true;
+                    this.setState(
+                        {
+                            concepts: conceptValues,
                             successMsg: result.data.msg,
                             showSuccessAlert: true,
                             showLoader: false,
-                            concepts_random_id: "",
+                            page_loading: true,
+                        },
+                        () => {
+                            this.loadConceptData();
+                        }
+                    );
+                } else {
+                    if (result.data.detail) {
+                        this.setState({
+                            errorMsg: result.data.detail,
                         });
                     } else {
-                        if (result.data.detail) {
-                            this.setState({
-                                errorMsg: result.data.detail,
-                            });
-                        } else {
-                            this.setState({
-                                errorMsg: result.data.msg,
-                            });
-                        }
                         this.setState({
-                            showErrorAlert: true,
-                            showLoader: false,
+                            errorMsg: result.data.msg,
                         });
                     }
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-        }
+                    this.setState({
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     };
+
+    handleImgPATCH = (options, form_data, conceptValues) => {
+        axios
+            .patch(
+                `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/files/`,
+                form_data,
+                options
+            )
+            .then((result) => {
+                console.log(result);
+                if (result.data.sts === true) {
+                    conceptValues[this.state.activeConcept].old_concept = true;
+                    this.setState(
+                        {
+                            concepts: conceptValues,
+                            successMsg: result.data.msg,
+                            showSuccessAlert: true,
+                            showLoader: false,
+                            page_loading: true,
+                        },
+                        () => {
+                            this.loadConceptData();
+                        }
+                    );
+                } else {
+                    if (result.data.detail) {
+                        this.setState({
+                            errorMsg: result.data.detail,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.data.msg,
+                        });
+                    }
+                    this.setState({
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    // -------------------------- Terms & Definition --------------------------
 
     onEditorChange = (evt) => {
         const values = [...this.state.concepts];
@@ -520,6 +748,9 @@ class SubjectConcepts extends Component {
         values.push({
             chapter_name: this.props.match.params.chapterName,
             topic_name: this.props.match.params.topicName,
+            concepts_random_id: "",
+            old_concept: true,
+            old_image: false,
             content: {
                 terms: "<p>Terms goes here</p>",
                 definition: "<p>Definition goes here</p>",
@@ -564,6 +795,32 @@ class SubjectConcepts extends Component {
             audioCollapsed: true,
             settingsCollapsed: true,
         });
+
+        const data = [...this.state.concepts];
+
+        fetch(
+            `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/`,
+            {
+                method: "DELETE",
+                headers: this.headers,
+                body: JSON.stringify({
+                    chapter_name: data[index].chapter_name,
+                    topic_name: data[index].topic_name,
+                    concepts_random_id: data[index].concepts_random_id,
+                }),
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                this.setState({
+                    page_loading: true,
+                });
+                this.loadConceptData();
+                console.log(result);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     };
 
     copyConcept = (index) => {
@@ -577,13 +834,20 @@ class SubjectConcepts extends Component {
             physics: keyboards[index].physics,
             maths: keyboards[index].maths,
         });
+        const images = [];
+        for (let i = 0; i < values[index].content.images.length; i++) {
+            images[i] = values[index].content.images[i];
+        }
         values.push({
             chapter_name: this.chapterName,
             topic_name: this.topicName,
+            concepts_random_id: "",
+            old_concept: true,
+            old_image: false,
             content: {
                 terms: values[index].content.terms,
                 definition: values[index].content.definition,
-                images: values[index].content.images,
+                images: images,
                 video: values[index].content.video,
                 audio: values[index].content.audio,
             },
@@ -600,19 +864,12 @@ class SubjectConcepts extends Component {
     };
 
     editConcept = (index, concept) => {
-        let keyboards = [...this.state.keyboards];
         this.setState({
             showEdit_option: true,
             activeConcept: index,
-            activeConceptData: concept,
-            activeKeyboards: keyboards[index],
             showErrorAlert: false,
             showSuccessAlert: false,
         });
-    };
-
-    componentDidMount = () => {
-        document.title = `${this.chapterName} Concepts - Teacher | IQLabs`;
     };
 
     handleFlip = (index) => {
@@ -624,6 +881,8 @@ class SubjectConcepts extends Component {
     };
 
     render() {
+        let data = [...this.state.concepts];
+        let boards = [...this.state.keyboards];
         return (
             <div className="wrapper">
                 {/* Navbar */}
@@ -976,6 +1235,10 @@ class SubjectConcepts extends Component {
                                             onClick={() => {
                                                 this.setState({
                                                     showEdit_option: false,
+                                                    contentCollapsed: true,
+                                                    imageCollapsed: true,
+                                                    audioCollapsed: true,
+                                                    settingsCollapsed: true,
                                                 });
                                             }}
                                         >
@@ -1041,12 +1304,12 @@ class SubjectConcepts extends Component {
                                                     {/* ---------- Terms ---------- */}
                                                     <div className="form-group">
                                                         <label>Terms</label>
-                                                        <CKEditor
+                                                        <CKeditor
                                                             data={
-                                                                this.state
-                                                                    .activeConceptData
-                                                                    .content
-                                                                    .terms
+                                                                data[
+                                                                    this.state
+                                                                        .activeConcept
+                                                                ].content.terms
                                                             }
                                                             onChange={
                                                                 this
@@ -1060,11 +1323,12 @@ class SubjectConcepts extends Component {
                                                         <label>
                                                             Definition
                                                         </label>
-                                                        <CKEditor
+                                                        <CKeditor
                                                             data={
-                                                                this.state
-                                                                    .activeConceptData
-                                                                    .content
+                                                                data[
+                                                                    this.state
+                                                                        .activeConcept
+                                                                ].content
                                                                     .definition
                                                             }
                                                             onChange={
@@ -1107,7 +1371,10 @@ class SubjectConcepts extends Component {
                                                         <p className="mb-2">
                                                             Image
                                                         </p>
-                                                        {this.state.activeConceptData.content.images.map(
+                                                        {data[
+                                                            this.state
+                                                                .activeConcept
+                                                        ].content.images.map(
                                                             (
                                                                 options,
                                                                 index
@@ -1150,9 +1417,11 @@ class SubjectConcepts extends Component {
                                                                                 role="group"
                                                                                 aria-label="Basic example"
                                                                             >
-                                                                                {this
-                                                                                    .state
-                                                                                    .activeConceptData
+                                                                                {data[
+                                                                                    this
+                                                                                        .state
+                                                                                        .activeConcept
+                                                                                ]
                                                                                     .content
                                                                                     .images
                                                                                     .length >
@@ -1206,9 +1475,10 @@ class SubjectConcepts extends Component {
                                                                 </Fragment>
                                                             )
                                                         )}
-                                                        {this.state
-                                                            .activeConceptData
-                                                            .content.images
+                                                        {data[
+                                                            this.state
+                                                                .activeConcept
+                                                        ].content.images
                                                             .length <
                                                         this.image_limit ? (
                                                             <div className="form-group mb-0">
@@ -1263,16 +1533,18 @@ class SubjectConcepts extends Component {
                                                                 className="custom-file-label"
                                                                 htmlFor="video"
                                                             >
-                                                                {this.state
-                                                                    .activeConceptData
-                                                                    .content
-                                                                    .video
+                                                                {data[
+                                                                    this.state
+                                                                        .activeConcept
+                                                                ].content.video
                                                                     .file_name ===
                                                                 ""
                                                                     ? "Choose file"
-                                                                    : this.state
-                                                                          .activeConceptData
-                                                                          .content
+                                                                    : data[
+                                                                          this
+                                                                              .state
+                                                                              .activeConcept
+                                                                      ].content
                                                                           .video
                                                                           .file_name}
                                                             </label>
@@ -1291,10 +1563,10 @@ class SubjectConcepts extends Component {
                                                                 )
                                                             }
                                                             value={
-                                                                this.state
-                                                                    .activeConceptData
-                                                                    .content
-                                                                    .video
+                                                                data[
+                                                                    this.state
+                                                                        .activeConcept
+                                                                ].content.video
                                                                     .pasteUrl
                                                             }
                                                         />
@@ -1330,7 +1602,10 @@ class SubjectConcepts extends Component {
                                                 <Card.Body className="p-3">
                                                     {/* ---------- Audio ---------- */}
                                                     <div className="form-group">
-                                                        {this.state.activeConceptData.content.audio.map(
+                                                        {data[
+                                                            this.state
+                                                                .activeConcept
+                                                        ].content.audio.map(
                                                             (
                                                                 options,
                                                                 index
@@ -1443,10 +1718,11 @@ class SubjectConcepts extends Component {
                                                                 <input
                                                                     type="checkbox"
                                                                     checked={
-                                                                        this
-                                                                            .state
-                                                                            .activeKeyboards
-                                                                            .all
+                                                                        boards[
+                                                                            this
+                                                                                .state
+                                                                                .activeConcept
+                                                                        ].all
                                                                     }
                                                                     onChange={(
                                                                         event
@@ -1463,16 +1739,19 @@ class SubjectConcepts extends Component {
                                                                 <input
                                                                     type="checkbox"
                                                                     checked={
-                                                                        this
-                                                                            .state
-                                                                            .activeKeyboards
+                                                                        boards[
+                                                                            this
+                                                                                .state
+                                                                                .activeConcept
+                                                                        ]
                                                                             .chemistry
                                                                     }
                                                                     disabled={
-                                                                        this
-                                                                            .state
-                                                                            .activeKeyboards
-                                                                            .all
+                                                                        boards[
+                                                                            this
+                                                                                .state
+                                                                                .activeConcept
+                                                                        ].all
                                                                     }
                                                                     onChange={(
                                                                         event
@@ -1489,16 +1768,18 @@ class SubjectConcepts extends Component {
                                                                 <input
                                                                     type="checkbox"
                                                                     checked={
-                                                                        this
-                                                                            .state
-                                                                            .activeKeyboards
-                                                                            .maths
+                                                                        boards[
+                                                                            this
+                                                                                .state
+                                                                                .activeConcept
+                                                                        ].maths
                                                                     }
                                                                     disabled={
-                                                                        this
-                                                                            .state
-                                                                            .activeKeyboards
-                                                                            .all
+                                                                        boards[
+                                                                            this
+                                                                                .state
+                                                                                .activeConcept
+                                                                        ].all
                                                                     }
                                                                     onChange={(
                                                                         event
@@ -1515,16 +1796,19 @@ class SubjectConcepts extends Component {
                                                                 <input
                                                                     type="checkbox"
                                                                     checked={
-                                                                        this
-                                                                            .state
-                                                                            .activeKeyboards
+                                                                        boards[
+                                                                            this
+                                                                                .state
+                                                                                .activeConcept
+                                                                        ]
                                                                             .physics
                                                                     }
                                                                     disabled={
-                                                                        this
-                                                                            .state
-                                                                            .activeKeyboards
-                                                                            .all
+                                                                        boards[
+                                                                            this
+                                                                                .state
+                                                                                .activeConcept
+                                                                        ].all
                                                                     }
                                                                     onChange={(
                                                                         event
@@ -1555,9 +1839,11 @@ class SubjectConcepts extends Component {
                                                                                 .handleLimited
                                                                         }
                                                                         checked={
-                                                                            this
-                                                                                .state
-                                                                                .activeConceptData
+                                                                            data[
+                                                                                this
+                                                                                    .state
+                                                                                    .activeConcept
+                                                                            ]
                                                                                 .settings
                                                                                 .limited
                                                                         }
@@ -1575,6 +1861,8 @@ class SubjectConcepts extends Component {
                                 ""
                             )}
                         </div>
+                        {/* Loading component */}
+                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
             </div>
