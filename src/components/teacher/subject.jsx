@@ -185,7 +185,7 @@ class ChapterModal extends Component {
                             </select>
                         </div>
                         <div className="form-group">
-                            <button className="btn btn-primary btn-block mt-2">
+                            <button className="btn btn-primary btn-sm btn-block">
                                 {this.state.showLoader ? (
                                     <Spinner
                                         as="span"
@@ -329,7 +329,7 @@ class SemesterModal extends Component {
                             />
                         </div>
                         <div className="form-group">
-                            <button className="btn btn-primary btn-block mt-2">
+                            <button className="btn btn-primary btn-sm btn-block">
                                 {this.state.showLoader ? (
                                     <Spinner
                                         as="span"
@@ -664,21 +664,35 @@ class SubjectChapters extends Component {
                                                                   <td></td>
                                                                   <td></td>
                                                                   <td className="text-right">
-                                                                      <Link
-                                                                          to={`/teacher/subject/${this.subjectId}/semester/${data.semester_id}`}
-                                                                      >
-                                                                          <button className="btn btn-primary btn-sm mr-2">
-                                                                              Auto
-                                                                          </button>
-                                                                      </Link>
-                                                                      <Link
-                                                                          to={`/teacher/subject/${this.subjectId}/semester/${data.semester_id}/direct-test`}
-                                                                      >
-                                                                          <button className="btn btn-primary btn-sm">
-                                                                              Direct
-                                                                              Test
-                                                                          </button>
-                                                                      </Link>
+                                                                      {data.direct_question ===
+                                                                          undefined ||
+                                                                      data.direct_question ===
+                                                                          false ? (
+                                                                          <Link
+                                                                              to={`/teacher/subject/${this.subjectId}/semester/${data.semester_id}`}
+                                                                          >
+                                                                              <button className="btn btn-primary btn-sm mr-2">
+                                                                                  Auto
+                                                                              </button>
+                                                                          </Link>
+                                                                      ) : (
+                                                                          ""
+                                                                      )}
+                                                                      {data.direct_question ===
+                                                                          undefined ||
+                                                                      data.direct_question ===
+                                                                          true ? (
+                                                                          <Link
+                                                                              to={`/teacher/subject/${this.subjectId}/semester/${data.semester_id}/direct`}
+                                                                          >
+                                                                              <button className="btn btn-primary btn-sm">
+                                                                                  Direct
+                                                                                  Test
+                                                                              </button>
+                                                                          </Link>
+                                                                      ) : (
+                                                                          ""
+                                                                      )}
                                                                   </td>
                                                               </tr>
                                                           </React.Fragment>

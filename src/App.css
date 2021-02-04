@@ -110,6 +110,12 @@ body {
     box-shadow: none;
 }
 
+.btn-primary.disabled, .btn-primary:disabled {
+    color: #fff;
+    background-color: #7c8188;
+    border-color: #7c8188;
+}
+
 .btn-primary-invert {
     color: #621012;
     background-color: #efd2ac;
@@ -585,4 +591,27 @@ input[type="search"]:focus {
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
+}
+
+
+/* PDF Preview */
+
+#ResumeContainer {
+    margin:auto;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+}
+
+.PDFDocument {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.PDFPage > canvas {
+    max-width: 100%;
+    height: auto !important;
 }

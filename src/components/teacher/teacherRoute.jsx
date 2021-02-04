@@ -22,6 +22,7 @@ import SemesterAuto from "./semester-auto";
 import SemesterAutoQA from "./semester-autoQA";
 import SemesterDirect from "./semester-direct";
 import EvaluateStudents from "./evaluateStudents";
+import Leaderboard from "./leaderBoard";
 
 const teacherRoutes = (
     <Switch>
@@ -195,7 +196,7 @@ const teacherRoutes = (
         />
         <Route
             exact
-            path="/teacher/subject/:subjectId/semester/:semesterId/direct-test"
+            path="/teacher/subject/:subjectId/semester/:semesterId/direct"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
@@ -207,7 +208,7 @@ const teacherRoutes = (
         />
         <Route
             exact
-            path="/teacher/subject/:subjectId/:chapterName/cycle-test/:cycle_testId"
+            path="/teacher/subject/:subjectId/:chapterName/cycle/:cycle_testId"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
@@ -219,7 +220,7 @@ const teacherRoutes = (
         />
         <Route
             exact
-            path="/teacher/subject/:subjectId/:chapterName/cycle-test/:cycle_testId/section/:sectionId"
+            path="/teacher/subject/:subjectId/:chapterName/cycle/:cycle_testId/section/:sectionId"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
@@ -231,7 +232,7 @@ const teacherRoutes = (
         />
         <Route
             exact
-            path="/teacher/subject/:subjectId/:chapterName/cycle-test/:cycle_testId/direct-test"
+            path="/teacher/subject/:subjectId/:chapterName/cycle/:cycle_testId/direct"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
@@ -250,6 +251,18 @@ const teacherRoutes = (
                     <Redirect to="/teacher" />
                 ) : (
                     <TeacherLogin />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/teacher/leaderboard"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <Leaderboard {...props} />
                 )
             }
         />
