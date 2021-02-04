@@ -22,6 +22,7 @@ import SemesterAuto from "./semester-auto";
 import SemesterAutoQA from "./semester-autoQA";
 import SemesterDirect from "./semester-direct";
 import EvaluateStudents from "./evaluateStudents";
+import Leaderboard from "./leaderBoard";
 
 const teacherRoutes = (
     <Switch>
@@ -250,6 +251,18 @@ const teacherRoutes = (
                     <Redirect to="/teacher" />
                 ) : (
                     <TeacherLogin />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/teacher/leaderboard"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <Leaderboard {...props} />
                 )
             }
         />

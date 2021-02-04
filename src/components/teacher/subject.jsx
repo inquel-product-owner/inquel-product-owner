@@ -664,21 +664,35 @@ class SubjectChapters extends Component {
                                                                   <td></td>
                                                                   <td></td>
                                                                   <td className="text-right">
-                                                                      <Link
-                                                                          to={`/teacher/subject/${this.subjectId}/semester/${data.semester_id}`}
-                                                                      >
-                                                                          <button className="btn btn-primary btn-sm mr-2">
-                                                                              Auto
-                                                                          </button>
-                                                                      </Link>
-                                                                      <Link
-                                                                          to={`/teacher/subject/${this.subjectId}/semester/${data.semester_id}/direct`}
-                                                                      >
-                                                                          <button className="btn btn-primary btn-sm">
-                                                                              Direct
-                                                                              Test
-                                                                          </button>
-                                                                      </Link>
+                                                                      {data.direct_question ===
+                                                                          undefined ||
+                                                                      data.direct_question ===
+                                                                          false ? (
+                                                                          <Link
+                                                                              to={`/teacher/subject/${this.subjectId}/semester/${data.semester_id}`}
+                                                                          >
+                                                                              <button className="btn btn-primary btn-sm mr-2">
+                                                                                  Auto
+                                                                              </button>
+                                                                          </Link>
+                                                                      ) : (
+                                                                          ""
+                                                                      )}
+                                                                      {data.direct_question ===
+                                                                          undefined ||
+                                                                      data.direct_question ===
+                                                                          true ? (
+                                                                          <Link
+                                                                              to={`/teacher/subject/${this.subjectId}/semester/${data.semester_id}/direct`}
+                                                                          >
+                                                                              <button className="btn btn-primary btn-sm">
+                                                                                  Direct
+                                                                                  Test
+                                                                              </button>
+                                                                          </Link>
+                                                                      ) : (
+                                                                          ""
+                                                                      )}
                                                                   </td>
                                                               </tr>
                                                           </React.Fragment>

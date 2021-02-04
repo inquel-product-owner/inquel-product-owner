@@ -20,7 +20,6 @@ class Dashboard extends Component {
             totalSubjectCount: 0,
             page_loading: true,
         };
-
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {

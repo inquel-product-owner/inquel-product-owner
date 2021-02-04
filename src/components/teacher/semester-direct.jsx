@@ -92,7 +92,9 @@ class SemesterDirect extends Component {
         });
     };
 
-    handleSubmit = () => {
+    handleSubmit = (event) => {
+        event.preventDefault();
+
         this.setState({
             showLoader: true,
             showSuccessAlert: false,
@@ -118,7 +120,11 @@ class SemesterDirect extends Component {
         };
 
         const pdf = this.state.pdf;
-        let extension = pdf.file_name.split(".");
+        let extension = "";
+
+        if (directTest.file !== null) {
+            extension = pdf.file_name.split(".");
+        }
 
         if (directTest.file === null) {
             this.setState({
@@ -201,30 +207,6 @@ class SemesterDirect extends Component {
                         showLoader: false,
                     });
                 });
-        }
-    };
-
-    componentDidUpdate = (prevProps, prevState) => {
-        if (
-            prevState.showErrorAlert !== this.state.showErrorAlert &&
-            this.state.showErrorAlert === true
-        ) {
-            setTimeout(() => {
-                this.setState({
-                    showErrorAlert: false,
-                });
-            }, 3000);
-        }
-
-        if (
-            prevState.showSuccessAlert !== this.state.showSuccessAlert &&
-            this.state.showSuccessAlert === true
-        ) {
-            setTimeout(() => {
-                this.setState({
-                    showSuccessAlert: false,
-                });
-            }, 3000);
         }
     };
 
@@ -329,7 +311,7 @@ class SemesterDirect extends Component {
                                 <div className="card light-bg shadow-sm">
                                     <div className="card-body">
                                         <div className="row justify-content-center">
-                                            <div className="col-md-4">
+                                            <div className="col-md-6">
                                                 <Alert
                                                     variant="danger"
                                                     show={
@@ -417,72 +399,71 @@ class SemesterDirect extends Component {
                                             </div>
                                         </div>
                                     </div>
-                                    <div
-                                        className="card-body secondary-bg text-white text-center"
-                                        style={{ overflowX: "auto" }}
-                                    >
+                                    <div className="card-body secondary-bg text-white text-center">
                                         {this.state.path === null ? (
                                             "Your uploads will appear here"
                                         ) : (
-                                            <div className="row justify-content-center">
-                                                <div className="col-md-12">
+                                            <>
+                                                <div id="ResumeContainer">
                                                     <Document
                                                         file={this.state.path}
                                                         onLoadSuccess={
                                                             this
                                                                 .onDocumentLoadSuccess
                                                         }
-                                                        renderMode="svg"
+                                                        className={
+                                                            "PDFDocument"
+                                                        }
                                                     >
                                                         <Page
                                                             pageNumber={
                                                                 this.state
                                                                     .pageNumber
                                                             }
+                                                            className={
+                                                                "PDFPagee shadow"
+                                                            }
                                                         />
                                                     </Document>
-                                                    <p className="my-3">
-                                                        Page{" "}
-                                                        {this.state.pageNumber}{" "}
-                                                        of {this.state.numPages}
-                                                    </p>
-                                                    <nav>
-                                                        <button
-                                                            className="btn btn-primary btn-sm mr-2"
-                                                            onClick={
-                                                                this
-                                                                    .goToPrevPage
-                                                            }
-                                                            disabled={
-                                                                this.state
-                                                                    .pageNumber ===
-                                                                1
-                                                                    ? true
-                                                                    : false
-                                                            }
-                                                        >
-                                                            Prev
-                                                        </button>
-                                                        <button
-                                                            className="btn btn-primary btn-sm"
-                                                            onClick={
-                                                                this
-                                                                    .goToNextPage
-                                                            }
-                                                            disabled={
-                                                                this.state
-                                                                    .numPages ===
-                                                                this.state
-                                                                    .pageNumber
-                                                                    ? true
-                                                                    : false
-                                                            }
-                                                        >
-                                                            Next
-                                                        </button>
-                                                    </nav>
                                                 </div>
-                                            </div>
+                                                <p className="my-3">
+                                                    Page {this.state.pageNumber}{" "}
+                                                    of {this.state.numPages}
+                                                </p>
+                                                <nav>
+                                                    <button
+                                                        className="btn btn-primary btn-sm mr-2"
+                                                        onClick={
+                                                            this.goToPrevPage
+                                                        }
+                                                        disabled={
+                                                            this.state
+                                                                .pageNumber ===
+                                                            1
+                                                                ? true
+                                                                : false
+                                                        }
+                                                    >
+                                                        Prev
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-primary btn-sm"
+                                                        onClick={
+                                                            this.goToNextPage
+                                                        }
+                                                        disabled={
+                                                            this.state
+                                                                .numPages ===
+                                                            this.state
+                                                                .pageNumber
+                                                                ? true
+                                                                : false
+                                                        }
+                                                    >
+                                                        Next
+                                                    </button>
+                                                </nav>
+                                            </>
                                         )}
                                     </div>
                                 </div>

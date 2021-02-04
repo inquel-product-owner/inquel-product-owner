@@ -827,8 +827,10 @@ class Chapters extends Component {
                                                                               </p>
                                                                           </div>
                                                                           <div className="col-md-6 text-right">
-                                                                              {!data.direct_question || data.direct_question ===
-                                                                              false ? (
+                                                                              {data.direct_question ===
+                                                                                  undefined ||
+                                                                              data.direct_question ===
+                                                                                  false ? (
                                                                                   <Link
                                                                                       to={`/teacher/subject/${this.subjectId}/${this.state.chapterName}/cycle/${data.cycle_test_id}`}
                                                                                   >
@@ -839,8 +841,10 @@ class Chapters extends Component {
                                                                               ) : (
                                                                                   ""
                                                                               )}
-                                                                              {!data.direct_question || data.direct_question ===
-                                                                              true ? (
+                                                                              {data.direct_question ===
+                                                                                  undefined ||
+                                                                              data.direct_question ===
+                                                                                  true ? (
                                                                                   <Link
                                                                                       to={`/teacher/subject/${this.subjectId}/${this.state.chapterName}/cycle/${data.cycle_test_id}/direct`}
                                                                                   >
