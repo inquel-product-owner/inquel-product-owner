@@ -19,6 +19,7 @@ class SubjectType1 extends Component {
             showSuccessAlert: false,
             showLoader: false,
             page_loading: true,
+            btnDisabled: false,
 
             contentCollapsed: true,
             propertiesCollapsed: true,
@@ -44,8 +45,7 @@ class SubjectType1 extends Component {
                     topic_name: this.props.match.params.topicName,
                     question: "<p>Question goes here</p>",
                     question_random_id: "",
-                    old_question: true,
-                    old_image: false,
+                    is_image_uploaded: false,
                     content: {
                         mcq: true,
                         fill_in: false,
@@ -203,15 +203,38 @@ class SubjectType1 extends Component {
                             topic_name: this.props.match.params.topicName,
                             question: response[i].question,
                             question_random_id: response[i].question_random_id,
-                            old_question: true,
-                            old_image: true,
+                            is_image_uploaded:
+                                response[i].files.length !== 0 ? true : false,
                             content: {
                                 mcq: response[i].mcq,
                                 fill_in: response[i].fill_in,
                                 boolean: response[i].boolean,
-                                fillin_answer: response[i].fillin_answer,
-                                boolean_question: response[i].boolean_question,
-                                options: response[i].options,
+                                fillin_answer:
+                                    response[i].fillin_answer.length !== 0
+                                        ? response[i].fillin_answer
+                                        : [""],
+                                boolean_question:
+                                    response[i].boolean_question.length !== 0
+                                        ? response[i].boolean_question
+                                        : [
+                                              {
+                                                  correct: false,
+                                                  content: "True",
+                                              },
+                                              {
+                                                  correct: false,
+                                                  content: "False",
+                                              },
+                                          ],
+                                options:
+                                    response[i].options.length !== 0
+                                        ? response[i].options
+                                        : [
+                                              { correct: false, content: "" },
+                                              { correct: false, content: "" },
+                                              { correct: false, content: "" },
+                                              { correct: false, content: "" },
+                                          ],
                                 explanation: response[i].explanation,
                                 images:
                                     images.length === 0
@@ -352,6 +375,16 @@ class SubjectType1 extends Component {
                 showLoader: false,
             });
         } else if (
+            data[this.state.activeQuestion].content.mcq === false &&
+            data[this.state.activeQuestion].content.fill_in === false &&
+            data[this.state.activeQuestion].content.boolean === false
+        ) {
+            this.setState({
+                errorMsg: "Select any one answer type",
+                showErrorAlert: true,
+                showLoader: false,
+            });
+        } else if (
             data[this.state.activeQuestion].properties.complexity === ""
         ) {
             this.setState({
@@ -387,29 +420,10 @@ class SubjectType1 extends Component {
                 showLoader: false,
             });
         } else {
-            if (data[this.state.activeQuestion].old_question === true) {
-                if (data[this.state.activeQuestion].question_random_id === "") {
-                    delete data[this.state.activeQuestion].question_random_id;
-                    if (data[this.state.activeQuestion].old_question) {
-                        delete data[this.state.activeQuestion].old_question;
-                    }
-                    if (!data[this.state.activeQuestion].old_image) {
-                        delete data[this.state.activeQuestion].old_image;
-                    }
-                    this.handlePOST(data);
-                } else {
-                    if (data[this.state.activeQuestion].old_question) {
-                        delete data[this.state.activeQuestion].old_question;
-                    }
-                    if (data[this.state.activeQuestion].old_image) {
-                        delete data[this.state.activeQuestion].old_image;
-                    }
-                    this.handlePUT(data);
-                }
+            if (data[this.state.activeQuestion].question_random_id === "") {
+                this.handlePOST(data);
             } else {
-                this.setState({
-                    isForm_submitted: true,
-                });
+                this.handlePUT(data);
             }
         }
     };
@@ -418,7 +432,43 @@ class SubjectType1 extends Component {
         fetch(`${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/`, {
             headers: this.headers,
             method: "POST",
-            body: JSON.stringify(data[this.state.activeQuestion]),
+            body: JSON.stringify({
+                chapter_name: this.props.match.params.chapterName,
+                topic_name: this.props.match.params.topicName,
+                question: data[this.state.activeQuestion].question,
+                content: {
+                    mcq: data[this.state.activeQuestion].content.mcq,
+                    fill_in: data[this.state.activeQuestion].content.fill_in,
+                    boolean: data[this.state.activeQuestion].content.boolean,
+                    fillin_answer:
+                        data[this.state.activeQuestion].content.fillin_answer,
+                    boolean_question:
+                        data[this.state.activeQuestion].content
+                            .boolean_question,
+                    options: data[this.state.activeQuestion].content.options,
+                    explanation:
+                        data[this.state.activeQuestion].content.explanation,
+                },
+                properties: {
+                    marks: data[this.state.activeQuestion].properties.marks,
+                    complexity:
+                        data[this.state.activeQuestion].properties.complexity,
+                    priority:
+                        data[this.state.activeQuestion].properties.priority,
+                    theme: data[this.state.activeQuestion].properties.theme,
+                    test: data[this.state.activeQuestion].properties.test,
+                    semester:
+                        data[this.state.activeQuestion].properties.semester,
+                    quiz: data[this.state.activeQuestion].properties.quiz,
+                    learn: data[this.state.activeQuestion].properties.learn,
+                },
+                settings: {
+                    virtual_keyboard:
+                        data[this.state.activeQuestion].settings
+                            .virtual_keyboard,
+                    limited: data[this.state.activeQuestion].settings.limited,
+                },
+            }),
         })
             .then((res) => res.json())
             .then((result) => {
@@ -426,8 +476,6 @@ class SubjectType1 extends Component {
                 if (result.sts === true) {
                     data[this.state.activeQuestion].question_random_id =
                         result.question_random_id;
-                    data[this.state.activeQuestion].old_question = false;
-                    data[this.state.activeQuestion].old_image = false;
                     this.setState({
                         questions: data,
                         isForm_submitted: true,
@@ -457,7 +505,45 @@ class SubjectType1 extends Component {
         fetch(`${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/`, {
             headers: this.headers,
             method: "PUT",
-            body: JSON.stringify(data[this.state.activeQuestion]),
+            body: JSON.stringify({
+                chapter_name: this.props.match.params.chapterName,
+                topic_name: this.props.match.params.topicName,
+                question: data[this.state.activeQuestion].question,
+                question_random_id:
+                    data[this.state.activeQuestion].question_random_id,
+                content: {
+                    mcq: data[this.state.activeQuestion].content.mcq,
+                    fill_in: data[this.state.activeQuestion].content.fill_in,
+                    boolean: data[this.state.activeQuestion].content.boolean,
+                    fillin_answer:
+                        data[this.state.activeQuestion].content.fillin_answer,
+                    boolean_question:
+                        data[this.state.activeQuestion].content
+                            .boolean_question,
+                    options: data[this.state.activeQuestion].content.options,
+                    explanation:
+                        data[this.state.activeQuestion].content.explanation,
+                },
+                properties: {
+                    marks: data[this.state.activeQuestion].properties.marks,
+                    complexity:
+                        data[this.state.activeQuestion].properties.complexity,
+                    priority:
+                        data[this.state.activeQuestion].properties.priority,
+                    theme: data[this.state.activeQuestion].properties.theme,
+                    test: data[this.state.activeQuestion].properties.test,
+                    semester:
+                        data[this.state.activeQuestion].properties.semester,
+                    quiz: data[this.state.activeQuestion].properties.quiz,
+                    learn: data[this.state.activeQuestion].properties.learn,
+                },
+                settings: {
+                    virtual_keyboard:
+                        data[this.state.activeQuestion].settings
+                            .virtual_keyboard,
+                    limited: data[this.state.activeQuestion].settings.limited,
+                },
+            }),
         })
             .then((res) => res.json())
             .then((result) => {
@@ -465,8 +551,8 @@ class SubjectType1 extends Component {
                 if (result.sts === true) {
                     data[this.state.activeQuestion].question_random_id =
                         result.question_random_id;
-                    data[this.state.activeQuestion].old_question = false;
-                    data[this.state.activeQuestion].old_image = true;
+                    // data[this.state.activeQuestion].is_image_uploaded =
+                    //     result.file_exists === true ? true : false;
                     this.setState({
                         questions: data,
                         isForm_submitted: true,
@@ -597,14 +683,14 @@ class SubjectType1 extends Component {
 
             if (files_arr.length !== 3) {
                 if (
-                    questionData[this.state.activeQuestion].old_image === false
+                    questionData[this.state.activeQuestion]
+                        .is_image_uploaded === false
                 ) {
                     this.handleImgPOST(options, form_data, questionData);
                 } else {
                     this.handleImgPATCH(options, form_data, questionData);
                 }
             } else {
-                questionData[this.state.activeQuestion].old_question = true;
                 this.setState(
                     {
                         questions: questionData,
@@ -614,7 +700,9 @@ class SubjectType1 extends Component {
                         page_loading: true,
                     },
                     () => {
-                        this.loadMCQData();
+                        setTimeout(() => {
+                            this.loadMCQData();
+                        }, 2000);
                     }
                 );
             }
@@ -631,7 +719,6 @@ class SubjectType1 extends Component {
             .then((result) => {
                 console.log(result);
                 if (result.data.sts === true) {
-                    questionData[this.state.activeQuestion].old_question = true;
                     this.setState(
                         {
                             questions: questionData,
@@ -641,7 +728,9 @@ class SubjectType1 extends Component {
                             page_loading: true,
                         },
                         () => {
-                            this.loadMCQData();
+                            setTimeout(() => {
+                                this.loadMCQData();
+                            }, 2000);
                         }
                     );
                 } else {
@@ -675,7 +764,6 @@ class SubjectType1 extends Component {
             .then((result) => {
                 console.log(result);
                 if (result.data.sts === true) {
-                    questionData[this.state.activeQuestion].old_question = true;
                     this.setState(
                         {
                             questions: questionData,
@@ -685,7 +773,9 @@ class SubjectType1 extends Component {
                             page_loading: true,
                         },
                         () => {
-                            this.loadMCQData();
+                            setTimeout(() => {
+                                this.loadMCQData();
+                            }, 2000);
                         }
                     );
                 } else {
@@ -902,16 +992,26 @@ class SubjectType1 extends Component {
 
     handleImageFile = (index, event) => {
         const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.images[index].file_name =
-            event.target.files[0].name;
-        values[this.state.activeQuestion].content.images[
-            index
-        ].path = URL.createObjectURL(event.target.files[0]);
-        values[this.state.activeQuestion].content.images[index].image =
-            event.target.files[0];
-        this.setState({
-            questions: values,
-        });
+        if (!event.target.files[0].name.match(/\.(jpg|jpeg|png|webp)$/)) {
+            this.setState({
+                errorMsg: "Please select valid image file",
+                showErrorAlert: true,
+                btnDisabled: true,
+            });
+        } else {
+            values[this.state.activeQuestion].content.images[index].file_name =
+                event.target.files[0].name;
+            values[this.state.activeQuestion].content.images[
+                index
+            ].path = URL.createObjectURL(event.target.files[0]);
+            values[this.state.activeQuestion].content.images[index].image =
+                event.target.files[0];
+            this.setState({
+                questions: values,
+                btnDisabled: false,
+                showErrorAlert: false,
+            });
+        }
     };
 
     changeImage = (image_index, q_index) => {
@@ -944,14 +1044,26 @@ class SubjectType1 extends Component {
 
     handleVideoFile = (event) => {
         let values = [...this.state.questions];
-        values[this.state.activeQuestion].content.video.file_name =
-            event.target.files[0].name;
-        values[this.state.activeQuestion].content.video.video =
-            event.target.files[0];
-        values[this.state.activeQuestion].content.video.pasteUrl = "";
-        this.setState({
-            questions: values,
-        });
+        if (
+            !event.target.files[0].name.match(/\.(mpeg|flv|avi|mov|mp4|mkv)$/)
+        ) {
+            this.setState({
+                errorMsg: "Please select valid video file",
+                showErrorAlert: true,
+                btnDisabled: true,
+            });
+        } else {
+            values[this.state.activeQuestion].content.video.file_name =
+                event.target.files[0].name;
+            values[this.state.activeQuestion].content.video.video =
+                event.target.files[0];
+            values[this.state.activeQuestion].content.video.pasteUrl = "";
+            this.setState({
+                questions: values,
+                btnDisabled: false,
+                showErrorAlert: false,
+            });
+        }
     };
 
     handleVideoUrl = (event) => {
@@ -977,13 +1089,23 @@ class SubjectType1 extends Component {
 
     handleAudioFile = (index, event) => {
         const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.audio[index].file_name =
-            event.target.files[0].name;
-        values[this.state.activeQuestion].content.audio[index].audio =
-            event.target.files[0];
-        this.setState({
-            questions: values,
-        });
+        if (!event.target.files[0].name.match(/\.(wav|mp3)$/)) {
+            this.setState({
+                errorMsg: "Please select valid audio file",
+                showErrorAlert: true,
+                btnDisabled: true,
+            });
+        } else {
+            values[this.state.activeQuestion].content.audio[index].file_name =
+                event.target.files[0].name;
+            values[this.state.activeQuestion].content.audio[index].audio =
+                event.target.files[0];
+            this.setState({
+                questions: values,
+                btnDisabled: false,
+                showErrorAlert: false,
+            });
+        }
     };
 
     // -------------------------- Properties --------------------------
@@ -1169,8 +1291,7 @@ class SubjectType1 extends Component {
             topic_name: this.topicName,
             question: "<p>Question goes here</p>",
             question_random_id: "",
-            old_question: true,
-            old_image: false,
+            is_image_uploaded: false,
             content: {
                 mcq: true,
                 fill_in: false,
@@ -1217,40 +1338,44 @@ class SubjectType1 extends Component {
         this.setState({
             questions: values,
             keyboards: keyboards,
+            activeQuestion: values.length - 1,
         });
     };
 
     removingQuestions = (index) => {
         const values = [...this.state.questions];
         const keyboards = [...this.state.keyboards];
-        keyboards.splice(index, 1);
-        values.splice(index, 1);
-        this.setState({
-            questions: values,
-            keyboards: keyboards,
-            showEdit_option: false,
-            contentCollapsed: true,
-            propertiesCollapsed: true,
-            settingsCollapsed: true,
-        });
-
-        const questionData = [...this.state.questions];
 
         fetch(`${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/`, {
             method: "DELETE",
             headers: this.headers,
             body: JSON.stringify({
-                chapter_name: questionData[index].chapter_name,
-                topic_name: questionData[index].topic_name,
-                question_random_id: questionData[index].question_random_id,
+                chapter_name: values[index].chapter_name,
+                topic_name: values[index].topic_name,
+                question_random_id: values[index].question_random_id,
             }),
         })
             .then((res) => res.json())
             .then((result) => {
-                this.setState({
-                    page_loading: true,
-                });
-                this.loadMCQData();
+                if (result.sts === true) {
+                    alert(result.msg);
+                    keyboards.splice(index, 1);
+                    values.splice(index, 1);
+                    this.setState({
+                        questions: values,
+                        keyboards: keyboards,
+                        showEdit_option: false,
+                        contentCollapsed: true,
+                        propertiesCollapsed: true,
+                        settingsCollapsed: true,
+                    });
+                } else {
+                    if (result.detail) {
+                        alert(result.detail);
+                    } else {
+                        alert(result.msg);
+                    }
+                }
                 console.log(result);
             })
             .catch((err) => {
@@ -1271,9 +1396,9 @@ class SubjectType1 extends Component {
         for (let i = 0; i < values[index].content.options.length; i++) {
             options[i] = values[index].content.options[i];
         }
-        const images = [];
-        for (let i = 0; i < values[index].content.images.length; i++) {
-            images[i] = values[index].content.images[i];
+        const fillin = [];
+        for (let i = 0; i < values[index].content.fillin_answer.length; i++) {
+            fillin[i] = values[index].content.fillin_answer[i];
         }
         const test = [];
         for (let i = 0; i < values[index].properties.test.length; i++) {
@@ -1292,19 +1417,26 @@ class SubjectType1 extends Component {
             topic_name: this.topicName,
             question: values[index].question,
             question_random_id: "",
-            old_question: true,
-            old_image: false,
+            is_image_uploaded: false,
             content: {
                 mcq: values[index].content.mcq,
                 fill_in: values[index].content.fill_in,
                 boolean: values[index].content.boolean,
-                fillin_answer: values[index].content.fillin_answer,
+                fillin_answer: fillin,
                 boolean_question: values[index].content.boolean_question,
                 options: options,
                 explanation: values[index].content.explanation,
-                images: images,
-                video: values[index].content.video,
-                audio: values[index].content.audio,
+                images: [{ title: "", file_name: "", image: null, path: "" }],
+                video: {
+                    title: "",
+                    file_name: "",
+                    video: null,
+                    pasteUrl: "",
+                },
+                audio: [
+                    { title: "", file_name: "", audio: null },
+                    { title: "", file_name: "", audio: null },
+                ],
             },
             properties: {
                 marks: values[index].properties.marks,
@@ -1324,6 +1456,7 @@ class SubjectType1 extends Component {
         this.setState({
             questions: values,
             keyboards: keyboards,
+            activeQuestion: values.length - 1,
         });
     };
 
@@ -1518,7 +1651,11 @@ class SubjectType1 extends Component {
                                                                                             }
                                                                                         >
                                                                                             <div className="form-group">
-                                                                                                <div className="card form-shadow">
+                                                                                                <div className={`card form-shadow ${
+                                                                                                        options.correct
+                                                                                                            ? "border border-success"
+                                                                                                            : ""
+                                                                                                    }`}>
                                                                                                     <div className="card-body small py-2">
                                                                                                         {options.content !==
                                                                                                         ""
@@ -1527,6 +1664,82 @@ class SubjectType1 extends Component {
                                                                                                                   index +
                                                                                                                   1
                                                                                                               }`}
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    );
+                                                                                }
+                                                                            )}
+                                                                        </div>
+                                                                    ) : (
+                                                                        ""
+                                                                    )}
+                                                                    {question
+                                                                        .content
+                                                                        .fill_in ? (
+                                                                        <div className="row">
+                                                                            {question.content.fillin_answer.map(
+                                                                                (
+                                                                                    fill_in,
+                                                                                    index
+                                                                                ) => {
+                                                                                    return (
+                                                                                        <div
+                                                                                            className="col-md-6"
+                                                                                            key={
+                                                                                                index
+                                                                                            }
+                                                                                        >
+                                                                                            <div className="form-group">
+                                                                                                <div className="card form-shadow">
+                                                                                                    <div className="card-body small py-2">
+                                                                                                        {fill_in !==
+                                                                                                        ""
+                                                                                                            ? fill_in
+                                                                                                            : `Answer 0${
+                                                                                                                  index +
+                                                                                                                  1
+                                                                                                              }`}
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    );
+                                                                                }
+                                                                            )}
+                                                                        </div>
+                                                                    ) : (
+                                                                        ""
+                                                                    )}
+                                                                    {question
+                                                                        .content
+                                                                        .boolean ? (
+                                                                        <div className="row">
+                                                                            {question.content.boolean_question.map(
+                                                                                (
+                                                                                    boolean,
+                                                                                    index
+                                                                                ) => {
+                                                                                    return (
+                                                                                        <div
+                                                                                            className="col-md-6"
+                                                                                            key={
+                                                                                                index
+                                                                                            }
+                                                                                        >
+                                                                                            <div className="form-group">
+                                                                                                <div
+                                                                                                    className={`card form-shadow ${
+                                                                                                        boolean.correct
+                                                                                                            ? "border border-success"
+                                                                                                            : ""
+                                                                                                    }`}
+                                                                                                >
+                                                                                                    <div className="card-body small py-2">
+                                                                                                        {
+                                                                                                            boolean.content
+                                                                                                        }
                                                                                                     </div>
                                                                                                 </div>
                                                                                             </div>
@@ -1616,6 +1829,7 @@ class SubjectType1 extends Component {
                                         <button
                                             className="btn btn-primary btn-sm"
                                             onClick={this.handleSubmit}
+                                            disabled={this.state.btnDisabled}
                                         >
                                             {this.state.showLoader ? (
                                                 <Spinner

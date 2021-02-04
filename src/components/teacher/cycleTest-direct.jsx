@@ -93,7 +93,9 @@ class CyleTestDirect extends Component {
         });
     };
 
-    handleSubmit = () => {
+    handleSubmit = (event) => {
+        event.preventDefault();
+
         this.setState({
             showLoader: true,
             showSuccessAlert: false,
@@ -120,7 +122,11 @@ class CyleTestDirect extends Component {
         };
 
         const pdf = this.state.pdf;
-        let extension = pdf.file_name.split(".");
+        let extension = "";
+
+        if (directTest.file !== null) {
+            extension = pdf.file_name.split(".");
+        }
 
         if (directTest.file === null) {
             this.setState({
@@ -203,30 +209,6 @@ class CyleTestDirect extends Component {
                         showLoader: false,
                     });
                 });
-        }
-    };
-
-    componentDidUpdate = (prevProps, prevState) => {
-        if (
-            prevState.showErrorAlert !== this.state.showErrorAlert &&
-            this.state.showErrorAlert === true
-        ) {
-            setTimeout(() => {
-                this.setState({
-                    showErrorAlert: false,
-                });
-            }, 3000);
-        }
-
-        if (
-            prevState.showSuccessAlert !== this.state.showSuccessAlert &&
-            this.state.showSuccessAlert === true
-        ) {
-            setTimeout(() => {
-                this.setState({
-                    showSuccessAlert: false,
-                });
-            }, 3000);
         }
     };
 
@@ -326,146 +308,169 @@ class CyleTestDirect extends Component {
                             </div>
                         </div>
 
-<div className="row justify-content-center">
-    <div className="col-md-9">
-                        <div className="card light-bg shadow-sm">
-                            <div className="card-body">
-                                <div className="row justify-content-center">
-                                    <div className="col-md-4">
-                                        <Alert
-                                            variant="danger"
-                                            show={this.state.showErrorAlert}
-                                            onClose={() => {
-                                                this.setState({
-                                                    showErrorAlert: false,
-                                                });
-                                            }}
-                                            dismissible
-                                        >
-                                            {this.state.errorMsg}
-                                        </Alert>
-                                        <Alert
-                                            variant="success"
-                                            show={this.state.showSuccessAlert}
-                                            onClose={() => {
-                                                this.setState({
-                                                    showSuccessAlert: false,
-                                                });
-                                            }}
-                                            dismissible
-                                        >
-                                            {this.state.successMsg}
-                                        </Alert>
+                        <div className="row justify-content-center">
+                            <div className="col-md-9">
+                                <div className="card light-bg shadow-sm">
+                                    <div className="card-body">
+                                        <div className="row justify-content-center">
+                                            <div className="col-md-6">
+                                                <Alert
+                                                    variant="danger"
+                                                    show={
+                                                        this.state
+                                                            .showErrorAlert
+                                                    }
+                                                    onClose={() => {
+                                                        this.setState({
+                                                            showErrorAlert: false,
+                                                        });
+                                                    }}
+                                                    dismissible
+                                                >
+                                                    {this.state.errorMsg}
+                                                </Alert>
+                                                <Alert
+                                                    variant="success"
+                                                    show={
+                                                        this.state
+                                                            .showSuccessAlert
+                                                    }
+                                                    onClose={() => {
+                                                        this.setState({
+                                                            showSuccessAlert: false,
+                                                        });
+                                                    }}
+                                                    dismissible
+                                                >
+                                                    {this.state.successMsg}
+                                                </Alert>
 
-                                        <div className="custom-file">
-                                            <input
-                                                type="file"
-                                                className="custom-file-input"
-                                                id="question"
-                                                accept=".pdf"
-                                                aria-describedby="inputGroupFileAddon01"
-                                                onChange={(event) =>
-                                                    this.handleFile(event)
-                                                }
-                                            />
-                                            <label
-                                                className="custom-file-label mb-0"
-                                                htmlFor="question"
-                                            >
-                                                {this.state.pdf.file_name ===
-                                                null
-                                                    ? "Choose file"
-                                                    : this.state.pdf.file_name}
-                                            </label>
+                                                <div className="custom-file">
+                                                    <input
+                                                        type="file"
+                                                        className="custom-file-input"
+                                                        id="question"
+                                                        accept=".pdf"
+                                                        aria-describedby="inputGroupFileAddon01"
+                                                        onChange={(event) =>
+                                                            this.handleFile(
+                                                                event
+                                                            )
+                                                        }
+                                                    />
+                                                    <label
+                                                        className="custom-file-label mb-0"
+                                                        htmlFor="question"
+                                                    >
+                                                        {this.state.pdf
+                                                            .file_name === null
+                                                            ? "Choose file"
+                                                            : this.state.pdf
+                                                                  .file_name}
+                                                    </label>
+                                                </div>
+                                                <small
+                                                    id="passwordHelpBlock"
+                                                    className="form-text text-muted mb-2"
+                                                >
+                                                    Select only pdf format & Max
+                                                    file upload size is 5MB
+                                                </small>
+
+                                                <button
+                                                    className="btn btn-primary btn-block btn-sm"
+                                                    onClick={this.handleSubmit}
+                                                    disabled={
+                                                        this.state.btnDisabled
+                                                    }
+                                                >
+                                                    {this.state.showLoader ? (
+                                                        <Spinner
+                                                            as="span"
+                                                            animation="border"
+                                                            size="sm"
+                                                            role="status"
+                                                            aria-hidden="true"
+                                                            className="mr-2"
+                                                        />
+                                                    ) : (
+                                                        ""
+                                                    )}
+                                                    Upload
+                                                </button>
+                                            </div>
                                         </div>
-                                        <small
-                                            id="passwordHelpBlock"
-                                            className="form-text text-muted mb-2"
-                                        >
-                                            Select only pdf format & Max file
-                                            upload size is 5MB
-                                        </small>
-
-                                        <button
-                                            className="btn btn-primary btn-block btn-sm"
-                                            onClick={this.handleSubmit}
-                                            disabled={this.state.btnDisabled}
-                                        >
-                                            {this.state.showLoader ? (
-                                                <Spinner
-                                                    as="span"
-                                                    animation="border"
-                                                    size="sm"
-                                                    role="status"
-                                                    aria-hidden="true"
-                                                    className="mr-2"
-                                                />
-                                            ) : (
-                                                ""
-                                            )}
-                                            Upload
-                                        </button>
+                                    </div>
+                                    <div className="card-body secondary-bg text-white text-center">
+                                        {this.state.path === null ? (
+                                            "Your uploads will appear here"
+                                        ) : (
+                                            <>
+                                                <div id="ResumeContainer">
+                                                    <Document
+                                                        file={this.state.path}
+                                                        onLoadSuccess={
+                                                            this
+                                                                .onDocumentLoadSuccess
+                                                        }
+                                                        className={
+                                                            "PDFDocument"
+                                                        }
+                                                    >
+                                                        <Page
+                                                            pageNumber={
+                                                                this.state
+                                                                    .pageNumber
+                                                            }
+                                                            className={
+                                                                "PDFPage shadow"
+                                                            }
+                                                        />
+                                                    </Document>
+                                                </div>
+                                                <p className="my-3">
+                                                    Page {this.state.pageNumber}{" "}
+                                                    of {this.state.numPages}
+                                                </p>
+                                                <nav>
+                                                    <button
+                                                        className="btn btn-primary btn-sm mr-2"
+                                                        onClick={
+                                                            this.goToPrevPage
+                                                        }
+                                                        disabled={
+                                                            this.state
+                                                                .pageNumber ===
+                                                            1
+                                                                ? true
+                                                                : false
+                                                        }
+                                                    >
+                                                        Prev
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-primary btn-sm"
+                                                        onClick={
+                                                            this.goToNextPage
+                                                        }
+                                                        disabled={
+                                                            this.state
+                                                                .numPages ===
+                                                            this.state
+                                                                .pageNumber
+                                                                ? true
+                                                                : false
+                                                        }
+                                                    >
+                                                        Next
+                                                    </button>
+                                                </nav>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             </div>
-                            <div
-                                className="card-body secondary-bg text-white text-center"
-                                style={{ overflowX: "auto" }}
-                            >
-                                {this.state.path === null ? (
-                                    "Your uploads will appear here"
-                                ) : (
-                                    <div className="row justify-content-center">
-                                        <div className="col-md-12">
-                                            <Document
-                                                file={this.state.path}
-                                                onLoadSuccess={
-                                                    this.onDocumentLoadSuccess
-                                                }
-                                                renderMode="svg"
-                                            >
-                                                <Page
-                                                    pageNumber={
-                                                        this.state.pageNumber
-                                                    }
-                                                />
-                                            </Document>
-                                            <p className="my-3">
-                                                Page {this.state.pageNumber} of{" "}
-                                                {this.state.numPages}
-                                            </p>
-                                            <nav>
-                                                <button
-                                                    className="btn btn-primary btn-sm mr-2"
-                                                    onClick={this.goToPrevPage}
-                                                    disabled={
-                                                        this.state
-                                                            .pageNumber === 1
-                                                            ? true
-                                                            : false
-                                                    }
-                                                >
-                                                    Prev
-                                                </button>
-                                                <button
-                                                    className="btn btn-primary btn-sm"
-                                                    onClick={this.goToNextPage}
-                                                    disabled={
-                                                        this.state.numPages ===
-                                                        this.state.pageNumber
-                                                            ? true
-                                                            : false
-                                                    }
-                                                >
-                                                    Next
-                                                </button>
-                                            </nav>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </div></div>
-</div>
+                        </div>
                     </div>
                 </div>
             </div>

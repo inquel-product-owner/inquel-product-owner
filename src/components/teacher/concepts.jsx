@@ -20,6 +20,7 @@ class SubjectConcepts extends Component {
             showSuccessAlert: false,
             showLoader: false,
             page_loading: true,
+            btnDisabled: false,
 
             contentCollapsed: true,
             imageCollapsed: true,
@@ -44,8 +45,7 @@ class SubjectConcepts extends Component {
                     chapter_name: this.props.match.params.chapterName,
                     topic_name: this.props.match.params.topicName,
                     concepts_random_id: "",
-                    old_concept: true,
-                    old_image: false,
+                    is_image_uploaded: false,
                     content: {
                         terms: "<p>Terms goes here</p>",
                         definition: "<p>Definition goes here</p>",
@@ -91,7 +91,7 @@ class SubjectConcepts extends Component {
 
     loadConceptData = () => {
         fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/`,
+            `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/?chapter_name=${this.chapterName}&topic_name=${this.topicName}`,
             {
                 method: "GET",
                 headers: this.headers,
@@ -100,9 +100,172 @@ class SubjectConcepts extends Component {
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
-                this.setState({
-                    page_loading: false,
-                });
+                let data = [];
+                let keyboards = [];
+                let images = [];
+                let audio = [];
+                let response = result.data.results[0].concepts;
+                if (response.length !== 0) {
+                    for (let i = 0; i < response.length; i++) {
+                        images = [];
+                        audio = [];
+                        if (response[i].files.length !== 0) {
+                            // image
+                            if (response[i].files[0].type1_image_1) {
+                                images.push({
+                                    title:
+                                        response[i].files[0]
+                                            .type1_image_1_title,
+                                    file_name: "",
+                                    image: null,
+                                    path: response[i].files[0].type1_image_1,
+                                });
+                            }
+                            if (response[i].files[0].type1_image_2) {
+                                images.push({
+                                    title:
+                                        response[i].files[0]
+                                            .type1_image_2_title,
+                                    file_name: "",
+                                    image: null,
+                                    path: response[i].files[0].type1_image_2,
+                                });
+                            }
+                            if (response[i].files[0].type1_image_3) {
+                                images.push({
+                                    title:
+                                        response[i].files[0]
+                                            .type1_image_3_title,
+                                    file_name: "",
+                                    image: null,
+                                    path: response[i].files[0].type1_image_3,
+                                });
+                            }
+                            if (response[i].files[0].type1_image_4) {
+                                images.push({
+                                    title:
+                                        response[i].files[0]
+                                            .type1_image_4_title,
+                                    file_name: "",
+                                    image: null,
+                                    path: response[i].files[0].type1_image_4,
+                                });
+                            }
+
+                            // audio
+                            if (response[i].files[0].type1_audio_1) {
+                                audio.push({
+                                    title:
+                                        response[i].files[0]
+                                            .type1_audio_1_title,
+                                    file_name: "",
+                                    audio: response[i].files[0].type1_audio_1,
+                                });
+                            }
+                            if (response[i].files[0].type1_audio_2) {
+                                audio.push({
+                                    title:
+                                        response[i].files[0]
+                                            .type1_audio_2_title,
+                                    file_name: "",
+                                    audio: response[i].files[0].type1_audio_2,
+                                });
+                            }
+                        }
+
+                        data.push({
+                            chapter_name: this.props.match.params.chapterName,
+                            topic_name: this.props.match.params.topicName,
+                            concepts_random_id: response[i].concepts_random_id,
+                            is_image_uploaded:
+                                response[i].files.length !== 0 ? true : false,
+                            content: {
+                                terms: response[i].terms,
+                                definition: response[i].definition,
+                                images:
+                                    images.length === 0
+                                        ? [
+                                              {
+                                                  title: "",
+                                                  file_name: "",
+                                                  image: null,
+                                                  path: "",
+                                              },
+                                          ]
+                                        : images,
+                                video: {
+                                    title:
+                                        response[i].files.length !== 0 &&
+                                        response[i].files[0].type1_video_1_title
+                                            ? response[i].files[0]
+                                                  .type1_video_1_title
+                                            : "",
+                                    file_name: "",
+                                    video: null,
+                                    pasteUrl:
+                                        response[i].files.length !== 0 &&
+                                        response[i].files[0].type1_video_1
+                                            ? response[i].files[0].type1_video_1
+                                            : "",
+                                },
+                                audio:
+                                    audio.length === 0
+                                        ? [
+                                              {
+                                                  title: "",
+                                                  file_name: "",
+                                                  audio: null,
+                                              },
+                                              {
+                                                  title: "",
+                                                  file_name: "",
+                                                  audio: null,
+                                              },
+                                          ]
+                                        : audio,
+                            },
+                            settings: {
+                                virtual_keyboard:
+                                    response[i].settings.virtual_keyboard,
+                                limited: response[i].settings.limited,
+                            },
+                        });
+
+                        // Keyboards
+                        let boards = {
+                            all: false,
+                            chemistry: false,
+                            physics: false,
+                            maths: false,
+                        };
+                        let virtual_keyboard =
+                            response[i].settings.virtual_keyboard;
+                        for (let j = 0; j < virtual_keyboard.length; j++) {
+                            if (virtual_keyboard[j] === "All") {
+                                boards.all = true;
+                                boards.chemistry = true;
+                                boards.maths = true;
+                                boards.physics = true;
+                            } else if (virtual_keyboard[j] === "Chemistry") {
+                                boards.chemistry = true;
+                            } else if (virtual_keyboard[j] === "Physics") {
+                                boards.physics = true;
+                            } else if (virtual_keyboard[j] === "Maths") {
+                                boards.maths = true;
+                            }
+                        }
+                        keyboards.push(boards);
+                    }
+                    this.setState({
+                        concepts: data,
+                        keyboards: keyboards,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -146,29 +309,10 @@ class SubjectConcepts extends Component {
                 showLoader: false,
             });
         } else {
-            if (data[this.state.activeConcept].old_concept === true) {
-                if (data[this.state.activeConcept].concepts_random_id === "") {
-                    delete data[this.state.activeConcept].concepts_random_id;
-                    if (data[this.state.activeConcept].old_concept) {
-                        delete data[this.state.activeConcept].old_concept;
-                    }
-                    if (!data[this.state.activeConcept].old_image) {
-                        delete data[this.state.activeConcept].old_image;
-                    }
-                    this.handlePOST(data);
-                } else {
-                    if (data[this.state.activeConcept].old_concept) {
-                        delete data[this.state.activeConcept].old_concept;
-                    }
-                    if (data[this.state.activeConcept].old_image) {
-                        delete data[this.state.activeConcept].old_image;
-                    }
-                    this.handlePUT(data);
-                }
+            if (data[this.state.activeConcept].concepts_random_id === "") {
+                this.handlePOST(data);
             } else {
-                this.setState({
-                    isForm_submitted: true,
-                });
+                this.handlePUT(data);
             }
         }
     };
@@ -179,7 +323,22 @@ class SubjectConcepts extends Component {
             {
                 headers: this.headers,
                 method: "POST",
-                body: JSON.stringify(data[this.state.activeConcept]),
+                body: JSON.stringify({
+                    chapter_name: this.props.match.params.chapterName,
+                    topic_name: this.props.match.params.topicName,
+                    content: {
+                        terms: data[this.state.activeConcept].content.terms,
+                        definition:
+                            data[this.state.activeConcept].content.definition,
+                    },
+                    settings: {
+                        virtual_keyboard:
+                            data[this.state.activeConcept].settings
+                                .virtual_keyboard,
+                        limited:
+                            data[this.state.activeConcept].settings.limited,
+                    },
+                }),
             }
         )
             .then((res) => res.json())
@@ -188,8 +347,6 @@ class SubjectConcepts extends Component {
                 if (result.sts === true) {
                     data[this.state.activeConcept].concepts_random_id =
                         result.concepts_random_id;
-                    data[this.state.activeConcept].old_concept = false;
-                    data[this.state.activeConcept].old_image = false;
                     this.setState({
                         concepts: data,
                         isForm_submitted: true,
@@ -221,7 +378,24 @@ class SubjectConcepts extends Component {
             {
                 headers: this.headers,
                 method: "PUT",
-                body: JSON.stringify(data[this.state.activeConcept]),
+                body: JSON.stringify({
+                    chapter_name: this.props.match.params.chapterName,
+                    topic_name: this.props.match.params.topicName,
+                    concepts_random_id:
+                        data[this.state.activeConcept].concepts_random_id,
+                    content: {
+                        terms: data[this.state.activeConcept].content.terms,
+                        definition:
+                            data[this.state.activeConcept].content.definition,
+                    },
+                    settings: {
+                        virtual_keyboard:
+                            data[this.state.activeConcept].settings
+                                .virtual_keyboard,
+                        limited:
+                            data[this.state.activeConcept].settings.limited,
+                    },
+                }),
             }
         )
             .then((res) => res.json())
@@ -230,8 +404,6 @@ class SubjectConcepts extends Component {
                 if (result.sts === true) {
                     data[this.state.activeConcept].concepts_random_id =
                         result.concepts_random_id;
-                    data[this.state.activeConcept].old_concept = false;
-                    data[this.state.activeConcept].old_image = true;
                     this.setState({
                         concepts: data,
                         isForm_submitted: true,
@@ -257,7 +429,7 @@ class SubjectConcepts extends Component {
             });
     };
 
-    // Run the image API once the question is added
+    // Run the image API once the concepts is added
     componentDidUpdate = (prevProps, prevState) => {
         if (
             prevState.isForm_submitted !== this.state.isForm_submitted &&
@@ -362,14 +534,14 @@ class SubjectConcepts extends Component {
 
             if (files_arr.length !== 3) {
                 if (
-                    conceptValues[this.state.activeConcept].old_image === false
+                    conceptValues[this.state.activeConcept]
+                        .is_image_uploaded === false
                 ) {
                     this.handleImgPOST(options, form_data, conceptValues);
                 } else {
                     this.handleImgPATCH(options, form_data, conceptValues);
                 }
             } else {
-                conceptValues[this.state.activeConcept].old_concept = true;
                 this.setState(
                     {
                         concepts: conceptValues,
@@ -379,7 +551,9 @@ class SubjectConcepts extends Component {
                         page_loading: true,
                     },
                     () => {
-                        this.loadConceptData();
+                        setTimeout(() => {
+                            this.loadConceptData();
+                        }, 2000);
                     }
                 );
             }
@@ -396,7 +570,6 @@ class SubjectConcepts extends Component {
             .then((result) => {
                 console.log(result);
                 if (result.data.sts === true) {
-                    conceptValues[this.state.activeConcept].old_concept = true;
                     this.setState(
                         {
                             concepts: conceptValues,
@@ -406,7 +579,9 @@ class SubjectConcepts extends Component {
                             page_loading: true,
                         },
                         () => {
-                            this.loadConceptData();
+                            setTimeout(() => {
+                                this.loadConceptData();
+                            }, 2000);
                         }
                     );
                 } else {
@@ -440,7 +615,6 @@ class SubjectConcepts extends Component {
             .then((result) => {
                 console.log(result);
                 if (result.data.sts === true) {
-                    conceptValues[this.state.activeConcept].old_concept = true;
                     this.setState(
                         {
                             concepts: conceptValues,
@@ -450,7 +624,9 @@ class SubjectConcepts extends Component {
                             page_loading: true,
                         },
                         () => {
-                            this.loadConceptData();
+                            setTimeout(() => {
+                                this.loadConceptData();
+                            }, 2000);
                         }
                     );
                 } else {
@@ -528,16 +704,26 @@ class SubjectConcepts extends Component {
 
     handleImageFile = (index, event) => {
         let values = [...this.state.concepts];
-        values[this.state.activeConcept].content.images[index].file_name =
-            event.target.files[0].name;
-        values[this.state.activeConcept].content.images[
-            index
-        ].path = URL.createObjectURL(event.target.files[0]);
-        values[this.state.activeConcept].content.images[index].image =
-            event.target.files[0];
-        this.setState({
-            concepts: values,
-        });
+        if (!event.target.files[0].name.match(/\.(jpg|jpeg|png|webp)$/)) {
+            this.setState({
+                errorMsg: "Please select valid image file",
+                showErrorAlert: true,
+                btnDisabled: true,
+            });
+        } else {
+            values[this.state.activeConcept].content.images[index].file_name =
+                event.target.files[0].name;
+            values[this.state.activeConcept].content.images[
+                index
+            ].path = URL.createObjectURL(event.target.files[0]);
+            values[this.state.activeConcept].content.images[index].image =
+                event.target.files[0];
+            this.setState({
+                concepts: values,
+                btnDisabled: false,
+                showErrorAlert: false,
+            });
+        }
     };
 
     changeImage = (image_index, q_index) => {
@@ -570,14 +756,26 @@ class SubjectConcepts extends Component {
 
     handleVideoFile = (event) => {
         let values = [...this.state.concepts];
-        values[this.state.activeConcept].content.video.file_name =
-            event.target.files[0].name;
-        values[this.state.activeConcept].content.video.video =
-            event.target.files[0];
-        values[this.state.activeConcept].content.video.pasteUrl = "";
-        this.setState({
-            concepts: values,
-        });
+        if (
+            !event.target.files[0].name.match(/\.(mpeg|flv|avi|mov|mp4|mkv)$/)
+        ) {
+            this.setState({
+                errorMsg: "Please select valid video file",
+                showErrorAlert: true,
+                btnDisabled: true,
+            });
+        } else {
+            values[this.state.activeConcept].content.video.file_name =
+                event.target.files[0].name;
+            values[this.state.activeConcept].content.video.video =
+                event.target.files[0];
+            values[this.state.activeConcept].content.video.pasteUrl = "";
+            this.setState({
+                concepts: values,
+                btnDisabled: false,
+                showErrorAlert: false,
+            });
+        }
     };
 
     handleVideoUrl = (event) => {
@@ -603,13 +801,23 @@ class SubjectConcepts extends Component {
 
     handleAudioFile = (index, event) => {
         const values = [...this.state.concepts];
-        values[this.state.activeConcept].content.audio[index].file_name =
-            event.target.files[0].name;
-        values[this.state.activeConcept].content.audio[index].audio =
-            event.target.files[0];
-        this.setState({
-            concepts: values,
-        });
+        if (!event.target.files[0].name.match(/\.(wav|mp3)$/)) {
+            this.setState({
+                errorMsg: "Please select valid audio file",
+                showErrorAlert: true,
+                btnDisabled: true,
+            });
+        } else {
+            values[this.state.activeConcept].content.audio[index].file_name =
+                event.target.files[0].name;
+            values[this.state.activeConcept].content.audio[index].audio =
+                event.target.files[0];
+            this.setState({
+                concepts: values,
+                btnDisabled: false,
+                showErrorAlert: false,
+            });
+        }
     };
 
     // -------------------------- Settings --------------------------
@@ -749,8 +957,7 @@ class SubjectConcepts extends Component {
             chapter_name: this.props.match.params.chapterName,
             topic_name: this.props.match.params.topicName,
             concepts_random_id: "",
-            old_concept: true,
-            old_image: false,
+            is_image_uploaded: false,
             content: {
                 terms: "<p>Terms goes here</p>",
                 definition: "<p>Definition goes here</p>",
@@ -775,6 +982,7 @@ class SubjectConcepts extends Component {
             concepts: values,
             keyboards: keyboards,
             flipState: flips,
+            activeConcept: values.length - 1,
         });
     };
 
@@ -782,21 +990,6 @@ class SubjectConcepts extends Component {
         const values = [...this.state.concepts];
         const keyboards = [...this.state.keyboards];
         const flips = [...this.state.flipState];
-        flips.splice(index, 1);
-        keyboards.splice(index, 1);
-        values.splice(index, 1);
-        this.setState({
-            concepts: values,
-            keyboards: keyboards,
-            flipState: flips,
-            showEdit_option: false,
-            contentCollapsed: true,
-            imageCollapsed: true,
-            audioCollapsed: true,
-            settingsCollapsed: true,
-        });
-
-        const data = [...this.state.concepts];
 
         fetch(
             `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/`,
@@ -804,18 +997,36 @@ class SubjectConcepts extends Component {
                 method: "DELETE",
                 headers: this.headers,
                 body: JSON.stringify({
-                    chapter_name: data[index].chapter_name,
-                    topic_name: data[index].topic_name,
-                    concepts_random_id: data[index].concepts_random_id,
+                    chapter_name: values[index].chapter_name,
+                    topic_name: values[index].topic_name,
+                    concepts_random_id: values[index].concepts_random_id,
                 }),
             }
         )
             .then((res) => res.json())
             .then((result) => {
-                this.setState({
-                    page_loading: true,
-                });
-                this.loadConceptData();
+                if (result.sts === true) {
+                    alert(result.msg);
+                    flips.splice(index, 1);
+                    keyboards.splice(index, 1);
+                    values.splice(index, 1);
+                    this.setState({
+                        concepts: values,
+                        keyboards: keyboards,
+                        flipState: flips,
+                        showEdit_option: false,
+                        contentCollapsed: true,
+                        imageCollapsed: true,
+                        audioCollapsed: true,
+                        settingsCollapsed: true,
+                    });
+                } else {
+                    if (result.detail) {
+                        alert(result.detail);
+                    } else {
+                        alert(result.msg);
+                    }
+                }
                 console.log(result);
             })
             .catch((err) => {
@@ -834,22 +1045,25 @@ class SubjectConcepts extends Component {
             physics: keyboards[index].physics,
             maths: keyboards[index].maths,
         });
-        const images = [];
-        for (let i = 0; i < values[index].content.images.length; i++) {
-            images[i] = values[index].content.images[i];
-        }
         values.push({
             chapter_name: this.chapterName,
             topic_name: this.topicName,
             concepts_random_id: "",
-            old_concept: true,
-            old_image: false,
+            is_image_uploaded: false,
             content: {
                 terms: values[index].content.terms,
                 definition: values[index].content.definition,
-                images: images,
-                video: values[index].content.video,
-                audio: values[index].content.audio,
+                images: [{ title: "", file_name: "", image: null, path: "" }],
+                video: {
+                    title: "",
+                    file_name: "",
+                    video: null,
+                    pasteUrl: "",
+                },
+                audio: [
+                    { title: "", file_name: "", audio: null },
+                    { title: "", file_name: "", audio: null },
+                ],
             },
             settings: {
                 virtual_keyboard: values[index].settings.virtual_keyboard,
@@ -860,6 +1074,7 @@ class SubjectConcepts extends Component {
             concepts: values,
             keyboards: keyboards,
             flipState: flips,
+            activeConcept: values.length - 1,
         });
     };
 
@@ -1215,6 +1430,7 @@ class SubjectConcepts extends Component {
                                         <button
                                             className="btn btn-primary btn-sm"
                                             onClick={this.handleSubmit}
+                                            disabled={this.state.btnDisabled}
                                         >
                                             {this.state.showLoader ? (
                                                 <Spinner
