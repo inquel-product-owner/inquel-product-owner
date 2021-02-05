@@ -42,9 +42,9 @@ class Scorecard extends Component {
             .then((result) => {
                 console.log(result);
                 this.setState({
-                    average: result.average,
-                    good: result.good,
-                    improve: result.improve,
+                    average: result.data.average,
+                    good: result.data.good,
+                    improve: result.data.improve,
                 });
             })
             .catch((err) => {
@@ -63,7 +63,7 @@ class Scorecard extends Component {
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
-                if (result.data.score_card_config === "") {
+                if (Object.keys(result.data.score_card_config).length !== 0) {
                     this.setState({
                         average: result.data.score_card_config.average,
                         good: result.data.score_card_config.good,
@@ -163,7 +163,7 @@ class Scorecard extends Component {
                 method: "POST",
                 headers: this.headers,
                 body: JSON.stringify({
-                    cycle_test_id: this.cycle_testId,
+                    semester_id: this.semesterId,
                     score_card_config: {
                         average: this.state.average,
                         good: this.state.good,
@@ -565,7 +565,6 @@ class SemesterAuto extends Component {
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
-            showLoader: false,
 
             sections: [
                 {
@@ -737,6 +736,10 @@ class SemesterAuto extends Component {
             section[index].section_name = event.target.value;
         } else if (type === "any_questions") {
             section[index].any_questions = Number(event.target.value);
+            if (section[index].marks !== 0 || section[index].marks !== 0) {
+                section[index].total_marks =
+                    Number(section[index].marks) * Number(event.target.value);
+            }
         }
         this.setState({
             sections: section,
@@ -868,7 +871,7 @@ class SemesterAuto extends Component {
         this.setState({
             showErrorAlert: false,
             showSuccessAlert: false,
-            showLoader: true,
+            page_loading: true,
         });
 
         const section = [...this.state.sections];
@@ -880,31 +883,31 @@ class SemesterAuto extends Component {
             this.setState({
                 errorMsg: "Duration minutes should in between 1 to 360",
                 showErrorAlert: true,
-                showLoader: false,
+                page_loading: false,
             });
         } else if (this.state.selectedAttempt === "") {
             this.setState({
                 errorMsg: "Please select a attempt",
                 showErrorAlert: true,
-                showLoader: false,
+                page_loading: false,
             });
         } else if (section[index].section_name === "") {
             this.setState({
                 errorMsg: "Enter the section name",
                 showErrorAlert: true,
-                showLoader: false,
+                page_loading: false,
             });
         } else if (section[index].question_type === "") {
             this.setState({
                 errorMsg: "Select a question type",
                 showErrorAlert: true,
-                showLoader: false,
+                page_loading: false,
             });
         } else if (section[index].category === "") {
             this.setState({
                 errorMsg: "Select a category",
                 showErrorAlert: true,
-                showLoader: false,
+                page_loading: false,
             });
         } else if (
             section[index].any_questions === "" ||
@@ -915,13 +918,13 @@ class SemesterAuto extends Component {
                 errorMsg:
                     "Enter no. of questions within the range of Total question",
                 showErrorAlert: true,
-                showLoader: false,
+                page_loading: false,
             });
         } else if (section[index].marks === "" || section[index].marks === 0) {
             this.setState({
                 errorMsg: "Enter valid marks",
                 showErrorAlert: true,
-                showLoader: false,
+                page_loading: false,
             });
         } else {
             if (section[index].section_id === "") {
@@ -960,7 +963,7 @@ class SemesterAuto extends Component {
                     this.setState({
                         successMsg: result.msg,
                         showSuccessAlert: true,
-                        showLoader: false,
+                        page_loading: false,
                         sections: section,
                     });
                     setTimeout(() => {
@@ -985,7 +988,7 @@ class SemesterAuto extends Component {
                     }
                     this.setState({
                         showErrorAlert: true,
-                        showLoader: false,
+                        page_loading: false,
                     });
                 }
             })
@@ -1022,7 +1025,7 @@ class SemesterAuto extends Component {
                     this.setState({
                         successMsg: result.data.msg,
                         showSuccessAlert: true,
-                        showLoader: false,
+                        page_loading: false,
                         sections: section,
                     });
                     setTimeout(() => {
@@ -1047,7 +1050,7 @@ class SemesterAuto extends Component {
                     }
                     this.setState({
                         showErrorAlert: true,
-                        showLoader: false,
+                        page_loading: false,
                     });
                 }
             })
@@ -1459,7 +1462,7 @@ class SemesterAuto extends Component {
                                                         "" ? (
                                                             <td>
                                                                 <Link
-                                                                    to={`/teacher/subject/${this.subjectId}/semester/${this.semesterId}/section/${section.section_id}`}
+                                                                    to={`/teacher/subject/${this.subjectId}/semester/${this.semesterId}/section/${section.section_id}/?attempt=${this.state.selectedAttempt}`}
                                                                 >
                                                                     <button className="btn btn-primary-invert btn-sm shadow-sm">
                                                                         <i className="fas fa-eye"></i>
@@ -1479,17 +1482,6 @@ class SemesterAuto extends Component {
                                                                     )
                                                                 }
                                                             >
-                                                                {this.state
-                                                                    .showLoader ? (
-                                                                    <Spinner
-                                                                        as="span"
-                                                                        animation="border"
-                                                                        size="sm"
-                                                                        role="status"
-                                                                        aria-hidden="true"
-                                                                        className="mr-2"
-                                                                    />
-                                                                ) : null}
                                                                 Save
                                                             </button>
                                                         </td>

@@ -442,6 +442,7 @@ class SubjectChapters extends Component {
                 this.setState({
                     semesterItems: result.data,
                     semester_chapters: chapters,
+                    chapter_names: [],
                     page_loading: false,
                 });
                 console.log(result);
@@ -671,7 +672,7 @@ class SubjectChapters extends Component {
                                                                           <Link
                                                                               to={`/teacher/subject/${this.subjectId}/semester/${data.semester_id}`}
                                                                           >
-                                                                              <button className="btn btn-primary btn-sm mr-2">
+                                                                              <button className="btn btn-primary btn-sm">
                                                                                   Auto
                                                                               </button>
                                                                           </Link>
@@ -685,7 +686,7 @@ class SubjectChapters extends Component {
                                                                           <Link
                                                                               to={`/teacher/subject/${this.subjectId}/semester/${data.semester_id}/direct`}
                                                                           >
-                                                                              <button className="btn btn-primary btn-sm">
+                                                                              <button className="btn btn-primary btn-sm ml-2">
                                                                                   Direct
                                                                                   Test
                                                                               </button>

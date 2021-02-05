@@ -111,64 +111,66 @@ class SubjectConcepts extends Component {
                         audio = [];
                         if (response[i].files.length !== 0) {
                             // image
-                            if (response[i].files[0].type1_image_1) {
+                            if (response[i].files[0].concepts_image_1) {
                                 images.push({
                                     title:
                                         response[i].files[0]
-                                            .type1_image_1_title,
+                                            .concepts_image_1_title,
                                     file_name: "",
                                     image: null,
-                                    path: response[i].files[0].type1_image_1,
+                                    path: response[i].files[0].concepts_image_1,
                                 });
                             }
-                            if (response[i].files[0].type1_image_2) {
+                            if (response[i].files[0].concepts_image_2) {
                                 images.push({
                                     title:
                                         response[i].files[0]
-                                            .type1_image_2_title,
+                                            .concepts_image_2_title,
                                     file_name: "",
                                     image: null,
-                                    path: response[i].files[0].type1_image_2,
+                                    path: response[i].files[0].concepts_image_2,
                                 });
                             }
-                            if (response[i].files[0].type1_image_3) {
+                            if (response[i].files[0].concepts_image_3) {
                                 images.push({
                                     title:
                                         response[i].files[0]
-                                            .type1_image_3_title,
+                                            .concepts_image_3_title,
                                     file_name: "",
                                     image: null,
-                                    path: response[i].files[0].type1_image_3,
+                                    path: response[i].files[0].concepts_image_3,
                                 });
                             }
-                            if (response[i].files[0].type1_image_4) {
+                            if (response[i].files[0].concepts_image_4) {
                                 images.push({
                                     title:
                                         response[i].files[0]
-                                            .type1_image_4_title,
+                                            .concepts_image_4_title,
                                     file_name: "",
                                     image: null,
-                                    path: response[i].files[0].type1_image_4,
+                                    path: response[i].files[0].concepts_image_4,
                                 });
                             }
 
                             // audio
-                            if (response[i].files[0].type1_audio_1) {
+                            if (response[i].files[0].concepts_audio_1) {
                                 audio.push({
                                     title:
                                         response[i].files[0]
-                                            .type1_audio_1_title,
+                                            .concepts_audio_1_title,
                                     file_name: "",
-                                    audio: response[i].files[0].type1_audio_1,
+                                    audio:
+                                        response[i].files[0].concepts_audio_1,
                                 });
                             }
-                            if (response[i].files[0].type1_audio_2) {
+                            if (response[i].files[0].concepts_audio_2) {
                                 audio.push({
                                     title:
                                         response[i].files[0]
-                                            .type1_audio_2_title,
+                                            .concepts_audio_2_title,
                                     file_name: "",
-                                    audio: response[i].files[0].type1_audio_2,
+                                    audio:
+                                        response[i].files[0].concepts_audio_2,
                                 });
                             }
                         }
@@ -196,16 +198,18 @@ class SubjectConcepts extends Component {
                                 video: {
                                     title:
                                         response[i].files.length !== 0 &&
-                                        response[i].files[0].type1_video_1_title
+                                        response[i].files[0]
+                                            .concepts_video_1_title
                                             ? response[i].files[0]
-                                                  .type1_video_1_title
+                                                  .concepts_video_1_title
                                             : "",
                                     file_name: "",
                                     video: null,
                                     pasteUrl:
                                         response[i].files.length !== 0 &&
-                                        response[i].files[0].type1_video_1
-                                            ? response[i].files[0].type1_video_1
+                                        response[i].files[0].paste_video_url
+                                            ? response[i].files[0]
+                                                  .paste_video_url
                                             : "",
                                 },
                                 audio:
@@ -728,7 +732,10 @@ class SubjectConcepts extends Component {
 
     changeImage = (image_index, q_index) => {
         const images = [...this.state.concepts];
-        if (this.state.selectedImage === image_index) {
+        if (
+            this.state.selectedImage === image_index &&
+            this.state.selectedImageQuestion === q_index
+        ) {
             this.setState({
                 selectedImage: "",
                 selectedImageQuestion: "",
@@ -990,48 +997,182 @@ class SubjectConcepts extends Component {
         const values = [...this.state.concepts];
         const keyboards = [...this.state.keyboards];
         const flips = [...this.state.flipState];
+        this.setState({
+            showEdit_option: false,
+            contentCollapsed: true,
+            imageCollapsed: true,
+            audioCollapsed: true,
+            settingsCollapsed: true,
+        });
 
-        fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/`,
-            {
-                method: "DELETE",
-                headers: this.headers,
-                body: JSON.stringify({
-                    chapter_name: values[index].chapter_name,
-                    topic_name: values[index].topic_name,
-                    concepts_random_id: values[index].concepts_random_id,
-                }),
-            }
-        )
-            .then((res) => res.json())
-            .then((result) => {
-                if (result.sts === true) {
-                    alert(result.msg);
-                    flips.splice(index, 1);
-                    keyboards.splice(index, 1);
-                    values.splice(index, 1);
-                    this.setState({
-                        concepts: values,
-                        keyboards: keyboards,
-                        flipState: flips,
-                        showEdit_option: false,
-                        contentCollapsed: true,
-                        imageCollapsed: true,
-                        audioCollapsed: true,
-                        settingsCollapsed: true,
-                    });
-                } else {
-                    if (result.detail) {
-                        alert(result.detail);
-                    } else {
+        if (values[index].concepts_random_id !== "") {
+            fetch(
+                `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/`,
+                {
+                    method: "DELETE",
+                    headers: this.headers,
+                    body: JSON.stringify({
+                        chapter_name: values[index].chapter_name,
+                        topic_name: values[index].topic_name,
+                        concepts_random_id: values[index].concepts_random_id,
+                    }),
+                }
+            )
+                .then((res) => res.json())
+                .then((result) => {
+                    if (result.sts === true) {
                         alert(result.msg);
+                        flips.splice(index, 1);
+                        keyboards.splice(index, 1);
+                        values.splice(index, 1);
+                        this.setState(
+                            {
+                                concepts: values,
+                                keyboards: keyboards,
+                                flipState: flips,
+                            },
+                            () => {
+                                if (values.length === 0) {
+                                    flips.push(false);
+                                    keyboards.push({
+                                        all: false,
+                                        chemistry: false,
+                                        physics: false,
+                                        maths: false,
+                                    });
+                                    values.push({
+                                        chapter_name: this.props.match.params
+                                            .chapterName,
+                                        topic_name: this.props.match.params
+                                            .topicName,
+                                        concepts_random_id: "",
+                                        is_image_uploaded: false,
+                                        content: {
+                                            terms: "<p>Terms goes here</p>",
+                                            definition:
+                                                "<p>Definition goes here</p>",
+                                            images: [
+                                                {
+                                                    title: "",
+                                                    file_name: "",
+                                                    image: null,
+                                                    path: "",
+                                                },
+                                            ],
+                                            video: {
+                                                title: "",
+                                                file_name: "",
+                                                video: null,
+                                                pasteUrl: "",
+                                            },
+                                            audio: [
+                                                {
+                                                    title: "",
+                                                    file_name: "",
+                                                    audio: null,
+                                                },
+                                                {
+                                                    title: "",
+                                                    file_name: "",
+                                                    audio: null,
+                                                },
+                                            ],
+                                        },
+                                        settings: {
+                                            virtual_keyboard: [],
+                                            limited: false,
+                                        },
+                                    });
+                                    this.setState({
+                                        concepts: values,
+                                        keyboards: keyboards,
+                                        flipState: flips,
+                                    });
+                                }
+                            }
+                        );
+                        setTimeout(() => {
+                            this.setState(
+                                {
+                                    page_loading: true,
+                                },
+                                () => {
+                                    this.loadConceptData();
+                                }
+                            );
+                        }, 1000);
+                    } else {
+                        if (result.detail) {
+                            alert(result.detail);
+                        } else {
+                            alert(result.msg);
+                        }
+                    }
+                    console.log(result);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        } else {
+            flips.splice(index, 1);
+            keyboards.splice(index, 1);
+            values.splice(index, 1);
+            this.setState(
+                {
+                    concepts: values,
+                    keyboards: keyboards,
+                    flipState: flips,
+                },
+                () => {
+                    if (values.length === 0) {
+                        flips.push(false);
+                        keyboards.push({
+                            all: false,
+                            chemistry: false,
+                            physics: false,
+                            maths: false,
+                        });
+                        values.push({
+                            chapter_name: this.props.match.params.chapterName,
+                            topic_name: this.props.match.params.topicName,
+                            concepts_random_id: "",
+                            is_image_uploaded: false,
+                            content: {
+                                terms: "<p>Terms goes here</p>",
+                                definition: "<p>Definition goes here</p>",
+                                images: [
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        image: null,
+                                        path: "",
+                                    },
+                                ],
+                                video: {
+                                    title: "",
+                                    file_name: "",
+                                    video: null,
+                                    pasteUrl: "",
+                                },
+                                audio: [
+                                    { title: "", file_name: "", audio: null },
+                                    { title: "", file_name: "", audio: null },
+                                ],
+                            },
+                            settings: {
+                                virtual_keyboard: [],
+                                limited: false,
+                            },
+                        });
+                        this.setState({
+                            concepts: values,
+                            keyboards: keyboards,
+                            flipState: flips,
+                        });
                     }
                 }
-                console.log(result);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+            );
+        }
     };
 
     copyConcept = (index) => {
@@ -1203,22 +1344,17 @@ class SubjectConcepts extends Component {
                                                         </button>
                                                     </div>
                                                     <div className="col-md-12 col-3">
-                                                        {this.state.concepts
-                                                            .length > 1 ? (
-                                                            <button
-                                                                type="button"
-                                                                className="btn btn-light bg-white btn-block shadow-sm"
-                                                                onClick={() =>
-                                                                    this.removingConcept(
-                                                                        c_index
-                                                                    )
-                                                                }
-                                                            >
-                                                                <i className="far fa-trash-alt fa-sm"></i>
-                                                            </button>
-                                                        ) : (
-                                                            ""
-                                                        )}
+                                                        <button
+                                                            type="button"
+                                                            className="btn btn-light bg-white btn-block shadow-sm"
+                                                            onClick={() =>
+                                                                this.removingConcept(
+                                                                    c_index
+                                                                )
+                                                            }
+                                                        >
+                                                            <i className="far fa-trash-alt fa-sm"></i>
+                                                        </button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1248,7 +1384,7 @@ class SubjectConcepts extends Component {
                                                                             .state
                                                                             .selectedImageQuestion ===
                                                                             c_index
-                                                                            ? "col-md-8"
+                                                                            ? "col-md-9"
                                                                             : "col-md-11 pr-md-0"
                                                                     }`}
                                                                 >
@@ -1278,13 +1414,24 @@ class SubjectConcepts extends Component {
                                                                 this.state
                                                                     .selectedImageQuestion ===
                                                                     c_index ? (
-                                                                    <div className="col-md-3 mb-2 mb-md-0 pr-md-0">
-                                                                        <div
-                                                                            className="card preview-img-lg bg-light shadow-sm"
-                                                                            style={{
-                                                                                backgroundImage: `url(${this.state.selectedImageData.path})`,
-                                                                            }}
-                                                                        ></div>
+                                                                    <div className="col-md-2 mb-2 mb-md-0 pr-md-0">
+                                                                        <div className="card shadow-sm">
+                                                                            <img
+                                                                                src={
+                                                                                    this
+                                                                                        .state
+                                                                                        .selectedImageData
+                                                                                        .path
+                                                                                }
+                                                                                alt={
+                                                                                    this
+                                                                                        .state
+                                                                                        .selectedImageData
+                                                                                        .file_name
+                                                                                }
+                                                                                className="img-fluid rounded-lg"
+                                                                            />
+                                                                        </div>
                                                                     </div>
                                                                 ) : (
                                                                     ""
@@ -1336,7 +1483,7 @@ class SubjectConcepts extends Component {
                                                                             .state
                                                                             .selectedImageQuestion ===
                                                                             c_index
-                                                                            ? "col-md-8"
+                                                                            ? "col-md-9"
                                                                             : "col-md-11 pr-md-0"
                                                                     }`}
                                                                 >
@@ -1366,13 +1513,24 @@ class SubjectConcepts extends Component {
                                                                 this.state
                                                                     .selectedImageQuestion ===
                                                                     c_index ? (
-                                                                    <div className="col-md-3 mb-2 mb-md-0 pr-md-0">
-                                                                        <div
-                                                                            className="card preview-img-lg bg-light shadow-sm"
-                                                                            style={{
-                                                                                backgroundImage: `url(${this.state.selectedImageData.path})`,
-                                                                            }}
-                                                                        ></div>
+                                                                    <div className="col-md-2 mb-2 mb-md-0 pr-md-0">
+                                                                        <div className="card shadow-sm">
+                                                                            <img
+                                                                                src={
+                                                                                    this
+                                                                                        .state
+                                                                                        .selectedImageData
+                                                                                        .path
+                                                                                }
+                                                                                alt={
+                                                                                    this
+                                                                                        .state
+                                                                                        .selectedImageData
+                                                                                        .file_name
+                                                                                }
+                                                                                className="img-fluid rounded-lg"
+                                                                            />
+                                                                        </div>
                                                                     </div>
                                                                 ) : (
                                                                     ""

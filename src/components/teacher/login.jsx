@@ -172,6 +172,7 @@ class TeacherLogin extends Component {
             body: JSON.stringify({
                 username: this.state.username,
                 password: this.state.password,
+                user: "teacher",
             }),
         })
             .then((res) => res.json())
@@ -373,17 +374,27 @@ class TeacherLogin extends Component {
                                                 </button>
                                             </div>
                                         </form>
-                                        <p className="small text-center mb-0">
+                                        <p className="small text-center mb-2">
                                             or
                                         </p>
-                                        <div className="d-flex justify-content-around mb-3">
-                                            <button className="btn btn-primary btn-sm">
-                                                <i className="fab fa-google"></i>
-                                            </button>
-                                            <button className="btn btn-primary btn-sm">
-                                                <i className="fab fa-facebook"></i>
-                                            </button>
+                                        <div className="d-flex justify-content-center mb-3">
+                                            <div className="col-md-8">
+                                                <div className="d-flex">
+                                                    <div className="col-6 text-center">
+                                                        <button className="btn btn-primary btn-sm">
+                                                            <i className="fab fa-google"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div className="col-6 text-center">
+                                                        <button className="btn btn-primary btn-sm">
+                                                            <i className="fab fa-facebook"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
+                                        {/* <div className="d-flex justify-content-around mb-3">
+                                        </div> */}
                                         <p className="text-center small mb-0">
                                             Don't have an account?{" "}
                                             <Link

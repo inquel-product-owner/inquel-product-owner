@@ -175,6 +175,7 @@ class StudentLogin extends Component {
             body: JSON.stringify({
                 username: this.state.username,
                 password: this.state.password,
+                user: "student",
             }),
         })
             .then((res) => res.json())
