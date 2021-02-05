@@ -834,7 +834,7 @@ class Chapters extends Component {
                                                                                   <Link
                                                                                       to={`/teacher/subject/${this.subjectId}/${this.state.chapterName}/cycle/${data.cycle_test_id}`}
                                                                                   >
-                                                                                      <button className="btn btn-primary btn-sm mr-2">
+                                                                                      <button className="btn btn-primary btn-sm">
                                                                                           Auto
                                                                                       </button>
                                                                                   </Link>
@@ -848,7 +848,7 @@ class Chapters extends Component {
                                                                                   <Link
                                                                                       to={`/teacher/subject/${this.subjectId}/${this.state.chapterName}/cycle/${data.cycle_test_id}/direct`}
                                                                                   >
-                                                                                      <button className="btn btn-primary btn-sm">
+                                                                                      <button className="btn btn-primary btn-sm ml-2">
                                                                                           Direct
                                                                                           Test
                                                                                       </button>

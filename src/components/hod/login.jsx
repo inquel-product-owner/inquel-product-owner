@@ -172,6 +172,7 @@ class HODLogin extends Component {
             body: JSON.stringify({
                 username: this.state.username,
                 password: this.state.password,
+                user: "hod",
             }),
         })
             .then((res) => res.json())
