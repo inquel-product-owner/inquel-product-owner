@@ -632,10 +632,20 @@ class SubjectChapters extends Component {
                                                                               </td>
                                                                               <td>
                                                                                   <Link
+                                                                                      to={`/teacher/subject/${this.subjectId}/${chapter.chapter_name}/summary/upload`}
+                                                                                      className="primary-text"
+                                                                                  >
+                                                                                      <button className="btn btn-primary btn-sm mr-2">
+                                                                                          <i className="fas fa-file-upload"></i>
+                                                                                      </button>
+                                                                                  </Link>
+                                                                                  <Link
                                                                                       to={`/teacher/subject/${this.subjectId}/${chapter.chapter_name}/summary`}
                                                                                       className="primary-text"
                                                                                   >
-                                                                                      <i className="fas fa-plus-circle fa-2x"></i>
+                                                                                      <button className="btn btn-primary btn-sm">
+                                                                                          <i className="fas fa-file-medical"></i>
+                                                                                      </button>
                                                                                   </Link>
                                                                               </td>
                                                                               <td className="text-right">
@@ -726,10 +736,20 @@ class SubjectChapters extends Component {
                                                               </td>
                                                               <td>
                                                                   <Link
+                                                                      to={`/teacher/subject/${this.subjectId}/${chapter.chapter_name}/summary/upload`}
+                                                                      className="primary-text"
+                                                                  >
+                                                                      <button className="btn btn-primary btn-sm mr-2">
+                                                                          <i className="fas fa-file-upload"></i>
+                                                                      </button>
+                                                                  </Link>
+                                                                  <Link
                                                                       to={`/teacher/subject/${this.subjectId}/${chapter.chapter_name}/summary`}
                                                                       className="primary-text"
                                                                   >
-                                                                      <i className="fas fa-plus-circle fa-2x"></i>
+                                                                      <button className="btn btn-primary btn-sm">
+                                                                          <i className="fas fa-file-medical"></i>
+                                                                      </button>
                                                                   </Link>
                                                               </td>
                                                               <td className="text-right">
@@ -755,7 +775,7 @@ class SubjectChapters extends Component {
                             className="btn btn-tomato btn-block shadow-sm mb-2"
                             onClick={this.toggleModal}
                         >
-                            Add chapter
+                            Add Chapter
                         </button>
                         <button
                             className="btn btn-tomato btn-block shadow-sm"

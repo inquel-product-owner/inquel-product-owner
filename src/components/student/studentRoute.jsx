@@ -1,5 +1,6 @@
 import React from "react";
 import { Switch, Route, Redirect } from "react-router-dom";
+
 import EmailVerify from "./emailVerification";
 import errorPage from "../404";
 import StudentLogin from "./login";

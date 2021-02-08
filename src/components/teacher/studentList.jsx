@@ -176,15 +176,19 @@ class StudentList extends Component {
                                 ref={this.gridRef}
                             />
                             <div className="card-body p-3">
-                                <Paginations
-                                    activePage={this.state.activeStudentPage}
-                                    totalItemsCount={
-                                        this.state.totalStudentCount
-                                    }
-                                    onChange={this.handleStudentPageChange.bind(
-                                        this
-                                    )}
-                                />
+                                {this.state.totalStudentCount >= 10 ? (
+                                    <Paginations
+                                        activePage={
+                                            this.state.activeStudentPage
+                                        }
+                                        totalItemsCount={
+                                            this.state.totalStudentCount
+                                        }
+                                        onChange={this.handleStudentPageChange.bind(
+                                            this
+                                        )}
+                                    />
+                                ) : null}
                             </div>
                         </div>
                         {/* Loading component */}

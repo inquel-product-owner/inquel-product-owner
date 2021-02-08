@@ -5,6 +5,7 @@ import SideNav from "./sidenav";
 import { baseUrl, hodUrl } from "../../shared/baseUrl";
 import Loading from "../sharedComponents/loader";
 import GroupTable from "../table/groupTable";
+import SubjectTable from "../table/subjectTable";
 import Paginations from "../sharedComponents/pagination";
 
 class TeacherProfile extends Component {
@@ -14,8 +15,11 @@ class TeacherProfile extends Component {
             showSideNav: false,
             teacherItems: [],
             groupItems: [],
+            subjectItems: [],
             activeGroupPage: 1,
             totalGroupCount: 0,
+            activeSubjectPage: 1,
+            totalSubjectCount: 0,
             page_loading: true,
         };
         this.teacherId = this.props.match.params.teacherId;
@@ -34,6 +38,47 @@ class TeacherProfile extends Component {
         });
     };
 
+    loadGroupData = () => {
+        fetch(`${this.url}/hod/groups/?page=${this.state.activeGroupPage}`, {
+            headers: this.headers,
+            method: "GET",
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                this.setState({
+                    groupItems: result.data.results,
+                    totalGroupCount: result.data.count,
+                    page_loading: false,
+                });
+                console.log(result);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    loadSubjectData = () => {
+        fetch(
+            `${this.url}/hod/subjects/?page=${this.state.activeSubjectPage}`,
+            {
+                headers: this.headers,
+                method: "GET",
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                this.setState({
+                    subjectItems: result.data.results,
+                    totalSubjectCount: result.data.count,
+                    page_loading: false,
+                });
+                console.log(result);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     componentDidMount = () => {
         document.title = "Teacher Profile - HOD | IQLabs";
 
@@ -45,8 +90,6 @@ class TeacherProfile extends Component {
             .then((result) => {
                 this.setState({
                     teacherItems: result.data,
-                    groupItems: result.data.results ? result.data.results : [],
-                    totalGroupCount: result.data.count ? result.data.count : 0,
                     page_loading: false,
                 });
                 console.log(result);
@@ -54,10 +97,33 @@ class TeacherProfile extends Component {
             .catch((err) => {
                 console.log(err);
             });
+
+        this.loadGroupData();
+        this.loadSubjectData();
+    };
+
+    componentDidUpdate = (prevProps, prevState) => {
+        if (prevState.activeGroupPage !== this.state.activeGroupPage) {
+            this.loadGroupData();
+            this.setState({
+                page_loading: true,
+            });
+        }
+
+        if (prevState.activeSubjectPage !== this.state.activeSubjectPage) {
+            this.loadSubjectData();
+            this.setState({
+                page_loading: true,
+            });
+        }
     };
 
     handleGroupPageChange(pageNumber) {
         this.setState({ activeGroupPage: pageNumber });
+    }
+
+    handleSubjectPageChange(pageNumber) {
+        this.setState({ activeSubjectPage: pageNumber });
     }
 
     render() {
@@ -148,34 +214,7 @@ class TeacherProfile extends Component {
                             </div>
                         </div>
 
-                        <div className="row mb-4">
-                            <div className="col-md-2 col-6">
-                                <form action="">
-                                    <label htmlFor="subject">Subjects</label>
-                                    <select
-                                        name="subject"
-                                        id="subject"
-                                        className="form-control shadow-sm"
-                                    >
-                                        <option value="maths">Maths</option>
-                                    </select>
-                                </form>
-                            </div>
-                            <div className="col-md-2 col-6">
-                                <form action="">
-                                    <label htmlFor="group">Group</label>
-                                    <select
-                                        name="group"
-                                        id="group"
-                                        className="form-control shadow-sm"
-                                    >
-                                        <option value="a">A</option>
-                                    </select>
-                                </form>
-                            </div>
-                        </div>
-
-                        {/* Course Handling */}
+                        {/* Group Handling */}
                         <div className="card shadow-sm mb-4">
                             <div className="card-header">
                                 <h5>Handling Groups</h5>
@@ -186,13 +225,44 @@ class TeacherProfile extends Component {
                                 view={true}
                             />
                             <div className="card-body p-3">
-                                <Paginations
-                                    activePage={this.state.activeGroupPage}
-                                    totalItemsCount={this.state.totalGroupCount}
-                                    onChange={this.handleGroupPageChange.bind(
-                                        this
-                                    )}
-                                />
+                                {this.state.totalGroupCount >= 10 ? (
+                                    <Paginations
+                                        activePage={this.state.activeGroupPage}
+                                        totalItemsCount={
+                                            this.state.totalGroupCount
+                                        }
+                                        onChange={this.handleGroupPageChange.bind(
+                                            this
+                                        )}
+                                    />
+                                ) : null}
+                            </div>
+                        </div>
+
+                        {/* Subject Handling */}
+                        <div className="card shadow-sm">
+                            <div className="card-header">
+                                <h5>Handling Subjects</h5>
+                            </div>
+                            <SubjectTable
+                                subjectItems={this.state.subjectItems}
+                                path="hod"
+                                check={false}
+                            />
+                            <div className="card-body p-3">
+                                {this.state.totalSubjectCount >= 10 ? (
+                                    <Paginations
+                                        activePage={
+                                            this.state.activeSubjectPage
+                                        }
+                                        totalItemsCount={
+                                            this.state.totalSubjectCount
+                                        }
+                                        onChange={this.handleSubjectPageChange.bind(
+                                            this
+                                        )}
+                                    />
+                                ) : null}
                             </div>
                         </div>
                         {/* Loading component */}

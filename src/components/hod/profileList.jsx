@@ -110,7 +110,7 @@ class AddStudentModal extends Component {
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
-                <Modal.Header closeButton></Modal.Header>
+                <Modal.Header closeButton>Create Student</Modal.Header>
                 <Modal.Body>
                     <Alert
                         variant="danger"
@@ -731,17 +731,19 @@ class ProfileList extends Component {
                                         path="hod"
                                     />
                                     <div className="card-body p-3">
-                                        <Paginations
-                                            activePage={
-                                                this.state.activeTeacherPage
-                                            }
-                                            totalItemsCount={
-                                                this.state.totalTeacherCount
-                                            }
-                                            onChange={this.handleTeacherPageChange.bind(
-                                                this
-                                            )}
-                                        />
+                                        {this.state.totalTeacherCount >= 10 ? (
+                                            <Paginations
+                                                activePage={
+                                                    this.state.activeTeacherPage
+                                                }
+                                                totalItemsCount={
+                                                    this.state.totalTeacherCount
+                                                }
+                                                onChange={this.handleTeacherPageChange.bind(
+                                                    this
+                                                )}
+                                            />
+                                        ) : null}
                                     </div>
                                 </div>
                             </Tab>
@@ -755,17 +757,19 @@ class ProfileList extends Component {
                                         ref={this.gridRef}
                                     />
                                     <div className="card-body p-3">
-                                        <Paginations
-                                            activePage={
-                                                this.state.activeStudentPage
-                                            }
-                                            totalItemsCount={
-                                                this.state.totalStudentCount
-                                            }
-                                            onChange={this.handleStudentPageChange.bind(
-                                                this
-                                            )}
-                                        />
+                                        {this.state.totalStudentCount >= 10 ? (
+                                            <Paginations
+                                                activePage={
+                                                    this.state.activeStudentPage
+                                                }
+                                                totalItemsCount={
+                                                    this.state.totalStudentCount
+                                                }
+                                                onChange={this.handleStudentPageChange.bind(
+                                                    this
+                                                )}
+                                            />
+                                        ) : null}
                                     </div>
                                 </div>
                             </Tab>

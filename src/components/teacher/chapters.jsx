@@ -587,10 +587,17 @@ class Chapters extends Component {
                                 <div className="row align-items-center">
                                     <div className="col-md-2 mb-2 mb-md-0">
                                         <Link
+                                            to={`/teacher/subject/${this.subjectId}/${this.state.chapterName}/${data.topic_name}/notes/upload`}
+                                        >
+                                            <button className="btn btn-sm btn-primary mr-2">
+                                                <i className="fas fa-file-upload fa-sm"></i>
+                                            </button>
+                                        </Link>
+                                        <Link
                                             to={`/teacher/subject/${this.subjectId}/${this.state.chapterName}/${data.topic_name}/notes`}
                                         >
                                             <button className="btn btn-sm btn-primary">
-                                                <i className="fas fa-file-upload fa-sm"></i>
+                                                <i className="fas fa-file-medical fa-sm"></i>
                                             </button>
                                         </Link>
                                     </div>
@@ -626,8 +633,15 @@ class Chapters extends Component {
                                             </button>
                                         </Link>
                                     </div>
-                                    <div className="col-md-2 text-center mb-2 mb-md-0">
-                                        2.4
+                                    <div className="col-md-2 mb-2 mb-md-0">
+                                        <select
+                                            name="next_topic"
+                                            className="form-control form-control-sm border-secondary"
+                                        >
+                                            <option value="">
+                                                Next topic
+                                            </option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -874,13 +888,13 @@ class Chapters extends Component {
                             className="btn btn-tomato btn-block shadow-sm"
                             onClick={() => this.toggleModal("1")}
                         >
-                            Add topic
+                            Add Topic
                         </button>
                         <button
                             className="btn btn-tomato btn-block shadow-sm"
                             onClick={this.toggleCycleTestModal}
                         >
-                            Add cycle test
+                            Add Cycle test
                         </button>
                         <button className="btn btn-tomato btn-block shadow-sm">
                             Add Quiz

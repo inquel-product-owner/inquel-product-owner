@@ -66,7 +66,6 @@ class GroupStudents extends Component {
     };
 
     componentDidUpdate = (prevProps, prevState) => {
-
         if (prevState.activeStudentPage !== this.state.activeStudentPage) {
             this.loadStudentData();
             this.setState({
@@ -82,7 +81,8 @@ class GroupStudents extends Component {
     render() {
         document.title =
             this.state.groupItem.length !== 0
-                ? this.state.groupItem.group_name + " Student List - Teacher | IQLabs"
+                ? this.state.groupItem.group_name +
+                  " Student List - Teacher | IQLabs"
                 : "Group Student List - Teacher | IQLabs";
         return (
             <div className="wrapper">
@@ -160,15 +160,19 @@ class GroupStudents extends Component {
                                 path="teacher"
                             />
                             <div className="card-body p-3">
-                                <Paginations
-                                    activePage={this.state.activeStudentPage}
-                                    totalItemsCount={
-                                        this.state.totalStudentCount
-                                    }
-                                    onChange={this.handleStudentPageChange.bind(
-                                        this
-                                    )}
-                                />
+                                {this.state.totalStudentCount >= 10 ? (
+                                    <Paginations
+                                        activePage={
+                                            this.state.activeStudentPage
+                                        }
+                                        totalItemsCount={
+                                            this.state.totalStudentCount
+                                        }
+                                        onChange={this.handleStudentPageChange.bind(
+                                            this
+                                        )}
+                                    />
+                                ) : null}
                             </div>
                         </div>
                         {/* Loading component */}

@@ -97,7 +97,7 @@ class GroupModal extends Component {
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
-                <Modal.Header closeButton></Modal.Header>
+                <Modal.Header closeButton>Create Group</Modal.Header>
                 <Modal.Body>
                     <Alert
                         variant="danger"
@@ -330,13 +330,17 @@ class GroupConfiguration extends Component {
                                 details={true}
                             />
                             <div className="card-body p-3">
-                                <Paginations
-                                    activePage={this.state.activeGroupPage}
-                                    totalItemsCount={this.state.totalGroupCount}
-                                    onChange={this.handleGroupPageChange.bind(
-                                        this
-                                    )}
-                                />
+                                {this.state.totalGroupCount >= 10 ? (
+                                    <Paginations
+                                        activePage={this.state.activeGroupPage}
+                                        totalItemsCount={
+                                            this.state.totalGroupCount
+                                        }
+                                        onChange={this.handleGroupPageChange.bind(
+                                            this
+                                        )}
+                                    />
+                                ) : null}
                             </div>
                         </div>
                         {/* Loading component */}

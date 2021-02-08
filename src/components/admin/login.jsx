@@ -129,7 +129,7 @@ class Login extends Component {
                                                 </label>
                                                 <input
                                                     type="text"
-                                                    name="username"
+                                                    name="admin_username"
                                                     id="username"
                                                     className="form-control form-shadow form-control-lg"
                                                     onChange={
@@ -158,7 +158,7 @@ class Login extends Component {
                                                                 ? "text"
                                                                 : "password"
                                                         }
-                                                        name="password"
+                                                        name="admin_password"
                                                         id="password"
                                                         className="form-control form-control-lg"
                                                         onChange={

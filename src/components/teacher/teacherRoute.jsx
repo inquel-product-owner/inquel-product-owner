@@ -1,5 +1,6 @@
 import React from "react";
 import { Switch, Route, Redirect } from "react-router-dom";
+
 import studentRoutes from "../student/studentRoute";
 import EmailVerify from "./emailVerification";
 import errorPage from "../404";
@@ -23,6 +24,8 @@ import SemesterAutoQA from "./semester-autoQA";
 import SemesterDirect from "./semester-direct";
 import EvaluateStudents from "./evaluateStudents";
 import Leaderboard from "./leaderBoard";
+import SummaryUpload from "./summaryUpload";
+import NotesUpload from "./notesUpload";
 
 const teacherRoutes = (
     <Switch>
@@ -136,6 +139,18 @@ const teacherRoutes = (
         />
         <Route
             exact
+            path="/teacher/subject/:subjectId/:chapterName/summary/upload"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <SummaryUpload {...props} />
+                )
+            }
+        />
+        <Route
+            exact
             path="/teacher/subject/:subjectId/:chapterName/:topicName/notes"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
@@ -143,6 +158,18 @@ const teacherRoutes = (
                     <Redirect to="/teacher/login" />
                 ) : (
                     <SubjectNotes {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/teacher/subject/:subjectId/:chapterName/:topicName/notes/upload"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <NotesUpload {...props} />
                 )
             }
         />
