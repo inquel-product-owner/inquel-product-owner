@@ -105,11 +105,13 @@ class SubjectTable extends Component {
                         rowDeselected={this.rowDeselected.bind(this)}
                     >
                         <ColumnsDirective>
-                            <ColumnDirective
-                                type="checkbox"
-                                allowSorting={false}
-                                allowFiltering={false}
-                            ></ColumnDirective>
+                            {this.props.check !== false ? (
+                                <ColumnDirective
+                                    type="checkbox"
+                                    allowSorting={false}
+                                    allowFiltering={false}
+                                ></ColumnDirective>
+                            ) : null}
                             <ColumnDirective
                                 field="id"
                                 headerText="Subject ID"

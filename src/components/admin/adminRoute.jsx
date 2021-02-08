@@ -21,11 +21,11 @@ const adminRoutes = (
         <Route
             exact
             path="/admin"
-            render={() =>
+            render={(props) =>
                 !localStorage.getItem("Inquel-Auth") ? (
                     <Redirect to="/admin/login" />
                 ) : (
-                    <Dashboard />
+                    <Dashboard {...props} />
                 )
             }
         />

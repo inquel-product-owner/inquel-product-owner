@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
 import { Spinner, Alert } from "react-bootstrap";
 import Header from "./navbar";
 import SideNav from "./sidenav";
@@ -168,26 +167,6 @@ class SubjectAssigning extends Component {
                                 <h5 className="primary-text mb-0">
                                     {this.props.subjectName}
                                 </h5>
-                            </div>
-                            <div className="col-md-6 text-center text-md-right">
-                                <button className="btn btn-primary-invert btn-sm mr-2">
-                                    Filter{" "}
-                                    <i className="fas fa-filter ml-1"></i>
-                                </button>
-                                <Link
-                                    to={`/hod/subject/${this.props.match.params.subjectId}`}
-                                >
-                                    <button className="btn btn-primary btn-sm mr-2">
-                                        Review
-                                    </button>
-                                </Link>
-                                <Link
-                                    to={`/hod/subject/${this.props.match.params.subjectId}/configure`}
-                                >
-                                    <button className="btn btn-primary btn-sm">
-                                        Configure Course
-                                    </button>
-                                </Link>
                             </div>
                         </div>
 

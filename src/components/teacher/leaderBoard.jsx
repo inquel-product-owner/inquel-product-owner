@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import SideNav from "./sidenav";
 import Header from "./navbar";
+import { Tabs, Tab } from "react-bootstrap";
 import Loading from "../sharedComponents/loader";
 import LeaderboardTable from "../table/leaderboardTable";
 import Paginations from "../sharedComponents/pagination";
@@ -15,6 +16,7 @@ class Leaderboard extends Component {
             totalCount: 0,
             leaderBoard: [],
             page_loading: false,
+            activeTab: "quiz",
         };
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
@@ -32,12 +34,21 @@ class Leaderboard extends Component {
     };
 
     componentDidMount = () => {
-        document.title = "Leaderboard - Teacher | IQLabs";
+        if (!this.props.location.hash) {
+            this.setState({ activeTab: "quiz" });
+        } else {
+            this.setState({ activeTab: this.props.location.hash.substring(1) });
+        }
     };
 
     handlePageChange(pageNumber) {
         this.setState({ activePage: pageNumber });
     }
+
+    handleSelect = (key) => {
+        this.setState({ activeTab: key });
+        this.props.history.push({ hash: key });
+    };
 
     render() {
         return (
@@ -65,28 +76,64 @@ class Leaderboard extends Component {
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
 
-                        <div className="mb-3">
-                            <button className="btn btn-primary btn-sm mr-2">
-                                Quiz
-                            </button>
-                            <button className="btn btn-primary-invert btn-sm">
-                                Course Toppers
-                            </button>
-                        </div>
+                        {/* Leaderboard table */}
+                        <Tabs
+                            activeKey={
+                                !this.props.location.hash
+                                    ? "quiz"
+                                    : this.props.location.hash.substring(1)
+                            }
+                            id="uncontrolled-tab-example"
+                            onSelect={this.handleSelect}
+                        >
+                            {/* Quiz Table */}
+                            <Tab eventKey="quiz" title="Quiz">
+                                <div className="card shadow-sm">
+                                    <LeaderboardTable
+                                        leaderBoard={this.state.leaderBoard}
+                                    />
+                                    <div className="card-body p-3">
+                                        {this.state.totalCount >= 10 ? (
+                                            <Paginations
+                                                activePage={
+                                                    this.state.activePage
+                                                }
+                                                totalItemsCount={
+                                                    this.state.totalCount
+                                                }
+                                                onChange={this.handlePageChange.bind(
+                                                    this
+                                                )}
+                                            />
+                                        ) : null}
+                                    </div>
+                                </div>
+                            </Tab>
 
-                        {/* Group table */}
-                        <div className="card shadow-sm mb-4">
-                            <LeaderboardTable
-                                leaderBoard={this.state.leaderBoard}
-                            />
-                            <div className="card-body p-3">
-                                <Paginations
-                                    activePage={this.state.activePage}
-                                    totalItemsCount={this.state.totalCount}
-                                    onChange={this.handlePageChange.bind(this)}
-                                />
-                            </div>
-                        </div>
+                            {/* Course toppers table */}
+                            <Tab eventKey="course" title="Course Toppers">
+                                <div className="card shadow-sm">
+                                    <LeaderboardTable
+                                        leaderBoard={this.state.leaderBoard}
+                                    />
+                                    <div className="card-body p-3">
+                                        {this.state.totalCount >= 10 ? (
+                                            <Paginations
+                                                activePage={
+                                                    this.state.activePage
+                                                }
+                                                totalItemsCount={
+                                                    this.state.totalCount
+                                                }
+                                                onChange={this.handlePageChange.bind(
+                                                    this
+                                                )}
+                                            />
+                                        ) : null}
+                                    </div>
+                                </div>
+                            </Tab>
+                        </Tabs>
                         {/* Loading component */}
                         {this.state.page_loading ? <Loading /> : ""}
                     </div>

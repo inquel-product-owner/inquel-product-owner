@@ -29,7 +29,7 @@ class EmailVerification extends Component {
     }
 
     componentDidMount = () => {
-        document.title = "Account verification | IQLabs";
+        document.title = "Account verification - Teacher | IQLabs";
 
         var token = this.props.match.params.tokenId;
         var url = baseUrl + hodUrl;

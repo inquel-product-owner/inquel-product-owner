@@ -393,8 +393,6 @@ class TeacherLogin extends Component {
                                                 </div>
                                             </div>
                                         </div>
-                                        {/* <div className="d-flex justify-content-around mb-3">
-                                        </div> */}
                                         <p className="text-center small mb-0">
                                             Don't have an account?{" "}
                                             <Link
