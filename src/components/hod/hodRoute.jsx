@@ -1,5 +1,6 @@
 import React from "react";
 import { Switch, Route, Redirect } from "react-router-dom";
+
 import HODLogin from "./login";
 import Dashboard from "./dashboard";
 import Group from "./group";
@@ -11,8 +12,8 @@ import ProfileList from "./profileList";
 import StudentProfile from "./studentProfile";
 import TeacherProfile from "./teacherProfile";
 import CourseScorecard from "./courseScorecard";
-import SubjectReview from "./subjectReview";
-import SubjectAssigning from "./subjectAssigning";
+import Subject from "./subject";
+// import SubjectAssigning from "./subjectAssigning";
 import SubjectConfiguration from "./subjectConfiguration";
 
 import EmailVerification from "./emailVerification";
@@ -161,11 +162,11 @@ const hodRoutes = (
                 !localStorage.getItem("is_hod") ? (
                     <Redirect to="/hod/login" />
                 ) : (
-                    <SubjectReview {...props} />
+                    <Subject {...props} />
                 )
             }
         />
-        <Route
+        {/* <Route
             exact
             path="/hod/subject/:subjectId/assign"
             render={(props) =>
@@ -176,7 +177,7 @@ const hodRoutes = (
                     <SubjectAssigning {...props} />
                 )
             }
-        />
+        /> */}
         <Route
             exact
             path="/hod/subject/:subjectId/configure"

@@ -731,17 +731,19 @@ class HodProfile extends Component {
                                         check={false}
                                     />
                                     <div className="card-body p-3">
-                                        <Paginations
-                                            activePage={
-                                                this.state.activeGroupPage
-                                            }
-                                            totalItemsCount={
-                                                this.state.totalGroupCount
-                                            }
-                                            onChange={this.handleGroupPageChange.bind(
-                                                this
-                                            )}
-                                        />
+                                        {this.state.totalGroupCount >= 10 ? (
+                                            <Paginations
+                                                activePage={
+                                                    this.state.activeGroupPage
+                                                }
+                                                totalItemsCount={
+                                                    this.state.totalGroupCount
+                                                }
+                                                onChange={this.handleGroupPageChange.bind(
+                                                    this
+                                                )}
+                                            />
+                                        ) : null}
                                     </div>
                                 </div>
 

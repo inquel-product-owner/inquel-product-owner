@@ -82,7 +82,7 @@ class SubjectModal extends Component {
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
-                <Modal.Header closeButton></Modal.Header>
+                <Modal.Header closeButton>Create Subject</Modal.Header>
                 <Modal.Body>
                     <Alert
                         variant="danger"
@@ -335,13 +335,17 @@ class Dashboard extends Component {
                                 check={true}
                             />
                             <div className="card-body p-3">
-                                <Paginations
-                                    activePage={this.state.activeGroupPage}
-                                    totalItemsCount={this.state.totalGroupCount}
-                                    onChange={this.handleGroupPageChange.bind(
-                                        this
-                                    )}
-                                />
+                                {this.state.totalGroupCount >= 10 ? (
+                                    <Paginations
+                                        activePage={this.state.activeGroupPage}
+                                        totalItemsCount={
+                                            this.state.totalGroupCount
+                                        }
+                                        onChange={this.handleGroupPageChange.bind(
+                                            this
+                                        )}
+                                    />
+                                ) : null}
                             </div>
                         </div>
 
@@ -376,15 +380,19 @@ class Dashboard extends Component {
                                 path="hod"
                             />
                             <div className="card-body p-3">
-                                <Paginations
-                                    activePage={this.state.activeSubjectPage}
-                                    totalItemsCount={
-                                        this.state.totalSubjectCount
-                                    }
-                                    onChange={this.handleSubjectPageChange.bind(
-                                        this
-                                    )}
-                                />
+                                {this.state.totalSubjectCount >= 10 ? (
+                                    <Paginations
+                                        activePage={
+                                            this.state.activeSubjectPage
+                                        }
+                                        totalItemsCount={
+                                            this.state.totalSubjectCount
+                                        }
+                                        onChange={this.handleSubjectPageChange.bind(
+                                            this
+                                        )}
+                                    />
+                                ) : null}
                             </div>
                         </div>
 

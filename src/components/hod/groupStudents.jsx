@@ -123,7 +123,7 @@ class StudentAssignModal extends Component {
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
-                <Modal.Header closeButton></Modal.Header>
+                <Modal.Header closeButton>Assign Student</Modal.Header>
                 <Modal.Body>
                     <Alert
                         variant="danger"
@@ -206,7 +206,7 @@ class StudentAssignModal extends Component {
                 </Modal.Body>
                 <Modal.Footer>
                     <button
-                        className="btn btn-primary"
+                        className="btn btn-primary btn-sm"
                         onClick={this.handleSubmit}
                     >
                         {this.state.showLoader ? (
@@ -434,15 +434,19 @@ class GroupStudents extends Component {
                                 category={true}
                             />
                             <div className="card-body p-3">
-                                <Paginations
-                                    activePage={this.state.activeStudentPage}
-                                    totalItemsCount={
-                                        this.state.totalStudentCount
-                                    }
-                                    onChange={this.handleStudentPageChange.bind(
-                                        this
-                                    )}
-                                />
+                                {this.state.totalStudentCount >= 10 ? (
+                                    <Paginations
+                                        activePage={
+                                            this.state.activeStudentPage
+                                        }
+                                        totalItemsCount={
+                                            this.state.totalStudentCount
+                                        }
+                                        onChange={this.handleStudentPageChange.bind(
+                                            this
+                                        )}
+                                    />
+                                ) : null}
                             </div>
                         </div>
                         {/* Loading component */}

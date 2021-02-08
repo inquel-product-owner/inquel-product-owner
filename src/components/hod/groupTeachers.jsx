@@ -106,7 +106,7 @@ class GroupTeachers extends Component {
                                     Teacher Profile
                                 </h5>
                             </div>
-                            <div className="col-md-10">
+                            <div className="col-md-10 text-right">
                                 <div className="row justify-content-end mb-4">
                                     <div className="col-md-3 pr-md-0">
                                         <form>

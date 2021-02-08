@@ -229,11 +229,6 @@ class HODModal extends Component {
     };
 
     handleValid_from = (event) => {
-        // var d = new Date(event.target.value).toLocaleDateString();
-        // var datearray = d.split("/");
-        // var year = datearray[2];
-        // var month = datearray[0];
-        // var day = datearray[1];
         this.setState({
             selectedValid_from: `${event.target.value} 00:00:00`,
         });
@@ -1038,17 +1033,19 @@ class Profiles extends Component {
                                         ref={this.gridRef}
                                     />
                                     <div className="card-body p-3">
-                                        <Paginations
-                                            activePage={
-                                                this.state.activeHODPage
-                                            }
-                                            totalItemsCount={
-                                                this.state.totalHODCount
-                                            }
-                                            onChange={this.handleHODPageChange.bind(
-                                                this
-                                            )}
-                                        />
+                                        {this.state.totalHODCount >= 10 ? (
+                                            <Paginations
+                                                activePage={
+                                                    this.state.activeHODPage
+                                                }
+                                                totalItemsCount={
+                                                    this.state.totalHODCount
+                                                }
+                                                onChange={this.handleHODPageChange.bind(
+                                                    this
+                                                )}
+                                            />
+                                        ) : null}
                                     </div>
                                 </div>
                             </Tab>
@@ -1062,17 +1059,19 @@ class Profiles extends Component {
                                         ref={this.gridRef}
                                     />
                                     <div className="card-body p-3">
-                                        <Paginations
-                                            activePage={
-                                                this.state.activeStudentPage
-                                            }
-                                            totalItemsCount={
-                                                this.state.totalStudentCount
-                                            }
-                                            onChange={this.handleStudentPageChange.bind(
-                                                this
-                                            )}
-                                        />
+                                        {this.state.totalStudentCount >= 10 ? (
+                                            <Paginations
+                                                activePage={
+                                                    this.state.activeStudentPage
+                                                }
+                                                totalItemsCount={
+                                                    this.state.totalStudentCount
+                                                }
+                                                onChange={this.handleStudentPageChange.bind(
+                                                    this
+                                                )}
+                                            />
+                                        ) : null}
                                     </div>
                                 </div>
                             </Tab>

@@ -148,15 +148,19 @@ class Group extends Component {
                                 path="teacher"
                             />
                             <div className="card-body p-3">
-                                <Paginations
-                                    activePage={this.state.activeSubjectPage}
-                                    totalItemsCount={
-                                        this.state.totalSubjectCount
-                                    }
-                                    onChange={this.handleSubjectPageChange.bind(
-                                        this
-                                    )}
-                                />
+                                {this.state.totalSubjectCount >= 10 ? (
+                                    <Paginations
+                                        activePage={
+                                            this.state.activeSubjectPage
+                                        }
+                                        totalItemsCount={
+                                            this.state.totalSubjectCount
+                                        }
+                                        onChange={this.handleSubjectPageChange.bind(
+                                            this
+                                        )}
+                                    />
+                                ) : null}
                             </div>
                         </div>
 

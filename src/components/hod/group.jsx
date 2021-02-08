@@ -83,7 +83,7 @@ class SubjectModal extends Component {
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
-                <Modal.Header closeButton></Modal.Header>
+                <Modal.Header closeButton>Create Subject</Modal.Header>
                 <Modal.Body>
                     <Alert
                         variant="danger"
@@ -259,13 +259,16 @@ class Group extends Component {
                 />
 
                 {/* Add Subject modal */}
-                {this.state.subjectModalShow?(
-                <SubjectModal
-                    show={this.state.subjectModalShow}
-                    onHide={this.addSubjectModal}
-                    groupId={this.props.match.params.groupId}
-                    formSubmission={this.formSubmission}
-                />):''}
+                {this.state.subjectModalShow ? (
+                    <SubjectModal
+                        show={this.state.subjectModalShow}
+                        onHide={this.addSubjectModal}
+                        groupId={this.props.match.params.groupId}
+                        formSubmission={this.formSubmission}
+                    />
+                ) : (
+                    ""
+                )}
 
                 <div
                     className={`section content ${
@@ -341,15 +344,19 @@ class Group extends Component {
                                 path="hod"
                             />
                             <div className="card-body p-3">
-                                <Paginations
-                                    activePage={this.state.activeSubjectPage}
-                                    totalItemsCount={
-                                        this.state.totalSubjectCount
-                                    }
-                                    onChange={this.handleSubjectPageChange.bind(
-                                        this
-                                    )}
-                                />
+                                {this.state.totalSubjectCount >= 10 ? (
+                                    <Paginations
+                                        activePage={
+                                            this.state.activeSubjectPage
+                                        }
+                                        totalItemsCount={
+                                            this.state.totalSubjectCount
+                                        }
+                                        onChange={this.handleSubjectPageChange.bind(
+                                            this
+                                        )}
+                                    />
+                                ) : null}
                             </div>
                         </div>
                         {/* Loading component */}
