@@ -2,7 +2,7 @@ import React from "react";
 import IdleTimer from "react-idle-timer";
 import { Modal } from "react-bootstrap";
 import { Redirect } from "react-router-dom";
-import { baseUrl, accountsUrl } from "../../shared/baseUrl";
+import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
 
 class Logout extends React.Component {
     constructor(props) {
@@ -31,12 +31,12 @@ class Logout extends React.Component {
             this.idleTimer.reset();
             this.setState({ isTimedOut: true });
 
-            var url = baseUrl + accountsUrl;
-            var authToken = localStorage.getItem("Authorization");
+            var url = baseUrl + adminPathUrl;
+            var authToken = localStorage.getItem("Inquel-Auth");
             var headers = {
                 Accept: "application/json",
                 "Content-Type": "application/json",
-                Authorization: authToken,
+                "Inquel-Auth": authToken,
             };
 
             fetch(`${url}/logout/`, {

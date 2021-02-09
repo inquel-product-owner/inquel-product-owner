@@ -4,7 +4,7 @@ import { Link, Redirect } from "react-router-dom";
 import logo from "../../assets/IQ_Labs_V5.png";
 import userpic from "../../assets/user.png";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
-import Logout from "../sharedComponents/handleLogout";
+import Logout from "../sharedComponents/handleAdminLogout";
 
 class Header extends Component {
     constructor(props) {

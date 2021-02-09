@@ -152,6 +152,7 @@ class SummaryUpload extends Component {
             showSuccessAlert: false,
             showLoader: false,
             summary_id: "",
+            summary_name: "",
 
             pdf: {
                 file_name: null,
@@ -220,6 +221,7 @@ class SummaryUpload extends Component {
             summary_id: "",
             limited: false,
             path: null,
+            summary_name: "",
         });
 
         fetch(
@@ -234,15 +236,16 @@ class SummaryUpload extends Component {
                 console.log(result);
                 if (result.sts === true && result.data.length !== 0) {
                     this.setState({
-                        summary_id: result.data[0].summary_id
-                            ? result.data[0].summary_id
-                            : "",
-                        limited: result.data[0].limited
-                            ? result.data[0].limited
-                            : false,
-                        path: result.data[0].direct_question_urls[0]
-                            ? result.data[0].direct_question_urls[0]
-                            : null,
+                        summary_id: result.data[0].summary_id,
+                        summary_name: result.data[0].summary_name,
+                        limited:
+                            result.data[0].summary_name === undefined
+                                ? result.data[0].limited
+                                : false,
+                        path:
+                            result.data[0].direct_question_urls.length !== 0
+                                ? result.data[0].direct_question_urls[0]
+                                : null,
                     });
                 }
                 this.setState({
@@ -452,7 +455,9 @@ class SummaryUpload extends Component {
                                         </p>
                                     </div>
                                     <div className="col-md-6 d-flex align-items-center justify-content-end">
-                                        {this.state.summary_id !== "" ? (
+                                        {this.state.summary_id !== "" &&
+                                        this.state.summary_name ===
+                                            undefined ? (
                                             <button
                                                 className="btn btn-primary btn-sm mr-2"
                                                 onClick={this.toggleModal}

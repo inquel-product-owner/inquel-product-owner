@@ -397,16 +397,19 @@ class SubjectSummary extends Component {
             showSideNav: false,
             showModal: false,
             showDeleteModal: false,
-            limited: false,
-            title: "",
-            content: "",
-            summary_id: "",
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
             showLoader: false,
+
+            limited: false,
+            title: "",
+            content: "",
+            summary_id: "",
             image: [],
+            summary_name: "",
+
             page_loading: true,
             is_formSubmited: false,
         };
@@ -451,6 +454,7 @@ class SubjectSummary extends Component {
             content: "",
             limited: false,
             summary_id: "",
+            summary_name: "",
         });
 
         fetch(
@@ -463,19 +467,19 @@ class SubjectSummary extends Component {
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
+                if (result.sts === true && result.data.length !== 0) {
+                    this.setState({
+                        title: result.data[0].summary_name,
+                        content: result.data[0].summary_content,
+                        limited:
+                            result.data[0].summary_name !== undefined
+                                ? result.data[0].limited
+                                : false,
+                        summary_id: result.data[0].summary_id,
+                        summary_name: result.data[0].summary_name,
+                    });
+                }
                 this.setState({
-                    title: result.data[0].summary_name
-                        ? result.data[0].summary_name
-                        : "",
-                    content: result.data[0].summary_content
-                        ? result.data[0].summary_content
-                        : "",
-                    limited: result.data[0].limited
-                        ? result.data[0].limited
-                        : false,
-                    summary_id: result.data[0].summary_id
-                        ? result.data[0].summary_id
-                        : "",
                     page_loading: false,
                 });
             })
@@ -702,7 +706,8 @@ class SubjectSummary extends Component {
                                         </p>
                                     </div>
                                     <div className="col-md-6 d-flex align-items-center justify-content-end">
-                                        {this.state.summary_id !== "" ? (
+                                        {this.state.summary_id !== "" &&
+                                        this.state.summary_name !== undefined ? (
                                             <button
                                                 className="btn btn-primary btn-sm mr-2"
                                                 onClick={this.toggleDeleteModal}
