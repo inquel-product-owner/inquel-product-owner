@@ -114,12 +114,7 @@ class ChapterModal extends Component {
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
-                <Modal.Header
-                    closeButton
-                    className="primary-text font-weight-bold"
-                >
-                    Add chapter
-                </Modal.Header>
+                <Modal.Header closeButton>Add chapter</Modal.Header>
                 <Modal.Body>
                     <Alert
                         variant="danger"
@@ -285,12 +280,7 @@ class SemesterModal extends Component {
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
-                <Modal.Header
-                    closeButton
-                    className="primary-text font-weight-bold"
-                >
-                    Add Semester
-                </Modal.Header>
+                <Modal.Header closeButton>Add Semester</Modal.Header>
                 <Modal.Body>
                     <Alert
                         variant="danger"
