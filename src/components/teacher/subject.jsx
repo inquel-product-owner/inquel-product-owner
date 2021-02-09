@@ -569,7 +569,6 @@ class SubjectChapters extends Component {
                                 <table className="table">
                                     <thead className="primary-bg text-white">
                                         <tr>
-                                            <th></th>
                                             <th scope="col">
                                                 Chapter structure
                                             </th>
@@ -580,6 +579,12 @@ class SubjectChapters extends Component {
                                                 className="text-right"
                                             >
                                                 Add content
+                                            </th>
+                                            <th
+                                                scope="col"
+                                                className="text-right"
+                                            >
+                                                Action
                                             </th>
                                         </tr>
                                     </thead>
@@ -606,6 +611,9 @@ class SubjectChapters extends Component {
                                                                               }
                                                                           >
                                                                               <td>
+                                                                                  <button className="btn btn-primary-invert shadow-sm btn-sm mr-1">
+                                                                                      <i className="fas fa-edit"></i>
+                                                                                  </button>
                                                                                   <button className="btn btn-primary-invert shadow-sm btn-sm">
                                                                                       <i className="fas fa-minus-circle"></i>
                                                                                   </button>
@@ -710,11 +718,6 @@ class SubjectChapters extends Component {
                                                       ) ? (
                                                           <tr key={index}>
                                                               <td>
-                                                                  <button className="btn btn-primary-invert shadow-sm btn-sm">
-                                                                      <i className="fas fa-minus-circle"></i>
-                                                                  </button>
-                                                              </td>
-                                                              <td>
                                                                   {
                                                                       chapter.chapter_name
                                                                   }
@@ -750,6 +753,14 @@ class SubjectChapters extends Component {
                                                                           Add
                                                                       </button>
                                                                   </Link>
+                                                              </td>
+                                                              <td className="text-right">
+                                                                  <button className="btn btn-primary-invert shadow-sm btn-sm mr-1">
+                                                                      <i className="far fa-edit"></i>
+                                                                  </button>
+                                                                  <button className="btn btn-primary-invert shadow-sm btn-sm">
+                                                                      <i className="far fa-trash-alt"></i>
+                                                                  </button>
                                                               </td>
                                                           </tr>
                                                       ) : null;

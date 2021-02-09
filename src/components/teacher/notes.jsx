@@ -400,16 +400,19 @@ class SubjectNotes extends Component {
             showSideNav: false,
             showModal: false,
             showDeleteModal: false,
-            limited: false,
-            title: "",
-            content: "",
-            notes_id: "",
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
             showLoader: false,
+
+            limited: false,
+            title: "",
+            content: "",
+            notes_id: "",
+            notes_name: "",
             image: [],
+
             page_loading: true,
             is_formSubmited: false,
         };
@@ -455,6 +458,7 @@ class SubjectNotes extends Component {
             content: "",
             limited: false,
             notes_id: "",
+            notes_name: "",
         });
 
         fetch(
@@ -467,19 +471,19 @@ class SubjectNotes extends Component {
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
+                if (result.sts === true && result.data.length !== 0) {
+                    this.setState({
+                        title: result.data[0].notes_name,
+                        content: result.data[0].notes_content,
+                        limited:
+                            result.data[0].notes_name !== undefined
+                                ? result.data[0].limited
+                                : false,
+                        notes_id: result.data[0].notes_id,
+                        notes_name: result.data[0].notes_name,
+                    });
+                }
                 this.setState({
-                    title: result.data[0].notes_name
-                        ? result.data[0].notes_name
-                        : "",
-                    content: result.data[0].notes_content
-                        ? result.data[0].notes_content
-                        : "",
-                    limited: result.data[0].limited
-                        ? result.data[0].limited
-                        : false,
-                    notes_id: result.data[0].notes_id
-                        ? result.data[0].notes_id
-                        : "",
                     page_loading: false,
                 });
             })
@@ -716,7 +720,8 @@ class SubjectNotes extends Component {
                                         </p>
                                     </div>
                                     <div className="col-md-6 d-flex align-items-center justify-content-end">
-                                        {this.state.notes_id !== "" ? (
+                                        {this.state.notes_id !== "" &&
+                                        this.state.notes_name !== undefined ? (
                                             <button
                                                 className="btn btn-primary btn-sm mr-2"
                                                 onClick={this.toggleDeleteModal}

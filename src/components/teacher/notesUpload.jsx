@@ -156,6 +156,7 @@ class NotesUpload extends Component {
             showSuccessAlert: false,
             showLoader: false,
             notes_id: "",
+            notes_name: "",
 
             pdf: {
                 file_name: null,
@@ -225,6 +226,7 @@ class NotesUpload extends Component {
             notes_id: "",
             limited: false,
             path: null,
+            notes_name: "",
         });
 
         fetch(
@@ -239,15 +241,15 @@ class NotesUpload extends Component {
                 console.log(result);
                 if (result.sts === true && result.data.length !== 0) {
                     this.setState({
-                        notes_id: result.data[0].notes_id
-                            ? result.data[0].notes_id
-                            : "",
-                        limited: result.data[0].limited
+                        notes_id: result.data[0].notes_id,
+                        notes_name: result.data[0].notes_name,
+                        limited: result.data[0].notes_name === undefined
                             ? result.data[0].limited
                             : false,
-                        path: result.data[0].direct_question_urls[0]
-                            ? result.data[0].direct_question_urls[0]
-                            : null,
+                        path:
+                            result.data[0].direct_question_urls.length !== 0
+                                ? result.data[0].direct_question_urls[0]
+                                : null,
                     });
                 }
                 this.setState({
@@ -458,7 +460,8 @@ class NotesUpload extends Component {
                                         </p>
                                     </div>
                                     <div className="col-md-6 d-flex align-items-center justify-content-end">
-                                        {this.state.notes_id !== "" ? (
+                                        {this.state.notes_id !== "" &&
+                                        this.state.notes_name === undefined ? (
                                             <button
                                                 className="btn btn-primary btn-sm mr-2"
                                                 onClick={this.toggleModal}
