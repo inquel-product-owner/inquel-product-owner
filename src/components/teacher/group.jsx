@@ -146,6 +146,7 @@ class Group extends Component {
                             <SubjectTable
                                 subjectItems={this.state.groupItem}
                                 path="teacher"
+                                check={false}
                             />
                             <div className="card-body p-3">
                                 {this.state.totalSubjectCount >= 10 ? (
