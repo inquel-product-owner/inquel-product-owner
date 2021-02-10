@@ -409,7 +409,7 @@ class ChapterEditModal extends Component {
                 chapter_id: this.state.chapter_id,
                 chapter_name: this.state.chapter_name,
                 chapter_status: this.state.chapter_status,
-                weightage: this.state.weightage,
+                weightage: this.state.weightage.toString(),
             }),
         })
             .then((res) => res.json())
@@ -674,6 +674,7 @@ class SemesterEditModal extends Component {
                                 className="form-control borders"
                                 onChange={this.handleSemester}
                                 placeholder="Semester name"
+                                value={this.state.semester_name}
                                 required
                             />
                         </div>
@@ -730,7 +731,7 @@ class ChapterDeleteModal extends Component {
         fetch(`${this.url}/teacher/subject/${this.props.subjectId}/chapter/`, {
             method: "DELETE",
             headers: this.headers,
-            body: JSON.stringify({ chapter_id: this.props.chapter_id }),
+            body: JSON.stringify({ chapter_id: this.props.data.chapter_id }),
         })
             .then((res) => res.json())
             .then((result) => {
@@ -799,7 +800,11 @@ class ChapterDeleteModal extends Component {
                         {this.state.successMsg}
                     </Alert>
                     <p className="mb-0">
-                        Are you sure that you want to delete this chapter?
+                        Are you sure that you want to delete{" "}
+                        <span className="font-weight-bold">
+                            {this.props.data.chapter_name}
+                        </span>
+                        ?
                     </p>
                 </Modal.Body>
                 <Modal.Footer>
@@ -862,7 +867,7 @@ class SemesterDeleteModal extends Component {
         fetch(`${this.url}/teacher/subject/${this.props.subjectId}/semester/`, {
             method: "DELETE",
             headers: this.headers,
-            body: JSON.stringify({ semester_id: this.props.semester_id }),
+            body: JSON.stringify({ semester_id: this.props.data.semester_id }),
         })
             .then((res) => res.json())
             .then((result) => {
@@ -931,7 +936,11 @@ class SemesterDeleteModal extends Component {
                         {this.state.successMsg}
                     </Alert>
                     <p className="mb-0">
-                        Are you sure that you want to delete this semester?
+                        Are you sure that you want to delete{" "}
+                        <span className="font-weight-bold">
+                            {this.props.data.semester_name}
+                        </span>
+                        ?
                     </p>
                 </Modal.Body>
                 <Modal.Footer>
@@ -1219,7 +1228,6 @@ class SubjectChapters extends Component {
                         show={this.state.showSemester_EditModal}
                         onHide={this.toggleSemester_EditModal}
                         formSubmission={this.semesterFormSubmission}
-                        chapter_names={this.state.chapter_names}
                         subjectId={this.subjectId}
                         data={this.state.selectedSemester}
                     />
@@ -1234,7 +1242,8 @@ class SubjectChapters extends Component {
                         onHide={this.toggleChapter_DeleteModal}
                         formSubmission={this.chapterFormSubmission}
                         subjectId={this.subjectId}
-                        chapter_id={this.state.selectedChapter}
+                        data={this.state.selectedChapter}
+                        toggleModal={this.toggleChapter_DeleteModal}
                     />
                 ) : (
                     ""
@@ -1247,7 +1256,8 @@ class SubjectChapters extends Component {
                         onHide={this.toggleSemester_DeleteModal}
                         formSubmission={this.semesterFormSubmission}
                         subjectId={this.subjectId}
-                        semester_id={this.state.selectedSemester}
+                        data={this.state.selectedSemester}
+                        toggleModal={this.toggleSemester_DeleteModal}
                     />
                 ) : (
                     ""
@@ -1339,7 +1349,7 @@ class SubjectChapters extends Component {
                                                                               </td>
                                                                               <td>
                                                                                   <Link
-                                                                                      to={`/teacher/subject/${this.subjectId}/${chapter.chapter_id}/summary/upload`}
+                                                                                      to={`${this.props.match.url}/chapter/${chapter.chapter_name}/summary/upload`}
                                                                                       className="primary-text"
                                                                                   >
                                                                                       <button className="btn btn-primary btn-sm mr-2">
@@ -1347,7 +1357,7 @@ class SubjectChapters extends Component {
                                                                                       </button>
                                                                                   </Link>
                                                                                   <Link
-                                                                                      to={`/teacher/subject/${this.subjectId}/${chapter.chapter_id}/summary`}
+                                                                                      to={`${this.props.match.url}/chapter/${chapter.chapter_name}/summary`}
                                                                                       className="primary-text"
                                                                                   >
                                                                                       <button className="btn btn-primary btn-sm">
@@ -1357,7 +1367,7 @@ class SubjectChapters extends Component {
                                                                               </td>
                                                                               <td className="text-right">
                                                                                   <Link
-                                                                                      to={`/teacher/subject/${this.subjectId}/${chapter.chapter_id}`}
+                                                                                      to={`${this.props.match.url}/chapter/${chapter.chapter_name}`}
                                                                                   >
                                                                                       <button className="btn btn-primary btn-sm">
                                                                                           Add
@@ -1379,7 +1389,7 @@ class SubjectChapters extends Component {
                                                                                       className="btn btn-primary-invert shadow-sm btn-sm"
                                                                                       onClick={() =>
                                                                                           this.toggleChapter_DeleteModal(
-                                                                                              chapter.chapter_id
+                                                                                              chapter
                                                                                           )
                                                                                       }
                                                                                   >
@@ -1444,7 +1454,7 @@ class SubjectChapters extends Component {
                                                                           className="btn btn-primary-invert shadow-sm btn-sm"
                                                                           onClick={() =>
                                                                               this.toggleSemester_DeleteModal(
-                                                                                  data.semester_id
+                                                                                  data
                                                                               )
                                                                           }
                                                                       >
@@ -1477,7 +1487,7 @@ class SubjectChapters extends Component {
                                                               </td>
                                                               <td>
                                                                   <Link
-                                                                      to={`/teacher/subject/${this.subjectId}/${chapter.chapter_id}/summary/upload`}
+                                                                      to={`/teacher/subject/${this.subjectId}/chapter/${chapter.chapter_name}/summary/upload`}
                                                                       className="primary-text"
                                                                   >
                                                                       <button className="btn btn-primary btn-sm mr-2">
@@ -1485,7 +1495,7 @@ class SubjectChapters extends Component {
                                                                       </button>
                                                                   </Link>
                                                                   <Link
-                                                                      to={`/teacher/subject/${this.subjectId}/${chapter.chapter_id}/summary`}
+                                                                      to={`/teacher/subject/${this.subjectId}/chapter/${chapter.chapter_name}/summary`}
                                                                       className="primary-text"
                                                                   >
                                                                       <button className="btn btn-primary btn-sm">
@@ -1495,7 +1505,7 @@ class SubjectChapters extends Component {
                                                               </td>
                                                               <td className="text-right">
                                                                   <Link
-                                                                      to={`/teacher/subject/${this.subjectId}/${chapter.chapter_id}`}
+                                                                      to={`/teacher/subject/${this.subjectId}/chapter/${chapter.chapter_name}`}
                                                                   >
                                                                       <button className="btn btn-primary btn-sm">
                                                                           Add
@@ -1517,7 +1527,7 @@ class SubjectChapters extends Component {
                                                                       className="btn btn-primary-invert shadow-sm btn-sm"
                                                                       onClick={() =>
                                                                           this.toggleChapter_DeleteModal(
-                                                                              chapter.chapter_id
+                                                                              chapter
                                                                           )
                                                                       }
                                                                   >

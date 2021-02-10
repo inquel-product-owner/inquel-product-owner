@@ -181,6 +181,7 @@ class NotesUpload extends Component {
             "Content-Type": "application/json",
             Authorization: this.authToken,
         };
+        pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
     }
 
     toggleSideNav = () => {
@@ -268,8 +269,6 @@ class NotesUpload extends Component {
         document.title = `${this.chapterName} Notes - Teacher | IQLabs`;
 
         this.loadNotesData();
-
-        pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
     };
 
     handleSubmit = (event) => {
@@ -574,7 +573,7 @@ class NotesUpload extends Component {
                                     </div>
                                 </div>
                             </div>
-                            <div className="card-body secondary-bg text-white text-center">
+                            <div className="card-body secondary-bg primary-text text-center">
                                 {this.state.path === null ? (
                                     "Your uploads will appear here"
                                 ) : (

@@ -115,7 +115,7 @@ const teacherRoutes = (
         />
         <Route
             exact
-            path="/teacher/subject/:subjectId/:chapterName"
+            path="/teacher/subject/:subjectId/chapter/:chapterName"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
@@ -127,7 +127,7 @@ const teacherRoutes = (
         />
         <Route
             exact
-            path="/teacher/subject/:subjectId/:chapterName/summary"
+            path="/teacher/subject/:subjectId/chapter/:chapterName/summary"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
@@ -139,7 +139,7 @@ const teacherRoutes = (
         />
         <Route
             exact
-            path="/teacher/subject/:subjectId/:chapterName/summary/upload"
+            path="/teacher/subject/:subjectId/chapter/:chapterName/summary/upload"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
@@ -151,7 +151,7 @@ const teacherRoutes = (
         />
         <Route
             exact
-            path="/teacher/subject/:subjectId/:chapterName/:topicName/notes"
+            path="/teacher/subject/:subjectId/chapter/:chapterName/:topicName/notes"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
@@ -163,7 +163,7 @@ const teacherRoutes = (
         />
         <Route
             exact
-            path="/teacher/subject/:subjectId/:chapterName/:topicName/notes/upload"
+            path="/teacher/subject/:subjectId/chapter/:chapterName/:topicName/notes/upload"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
@@ -175,7 +175,7 @@ const teacherRoutes = (
         />
         <Route
             exact
-            path="/teacher/subject/:subjectId/:chapterName/:topicName/type1"
+            path="/teacher/subject/:subjectId/chapter/:chapterName/:topicName/type1"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
@@ -187,7 +187,7 @@ const teacherRoutes = (
         />
         <Route
             exact
-            path="/teacher/subject/:subjectId/:chapterName/:topicName/concepts"
+            path="/teacher/subject/:subjectId/chapter/:chapterName/:topicName/concepts"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
@@ -235,7 +235,7 @@ const teacherRoutes = (
         />
         <Route
             exact
-            path="/teacher/subject/:subjectId/:chapterName/cycle/:cycle_testId"
+            path="/teacher/subject/:subjectId/chapter/:chapterId/cycle/:cycle_testId"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
@@ -247,7 +247,7 @@ const teacherRoutes = (
         />
         <Route
             exact
-            path="/teacher/subject/:subjectId/:chapterName/cycle/:cycle_testId/section/:sectionId"
+            path="/teacher/subject/:subjectId/chapter/:chapterId/cycle/:cycle_testId/section/:sectionId"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
@@ -259,7 +259,7 @@ const teacherRoutes = (
         />
         <Route
             exact
-            path="/teacher/subject/:subjectId/:chapterName/cycle/:cycle_testId/direct"
+            path="/teacher/subject/:subjectId/chapter/:chapterId/cycle/:cycle_testId/direct"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (

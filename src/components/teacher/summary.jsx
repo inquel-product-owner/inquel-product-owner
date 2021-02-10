@@ -107,30 +107,6 @@ class ImageUploadModal extends Component {
         }
     };
 
-    componentDidUpdate = (prevProps, prevState) => {
-        if (
-            prevState.showSuccessAlert !== this.state.showSuccessAlert &&
-            this.state.showSuccessAlert === true
-        ) {
-            setTimeout(() => {
-                this.setState({
-                    showSuccessAlert: false,
-                });
-            }, 2000);
-        }
-
-        if (
-            prevState.showErrorAlert !== this.state.showErrorAlert &&
-            this.state.showErrorAlert === true
-        ) {
-            setTimeout(() => {
-                this.setState({
-                    showErrorAlert: false,
-                });
-            }, 3000);
-        }
-    };
-
     render() {
         return (
             <Modal
@@ -142,7 +118,7 @@ class ImageUploadModal extends Component {
             >
                 <Modal.Header
                     closeButton
-                    className="primary-text font-weight-bold align-items-center"
+                    className="align-items-center"
                 >
                     Upload Image
                     {this.state.showLoader ? (

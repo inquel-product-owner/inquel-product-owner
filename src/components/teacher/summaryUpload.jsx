@@ -176,6 +176,7 @@ class SummaryUpload extends Component {
             "Content-Type": "application/json",
             Authorization: this.authToken,
         };
+        pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
     }
 
     toggleSideNav = () => {
@@ -264,8 +265,6 @@ class SummaryUpload extends Component {
         document.title = `${this.chapterName} Summary - Teacher | IQLabs`;
 
         this.loadSummaryData();
-
-        pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
     };
 
     handleSubmit = (event) => {
@@ -570,7 +569,7 @@ class SummaryUpload extends Component {
                                     </div>
                                 </div>
                             </div>
-                            <div className="card-body secondary-bg text-white text-center">
+                            <div className="card-body secondary-bg primary-text text-center">
                                 {this.state.path === null ? (
                                     "Your uploads will appear here"
                                 ) : (
