@@ -93,12 +93,9 @@ class TeacherTable extends Component {
             itemTemplate: dateTemplate,
         };
         this.toolbarOptions = ["Search"];
-        this.state = {
-            teacherId: [],
-        };
     }
 
-    showConsole = () => {
+    handleTeacher = () => {
         console.log("I'm triggered");
     };
 
@@ -127,32 +124,25 @@ class TeacherTable extends Component {
         this.gridInstance.autoFitColumns();
     }
 
-    rowSelected() {
+    rowSelected(props) {
         if (this.gridInstance) {
-            // const selectedrowindex = this.gridInstance.getSelectedRowIndexes();
             const selectedrecords = this.gridInstance.getSelectedRecords();
             let element = [];
             for (let index = 0; index < selectedrecords.length; index++) {
                 element.push(selectedrecords[index].id.toString());
             }
-            console.log(element);
-            this.setState({
-                teacherId: element,
-            });
+            this.props.handleTeacherId(element);
         }
     }
 
-    rowDeselected() {
+    rowDeselected(props) {
         if (this.gridInstance) {
             const selectedrecords = this.gridInstance.getSelectedRecords();
             let element = [];
             for (let index = 0; index < selectedrecords.length; index++) {
                 element.push(selectedrecords[index].id.toString());
             }
-            console.log(element);
-            this.setState({
-                teacherId: element,
-            });
+            this.props.handleTeacherId(element);
         }
     }
 

@@ -55,13 +55,14 @@ class AddStudentModal extends Component {
                         showLoader: false,
                         email: [""],
                     });
-                    this.props.studentFormSubmission(true);
                     if (result.data.existing_email) {
                         if (result.data.existing_email.length !== 0) {
                             this.setState({
                                 errorMsg: result.data.existing_email,
                                 showErrorAlert: true,
                             });
+                        } else {
+                            this.props.studentFormSubmission(true);
                         }
                     }
                 } else {
@@ -451,6 +452,167 @@ class AddTeacherModal extends Component {
     }
 }
 
+// Teacher delete modal
+class TeacherDeleteModal extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: false,
+            errorLoop: false,
+        };
+        this.url = baseUrl + hodUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
+    }
+
+    handleDelete = () => {
+        this.setState({
+            showSuccessAlert: false,
+            showErrorAlert: false,
+            showLoader: true,
+        });
+
+        if (this.props.data.length !== 0) {
+            fetch(`${this.url}/hod/teacher/delete/`, {
+                method: "DELETE",
+                headers: this.headers,
+                body: JSON.stringify({ teacher_ids: this.props.data }),
+            })
+                .then((res) => res.json())
+                .then((result) => {
+                    console.log(result);
+                    if (result.sts === true) {
+                        this.setState({
+                            successMsg: result.msg,
+                            showSuccessAlert: true,
+                            showLoader: false,
+                        });
+                        this.props.teacherFormSubmission(true);
+                    } else {
+                        if (result.detail) {
+                            this.setState({
+                                errorMsg: result.detail,
+                            });
+                        } else if (result.data) {
+                            this.setState({
+                                errorLoop: true,
+                                errorMsg: result.data,
+                            });
+                        } else {
+                            this.setState({
+                                errorMsg: result.msg,
+                            });
+                        }
+                        this.setState({
+                            showErrorAlert: true,
+                            showLoader: false,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        } else {
+            alert("Please select a teacher to delete");
+        }
+    };
+
+    render() {
+        console.log(this.props.data);
+        return (
+            <Modal
+                show={this.props.show}
+                onHide={this.props.onHide}
+                size="md"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Header closeButton>Delete Teacher</Modal.Header>
+                <Modal.Body>
+                    <Alert
+                        variant="danger"
+                        show={this.state.showErrorAlert}
+                        onClose={() => {
+                            this.setState({
+                                showErrorAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.errorLoop === true
+                            ? this.state.errorMsg.map((data, index) => {
+                                  let value = Object.entries(data);
+                                  return (
+                                      <p className="small mb-1" key={index}>
+                                          <span className="font-weight-bold">
+                                              {value[0][0]}
+                                          </span>{" "}
+                                          {value[0][1]}
+                                      </p>
+                                  );
+                              })
+                            : this.state.errorMsg}
+                    </Alert>
+                    <Alert
+                        variant="success"
+                        show={this.state.showSuccessAlert}
+                        onClose={() => {
+                            this.setState({
+                                showSuccessAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.successMsg}
+                    </Alert>
+                    <p>Are you sure that you want to delete this teacher?</p>
+                    {this.props.data.map((item, index) => {
+                        return (
+                            <p className="small mb-2" key={index}>
+                                {index + 1}. {item.username}
+                            </p>
+                        );
+                    })}
+                </Modal.Body>
+                <Modal.Footer>
+                    <button
+                        className="btn btn-secondary btn-sm mr-2"
+                        onClick={this.props.toggleModal}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        className="btn btn-primary btn-sm"
+                        onClick={this.handleDelete}
+                    >
+                        {this.state.showLoader ? (
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                                className="mr-2"
+                            />
+                        ) : (
+                            ""
+                        )}
+                        Delete
+                    </button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
+}
+
 class ProfileList extends Component {
     constructor(props) {
         super(props);
@@ -460,11 +622,20 @@ class ProfileList extends Component {
             activeStudentPage: 1,
             totalStudentCount: 0,
             showSideNav: false,
+
             activeTab: "teacher",
             showStudentModal: false,
             showTeacherModal: false,
+            showStudent_DeleteModal: false,
+            showTeacher_DeleteModal: false,
+
             teacherItems: [],
             studentItems: [],
+            teacherId: [],
+            studentId: [],
+            selectedTeacher: [],
+            selectedStudent: [],
+
             page_loading: true,
             is_teacherFormSubmited: false,
             is_studentFormSubmited: false,
@@ -602,6 +773,7 @@ class ProfileList extends Component {
             setTimeout(() => {
                 this.setState({
                     showTeacherModal: false,
+                    showTeacher_DeleteModal: false,
                 });
             }, 1000);
         }
@@ -615,8 +787,41 @@ class ProfileList extends Component {
             setTimeout(() => {
                 this.setState({
                     showStudentModal: false,
+                    showStudent_DeleteModal: false,
                 });
             }, 1000);
+        }
+    };
+
+    // Gets teacher ID from the teacher table
+    handleTeacherId = (data) => {
+        let value = [];
+        const teacherItems = this.state.teacherItems;
+        for (let i = 0; i < teacherItems.length; i++) {
+            if (data.includes(teacherItems[i].id.toString())) {
+                value.push({
+                    id: teacherItems[i].id.toString(),
+                    username: teacherItems[i].username,
+                });
+            } else {
+                continue;
+            }
+        }
+        this.setState({
+            selectedTeacher: value,
+            teacherId: data,
+        });
+    };
+
+    handleDelete = () => {
+        if (this.state.activeTab === "teacher") {
+            this.setState({
+                showTeacher_DeleteModal: !this.state.showTeacher_DeleteModal,
+            });
+        } else if (this.state.activeTab === "student") {
+            this.setState({
+                showStudent_DeleteModal: !this.state.showStudent_DeleteModal,
+            });
         }
     };
 
@@ -652,18 +857,33 @@ class ProfileList extends Component {
                 />
 
                 {/* Add Student modal */}
-                <AddStudentModal
-                    show={this.state.showStudentModal}
-                    onHide={this.handleProfileAdding}
-                    studentFormSubmission={this.studentFormSubmission}
-                />
+                {this.state.showStudentModal ? (
+                    <AddStudentModal
+                        show={this.state.showStudentModal}
+                        onHide={this.handleProfileAdding}
+                        studentFormSubmission={this.studentFormSubmission}
+                    />
+                ) : null}
 
                 {/* Add Teacher modal */}
-                <AddTeacherModal
-                    show={this.state.showTeacherModal}
-                    onHide={this.handleProfileAdding}
-                    teacherFormSubmission={this.teacherFormSubmission}
-                />
+                {this.state.showTeacherModal ? (
+                    <AddTeacherModal
+                        show={this.state.showTeacherModal}
+                        onHide={this.handleProfileAdding}
+                        teacherFormSubmission={this.teacherFormSubmission}
+                    />
+                ) : null}
+
+                {/* Delete Teacher modal */}
+                {this.state.showTeacher_DeleteModal ? (
+                    <TeacherDeleteModal
+                        show={this.state.showTeacher_DeleteModal}
+                        onHide={this.handleDelete}
+                        teacherFormSubmission={this.teacherFormSubmission}
+                        data={this.state.selectedTeacher}
+                        toggleModal={this.handleDelete}
+                    />
+                ) : null}
 
                 <div
                     className={`section content ${
@@ -686,7 +906,10 @@ class ProfileList extends Component {
                             >
                                 Add New
                             </button>
-                            <button className="btn btn-primary btn-sm mr-1">
+                            <button
+                                className="btn btn-primary btn-sm mr-1"
+                                onClick={this.handleDelete}
+                            >
                                 Delete
                             </button>
                             <button className="btn btn-primary btn-sm mr-1">
@@ -727,8 +950,8 @@ class ProfileList extends Component {
                                 <div className="card shadow-sm">
                                     <TeacherTable
                                         teacherItems={this.state.teacherItems}
-                                        ref={this.gridRef}
                                         path="hod"
+                                        handleTeacherId={this.handleTeacherId}
                                     />
                                     <div className="card-body p-3">
                                         {this.state.totalTeacherCount >= 10 ? (
@@ -754,7 +977,6 @@ class ProfileList extends Component {
                                         studentItems={this.state.studentItems}
                                         path="hod"
                                         group={true}
-                                        ref={this.gridRef}
                                     />
                                     <div className="card-body p-3">
                                         {this.state.totalStudentCount >= 10 ? (
