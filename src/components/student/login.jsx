@@ -129,12 +129,18 @@ class StudentLogin extends Component {
             username: "",
             password: "",
             errorMsg: "",
-            items: [],
             showLoader: false,
             showErrorAlert: false,
             showPassword: false,
             showModal: false,
             is_formSubmitted: false,
+        };
+        this.url = baseUrl + accountsUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
         };
     }
 
@@ -165,8 +171,8 @@ class StudentLogin extends Component {
             showLoader: true,
             showErrorAlert: false,
         });
-        var url = `${baseUrl}${accountsUrl}/login/`;
-        fetch(url, {
+
+        fetch(`${this.url}/login/`, {
             headers: {
                 Accept: "application/json",
                 "Content-Type": "application/json",
@@ -180,20 +186,49 @@ class StudentLogin extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                this.setState({
-                    items: result,
-                });
-                if (result.sts) {
-                    localStorage.clear();
-                    localStorage.setItem(
-                        "Authorization",
-                        `Token ${result.token}`
-                    );
-                    localStorage.setItem("is_student", result.is_student);
-                    localStorage.setItem("Username", result.username);
-                    this.setState({
-                        showLoader: false,
-                    });
+                if (result.sts === true) {
+                    if (localStorage.getItem("Authorization")) {
+                        fetch(`${this.url}/logout/`, {
+                            headers: this.headers,
+                            method: "POST",
+                        })
+                            .then((res) => res.json())
+                            .then((results) => {
+                                if (results.sts === true) {
+                                    localStorage.clear();
+                                    console.log(results);
+
+                                    localStorage.setItem(
+                                        "Authorization",
+                                        `Token ${result.token}`
+                                    );
+                                    localStorage.setItem(
+                                        "is_student",
+                                        result.is_student
+                                    );
+                                    localStorage.setItem(
+                                        "Username",
+                                        result.username
+                                    );
+                                    this.setState({
+                                        showLoader: false,
+                                    });
+                                }
+                            })
+                            .catch((err) => {
+                                console.log(err);
+                            });
+                    } else {
+                        localStorage.setItem(
+                            "Authorization",
+                            `Token ${result.token}`
+                        );
+                        localStorage.setItem("is_student", result.is_student);
+                        localStorage.setItem("Username", result.username);
+                        this.setState({
+                            showLoader: false,
+                        });
+                    }
                 }
                 if (!result.sts && result.msg) {
                     this.setState({

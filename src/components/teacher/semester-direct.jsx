@@ -38,6 +38,7 @@ class SemesterDirect extends Component {
             "Content-Type": "application/json",
             Authorization: this.authToken,
         };
+        pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
     }
 
     toggleSideNav = () => {
@@ -48,8 +49,6 @@ class SemesterDirect extends Component {
 
     componentDidMount = () => {
         document.title = `Semester name - Teacher | IQLabs`;
-
-        pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
     };
 
     handleFile = (event) => {
@@ -253,17 +252,6 @@ class SemesterDirect extends Component {
                             </div>
                         </div>
 
-                        <div className="row mb-2">
-                            <div className="col-md-3">
-                                <h6 className="primary-text">TEST ANALYSIS</h6>
-                            </div>
-                            <div className="col-md-3">
-                                <h6 className="primary-text">
-                                    ATTEMPTS & PAPERS
-                                </h6>
-                            </div>
-                        </div>
-
                         {/* Header configuration */}
                         <div className="row justify-content-center mb-3">
                             <div className="col-md-3">
@@ -399,7 +387,7 @@ class SemesterDirect extends Component {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="card-body secondary-bg text-white text-center">
+                                    <div className="card-body secondary-bg primary-text text-center">
                                         {this.state.path === null ? (
                                             "Your uploads will appear here"
                                         ) : (

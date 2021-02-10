@@ -215,12 +215,7 @@ class Scorecard extends Component {
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
-                <Modal.Header
-                    closeButton
-                    className="font-weight-bold primary-text"
-                >
-                    Scorecard Configuration
-                </Modal.Header>
+                <Modal.Header closeButton>Scorecard Configuration</Modal.Header>
                 <Modal.Body>
                     <Alert
                         variant="danger"
@@ -1132,7 +1127,7 @@ class SemesterAuto extends Component {
 
                         <div className="card shadow-sm mb-3">
                             <div className="card-body text-center">
-                                <h6 className="mb-0">Semester name</h6>
+                                <h6 className="primary-text mb-0">Semester name</h6>
                             </div>
                         </div>
 

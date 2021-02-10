@@ -122,12 +122,7 @@ class TopicModal extends Component {
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
-                <Modal.Header
-                    closeButton
-                    className="primary-text font-weight-bold"
-                >
-                    Create topic
-                </Modal.Header>
+                <Modal.Header closeButton>Create Topic</Modal.Header>
                 <Modal.Body>
                     <Alert
                         variant="danger"
@@ -265,12 +260,7 @@ class CycleTestModal extends Component {
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
-                <Modal.Header
-                    closeButton
-                    className="primary-text font-weight-bold"
-                >
-                    Create cycle test
-                </Modal.Header>
+                <Modal.Header closeButton>Create Cycle test</Modal.Header>
                 <Modal.Body>
                     <Alert
                         variant="danger"
@@ -538,7 +528,7 @@ class Chapters extends Component {
         const chapters = this.state.chapters;
         chapters.chapter_name = event.value;
         this.props.history.push({
-            pathname: `/teacher/subject/${this.subjectId}/${event.value}`,
+            pathname: `/teacher/subject/${this.subjectId}/chapter/${event.value}`,
         });
         this.setState(
             {
@@ -587,14 +577,14 @@ class Chapters extends Component {
                                 <div className="row align-items-center">
                                     <div className="col-md-2 mb-2 mb-md-0">
                                         <Link
-                                            to={`/teacher/subject/${this.subjectId}/${this.state.chapterName}/${data.topic_name}/notes/upload`}
+                                            to={`${this.props.match.url}/${data.topic_name}/notes/upload`}
                                         >
                                             <button className="btn btn-sm btn-primary mr-2">
                                                 <i className="fas fa-file-upload fa-sm"></i>
                                             </button>
                                         </Link>
                                         <Link
-                                            to={`/teacher/subject/${this.subjectId}/${this.state.chapterName}/${data.topic_name}/notes`}
+                                            to={`${this.props.match.url}/${data.topic_name}/notes`}
                                         >
                                             <button className="btn btn-sm btn-primary">
                                                 <i className="fas fa-file-medical fa-sm"></i>
@@ -610,7 +600,7 @@ class Chapters extends Component {
                                     </div>
                                     <div className="col-md-2 mb-2 mb-md-0">
                                         <Link
-                                            to={`/teacher/subject/${this.subjectId}/${this.state.chapterName}/${data.topic_name}/concepts`}
+                                            to={`${this.props.match.url}/${data.topic_name}/concepts`}
                                         >
                                             <button className="btn btn-primary btn-sm">
                                                 View / Edit
@@ -619,7 +609,7 @@ class Chapters extends Component {
                                     </div>
                                     <div className="col-md-2 mb-2 mb-md-0">
                                         <Link
-                                            to={`/teacher/subject/${this.subjectId}/${this.state.chapterName}/${data.topic_name}/type1`}
+                                            to={`${this.props.match.url}/${data.topic_name}/type1`}
                                         >
                                             <button className="btn btn-primary btn-sm">
                                                 View / Edit
@@ -638,9 +628,7 @@ class Chapters extends Component {
                                             name="next_topic"
                                             className="form-control form-control-sm border-secondary"
                                         >
-                                            <option value="">
-                                                Next topic
-                                            </option>
+                                            <option value="">Next topic</option>
                                         </select>
                                     </div>
                                 </div>
@@ -846,7 +834,7 @@ class Chapters extends Component {
                                                                               data.direct_question ===
                                                                                   false ? (
                                                                                   <Link
-                                                                                      to={`/teacher/subject/${this.subjectId}/${this.state.chapterName}/cycle/${data.cycle_test_id}`}
+                                                                                      to={`${this.props.match.url}/cycle/${data.cycle_test_id}`}
                                                                                   >
                                                                                       <button className="btn btn-primary btn-sm">
                                                                                           Auto
@@ -860,7 +848,7 @@ class Chapters extends Component {
                                                                               data.direct_question ===
                                                                                   true ? (
                                                                                   <Link
-                                                                                      to={`/teacher/subject/${this.subjectId}/${this.state.chapterName}/cycle/${data.cycle_test_id}/direct`}
+                                                                                      to={`${this.props.match.url}/cycle/${data.cycle_test_id}/direct`}
                                                                                   >
                                                                                       <button className="btn btn-primary btn-sm ml-2">
                                                                                           Direct

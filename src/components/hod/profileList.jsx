@@ -114,6 +114,18 @@ class AddStudentModal extends Component {
                 <Modal.Header closeButton>Create Student</Modal.Header>
                 <Modal.Body>
                     <Alert
+                        variant="success"
+                        show={this.state.showSuccessAlert}
+                        onClose={() => {
+                            this.setState({
+                                showSuccessAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.successMsg}
+                    </Alert>
+                    <Alert
                         variant="danger"
                         show={this.state.showErrorAlert}
                         onClose={() => {
@@ -131,18 +143,6 @@ class AddStudentModal extends Component {
                                 </p>
                             );
                         })}
-                    </Alert>
-                    <Alert
-                        variant="success"
-                        show={this.state.showSuccessAlert}
-                        onClose={() => {
-                            this.setState({
-                                showSuccessAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.successMsg}
                     </Alert>
 
                     <form onSubmit={this.handleSubmit} autoComplete="off">
@@ -502,9 +502,16 @@ class TeacherDeleteModal extends Component {
                                 errorMsg: result.detail,
                             });
                         } else if (result.data) {
+                            if (result.data.deleted_teachers.length !== 0) {
+                                this.setState({
+                                    successMsg: "Inactive teachers deleted!",
+                                    showSuccessAlert: true,
+                                });
+                                this.props.teacherFormSubmission(true);
+                            }
                             this.setState({
                                 errorLoop: true,
-                                errorMsg: result.data,
+                                errorMsg: result.data.invalid_teachers,
                             });
                         } else {
                             this.setState({
@@ -538,6 +545,18 @@ class TeacherDeleteModal extends Component {
                 <Modal.Header closeButton>Delete Teacher</Modal.Header>
                 <Modal.Body>
                     <Alert
+                        variant="success"
+                        show={this.state.showSuccessAlert}
+                        onClose={() => {
+                            this.setState({
+                                showSuccessAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.successMsg}
+                    </Alert>
+                    <Alert
                         variant="danger"
                         show={this.state.showErrorAlert}
                         onClose={() => {
@@ -560,18 +579,6 @@ class TeacherDeleteModal extends Component {
                                   );
                               })
                             : this.state.errorMsg}
-                    </Alert>
-                    <Alert
-                        variant="success"
-                        show={this.state.showSuccessAlert}
-                        onClose={() => {
-                            this.setState({
-                                showSuccessAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.successMsg}
                     </Alert>
                     <p>Are you sure that you want to delete this teacher?</p>
                     {this.props.data.map((item, index) => {
@@ -631,8 +638,6 @@ class ProfileList extends Component {
 
             teacherItems: [],
             studentItems: [],
-            teacherId: [],
-            studentId: [],
             selectedTeacher: [],
             selectedStudent: [],
 
@@ -775,7 +780,7 @@ class ProfileList extends Component {
                     showTeacherModal: false,
                     showTeacher_DeleteModal: false,
                 });
-            }, 1000);
+            }, 2000);
         }
     };
 
@@ -809,7 +814,6 @@ class ProfileList extends Component {
         }
         this.setState({
             selectedTeacher: value,
-            teacherId: data,
         });
     };
 
