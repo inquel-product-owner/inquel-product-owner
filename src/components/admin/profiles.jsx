@@ -57,7 +57,6 @@ class HODModal extends Component {
             "Inquel-Auth": this.authToken,
         };
         this.url = baseUrl + adminPathUrl;
-        this.gridRef = React.createRef();
     }
 
     // Fetch Category & Board Data

@@ -39,15 +39,15 @@ class TeacherProfile extends Component {
     };
 
     loadGroupData = () => {
-        fetch(`${this.url}/hod/groups/?page=${this.state.activeGroupPage}`, {
+        fetch(`${this.url}/hod/teacher/${this.teacherId}/`, {
             headers: this.headers,
             method: "GET",
         })
             .then((res) => res.json())
             .then((result) => {
                 this.setState({
-                    groupItems: result.data.results,
-                    totalGroupCount: result.data.count,
+                    groupItems: result.data.group_data,
+                    totalGroupCount: result.data.group_data.length,
                     page_loading: false,
                 });
                 console.log(result);
@@ -58,18 +58,16 @@ class TeacherProfile extends Component {
     };
 
     loadSubjectData = () => {
-        fetch(
-            `${this.url}/hod/subjects/?page=${this.state.activeSubjectPage}`,
-            {
-                headers: this.headers,
-                method: "GET",
-            }
-        )
+        fetch(`${this.url}/hod/teacher/${this.teacherId}/`, {
+            headers: this.headers,
+            method: "GET",
+        })
             .then((res) => res.json())
             .then((result) => {
                 this.setState({
-                    subjectItems: result.data.results,
-                    totalSubjectCount: result.data.count,
+                    subjectItems: result.data.independent_subject_data,
+                    totalSubjectCount:
+                        result.data.independent_subject_data.length,
                     page_loading: false,
                 });
                 console.log(result);
@@ -89,7 +87,7 @@ class TeacherProfile extends Component {
             .then((res) => res.json())
             .then((result) => {
                 this.setState({
-                    teacherItems: result.data,
+                    teacherItems: result.data.teacher_profile,
                     page_loading: false,
                 });
                 console.log(result);
