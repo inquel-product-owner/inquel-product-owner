@@ -13,6 +13,7 @@ class GroupModal extends Component {
         this.state = {
             groupName: "",
             groupDesc: "",
+            valid_from: "",
             valid_to: "",
             errorMsg: "",
             successMsg: "",
@@ -22,21 +23,19 @@ class GroupModal extends Component {
         };
     }
 
-    handleGroupName = (event) => {
+    handleGroupData = (event) => {
+        const name = event.target.name;
+        const value = event.target.value;
         this.setState({
-            groupName: event.target.value,
+            [name]: value,
         });
     };
 
-    handleGroupDesc = (event) => {
+    handleDate = (event) => {
+        const name = event.target.name;
+        const value = event.target.value;
         this.setState({
-            groupDesc: event.target.value,
-        });
-    };
-
-    handleValid_to = (event) => {
-        this.setState({
-            valid_to: `${event.target.value} 00:00:00`,
+            [name]: `${value} 00:00:00`,
         });
     };
 
@@ -62,6 +61,7 @@ class GroupModal extends Component {
             body: JSON.stringify({
                 group_name: this.state.groupName,
                 group_description: this.state.groupDesc,
+                valid_from: this.state.valid_from,
                 valid_to: this.state.valid_to,
             }),
         })
@@ -125,24 +125,34 @@ class GroupModal extends Component {
                     </Alert>
                     <form onSubmit={this.handleSubmit} autoComplete="off">
                         <div className="form-group">
-                            <label htmlFor="gname">Group name</label>
+                            <label htmlFor="groupName">Group name</label>
                             <input
                                 type="text"
-                                name="gname"
-                                id="gname"
+                                name="groupName"
+                                id="groupName"
                                 className="form-control borders"
-                                onChange={this.handleGroupName}
+                                onChange={this.handleGroupData}
                             />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="gdescription">Description</label>
+                            <label htmlFor="groupDesc">Description</label>
                             <textarea
-                                name="gdescription"
-                                id="gdescription"
+                                name="groupDesc"
+                                id="groupDesc"
                                 rows="5"
                                 className="form-control borders"
-                                onChange={this.handleGroupDesc}
+                                onChange={this.handleGroupData}
                             ></textarea>
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="valid_from">Valid from</label>
+                            <input
+                                type="date"
+                                name="valid_from"
+                                id="valid_from"
+                                className="form-control borders"
+                                onChange={this.handleDate}
+                            />
                         </div>
                         <div className="form-group">
                             <label htmlFor="valid_to">Valid to</label>
@@ -151,7 +161,7 @@ class GroupModal extends Component {
                                 name="valid_to"
                                 id="valid_to"
                                 className="form-control borders"
-                                onChange={this.handleValid_to}
+                                onChange={this.handleDate}
                             />
                         </div>
                         <div className="form-group">

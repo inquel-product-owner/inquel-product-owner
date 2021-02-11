@@ -74,7 +74,6 @@ class TopicModal extends Component {
                 this.state.topic_name
             );
         }
-        console.log(chapters);
 
         fetch(
             `${this.url}/teacher/subject/${this.props.subjectId}/chapter/topics/`,
@@ -189,7 +188,7 @@ class CycleTestModal extends Component {
         super(props);
         this.state = {
             cycle_test: "",
-            chapter_name: this.props.chapter_name,
+            chapter_id: this.props.chapter_id,
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
@@ -218,7 +217,7 @@ class CycleTestModal extends Component {
             headers: this.headers,
             method: "POST",
             body: JSON.stringify({
-                chapter_name: this.state.chapter_name,
+                chapter_id: this.state.chapter_id,
                 cycle_test_name: this.state.cycle_test,
             }),
         })
@@ -331,11 +330,12 @@ class Chapters extends Component {
             showCycleTestModal: false,
             collapsed: false,
             chapterList: [],
+            chapterId: "",
             chapterName: "",
             activeTopic: "",
             chapters: {
                 topic_id: "",
-                chapter_name: this.props.match.params.chapterName,
+                chapter_id: this.props.match.params.chapterId,
                 chapter_structure: [],
             },
             cycle_test: [],
@@ -380,7 +380,7 @@ class Chapters extends Component {
 
     loadChapterData = () => {
         fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/chapter/topics/?chapter_name=${this.state.chapterName}`,
+            `${this.url}/teacher/subject/${this.subjectId}/chapter/topics/?chapter_id=${this.state.chapterId}`,
             {
                 headers: this.headers,
                 method: "GET",
@@ -399,6 +399,7 @@ class Chapters extends Component {
                         : "";
                     this.setState({
                         chapters: chapters,
+                        chapterName: result.data.chapter_name !== undefined ? result.data.chapter_name : 'Chapter name',
                         page_loading: false,
                     });
                 }
@@ -410,7 +411,7 @@ class Chapters extends Component {
 
     loadCycleTestData = () => {
         fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/cycle/?chapter_name=${this.state.chapterName}`,
+            `${this.url}/teacher/subject/${this.subjectId}/cycle/?chapter_id=${this.state.chapterId}`,
             {
                 headers: this.headers,
                 method: "GET",
@@ -434,7 +435,7 @@ class Chapters extends Component {
     componentDidMount = () => {
         this.setState(
             {
-                chapterName: this.props.match.params.chapterName,
+                chapterId: this.props.match.params.chapterId,
             },
             () => {
                 this.loadChapterData();
@@ -459,12 +460,12 @@ class Chapters extends Component {
     };
 
     componentDidUpdate = (prevProps, prevState) => {
-        if (this.props.match.params.chapterName !== this.state.chapterName) {
+        if (this.props.match.params.chapterId !== this.state.chapterId) {
             const chapters = this.state.chapters;
-            chapters.chapter_name = this.props.match.params.chapterName;
+            chapters.chapter_id = this.props.match.params.chapterId;
             this.setState(
                 {
-                    chapterName: this.props.match.params.chapterName,
+                    chapterId: this.props.match.params.chapterId,
                     chapters: chapters,
                     page_loading: true,
                 },
@@ -526,13 +527,13 @@ class Chapters extends Component {
 
     handleSelect = (event) => {
         const chapters = this.state.chapters;
-        chapters.chapter_name = event.value;
+        chapters.chapter_id = event.value;
         this.props.history.push({
             pathname: `/teacher/subject/${this.subjectId}/chapter/${event.value}`,
         });
         this.setState(
             {
-                chapterName: event.value,
+                chapterId: event.value,
                 chapters: chapters,
                 page_loading: true,
             },
@@ -577,14 +578,14 @@ class Chapters extends Component {
                                 <div className="row align-items-center">
                                     <div className="col-md-2 mb-2 mb-md-0">
                                         <Link
-                                            to={`${this.props.match.url}/${data.topic_name}/notes/upload`}
+                                            to={`/teacher/subject/${this.subjectId}/chapter/${this.state.chapterName}/${data.topic_name}/notes/upload`}
                                         >
                                             <button className="btn btn-sm btn-primary mr-2">
                                                 <i className="fas fa-file-upload fa-sm"></i>
                                             </button>
                                         </Link>
                                         <Link
-                                            to={`${this.props.match.url}/${data.topic_name}/notes`}
+                                            to={`/teacher/subject/${this.subjectId}/chapter/${this.state.chapterName}/${data.topic_name}/notes`}
                                         >
                                             <button className="btn btn-sm btn-primary">
                                                 <i className="fas fa-file-medical fa-sm"></i>
@@ -600,7 +601,7 @@ class Chapters extends Component {
                                     </div>
                                     <div className="col-md-2 mb-2 mb-md-0">
                                         <Link
-                                            to={`${this.props.match.url}/${data.topic_name}/concepts`}
+                                            to={`/teacher/subject/${this.subjectId}/chapter/${this.state.chapterName}/${data.topic_name}/concepts`}
                                         >
                                             <button className="btn btn-primary btn-sm">
                                                 View / Edit
@@ -609,7 +610,7 @@ class Chapters extends Component {
                                     </div>
                                     <div className="col-md-2 mb-2 mb-md-0">
                                         <Link
-                                            to={`${this.props.match.url}/${data.topic_name}/type1`}
+                                            to={`/teacher/subject/${this.subjectId}/chapter/${this.state.chapterName}/${data.topic_name}/type1`}
                                         >
                                             <button className="btn btn-primary btn-sm">
                                                 View / Edit
@@ -675,7 +676,7 @@ class Chapters extends Component {
                         onHide={this.toggleCycleTestModal}
                         formSubmission={this.cycleTest_formSubmission}
                         subjectId={this.subjectId}
-                        chapter_name={this.state.chapterName}
+                        chapter_id={this.state.chapterId}
                     />
                 ) : (
                     ""
@@ -706,7 +707,7 @@ class Chapters extends Component {
                                     options={this.state.chapterList.map(
                                         function (list) {
                                             return {
-                                                value: list.chapter_name,
+                                                value: list.chapter_id,
                                                 label: list.chapter_name,
                                             };
                                         }

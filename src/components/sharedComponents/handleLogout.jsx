@@ -27,7 +27,6 @@ class Logout extends React.Component {
 
     onIdle = () => {
         if (!this.state.isTimedOut) {
-            this.setState({ showModal: true });
             this.idleTimer.reset();
             this.setState({ isTimedOut: true });
 
@@ -47,6 +46,7 @@ class Logout extends React.Component {
                 .then((result) => {
                     localStorage.clear();
                     console.log(result);
+                    this.setState({ showModal: true });
                 })
                 .catch((err) => {
                     console.log(err);

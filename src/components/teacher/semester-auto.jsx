@@ -1127,7 +1127,9 @@ class SemesterAuto extends Component {
 
                         <div className="card shadow-sm mb-3">
                             <div className="card-body text-center">
-                                <h6 className="primary-text mb-0">Semester name</h6>
+                                <h6 className="primary-text mb-0">
+                                    Semester name
+                                </h6>
                             </div>
                         </div>
 
@@ -1457,7 +1459,7 @@ class SemesterAuto extends Component {
                                                         "" ? (
                                                             <td>
                                                                 <Link
-                                                                    to={`/teacher/subject/${this.subjectId}/semester/${this.semesterId}/section/${section.section_id}/?attempt=${this.state.selectedAttempt}`}
+                                                                    to={`${this.props.match.url}/section/${section.section_id}/?attempt=${this.state.selectedAttempt}`}
                                                                 >
                                                                     <button className="btn btn-primary-invert btn-sm shadow-sm">
                                                                         <i className="fas fa-eye"></i>

@@ -5,6 +5,7 @@ import SideNav from "./sidenav";
 import { Spinner, Alert } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import { Document, Page, pdfjs } from "react-pdf";
+import Loading from "../sharedComponents/loader";
 
 class SemesterDirect extends Component {
     constructor(props) {
@@ -28,6 +29,7 @@ class SemesterDirect extends Component {
             numPages: null,
             pageNumber: 1,
             btnDisabled: false,
+            page_loading: true,
         };
         this.subjectId = this.props.match.params.subjectId;
         this.semesterId = this.props.match.params.semesterId;
@@ -47,8 +49,30 @@ class SemesterDirect extends Component {
         });
     };
 
+    loadSemesterData = () => {
+        fetch(
+            `${this.url}/teacher/subject/${this.subjectId}/semester/${this.semesterId}/files/`,
+            {
+                method: "GET",
+                headers: this.headers,
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                this.setState({
+                    page_loading: false,
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     componentDidMount = () => {
         document.title = `Semester name - Teacher | IQLabs`;
+
+        this.loadSemesterData();
     };
 
     handleFile = (event) => {
@@ -162,19 +186,27 @@ class SemesterDirect extends Component {
         } else {
             axios
                 .post(
-                    `${this.url}/teacher/subject/${this.subjectId}/semester/files/`,
+                    `${this.url}/teacher/subject/${this.subjectId}/semester/${this.semesterId}/files/`,
                     form_data,
                     options
                 )
                 .then((result) => {
                     console.log(result);
                     if (result.data.sts === true) {
-                        this.setState({
-                            successMsg: result.data.msg,
-                            showSuccessAlert: true,
-                            showLoader: false,
-                            url: result.data.url,
-                        });
+                        this.setState(
+                            {
+                                successMsg: result.data.msg,
+                                showSuccessAlert: true,
+                                showLoader: false,
+                                url: result.data.url,
+                            },
+                            () => {
+                                this.setState({
+                                    page_loading: true,
+                                });
+                                this.loadSemesterData();
+                            }
+                        );
                     } else if (result.data.sts === false) {
                         if (result.data.detail) {
                             this.setState({
@@ -457,6 +489,8 @@ class SemesterDirect extends Component {
                                 </div>
                             </div>
                         </div>
+                        {/* Loading component */}
+                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
             </div>

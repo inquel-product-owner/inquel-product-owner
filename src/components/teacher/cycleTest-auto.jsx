@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import Header from "./navbar";
 import SideNav from "./sidenav";
-import Select from "react-select";
+// import Select from "react-select";
 import { Link } from "react-router-dom";
 import { Modal, Alert, Spinner } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
@@ -21,7 +21,7 @@ class Scorecard extends Component {
             improve: "",
         };
         this.subjectId = this.props.subjectId;
-        this.chapterName = this.props.chapterName;
+        this.chapterId = this.props.chapterId;
         this.cycle_testId = this.props.cycle_testId;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
@@ -217,12 +217,7 @@ class Scorecard extends Component {
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
-                <Modal.Header
-                    closeButton
-                    className="font-weight-bold primary-text"
-                >
-                    Scorecard Configuration
-                </Modal.Header>
+                <Modal.Header closeButton>Scorecard Configuration</Modal.Header>
                 <Modal.Body>
                     <Alert
                         variant="danger"
@@ -568,9 +563,6 @@ class CycleTestAuto extends Component {
             showErrorAlert: false,
             showSuccessAlert: false,
 
-            chapterList: [],
-            chapterName: "",
-
             sections: [
                 {
                     section_id: "",
@@ -594,6 +586,7 @@ class CycleTestAuto extends Component {
             is_formSubmitted: false,
         };
         this.subjectId = this.props.match.params.subjectId;
+        this.chapterId = this.props.match.params.chapterId;
         this.cycle_testId = this.props.match.params.cycle_testId;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
@@ -628,7 +621,7 @@ class CycleTestAuto extends Component {
 
     loadAttemptData = () => {
         fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/filter/?chapter_name=${this.state.chapterName}`,
+            `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/filter/?chapter_id=${this.chapterId}`,
             {
                 method: "GET",
                 headers: this.headers,
@@ -678,7 +671,7 @@ class CycleTestAuto extends Component {
                         duration = result.data[i].duration;
                         selectedAttempt = result.data[i].attempts;
                         fetch(
-                            `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/filter/?chapter_name=${this.state.chapterName}&attempts=${selectedAttempt}&question_type=${result.data[i].question_type}`,
+                            `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/filter/?chapter_id=${this.chapterId}&attempts=${selectedAttempt}&question_type=${result.data[i].question_type}`,
                             {
                                 method: "GET",
                                 headers: this.headers,
@@ -698,7 +691,7 @@ class CycleTestAuto extends Component {
                             });
                     }
                     fetch(
-                        `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/filter/?chapter_name=${this.state.chapterName}&attempts=${selectedAttempt}`,
+                        `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/filter/?chapter_id=${this.chapterId}&attempts=${selectedAttempt}`,
                         {
                             method: "GET",
                             headers: this.headers,
@@ -731,62 +724,62 @@ class CycleTestAuto extends Component {
     };
 
     componentDidMount = () => {
-        this.setState(
-            {
-                chapterName: this.props.match.params.chapterName,
-            },
-            () => {
-                this.loadAttemptData();
-                this.loadSectionData();
-            }
-        );
+        // this.setState(
+        //     {
+        //         chapterId: this.props.match.params.chapterId,
+        //     },
+        //     () => {
+        //     }
+        // );
+        this.loadAttemptData();
+        this.loadSectionData();
 
-        fetch(`${this.url}/teacher/subject/${this.subjectId}/`, {
-            headers: this.headers,
-            method: "GET",
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                this.setState({
-                    chapterList: result.data.results,
-                });
-                console.log(result);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+        // fetch(`${this.url}/teacher/subject/${this.subjectId}/`, {
+        //     headers: this.headers,
+        //     method: "GET",
+        // })
+        //     .then((res) => res.json())
+        //     .then((result) => {
+        //         this.setState({
+        //             chapterList: result.data.results,
+        //         });
+        //         console.log(result);
+        //     })
+        //     .catch((err) => {
+        //         console.log(err);
+        //     });
     };
 
-    componentDidUpdate = (prevProps, prevState) => {
-        if (this.props.match.params.chapterName !== this.state.chapterName) {
-            this.setState(
-                {
-                    chapterName: this.props.match.params.chapterName,
-                    page_loading: true,
-                },
-                () => {
-                    this.loadAttemptData();
-                    this.loadSectionData();
-                }
-            );
-        }
-    };
+    // componentDidUpdate = (prevProps, prevState) => {
+    //     if (this.props.match.params.chapterId !== this.chapterId) {
+    //         this.setState(
+    //             {
+    //                 chapterId: this.props.match.params.chapterId,
+    //                 page_loading: true,
+    //             },
+    //             () => {
+    //                 this.loadAttemptData();
+    //                 this.loadSectionData();
+    //             }
+    //         );
+    //     }
+    // };
 
-    handleSelect = (event) => {
-        this.props.history.push({
-            pathname: `/teacher/subject/${this.subjectId}/${event.value}/cycle/${this.cycle_testId}`,
-        });
-        this.setState(
-            {
-                chapterName: event.value,
-                page_loading: true,
-            },
-            () => {
-                this.loadAttemptData();
-                this.loadSectionData();
-            }
-        );
-    };
+    // handleSelect = (event) => {
+    //     this.props.history.push({
+    //         pathname: `/teacher/subject/${this.subjectId}/chapter/${event.value}/cycle/${this.cycle_testId}`,
+    //     });
+    //     this.setState(
+    //         {
+    //             chapterId: event.value,
+    //             page_loading: true,
+    //         },
+    //         () => {
+    //             this.loadAttemptData();
+    //             this.loadSectionData();
+    //         }
+    //     );
+    // };
 
     handleSectionData = (index, event, type) => {
         const section = [...this.state.sections];
@@ -811,7 +804,7 @@ class CycleTestAuto extends Component {
 
         if (event.target.value !== "") {
             fetch(
-                `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/filter/?chapter_name=${this.state.chapterName}&attempts=${event.target.value}`,
+                `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/filter/?chapter_id=${this.chapterId}&attempts=${event.target.value}`,
                 {
                     method: "GET",
                     headers: this.headers,
@@ -839,7 +832,7 @@ class CycleTestAuto extends Component {
 
         if (event.target.value !== "") {
             fetch(
-                `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/filter/?chapter_name=${this.state.chapterName}&attempts=${this.state.selectedAttempt}&question_type=${event.target.value}`,
+                `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/filter/?chapter_id=${this.chapterId}&attempts=${this.state.selectedAttempt}&question_type=${event.target.value}`,
                 {
                     method: "GET",
                     headers: this.headers,
@@ -875,7 +868,7 @@ class CycleTestAuto extends Component {
 
         if (event.target.value !== "") {
             fetch(
-                `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/filter/?chapter_name=${this.state.chapterName}&attempts=${this.state.selectedAttempt}&question_type=${section[index].question_type}&category=${event.target.value}`,
+                `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/filter/?chapter_id=${this.chapterId}&attempts=${this.state.selectedAttempt}&question_type=${section[index].question_type}&category=${event.target.value}`,
                 {
                     method: "GET",
                     headers: this.headers,
@@ -1001,7 +994,7 @@ class CycleTestAuto extends Component {
                 headers: this.headers,
                 body: JSON.stringify({
                     cycle_test_id: this.cycle_testId,
-                    chapter_name: this.state.chapterName,
+                    chapter_id: this.chapterId,
                     duration: this.state.duration,
                     attempts: this.state.selectedAttempt,
                     section_description: section[index].section_name,
@@ -1064,7 +1057,7 @@ class CycleTestAuto extends Component {
                 headers: this.headers,
                 body: JSON.stringify({
                     cycle_test_id: this.cycle_testId,
-                    chapter_name: this.state.chapterName,
+                    chapter_id: this.chapterId,
                     duration: this.state.duration,
                     attempts: this.state.selectedAttempt,
                     section_description: section[index].section_name,
@@ -1169,7 +1162,7 @@ class CycleTestAuto extends Component {
                         show={this.state.showModal}
                         onHide={this.toggleModal}
                         subjectId={this.subjectId}
-                        chapterName={this.state.chapterName}
+                        chapterId={this.chapterId}
                         cycle_testId={this.cycle_testId}
                         formSubmission={this.formSubmission}
                     />
@@ -1203,7 +1196,7 @@ class CycleTestAuto extends Component {
                         <div className="row align-items-center mb-3">
                             <div className="col-md-8">
                                 <div className="row align-items-center">
-                                    <div className="col-md-4">
+                                    {/* <div className="col-md-4">
                                         <Select
                                             className="basic-single"
                                             placeholder={this.state.chapterName}
@@ -1213,8 +1206,7 @@ class CycleTestAuto extends Component {
                                             options={this.state.chapterList.map(
                                                 function (list) {
                                                     return {
-                                                        value:
-                                                            list.chapter_name,
+                                                        value: list.chapter_id,
                                                         label:
                                                             list.chapter_name,
                                                     };
@@ -1223,7 +1215,7 @@ class CycleTestAuto extends Component {
                                             onChange={this.handleSelect}
                                             required
                                         />
-                                    </div>
+                                    </div> */}
                                     <div className="col-md-4">
                                         <input
                                             type="number"
@@ -1546,7 +1538,7 @@ class CycleTestAuto extends Component {
                                                         "" ? (
                                                             <td>
                                                                 <Link
-                                                                    to={`/teacher/subject/${this.subjectId}/${this.state.chapterName}/cycle/${this.cycle_testId}/section/${section.section_id}/?attempt=${this.state.selectedAttempt}`}
+                                                                    to={`${this.props.match.url}/section/${section.section_id}/?attempt=${this.state.selectedAttempt}`}
                                                                 >
                                                                     <button className="btn btn-primary-invert btn-sm shadow-sm">
                                                                         <i className="fas fa-eye"></i>

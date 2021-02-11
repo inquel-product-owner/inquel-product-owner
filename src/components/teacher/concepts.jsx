@@ -171,7 +171,7 @@ class SubjectConcepts extends Component {
             isForm_submitted: false,
 
             activeConcept: "",
-            selectedImageQuestion: "",
+            selectedImageConcept: "",
             selectedImageData: [],
             selectedImage: "",
             flipState: [false],
@@ -197,11 +197,11 @@ class SubjectConcepts extends Component {
                             title: "",
                             file_name: "",
                             video: null,
-                            pasteUrl: "",
+                            path: "",
                         },
                         audio: [
-                            { title: "", file_name: "", audio: null },
-                            { title: "", file_name: "", audio: null },
+                            { title: "", file_name: "", audio: null, path: "" },
+                            { title: "", file_name: "", audio: null, path: "" },
                         ],
                     },
                     settings: {
@@ -300,8 +300,8 @@ class SubjectConcepts extends Component {
                                         response[i].files[0]
                                             .concepts_audio_1_title,
                                     file_name: "",
-                                    audio:
-                                        response[i].files[0].concepts_audio_1,
+                                    audio: null,
+                                    path: response[i].files[0].concepts_audio_1,
                                 });
                             }
                             if (response[i].files[0].concepts_audio_2) {
@@ -310,8 +310,8 @@ class SubjectConcepts extends Component {
                                         response[i].files[0]
                                             .concepts_audio_2_title,
                                     file_name: "",
-                                    audio:
-                                        response[i].files[0].concepts_audio_2,
+                                    audio: null,
+                                    path: response[i].files[0].concepts_audio_2,
                                 });
                             }
                         }
@@ -346,7 +346,7 @@ class SubjectConcepts extends Component {
                                             : "",
                                     file_name: "",
                                     video: null,
-                                    pasteUrl:
+                                    path:
                                         response[i].files.length !== 0 &&
                                         response[i].files[0].paste_video_url
                                             ? response[i].files[0]
@@ -360,11 +360,13 @@ class SubjectConcepts extends Component {
                                                   title: "",
                                                   file_name: "",
                                                   audio: null,
+                                                  path: "",
                                               },
                                               {
                                                   title: "",
                                                   file_name: "",
                                                   audio: null,
+                                                  path: "",
                                               },
                                           ]
                                         : audio,
@@ -849,7 +851,8 @@ class SubjectConcepts extends Component {
 
     handleImageFile = (index, event) => {
         let values = [...this.state.concepts];
-        if (!event.target.files[0].name.match(/\.(jpg|jpeg|png|webp)$/)) {
+        const file = event.target.files[0].name.toLowerCase();
+        if (!file.match(/\.(jpg|jpeg|png|webp)$/)) {
             this.setState({
                 errorMsg: "Please select valid image file",
                 showErrorAlert: true,
@@ -875,20 +878,35 @@ class SubjectConcepts extends Component {
         const images = [...this.state.concepts];
         if (
             this.state.selectedImage === image_index &&
-            this.state.selectedImageQuestion === q_index
+            this.state.selectedImageConcept === q_index
         ) {
             this.setState({
                 selectedImage: "",
-                selectedImageQuestion: "",
+                selectedImageConcept: "",
                 selectedImageData: [],
             });
         } else {
             this.setState({
                 selectedImage: image_index,
-                selectedImageQuestion: q_index,
+                selectedImageConcept: q_index,
                 selectedImageData: images[q_index].content.images[image_index],
             });
         }
+    };
+
+    clearImages = () => {
+        const values = [...this.state.questions];
+        values[this.state.activeQuestion].content.images = [
+            {
+                title: "",
+                file_name: "",
+                image: null,
+                path: "",
+            },
+        ];
+        this.setState({
+            questions: values,
+        });
     };
 
     // -------------------------- Video --------------------------
@@ -904,9 +922,8 @@ class SubjectConcepts extends Component {
 
     handleVideoFile = (event) => {
         let values = [...this.state.concepts];
-        if (
-            !event.target.files[0].name.match(/\.(mpeg|flv|avi|mov|mp4|mkv)$/)
-        ) {
+        const file = event.target.files[0].name.toLowerCase();
+        if (!file.match(/\.(mpeg|flv|avi|mov|mp4|mkv)$/)) {
             this.setState({
                 errorMsg: "Please select valid video file",
                 showErrorAlert: true,
@@ -915,9 +932,11 @@ class SubjectConcepts extends Component {
         } else {
             values[this.state.activeConcept].content.video.file_name =
                 event.target.files[0].name;
+            values[
+                this.state.activeConcept
+            ].content.video.path = URL.createObjectURL(event.target.files[0]);
             values[this.state.activeConcept].content.video.video =
                 event.target.files[0];
-            values[this.state.activeConcept].content.video.pasteUrl = "";
             this.setState({
                 concepts: values,
                 btnDisabled: false,
@@ -928,11 +947,22 @@ class SubjectConcepts extends Component {
 
     handleVideoUrl = (event) => {
         const values = [...this.state.concepts];
-        values[this.state.activeConcept].content.video.pasteUrl =
+        values[this.state.activeConcept].content.video.path =
             event.target.value;
         values[this.state.activeConcept].content.video.file_name = "";
         this.setState({
             concepts: values,
+        });
+    };
+
+    clearVideo = () => {
+        const values = [...this.state.questions];
+        values[this.state.activeConcept].content.video.title = "";
+        values[this.state.activeConcept].content.video.file_name = "";
+        values[this.state.activeConcept].content.video.video = null;
+        values[this.state.activeConcept].content.video.path = "";
+        this.setState({
+            questions: values,
         });
     };
 
@@ -949,7 +979,8 @@ class SubjectConcepts extends Component {
 
     handleAudioFile = (index, event) => {
         const values = [...this.state.concepts];
-        if (!event.target.files[0].name.match(/\.(wav|mp3)$/)) {
+        const file = event.target.files[0].name.toLowerCase();
+        if (!file.match(/\.(wav|mp3)$/)) {
             this.setState({
                 errorMsg: "Please select valid audio file",
                 showErrorAlert: true,
@@ -958,6 +989,9 @@ class SubjectConcepts extends Component {
         } else {
             values[this.state.activeConcept].content.audio[index].file_name =
                 event.target.files[0].name;
+            values[this.state.activeConcept].content.audio[
+                index
+            ].path = URL.createObjectURL(event.target.files[0]);
             values[this.state.activeConcept].content.audio[index].audio =
                 event.target.files[0];
             this.setState({
@@ -966,6 +1000,17 @@ class SubjectConcepts extends Component {
                 showErrorAlert: false,
             });
         }
+    };
+
+    clearAudios = () => {
+        const values = [...this.state.questions];
+        values[this.state.activeQuestion].content.audio = [
+            { title: "", file_name: "", audio: null, path: "" },
+            { title: "", file_name: "", audio: null, path: "" },
+        ];
+        this.setState({
+            questions: values,
+        });
     };
 
     // -------------------------- Settings --------------------------
@@ -1114,11 +1159,11 @@ class SubjectConcepts extends Component {
                     title: "",
                     file_name: "",
                     video: null,
-                    pasteUrl: "",
+                    path: "",
                 },
                 audio: [
-                    { title: "", file_name: "", audio: null },
-                    { title: "", file_name: "", audio: null },
+                    { title: "", file_name: "", audio: null, path: "" },
+                    { title: "", file_name: "", audio: null, path: "" },
                 ],
             },
             settings: {
@@ -1154,6 +1199,14 @@ class SubjectConcepts extends Component {
                 showConceptDelete_Modal: !this.state.showConceptDelete_Modal,
             });
         } else {
+            if (this.state.selectedImageConcept === index) {
+                this.setState({
+                    selectedImageConcept: "",
+                    selectedImageData: [],
+                    selectedImage: "",
+                });
+            }
+
             flips.splice(index, 1);
             keyboards.splice(index, 1);
             values.splice(index, 1);
@@ -1192,11 +1245,21 @@ class SubjectConcepts extends Component {
                                     title: "",
                                     file_name: "",
                                     video: null,
-                                    pasteUrl: "",
+                                    path: "",
                                 },
                                 audio: [
-                                    { title: "", file_name: "", audio: null },
-                                    { title: "", file_name: "", audio: null },
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        audio: null,
+                                        path: "",
+                                    },
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        audio: null,
+                                        path: "",
+                                    },
                                 ],
                             },
                             settings: {
@@ -1225,6 +1288,7 @@ class SubjectConcepts extends Component {
         const values = [...this.state.concepts];
         const keyboards = [...this.state.keyboards];
         const flips = [...this.state.flipState];
+
         flips.push(flips[index]);
         keyboards.push({
             all: keyboards[index].all,
@@ -1245,11 +1309,11 @@ class SubjectConcepts extends Component {
                     title: "",
                     file_name: "",
                     video: null,
-                    pasteUrl: "",
+                    path: "",
                 },
                 audio: [
-                    { title: "", file_name: "", audio: null },
-                    { title: "", file_name: "", audio: null },
+                    { title: "", file_name: "", audio: null, path: "" },
+                    { title: "", file_name: "", audio: null, path: "" },
                 ],
             },
             settings: {
@@ -1283,6 +1347,14 @@ class SubjectConcepts extends Component {
             flips.splice(this.state.activeConcept, 1);
             keyboards.splice(this.state.activeConcept, 1);
             values.splice(this.state.activeConcept, 1);
+
+            if (this.state.selectedImageConcept === this.state.activeConcept) {
+                this.setState({
+                    selectedImageConcept: "",
+                    selectedImageData: [],
+                    selectedImage: "",
+                });
+            }
 
             this.setState(
                 {
@@ -1319,18 +1391,20 @@ class SubjectConcepts extends Component {
                                     title: "",
                                     file_name: "",
                                     video: null,
-                                    pasteUrl: "",
+                                    path: "",
                                 },
                                 audio: [
                                     {
                                         title: "",
                                         file_name: "",
                                         audio: null,
+                                        path: "",
                                     },
                                     {
                                         title: "",
                                         file_name: "",
                                         audio: null,
+                                        path: "",
                                     },
                                 ],
                             },
@@ -1518,100 +1592,22 @@ class SubjectConcepts extends Component {
                                                 >
                                                     <div className="card shadow-sm">
                                                         <div className="card-body">
-                                                            <div className="row">
-                                                                {/* terms */}
+                                                            {/* Front-view */}
+                                                            <div className="card">
                                                                 <div
-                                                                    className={`${
-                                                                        this
-                                                                            .state
-                                                                            .selectedImageData
-                                                                            .length !==
-                                                                            0 &&
-                                                                        this
-                                                                            .state
-                                                                            .selectedImageQuestion ===
+                                                                    className="card-body"
+                                                                    onClick={() =>
+                                                                        this.handleFlip(
                                                                             c_index
-                                                                            ? "col-md-9"
-                                                                            : "col-md-11 pr-md-0"
-                                                                    }`}
-                                                                >
-                                                                    {/* Front-view */}
-                                                                    <div className="card">
-                                                                        <div
-                                                                            className="card-body"
-                                                                            onClick={() =>
-                                                                                this.handleFlip(
-                                                                                    c_index
-                                                                                )
-                                                                            }
-                                                                            dangerouslySetInnerHTML={{
-                                                                                __html:
-                                                                                    concept
-                                                                                        .content
-                                                                                        .terms,
-                                                                            }}
-                                                                        ></div>
-                                                                    </div>
-                                                                </div>
-                                                                {/* image preview */}
-                                                                {this.state
-                                                                    .selectedImageData
-                                                                    .length !==
-                                                                    0 &&
-                                                                this.state
-                                                                    .selectedImageQuestion ===
-                                                                    c_index ? (
-                                                                    <div className="col-md-2 mb-2 mb-md-0 pr-md-0">
-                                                                        <div className="card shadow-sm">
-                                                                            <img
-                                                                                src={
-                                                                                    this
-                                                                                        .state
-                                                                                        .selectedImageData
-                                                                                        .path
-                                                                                }
-                                                                                alt={
-                                                                                    this
-                                                                                        .state
-                                                                                        .selectedImageData
-                                                                                        .file_name
-                                                                                }
-                                                                                className="img-fluid rounded-lg"
-                                                                            />
-                                                                        </div>
-                                                                    </div>
-                                                                ) : (
-                                                                    ""
-                                                                )}
-                                                                <div className="col-md-1 d-flex justify-content-md-center justify-content-around flex-wrap">
-                                                                    {concept.content.images.map(
-                                                                        (
-                                                                            images,
-                                                                            index
-                                                                        ) => {
-                                                                            return images.path !==
-                                                                                "" ? (
-                                                                                <div
-                                                                                    key={
-                                                                                        index
-                                                                                    }
-                                                                                    className="card preview-img-sm bg-light shadow-sm"
-                                                                                    style={{
-                                                                                        backgroundImage: `url(${images.path})`,
-                                                                                    }}
-                                                                                    onClick={() =>
-                                                                                        this.changeImage(
-                                                                                            index,
-                                                                                            c_index
-                                                                                        )
-                                                                                    }
-                                                                                ></div>
-                                                                            ) : (
-                                                                                ""
-                                                                            );
-                                                                        }
-                                                                    )}
-                                                                </div>
+                                                                        )
+                                                                    }
+                                                                    dangerouslySetInnerHTML={{
+                                                                        __html:
+                                                                            concept
+                                                                                .content
+                                                                                .terms,
+                                                                    }}
+                                                                ></div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1628,7 +1624,7 @@ class SubjectConcepts extends Component {
                                                                             0 &&
                                                                         this
                                                                             .state
-                                                                            .selectedImageQuestion ===
+                                                                            .selectedImageConcept ===
                                                                             c_index
                                                                             ? "col-md-9"
                                                                             : "col-md-11 pr-md-0"
@@ -1658,7 +1654,7 @@ class SubjectConcepts extends Component {
                                                                     .length !==
                                                                     0 &&
                                                                 this.state
-                                                                    .selectedImageQuestion ===
+                                                                    .selectedImageConcept ===
                                                                     c_index ? (
                                                                     <div className="col-md-2 mb-2 mb-md-0 pr-md-0">
                                                                         <div className="card shadow-sm">
@@ -1889,9 +1885,24 @@ class SubjectConcepts extends Component {
                                                 <Card.Body className="p-3">
                                                     {/* ---------- Image ---------- */}
                                                     <div className="form-group">
-                                                        <p className="mb-2">
-                                                            Image
-                                                        </p>
+                                                        <div className="row align-items-center mb-2">
+                                                            <div className="col-md-6">
+                                                                <p className="mb-0">
+                                                                    Image
+                                                                </p>
+                                                            </div>
+                                                            <div className="col-md-6 text-right">
+                                                                <button
+                                                                    className="btn btn-link btn-sm shadow-none"
+                                                                    onClick={
+                                                                        this
+                                                                            .clearImages
+                                                                    }
+                                                                >
+                                                                    Clear
+                                                                </button>
+                                                            </div>
+                                                        </div>
                                                         {data[
                                                             this.state
                                                                 .activeConcept
@@ -1938,32 +1949,17 @@ class SubjectConcepts extends Component {
                                                                                 role="group"
                                                                                 aria-label="Basic example"
                                                                             >
-                                                                                {data[
-                                                                                    this
-                                                                                        .state
-                                                                                        .activeConcept
-                                                                                ]
-                                                                                    .content
-                                                                                    .images
-                                                                                    .length >
-                                                                                1 ? (
-                                                                                    <button
-                                                                                        type="button"
-                                                                                        className="btn btn-light btn-sm shadow-none font-weight-bold"
-                                                                                        onClick={() =>
-                                                                                            this.handleRemoveImageFields(
-                                                                                                index
-                                                                                            )
-                                                                                        }
-                                                                                    >
-                                                                                        -
-                                                                                    </button>
-                                                                                ) : (
-                                                                                    <button
-                                                                                        type="button"
-                                                                                        className="btn btn-light btn-sm"
-                                                                                    ></button>
-                                                                                )}
+                                                                                <button
+                                                                                    type="button"
+                                                                                    className="btn btn-light btn-sm shadow-none font-weight-bold"
+                                                                                    onClick={() =>
+                                                                                        this.handleRemoveImageFields(
+                                                                                            index
+                                                                                        )
+                                                                                    }
+                                                                                >
+                                                                                    -
+                                                                                </button>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -1996,6 +1992,17 @@ class SubjectConcepts extends Component {
                                                                 </Fragment>
                                                             )
                                                         )}
+                                                        <small
+                                                            className="form-text text-muted mb-2"
+                                                            style={{
+                                                                marginTop:
+                                                                    "-8px",
+                                                            }}
+                                                        >
+                                                            Select only .png
+                                                            .jpg .jpeg .webp
+                                                        </small>
+
                                                         {data[
                                                             this.state
                                                                 .activeConcept
@@ -2020,9 +2027,24 @@ class SubjectConcepts extends Component {
 
                                                     {/* ---------- Video ---------- */}
                                                     <div className="form-group">
-                                                        <p className="mb-2">
-                                                            Video
-                                                        </p>
+                                                        <div className="row align-items-center mb-2">
+                                                            <div className="col-md-6">
+                                                                <p className="mb-0">
+                                                                    Video
+                                                                </p>
+                                                            </div>
+                                                            <div className="col-md-6 text-right">
+                                                                <button
+                                                                    className="btn btn-link btn-sm shadow-none"
+                                                                    onClick={
+                                                                        this
+                                                                            .clearVideo
+                                                                    }
+                                                                >
+                                                                    Clear
+                                                                </button>
+                                                            </div>
+                                                        </div>
                                                         <input
                                                             type="text"
                                                             name="video"
@@ -2030,6 +2052,13 @@ class SubjectConcepts extends Component {
                                                             placeholder="Video title"
                                                             autoComplete="off"
                                                             className="form-control form-control-sm border-secondary mb-1"
+                                                            value={
+                                                                data[
+                                                                    this.state
+                                                                        .activeConcept
+                                                                ].content.video
+                                                                    .title
+                                                            }
                                                             onChange={
                                                                 this
                                                                     .handleVideoTitle
@@ -2070,6 +2099,18 @@ class SubjectConcepts extends Component {
                                                                           .file_name}
                                                             </label>
                                                         </div>
+                                                        <small
+                                                            className="form-text text-muted mb-2"
+                                                            style={{
+                                                                marginTop:
+                                                                    "-8px",
+                                                            }}
+                                                        >
+                                                            Select only .mpeg
+                                                            .flv .avi .mov .mp4
+                                                            .mkv
+                                                        </small>
+
                                                         <p className="text-center small font-weight-bold mb-2">
                                                             Or
                                                         </p>
@@ -2077,7 +2118,7 @@ class SubjectConcepts extends Component {
                                                             type="url"
                                                             name="video"
                                                             placeholder="Paste URL"
-                                                            className="form-control form-control-sm border-secondary"
+                                                            className="form-control form-control-sm border-secondary mb-1"
                                                             onChange={(event) =>
                                                                 this.handleVideoUrl(
                                                                     event
@@ -2088,9 +2129,13 @@ class SubjectConcepts extends Component {
                                                                     this.state
                                                                         .activeConcept
                                                                 ].content.video
-                                                                    .pasteUrl
+                                                                    .path
                                                             }
                                                         />
+                                                        <small className="form-text text-muted mb-2">
+                                                            Only https supported
+                                                            video
+                                                        </small>
                                                     </div>
                                                 </Card.Body>
                                             </Accordion.Collapse>
@@ -2123,6 +2168,17 @@ class SubjectConcepts extends Component {
                                                 <Card.Body className="p-3">
                                                     {/* ---------- Audio ---------- */}
                                                     <div className="form-group">
+                                                        <div className="text-right">
+                                                            <button
+                                                                className="btn btn-link btn-sm shadow-none"
+                                                                onClick={
+                                                                    this
+                                                                        .clearAudios
+                                                                }
+                                                            >
+                                                                Clear
+                                                            </button>
+                                                        </div>
                                                         {data[
                                                             this.state
                                                                 .activeConcept
@@ -2185,6 +2241,16 @@ class SubjectConcepts extends Component {
                                                                 </Fragment>
                                                             )
                                                         )}
+                                                        <small
+                                                            className="form-text text-muted mb-2"
+                                                            style={{
+                                                                marginTop:
+                                                                    "-8px",
+                                                            }}
+                                                        >
+                                                            Select only .wav
+                                                            .mp3
+                                                        </small>
                                                     </div>
                                                 </Card.Body>
                                             </Accordion.Collapse>

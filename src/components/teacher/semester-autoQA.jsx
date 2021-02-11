@@ -40,7 +40,7 @@ class SemesterAutoQA extends Component {
 
     loadQAData = () => {
         fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/auto/${this.sectionId}/?attempt_number=${this.attempt}`,
+            `${this.url}/teacher/subject/${this.subjectId}/semester/${this.semesterId}/auto/${this.sectionId}/?attempt_number=${this.attempt}`,
             {
                 method: "GET",
                 headers: this.headers,
