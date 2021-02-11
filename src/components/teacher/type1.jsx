@@ -4,7 +4,17 @@ import Header from "./navbar";
 import SideNav from "./sidenav";
 import CKeditor from "../sharedComponents/CKeditor";
 import ReactSwitch from "../sharedComponents/switchComponent";
-import { Accordion, Card, Alert, Spinner, Modal } from "react-bootstrap";
+import {
+    Accordion,
+    Card,
+    Alert,
+    Spinner,
+    Modal,
+    Tab,
+    Row,
+    Col,
+    Nav,
+} from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import Loading from "../sharedComponents/loader";
 
@@ -147,11 +157,154 @@ class MCQDeleteModal extends Component {
     }
 }
 
+class FileModal extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            image: this.props.image,
+            video: this.props.video,
+            audio: this.props.audio,
+            selectedImage: 0,
+            selectedImageData: [],
+        };
+        this.url = baseUrl + teacherUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
+    }
+
+    changeImage = (image_index) => {
+        const images = [...this.state.image];
+        if (this.state.selectedImage === image_index) {
+            this.setState({
+                selectedImage: "",
+                selectedImageData: [],
+            });
+        } else {
+            this.setState({
+                selectedImage: image_index,
+                selectedImageData: images[image_index],
+            });
+        }
+    };
+
+    render() {
+        const video = this.state.video;
+        return (
+            <Modal
+                show={this.props.show}
+                onHide={this.props.onHide}
+                size="lg"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Header closeButton>Uploaded Files</Modal.Header>
+                <Modal.Body>
+                    <Tab.Container
+                        id="left-tabs-example"
+                        defaultActiveKey="image"
+                    >
+                        <Row>
+                            <Col sm={3} className="mb-3 mb-md-0">
+                                <Nav variant="pills" className="flex-column">
+                                    <Nav.Item>
+                                        <Nav.Link eventKey="image">
+                                            Image
+                                        </Nav.Link>
+                                    </Nav.Item>
+                                    <Nav.Item>
+                                        <Nav.Link eventKey="video">
+                                            Video
+                                        </Nav.Link>
+                                    </Nav.Item>
+                                    <Nav.Item>
+                                        <Nav.Link eventKey="audio">
+                                            Audio
+                                        </Nav.Link>
+                                    </Nav.Item>
+                                </Nav>
+                            </Col>
+                            <Col sm={9}>
+                                <Tab.Content>
+                                    <Tab.Pane eventKey="image">
+                                        {this.state.image.map(
+                                            (images, index) => {
+                                                return images.path !== "" ? (
+                                                    <div
+                                                        key={index}
+                                                        className="card preview-img-sm bg-light shadow-sm mb-2"
+                                                        style={{
+                                                            backgroundImage: `url(${images.path})`,
+                                                        }}
+                                                        onClick={() =>
+                                                            this.changeImage(
+                                                                index
+                                                            )
+                                                        }
+                                                    ></div>
+                                                ) : (
+                                                    null
+                                                );
+                                            }
+                                        )}
+                                        {this.state.selectedImageData.length !==
+                                        0 ? (
+                                            <div className="card shadow-sm">
+                                                <img
+                                                    src={
+                                                        this.state
+                                                            .selectedImageData
+                                                            .path
+                                                    }
+                                                    alt={
+                                                        this.state
+                                                            .selectedImageData
+                                                            .file_name
+                                                    }
+                                                    className="img-fluid rounded-lg"
+                                                />
+                                            </div>
+                                        ) : (
+                                            ""
+                                        )}
+                                    </Tab.Pane>
+                                    <Tab.Pane eventKey="video">
+                                        {this.state.video.path !== null ? (
+                                            <video
+                                                src={this.state.video.path}
+                                            ></video>
+                                        ) : (
+                                            "Video not uploaded"
+                                        )}
+                                    </Tab.Pane>
+                                    <Tab.Pane eventKey="audio">
+                                        {this.state.audio.map((item, index) => {
+                                            return item.path !== null ? (
+                                                <audio src={item.path}></audio>
+                                            ) : (
+                                                "Audio not uploaded"
+                                            );
+                                        })}
+                                    </Tab.Pane>
+                                </Tab.Content>
+                            </Col>
+                        </Row>
+                    </Tab.Container>
+                </Modal.Body>
+            </Modal>
+        );
+    }
+}
+
 class SubjectType1 extends Component {
     constructor(props) {
         super(props);
         this.state = {
             showSideNav: false,
+            showModal: false,
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
@@ -171,9 +324,11 @@ class SubjectType1 extends Component {
             isForm_submitted: false,
 
             activeQuestion: "",
-            selectedImageQuestion: "",
-            selectedImageData: [],
+            // selectedImageQuestion: "",
+            // selectedImageData: [],
             selectedImage: "",
+            selectedVideo: "",
+            selectedAudio: "",
             selectedQuestion: [],
 
             keyboards: [
@@ -210,11 +365,11 @@ class SubjectType1 extends Component {
                             title: "",
                             file_name: "",
                             video: null,
-                            pasteUrl: "",
+                            path: "",
                         },
                         audio: [
-                            { title: "", file_name: "", audio: null },
-                            { title: "", file_name: "", audio: null },
+                            { title: "", file_name: "", audio: null, path: "" },
+                            { title: "", file_name: "", audio: null, path: "" },
                         ],
                     },
                     properties: {
@@ -251,6 +406,15 @@ class SubjectType1 extends Component {
     toggleSideNav = () => {
         this.setState({
             showSideNav: !this.state.showSideNav,
+        });
+    };
+
+    toggleModal = (image, video, audio) => {
+        this.setState({
+            showModal: !this.state.showModal,
+            selectedImage: image,
+            selectedVideo: video,
+            selectedAudio: audio,
         });
     };
 
@@ -325,7 +489,8 @@ class SubjectType1 extends Component {
                                         response[i].files[0]
                                             .type1_audio_1_title,
                                     file_name: "",
-                                    audio: response[i].files[0].type1_audio_1,
+                                    audio: null,
+                                    path: response[i].files[0].type1_audio_1,
                                 });
                             }
                             if (response[i].files[0].type1_audio_2) {
@@ -334,7 +499,8 @@ class SubjectType1 extends Component {
                                         response[i].files[0]
                                             .type1_audio_2_title,
                                     file_name: "",
-                                    audio: response[i].files[0].type1_audio_2,
+                                    audio: null,
+                                    path: response[i].files[0].type1_audio_2,
                                 });
                             }
                         }
@@ -397,7 +563,7 @@ class SubjectType1 extends Component {
                                             : "",
                                     file_name: "",
                                     video: null,
-                                    pasteUrl:
+                                    path:
                                         response[i].files.length !== 0 &&
                                         response[i].files[0].paste_video_url
                                             ? response[i].files[0]
@@ -411,11 +577,13 @@ class SubjectType1 extends Component {
                                                   title: "",
                                                   file_name: "",
                                                   audio: null,
+                                                  path: "",
                                               },
                                               {
                                                   title: "",
                                                   file_name: "",
                                                   audio: null,
+                                                  path: "",
                                               },
                                           ]
                                         : audio,
@@ -851,13 +1019,12 @@ class SubjectType1 extends Component {
             );
 
             if (
-                questionData[this.state.activeQuestion].content.video
-                    .pasteUrl !== ""
+                questionData[this.state.activeQuestion].content.video.path !==
+                ""
             ) {
                 form_data.append(
                     "video_url",
-                    questionData[this.state.activeQuestion].content.video
-                        .pasteUrl
+                    questionData[this.state.activeQuestion].content.video.path
                 );
             }
 
@@ -1184,9 +1351,25 @@ class SubjectType1 extends Component {
     handleRemoveOptionFields = (index) => {
         const values = [...this.state.questions];
         values[this.state.activeQuestion].content.options.splice(index, 1);
-        this.setState({
-            questions: values,
-        });
+        this.setState(
+            {
+                questions: values,
+            },
+            () => {
+                if (
+                    values[this.state.activeQuestion].content.options.length ===
+                    0
+                ) {
+                    values[this.state.activeQuestion].content.options.push({
+                        correct: false,
+                        content: "",
+                    });
+                }
+                this.setState({
+                    questions: values,
+                });
+            }
+        );
     };
 
     handleAnswerChange = (index, event) => {
@@ -1212,9 +1395,24 @@ class SubjectType1 extends Component {
             index,
             1
         );
-        this.setState({
-            questions: values,
-        });
+        this.setState(
+            {
+                questions: values,
+            },
+            () => {
+                if (
+                    values[this.state.activeQuestion].content.fillin_answer
+                        .length === 0
+                ) {
+                    values[
+                        this.state.activeQuestion
+                    ].content.fillin_answer.push("");
+                }
+                this.setState({
+                    questions: values,
+                });
+            }
+        );
     };
 
     // -------------------------- Image --------------------------
@@ -1244,14 +1442,33 @@ class SubjectType1 extends Component {
     handleRemoveImageFields = (index) => {
         const values = [...this.state.questions];
         values[this.state.activeQuestion].content.images.splice(index, 1);
-        this.setState({
-            questions: values,
-        });
+        this.setState(
+            {
+                questions: values,
+            },
+            () => {
+                if (
+                    values[this.state.activeQuestion].content.images.length ===
+                    0
+                ) {
+                    values[this.state.activeQuestion].content.images.push({
+                        title: "",
+                        file_name: "",
+                        image: null,
+                        path: "",
+                    });
+                }
+                this.setState({
+                    questions: values,
+                });
+            }
+        );
     };
 
     handleImageFile = (index, event) => {
         const values = [...this.state.questions];
-        if (!event.target.files[0].name.match(/\.(jpg|jpeg|png|webp)$/)) {
+        const file = event.target.files[0].name.toLowerCase();
+        if (!file.match(/\.(jpg|jpeg|png|webp)$/)) {
             this.setState({
                 errorMsg: "Please select valid image file",
                 showErrorAlert: true,
@@ -1273,24 +1490,39 @@ class SubjectType1 extends Component {
         }
     };
 
-    changeImage = (image_index, q_index) => {
-        const images = [...this.state.questions];
-        if (
-            this.state.selectedImage === image_index &&
-            this.state.selectedImageQuestion === q_index
-        ) {
-            this.setState({
-                selectedImage: "",
-                selectedImageQuestion: "",
-                selectedImageData: [],
-            });
-        } else {
-            this.setState({
-                selectedImage: image_index,
-                selectedImageQuestion: q_index,
-                selectedImageData: images[q_index].content.images[image_index],
-            });
-        }
+    // changeImage = (image_index, q_index) => {
+    //     const images = [...this.state.questions];
+    //     if (
+    //         this.state.selectedImage === image_index &&
+    //         this.state.selectedImageQuestion === q_index
+    //     ) {
+    //         this.setState({
+    //             selectedImage: "",
+    //             selectedImageQuestion: "",
+    //             selectedImageData: [],
+    //         });
+    //     } else {
+    //         this.setState({
+    //             selectedImage: image_index,
+    //             selectedImageQuestion: q_index,
+    //             selectedImageData: images[q_index].content.images[image_index],
+    //         });
+    //     }
+    // };
+
+    clearImages = () => {
+        const values = [...this.state.questions];
+        values[this.state.activeQuestion].content.images = [
+            {
+                title: "",
+                file_name: "",
+                image: null,
+                path: "",
+            },
+        ];
+        this.setState({
+            questions: values,
+        });
     };
 
     // -------------------------- Video --------------------------
@@ -1306,9 +1538,8 @@ class SubjectType1 extends Component {
 
     handleVideoFile = (event) => {
         let values = [...this.state.questions];
-        if (
-            !event.target.files[0].name.match(/\.(mpeg|flv|avi|mov|mp4|mkv)$/)
-        ) {
+        const file = event.target.files[0].name.toLowerCase();
+        if (!file.match(/\.(mpeg|flv|avi|mov|mp4|mkv)$/)) {
             this.setState({
                 errorMsg: "Please select valid video file",
                 showErrorAlert: true,
@@ -1317,9 +1548,11 @@ class SubjectType1 extends Component {
         } else {
             values[this.state.activeQuestion].content.video.file_name =
                 event.target.files[0].name;
+            values[
+                this.state.activeQuestion
+            ].content.video.path = URL.createObjectURL(event.target.files[0]);
             values[this.state.activeQuestion].content.video.video =
                 event.target.files[0];
-            values[this.state.activeQuestion].content.video.pasteUrl = "";
             this.setState({
                 questions: values,
                 btnDisabled: false,
@@ -1330,10 +1563,21 @@ class SubjectType1 extends Component {
 
     handleVideoUrl = (event) => {
         const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.video.pasteUrl =
+        values[this.state.activeQuestion].content.video.path =
             event.target.value;
         values[this.state.activeQuestion].content.video.file_name = "";
         values[this.state.activeQuestion].content.video.video = null;
+        this.setState({
+            questions: values,
+        });
+    };
+
+    clearVideo = () => {
+        const values = [...this.state.questions];
+        values[this.state.activeQuestion].content.video.title = "";
+        values[this.state.activeQuestion].content.video.file_name = "";
+        values[this.state.activeQuestion].content.video.video = null;
+        values[this.state.activeQuestion].content.video.path = "";
         this.setState({
             questions: values,
         });
@@ -1352,7 +1596,8 @@ class SubjectType1 extends Component {
 
     handleAudioFile = (index, event) => {
         const values = [...this.state.questions];
-        if (!event.target.files[0].name.match(/\.(wav|mp3)$/)) {
+        const file = event.target.files[0].name.toLowerCase();
+        if (!file.match(/\.(wav|mp3)$/)) {
             this.setState({
                 errorMsg: "Please select valid audio file",
                 showErrorAlert: true,
@@ -1361,6 +1606,9 @@ class SubjectType1 extends Component {
         } else {
             values[this.state.activeQuestion].content.audio[index].file_name =
                 event.target.files[0].name;
+            values[this.state.activeQuestion].content.audio[
+                index
+            ].path = URL.createObjectURL(event.target.files[0]);
             values[this.state.activeQuestion].content.audio[index].audio =
                 event.target.files[0];
             this.setState({
@@ -1369,6 +1617,17 @@ class SubjectType1 extends Component {
                 showErrorAlert: false,
             });
         }
+    };
+
+    clearAudios = () => {
+        const values = [...this.state.questions];
+        values[this.state.activeQuestion].content.audio = [
+            { title: "", file_name: "", audio: null, path: "" },
+            { title: "", file_name: "", audio: null, path: "" },
+        ];
+        this.setState({
+            questions: values,
+        });
     };
 
     // -------------------------- Properties --------------------------
@@ -1576,11 +1835,11 @@ class SubjectType1 extends Component {
                     title: "",
                     file_name: "",
                     video: null,
-                    pasteUrl: "",
+                    path: "",
                 },
                 audio: [
-                    { title: "", file_name: "", audio: null },
-                    { title: "", file_name: "", audio: null },
+                    { title: "", file_name: "", audio: null, path: "" },
+                    { title: "", file_name: "", audio: null, path: "" },
                 ],
             },
             properties: {
@@ -1622,6 +1881,14 @@ class SubjectType1 extends Component {
                 showMCQDelete_Modal: !this.state.showMCQDelete_Modal,
             });
         } else {
+            // if (this.state.selectedImageQuestion === index) {
+            //     this.setState({
+            //         selectedImageQuestion: "",
+            //         selectedImageData: [],
+            //         selectedImage: "",
+            //     });
+            // }
+
             keyboards.splice(index, 1);
             values.splice(index, 1);
             this.setState(
@@ -1671,11 +1938,21 @@ class SubjectType1 extends Component {
                                     title: "",
                                     file_name: "",
                                     video: null,
-                                    pasteUrl: "",
+                                    path: "",
                                 },
                                 audio: [
-                                    { title: "", file_name: "", audio: null },
-                                    { title: "", file_name: "", audio: null },
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        audio: null,
+                                        path: "",
+                                    },
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        audio: null,
+                                        path: "",
+                                    },
                                 ],
                             },
                             properties: {
@@ -1713,12 +1990,12 @@ class SubjectType1 extends Component {
         const values = [...this.state.questions];
         const keyboards = [...this.state.keyboards];
 
-        keyboards.push({
+        keyboards[values.length] = {
             all: keyboards[index].all,
             chemistry: keyboards[index].chemistry,
             physics: keyboards[index].physics,
             maths: keyboards[index].maths,
-        });
+        };
         const options = [];
         for (let i = 0; i < values[index].content.options.length; i++) {
             options[i] = {
@@ -1772,11 +2049,11 @@ class SubjectType1 extends Component {
                     title: "",
                     file_name: "",
                     video: null,
-                    pasteUrl: "",
+                    path: "",
                 },
                 audio: [
-                    { title: "", file_name: "", audio: null },
-                    { title: "", file_name: "", audio: null },
+                    { title: "", file_name: "", audio: null, path: "" },
+                    { title: "", file_name: "", audio: null, path: "" },
                 ],
             },
             properties: {
@@ -1817,6 +2094,16 @@ class SubjectType1 extends Component {
 
             keyboards.splice(this.state.activeQuestion, 1);
             values.splice(this.state.activeQuestion, 1);
+
+            // if (
+            //     this.state.selectedImageQuestion === this.state.activeQuestion
+            // ) {
+            //     this.setState({
+            //         selectedImageQuestion: "",
+            //         selectedImageData: [],
+            //         selectedImage: "",
+            //     });
+            // }
 
             this.setState(
                 {
@@ -1871,18 +2158,20 @@ class SubjectType1 extends Component {
                                     title: "",
                                     file_name: "",
                                     video: null,
-                                    pasteUrl: "",
+                                    path: "",
                                 },
                                 audio: [
                                     {
                                         title: "",
                                         file_name: "",
                                         audio: null,
+                                        path: "",
                                     },
                                     {
                                         title: "",
                                         file_name: "",
                                         audio: null,
+                                        path: "",
                                     },
                                 ],
                             },
@@ -1947,6 +2236,17 @@ class SubjectType1 extends Component {
                         chapter_name={this.chapterName}
                         topic_name={this.topicName}
                         values={this.state.selectedQuestion}
+                    />
+                ) : null}
+
+                {/* MCQ Deletion Modal */}
+                {this.state.showModal ? (
+                    <FileModal
+                        show={this.state.showModal}
+                        onHide={this.toggleModal}
+                        image={this.state.selectedImage}
+                        video={this.state.selectedVideo}
+                        audio={this.state.selectedAudio}
                     />
                 ) : null}
 
@@ -2069,21 +2369,7 @@ class SubjectType1 extends Component {
                                                         <div className="card-body">
                                                             <div className="row">
                                                                 {/* Questions & options */}
-                                                                <div
-                                                                    className={`${
-                                                                        this
-                                                                            .state
-                                                                            .selectedImageData
-                                                                            .length !==
-                                                                            0 &&
-                                                                        this
-                                                                            .state
-                                                                            .selectedImageQuestion ===
-                                                                            q_index
-                                                                            ? "col-md-9"
-                                                                            : "col-md-11 pr-md-0"
-                                                                    }`}
-                                                                >
+                                                                <div className="col-md-11 pr-md-0">
                                                                     <div className="form-group">
                                                                         <div className="card form-shadow">
                                                                             <div
@@ -2220,7 +2506,7 @@ class SubjectType1 extends Component {
                                                                     )}
                                                                 </div>
                                                                 {/* image preview */}
-                                                                {this.state
+                                                                {/* {this.state
                                                                     .selectedImageData
                                                                     .length !==
                                                                     0 &&
@@ -2248,8 +2534,8 @@ class SubjectType1 extends Component {
                                                                     </div>
                                                                 ) : (
                                                                     ""
-                                                                )}
-                                                                <div className="col-md-1 d-flex justify-content-md-center justify-content-around flex-wrap">
+                                                                )} */}
+                                                                {/* <div className="col-md-1 d-flex justify-content-md-center justify-content-around flex-wrap">
                                                                     {question.content.images.map(
                                                                         (
                                                                             images,
@@ -2282,6 +2568,26 @@ class SubjectType1 extends Component {
                                                                             );
                                                                         }
                                                                     )}
+                                                                </div> */}
+                                                                <div className="col-md-1 pl-0 text-right">
+                                                                    <button
+                                                                        className="btn btn-light bg-white"
+                                                                        onClick={() =>
+                                                                            this.toggleModal(
+                                                                                question
+                                                                                    .content
+                                                                                    .images,
+                                                                                question
+                                                                                    .content
+                                                                                    .video,
+                                                                                question
+                                                                                    .content
+                                                                                    .audio
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <i className="far fa-folder-open"></i>
+                                                                    </button>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -2561,17 +2867,7 @@ class SubjectType1 extends Component {
                                                                                                 )
                                                                                             }
                                                                                         >
-                                                                                            {data[
-                                                                                                this
-                                                                                                    .state
-                                                                                                    .activeQuestion
-                                                                                            ]
-                                                                                                .content
-                                                                                                .options
-                                                                                                .length >
-                                                                                            1
-                                                                                                ? "-"
-                                                                                                : ""}
+                                                                                            -
                                                                                         </button>
                                                                                     </div>
                                                                                 </div>
@@ -2687,17 +2983,7 @@ class SubjectType1 extends Component {
                                                                                                 )
                                                                                             }
                                                                                         >
-                                                                                            {data[
-                                                                                                this
-                                                                                                    .state
-                                                                                                    .activeQuestion
-                                                                                            ]
-                                                                                                .content
-                                                                                                .fillin_answer
-                                                                                                .length >
-                                                                                            1
-                                                                                                ? "-"
-                                                                                                : ""}
+                                                                                            -
                                                                                         </button>
                                                                                     </div>
                                                                                 </div>
@@ -2805,9 +3091,24 @@ class SubjectType1 extends Component {
 
                                                     {/* ---------- Image ---------- */}
                                                     <div className="form-group">
-                                                        <p className="mb-2">
-                                                            Image
-                                                        </p>
+                                                        <div className="row align-items-center mb-2">
+                                                            <div className="col-md-6">
+                                                                <p className="mb-0">
+                                                                    Image
+                                                                </p>
+                                                            </div>
+                                                            <div className="col-md-6 text-right">
+                                                                <button
+                                                                    className="btn btn-link btn-sm shadow-none"
+                                                                    onClick={
+                                                                        this
+                                                                            .clearImages
+                                                                    }
+                                                                >
+                                                                    Clear
+                                                                </button>
+                                                            </div>
+                                                        </div>
                                                         {data[
                                                             this.state
                                                                 .activeQuestion
@@ -2854,32 +3155,17 @@ class SubjectType1 extends Component {
                                                                                 role="group"
                                                                                 aria-label="Basic example"
                                                                             >
-                                                                                {data[
-                                                                                    this
-                                                                                        .state
-                                                                                        .activeQuestion
-                                                                                ]
-                                                                                    .content
-                                                                                    .images
-                                                                                    .length >
-                                                                                1 ? (
-                                                                                    <button
-                                                                                        type="button"
-                                                                                        className="btn btn-light btn-sm shadow-none font-weight-bold"
-                                                                                        onClick={() =>
-                                                                                            this.handleRemoveImageFields(
-                                                                                                index
-                                                                                            )
-                                                                                        }
-                                                                                    >
-                                                                                        -
-                                                                                    </button>
-                                                                                ) : (
-                                                                                    <button
-                                                                                        type="button"
-                                                                                        className="btn btn-light btn-sm"
-                                                                                    ></button>
-                                                                                )}
+                                                                                <button
+                                                                                    type="button"
+                                                                                    className="btn btn-light btn-sm shadow-none font-weight-bold"
+                                                                                    onClick={() =>
+                                                                                        this.handleRemoveImageFields(
+                                                                                            index
+                                                                                        )
+                                                                                    }
+                                                                                >
+                                                                                    -
+                                                                                </button>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -2913,7 +3199,6 @@ class SubjectType1 extends Component {
                                                             )
                                                         )}
                                                         <small
-                                                            id="passwordHelpBlock"
                                                             className="form-text text-muted mb-2"
                                                             style={{
                                                                 marginTop:
@@ -2948,9 +3233,24 @@ class SubjectType1 extends Component {
 
                                                     {/* ---------- Video ---------- */}
                                                     <div className="form-group">
-                                                        <p className="mb-2">
-                                                            Video
-                                                        </p>
+                                                        <div className="row align-items-center mb-2">
+                                                            <div className="col-md-6">
+                                                                <p className="mb-0">
+                                                                    Video
+                                                                </p>
+                                                            </div>
+                                                            <div className="col-md-6 text-right">
+                                                                <button
+                                                                    className="btn btn-link btn-sm shadow-none"
+                                                                    onClick={
+                                                                        this
+                                                                            .clearVideo
+                                                                    }
+                                                                >
+                                                                    Clear
+                                                                </button>
+                                                            </div>
+                                                        </div>
                                                         <input
                                                             type="text"
                                                             name="video"
@@ -2960,6 +3260,13 @@ class SubjectType1 extends Component {
                                                             onChange={
                                                                 this
                                                                     .handleVideoTitle
+                                                            }
+                                                            value={
+                                                                data[
+                                                                    this.state
+                                                                        .activeQuestion
+                                                                ].content.video
+                                                                    .title
                                                             }
                                                             autoComplete="off"
                                                         />
@@ -2999,7 +3306,6 @@ class SubjectType1 extends Component {
                                                             </label>
                                                         </div>
                                                         <small
-                                                            id="passwordHelpBlock"
                                                             className="form-text text-muted mb-2"
                                                             style={{
                                                                 marginTop:
@@ -3030,13 +3336,10 @@ class SubjectType1 extends Component {
                                                                     this.state
                                                                         .activeQuestion
                                                                 ].content.video
-                                                                    .pasteUrl
+                                                                    .path
                                                             }
                                                         />
-                                                        <small
-                                                            id="passwordHelpBlock"
-                                                            className="form-text text-muted mb-2"
-                                                        >
+                                                        <small className="form-text text-muted mb-2">
                                                             Only https supported
                                                             video
                                                         </small>
@@ -3044,9 +3347,24 @@ class SubjectType1 extends Component {
 
                                                     {/* ---------- Audio ---------- */}
                                                     <div className="form-group">
-                                                        <p className="mb-2">
-                                                            Audio
-                                                        </p>
+                                                        <div className="row align-items-center mb-2">
+                                                            <div className="col-md-6">
+                                                                <p className="mb-0">
+                                                                    Audio
+                                                                </p>
+                                                            </div>
+                                                            <div className="col-md-6 text-right">
+                                                                <button
+                                                                    className="btn btn-link btn-sm shadow-none"
+                                                                    onClick={
+                                                                        this
+                                                                            .clearAudios
+                                                                    }
+                                                                >
+                                                                    Clear
+                                                                </button>
+                                                            </div>
+                                                        </div>
                                                         {data[
                                                             this.state
                                                                 .activeQuestion
@@ -3110,7 +3428,6 @@ class SubjectType1 extends Component {
                                                             )
                                                         )}
                                                         <small
-                                                            id="passwordHelpBlock"
                                                             className="form-text text-muted mb-2"
                                                             style={{
                                                                 marginTop:

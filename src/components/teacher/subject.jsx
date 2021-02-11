@@ -359,7 +359,6 @@ class ChapterEditModal extends Component {
             weightage: this.props.data.weightage,
             chapter_status: this.props.data.chapter_status,
             status: [],
-            data: this.props.data,
 
             errorMsg: "",
             successMsg: "",
@@ -1367,7 +1366,7 @@ class SubjectChapters extends Component {
                                                                               </td>
                                                                               <td className="text-right">
                                                                                   <Link
-                                                                                      to={`${this.props.match.url}/chapter/${chapter.chapter_name}`}
+                                                                                      to={`${this.props.match.url}/chapter/${chapter.chapter_id}`}
                                                                                   >
                                                                                       <button className="btn btn-primary btn-sm">
                                                                                           Add
@@ -1505,7 +1504,7 @@ class SubjectChapters extends Component {
                                                               </td>
                                                               <td className="text-right">
                                                                   <Link
-                                                                      to={`/teacher/subject/${this.subjectId}/chapter/${chapter.chapter_name}`}
+                                                                      to={`/teacher/subject/${this.subjectId}/chapter/${chapter.chapter_id}`}
                                                                   >
                                                                       <button className="btn btn-primary btn-sm">
                                                                           Add
