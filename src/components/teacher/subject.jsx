@@ -1385,7 +1385,7 @@ class SubjectChapters extends Component {
                                                                                   >
                                                                                       <i className="far fa-edit"></i>
                                                                                   </button>
-                                                                                  <button
+                                                                                  {/* <button
                                                                                       className="btn btn-primary-invert shadow-sm btn-sm"
                                                                                       onClick={() =>
                                                                                           this.toggleChapter_DeleteModal(
@@ -1394,7 +1394,7 @@ class SubjectChapters extends Component {
                                                                                       }
                                                                                   >
                                                                                       <i className="far fa-trash-alt"></i>
-                                                                                  </button>
+                                                                                  </button> */}
                                                                               </td>
                                                                           </tr>
                                                                       ) : null;
@@ -1450,7 +1450,7 @@ class SubjectChapters extends Component {
                                                                       >
                                                                           <i className="far fa-edit"></i>
                                                                       </button>
-                                                                      <button
+                                                                      {/* <button
                                                                           className="btn btn-primary-invert shadow-sm btn-sm"
                                                                           onClick={() =>
                                                                               this.toggleSemester_DeleteModal(
@@ -1459,7 +1459,7 @@ class SubjectChapters extends Component {
                                                                           }
                                                                       >
                                                                           <i className="far fa-trash-alt"></i>
-                                                                      </button>
+                                                                      </button> */}
                                                                   </td>
                                                               </tr>
                                                           </React.Fragment>
@@ -1523,7 +1523,7 @@ class SubjectChapters extends Component {
                                                                   >
                                                                       <i className="far fa-edit"></i>
                                                                   </button>
-                                                                  <button
+                                                                  {/* <button
                                                                       className="btn btn-primary-invert shadow-sm btn-sm"
                                                                       onClick={() =>
                                                                           this.toggleChapter_DeleteModal(
@@ -1532,7 +1532,7 @@ class SubjectChapters extends Component {
                                                                       }
                                                                   >
                                                                       <i className="far fa-trash-alt"></i>
-                                                                  </button>
+                                                                  </button> */}
                                                               </td>
                                                           </tr>
                                                       ) : null;

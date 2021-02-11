@@ -79,7 +79,7 @@ class Header extends Component {
                             <Dropdown>
                                 <Dropdown.Toggle
                                     variant="light"
-                                    className="bg-white border-0 nav-link"
+                                    className="bg-white border-0 nav-link shadow-none"
                                     id="dropdown-basic"
                                 >
                                     <img
