@@ -4,10 +4,149 @@ import Header from "./navbar";
 import SideNav from "./sidenav";
 import CKeditor from "../sharedComponents/CKeditor";
 import ReactSwitch from "../sharedComponents/switchComponent";
-import { Accordion, Card, Alert, Spinner } from "react-bootstrap";
+import { Accordion, Card, Alert, Spinner, Modal } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import ReactCardFlip from "react-card-flip";
 import Loading from "../sharedComponents/loader";
+
+class ConceptsDeleteModal extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: false,
+        };
+        this.url = baseUrl + teacherUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
+    }
+
+    handleDelete = () => {
+        this.setState({
+            showSuccessAlert: false,
+            showErrorAlert: false,
+            showLoader: true,
+        });
+
+        fetch(
+            `${this.url}/teacher/subject/${this.props.subjectId}/chapter/concepts/`,
+            {
+                method: "DELETE",
+                headers: this.headers,
+                body: JSON.stringify({
+                    chapter_name: this.props.chapter_name,
+                    topic_name: this.props.topic_name,
+                    concepts_random_id: this.props.values,
+                }),
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        showLoader: false,
+                    });
+                    this.props.formSubmission(true);
+                } else {
+                    if (result.detail) {
+                        this.setState({
+                            errorMsg: result.detail,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.msg,
+                        });
+                    }
+                    this.setState({
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    render() {
+        return (
+            <Modal
+                show={this.props.show}
+                onHide={this.props.onHide}
+                size="md"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Header closeButton>Delete Concept</Modal.Header>
+                <Modal.Body>
+                    <Alert
+                        variant="danger"
+                        show={this.state.showErrorAlert}
+                        onClose={() => {
+                            this.setState({
+                                showErrorAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.errorMsg}
+                    </Alert>
+                    <Alert
+                        variant="success"
+                        show={this.state.showSuccessAlert}
+                        onClose={() => {
+                            this.setState({
+                                showSuccessAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.successMsg}
+                    </Alert>
+                    <p className="mb-0">
+                        Are you sure that you want to delete this concept?
+                    </p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <button
+                        className="btn btn-secondary btn-sm mr-2"
+                        onClick={this.props.toggleModal}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        className="btn btn-primary btn-sm"
+                        onClick={this.handleDelete}
+                    >
+                        {this.state.showLoader ? (
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                                className="mr-2"
+                            />
+                        ) : (
+                            ""
+                        )}
+                        Delete
+                    </button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
+}
 
 class SubjectConcepts extends Component {
     constructor(props) {
@@ -21,6 +160,7 @@ class SubjectConcepts extends Component {
             showLoader: false,
             page_loading: true,
             btnDisabled: false,
+            showConceptDelete_Modal: false,
 
             contentCollapsed: true,
             imageCollapsed: true,
@@ -35,6 +175,7 @@ class SubjectConcepts extends Component {
             selectedImageData: [],
             selectedImage: "",
             flipState: [false],
+            selectedConcept: [],
 
             keyboards: [
                 { all: false, chemistry: false, physics: false, maths: false },
@@ -997,122 +1138,21 @@ class SubjectConcepts extends Component {
         const values = [...this.state.concepts];
         const keyboards = [...this.state.keyboards];
         const flips = [...this.state.flipState];
+
         this.setState({
             showEdit_option: false,
             contentCollapsed: true,
             imageCollapsed: true,
             audioCollapsed: true,
             settingsCollapsed: true,
+            activeConcept: index,
         });
 
         if (values[index].concepts_random_id !== "") {
-            fetch(
-                `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/`,
-                {
-                    method: "DELETE",
-                    headers: this.headers,
-                    body: JSON.stringify({
-                        chapter_name: values[index].chapter_name,
-                        topic_name: values[index].topic_name,
-                        concepts_random_id: values[index].concepts_random_id,
-                    }),
-                }
-            )
-                .then((res) => res.json())
-                .then((result) => {
-                    if (result.sts === true) {
-                        alert(result.msg);
-                        flips.splice(index, 1);
-                        keyboards.splice(index, 1);
-                        values.splice(index, 1);
-                        this.setState(
-                            {
-                                concepts: values,
-                                keyboards: keyboards,
-                                flipState: flips,
-                            },
-                            () => {
-                                if (values.length === 0) {
-                                    flips.push(false);
-                                    keyboards.push({
-                                        all: false,
-                                        chemistry: false,
-                                        physics: false,
-                                        maths: false,
-                                    });
-                                    values.push({
-                                        chapter_name: this.props.match.params
-                                            .chapterName,
-                                        topic_name: this.props.match.params
-                                            .topicName,
-                                        concepts_random_id: "",
-                                        is_image_uploaded: false,
-                                        content: {
-                                            terms: "<p>Terms goes here</p>",
-                                            definition:
-                                                "<p>Definition goes here</p>",
-                                            images: [
-                                                {
-                                                    title: "",
-                                                    file_name: "",
-                                                    image: null,
-                                                    path: "",
-                                                },
-                                            ],
-                                            video: {
-                                                title: "",
-                                                file_name: "",
-                                                video: null,
-                                                pasteUrl: "",
-                                            },
-                                            audio: [
-                                                {
-                                                    title: "",
-                                                    file_name: "",
-                                                    audio: null,
-                                                },
-                                                {
-                                                    title: "",
-                                                    file_name: "",
-                                                    audio: null,
-                                                },
-                                            ],
-                                        },
-                                        settings: {
-                                            virtual_keyboard: [],
-                                            limited: false,
-                                        },
-                                    });
-                                    this.setState({
-                                        concepts: values,
-                                        keyboards: keyboards,
-                                        flipState: flips,
-                                    });
-                                }
-                            }
-                        );
-                        setTimeout(() => {
-                            this.setState(
-                                {
-                                    page_loading: true,
-                                },
-                                () => {
-                                    this.loadConceptData();
-                                }
-                            );
-                        }, 1000);
-                    } else {
-                        if (result.detail) {
-                            alert(result.detail);
-                        } else {
-                            alert(result.msg);
-                        }
-                    }
-                    console.log(result);
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
+            this.setState({
+                selectedConcept: values[index].concepts_random_id,
+                showConceptDelete_Modal: !this.state.showConceptDelete_Modal,
+            });
         } else {
             flips.splice(index, 1);
             keyboards.splice(index, 1);
@@ -1175,6 +1215,12 @@ class SubjectConcepts extends Component {
         }
     };
 
+    closeConcept_DeleteModal = () => {
+        this.setState({
+            showConceptDelete_Modal: !this.state.showConceptDelete_Modal,
+        });
+    };
+
     copyConcept = (index) => {
         const values = [...this.state.concepts];
         const keyboards = [...this.state.keyboards];
@@ -1228,6 +1274,93 @@ class SubjectConcepts extends Component {
         });
     };
 
+    handleConcept_Deletion = (isMCQ_Deleted) => {
+        if (isMCQ_Deleted === true) {
+            const values = [...this.state.concepts];
+            const keyboards = [...this.state.keyboards];
+            const flips = [...this.state.flipState];
+
+            flips.splice(this.state.activeConcept, 1);
+            keyboards.splice(this.state.activeConcept, 1);
+            values.splice(this.state.activeConcept, 1);
+
+            this.setState(
+                {
+                    concepts: values,
+                    keyboards: keyboards,
+                    flipState: flips,
+                },
+                () => {
+                    if (values.length === 0) {
+                        flips.push(false);
+                        keyboards.push({
+                            all: false,
+                            chemistry: false,
+                            physics: false,
+                            maths: false,
+                        });
+                        values.push({
+                            chapter_name: this.props.match.params.chapterName,
+                            topic_name: this.props.match.params.topicName,
+                            concepts_random_id: "",
+                            is_image_uploaded: false,
+                            content: {
+                                terms: "<p>Terms goes here</p>",
+                                definition: "<p>Definition goes here</p>",
+                                images: [
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        image: null,
+                                        path: "",
+                                    },
+                                ],
+                                video: {
+                                    title: "",
+                                    file_name: "",
+                                    video: null,
+                                    pasteUrl: "",
+                                },
+                                audio: [
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        audio: null,
+                                    },
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        audio: null,
+                                    },
+                                ],
+                            },
+                            settings: {
+                                virtual_keyboard: [],
+                                limited: false,
+                            },
+                        });
+                        this.setState({
+                            concepts: values,
+                            keyboards: keyboards,
+                            flipState: flips,
+                        });
+                    }
+                }
+            );
+            setTimeout(() => {
+                this.setState(
+                    {
+                        showConceptDelete_Modal: false,
+                        page_loading: true,
+                    },
+                    () => {
+                        this.loadConceptData();
+                    }
+                );
+            }, 1000);
+        }
+    };
+
     handleFlip = (index) => {
         const flips = [...this.state.flipState];
         flips[index] = !flips[index];
@@ -1249,6 +1382,20 @@ class SubjectConcepts extends Component {
                     shownav={this.state.showSideNav}
                     activeLink="dashboard"
                 />
+
+                {/* Concept Deletion Modal */}
+                {this.state.showConceptDelete_Modal ? (
+                    <ConceptsDeleteModal
+                        show={this.state.showConceptDelete_Modal}
+                        onHide={this.closeConcept_DeleteModal}
+                        toggleModal={this.closeConcept_DeleteModal}
+                        formSubmission={this.handleConcept_Deletion}
+                        subjectId={this.subjectId}
+                        chapter_name={this.chapterName}
+                        topic_name={this.topicName}
+                        values={this.state.selectedConcept}
+                    />
+                ) : null}
 
                 <div
                     className={`section content ${

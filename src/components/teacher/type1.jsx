@@ -4,9 +4,148 @@ import Header from "./navbar";
 import SideNav from "./sidenav";
 import CKeditor from "../sharedComponents/CKeditor";
 import ReactSwitch from "../sharedComponents/switchComponent";
-import { Accordion, Card, Alert, Spinner } from "react-bootstrap";
+import { Accordion, Card, Alert, Spinner, Modal } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import Loading from "../sharedComponents/loader";
+
+class MCQDeleteModal extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: false,
+        };
+        this.url = baseUrl + teacherUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
+    }
+
+    handleDelete = () => {
+        this.setState({
+            showSuccessAlert: false,
+            showErrorAlert: false,
+            showLoader: true,
+        });
+
+        fetch(
+            `${this.url}/teacher/subject/${this.props.subjectId}/chapter/mcq/`,
+            {
+                method: "DELETE",
+                headers: this.headers,
+                body: JSON.stringify({
+                    chapter_name: this.props.chapter_name,
+                    topic_name: this.props.topic_name,
+                    question_random_id: this.props.values,
+                }),
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        showLoader: false,
+                    });
+                    this.props.formSubmission(true);
+                } else {
+                    if (result.detail) {
+                        this.setState({
+                            errorMsg: result.detail,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.msg,
+                        });
+                    }
+                    this.setState({
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    render() {
+        return (
+            <Modal
+                show={this.props.show}
+                onHide={this.props.onHide}
+                size="md"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Header closeButton>Delete MCQ</Modal.Header>
+                <Modal.Body>
+                    <Alert
+                        variant="danger"
+                        show={this.state.showErrorAlert}
+                        onClose={() => {
+                            this.setState({
+                                showErrorAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.errorMsg}
+                    </Alert>
+                    <Alert
+                        variant="success"
+                        show={this.state.showSuccessAlert}
+                        onClose={() => {
+                            this.setState({
+                                showSuccessAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.successMsg}
+                    </Alert>
+                    <p className="mb-0">
+                        Are you sure that you want to delete this question?
+                    </p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <button
+                        className="btn btn-secondary btn-sm mr-2"
+                        onClick={this.props.toggleModal}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        className="btn btn-primary btn-sm"
+                        onClick={this.handleDelete}
+                    >
+                        {this.state.showLoader ? (
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                                className="mr-2"
+                            />
+                        ) : (
+                            ""
+                        )}
+                        Delete
+                    </button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
+}
 
 class SubjectType1 extends Component {
     constructor(props) {
@@ -20,6 +159,7 @@ class SubjectType1 extends Component {
             showLoader: false,
             page_loading: true,
             btnDisabled: false,
+            showMCQDelete_Modal: false,
 
             contentCollapsed: true,
             propertiesCollapsed: true,
@@ -34,6 +174,7 @@ class SubjectType1 extends Component {
             selectedImageQuestion: "",
             selectedImageData: [],
             selectedImage: "",
+            selectedQuestion: [],
 
             keyboards: [
                 { all: false, chemistry: false, physics: false, maths: false },
@@ -259,7 +400,8 @@ class SubjectType1 extends Component {
                                     pasteUrl:
                                         response[i].files.length !== 0 &&
                                         response[i].files[0].paste_video_url
-                                            ? response[i].files[0].paste_video_url
+                                            ? response[i].files[0]
+                                                  .paste_video_url
                                             : "",
                                 },
                                 audio:
@@ -1471,157 +1613,14 @@ class SubjectType1 extends Component {
             contentCollapsed: true,
             propertiesCollapsed: true,
             settingsCollapsed: true,
+            activeQuestion: index,
         });
 
         if (values[index].question_random_id !== "") {
-            fetch(
-                `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/`,
-                {
-                    method: "DELETE",
-                    headers: this.headers,
-                    body: JSON.stringify({
-                        chapter_name: values[index].chapter_name,
-                        topic_name: values[index].topic_name,
-                        question_random_id: values[index].question_random_id,
-                    }),
-                }
-            )
-                .then((res) => res.json())
-                .then((result) => {
-                    if (result.sts === true) {
-                        alert(result.msg);
-                        keyboards.splice(index, 1);
-                        values.splice(index, 1);
-                        this.setState(
-                            {
-                                questions: values,
-                                keyboards: keyboards,
-                            },
-                            () => {
-                                if (values.length === 0) {
-                                    keyboards.push({
-                                        all: false,
-                                        chemistry: false,
-                                        physics: false,
-                                        maths: false,
-                                    });
-                                    values.push({
-                                        chapter_name: this.chapterName,
-                                        topic_name: this.topicName,
-                                        question: "<p>Question goes here</p>",
-                                        question_random_id: "",
-                                        is_image_uploaded: false,
-                                        content: {
-                                            mcq: true,
-                                            fill_in: false,
-                                            boolean: false,
-                                            fillin_answer: [""],
-                                            boolean_question: [
-                                                {
-                                                    correct: false,
-                                                    content: "True",
-                                                },
-                                                {
-                                                    correct: false,
-                                                    content: "False",
-                                                },
-                                            ],
-                                            options: [
-                                                { correct: false, content: "" },
-                                                { correct: false, content: "" },
-                                                { correct: false, content: "" },
-                                                { correct: false, content: "" },
-                                            ],
-                                            explanation: "",
-                                            images: [
-                                                {
-                                                    title: "",
-                                                    file_name: "",
-                                                    image: null,
-                                                    path: "",
-                                                },
-                                            ],
-                                            video: {
-                                                title: "",
-                                                file_name: "",
-                                                video: null,
-                                                pasteUrl: "",
-                                            },
-                                            audio: [
-                                                {
-                                                    title: "",
-                                                    file_name: "",
-                                                    audio: null,
-                                                },
-                                                {
-                                                    title: "",
-                                                    file_name: "",
-                                                    audio: null,
-                                                },
-                                            ],
-                                        },
-                                        properties: {
-                                            marks: "",
-                                            complexity: "",
-                                            priority: "",
-                                            theme: "",
-                                            test: [
-                                                false,
-                                                false,
-                                                false,
-                                                false,
-                                                false,
-                                            ],
-                                            semester: [
-                                                false,
-                                                false,
-                                                false,
-                                                false,
-                                                false,
-                                            ],
-                                            quiz: [
-                                                false,
-                                                false,
-                                                false,
-                                                false,
-                                                false,
-                                            ],
-                                            learn: false,
-                                        },
-                                        settings: {
-                                            virtual_keyboard: [],
-                                            limited: false,
-                                        },
-                                    });
-                                    this.setState({
-                                        questions: values,
-                                        keyboards: keyboards,
-                                    });
-                                }
-                            }
-                        );
-                        setTimeout(() => {
-                            this.setState(
-                                {
-                                    page_loading: true,
-                                },
-                                () => {
-                                    this.loadMCQData();
-                                }
-                            );
-                        }, 1000);
-                    } else {
-                        if (result.detail) {
-                            alert(result.detail);
-                        } else {
-                            alert(result.msg);
-                        }
-                    }
-                    console.log(result);
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
+            this.setState({
+                selectedQuestion: values[index].question_random_id,
+                showMCQDelete_Modal: !this.state.showMCQDelete_Modal,
+            });
         } else {
             keyboards.splice(index, 1);
             values.splice(index, 1);
@@ -1704,9 +1703,16 @@ class SubjectType1 extends Component {
         }
     };
 
+    closeMCQ_DeleteModal = () => {
+        this.setState({
+            showMCQDelete_Modal: !this.state.showMCQDelete_Modal,
+        });
+    };
+
     copyQuestions = (index) => {
         const values = [...this.state.questions];
         const keyboards = [...this.state.keyboards];
+
         keyboards.push({
             all: keyboards[index].all,
             chemistry: keyboards[index].chemistry,
@@ -1715,11 +1721,25 @@ class SubjectType1 extends Component {
         });
         const options = [];
         for (let i = 0; i < values[index].content.options.length; i++) {
-            options[i] = values[index].content.options[i];
+            options[i] = {
+                content: values[index].content.options[i].content,
+                correct: values[index].content.options[i].correct,
+            };
         }
         const fillin = [];
         for (let i = 0; i < values[index].content.fillin_answer.length; i++) {
             fillin[i] = values[index].content.fillin_answer[i];
+        }
+        const boolean = [];
+        for (
+            let i = 0;
+            i < values[index].content.boolean_question.length;
+            i++
+        ) {
+            boolean[i] = {
+                content: values[index].content.boolean_question[i].content,
+                correct: values[index].content.boolean_question[i].correct,
+            };
         }
         const test = [];
         for (let i = 0; i < values[index].properties.test.length; i++) {
@@ -1733,7 +1753,7 @@ class SubjectType1 extends Component {
         for (let i = 0; i < values[index].properties.quiz.length; i++) {
             quiz[i] = values[index].properties.quiz[i];
         }
-        values.push({
+        values[values.length] = {
             chapter_name: this.chapterName,
             topic_name: this.topicName,
             question: values[index].question,
@@ -1744,7 +1764,7 @@ class SubjectType1 extends Component {
                 fill_in: values[index].content.fill_in,
                 boolean: values[index].content.boolean,
                 fillin_answer: fillin,
-                boolean_question: values[index].content.boolean_question,
+                boolean_question: boolean,
                 options: options,
                 explanation: values[index].content.explanation,
                 images: [{ title: "", file_name: "", image: null, path: "" }],
@@ -1773,7 +1793,7 @@ class SubjectType1 extends Component {
                 virtual_keyboard: values[index].settings.virtual_keyboard,
                 limited: values[index].settings.limited,
             },
-        });
+        };
         this.setState({
             questions: values,
             keyboards: keyboards,
@@ -1790,6 +1810,118 @@ class SubjectType1 extends Component {
         });
     };
 
+    handleMCQ_Deletion = (isMCQ_Deleted) => {
+        if (isMCQ_Deleted === true) {
+            const values = [...this.state.questions];
+            const keyboards = [...this.state.keyboards];
+
+            keyboards.splice(this.state.activeQuestion, 1);
+            values.splice(this.state.activeQuestion, 1);
+
+            this.setState(
+                {
+                    questions: values,
+                    keyboards: keyboards,
+                },
+                () => {
+                    if (values.length === 0) {
+                        keyboards.push({
+                            all: false,
+                            chemistry: false,
+                            physics: false,
+                            maths: false,
+                        });
+                        values.push({
+                            chapter_name: this.chapterName,
+                            topic_name: this.topicName,
+                            question: "<p>Question goes here</p>",
+                            question_random_id: "",
+                            is_image_uploaded: false,
+                            content: {
+                                mcq: true,
+                                fill_in: false,
+                                boolean: false,
+                                fillin_answer: [""],
+                                boolean_question: [
+                                    {
+                                        correct: false,
+                                        content: "True",
+                                    },
+                                    {
+                                        correct: false,
+                                        content: "False",
+                                    },
+                                ],
+                                options: [
+                                    { correct: false, content: "" },
+                                    { correct: false, content: "" },
+                                    { correct: false, content: "" },
+                                    { correct: false, content: "" },
+                                ],
+                                explanation: "",
+                                images: [
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        image: null,
+                                        path: "",
+                                    },
+                                ],
+                                video: {
+                                    title: "",
+                                    file_name: "",
+                                    video: null,
+                                    pasteUrl: "",
+                                },
+                                audio: [
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        audio: null,
+                                    },
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        audio: null,
+                                    },
+                                ],
+                            },
+                            properties: {
+                                marks: "",
+                                complexity: "",
+                                priority: "",
+                                theme: "",
+                                test: [false, false, false, false, false],
+                                semester: [false, false, false, false, false],
+                                quiz: [false, false, false, false, false],
+                                learn: false,
+                            },
+                            settings: {
+                                virtual_keyboard: [],
+                                limited: false,
+                            },
+                        });
+                        this.setState({
+                            questions: values,
+                            keyboards: keyboards,
+                        });
+                    }
+                }
+            );
+            setTimeout(() => {
+                this.setState(
+                    {
+                        showMCQDelete_Modal: false,
+                        page_loading: true,
+                    },
+                    () => {
+                        this.loadMCQData();
+                    }
+                );
+            }, 1000);
+        }
+    };
+
     render() {
         let data = [...this.state.questions];
         let boards = [...this.state.keyboards];
@@ -1803,6 +1935,20 @@ class SubjectType1 extends Component {
                     shownav={this.state.showSideNav}
                     activeLink="dashboard"
                 />
+
+                {/* MCQ Deletion Modal */}
+                {this.state.showMCQDelete_Modal ? (
+                    <MCQDeleteModal
+                        show={this.state.showMCQDelete_Modal}
+                        onHide={this.closeMCQ_DeleteModal}
+                        toggleModal={this.closeMCQ_DeleteModal}
+                        formSubmission={this.handleMCQ_Deletion}
+                        subjectId={this.subjectId}
+                        chapter_name={this.chapterName}
+                        topic_name={this.topicName}
+                        values={this.state.selectedQuestion}
+                    />
+                ) : null}
 
                 <div
                     className={`section content ${
