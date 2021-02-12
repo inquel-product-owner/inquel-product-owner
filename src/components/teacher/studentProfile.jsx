@@ -55,7 +55,7 @@ class StudentProfile extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="Group" togglenav={this.toggleSideNav} />
+                <Header name="Student Profile" togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
                 <SideNav

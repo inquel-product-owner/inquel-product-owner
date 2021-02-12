@@ -103,7 +103,7 @@ class StudentList extends Component {
             <div className="wrapper">
                 {/* Navbar */}
                 <Header
-                    name={this.state.activeTab === "Student Profiles"}
+                    name="Student Profiles"
                     togglenav={this.toggleSideNav}
                 />
 
@@ -131,7 +131,7 @@ class StudentList extends Component {
                         <div className="row align-items-center">
                             <div className="col-md-2">
                                 <h5 className="primary-text">
-                                    Students Profile
+                                    Students Profiles
                                 </h5>
                             </div>
                             <div className="col-md-10">

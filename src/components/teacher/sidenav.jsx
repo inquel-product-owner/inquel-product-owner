@@ -67,15 +67,15 @@ class SideNav extends Component {
                             </button>
                         </OverlayTrigger>
                     </Link>
-                    <Link to="/">
+                    <Link to="/teacher/account">
                         <OverlayTrigger
                             key="right"
                             placement="right"
-                            overlay={<Tooltip id="tooltip">Clipboard</Tooltip>}
+                            overlay={<Tooltip id="tooltip">Account</Tooltip>}
                         >
                             <button className="btn sidebar-btn btn-sm mb-3">
                                 <i
-                                    className="far fa-clipboard"
+                                    className="fas fa-user-circle"
                                     style={{ marginLeft: "-1.5px" }}
                                 ></i>
                             </button>
@@ -103,7 +103,7 @@ class SideNav extends Component {
                             placement="right"
                             overlay={<Tooltip id="tooltip">Settings</Tooltip>}
                         >
-                            <button className="btn sidebar-btn btn-sm mb-2">
+                            <button className="btn sidebar-btn btn-sm mb-3">
                                 <i
                                     className="fas fa-cog"
                                     style={{ marginLeft: "-1.5px" }}

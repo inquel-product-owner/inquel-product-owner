@@ -399,7 +399,10 @@ class Chapters extends Component {
                         : "";
                     this.setState({
                         chapters: chapters,
-                        chapterName: result.data.chapter_name !== undefined ? result.data.chapter_name : 'Chapter name',
+                        chapterName:
+                            result.data.chapter_name !== undefined
+                                ? result.data.chapter_name
+                                : "Chapter name",
                         page_loading: false,
                     });
                 }
@@ -578,14 +581,14 @@ class Chapters extends Component {
                                 <div className="row align-items-center">
                                     <div className="col-md-2 mb-2 mb-md-0">
                                         <Link
-                                            to={`/teacher/subject/${this.subjectId}/chapter/${this.state.chapterName}/${data.topic_name}/notes/upload`}
+                                            to={`${this.props.match.url}/${data.topic_name}/notes/upload`}
                                         >
                                             <button className="btn btn-sm btn-primary mr-2">
                                                 <i className="fas fa-file-upload fa-sm"></i>
                                             </button>
                                         </Link>
                                         <Link
-                                            to={`/teacher/subject/${this.subjectId}/chapter/${this.state.chapterName}/${data.topic_name}/notes`}
+                                            to={`${this.props.match.url}/${data.topic_name}/notes`}
                                         >
                                             <button className="btn btn-sm btn-primary">
                                                 <i className="fas fa-file-medical fa-sm"></i>
@@ -593,15 +596,8 @@ class Chapters extends Component {
                                         </Link>
                                     </div>
                                     <div className="col-md-2 mb-2 mb-md-0">
-                                        <Link to="">
-                                            <button className="btn btn-primary btn-sm">
-                                                View / Edit
-                                            </button>
-                                        </Link>
-                                    </div>
-                                    <div className="col-md-2 mb-2 mb-md-0">
                                         <Link
-                                            to={`/teacher/subject/${this.subjectId}/chapter/${this.state.chapterName}/${data.topic_name}/concepts`}
+                                            to={`${this.props.match.url}/${data.topic_name}/match`}
                                         >
                                             <button className="btn btn-primary btn-sm">
                                                 View / Edit
@@ -610,7 +606,7 @@ class Chapters extends Component {
                                     </div>
                                     <div className="col-md-2 mb-2 mb-md-0">
                                         <Link
-                                            to={`/teacher/subject/${this.subjectId}/chapter/${this.state.chapterName}/${data.topic_name}/type1`}
+                                            to={`${this.props.match.url}/${data.topic_name}/concepts`}
                                         >
                                             <button className="btn btn-primary btn-sm">
                                                 View / Edit
@@ -618,7 +614,18 @@ class Chapters extends Component {
                                         </Link>
                                     </div>
                                     <div className="col-md-2 mb-2 mb-md-0">
-                                        <Link to="">
+                                        <Link
+                                            to={`${this.props.match.url}/${data.topic_name}/type1`}
+                                        >
+                                            <button className="btn btn-primary btn-sm">
+                                                View / Edit
+                                            </button>
+                                        </Link>
+                                    </div>
+                                    <div className="col-md-2 mb-2 mb-md-0">
+                                        <Link
+                                            to={`${this.props.match.url}/${data.topic_name}/type2`}
+                                        >
                                             <button className="btn btn-primary btn-sm">
                                                 View / Edit
                                             </button>

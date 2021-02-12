@@ -97,7 +97,7 @@ class SideNav extends Component {
                             placement="right"
                             overlay={<Tooltip id="tooltip">Settings</Tooltip>}
                         >
-                            <button className="btn sidebar-btn btn-sm mb-2">
+                            <button className="btn sidebar-btn btn-sm mb-3">
                                 <i
                                     className="fas fa-cog"
                                     style={{ marginLeft: "-1.5px" }}
