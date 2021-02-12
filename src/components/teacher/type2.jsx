@@ -4,9 +4,148 @@ import Header from "./navbar";
 import SideNav from "./sidenav";
 import CKeditor from "../sharedComponents/CKeditor";
 import ReactSwitch from "../sharedComponents/switchComponent";
-import { Accordion, Card, Alert, Spinner } from "react-bootstrap";
+import { Accordion, Card, Alert, Spinner, Modal } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import Loading from "../sharedComponents/loader";
+
+class MCQDeleteModal extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: false,
+        };
+        this.url = baseUrl + teacherUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
+    }
+
+    handleDelete = () => {
+        this.setState({
+            showSuccessAlert: false,
+            showErrorAlert: false,
+            showLoader: true,
+        });
+
+        fetch(
+            `${this.url}/teacher/subject/${this.props.subjectId}/chapter/mcq/`,
+            {
+                method: "DELETE",
+                headers: this.headers,
+                body: JSON.stringify({
+                    chapter_name: this.props.chapter_name,
+                    topic_name: this.props.topic_name,
+                    question_random_id: this.props.values,
+                }),
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        showLoader: false,
+                    });
+                    this.props.formSubmission(true);
+                } else {
+                    if (result.detail) {
+                        this.setState({
+                            errorMsg: result.detail,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.msg,
+                        });
+                    }
+                    this.setState({
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    render() {
+        return (
+            <Modal
+                show={this.props.show}
+                onHide={this.props.onHide}
+                size="md"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Header closeButton>Delete MCQ</Modal.Header>
+                <Modal.Body>
+                    <Alert
+                        variant="danger"
+                        show={this.state.showErrorAlert}
+                        onClose={() => {
+                            this.setState({
+                                showErrorAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.errorMsg}
+                    </Alert>
+                    <Alert
+                        variant="success"
+                        show={this.state.showSuccessAlert}
+                        onClose={() => {
+                            this.setState({
+                                showSuccessAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.successMsg}
+                    </Alert>
+                    <p className="mb-0">
+                        Are you sure that you want to delete this question?
+                    </p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <button
+                        className="btn btn-secondary btn-sm mr-2"
+                        onClick={this.props.toggleModal}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        className="btn btn-primary btn-sm"
+                        onClick={this.handleDelete}
+                    >
+                        {this.state.showLoader ? (
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                                className="mr-2"
+                            />
+                        ) : (
+                            ""
+                        )}
+                        Delete
+                    </button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
+}
 
 class SubjectType1 extends Component {
     constructor(props) {
@@ -19,6 +158,8 @@ class SubjectType1 extends Component {
             showSuccessAlert: false,
             showLoader: false,
             page_loading: true,
+            btnDisabled: false,
+            showMCQDelete_Modal: false,
 
             contentCollapsed: true,
             propertiesCollapsed: true,
@@ -33,6 +174,7 @@ class SubjectType1 extends Component {
             selectedImageQuestion: "",
             selectedImageData: [],
             selectedImage: "",
+            selectedQuestion: [],
 
             keyboards: [
                 { all: false, chemistry: false, physics: false, maths: false },
@@ -44,8 +186,7 @@ class SubjectType1 extends Component {
                     topic_name: this.props.match.params.topicName,
                     question: "<p>Question goes here</p>",
                     question_random_id: "",
-                    old_question: true,
-                    old_image: false,
+                    is_image_uploaded: false,
                     content: {
                         mcq: true,
                         fill_in: false,
@@ -69,11 +210,11 @@ class SubjectType1 extends Component {
                             title: "",
                             file_name: "",
                             video: null,
-                            pasteUrl: "",
+                            path: "",
                         },
                         audio: [
-                            { title: "", file_name: "", audio: null },
-                            { title: "", file_name: "", audio: null },
+                            { title: "", file_name: "", audio: null, path: "" },
+                            { title: "", file_name: "", audio: null, path: "" },
                         ],
                     },
                     properties: {
@@ -184,7 +325,8 @@ class SubjectType1 extends Component {
                                         response[i].files[0]
                                             .type1_audio_1_title,
                                     file_name: "",
-                                    audio: response[i].files[0].type1_audio_1,
+                                    audio: null,
+                                    path: response[i].files[0].type1_audio_1,
                                 });
                             }
                             if (response[i].files[0].type1_audio_2) {
@@ -193,7 +335,8 @@ class SubjectType1 extends Component {
                                         response[i].files[0]
                                             .type1_audio_2_title,
                                     file_name: "",
-                                    audio: response[i].files[0].type1_audio_2,
+                                    audio: null,
+                                    path: response[i].files[0].type1_audio_2,
                                 });
                             }
                         }
@@ -203,8 +346,8 @@ class SubjectType1 extends Component {
                             topic_name: this.props.match.params.topicName,
                             question: response[i].question,
                             question_random_id: response[i].question_random_id,
-                            old_question: true,
-                            old_image: true,
+                            is_image_uploaded:
+                                response[i].files.length !== 0 ? true : false,
                             content: {
                                 mcq: response[i].mcq,
                                 fill_in: response[i].fill_in,
@@ -256,10 +399,11 @@ class SubjectType1 extends Component {
                                             : "",
                                     file_name: "",
                                     video: null,
-                                    pasteUrl:
+                                    path:
                                         response[i].files.length !== 0 &&
-                                        response[i].files[0].type1_video_1
-                                            ? response[i].files[0].type1_video_1
+                                        response[i].files[0].paste_video_url
+                                            ? response[i].files[0]
+                                                  .paste_video_url
                                             : "",
                                 },
                                 audio:
@@ -269,11 +413,13 @@ class SubjectType1 extends Component {
                                                   title: "",
                                                   file_name: "",
                                                   audio: null,
+                                                  path: "",
                                               },
                                               {
                                                   title: "",
                                                   file_name: "",
                                                   audio: null,
+                                                  path: "",
                                               },
                                           ]
                                         : audio,
@@ -367,10 +513,126 @@ class SubjectType1 extends Component {
         });
 
         const data = [...this.state.questions];
+        let option_correct = data[this.state.activeQuestion].content.mcq
+            ? false
+            : true;
+        let option_content = data[this.state.activeQuestion].content.mcq
+            ? false
+            : true;
+        let fill_in = data[this.state.activeQuestion].content.fill_in
+            ? false
+            : true;
+        let boolean_correct = data[this.state.activeQuestion].content.boolean
+            ? false
+            : true;
+
+        // Options validation
+        if (data[this.state.activeQuestion].content.mcq === true) {
+            for (
+                let i = 0;
+                i < data[this.state.activeQuestion].content.options.length;
+                i++
+            ) {
+                if (
+                    data[this.state.activeQuestion].content.options[i]
+                        .correct === true
+                ) {
+                    option_correct = true;
+                } else {
+                    continue;
+                }
+            }
+            for (
+                let i = 0;
+                i < data[this.state.activeQuestion].content.options.length;
+                i++
+            ) {
+                if (
+                    data[this.state.activeQuestion].content.options[i]
+                        .content !== ""
+                ) {
+                    option_content = true;
+                } else {
+                    option_content = false;
+                }
+            }
+        }
+
+        // fill in validation
+        if (data[this.state.activeQuestion].content.fill_in === true) {
+            for (
+                let i = 0;
+                i <
+                data[this.state.activeQuestion].content.fillin_answer.length;
+                i++
+            ) {
+                if (
+                    data[this.state.activeQuestion].content.fillin_answer[i] !==
+                    ""
+                ) {
+                    fill_in = true;
+                } else {
+                    fill_in = false;
+                }
+            }
+        }
+
+        // Boolean validation
+        if (data[this.state.activeQuestion].content.boolean === true) {
+            for (
+                let i = 0;
+                i <
+                data[this.state.activeQuestion].content.boolean_question.length;
+                i++
+            ) {
+                if (
+                    data[this.state.activeQuestion].content.boolean_question[i]
+                        .correct === true
+                ) {
+                    boolean_correct = true;
+                } else {
+                    continue;
+                }
+            }
+        }
 
         if (data[this.state.activeQuestion].question === "") {
             this.setState({
                 errorMsg: "Question is required",
+                showErrorAlert: true,
+                showLoader: false,
+            });
+        } else if (
+            data[this.state.activeQuestion].content.mcq === false &&
+            data[this.state.activeQuestion].content.fill_in === false &&
+            data[this.state.activeQuestion].content.boolean === false
+        ) {
+            this.setState({
+                errorMsg: "Select any one answer type",
+                showErrorAlert: true,
+                showLoader: false,
+            });
+        } else if (option_content === false) {
+            this.setState({
+                errorMsg: "Enter the options value",
+                showErrorAlert: true,
+                showLoader: false,
+            });
+        } else if (option_correct === false) {
+            this.setState({
+                errorMsg: "Select a correct option in the MCQ",
+                showErrorAlert: true,
+                showLoader: false,
+            });
+        } else if (fill_in === false) {
+            this.setState({
+                errorMsg: "Enter the fill in answers",
+                showErrorAlert: true,
+                showLoader: false,
+            });
+        } else if (boolean_correct === false) {
+            this.setState({
+                errorMsg: "Select either True or False",
                 showErrorAlert: true,
                 showLoader: false,
             });
@@ -410,29 +672,10 @@ class SubjectType1 extends Component {
                 showLoader: false,
             });
         } else {
-            if (data[this.state.activeQuestion].old_question === true) {
-                if (data[this.state.activeQuestion].question_random_id === "") {
-                    delete data[this.state.activeQuestion].question_random_id;
-                    if (data[this.state.activeQuestion].old_question) {
-                        delete data[this.state.activeQuestion].old_question;
-                    }
-                    if (!data[this.state.activeQuestion].old_image) {
-                        delete data[this.state.activeQuestion].old_image;
-                    }
-                    this.handlePOST(data);
-                } else {
-                    if (data[this.state.activeQuestion].old_question) {
-                        delete data[this.state.activeQuestion].old_question;
-                    }
-                    if (data[this.state.activeQuestion].old_image) {
-                        delete data[this.state.activeQuestion].old_image;
-                    }
-                    this.handlePUT(data);
-                }
+            if (data[this.state.activeQuestion].question_random_id === "") {
+                this.handlePOST(data);
             } else {
-                this.setState({
-                    isForm_submitted: true,
-                });
+                this.handlePUT(data);
             }
         }
     };
@@ -441,7 +684,43 @@ class SubjectType1 extends Component {
         fetch(`${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/`, {
             headers: this.headers,
             method: "POST",
-            body: JSON.stringify(data[this.state.activeQuestion]),
+            body: JSON.stringify({
+                chapter_name: this.props.match.params.chapterName,
+                topic_name: this.props.match.params.topicName,
+                question: data[this.state.activeQuestion].question,
+                content: {
+                    mcq: data[this.state.activeQuestion].content.mcq,
+                    fill_in: data[this.state.activeQuestion].content.fill_in,
+                    boolean: data[this.state.activeQuestion].content.boolean,
+                    fillin_answer:
+                        data[this.state.activeQuestion].content.fillin_answer,
+                    boolean_question:
+                        data[this.state.activeQuestion].content
+                            .boolean_question,
+                    options: data[this.state.activeQuestion].content.options,
+                    explanation:
+                        data[this.state.activeQuestion].content.explanation,
+                },
+                properties: {
+                    marks: data[this.state.activeQuestion].properties.marks,
+                    complexity:
+                        data[this.state.activeQuestion].properties.complexity,
+                    priority:
+                        data[this.state.activeQuestion].properties.priority,
+                    theme: data[this.state.activeQuestion].properties.theme,
+                    test: data[this.state.activeQuestion].properties.test,
+                    semester:
+                        data[this.state.activeQuestion].properties.semester,
+                    quiz: data[this.state.activeQuestion].properties.quiz,
+                    learn: data[this.state.activeQuestion].properties.learn,
+                },
+                settings: {
+                    virtual_keyboard:
+                        data[this.state.activeQuestion].settings
+                            .virtual_keyboard,
+                    limited: data[this.state.activeQuestion].settings.limited,
+                },
+            }),
         })
             .then((res) => res.json())
             .then((result) => {
@@ -449,8 +728,6 @@ class SubjectType1 extends Component {
                 if (result.sts === true) {
                     data[this.state.activeQuestion].question_random_id =
                         result.question_random_id;
-                    data[this.state.activeQuestion].old_question = true;
-                    data[this.state.activeQuestion].old_image = false;
                     this.setState({
                         questions: data,
                         isForm_submitted: true,
@@ -480,7 +757,45 @@ class SubjectType1 extends Component {
         fetch(`${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/`, {
             headers: this.headers,
             method: "PUT",
-            body: JSON.stringify(data[this.state.activeQuestion]),
+            body: JSON.stringify({
+                chapter_name: this.props.match.params.chapterName,
+                topic_name: this.props.match.params.topicName,
+                question: data[this.state.activeQuestion].question,
+                question_random_id:
+                    data[this.state.activeQuestion].question_random_id,
+                content: {
+                    mcq: data[this.state.activeQuestion].content.mcq,
+                    fill_in: data[this.state.activeQuestion].content.fill_in,
+                    boolean: data[this.state.activeQuestion].content.boolean,
+                    fillin_answer:
+                        data[this.state.activeQuestion].content.fillin_answer,
+                    boolean_question:
+                        data[this.state.activeQuestion].content
+                            .boolean_question,
+                    options: data[this.state.activeQuestion].content.options,
+                    explanation:
+                        data[this.state.activeQuestion].content.explanation,
+                },
+                properties: {
+                    marks: data[this.state.activeQuestion].properties.marks,
+                    complexity:
+                        data[this.state.activeQuestion].properties.complexity,
+                    priority:
+                        data[this.state.activeQuestion].properties.priority,
+                    theme: data[this.state.activeQuestion].properties.theme,
+                    test: data[this.state.activeQuestion].properties.test,
+                    semester:
+                        data[this.state.activeQuestion].properties.semester,
+                    quiz: data[this.state.activeQuestion].properties.quiz,
+                    learn: data[this.state.activeQuestion].properties.learn,
+                },
+                settings: {
+                    virtual_keyboard:
+                        data[this.state.activeQuestion].settings
+                            .virtual_keyboard,
+                    limited: data[this.state.activeQuestion].settings.limited,
+                },
+            }),
         })
             .then((res) => res.json())
             .then((result) => {
@@ -488,8 +803,8 @@ class SubjectType1 extends Component {
                 if (result.sts === true) {
                     data[this.state.activeQuestion].question_random_id =
                         result.question_random_id;
-                    data[this.state.activeQuestion].old_question = false;
-                    data[this.state.activeQuestion].old_image = true;
+                    // data[this.state.activeQuestion].is_image_uploaded =
+                    //     result.file_exists === true ? true : false;
                     this.setState({
                         questions: data,
                         isForm_submitted: true,
@@ -538,6 +853,16 @@ class SubjectType1 extends Component {
                 "question_random_id",
                 questionData[this.state.activeQuestion].question_random_id
             );
+
+            if (
+                questionData[this.state.activeQuestion].content.video.path !==
+                ""
+            ) {
+                form_data.append(
+                    "video_url",
+                    questionData[this.state.activeQuestion].content.video.path
+                );
+            }
 
             if (
                 questionData[this.state.activeQuestion].content.video.video !==
@@ -620,14 +945,14 @@ class SubjectType1 extends Component {
 
             if (files_arr.length !== 3) {
                 if (
-                    questionData[this.state.activeQuestion].old_image === false
+                    questionData[this.state.activeQuestion]
+                        .is_image_uploaded === false
                 ) {
                     this.handleImgPOST(options, form_data, questionData);
                 } else {
                     this.handleImgPATCH(options, form_data, questionData);
                 }
             } else {
-                questionData[this.state.activeQuestion].old_question = true;
                 this.setState(
                     {
                         questions: questionData,
@@ -656,7 +981,6 @@ class SubjectType1 extends Component {
             .then((result) => {
                 console.log(result);
                 if (result.data.sts === true) {
-                    questionData[this.state.activeQuestion].old_question = true;
                     this.setState(
                         {
                             questions: questionData,
@@ -702,7 +1026,6 @@ class SubjectType1 extends Component {
             .then((result) => {
                 console.log(result);
                 if (result.data.sts === true) {
-                    questionData[this.state.activeQuestion].old_question = true;
                     this.setState(
                         {
                             questions: questionData,
@@ -864,9 +1187,25 @@ class SubjectType1 extends Component {
     handleRemoveOptionFields = (index) => {
         const values = [...this.state.questions];
         values[this.state.activeQuestion].content.options.splice(index, 1);
-        this.setState({
-            questions: values,
-        });
+        this.setState(
+            {
+                questions: values,
+            },
+            () => {
+                if (
+                    values[this.state.activeQuestion].content.options.length ===
+                    0
+                ) {
+                    values[this.state.activeQuestion].content.options.push({
+                        correct: false,
+                        content: "",
+                    });
+                }
+                this.setState({
+                    questions: values,
+                });
+            }
+        );
     };
 
     handleAnswerChange = (index, event) => {
@@ -892,9 +1231,24 @@ class SubjectType1 extends Component {
             index,
             1
         );
-        this.setState({
-            questions: values,
-        });
+        this.setState(
+            {
+                questions: values,
+            },
+            () => {
+                if (
+                    values[this.state.activeQuestion].content.fillin_answer
+                        .length === 0
+                ) {
+                    values[
+                        this.state.activeQuestion
+                    ].content.fillin_answer.push("");
+                }
+                this.setState({
+                    questions: values,
+                });
+            }
+        );
     };
 
     // -------------------------- Image --------------------------
@@ -924,28 +1278,60 @@ class SubjectType1 extends Component {
     handleRemoveImageFields = (index) => {
         const values = [...this.state.questions];
         values[this.state.activeQuestion].content.images.splice(index, 1);
-        this.setState({
-            questions: values,
-        });
+        this.setState(
+            {
+                questions: values,
+            },
+            () => {
+                if (
+                    values[this.state.activeQuestion].content.images.length ===
+                    0
+                ) {
+                    values[this.state.activeQuestion].content.images.push({
+                        title: "",
+                        file_name: "",
+                        image: null,
+                        path: "",
+                    });
+                }
+                this.setState({
+                    questions: values,
+                });
+            }
+        );
     };
 
     handleImageFile = (index, event) => {
         const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.images[index].file_name =
-            event.target.files[0].name;
-        values[this.state.activeQuestion].content.images[
-            index
-        ].path = URL.createObjectURL(event.target.files[0]);
-        values[this.state.activeQuestion].content.images[index].image =
-            event.target.files[0];
-        this.setState({
-            questions: values,
-        });
+        const file = event.target.files[0].name.toLowerCase();
+        if (!file.match(/\.(jpg|jpeg|png|webp)$/)) {
+            this.setState({
+                errorMsg: "Please select valid image file",
+                showErrorAlert: true,
+                btnDisabled: true,
+            });
+        } else {
+            values[this.state.activeQuestion].content.images[index].file_name =
+                event.target.files[0].name;
+            values[this.state.activeQuestion].content.images[
+                index
+            ].path = URL.createObjectURL(event.target.files[0]);
+            values[this.state.activeQuestion].content.images[index].image =
+                event.target.files[0];
+            this.setState({
+                questions: values,
+                btnDisabled: false,
+                showErrorAlert: false,
+            });
+        }
     };
 
     changeImage = (image_index, q_index) => {
         const images = [...this.state.questions];
-        if (this.state.selectedImage === image_index) {
+        if (
+            this.state.selectedImage === image_index &&
+            this.state.selectedImageQuestion === q_index
+        ) {
             this.setState({
                 selectedImage: "",
                 selectedImageQuestion: "",
@@ -958,6 +1344,21 @@ class SubjectType1 extends Component {
                 selectedImageData: images[q_index].content.images[image_index],
             });
         }
+    };
+
+    clearImages = () => {
+        const values = [...this.state.questions];
+        values[this.state.activeQuestion].content.images = [
+            {
+                title: "",
+                file_name: "",
+                image: null,
+                path: "",
+            },
+        ];
+        this.setState({
+            questions: values,
+        });
     };
 
     // -------------------------- Video --------------------------
@@ -973,21 +1374,46 @@ class SubjectType1 extends Component {
 
     handleVideoFile = (event) => {
         let values = [...this.state.questions];
-        values[this.state.activeQuestion].content.video.file_name =
-            event.target.files[0].name;
-        values[this.state.activeQuestion].content.video.video =
-            event.target.files[0];
-        values[this.state.activeQuestion].content.video.pasteUrl = "";
+        const file = event.target.files[0].name.toLowerCase();
+        if (!file.match(/\.(mpeg|flv|avi|mov|mp4|mkv)$/)) {
+            this.setState({
+                errorMsg: "Please select valid video file",
+                showErrorAlert: true,
+                btnDisabled: true,
+            });
+        } else {
+            values[this.state.activeQuestion].content.video.file_name =
+                event.target.files[0].name;
+            values[
+                this.state.activeQuestion
+            ].content.video.path = URL.createObjectURL(event.target.files[0]);
+            values[this.state.activeQuestion].content.video.video =
+                event.target.files[0];
+            this.setState({
+                questions: values,
+                btnDisabled: false,
+                showErrorAlert: false,
+            });
+        }
+    };
+
+    handleVideoUrl = (event) => {
+        const values = [...this.state.questions];
+        values[this.state.activeQuestion].content.video.path =
+            event.target.value;
+        values[this.state.activeQuestion].content.video.file_name = "";
+        values[this.state.activeQuestion].content.video.video = null;
         this.setState({
             questions: values,
         });
     };
 
-    handleVideoUrl = (event) => {
+    clearVideo = () => {
         const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.video.pasteUrl =
-            event.target.value;
+        values[this.state.activeQuestion].content.video.title = "";
         values[this.state.activeQuestion].content.video.file_name = "";
+        values[this.state.activeQuestion].content.video.video = null;
+        values[this.state.activeQuestion].content.video.path = "";
         this.setState({
             questions: values,
         });
@@ -1006,10 +1432,35 @@ class SubjectType1 extends Component {
 
     handleAudioFile = (index, event) => {
         const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.audio[index].file_name =
-            event.target.files[0].name;
-        values[this.state.activeQuestion].content.audio[index].audio =
-            event.target.files[0];
+        const file = event.target.files[0].name.toLowerCase();
+        if (!file.match(/\.(wav|mp3)$/)) {
+            this.setState({
+                errorMsg: "Please select valid audio file",
+                showErrorAlert: true,
+                btnDisabled: true,
+            });
+        } else {
+            values[this.state.activeQuestion].content.audio[index].file_name =
+                event.target.files[0].name;
+            values[this.state.activeQuestion].content.audio[
+                index
+            ].path = URL.createObjectURL(event.target.files[0]);
+            values[this.state.activeQuestion].content.audio[index].audio =
+                event.target.files[0];
+            this.setState({
+                questions: values,
+                btnDisabled: false,
+                showErrorAlert: false,
+            });
+        }
+    };
+
+    clearAudios = () => {
+        const values = [...this.state.questions];
+        values[this.state.activeQuestion].content.audio = [
+            { title: "", file_name: "", audio: null, path: "" },
+            { title: "", file_name: "", audio: null, path: "" },
+        ];
         this.setState({
             questions: values,
         });
@@ -1198,8 +1649,7 @@ class SubjectType1 extends Component {
             topic_name: this.topicName,
             question: "<p>Question goes here</p>",
             question_random_id: "",
-            old_question: true,
-            old_image: false,
+            is_image_uploaded: false,
             content: {
                 mcq: true,
                 fill_in: false,
@@ -1221,11 +1671,11 @@ class SubjectType1 extends Component {
                     title: "",
                     file_name: "",
                     video: null,
-                    pasteUrl: "",
+                    path: "",
                 },
                 audio: [
-                    { title: "", file_name: "", audio: null },
-                    { title: "", file_name: "", audio: null },
+                    { title: "", file_name: "", audio: null, path: "" },
+                    { title: "", file_name: "", audio: null, path: "" },
                 ],
             },
             properties: {
@@ -1253,61 +1703,156 @@ class SubjectType1 extends Component {
     removingQuestions = (index) => {
         const values = [...this.state.questions];
         const keyboards = [...this.state.keyboards];
-        keyboards.splice(index, 1);
-        values.splice(index, 1);
         this.setState({
-            questions: values,
-            keyboards: keyboards,
             showEdit_option: false,
             contentCollapsed: true,
             propertiesCollapsed: true,
             settingsCollapsed: true,
+            activeQuestion: index,
         });
 
-        const questionData = [...this.state.questions];
-
-        fetch(`${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/`, {
-            method: "DELETE",
-            headers: this.headers,
-            body: JSON.stringify({
-                chapter_name: questionData[index].chapter_name,
-                topic_name: questionData[index].topic_name,
-                question_random_id: questionData[index].question_random_id,
-            }),
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                // this.setState(
-                //     {
-                //         page_loading: true,
-                //     },
-                //     () => {
-                //         this.loadMCQData();
-                //     }
-                // );
-                console.log(result);
-            })
-            .catch((err) => {
-                console.log(err);
+        if (values[index].question_random_id !== "") {
+            this.setState({
+                selectedQuestion: values[index].question_random_id,
+                showMCQDelete_Modal: !this.state.showMCQDelete_Modal,
             });
+        } else {
+            if (this.state.selectedImageQuestion === index) {
+                this.setState({
+                    selectedImageQuestion: "",
+                    selectedImageData: [],
+                    selectedImage: "",
+                });
+            }
+
+            keyboards.splice(index, 1);
+            values.splice(index, 1);
+            this.setState(
+                {
+                    questions: values,
+                    keyboards: keyboards,
+                },
+                () => {
+                    if (values.length === 0) {
+                        keyboards.push({
+                            all: false,
+                            chemistry: false,
+                            physics: false,
+                            maths: false,
+                        });
+                        values.push({
+                            chapter_name: this.chapterName,
+                            topic_name: this.topicName,
+                            question: "<p>Question goes here</p>",
+                            question_random_id: "",
+                            is_image_uploaded: false,
+                            content: {
+                                mcq: true,
+                                fill_in: false,
+                                boolean: false,
+                                fillin_answer: [""],
+                                boolean_question: [
+                                    { correct: false, content: "True" },
+                                    { correct: false, content: "False" },
+                                ],
+                                options: [
+                                    { correct: false, content: "" },
+                                    { correct: false, content: "" },
+                                    { correct: false, content: "" },
+                                    { correct: false, content: "" },
+                                ],
+                                explanation: "",
+                                images: [
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        image: null,
+                                        path: "",
+                                    },
+                                ],
+                                video: {
+                                    title: "",
+                                    file_name: "",
+                                    video: null,
+                                    path: "",
+                                },
+                                audio: [
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        audio: null,
+                                        path: "",
+                                    },
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        audio: null,
+                                        path: "",
+                                    },
+                                ],
+                            },
+                            properties: {
+                                marks: "",
+                                complexity: "",
+                                priority: "",
+                                theme: "",
+                                test: [false, false, false, false, false],
+                                semester: [false, false, false, false, false],
+                                quiz: [false, false, false, false, false],
+                                learn: false,
+                            },
+                            settings: {
+                                virtual_keyboard: [],
+                                limited: false,
+                            },
+                        });
+                        this.setState({
+                            questions: values,
+                            keyboards: keyboards,
+                        });
+                    }
+                }
+            );
+        }
+    };
+
+    closeMCQ_DeleteModal = () => {
+        this.setState({
+            showMCQDelete_Modal: !this.state.showMCQDelete_Modal,
+        });
     };
 
     copyQuestions = (index) => {
         const values = [...this.state.questions];
         const keyboards = [...this.state.keyboards];
-        keyboards.push({
+
+        keyboards[values.length] = {
             all: keyboards[index].all,
             chemistry: keyboards[index].chemistry,
             physics: keyboards[index].physics,
             maths: keyboards[index].maths,
-        });
+        };
         const options = [];
         for (let i = 0; i < values[index].content.options.length; i++) {
-            options[i] = values[index].content.options[i];
+            options[i] = {
+                content: values[index].content.options[i].content,
+                correct: values[index].content.options[i].correct,
+            };
         }
         const fillin = [];
         for (let i = 0; i < values[index].content.fillin_answer.length; i++) {
             fillin[i] = values[index].content.fillin_answer[i];
+        }
+        const boolean = [];
+        for (
+            let i = 0;
+            i < values[index].content.boolean_question.length;
+            i++
+        ) {
+            boolean[i] = {
+                content: values[index].content.boolean_question[i].content,
+                correct: values[index].content.boolean_question[i].correct,
+            };
         }
         const test = [];
         for (let i = 0; i < values[index].properties.test.length; i++) {
@@ -1321,19 +1866,18 @@ class SubjectType1 extends Component {
         for (let i = 0; i < values[index].properties.quiz.length; i++) {
             quiz[i] = values[index].properties.quiz[i];
         }
-        values.push({
+        values[values.length] = {
             chapter_name: this.chapterName,
             topic_name: this.topicName,
             question: values[index].question,
             question_random_id: "",
-            old_question: true,
-            old_image: false,
+            is_image_uploaded: false,
             content: {
                 mcq: values[index].content.mcq,
                 fill_in: values[index].content.fill_in,
                 boolean: values[index].content.boolean,
                 fillin_answer: fillin,
-                boolean_question: values[index].content.boolean_question,
+                boolean_question: boolean,
                 options: options,
                 explanation: values[index].content.explanation,
                 images: [{ title: "", file_name: "", image: null, path: "" }],
@@ -1341,11 +1885,11 @@ class SubjectType1 extends Component {
                     title: "",
                     file_name: "",
                     video: null,
-                    pasteUrl: "",
+                    path: "",
                 },
                 audio: [
-                    { title: "", file_name: "", audio: null },
-                    { title: "", file_name: "", audio: null },
+                    { title: "", file_name: "", audio: null, path: "" },
+                    { title: "", file_name: "", audio: null, path: "" },
                 ],
             },
             properties: {
@@ -1362,7 +1906,7 @@ class SubjectType1 extends Component {
                 virtual_keyboard: values[index].settings.virtual_keyboard,
                 limited: values[index].settings.limited,
             },
-        });
+        };
         this.setState({
             questions: values,
             keyboards: keyboards,
@@ -1379,6 +1923,130 @@ class SubjectType1 extends Component {
         });
     };
 
+    handleMCQ_Deletion = (isMCQ_Deleted) => {
+        if (isMCQ_Deleted === true) {
+            const values = [...this.state.questions];
+            const keyboards = [...this.state.keyboards];
+
+            keyboards.splice(this.state.activeQuestion, 1);
+            values.splice(this.state.activeQuestion, 1);
+
+            if (
+                this.state.selectedImageQuestion === this.state.activeQuestion
+            ) {
+                this.setState({
+                    selectedImageQuestion: "",
+                    selectedImageData: [],
+                    selectedImage: "",
+                });
+            }
+
+            this.setState(
+                {
+                    questions: values,
+                    keyboards: keyboards,
+                },
+                () => {
+                    if (values.length === 0) {
+                        keyboards.push({
+                            all: false,
+                            chemistry: false,
+                            physics: false,
+                            maths: false,
+                        });
+                        values.push({
+                            chapter_name: this.chapterName,
+                            topic_name: this.topicName,
+                            question: "<p>Question goes here</p>",
+                            question_random_id: "",
+                            is_image_uploaded: false,
+                            content: {
+                                mcq: true,
+                                fill_in: false,
+                                boolean: false,
+                                fillin_answer: [""],
+                                boolean_question: [
+                                    {
+                                        correct: false,
+                                        content: "True",
+                                    },
+                                    {
+                                        correct: false,
+                                        content: "False",
+                                    },
+                                ],
+                                options: [
+                                    { correct: false, content: "" },
+                                    { correct: false, content: "" },
+                                    { correct: false, content: "" },
+                                    { correct: false, content: "" },
+                                ],
+                                explanation: "",
+                                images: [
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        image: null,
+                                        path: "",
+                                    },
+                                ],
+                                video: {
+                                    title: "",
+                                    file_name: "",
+                                    video: null,
+                                    path: "",
+                                },
+                                audio: [
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        audio: null,
+                                        path: "",
+                                    },
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        audio: null,
+                                        path: "",
+                                    },
+                                ],
+                            },
+                            properties: {
+                                marks: "",
+                                complexity: "",
+                                priority: "",
+                                theme: "",
+                                test: [false, false, false, false, false],
+                                semester: [false, false, false, false, false],
+                                quiz: [false, false, false, false, false],
+                                learn: false,
+                            },
+                            settings: {
+                                virtual_keyboard: [],
+                                limited: false,
+                            },
+                        });
+                        this.setState({
+                            questions: values,
+                            keyboards: keyboards,
+                        });
+                    }
+                }
+            );
+            setTimeout(() => {
+                this.setState(
+                    {
+                        showMCQDelete_Modal: false,
+                        page_loading: true,
+                    },
+                    () => {
+                        this.loadMCQData();
+                    }
+                );
+            }, 1000);
+        }
+    };
+
     render() {
         let data = [...this.state.questions];
         let boards = [...this.state.keyboards];
@@ -1392,6 +2060,20 @@ class SubjectType1 extends Component {
                     shownav={this.state.showSideNav}
                     activeLink="dashboard"
                 />
+
+                {/* MCQ Deletion Modal */}
+                {this.state.showMCQDelete_Modal ? (
+                    <MCQDeleteModal
+                        show={this.state.showMCQDelete_Modal}
+                        onHide={this.closeMCQ_DeleteModal}
+                        toggleModal={this.closeMCQ_DeleteModal}
+                        formSubmission={this.handleMCQ_Deletion}
+                        subjectId={this.subjectId}
+                        chapter_name={this.chapterName}
+                        topic_name={this.topicName}
+                        values={this.state.selectedQuestion}
+                    />
+                ) : null}
 
                 <div
                     className={`section content ${
@@ -1491,23 +2173,17 @@ class SubjectType1 extends Component {
                                                             </button>
                                                         </div>
                                                         <div className="col-md-12 col-3">
-                                                            {this.state
-                                                                .questions
-                                                                .length > 1 ? (
-                                                                <button
-                                                                    type="button"
-                                                                    className="btn btn-light bg-white btn-block shadow-sm"
-                                                                    onClick={() =>
-                                                                        this.removingQuestions(
-                                                                            q_index
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <i className="far fa-trash-alt fa-sm"></i>
-                                                                </button>
-                                                            ) : (
-                                                                ""
-                                                            )}
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-light bg-white btn-block shadow-sm"
+                                                                onClick={() =>
+                                                                    this.removingQuestions(
+                                                                        q_index
+                                                                    )
+                                                                }
+                                                            >
+                                                                <i className="far fa-trash-alt fa-sm"></i>
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1529,7 +2205,7 @@ class SubjectType1 extends Component {
                                                                             .state
                                                                             .selectedImageQuestion ===
                                                                             q_index
-                                                                            ? "col-md-8"
+                                                                            ? "col-md-9"
                                                                             : "col-md-11 pr-md-0"
                                                                     }`}
                                                                 >
@@ -1561,15 +2237,23 @@ class SubjectType1 extends Component {
                                                                                             }
                                                                                         >
                                                                                             <div className="form-group">
-                                                                                                <div className="card form-shadow">
+                                                                                                <div
+                                                                                                    className={`card form-shadow ${
+                                                                                                        options.correct
+                                                                                                            ? "border border-success"
+                                                                                                            : ""
+                                                                                                    }`}
+                                                                                                >
                                                                                                     <div className="card-body small py-2">
                                                                                                         {options.content !==
-                                                                                                        ""
-                                                                                                            ? options.content
-                                                                                                            : `Option 0${
-                                                                                                                  index +
-                                                                                                                  1
-                                                                                                              }`}
+                                                                                                        "" ? (
+                                                                                                            options.content
+                                                                                                        ) : (
+                                                                                                            <span className="text-muted">{`Option 0${
+                                                                                                                index +
+                                                                                                                1
+                                                                                                            }`}</span>
+                                                                                                        )}
                                                                                                     </div>
                                                                                                 </div>
                                                                                             </div>
@@ -1601,12 +2285,14 @@ class SubjectType1 extends Component {
                                                                                                 <div className="card form-shadow">
                                                                                                     <div className="card-body small py-2">
                                                                                                         {fill_in !==
-                                                                                                        ""
-                                                                                                            ? fill_in
-                                                                                                            : `Answer 0${
-                                                                                                                  index +
-                                                                                                                  1
-                                                                                                              }`}
+                                                                                                        "" ? (
+                                                                                                            fill_in
+                                                                                                        ) : (
+                                                                                                            <span className="text-muted">{`Answer 0${
+                                                                                                                index +
+                                                                                                                1
+                                                                                                            }`}</span>
+                                                                                                        )}
                                                                                                     </div>
                                                                                                 </div>
                                                                                             </div>
@@ -1638,8 +2324,8 @@ class SubjectType1 extends Component {
                                                                                                 <div
                                                                                                     className={`card form-shadow ${
                                                                                                         boolean.correct
-                                                                                                            ? "bg-success"
-                                                                                                            : "bg-white"
+                                                                                                            ? "border border-success"
+                                                                                                            : ""
                                                                                                     }`}
                                                                                                 >
                                                                                                     <div className="card-body small py-2">
@@ -1666,13 +2352,24 @@ class SubjectType1 extends Component {
                                                                 this.state
                                                                     .selectedImageQuestion ===
                                                                     q_index ? (
-                                                                    <div className="col-md-3 mb-2 mb-md-0 pr-md-0">
-                                                                        <div
-                                                                            className="card preview-img-lg bg-light shadow-sm"
-                                                                            style={{
-                                                                                backgroundImage: `url(${this.state.selectedImageData.path})`,
-                                                                            }}
-                                                                        ></div>
+                                                                    <div className="col-md-2 mb-2 mb-md-0 pr-md-0">
+                                                                        <div className="card shadow-sm">
+                                                                            <img
+                                                                                src={
+                                                                                    this
+                                                                                        .state
+                                                                                        .selectedImageData
+                                                                                        .path
+                                                                                }
+                                                                                alt={
+                                                                                    this
+                                                                                        .state
+                                                                                        .selectedImageData
+                                                                                        .file_name
+                                                                                }
+                                                                                className="img-fluid rounded-lg"
+                                                                            />
+                                                                        </div>
                                                                     </div>
                                                                 ) : (
                                                                     ""
@@ -1735,6 +2432,7 @@ class SubjectType1 extends Component {
                                         <button
                                             className="btn btn-primary btn-sm"
                                             onClick={this.handleSubmit}
+                                            disabled={this.state.btnDisabled}
                                         >
                                             {this.state.showLoader ? (
                                                 <Spinner
@@ -1988,17 +2686,7 @@ class SubjectType1 extends Component {
                                                                                                 )
                                                                                             }
                                                                                         >
-                                                                                            {data[
-                                                                                                this
-                                                                                                    .state
-                                                                                                    .activeQuestion
-                                                                                            ]
-                                                                                                .content
-                                                                                                .options
-                                                                                                .length >
-                                                                                            1
-                                                                                                ? "-"
-                                                                                                : ""}
+                                                                                            -
                                                                                         </button>
                                                                                     </div>
                                                                                 </div>
@@ -2114,17 +2802,7 @@ class SubjectType1 extends Component {
                                                                                                 )
                                                                                             }
                                                                                         >
-                                                                                            {data[
-                                                                                                this
-                                                                                                    .state
-                                                                                                    .activeQuestion
-                                                                                            ]
-                                                                                                .content
-                                                                                                .fillin_answer
-                                                                                                .length >
-                                                                                            1
-                                                                                                ? "-"
-                                                                                                : ""}
+                                                                                            -
                                                                                         </button>
                                                                                     </div>
                                                                                 </div>
@@ -2232,9 +2910,24 @@ class SubjectType1 extends Component {
 
                                                     {/* ---------- Image ---------- */}
                                                     <div className="form-group">
-                                                        <p className="mb-2">
-                                                            Image
-                                                        </p>
+                                                        <div className="row align-items-center mb-2">
+                                                            <div className="col-md-6">
+                                                                <p className="mb-0">
+                                                                    Image
+                                                                </p>
+                                                            </div>
+                                                            <div className="col-md-6 text-right">
+                                                                <button
+                                                                    className="btn btn-link btn-sm shadow-none"
+                                                                    onClick={
+                                                                        this
+                                                                            .clearImages
+                                                                    }
+                                                                >
+                                                                    Clear
+                                                                </button>
+                                                            </div>
+                                                        </div>
                                                         {data[
                                                             this.state
                                                                 .activeQuestion
@@ -2281,32 +2974,17 @@ class SubjectType1 extends Component {
                                                                                 role="group"
                                                                                 aria-label="Basic example"
                                                                             >
-                                                                                {data[
-                                                                                    this
-                                                                                        .state
-                                                                                        .activeQuestion
-                                                                                ]
-                                                                                    .content
-                                                                                    .images
-                                                                                    .length >
-                                                                                1 ? (
-                                                                                    <button
-                                                                                        type="button"
-                                                                                        className="btn btn-light btn-sm shadow-none font-weight-bold"
-                                                                                        onClick={() =>
-                                                                                            this.handleRemoveImageFields(
-                                                                                                index
-                                                                                            )
-                                                                                        }
-                                                                                    >
-                                                                                        -
-                                                                                    </button>
-                                                                                ) : (
-                                                                                    <button
-                                                                                        type="button"
-                                                                                        className="btn btn-light btn-sm"
-                                                                                    ></button>
-                                                                                )}
+                                                                                <button
+                                                                                    type="button"
+                                                                                    className="btn btn-light btn-sm shadow-none font-weight-bold"
+                                                                                    onClick={() =>
+                                                                                        this.handleRemoveImageFields(
+                                                                                            index
+                                                                                        )
+                                                                                    }
+                                                                                >
+                                                                                    -
+                                                                                </button>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -2340,7 +3018,6 @@ class SubjectType1 extends Component {
                                                             )
                                                         )}
                                                         <small
-                                                            id="passwordHelpBlock"
                                                             className="form-text text-muted mb-2"
                                                             style={{
                                                                 marginTop:
@@ -2375,9 +3052,24 @@ class SubjectType1 extends Component {
 
                                                     {/* ---------- Video ---------- */}
                                                     <div className="form-group">
-                                                        <p className="mb-2">
-                                                            Video
-                                                        </p>
+                                                        <div className="row align-items-center mb-2">
+                                                            <div className="col-md-6">
+                                                                <p className="mb-0">
+                                                                    Video
+                                                                </p>
+                                                            </div>
+                                                            <div className="col-md-6 text-right">
+                                                                <button
+                                                                    className="btn btn-link btn-sm shadow-none"
+                                                                    onClick={
+                                                                        this
+                                                                            .clearVideo
+                                                                    }
+                                                                >
+                                                                    Clear
+                                                                </button>
+                                                            </div>
+                                                        </div>
                                                         <input
                                                             type="text"
                                                             name="video"
@@ -2387,6 +3079,13 @@ class SubjectType1 extends Component {
                                                             onChange={
                                                                 this
                                                                     .handleVideoTitle
+                                                            }
+                                                            value={
+                                                                data[
+                                                                    this.state
+                                                                        .activeQuestion
+                                                                ].content.video
+                                                                    .title
                                                             }
                                                             autoComplete="off"
                                                         />
@@ -2426,7 +3125,6 @@ class SubjectType1 extends Component {
                                                             </label>
                                                         </div>
                                                         <small
-                                                            id="passwordHelpBlock"
                                                             className="form-text text-muted mb-2"
                                                             style={{
                                                                 marginTop:
@@ -2445,7 +3143,7 @@ class SubjectType1 extends Component {
                                                             type="url"
                                                             name="video"
                                                             placeholder="Paste URL"
-                                                            className="form-control form-control-sm border-secondary"
+                                                            className="form-control form-control-sm border-secondary mb-1"
                                                             onChange={(event) =>
                                                                 this.handleVideoUrl(
                                                                     event
@@ -2457,16 +3155,35 @@ class SubjectType1 extends Component {
                                                                     this.state
                                                                         .activeQuestion
                                                                 ].content.video
-                                                                    .pasteUrl
+                                                                    .path
                                                             }
                                                         />
+                                                        <small className="form-text text-muted mb-2">
+                                                            Only https supported
+                                                            video
+                                                        </small>
                                                     </div>
 
                                                     {/* ---------- Audio ---------- */}
                                                     <div className="form-group">
-                                                        <p className="mb-2">
-                                                            Audio
-                                                        </p>
+                                                        <div className="row align-items-center mb-2">
+                                                            <div className="col-md-6">
+                                                                <p className="mb-0">
+                                                                    Audio
+                                                                </p>
+                                                            </div>
+                                                            <div className="col-md-6 text-right">
+                                                                <button
+                                                                    className="btn btn-link btn-sm shadow-none"
+                                                                    onClick={
+                                                                        this
+                                                                            .clearAudios
+                                                                    }
+                                                                >
+                                                                    Clear
+                                                                </button>
+                                                            </div>
+                                                        </div>
                                                         {data[
                                                             this.state
                                                                 .activeQuestion
@@ -2530,7 +3247,6 @@ class SubjectType1 extends Component {
                                                             )
                                                         )}
                                                         <small
-                                                            id="passwordHelpBlock"
                                                             className="form-text text-muted mb-2"
                                                             style={{
                                                                 marginTop:

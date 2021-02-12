@@ -142,7 +142,6 @@ class Dashboard extends Component {
                                 groupItems={this.state.groupItem}
                                 path="teacher"
                                 view={true}
-                                check={true}
                             />
                             <div className="card-body p-3">
                                 {this.state.totalGroupCount >= 10 ? (
@@ -167,6 +166,7 @@ class Dashboard extends Component {
                             <SubjectTable
                                 subjectItems={this.state.subjectItem}
                                 path="teacher"
+                                check={false}
                             />
                             <div className="card-body p-3">
                                 {this.state.totalSubjectCount >= 10 ? (

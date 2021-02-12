@@ -3,36 +3,22 @@ import axios from "axios";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import Switch from "react-switch";
-import { Spinner, Alert } from "react-bootstrap";
+import { Spinner, Alert, Modal } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import { Document, Page, pdfjs } from "react-pdf";
+import Loading from "../sharedComponents/loader";
 
-class SummaryUpload extends Component {
+class DeleteModal extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
             showLoader: false,
-            summary_id: "",
-
-            pdf: {
-                file_name: null,
-                file: null,
-            },
-            url: "",
-            path: null,
-            limited: false,
-
-            numPages: null,
-            pageNumber: 1,
-            btnDisabled: false,
         };
-        this.subjectId = this.props.match.params.subjectId;
-        this.chapterName = this.props.match.params.chapterName;
+        this.subjectId = this.props.subjectId;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
@@ -42,35 +28,167 @@ class SummaryUpload extends Component {
         };
     }
 
+    handleDelete = () => {
+        this.setState({
+            showSuccessAlert: false,
+            showErrorAlert: false,
+            showLoader: true,
+        });
+
+        fetch(`${this.url}/teacher/subject/${this.subjectId}/summary/`, {
+            method: "DELETE",
+            headers: this.headers,
+            body: JSON.stringify({ summary_id: this.props.summary_id }),
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        showLoader: false,
+                    });
+                    this.props.formSubmission(true);
+                } else {
+                    if (result.detail) {
+                        this.setState({
+                            errorMsg: result.detail,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.msg,
+                        });
+                    }
+                    this.setState({
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+    render() {
+        return (
+            <Modal
+                show={this.props.show}
+                onHide={this.props.onHide}
+                size="md"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Header closeButton>Delete Summary</Modal.Header>
+                <Modal.Body>
+                    <Alert
+                        variant="danger"
+                        show={this.state.showErrorAlert}
+                        onClose={() => {
+                            this.setState({
+                                showErrorAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.errorMsg}
+                    </Alert>
+                    <Alert
+                        variant="success"
+                        show={this.state.showSuccessAlert}
+                        onClose={() => {
+                            this.setState({
+                                showSuccessAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.successMsg}
+                    </Alert>
+                    <p className="mb-0">
+                        Are you sure that you want to delete this summary?
+                    </p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <button
+                        className="btn btn-secondary btn-sm mr-2"
+                        onClick={this.props.toggleModal}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        className="btn btn-primary btn-sm"
+                        onClick={this.handleDelete}
+                    >
+                        {this.state.showLoader ? (
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                                className="mr-2"
+                            />
+                        ) : (
+                            ""
+                        )}
+                        Delete
+                    </button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
+}
+
+class SummaryUpload extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            showSideNav: false,
+            showModal: false,
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: false,
+            summary_id: "",
+            summary_name: "",
+
+            pdf: {
+                file_name: null,
+                file: null,
+            },
+            path: null,
+            limited: false,
+
+            numPages: null,
+            pageNumber: 1,
+            btnDisabled: false,
+            page_loading: true,
+            is_formSubmited: false,
+        };
+        this.subjectId = this.props.match.params.subjectId;
+        this.chapterId = this.props.match.params.chapterId;
+        this.url = baseUrl + teacherUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
+        pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+    }
+
     toggleSideNav = () => {
         this.setState({
             showSideNav: !this.state.showSideNav,
         });
     };
 
-    loadSummaryData = () => {
-        fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/summary/files/pdf/`,
-            {
-                method: "GET",
-                headers: this.headers,
-            }
-        )
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    componentDidMount = () => {
-        document.title = `${this.chapterName} Summary - Teacher | IQLabs`;
-
-        this.loadSummaryData()
-
-        pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+    toggleModal = () => {
+        this.setState({
+            showModal: !this.state.showModal,
+        });
     };
 
     handleSwitch = () => {
@@ -99,6 +217,56 @@ class SummaryUpload extends Component {
         }
     };
 
+    loadSummaryData = () => {
+        this.setState({
+            summary_id: "",
+            limited: false,
+            path: null,
+            summary_name: "",
+        });
+
+        fetch(
+            `${this.url}/teacher/subject/${this.subjectId}/summary/?chapter_id=${this.chapterId}`,
+            {
+                method: "GET",
+                headers: this.headers,
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true && result.data.length !== 0) {
+                    this.setState({
+                        summary_id: result.data[0].summary_id,
+                        summary_name: result.data[0].summary_name,
+                        limited:
+                            result.data[0].summary_name === undefined
+                                ? result.data[0].limited
+                                : false,
+                        path:
+                            result.data[0].direct_question_urls.length !== 0
+                                ? result.data[0].direct_question_urls[0]
+                                : null,
+                    });
+                }
+                this.setState({
+                    page_loading: false,
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    page_loading: false,
+                });
+            });
+    };
+
+    componentDidMount = () => {
+        document.title = `${this.chapterId} Summary - Teacher | IQLabs`;
+
+        this.loadSummaryData();
+    };
+
     handleSubmit = (event) => {
         event.preventDefault();
 
@@ -112,7 +280,7 @@ class SummaryUpload extends Component {
 
         let form_data = new FormData();
 
-        form_data.append("chapter_name", this.chapterName);
+        form_data.append("chapter_id", this.chapterId);
         form_data.append("summary_file_1", files.file);
         form_data.append("limited", this.state.limited);
 
@@ -161,9 +329,10 @@ class SummaryUpload extends Component {
                             successMsg: result.data.msg,
                             showSuccessAlert: true,
                             showLoader: false,
-                            url: result.data.url,
+                            path: result.data.url,
                             summary_id: result.data.summary_id,
                         });
+                        this.loadSummaryData();
                     } else if (result.data.sts === false) {
                         if (result.data.detail) {
                             this.setState({
@@ -198,21 +367,29 @@ class SummaryUpload extends Component {
         }
     };
 
-    handleDelete = () => {
-        fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/summary/files/pdf/`,
-            {
-                method: "DELETE",
-                headers: this.headers,
-            }
-        )
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-            })
-            .catch((err) => {
-                console.log(err);
+    componentDidUpdate = (prevProps, prevState) => {
+        if (
+            prevState.is_formSubmited !== this.state.is_formSubmited &&
+            this.state.is_formSubmited === true
+        ) {
+            this.loadSummaryData();
+            this.setState({
+                is_formSubmited: false,
             });
+        }
+    };
+
+    formSubmission = (is_formSubmited) => {
+        if (is_formSubmited) {
+            this.setState({
+                is_formSubmited: true,
+            });
+            setTimeout(() => {
+                this.setState({
+                    showModal: false,
+                });
+            }, 1000);
+        }
     };
 
     onDocumentLoadSuccess = ({ numPages }) => {
@@ -236,6 +413,18 @@ class SummaryUpload extends Component {
                     activeLink="dashboard"
                 />
 
+                {/* Delete Modal */}
+                {this.state.showModal ? (
+                    <DeleteModal
+                        show={this.state.showModal}
+                        onHide={this.toggleModal}
+                        subjectId={this.subjectId}
+                        summary_id={this.state.summary_id}
+                        formSubmission={this.formSubmission}
+                        toggleModal={this.toggleModal}
+                    />
+                ) : null}
+
                 <div
                     className={`section content ${
                         this.state.showSideNav ? "active" : ""
@@ -258,17 +447,16 @@ class SummaryUpload extends Component {
                                             <span className="font-weight-bold">
                                                 Summary:
                                             </span>{" "}
-                                            {
-                                                this.props.match.params
-                                                    .chapterName
-                                            }
+                                            Chapter name
                                         </p>
                                     </div>
                                     <div className="col-md-6 d-flex align-items-center justify-content-end">
-                                        {this.state.summary_id !== "" ? (
+                                        {this.state.summary_id !== "" &&
+                                        this.state.summary_name ===
+                                            undefined ? (
                                             <button
                                                 className="btn btn-primary btn-sm mr-2"
-                                                onClick={this.handleDelete}
+                                                onClick={this.toggleModal}
                                             >
                                                 Delete
                                             </button>
@@ -353,7 +541,7 @@ class SummaryUpload extends Component {
                                             className="form-text text-muted mb-2"
                                         >
                                             Select only pdf format & Max file
-                                            upload size is 5MB
+                                            size is 5MB
                                         </small>
 
                                         <button
@@ -378,7 +566,7 @@ class SummaryUpload extends Component {
                                     </div>
                                 </div>
                             </div>
-                            <div className="card-body secondary-bg text-white text-center">
+                            <div className="card-body secondary-bg primary-text text-center">
                                 {this.state.path === null ? (
                                     "Your uploads will appear here"
                                 ) : (
@@ -434,6 +622,8 @@ class SummaryUpload extends Component {
                                 )}
                             </div>
                         </div>
+                        {/* Loading component */}
+                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
             </div>

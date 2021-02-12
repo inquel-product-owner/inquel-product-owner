@@ -2,33 +2,23 @@ import React, { Component } from "react";
 import axios from "axios";
 import Header from "./navbar";
 import SideNav from "./sidenav";
-import { Spinner, Alert } from "react-bootstrap";
+import Switch from "react-switch";
+import { Spinner, Alert, Modal } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import { Document, Page, pdfjs } from "react-pdf";
+import Loading from "../sharedComponents/loader";
 
-class NotesUpload extends Component {
+class DeleteModal extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
             showLoader: false,
-            pdf: {
-                file_name: null,
-                file: null,
-            },
-            url: "",
-            path: null,
-            numPages: null,
-            pageNumber: 1,
-            btnDisabled: false,
         };
-        this.subjectId = this.props.match.params.subjectId;
-        this.chapterName = this.props.match.params.chapterName;
-        this.topicName = this.props.match.params.topicName;
+        this.subjectId = this.props.subjectId;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
@@ -38,16 +28,178 @@ class NotesUpload extends Component {
         };
     }
 
+    handleDelete = () => {
+        this.setState({
+            showSuccessAlert: false,
+            showErrorAlert: false,
+            showLoader: true,
+        });
+
+        fetch(`${this.url}/teacher/subject/${this.subjectId}/notes/`, {
+            method: "DELETE",
+            headers: this.headers,
+            body: JSON.stringify({
+                chapter_id: this.props.chapterId,
+                topic_name: this.props.topicName,
+                notes_id: this.props.notes_id,
+            }),
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        showLoader: false,
+                    });
+                    this.props.formSubmission(true);
+                } else {
+                    if (result.detail) {
+                        this.setState({
+                            errorMsg: result.detail,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.msg,
+                        });
+                    }
+                    this.setState({
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+    render() {
+        return (
+            <Modal
+                show={this.props.show}
+                onHide={this.props.onHide}
+                size="md"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Header closeButton>Delete Notes</Modal.Header>
+                <Modal.Body>
+                    <Alert
+                        variant="danger"
+                        show={this.state.showErrorAlert}
+                        onClose={() => {
+                            this.setState({
+                                showErrorAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.errorMsg}
+                    </Alert>
+                    <Alert
+                        variant="success"
+                        show={this.state.showSuccessAlert}
+                        onClose={() => {
+                            this.setState({
+                                showSuccessAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.successMsg}
+                    </Alert>
+                    <p className="mb-0">
+                        Are you sure that you want to delete this notes?
+                    </p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <button
+                        className="btn btn-secondary btn-sm mr-2"
+                        onClick={this.props.toggleModal}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        className="btn btn-primary btn-sm"
+                        onClick={this.handleDelete}
+                    >
+                        {this.state.showLoader ? (
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                                className="mr-2"
+                            />
+                        ) : (
+                            ""
+                        )}
+                        Delete
+                    </button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
+}
+
+class NotesUpload extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            showSideNav: false,
+            showModal: false,
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: false,
+            notes_id: "",
+            notes_name: "",
+
+            pdf: {
+                file_name: null,
+                file: null,
+            },
+            path: null,
+            limited: false,
+
+            numPages: null,
+            pageNumber: 1,
+            btnDisabled: false,
+            page_loading: true,
+            is_formSubmited: false,
+        };
+        this.subjectId = this.props.match.params.subjectId;
+        this.chapterId = this.props.match.params.chapterId;
+        this.topicName = this.props.match.params.topicName;
+        this.url = baseUrl + teacherUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
+        pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+    }
+
     toggleSideNav = () => {
         this.setState({
             showSideNav: !this.state.showSideNav,
         });
     };
 
-    componentDidMount = () => {
-        document.title = `${this.chapterName} Notes - Teacher | IQLabs`;
+    toggleModal = () => {
+        this.setState({
+            showModal: !this.state.showModal,
+        });
+    };
 
-        pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+    handleSwitch = () => {
+        this.setState({
+            limited: !this.state.limited,
+        });
     };
 
     handleFile = (event) => {
@@ -70,6 +222,55 @@ class NotesUpload extends Component {
         }
     };
 
+    loadNotesData = () => {
+        this.setState({
+            notes_id: "",
+            limited: false,
+            path: null,
+            notes_name: "",
+        });
+
+        fetch(
+            `${this.url}/teacher/subject/${this.subjectId}/notes/?chapter_id=${this.chapterId}&topic_name=${this.topicName}`,
+            {
+                method: "GET",
+                headers: this.headers,
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true && result.data.length !== 0) {
+                    this.setState({
+                        notes_id: result.data[0].notes_id,
+                        notes_name: result.data[0].notes_name,
+                        limited: result.data[0].notes_name === undefined
+                            ? result.data[0].limited
+                            : false,
+                        path:
+                            result.data[0].direct_question_urls.length !== 0
+                                ? result.data[0].direct_question_urls[0]
+                                : null,
+                    });
+                }
+                this.setState({
+                    page_loading: false,
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    page_loading: false,
+                });
+            });
+    };
+
+    componentDidMount = () => {
+        document.title = `${this.chapterId} Notes - Teacher | IQLabs`;
+
+        this.loadNotesData();
+    };
+
     handleSubmit = (event) => {
         event.preventDefault();
 
@@ -83,9 +284,10 @@ class NotesUpload extends Component {
 
         let form_data = new FormData();
 
-        form_data.append("chapter_name", this.chapterName);
+        form_data.append("chapter_id", this.chapterId);
         form_data.append("topic_name", this.topicName);
         form_data.append("notes_file_1", files.file);
+        form_data.append("limited", this.state.limited);
 
         const options = {
             headers: {
@@ -121,7 +323,7 @@ class NotesUpload extends Component {
         } else {
             axios
                 .post(
-                    `${this.url}/teacher/subject/${this.subjectId}/notes/files/`,
+                    `${this.url}/teacher/subject/${this.subjectId}/notes/files/pdf/`,
                     form_data,
                     options
                 )
@@ -132,8 +334,10 @@ class NotesUpload extends Component {
                             successMsg: result.data.msg,
                             showSuccessAlert: true,
                             showLoader: false,
-                            url: result.data.url,
+                            path: result.data.url,
+                            notes_id: result.data.notes_id,
                         });
+                        this.loadNotesData();
                     } else if (result.data.sts === false) {
                         if (result.data.detail) {
                             this.setState({
@@ -168,6 +372,31 @@ class NotesUpload extends Component {
         }
     };
 
+    componentDidUpdate = (prevProps, prevState) => {
+        if (
+            prevState.is_formSubmited !== this.state.is_formSubmited &&
+            this.state.is_formSubmited === true
+        ) {
+            this.loadNotesData();
+            this.setState({
+                is_formSubmited: false,
+            });
+        }
+    };
+
+    formSubmission = (is_formSubmited) => {
+        if (is_formSubmited) {
+            this.setState({
+                is_formSubmited: true,
+            });
+            setTimeout(() => {
+                this.setState({
+                    showModal: false,
+                });
+            }, 1000);
+        }
+    };
+
     onDocumentLoadSuccess = ({ numPages }) => {
         this.setState({ numPages });
     };
@@ -189,6 +418,20 @@ class NotesUpload extends Component {
                     activeLink="dashboard"
                 />
 
+                {/* Delete Modal */}
+                {this.state.showModal ? (
+                    <DeleteModal
+                        show={this.state.showModal}
+                        onHide={this.toggleModal}
+                        subjectId={this.subjectId}
+                        chapterId={this.chapterId}
+                        topicName={this.topicName}
+                        notes_id={this.state.notes_id}
+                        formSubmission={this.formSubmission}
+                        toggleModal={this.toggleModal}
+                    />
+                ) : null}
+
                 <div
                     className={`section content ${
                         this.state.showSideNav ? "active" : ""
@@ -209,11 +452,42 @@ class NotesUpload extends Component {
                                     <div className="col-md-6">
                                         <p className="small mb-0">
                                             <span className="font-weight-bold">
-                                                Summary:
+                                                Notes:
                                             </span>{" "}
-                                            {this.chapterName} |{" "}
+                                            {this.chapterId} |{" "}
                                             {this.topicName}
                                         </p>
+                                    </div>
+                                    <div className="col-md-6 d-flex align-items-center justify-content-end">
+                                        {this.state.notes_id !== "" &&
+                                        this.state.notes_name === undefined ? (
+                                            <button
+                                                className="btn btn-primary btn-sm mr-2"
+                                                onClick={this.toggleModal}
+                                            >
+                                                Delete
+                                            </button>
+                                        ) : null}
+                                        <div className="d-flex justify-content-end">
+                                            <span className="mr-2 small primary-text font-weight-bold">
+                                                Limited
+                                            </span>
+                                            <Switch
+                                                checked={this.state.limited}
+                                                onChange={this.handleSwitch}
+                                                onColor="#621012"
+                                                onHandleColor="#efd2ac"
+                                                handleDiameter={12}
+                                                uncheckedIcon={false}
+                                                checkedIcon={false}
+                                                boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
+                                                activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
+                                                height={18}
+                                                width={35}
+                                                className="react-switch"
+                                                id="select-all"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -274,7 +548,7 @@ class NotesUpload extends Component {
                                             className="form-text text-muted mb-2"
                                         >
                                             Select only pdf format & Max file
-                                            upload size is 5MB
+                                            size is 5MB
                                         </small>
 
                                         <button
@@ -299,7 +573,7 @@ class NotesUpload extends Component {
                                     </div>
                                 </div>
                             </div>
-                            <div className="card-body secondary-bg text-white text-center">
+                            <div className="card-body secondary-bg primary-text text-center">
                                 {this.state.path === null ? (
                                     "Your uploads will appear here"
                                 ) : (
@@ -355,6 +629,8 @@ class NotesUpload extends Component {
                                 )}
                             </div>
                         </div>
+                        {/* Loading component */}
+                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
             </div>

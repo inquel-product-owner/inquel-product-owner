@@ -5,6 +5,7 @@ import SideNav from "./sidenav";
 import { Spinner, Alert } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import { Document, Page, pdfjs } from "react-pdf";
+import Loading from "../sharedComponents/loader";
 
 class SemesterDirect extends Component {
     constructor(props) {
@@ -23,11 +24,11 @@ class SemesterDirect extends Component {
             exam_date: "",
             starts_at: "",
             ends_at: "",
-            url: "",
             path: null,
             numPages: null,
             pageNumber: 1,
             btnDisabled: false,
+            page_loading: true,
         };
         this.subjectId = this.props.match.params.subjectId;
         this.semesterId = this.props.match.params.semesterId;
@@ -38,6 +39,7 @@ class SemesterDirect extends Component {
             "Content-Type": "application/json",
             Authorization: this.authToken,
         };
+        pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
     }
 
     toggleSideNav = () => {
@@ -46,10 +48,51 @@ class SemesterDirect extends Component {
         });
     };
 
+    loadSemesterData = () => {
+        fetch(
+            `${this.url}/teacher/subject/${this.subjectId}/semester/${this.semesterId}/files/`,
+            {
+                method: "GET",
+                headers: this.headers,
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        path:
+                            result.data.direct_question_urls.length !== 0
+                                ? result.data.direct_question_urls
+                                : null,
+                        page_loading: false,
+                    });
+                } else {
+                    if (result.detail) {
+                        this.setState({
+                            errorMsg: result.detail,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.msg,
+                        });
+                    }
+                    this.setState({
+                        showErrorAlert: true,
+                        showLoader: false,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     componentDidMount = () => {
         document.title = `Semester name - Teacher | IQLabs`;
 
-        pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+        this.loadSemesterData();
     };
 
     handleFile = (event) => {
@@ -163,19 +206,27 @@ class SemesterDirect extends Component {
         } else {
             axios
                 .post(
-                    `${this.url}/teacher/subject/${this.subjectId}/semester/files/`,
+                    `${this.url}/teacher/subject/${this.subjectId}/semester/${this.semesterId}/files/`,
                     form_data,
                     options
                 )
                 .then((result) => {
                     console.log(result);
                     if (result.data.sts === true) {
-                        this.setState({
-                            successMsg: result.data.msg,
-                            showSuccessAlert: true,
-                            showLoader: false,
-                            url: result.data.url,
-                        });
+                        this.setState(
+                            {
+                                successMsg: result.data.msg,
+                                showSuccessAlert: true,
+                                showLoader: false,
+                                path: result.data.url,
+                            },
+                            () => {
+                                this.setState({
+                                    page_loading: true,
+                                });
+                                this.loadSemesterData();
+                            }
+                        );
                     } else if (result.data.sts === false) {
                         if (result.data.detail) {
                             this.setState({
@@ -250,17 +301,6 @@ class SemesterDirect extends Component {
                                 <h5 className="primary-text mb-0">
                                     Semester name
                                 </h5>
-                            </div>
-                        </div>
-
-                        <div className="row mb-2">
-                            <div className="col-md-3">
-                                <h6 className="primary-text">TEST ANALYSIS</h6>
-                            </div>
-                            <div className="col-md-3">
-                                <h6 className="primary-text">
-                                    ATTEMPTS & PAPERS
-                                </h6>
                             </div>
                         </div>
 
@@ -399,7 +439,7 @@ class SemesterDirect extends Component {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="card-body secondary-bg text-white text-center">
+                                    <div className="card-body secondary-bg primary-text text-center">
                                         {this.state.path === null ? (
                                             "Your uploads will appear here"
                                         ) : (
@@ -469,6 +509,8 @@ class SemesterDirect extends Component {
                                 </div>
                             </div>
                         </div>
+                        {/* Loading component */}
+                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
             </div>

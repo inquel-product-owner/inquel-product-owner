@@ -5,6 +5,7 @@ import SideNav from "./sidenav";
 import { Spinner, Alert } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import { Document, Page, pdfjs } from "react-pdf";
+import Loading from "../sharedComponents/loader";
 
 class CyleTestDirect extends Component {
     constructor(props) {
@@ -23,14 +24,14 @@ class CyleTestDirect extends Component {
             exam_date: "",
             starts_at: "",
             ends_at: "",
-            url: "",
             path: null,
             numPages: null,
             pageNumber: 1,
             btnDisabled: false,
+            page_loading: true,
         };
         this.subjectId = this.props.match.params.subjectId;
-        this.chapterName = this.props.match.params.chapterName;
+        this.chapterId = this.props.match.params.chapterId;
         this.cycle_testId = this.props.match.params.cycle_testId;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
@@ -39,6 +40,7 @@ class CyleTestDirect extends Component {
             "Content-Type": "application/json",
             Authorization: this.authToken,
         };
+        pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
     }
 
     toggleSideNav = () => {
@@ -47,10 +49,51 @@ class CyleTestDirect extends Component {
         });
     };
 
+    loadCycletestData = () => {
+        fetch(
+            `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/files/`,
+            {
+                method: "GET",
+                headers: this.headers,
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        path:
+                            result.data.direct_question_urls.length !== 0
+                                ? result.data.direct_question_urls
+                                : null,
+                        page_loading: false,
+                    });
+                } else {
+                    if (result.detail) {
+                        this.setState({
+                            errorMsg: result.detail,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.msg,
+                        });
+                    }
+                    this.setState({
+                        showErrorAlert: true,
+                        showLoader: false,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     componentDidMount = () => {
         document.title = `${this.chapterName} - Teacher | IQLabs`;
 
-        pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+        this.loadCycletestData();
     };
 
     handleFile = (event) => {
@@ -107,7 +150,7 @@ class CyleTestDirect extends Component {
         let form_data = new FormData();
 
         form_data.append("cycle_test_id", this.cycle_testId);
-        form_data.append("chapter_name", this.chapterName);
+        form_data.append("chapter_id", this.chapterId);
         form_data.append("exam_date", this.state.exam_date);
         form_data.append("starts_at", this.state.starts_at);
         form_data.append("ends_at", this.state.ends_at);
@@ -165,19 +208,27 @@ class CyleTestDirect extends Component {
         } else {
             axios
                 .post(
-                    `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/files/?chapter_name=${this.chapterName}`,
+                    `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/files/`,
                     form_data,
                     options
                 )
                 .then((result) => {
                     console.log(result);
                     if (result.data.sts === true) {
-                        this.setState({
-                            successMsg: result.data.msg,
-                            showSuccessAlert: true,
-                            showLoader: false,
-                            url: result.data.url,
-                        });
+                        this.setState(
+                            {
+                                successMsg: result.data.msg,
+                                showSuccessAlert: true,
+                                showLoader: false,
+                                path: result.data.url,
+                            },
+                            () => {
+                                this.setState({
+                                    page_loading: true,
+                                });
+                                this.loadCycletestData();
+                            }
+                        );
                     } else if (result.data.sts === false) {
                         if (result.data.detail) {
                             this.setState({
@@ -252,17 +303,6 @@ class CyleTestDirect extends Component {
                                 <h5 className="primary-text mb-0">
                                     {this.chapterName}
                                 </h5>
-                            </div>
-                        </div>
-
-                        <div className="row mb-2">
-                            <div className="col-md-3">
-                                <h6 className="primary-text">TEST ANALYSIS</h6>
-                            </div>
-                            <div className="col-md-3">
-                                <h6 className="primary-text">
-                                    ATTEMPTS & PAPERS
-                                </h6>
                             </div>
                         </div>
 
@@ -401,7 +441,7 @@ class CyleTestDirect extends Component {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="card-body secondary-bg text-white text-center">
+                                    <div className="card-body secondary-bg primary-text text-center">
                                         {this.state.path === null ? (
                                             "Your uploads will appear here"
                                         ) : (
@@ -471,6 +511,8 @@ class CyleTestDirect extends Component {
                                 </div>
                             </div>
                         </div>
+                        {/* Loading component */}
+                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
             </div>

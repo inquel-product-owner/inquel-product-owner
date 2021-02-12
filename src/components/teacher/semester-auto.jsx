@@ -215,12 +215,7 @@ class Scorecard extends Component {
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
-                <Modal.Header
-                    closeButton
-                    className="font-weight-bold primary-text"
-                >
-                    Scorecard Configuration
-                </Modal.Header>
+                <Modal.Header closeButton>Scorecard Configuration</Modal.Header>
                 <Modal.Body>
                     <Alert
                         variant="danger"
@@ -632,9 +627,17 @@ class SemesterAuto extends Component {
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
-                if (result.data.attempts !== undefined) {
+                if (result.sts === true) {
+                    if (result.data.attempts !== undefined) {
+                        this.setState({
+                            attempts: result.data.attempts,
+                        });
+                    }
+                } else {
                     this.setState({
-                        attempts: result.data.attempts,
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
                     });
                 }
             })
@@ -1132,7 +1135,9 @@ class SemesterAuto extends Component {
 
                         <div className="card shadow-sm mb-3">
                             <div className="card-body text-center">
-                                <h6 className="mb-0">Semester name</h6>
+                                <h6 className="primary-text mb-0">
+                                    Semester name
+                                </h6>
                             </div>
                         </div>
 
@@ -1160,6 +1165,7 @@ class SemesterAuto extends Component {
                                             id="attempt"
                                             className="form-control form-shadow"
                                             onChange={this.handleAttempt}
+                                            value={this.state.selectedAttempt}
                                             required
                                         >
                                             <option value="">
@@ -1172,13 +1178,6 @@ class SemesterAuto extends Component {
                                                               <option
                                                                   value={data}
                                                                   key={index}
-                                                                  selected={
-                                                                      data ===
-                                                                      this.state
-                                                                          .selectedAttempt
-                                                                          ? true
-                                                                          : false
-                                                                  }
                                                               >
                                                                   {data}
                                                               </option>
@@ -1296,6 +1295,9 @@ class SemesterAuto extends Component {
                                                                         event
                                                                     )
                                                                 }
+                                                                value={
+                                                                    section.question_type
+                                                                }
                                                                 required
                                                             >
                                                                 <option value="">
@@ -1318,17 +1320,13 @@ class SemesterAuto extends Component {
                                                                                       key={
                                                                                           index
                                                                                       }
-                                                                                      selected={
-                                                                                          data ===
-                                                                                          section.question_type
-                                                                                              ? true
-                                                                                              : false
-                                                                                      }
                                                                                   >
                                                                                       {data ===
                                                                                       "type_1"
                                                                                           ? "Type 1"
-                                                                                          : "Type 2"}
+                                                                                          : "type_2"
+                                                                                          ? "Type 2"
+                                                                                          : ""}
                                                                                   </option>
                                                                               );
                                                                           }
@@ -1349,6 +1347,9 @@ class SemesterAuto extends Component {
                                                                         event
                                                                     )
                                                                 }
+                                                                value={
+                                                                    section.category
+                                                                }
                                                                 required
                                                             >
                                                                 <option value="">
@@ -1357,38 +1358,36 @@ class SemesterAuto extends Component {
                                                                 </option>
                                                                 {filterData[
                                                                     index
-                                                                ].category
-                                                                    .length !==
-                                                                0
+                                                                ] !== undefined
                                                                     ? filterData[
                                                                           index
-                                                                      ].category.map(
-                                                                          (
-                                                                              data,
+                                                                      ].category
+                                                                          .length !==
+                                                                      0
+                                                                        ? filterData[
                                                                               index
-                                                                          ) => {
-                                                                              return (
-                                                                                  <option
-                                                                                      value={
-                                                                                          data
-                                                                                      }
-                                                                                      key={
-                                                                                          index
-                                                                                      }
-                                                                                      selected={
-                                                                                          data ===
-                                                                                          section.category
-                                                                                              ? true
-                                                                                              : false
-                                                                                      }
-                                                                                  >
-                                                                                      {
-                                                                                          data
-                                                                                      }
-                                                                                  </option>
-                                                                              );
-                                                                          }
-                                                                      )
+                                                                          ].category.map(
+                                                                              (
+                                                                                  data,
+                                                                                  c_index
+                                                                              ) => {
+                                                                                  return (
+                                                                                      <option
+                                                                                          value={
+                                                                                              data
+                                                                                          }
+                                                                                          key={
+                                                                                              c_index
+                                                                                          }
+                                                                                      >
+                                                                                          {
+                                                                                              data
+                                                                                          }
+                                                                                      </option>
+                                                                                  );
+                                                                              }
+                                                                          )
+                                                                        : null
                                                                     : null}
                                                             </select>
                                                         </td>
@@ -1462,7 +1461,7 @@ class SemesterAuto extends Component {
                                                         "" ? (
                                                             <td>
                                                                 <Link
-                                                                    to={`/teacher/subject/${this.subjectId}/semester/${this.semesterId}/section/${section.section_id}/?attempt=${this.state.selectedAttempt}`}
+                                                                    to={`${this.props.match.url}/section/${section.section_id}/?attempt=${this.state.selectedAttempt}`}
                                                                 >
                                                                     <button className="btn btn-primary-invert btn-sm shadow-sm">
                                                                         <i className="fas fa-eye"></i>
