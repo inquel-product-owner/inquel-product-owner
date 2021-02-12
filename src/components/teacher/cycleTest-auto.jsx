@@ -19,6 +19,7 @@ class Scorecard extends Component {
             average: "",
             good: "",
             improve: "",
+            page_loading: true,
         };
         this.subjectId = this.props.subjectId;
         this.chapterId = this.props.chapterId;
@@ -43,10 +44,29 @@ class Scorecard extends Component {
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        average: result.data.average,
+                        good: result.data.good,
+                        improve: result.data.improve,
+                    });
+                } else {
+                    if (result.detail) {
+                        this.setState({
+                            errorMsg: result.detail,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.msg,
+                        });
+                    }
+                    this.setState({
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
                 this.setState({
-                    average: result.data.average,
-                    good: result.data.good,
-                    improve: result.data.improve,
+                    page_loading: false,
                 });
             })
             .catch((err) => {
@@ -65,14 +85,33 @@ class Scorecard extends Component {
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
-                if (Object.keys(result.data.score_card_config).length !== 0) {
-                    this.setState({
-                        average: result.data.score_card_config.average,
-                        good: result.data.score_card_config.good,
-                        improve: result.data.score_card_config.improve,
-                    });
+                if (result.sts === true) {
+                    if (
+                        Object.keys(result.data.score_card_config).length !== 0
+                    ) {
+                        this.setState({
+                            average: result.data.score_card_config.average,
+                            good: result.data.score_card_config.good,
+                            improve: result.data.score_card_config.improve,
+                            page_loading: false,
+                        });
+                    } else {
+                        this.loadDefault_ScoreCard();
+                    }
                 } else {
-                    this.loadDefault_ScoreCard();
+                    if (result.detail) {
+                        this.setState({
+                            errorMsg: result.detail,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.msg,
+                        });
+                    }
+                    this.setState({
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
                 }
             })
             .catch((err) => {
@@ -217,7 +256,24 @@ class Scorecard extends Component {
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
-                <Modal.Header closeButton>Scorecard Configuration</Modal.Header>
+                <Modal.Header
+                    closeButton
+                    className="align-items-center"
+                >
+                    Scorecard Configuration
+                    {this.state.page_loading ? (
+                        <Spinner
+                            as="span"
+                            animation="border"
+                            size="sm"
+                            role="status"
+                            aria-hidden="true"
+                            className="ml-3 mb-0"
+                        />
+                    ) : (
+                        ""
+                    )}
+                </Modal.Header>
                 <Modal.Body>
                     <Alert
                         variant="danger"
@@ -581,6 +637,7 @@ class CycleTestAuto extends Component {
             attempts: [],
             selectedAttempt: "",
             question_type: [],
+            disableAttempt: false,
 
             page_loading: true,
             is_formSubmitted: false,
@@ -719,10 +776,12 @@ class CycleTestAuto extends Component {
                         duration: duration,
                         selectedAttempt: selectedAttempt,
                         page_loading: false,
+                        disableAttempt: true,
                     });
                 } else {
                     this.setState({
                         page_loading: false,
+                        disableAttempt: false,
                     });
                 }
             })
@@ -1245,6 +1304,11 @@ class CycleTestAuto extends Component {
                                             className="form-control form-shadow"
                                             onChange={this.handleAttempt}
                                             value={this.state.selectedAttempt}
+                                            disabled={
+                                                this.state.disableAttempt
+                                                    ? true
+                                                    : false
+                                            }
                                             required
                                         >
                                             <option value="">

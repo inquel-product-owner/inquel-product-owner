@@ -208,6 +208,12 @@ class SummaryUpload extends Component {
                 showErrorAlert: true,
                 btnDisabled: true,
             });
+        } else if (event.target.files[0].size > 5000000) {
+            this.setState({
+                errorMsg: "File sixe exceeds more then 5MB!",
+                showErrorAlert: true,
+                btnDisabled: true,
+            });
         } else {
             this.setState({
                 pdf: pdf,
@@ -310,7 +316,7 @@ class SummaryUpload extends Component {
                 errorMsg: "Invalid file format!",
                 showErrorAlert: true,
             });
-        } else if (pdf.size > 5000000) {
+        } else if (pdf.file.size > 5000000) {
             this.setState({
                 errorMsg: "File sixe exceeds more then 5MB!",
                 showErrorAlert: true,
