@@ -630,9 +630,17 @@ class CycleTestAuto extends Component {
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
-                if (result.data.attempts !== undefined) {
+                if (result.sts === true) {
+                    if (result.data.attempts !== undefined) {
+                        this.setState({
+                            attempts: result.data.attempts,
+                        });
+                    }
+                } else {
                     this.setState({
-                        attempts: result.data.attempts,
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
                     });
                 }
             })
@@ -1236,6 +1244,7 @@ class CycleTestAuto extends Component {
                                             id="attempt"
                                             className="form-control form-shadow"
                                             onChange={this.handleAttempt}
+                                            value={this.state.selectedAttempt}
                                             required
                                         >
                                             <option value="">
@@ -1248,13 +1257,6 @@ class CycleTestAuto extends Component {
                                                               <option
                                                                   value={data}
                                                                   key={index}
-                                                                  selected={
-                                                                      data ===
-                                                                      this.state
-                                                                          .selectedAttempt
-                                                                          ? true
-                                                                          : false
-                                                                  }
                                                               >
                                                                   {data}
                                                               </option>
@@ -1372,6 +1374,9 @@ class CycleTestAuto extends Component {
                                                                         event
                                                                     )
                                                                 }
+                                                                value={
+                                                                    section.question_type
+                                                                }
                                                                 required
                                                             >
                                                                 <option value="">
@@ -1394,17 +1399,13 @@ class CycleTestAuto extends Component {
                                                                                       key={
                                                                                           index
                                                                                       }
-                                                                                      selected={
-                                                                                          data ===
-                                                                                          section.question_type
-                                                                                              ? true
-                                                                                              : false
-                                                                                      }
                                                                                   >
                                                                                       {data ===
                                                                                       "type_1"
                                                                                           ? "Type 1"
-                                                                                          : "Type 2"}
+                                                                                          : "type_2"
+                                                                                          ? "Type 2"
+                                                                                          : ""}
                                                                                   </option>
                                                                               );
                                                                           }
@@ -1425,6 +1426,9 @@ class CycleTestAuto extends Component {
                                                                         event
                                                                     )
                                                                 }
+                                                                value={
+                                                                    section.category
+                                                                }
                                                                 required
                                                             >
                                                                 <option value="">
@@ -1433,38 +1437,36 @@ class CycleTestAuto extends Component {
                                                                 </option>
                                                                 {filterData[
                                                                     index
-                                                                ].category
-                                                                    .length !==
-                                                                0
+                                                                ] !== undefined
                                                                     ? filterData[
                                                                           index
-                                                                      ].category.map(
-                                                                          (
-                                                                              data,
+                                                                      ].category
+                                                                          .length !==
+                                                                      0
+                                                                        ? filterData[
                                                                               index
-                                                                          ) => {
-                                                                              return (
-                                                                                  <option
-                                                                                      value={
-                                                                                          data
-                                                                                      }
-                                                                                      key={
-                                                                                          index
-                                                                                      }
-                                                                                      selected={
-                                                                                          data ===
-                                                                                          section.category
-                                                                                              ? true
-                                                                                              : false
-                                                                                      }
-                                                                                  >
-                                                                                      {
-                                                                                          data
-                                                                                      }
-                                                                                  </option>
-                                                                              );
-                                                                          }
-                                                                      )
+                                                                          ].category.map(
+                                                                              (
+                                                                                  data,
+                                                                                  c_index
+                                                                              ) => {
+                                                                                  return (
+                                                                                      <option
+                                                                                          value={
+                                                                                              data
+                                                                                          }
+                                                                                          key={
+                                                                                              c_index
+                                                                                          }
+                                                                                      >
+                                                                                          {
+                                                                                              data
+                                                                                          }
+                                                                                      </option>
+                                                                                  );
+                                                                              }
+                                                                          )
+                                                                        : null
                                                                     : null}
                                                             </select>
                                                         </td>

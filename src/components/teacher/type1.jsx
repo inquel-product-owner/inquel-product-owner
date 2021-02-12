@@ -50,7 +50,7 @@ class MCQDeleteModal extends Component {
                 method: "DELETE",
                 headers: this.headers,
                 body: JSON.stringify({
-                    chapter_name: this.props.chapter_name,
+                    chapter_id: this.props.chapter_id,
                     topic_name: this.props.topic_name,
                     question_random_id: this.props.values,
                 }),
@@ -337,7 +337,7 @@ class SubjectType1 extends Component {
 
             questions: [
                 {
-                    chapter_name: this.props.match.params.chapterName,
+                    chapter_id: this.props.match.params.chapterId,
                     topic_name: this.props.match.params.topicName,
                     question: "<p>Question goes here</p>",
                     question_random_id: "",
@@ -392,7 +392,7 @@ class SubjectType1 extends Component {
         this.option_limit = 6;
         this.image_limit = 4;
         this.subjectId = this.props.match.params.subjectId;
-        this.chapterName = this.props.match.params.chapterName;
+        this.chapterId = this.props.match.params.chapterId;
         this.topicName = this.props.match.params.topicName;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
@@ -422,7 +422,7 @@ class SubjectType1 extends Component {
 
     loadMCQData = () => {
         fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/?chapter_name=${this.chapterName}&topic_name=${this.topicName}`,
+            `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/?chapter_id=${this.chapterId}&topic_name=${this.topicName}`,
             {
                 headers: this.headers,
                 method: "GET",
@@ -506,7 +506,7 @@ class SubjectType1 extends Component {
                         }
 
                         data.push({
-                            chapter_name: this.props.match.params.chapterName,
+                            chapter_id: this.props.match.params.chapterId,
                             topic_name: this.props.match.params.topicName,
                             question: response[i].question,
                             question_random_id: response[i].question_random_id,
@@ -648,7 +648,7 @@ class SubjectType1 extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.chapterName} Type 1 MCQ - Teacher | IQLabs`;
+        document.title = `${this.chapterId} Type 1 MCQ - Teacher | IQLabs`;
 
         fetch(`${this.url}/teacher/status/data/?theme=1&complexity=1`, {
             headers: this.headers,
@@ -849,7 +849,7 @@ class SubjectType1 extends Component {
             headers: this.headers,
             method: "POST",
             body: JSON.stringify({
-                chapter_name: this.props.match.params.chapterName,
+                chapter_id: this.props.match.params.chapterId,
                 topic_name: this.props.match.params.topicName,
                 question: data[this.state.activeQuestion].question,
                 content: {
@@ -922,7 +922,7 @@ class SubjectType1 extends Component {
             headers: this.headers,
             method: "PUT",
             body: JSON.stringify({
-                chapter_name: this.props.match.params.chapterName,
+                chapter_id: this.props.match.params.chapterId,
                 topic_name: this.props.match.params.topicName,
                 question: data[this.state.activeQuestion].question,
                 question_random_id:
@@ -1011,7 +1011,7 @@ class SubjectType1 extends Component {
 
             let form_data = new FormData();
 
-            form_data.append("chapter_name", this.chapterName);
+            form_data.append("chapter_id", this.chapterId);
             form_data.append("topic_name", this.topicName);
             form_data.append(
                 "question_random_id",
@@ -1809,7 +1809,7 @@ class SubjectType1 extends Component {
             maths: false,
         });
         values.push({
-            chapter_name: this.chapterName,
+            chapter_id: this.chapterId,
             topic_name: this.topicName,
             question: "<p>Question goes here</p>",
             question_random_id: "",
@@ -1905,7 +1905,7 @@ class SubjectType1 extends Component {
                             maths: false,
                         });
                         values.push({
-                            chapter_name: this.chapterName,
+                            chapter_id: this.chapterId,
                             topic_name: this.topicName,
                             question: "<p>Question goes here</p>",
                             question_random_id: "",
@@ -2031,7 +2031,7 @@ class SubjectType1 extends Component {
             quiz[i] = values[index].properties.quiz[i];
         }
         values[values.length] = {
-            chapter_name: this.chapterName,
+            chapter_id: this.chapterId,
             topic_name: this.topicName,
             question: values[index].question,
             question_random_id: "",
@@ -2119,7 +2119,7 @@ class SubjectType1 extends Component {
                             maths: false,
                         });
                         values.push({
-                            chapter_name: this.chapterName,
+                            chapter_id: this.chapterId,
                             topic_name: this.topicName,
                             question: "<p>Question goes here</p>",
                             question_random_id: "",
@@ -2233,7 +2233,7 @@ class SubjectType1 extends Component {
                         toggleModal={this.closeMCQ_DeleteModal}
                         formSubmission={this.handleMCQ_Deletion}
                         subjectId={this.subjectId}
-                        chapter_name={this.chapterName}
+                        chapter_id={this.chapterId}
                         topic_name={this.topicName}
                         values={this.state.selectedQuestion}
                     />
@@ -2278,7 +2278,7 @@ class SubjectType1 extends Component {
                                 <div className="row align-items-center">
                                     <div className="col-md-6">
                                         <h5 className="primary-text">
-                                            {`${this.chapterName} - MCQ`}
+                                            {`${this.chapterId} - MCQ`}
                                         </h5>
                                     </div>
                                     <div className="col-md-6">

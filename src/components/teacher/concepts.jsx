@@ -41,7 +41,7 @@ class ConceptsDeleteModal extends Component {
                 method: "DELETE",
                 headers: this.headers,
                 body: JSON.stringify({
-                    chapter_name: this.props.chapter_name,
+                    chapter_id: this.props.chapter_id,
                     topic_name: this.props.topic_name,
                     concepts_random_id: this.props.values,
                 }),
@@ -183,7 +183,7 @@ class SubjectConcepts extends Component {
 
             concepts: [
                 {
-                    chapter_name: this.props.match.params.chapterName,
+                    chapter_id: this.props.match.params.chapterId,
                     topic_name: this.props.match.params.topicName,
                     concepts_random_id: "",
                     is_image_uploaded: false,
@@ -213,7 +213,7 @@ class SubjectConcepts extends Component {
         };
         this.image_limit = 4;
         this.subjectId = this.props.match.params.subjectId;
-        this.chapterName = this.props.match.params.chapterName;
+        this.chapterId = this.props.match.params.chapterId;
         this.topicName = this.props.match.params.topicName;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
@@ -232,7 +232,7 @@ class SubjectConcepts extends Component {
 
     loadConceptData = () => {
         fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/?chapter_name=${this.chapterName}&topic_name=${this.topicName}`,
+            `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/?chapter_id=${this.chapterId}&topic_name=${this.topicName}`,
             {
                 method: "GET",
                 headers: this.headers,
@@ -317,7 +317,7 @@ class SubjectConcepts extends Component {
                         }
 
                         data.push({
-                            chapter_name: this.props.match.params.chapterName,
+                            chapter_id: this.props.match.params.chapterId,
                             topic_name: this.props.match.params.topicName,
                             concepts_random_id: response[i].concepts_random_id,
                             is_image_uploaded:
@@ -420,7 +420,7 @@ class SubjectConcepts extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.chapterName} Concepts - Teacher | IQLabs`;
+        document.title = `${this.chapterId} Concepts - Teacher | IQLabs`;
 
         this.loadConceptData();
     };
@@ -471,7 +471,7 @@ class SubjectConcepts extends Component {
                 headers: this.headers,
                 method: "POST",
                 body: JSON.stringify({
-                    chapter_name: this.props.match.params.chapterName,
+                    chapter_id: this.props.match.params.chapterId,
                     topic_name: this.props.match.params.topicName,
                     content: {
                         terms: data[this.state.activeConcept].content.terms,
@@ -526,7 +526,7 @@ class SubjectConcepts extends Component {
                 headers: this.headers,
                 method: "PUT",
                 body: JSON.stringify({
-                    chapter_name: this.props.match.params.chapterName,
+                    chapter_id: this.props.match.params.chapterId,
                     topic_name: this.props.match.params.topicName,
                     concepts_random_id:
                         data[this.state.activeConcept].concepts_random_id,
@@ -593,7 +593,7 @@ class SubjectConcepts extends Component {
 
             let form_data = new FormData();
 
-            form_data.append("chapter_name", this.chapterName);
+            form_data.append("chapter_id", this.chapterId);
             form_data.append("topic_name", this.topicName);
             form_data.append(
                 "concepts_random_id",
@@ -1147,7 +1147,7 @@ class SubjectConcepts extends Component {
             maths: false,
         });
         values.push({
-            chapter_name: this.props.match.params.chapterName,
+            chapter_id: this.props.match.params.chapterId,
             topic_name: this.props.match.params.topicName,
             concepts_random_id: "",
             is_image_uploaded: false,
@@ -1226,7 +1226,7 @@ class SubjectConcepts extends Component {
                             maths: false,
                         });
                         values.push({
-                            chapter_name: this.props.match.params.chapterName,
+                            chapter_id: this.props.match.params.chapterId,
                             topic_name: this.props.match.params.topicName,
                             concepts_random_id: "",
                             is_image_uploaded: false,
@@ -1297,7 +1297,7 @@ class SubjectConcepts extends Component {
             maths: keyboards[index].maths,
         });
         values.push({
-            chapter_name: this.chapterName,
+            chapter_id: this.chapterId,
             topic_name: this.topicName,
             concepts_random_id: "",
             is_image_uploaded: false,
@@ -1372,7 +1372,7 @@ class SubjectConcepts extends Component {
                             maths: false,
                         });
                         values.push({
-                            chapter_name: this.props.match.params.chapterName,
+                            chapter_id: this.props.match.params.chapterId,
                             topic_name: this.props.match.params.topicName,
                             concepts_random_id: "",
                             is_image_uploaded: false,
@@ -1465,7 +1465,7 @@ class SubjectConcepts extends Component {
                         toggleModal={this.closeConcept_DeleteModal}
                         formSubmission={this.handleConcept_Deletion}
                         subjectId={this.subjectId}
-                        chapter_name={this.chapterName}
+                        chapter_id={this.chapterId}
                         topic_name={this.topicName}
                         values={this.state.selectedConcept}
                     />
@@ -1499,7 +1499,7 @@ class SubjectConcepts extends Component {
                                 <div className="row align-items-center">
                                     <div className="col-md-6">
                                         <h5 className="primary-text">
-                                            {`${this.chapterName} - Concepts`}
+                                            {`${this.chapterId} - Concepts`}
                                         </h5>
                                     </div>
                                     <div className="col-md-6">

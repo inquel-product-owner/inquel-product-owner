@@ -25,7 +25,7 @@ class ImageUploadModal extends Component {
             copiedImage: "",
         };
         this.subjectId = this.props.subjectId;
-        this.chapterName = this.props.chapterName;
+        this.chapterId = this.props.chapterId;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
     }
@@ -38,7 +38,7 @@ class ImageUploadModal extends Component {
         });
 
         let form_data = new FormData();
-        form_data.append("chapter_name", this.chapterName);
+        form_data.append("chapter_id", this.chapterId);
         form_data.append("summary_image_1", event.target.files[0]);
 
         const options = {
@@ -390,7 +390,7 @@ class SubjectSummary extends Component {
             is_formSubmited: false,
         };
         this.subjectId = this.props.match.params.subjectId;
-        this.chapterName = this.props.match.params.chapterName;
+        this.chapterId = this.props.match.params.chapterId;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
@@ -434,7 +434,7 @@ class SubjectSummary extends Component {
         });
 
         fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/summary/?chapter_name=${this.chapterName}`,
+            `${this.url}/teacher/subject/${this.subjectId}/summary/?chapter_id=${this.chapterId}`,
             {
                 method: "GET",
                 headers: this.headers,
@@ -468,7 +468,7 @@ class SubjectSummary extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.chapterName} Summary - Teacher | IQLabs`;
+        document.title = `${this.chapterId} Summary - Teacher | IQLabs`;
 
         this.loadSummaryData();
     };
@@ -518,7 +518,7 @@ class SubjectSummary extends Component {
                 limited: this.state.limited,
                 summary_name: this.state.title,
                 summary_content: this.state.content,
-                chapter_name: this.chapterName,
+                chapter_id: this.chapterId,
             }),
         })
             .then((res) => res.json())
@@ -559,7 +559,7 @@ class SubjectSummary extends Component {
                 summary_name: this.state.title,
                 summary_content: this.state.content,
                 summary_id: this.state.summary_id,
-                chapter_name: this.chapterName,
+                chapter_id: this.chapterId,
             }),
         })
             .then((res) => res.json())
@@ -635,7 +635,7 @@ class SubjectSummary extends Component {
                         onHide={this.toggleModal}
                         image={this.state.image}
                         subjectId={this.subjectId}
-                        chapterName={this.chapterName}
+                        chapterId={this.chapterId}
                     />
                 ) : (
                     ""
@@ -675,10 +675,7 @@ class SubjectSummary extends Component {
                                             <span className="font-weight-bold">
                                                 Summary:
                                             </span>{" "}
-                                            {
-                                                this.props.match.params
-                                                    .chapterName
-                                            }
+                                            Chapter name
                                         </p>
                                     </div>
                                     <div className="col-md-6 d-flex align-items-center justify-content-end">

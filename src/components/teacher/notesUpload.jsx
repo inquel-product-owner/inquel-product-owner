@@ -39,7 +39,7 @@ class DeleteModal extends Component {
             method: "DELETE",
             headers: this.headers,
             body: JSON.stringify({
-                chapter_name: this.props.chapterName,
+                chapter_id: this.props.chapterId,
                 topic_name: this.props.topicName,
                 notes_id: this.props.notes_id,
             }),
@@ -172,7 +172,7 @@ class NotesUpload extends Component {
             is_formSubmited: false,
         };
         this.subjectId = this.props.match.params.subjectId;
-        this.chapterName = this.props.match.params.chapterName;
+        this.chapterId = this.props.match.params.chapterId;
         this.topicName = this.props.match.params.topicName;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
@@ -231,7 +231,7 @@ class NotesUpload extends Component {
         });
 
         fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/notes/?chapter_name=${this.chapterName}&topic_name=${this.topicName}`,
+            `${this.url}/teacher/subject/${this.subjectId}/notes/?chapter_id=${this.chapterId}&topic_name=${this.topicName}`,
             {
                 method: "GET",
                 headers: this.headers,
@@ -266,7 +266,7 @@ class NotesUpload extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.chapterName} Notes - Teacher | IQLabs`;
+        document.title = `${this.chapterId} Notes - Teacher | IQLabs`;
 
         this.loadNotesData();
     };
@@ -284,7 +284,7 @@ class NotesUpload extends Component {
 
         let form_data = new FormData();
 
-        form_data.append("chapter_name", this.chapterName);
+        form_data.append("chapter_id", this.chapterId);
         form_data.append("topic_name", this.topicName);
         form_data.append("notes_file_1", files.file);
         form_data.append("limited", this.state.limited);
@@ -424,7 +424,7 @@ class NotesUpload extends Component {
                         show={this.state.showModal}
                         onHide={this.toggleModal}
                         subjectId={this.subjectId}
-                        chapterName={this.chapterName}
+                        chapterId={this.chapterId}
                         topicName={this.topicName}
                         notes_id={this.state.notes_id}
                         formSubmission={this.formSubmission}
@@ -454,7 +454,7 @@ class NotesUpload extends Component {
                                             <span className="font-weight-bold">
                                                 Notes:
                                             </span>{" "}
-                                            {this.chapterName} |{" "}
+                                            {this.chapterId} |{" "}
                                             {this.topicName}
                                         </p>
                                     </div>

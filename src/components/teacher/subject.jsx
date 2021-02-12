@@ -701,277 +701,277 @@ class SemesterEditModal extends Component {
     }
 }
 
-class ChapterDeleteModal extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            errorMsg: "",
-            successMsg: "",
-            showErrorAlert: false,
-            showSuccessAlert: false,
-            showLoader: false,
-        };
-        this.url = baseUrl + teacherUrl;
-        this.authToken = localStorage.getItem("Authorization");
-        this.headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: this.authToken,
-        };
-    }
+// class ChapterDeleteModal extends Component {
+//     constructor(props) {
+//         super(props);
+//         this.state = {
+//             errorMsg: "",
+//             successMsg: "",
+//             showErrorAlert: false,
+//             showSuccessAlert: false,
+//             showLoader: false,
+//         };
+//         this.url = baseUrl + teacherUrl;
+//         this.authToken = localStorage.getItem("Authorization");
+//         this.headers = {
+//             Accept: "application/json",
+//             "Content-Type": "application/json",
+//             Authorization: this.authToken,
+//         };
+//     }
 
-    handleDelete = () => {
-        this.setState({
-            showSuccessAlert: false,
-            showErrorAlert: false,
-            showLoader: true,
-        });
+//     handleDelete = () => {
+//         this.setState({
+//             showSuccessAlert: false,
+//             showErrorAlert: false,
+//             showLoader: true,
+//         });
 
-        fetch(`${this.url}/teacher/subject/${this.props.subjectId}/chapter/`, {
-            method: "DELETE",
-            headers: this.headers,
-            body: JSON.stringify({ chapter_id: this.props.data.chapter_id }),
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    this.setState({
-                        successMsg: result.msg,
-                        showSuccessAlert: true,
-                        showLoader: false,
-                    });
-                    this.props.chapterFormSubmission(true);
-                } else {
-                    if (result.detail) {
-                        this.setState({
-                            errorMsg: result.detail,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.msg,
-                        });
-                    }
-                    this.setState({
-                        showErrorAlert: true,
-                        showLoader: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
+//         fetch(`${this.url}/teacher/subject/${this.props.subjectId}/chapter/`, {
+//             method: "DELETE",
+//             headers: this.headers,
+//             body: JSON.stringify({ chapter_id: this.props.data.chapter_id }),
+//         })
+//             .then((res) => res.json())
+//             .then((result) => {
+//                 console.log(result);
+//                 if (result.sts === true) {
+//                     this.setState({
+//                         successMsg: result.msg,
+//                         showSuccessAlert: true,
+//                         showLoader: false,
+//                     });
+//                     this.props.chapterFormSubmission(true);
+//                 } else {
+//                     if (result.detail) {
+//                         this.setState({
+//                             errorMsg: result.detail,
+//                         });
+//                     } else {
+//                         this.setState({
+//                             errorMsg: result.msg,
+//                         });
+//                     }
+//                     this.setState({
+//                         showErrorAlert: true,
+//                         showLoader: false,
+//                     });
+//                 }
+//             })
+//             .catch((err) => {
+//                 console.log(err);
+//             });
+//     };
 
-    render() {
-        return (
-            <Modal
-                show={this.props.show}
-                onHide={this.props.onHide}
-                size="md"
-                aria-labelledby="contained-modal-title-vcenter"
-                centered
-            >
-                <Modal.Header closeButton>Delete Chapter</Modal.Header>
-                <Modal.Body>
-                    <Alert
-                        variant="danger"
-                        show={this.state.showErrorAlert}
-                        onClose={() => {
-                            this.setState({
-                                showErrorAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.errorMsg}
-                    </Alert>
-                    <Alert
-                        variant="success"
-                        show={this.state.showSuccessAlert}
-                        onClose={() => {
-                            this.setState({
-                                showSuccessAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.successMsg}
-                    </Alert>
-                    <p className="mb-0">
-                        Are you sure that you want to delete{" "}
-                        <span className="font-weight-bold">
-                            {this.props.data.chapter_name}
-                        </span>
-                        ?
-                    </p>
-                </Modal.Body>
-                <Modal.Footer>
-                    <button
-                        className="btn btn-secondary btn-sm mr-2"
-                        onClick={this.props.toggleModal}
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        className="btn btn-primary btn-sm"
-                        onClick={this.handleDelete}
-                    >
-                        {this.state.showLoader ? (
-                            <Spinner
-                                as="span"
-                                animation="border"
-                                size="sm"
-                                role="status"
-                                aria-hidden="true"
-                                className="mr-2"
-                            />
-                        ) : (
-                            ""
-                        )}
-                        Delete
-                    </button>
-                </Modal.Footer>
-            </Modal>
-        );
-    }
-}
+//     render() {
+//         return (
+//             <Modal
+//                 show={this.props.show}
+//                 onHide={this.props.onHide}
+//                 size="md"
+//                 aria-labelledby="contained-modal-title-vcenter"
+//                 centered
+//             >
+//                 <Modal.Header closeButton>Delete Chapter</Modal.Header>
+//                 <Modal.Body>
+//                     <Alert
+//                         variant="danger"
+//                         show={this.state.showErrorAlert}
+//                         onClose={() => {
+//                             this.setState({
+//                                 showErrorAlert: false,
+//                             });
+//                         }}
+//                         dismissible
+//                     >
+//                         {this.state.errorMsg}
+//                     </Alert>
+//                     <Alert
+//                         variant="success"
+//                         show={this.state.showSuccessAlert}
+//                         onClose={() => {
+//                             this.setState({
+//                                 showSuccessAlert: false,
+//                             });
+//                         }}
+//                         dismissible
+//                     >
+//                         {this.state.successMsg}
+//                     </Alert>
+//                     <p className="mb-0">
+//                         Are you sure that you want to delete{" "}
+//                         <span className="font-weight-bold">
+//                             {this.props.data.chapter_name}
+//                         </span>
+//                         ?
+//                     </p>
+//                 </Modal.Body>
+//                 <Modal.Footer>
+//                     <button
+//                         className="btn btn-secondary btn-sm mr-2"
+//                         onClick={this.props.toggleModal}
+//                     >
+//                         Cancel
+//                     </button>
+//                     <button
+//                         className="btn btn-primary btn-sm"
+//                         onClick={this.handleDelete}
+//                     >
+//                         {this.state.showLoader ? (
+//                             <Spinner
+//                                 as="span"
+//                                 animation="border"
+//                                 size="sm"
+//                                 role="status"
+//                                 aria-hidden="true"
+//                                 className="mr-2"
+//                             />
+//                         ) : (
+//                             ""
+//                         )}
+//                         Delete
+//                     </button>
+//                 </Modal.Footer>
+//             </Modal>
+//         );
+//     }
+// }
 
-class SemesterDeleteModal extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            errorMsg: "",
-            successMsg: "",
-            showErrorAlert: false,
-            showSuccessAlert: false,
-            showLoader: false,
-        };
-        this.url = baseUrl + teacherUrl;
-        this.authToken = localStorage.getItem("Authorization");
-        this.headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: this.authToken,
-        };
-    }
+// class SemesterDeleteModal extends Component {
+//     constructor(props) {
+//         super(props);
+//         this.state = {
+//             errorMsg: "",
+//             successMsg: "",
+//             showErrorAlert: false,
+//             showSuccessAlert: false,
+//             showLoader: false,
+//         };
+//         this.url = baseUrl + teacherUrl;
+//         this.authToken = localStorage.getItem("Authorization");
+//         this.headers = {
+//             Accept: "application/json",
+//             "Content-Type": "application/json",
+//             Authorization: this.authToken,
+//         };
+//     }
 
-    handleDelete = () => {
-        this.setState({
-            showSuccessAlert: false,
-            showErrorAlert: false,
-            showLoader: true,
-        });
+//     handleDelete = () => {
+//         this.setState({
+//             showSuccessAlert: false,
+//             showErrorAlert: false,
+//             showLoader: true,
+//         });
 
-        fetch(`${this.url}/teacher/subject/${this.props.subjectId}/semester/`, {
-            method: "DELETE",
-            headers: this.headers,
-            body: JSON.stringify({ semester_id: this.props.data.semester_id }),
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    this.setState({
-                        successMsg: result.msg,
-                        showSuccessAlert: true,
-                        showLoader: false,
-                    });
-                    this.props.semesterFormSubmission(true);
-                } else {
-                    if (result.detail) {
-                        this.setState({
-                            errorMsg: result.detail,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.msg,
-                        });
-                    }
-                    this.setState({
-                        showErrorAlert: true,
-                        showLoader: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
+//         fetch(`${this.url}/teacher/subject/${this.props.subjectId}/semester/`, {
+//             method: "DELETE",
+//             headers: this.headers,
+//             body: JSON.stringify({ semester_id: this.props.data.semester_id }),
+//         })
+//             .then((res) => res.json())
+//             .then((result) => {
+//                 console.log(result);
+//                 if (result.sts === true) {
+//                     this.setState({
+//                         successMsg: result.msg,
+//                         showSuccessAlert: true,
+//                         showLoader: false,
+//                     });
+//                     this.props.semesterFormSubmission(true);
+//                 } else {
+//                     if (result.detail) {
+//                         this.setState({
+//                             errorMsg: result.detail,
+//                         });
+//                     } else {
+//                         this.setState({
+//                             errorMsg: result.msg,
+//                         });
+//                     }
+//                     this.setState({
+//                         showErrorAlert: true,
+//                         showLoader: false,
+//                     });
+//                 }
+//             })
+//             .catch((err) => {
+//                 console.log(err);
+//             });
+//     };
 
-    render() {
-        return (
-            <Modal
-                show={this.props.show}
-                onHide={this.props.onHide}
-                size="md"
-                aria-labelledby="contained-modal-title-vcenter"
-                centered
-            >
-                <Modal.Header closeButton>Delete Semester</Modal.Header>
-                <Modal.Body>
-                    <Alert
-                        variant="danger"
-                        show={this.state.showErrorAlert}
-                        onClose={() => {
-                            this.setState({
-                                showErrorAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.errorMsg}
-                    </Alert>
-                    <Alert
-                        variant="success"
-                        show={this.state.showSuccessAlert}
-                        onClose={() => {
-                            this.setState({
-                                showSuccessAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.successMsg}
-                    </Alert>
-                    <p className="mb-0">
-                        Are you sure that you want to delete{" "}
-                        <span className="font-weight-bold">
-                            {this.props.data.semester_name}
-                        </span>
-                        ?
-                    </p>
-                </Modal.Body>
-                <Modal.Footer>
-                    <button
-                        className="btn btn-secondary btn-sm mr-2"
-                        onClick={this.props.toggleModal}
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        className="btn btn-primary btn-sm"
-                        onClick={this.handleDelete}
-                    >
-                        {this.state.showLoader ? (
-                            <Spinner
-                                as="span"
-                                animation="border"
-                                size="sm"
-                                role="status"
-                                aria-hidden="true"
-                                className="mr-2"
-                            />
-                        ) : (
-                            ""
-                        )}
-                        Delete
-                    </button>
-                </Modal.Footer>
-            </Modal>
-        );
-    }
-}
+//     render() {
+//         return (
+//             <Modal
+//                 show={this.props.show}
+//                 onHide={this.props.onHide}
+//                 size="md"
+//                 aria-labelledby="contained-modal-title-vcenter"
+//                 centered
+//             >
+//                 <Modal.Header closeButton>Delete Semester</Modal.Header>
+//                 <Modal.Body>
+//                     <Alert
+//                         variant="danger"
+//                         show={this.state.showErrorAlert}
+//                         onClose={() => {
+//                             this.setState({
+//                                 showErrorAlert: false,
+//                             });
+//                         }}
+//                         dismissible
+//                     >
+//                         {this.state.errorMsg}
+//                     </Alert>
+//                     <Alert
+//                         variant="success"
+//                         show={this.state.showSuccessAlert}
+//                         onClose={() => {
+//                             this.setState({
+//                                 showSuccessAlert: false,
+//                             });
+//                         }}
+//                         dismissible
+//                     >
+//                         {this.state.successMsg}
+//                     </Alert>
+//                     <p className="mb-0">
+//                         Are you sure that you want to delete{" "}
+//                         <span className="font-weight-bold">
+//                             {this.props.data.semester_name}
+//                         </span>
+//                         ?
+//                     </p>
+//                 </Modal.Body>
+//                 <Modal.Footer>
+//                     <button
+//                         className="btn btn-secondary btn-sm mr-2"
+//                         onClick={this.props.toggleModal}
+//                     >
+//                         Cancel
+//                     </button>
+//                     <button
+//                         className="btn btn-primary btn-sm"
+//                         onClick={this.handleDelete}
+//                     >
+//                         {this.state.showLoader ? (
+//                             <Spinner
+//                                 as="span"
+//                                 animation="border"
+//                                 size="sm"
+//                                 role="status"
+//                                 aria-hidden="true"
+//                                 className="mr-2"
+//                             />
+//                         ) : (
+//                             ""
+//                         )}
+//                         Delete
+//                     </button>
+//                 </Modal.Footer>
+//             </Modal>
+//         );
+//     }
+// }
 
 class SubjectChapters extends Component {
     constructor(props) {
@@ -982,8 +982,8 @@ class SubjectChapters extends Component {
             showSemesterModal: false,
             showChapter_EditModal: false,
             showSemester_EditModal: false,
-            showChapter_DeleteModal: false,
-            showSemester_DeleteModal: false,
+            // showChapter_DeleteModal: false,
+            // showSemester_DeleteModal: false,
 
             subjectItems: [], // Chapter data
             semesterItems: [], // Semester data
@@ -1033,19 +1033,19 @@ class SubjectChapters extends Component {
         });
     };
 
-    toggleChapter_DeleteModal = (data) => {
-        this.setState({
-            selectedChapter: data,
-            showChapter_DeleteModal: !this.state.showChapter_DeleteModal,
-        });
-    };
+    // toggleChapter_DeleteModal = (data) => {
+    //     this.setState({
+    //         selectedChapter: data,
+    //         showChapter_DeleteModal: !this.state.showChapter_DeleteModal,
+    //     });
+    // };
 
-    toggleSemester_DeleteModal = (data) => {
-        this.setState({
-            selectedSemester: data,
-            showSemester_DeleteModal: !this.state.showSemester_DeleteModal,
-        });
-    };
+    // toggleSemester_DeleteModal = (data) => {
+    //     this.setState({
+    //         selectedSemester: data,
+    //         showSemester_DeleteModal: !this.state.showSemester_DeleteModal,
+    //     });
+    // };
 
     toggleSemesterModal = () => {
         const chapter_id = this.state.chapter_id;
@@ -1235,7 +1235,7 @@ class SubjectChapters extends Component {
                 )}
 
                 {/* Chapter Delete modal */}
-                {this.state.showChapter_DeleteModal ? (
+                {/* {this.state.showChapter_DeleteModal ? (
                     <ChapterDeleteModal
                         show={this.state.showChapter_DeleteModal}
                         onHide={this.toggleChapter_DeleteModal}
@@ -1246,10 +1246,10 @@ class SubjectChapters extends Component {
                     />
                 ) : (
                     ""
-                )}
+                )} */}
 
                 {/* Semester Delete modal */}
-                {this.state.showSemester_DeleteModal ? (
+                {/* {this.state.showSemester_DeleteModal ? (
                     <SemesterDeleteModal
                         show={this.state.showSemester_DeleteModal}
                         onHide={this.toggleSemester_DeleteModal}
@@ -1260,7 +1260,7 @@ class SubjectChapters extends Component {
                     />
                 ) : (
                     ""
-                )}
+                )} */}
 
                 <div
                     className={`section content ${
@@ -1348,7 +1348,7 @@ class SubjectChapters extends Component {
                                                                               </td>
                                                                               <td>
                                                                                   <Link
-                                                                                      to={`${this.props.match.url}/chapter/${chapter.chapter_name}/summary/upload`}
+                                                                                      to={`${this.props.match.url}/chapter/${chapter.chapter_id}/summary/upload`}
                                                                                       className="primary-text"
                                                                                   >
                                                                                       <button className="btn btn-primary btn-sm mr-2">
@@ -1356,7 +1356,7 @@ class SubjectChapters extends Component {
                                                                                       </button>
                                                                                   </Link>
                                                                                   <Link
-                                                                                      to={`${this.props.match.url}/chapter/${chapter.chapter_name}/summary`}
+                                                                                      to={`${this.props.match.url}/chapter/${chapter.chapter_id}/summary`}
                                                                                       className="primary-text"
                                                                                   >
                                                                                       <button className="btn btn-primary btn-sm">
@@ -1413,7 +1413,7 @@ class SubjectChapters extends Component {
                                                                       data.direct_question ===
                                                                           false ? (
                                                                           <Link
-                                                                              to={`/teacher/subject/${this.subjectId}/semester/${data.semester_id}`}
+                                                                              to={`${this.props.match.url}/semester/${data.semester_id}`}
                                                                           >
                                                                               <button className="btn btn-primary btn-sm">
                                                                                   Auto
@@ -1427,7 +1427,7 @@ class SubjectChapters extends Component {
                                                                       data.direct_question ===
                                                                           true ? (
                                                                           <Link
-                                                                              to={`/teacher/subject/${this.subjectId}/semester/${data.semester_id}/direct`}
+                                                                              to={`${this.props.match.url}/semester/${data.semester_id}/direct`}
                                                                           >
                                                                               <button className="btn btn-primary btn-sm ml-2">
                                                                                   Direct
@@ -1486,7 +1486,7 @@ class SubjectChapters extends Component {
                                                               </td>
                                                               <td>
                                                                   <Link
-                                                                      to={`/teacher/subject/${this.subjectId}/chapter/${chapter.chapter_name}/summary/upload`}
+                                                                      to={`${this.props.match.url}/chapter/${chapter.chapter_id}/summary/upload`}
                                                                       className="primary-text"
                                                                   >
                                                                       <button className="btn btn-primary btn-sm mr-2">
@@ -1494,7 +1494,7 @@ class SubjectChapters extends Component {
                                                                       </button>
                                                                   </Link>
                                                                   <Link
-                                                                      to={`/teacher/subject/${this.subjectId}/chapter/${chapter.chapter_name}/summary`}
+                                                                      to={`${this.props.match.url}/chapter/${chapter.chapter_id}/summary`}
                                                                       className="primary-text"
                                                                   >
                                                                       <button className="btn btn-primary btn-sm">
@@ -1504,7 +1504,7 @@ class SubjectChapters extends Component {
                                                               </td>
                                                               <td className="text-right">
                                                                   <Link
-                                                                      to={`/teacher/subject/${this.subjectId}/chapter/${chapter.chapter_id}`}
+                                                                      to={`${this.props.match.url}/chapter/${chapter.chapter_id}`}
                                                                   >
                                                                       <button className="btn btn-primary btn-sm">
                                                                           Add

@@ -22,7 +22,7 @@ class ImageUploadModal extends Component {
             copiedImage: "",
         };
         this.subjectId = this.props.subjectId;
-        this.chapterName = this.props.chapterName;
+        this.chapterId = this.props.chapterId;
         this.topicName = this.props.topicName;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
@@ -36,7 +36,7 @@ class ImageUploadModal extends Component {
         });
 
         let form_data = new FormData();
-        form_data.append("chapter_name", this.chapterName);
+        form_data.append("chapter_id", this.chapterId);
         form_data.append("topic_name", this.topicName);
         form_data.append("notes_image_1", event.target.files[0]);
 
@@ -261,7 +261,7 @@ class DeleteModal extends Component {
             method: "DELETE",
             headers: this.headers,
             body: JSON.stringify({
-                chapter_name: this.props.chapterName,
+                chapter_id: this.props.chapterId,
                 topic_name: this.props.topicName,
                 notes_id: this.props.notes_id,
             }),
@@ -390,7 +390,7 @@ class SubjectNotes extends Component {
             is_formSubmited: false,
         };
         this.subjectId = this.props.match.params.subjectId;
-        this.chapterName = this.props.match.params.chapterName;
+        this.chapterId = this.props.match.params.chapterId;
         this.topicName = this.props.match.params.topicName;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
@@ -435,7 +435,7 @@ class SubjectNotes extends Component {
         });
 
         fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/notes/?chapter_name=${this.chapterName}&topic_name=${this.topicName}`,
+            `${this.url}/teacher/subject/${this.subjectId}/notes/?chapter_id=${this.chapterId}&topic_name=${this.topicName}`,
             {
                 method: "GET",
                 headers: this.headers,
@@ -469,7 +469,7 @@ class SubjectNotes extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.chapterName} Notes - Teacher | IQLabs`;
+        document.title = `${this.chapterId} Notes - Teacher | IQLabs`;
 
         this.loadNotesData();
     };
@@ -520,7 +520,7 @@ class SubjectNotes extends Component {
                 limited: this.state.limited,
                 notes_name: this.state.title,
                 notes_content: this.state.content,
-                chapter_name: this.chapterName,
+                chapter_id: this.chapterId,
                 topic_name: this.topicName,
             }),
         })
@@ -564,7 +564,7 @@ class SubjectNotes extends Component {
                 limited: this.state.limited,
                 notes_name: this.state.title,
                 notes_content: this.state.content,
-                chapter_name: this.chapterName,
+                chapter_id: this.chapterId,
                 topic_name: this.topicName,
                 notes_id: this.state.notes_id,
             }),
@@ -645,7 +645,7 @@ class SubjectNotes extends Component {
                         onHide={this.toggleModal}
                         image={this.state.image}
                         subjectId={this.subjectId}
-                        chapterName={this.chapterName}
+                        chapterId={this.chapterId}
                         topicName={this.topicName}
                     />
                 ) : (
@@ -658,7 +658,7 @@ class SubjectNotes extends Component {
                         show={this.state.showDeleteModal}
                         onHide={this.toggleDeleteModal}
                         subjectId={this.subjectId}
-                        chapterName={this.chapterName}
+                        chapterId={this.chapterId}
                         topicName={this.topicName}
                         notes_id={this.state.notes_id}
                         formSubmission={this.formSubmission}
@@ -688,7 +688,7 @@ class SubjectNotes extends Component {
                                             <span className="font-weight-bold">
                                                 Notes:
                                             </span>{" "}
-                                            {this.chapterName} |{" "}
+                                            {this.chapterId} |{" "}
                                             {this.topicName}
                                         </p>
                                     </div>

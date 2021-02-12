@@ -168,7 +168,7 @@ class SummaryUpload extends Component {
             is_formSubmited: false,
         };
         this.subjectId = this.props.match.params.subjectId;
-        this.chapterName = this.props.match.params.chapterName;
+        this.chapterId = this.props.match.params.chapterId;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
@@ -226,7 +226,7 @@ class SummaryUpload extends Component {
         });
 
         fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/summary/?chapter_name=${this.chapterName}`,
+            `${this.url}/teacher/subject/${this.subjectId}/summary/?chapter_id=${this.chapterId}`,
             {
                 method: "GET",
                 headers: this.headers,
@@ -262,7 +262,7 @@ class SummaryUpload extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.chapterName} Summary - Teacher | IQLabs`;
+        document.title = `${this.chapterId} Summary - Teacher | IQLabs`;
 
         this.loadSummaryData();
     };
@@ -280,7 +280,7 @@ class SummaryUpload extends Component {
 
         let form_data = new FormData();
 
-        form_data.append("chapter_name", this.chapterName);
+        form_data.append("chapter_id", this.chapterId);
         form_data.append("summary_file_1", files.file);
         form_data.append("limited", this.state.limited);
 
@@ -447,10 +447,7 @@ class SummaryUpload extends Component {
                                             <span className="font-weight-bold">
                                                 Summary:
                                             </span>{" "}
-                                            {
-                                                this.props.match.params
-                                                    .chapterName
-                                            }
+                                            Chapter name
                                         </p>
                                     </div>
                                     <div className="col-md-6 d-flex align-items-center justify-content-end">

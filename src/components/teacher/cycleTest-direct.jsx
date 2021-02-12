@@ -24,7 +24,6 @@ class CyleTestDirect extends Component {
             exam_date: "",
             starts_at: "",
             ends_at: "",
-            url: "",
             path: null,
             numPages: null,
             pageNumber: 1,
@@ -61,9 +60,30 @@ class CyleTestDirect extends Component {
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
-                this.setState({
-                    page_loading: false,
-                });
+                if (result.sts === true) {
+                    this.setState({
+                        path:
+                            result.data.direct_question_urls.length !== 0
+                                ? result.data.direct_question_urls
+                                : null,
+                        page_loading: false,
+                    });
+                } else {
+                    if (result.detail) {
+                        this.setState({
+                            errorMsg: result.detail,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.msg,
+                        });
+                    }
+                    this.setState({
+                        showErrorAlert: true,
+                        showLoader: false,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -200,7 +220,7 @@ class CyleTestDirect extends Component {
                                 successMsg: result.data.msg,
                                 showSuccessAlert: true,
                                 showLoader: false,
-                                url: result.data.url,
+                                path: result.data.url,
                             },
                             () => {
                                 this.setState({
