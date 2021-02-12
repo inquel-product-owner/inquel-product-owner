@@ -245,9 +245,7 @@ class FileModal extends Component {
                                                             )
                                                         }
                                                     ></div>
-                                                ) : (
-                                                    null
-                                                );
+                                                ) : null;
                                             }
                                         )}
                                         {this.state.selectedImageData.length !==
@@ -366,6 +364,7 @@ class SubjectType1 extends Component {
                             file_name: "",
                             video: null,
                             path: "",
+                            url: "",
                         },
                         audio: [
                             { title: "", file_name: "", audio: null, path: "" },
@@ -505,6 +504,17 @@ class SubjectType1 extends Component {
                             }
                         }
 
+                        // video
+                        var path = "";
+                        if (response[i].files.length !== 0) {
+                            if (response[i].files[0].paste_video_url) {
+                                path = response[i].files[0].paste_video_url;
+                            }
+                            if (response[i].files[0].type1_video_1) {
+                                path = response[i].files[0].type1_video_1;
+                            }
+                        }
+
                         data.push({
                             chapter_id: this.props.match.params.chapterId,
                             topic_name: this.props.match.params.topicName,
@@ -563,12 +573,8 @@ class SubjectType1 extends Component {
                                             : "",
                                     file_name: "",
                                     video: null,
-                                    path:
-                                        response[i].files.length !== 0 &&
-                                        response[i].files[0].paste_video_url
-                                            ? response[i].files[0]
-                                                  .paste_video_url
-                                            : "",
+                                    path: path,
+                                    url: "",
                                 },
                                 audio:
                                     audio.length === 0
@@ -826,15 +832,6 @@ class SubjectType1 extends Component {
                 showErrorAlert: true,
                 showLoader: false,
             });
-        } else if (
-            data[this.state.activeQuestion].settings.virtual_keyboard.length ===
-            0
-        ) {
-            this.setState({
-                errorMsg: "Please select a Virtual keyboard",
-                showErrorAlert: true,
-                showLoader: false,
-            });
         } else {
             if (data[this.state.activeQuestion].question_random_id === "") {
                 this.handlePOST(data);
@@ -967,8 +964,6 @@ class SubjectType1 extends Component {
                 if (result.sts === true) {
                     data[this.state.activeQuestion].question_random_id =
                         result.question_random_id;
-                    // data[this.state.activeQuestion].is_image_uploaded =
-                    //     result.file_exists === true ? true : false;
                     this.setState({
                         questions: data,
                         isForm_submitted: true,
@@ -1019,12 +1014,11 @@ class SubjectType1 extends Component {
             );
 
             if (
-                questionData[this.state.activeQuestion].content.video.path !==
-                ""
+                questionData[this.state.activeQuestion].content.video.url !== ""
             ) {
                 form_data.append(
                     "video_url",
-                    questionData[this.state.activeQuestion].content.video.path
+                    questionData[this.state.activeQuestion].content.video.url
                 );
             }
 
@@ -1123,10 +1117,16 @@ class SubjectType1 extends Component {
                         successMsg: "Question added",
                         showSuccessAlert: true,
                         showLoader: false,
-                        page_loading: true,
                     },
                     () => {
                         setTimeout(() => {
+                            this.setState({
+                                showEdit_option: false,
+                                contentCollapsed: true,
+                                propertiesCollapsed: true,
+                                settingsCollapsed: true,
+                                page_loading: true,
+                            });
                             this.loadMCQData();
                         }, 2000);
                     }
@@ -1151,10 +1151,16 @@ class SubjectType1 extends Component {
                             successMsg: result.data.msg,
                             showSuccessAlert: true,
                             showLoader: false,
-                            page_loading: true,
                         },
                         () => {
                             setTimeout(() => {
+                                this.setState({
+                                    showEdit_option: false,
+                                    contentCollapsed: true,
+                                    propertiesCollapsed: true,
+                                    settingsCollapsed: true,
+                                    page_loading: true,
+                                });
                                 this.loadMCQData();
                             }, 2000);
                         }
@@ -1196,10 +1202,16 @@ class SubjectType1 extends Component {
                             successMsg: result.data.msg,
                             showSuccessAlert: true,
                             showLoader: false,
-                            page_loading: true,
                         },
                         () => {
                             setTimeout(() => {
+                                this.setState({
+                                    showEdit_option: false,
+                                    contentCollapsed: true,
+                                    propertiesCollapsed: true,
+                                    settingsCollapsed: true,
+                                    page_loading: true,
+                                });
                                 this.loadMCQData();
                             }, 2000);
                         }
@@ -1553,6 +1565,7 @@ class SubjectType1 extends Component {
             ].content.video.path = URL.createObjectURL(event.target.files[0]);
             values[this.state.activeQuestion].content.video.video =
                 event.target.files[0];
+            values[this.state.activeQuestion].content.video.url = "";
             this.setState({
                 questions: values,
                 btnDisabled: false,
@@ -1563,10 +1576,11 @@ class SubjectType1 extends Component {
 
     handleVideoUrl = (event) => {
         const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.video.path =
+        values[this.state.activeQuestion].content.video.url =
             event.target.value;
         values[this.state.activeQuestion].content.video.file_name = "";
         values[this.state.activeQuestion].content.video.video = null;
+        values[this.state.activeQuestion].content.video.path = "";
         this.setState({
             questions: values,
         });
@@ -1578,6 +1592,7 @@ class SubjectType1 extends Component {
         values[this.state.activeQuestion].content.video.file_name = "";
         values[this.state.activeQuestion].content.video.video = null;
         values[this.state.activeQuestion].content.video.path = "";
+        values[this.state.activeQuestion].content.video.url = "";
         this.setState({
             questions: values,
         });
@@ -1836,6 +1851,7 @@ class SubjectType1 extends Component {
                     file_name: "",
                     video: null,
                     path: "",
+                    url: "",
                 },
                 audio: [
                     { title: "", file_name: "", audio: null, path: "" },
@@ -1939,6 +1955,7 @@ class SubjectType1 extends Component {
                                     file_name: "",
                                     video: null,
                                     path: "",
+                                    url: "",
                                 },
                                 audio: [
                                     {
@@ -2050,6 +2067,7 @@ class SubjectType1 extends Component {
                     file_name: "",
                     video: null,
                     path: "",
+                    url: "",
                 },
                 audio: [
                     { title: "", file_name: "", audio: null, path: "" },
@@ -2159,6 +2177,7 @@ class SubjectType1 extends Component {
                                     file_name: "",
                                     video: null,
                                     path: "",
+                                    url: "",
                                 },
                                 audio: [
                                     {
@@ -3336,7 +3355,7 @@ class SubjectType1 extends Component {
                                                                     this.state
                                                                         .activeQuestion
                                                                 ].content.video
-                                                                    .path
+                                                                    .url
                                                             }
                                                         />
                                                         <small className="form-text text-muted mb-2">

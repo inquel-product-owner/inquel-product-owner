@@ -12,7 +12,7 @@ class SemesterAutoQA extends Component {
             data: [],
             pageNumber: "",
             page_loading: true,
-
+            duration: "",
             selectedImageQuestion: "",
             selectedImageData: [],
             selectedImage: "",
@@ -178,6 +178,30 @@ class SemesterAutoQA extends Component {
                                         }
                                     }
 
+                                    // video
+                                    var path = "";
+                                    if (
+                                        result.data.results[i].mcq[j].files
+                                            .length !== 0
+                                    ) {
+                                        if (
+                                            result.data.results[i].mcq[j]
+                                                .files[0].paste_video_url
+                                        ) {
+                                            path =
+                                                result.data.results[i].mcq[j]
+                                                    .files[0].paste_video_url;
+                                        }
+                                        if (
+                                            result.data.results[i].mcq[j]
+                                                .files[0].type1_video_1
+                                        ) {
+                                            path =
+                                                result.data.results[i].mcq[j]
+                                                    .files[0].type1_video_1;
+                                        }
+                                    }
+
                                     data.push({
                                         question:
                                             result.data.results[i].mcq[j]
@@ -270,17 +294,8 @@ class SemesterAutoQA extends Component {
                                                         : "",
                                                 file_name: "",
                                                 video: null,
-                                                pasteUrl:
-                                                    result.data.results[i].mcq[
-                                                        j
-                                                    ].files.length !== 0 &&
-                                                    result.data.results[i].mcq[
-                                                        j
-                                                    ].files[0].paste_video_url
-                                                        ? result.data.results[i]
-                                                              .mcq[j].files[0]
-                                                              .paste_video_url
-                                                        : "",
+                                                path: path,
+                                                url: "",
                                             },
                                             audio:
                                                 audio.length === 0
@@ -387,7 +402,7 @@ class SemesterAutoQA extends Component {
                                                 Questions
                                             </div>
                                             <div className="col-md-4">
-                                                Total time: 40 mins
+                                                Total time: {this.state.duration} mins
                                             </div>
                                         </div>
                                     </div>
@@ -408,7 +423,7 @@ class SemesterAutoQA extends Component {
                                               </div>
                                           </div>
                                           <div className="col-md-11 pl-0">
-                                              <div className="card small shadow-sm">
+                                              <div className="card shadow-sm">
                                                   <div className="card-body">
                                                       <div className="row">
                                                           {/* Questions & options */}
@@ -426,7 +441,7 @@ class SemesterAutoQA extends Component {
                                                               }`}
                                                           >
                                                               <div className="form-group">
-                                                                  <div className="card">
+                                                                  <div className="card form-shadow">
                                                                       <div
                                                                           className="card-body font-weight-bold py-2"
                                                                           dangerouslySetInnerHTML={{

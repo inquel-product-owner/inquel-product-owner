@@ -63,9 +63,11 @@ class SemesterDirect extends Component {
                     this.setState({
                         path:
                             result.data.direct_question_urls.length !== 0
-                                ? result.data.direct_question_urls
+                                ? result.data.direct_question_urls[0]
                                 : null,
-                        page_loading: false,
+                        exam_date: result.data.exam_date,
+                        starts_at: result.data.starts_at,
+                        ends_at: result.data.ends_at,
                     });
                 } else {
                     if (result.detail) {
@@ -80,9 +82,11 @@ class SemesterDirect extends Component {
                     this.setState({
                         showErrorAlert: true,
                         showLoader: false,
-                        page_loading: false,
                     });
                 }
+                this.setState({
+                    page_loading: false,
+                });
             })
             .catch((err) => {
                 console.log(err);
@@ -103,6 +107,12 @@ class SemesterDirect extends Component {
         if (extension[extension.length - 1].toLowerCase() !== "pdf") {
             this.setState({
                 errorMsg: "Invalid file format!",
+                showErrorAlert: true,
+                btnDisabled: true,
+            });
+        } else if (event.target.files[0].size > 5000000) {
+            this.setState({
+                errorMsg: "File sixe exceeds more then 5MB!",
                 showErrorAlert: true,
                 btnDisabled: true,
             });
@@ -198,7 +208,7 @@ class SemesterDirect extends Component {
                 errorMsg: "Invalid file format!",
                 showErrorAlert: true,
             });
-        } else if (pdf.size > 5000000) {
+        } else if (pdf.file.size > 5000000) {
             this.setState({
                 errorMsg: "File sixe exceeds more then 5MB!",
                 showErrorAlert: true,

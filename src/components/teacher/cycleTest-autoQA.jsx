@@ -12,13 +12,13 @@ class CycleTestAutoQA extends Component {
             data: [],
             pageNumber: "",
             page_loading: true,
-
+            duration: "",
             selectedImageQuestion: "",
             selectedImageData: [],
             selectedImage: "",
         };
         this.subjectId = this.props.match.params.subjectId;
-        this.chapterName = this.props.match.params.chapterName;
+        this.chapterId = this.props.match.params.chapterId;
         this.cycle_testId = this.props.match.params.cycle_testId;
         this.sectionId = this.props.match.params.sectionId;
         this.attempt = new URLSearchParams(this.props.location.search).get(
@@ -179,6 +179,30 @@ class CycleTestAutoQA extends Component {
                                         }
                                     }
 
+                                    // video
+                                    var path = "";
+                                    if (
+                                        result.data.results[i].mcq[j].files
+                                            .length !== 0
+                                    ) {
+                                        if (
+                                            result.data.results[i].mcq[j]
+                                                .files[0].paste_video_url
+                                        ) {
+                                            path =
+                                                result.data.results[i].mcq[j]
+                                                    .files[0].paste_video_url;
+                                        }
+                                        if (
+                                            result.data.results[i].mcq[j]
+                                                .files[0].type1_video_1
+                                        ) {
+                                            path =
+                                                result.data.results[i].mcq[j]
+                                                    .files[0].type1_video_1;
+                                        }
+                                    }
+
                                     data.push({
                                         question:
                                             result.data.results[i].mcq[j]
@@ -271,17 +295,8 @@ class CycleTestAutoQA extends Component {
                                                         : "",
                                                 file_name: "",
                                                 video: null,
-                                                pasteUrl:
-                                                    result.data.results[i].mcq[
-                                                        j
-                                                    ].files.length !== 0 &&
-                                                    result.data.results[i].mcq[
-                                                        j
-                                                    ].files[0].paste_video_url
-                                                        ? result.data.results[i]
-                                                              .mcq[j].files[0]
-                                                              .paste_video_url
-                                                        : "",
+                                                path: path,
+                                                url: "",
                                             },
                                             audio:
                                                 audio.length === 0
@@ -320,7 +335,7 @@ class CycleTestAutoQA extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.chapterName} - Teacher | IQLabs`;
+        document.title = `${this.chapterId} - Teacher | IQLabs`;
 
         this.loadQAData();
     };
@@ -388,7 +403,7 @@ class CycleTestAutoQA extends Component {
                                                 Questions
                                             </div>
                                             <div className="col-md-4">
-                                                Total time: 40 mins
+                                                Total time: {this.state.duration} mins
                                             </div>
                                         </div>
                                     </div>
@@ -409,7 +424,7 @@ class CycleTestAutoQA extends Component {
                                               </div>
                                           </div>
                                           <div className="col-md-11 pl-0">
-                                              <div className="card small shadow-sm">
+                                              <div className="card shadow-sm">
                                                   <div className="card-body">
                                                       <div className="row">
                                                           {/* Questions & options */}
@@ -427,7 +442,7 @@ class CycleTestAutoQA extends Component {
                                                               }`}
                                                           >
                                                               <div className="form-group">
-                                                                  <div className="card">
+                                                                  <div className="card form-shadow">
                                                                       <div
                                                                           className="card-body font-weight-bold py-2"
                                                                           dangerouslySetInnerHTML={{

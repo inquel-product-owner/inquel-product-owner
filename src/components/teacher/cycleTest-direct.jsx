@@ -64,9 +64,11 @@ class CyleTestDirect extends Component {
                     this.setState({
                         path:
                             result.data.direct_question_urls.length !== 0
-                                ? result.data.direct_question_urls
+                                ? result.data.direct_question_urls[0]
                                 : null,
-                        page_loading: false,
+                        exam_date: result.data.exam_date,
+                        starts_at: result.data.starts_at,
+                        ends_at: result.data.ends_at,
                     });
                 } else {
                     if (result.detail) {
@@ -81,9 +83,11 @@ class CyleTestDirect extends Component {
                     this.setState({
                         showErrorAlert: true,
                         showLoader: false,
-                        page_loading: false,
                     });
                 }
+                this.setState({
+                    page_loading: false,
+                });
             })
             .catch((err) => {
                 console.log(err);
@@ -104,6 +108,12 @@ class CyleTestDirect extends Component {
         if (extension[extension.length - 1].toLowerCase() !== "pdf") {
             this.setState({
                 errorMsg: "Invalid file format!",
+                showErrorAlert: true,
+                btnDisabled: true,
+            });
+        } else if (event.target.files[0].size > 5000000) {
+            this.setState({
+                errorMsg: "File sixe exceeds more then 5MB!",
                 showErrorAlert: true,
                 btnDisabled: true,
             });
@@ -200,7 +210,7 @@ class CyleTestDirect extends Component {
                 errorMsg: "Invalid file format!",
                 showErrorAlert: true,
             });
-        } else if (pdf.size > 5000000) {
+        } else if (pdf.file.size > 5000000) {
             this.setState({
                 errorMsg: "File sixe exceeds more then 5MB!",
                 showErrorAlert: true,
@@ -315,6 +325,7 @@ class CyleTestDirect extends Component {
                                         type="datetime-local"
                                         name="exam_date"
                                         id="exam_date"
+                                        value={this.state.exam_date}
                                         className="form-control form-shadow"
                                         onChange={this.handleDate}
                                     />
@@ -329,6 +340,7 @@ class CyleTestDirect extends Component {
                                         type="time"
                                         name="starts_at"
                                         id="starts_at"
+                                        value={this.state.starts_at}
                                         className="form-control form-shadow"
                                         onChange={this.handleTime}
                                     />
@@ -341,6 +353,7 @@ class CyleTestDirect extends Component {
                                         type="time"
                                         name="ends_at"
                                         id="ends_at"
+                                        value={this.state.ends_at}
                                         className="form-control form-shadow"
                                         onChange={this.handleTime}
                                     />
