@@ -198,6 +198,7 @@ class SubjectConcepts extends Component {
                             file_name: "",
                             video: null,
                             path: "",
+                            url: "",
                         },
                         audio: [
                             { title: "", file_name: "", audio: null, path: "" },
@@ -316,6 +317,17 @@ class SubjectConcepts extends Component {
                             }
                         }
 
+                        // video
+                        var path = "";
+                        if (response[i].files.length !== 0) {
+                            if (response[i].files[0].paste_video_url) {
+                                path = response[i].files[0].paste_video_url;
+                            }
+                            if (response[i].files[0].concepts_video_1) {
+                                path = response[i].files[0].concepts_video_1;
+                            }
+                        }
+
                         data.push({
                             chapter_id: this.props.match.params.chapterId,
                             topic_name: this.props.match.params.topicName,
@@ -346,12 +358,8 @@ class SubjectConcepts extends Component {
                                             : "",
                                     file_name: "",
                                     video: null,
-                                    path:
-                                        response[i].files.length !== 0 &&
-                                        response[i].files[0].paste_video_url
-                                            ? response[i].files[0]
-                                                  .paste_video_url
-                                            : "",
+                                    path: path,
+                                    url: "",
                                 },
                                 audio:
                                     audio.length === 0
@@ -443,15 +451,6 @@ class SubjectConcepts extends Component {
         } else if (data[this.state.activeConcept].content.definition === "") {
             this.setState({
                 errorMsg: "Definition is required",
-                showErrorAlert: true,
-                showLoader: false,
-            });
-        } else if (
-            data[this.state.activeConcept].settings.virtual_keyboard.length ===
-            0
-        ) {
-            this.setState({
-                errorMsg: "Please select a Virtual keyboard",
                 showErrorAlert: true,
                 showLoader: false,
             });
@@ -601,6 +600,15 @@ class SubjectConcepts extends Component {
             );
 
             if (
+                conceptValues[this.state.activeConcept].content.video.url !== ""
+            ) {
+                form_data.append(
+                    "video_url",
+                    conceptValues[this.state.activeConcept].content.video.url
+                );
+            }
+
+            if (
                 conceptValues[this.state.activeConcept].content.video.video !==
                 null
             ) {
@@ -695,10 +703,17 @@ class SubjectConcepts extends Component {
                         successMsg: "Concepts added",
                         showSuccessAlert: true,
                         showLoader: false,
-                        page_loading: true,
                     },
                     () => {
                         setTimeout(() => {
+                            this.setState({
+                                showEdit_option: false,
+                                contentCollapsed: true,
+                                imageCollapsed: true,
+                                audioCollapsed: true,
+                                settingsCollapsed: true,
+                                page_loading: true,
+                            });
                             this.loadConceptData();
                         }, 2000);
                     }
@@ -723,10 +738,17 @@ class SubjectConcepts extends Component {
                             successMsg: result.data.msg,
                             showSuccessAlert: true,
                             showLoader: false,
-                            page_loading: true,
                         },
                         () => {
                             setTimeout(() => {
+                            this.setState({
+                                showEdit_option: false,
+                                contentCollapsed: true,
+                                imageCollapsed: true,
+                                audioCollapsed: true,
+                                settingsCollapsed: true,
+                                page_loading: true,
+                            });
                                 this.loadConceptData();
                             }, 2000);
                         }
@@ -768,10 +790,17 @@ class SubjectConcepts extends Component {
                             successMsg: result.data.msg,
                             showSuccessAlert: true,
                             showLoader: false,
-                            page_loading: true,
                         },
                         () => {
                             setTimeout(() => {
+                                this.setState({
+                                    showEdit_option: false,
+                                    contentCollapsed: true,
+                                    imageCollapsed: true,
+                                    audioCollapsed: true,
+                                    settingsCollapsed: true,
+                                    page_loading: true,
+                                });
                                 this.loadConceptData();
                             }, 2000);
                         }
@@ -895,8 +924,8 @@ class SubjectConcepts extends Component {
     };
 
     clearImages = () => {
-        const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.images = [
+        const values = [...this.state.concepts];
+        values[this.state.activeConcept].content.images = [
             {
                 title: "",
                 file_name: "",
@@ -905,7 +934,7 @@ class SubjectConcepts extends Component {
             },
         ];
         this.setState({
-            questions: values,
+            concepts: values,
         });
     };
 
@@ -937,6 +966,7 @@ class SubjectConcepts extends Component {
             ].content.video.path = URL.createObjectURL(event.target.files[0]);
             values[this.state.activeConcept].content.video.video =
                 event.target.files[0];
+                values[this.state.activeConcept].content.video.url = "";
             this.setState({
                 concepts: values,
                 btnDisabled: false,
@@ -947,22 +977,26 @@ class SubjectConcepts extends Component {
 
     handleVideoUrl = (event) => {
         const values = [...this.state.concepts];
+        values[this.state.activeConcept].content.video.url =
+            event.target.value;
         values[this.state.activeConcept].content.video.path =
             event.target.value;
         values[this.state.activeConcept].content.video.file_name = "";
+        values[this.state.activeConcept].content.video.path = "";
         this.setState({
             concepts: values,
         });
     };
 
     clearVideo = () => {
-        const values = [...this.state.questions];
+        const values = [...this.state.concepts];
         values[this.state.activeConcept].content.video.title = "";
         values[this.state.activeConcept].content.video.file_name = "";
         values[this.state.activeConcept].content.video.video = null;
         values[this.state.activeConcept].content.video.path = "";
+        values[this.state.activeConcept].content.video.url = "";
         this.setState({
-            questions: values,
+            concepts: values,
         });
     };
 
@@ -1003,13 +1037,13 @@ class SubjectConcepts extends Component {
     };
 
     clearAudios = () => {
-        const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.audio = [
+        const values = [...this.state.concepts];
+        values[this.state.activeConcept].content.audio = [
             { title: "", file_name: "", audio: null, path: "" },
             { title: "", file_name: "", audio: null, path: "" },
         ];
         this.setState({
-            questions: values,
+            concepts: values,
         });
     };
 
@@ -1160,6 +1194,7 @@ class SubjectConcepts extends Component {
                     file_name: "",
                     video: null,
                     path: "",
+                    url: "",
                 },
                 audio: [
                     { title: "", file_name: "", audio: null, path: "" },
@@ -1246,6 +1281,7 @@ class SubjectConcepts extends Component {
                                     file_name: "",
                                     video: null,
                                     path: "",
+                                    url: "",
                                 },
                                 audio: [
                                     {
@@ -1310,6 +1346,7 @@ class SubjectConcepts extends Component {
                     file_name: "",
                     video: null,
                     path: "",
+                    url: "",
                 },
                 audio: [
                     { title: "", file_name: "", audio: null, path: "" },
@@ -1392,6 +1429,7 @@ class SubjectConcepts extends Component {
                                     file_name: "",
                                     video: null,
                                     path: "",
+                                    url: "",
                                 },
                                 audio: [
                                     {
@@ -2129,7 +2167,7 @@ class SubjectConcepts extends Component {
                                                                     this.state
                                                                         .activeConcept
                                                                 ].content.video
-                                                                    .path
+                                                                    .url
                                                             }
                                                         />
                                                         <small className="form-text text-muted mb-2">
