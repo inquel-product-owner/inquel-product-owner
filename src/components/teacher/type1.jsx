@@ -277,18 +277,29 @@ class FileModal extends Component {
                                         )}
                                     </Tab.Pane>
                                     <Tab.Pane eventKey="video">
-                                        {this.state.video.path !== null ? (
-                                            <video controls
-                                                src={this.state.video.path}
-                                            ></video>
-                                        ) : (
-                                            "Video not uploaded"
-                                        )}
+                                        <div className="card">
+                                            {this.state.video.path !== null ? (
+                                                <div class="embed-responsive embed-responsive-16by9">
+                                                    <video
+                                                        controls
+                                                        src={
+                                                            this.state.video
+                                                                .path
+                                                        }
+                                                    ></video>
+                                                </div>
+                                            ) : (
+                                                "Video not uploaded"
+                                            )}
+                                        </div>
                                     </Tab.Pane>
                                     <Tab.Pane eventKey="audio">
                                         {this.state.audio.map((item, index) => {
                                             return item.path !== null ? (
-                                                <audio src={item.path} controls></audio>
+                                                <audio
+                                                    src={item.path}
+                                                    controls
+                                                ></audio>
                                             ) : (
                                                 "Audio not uploaded"
                                             );
@@ -661,7 +672,7 @@ class SubjectType1 extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.props.chapter_name} Type 1 MCQ - Teacher | IQLabs`;
+        document.title = `${this.props.topic_name} MCQ - Teacher | IQLabs`;
 
         fetch(`${this.url}/teacher/status/data/?theme=1&complexity=1`, {
             headers: this.headers,
@@ -2243,7 +2254,10 @@ class SubjectType1 extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name={this.props.subject_name} togglenav={this.toggleSideNav} />
+                <Header
+                    name={this.props.subject_name}
+                    togglenav={this.toggleSideNav}
+                />
 
                 {/* Sidebar */}
                 <SideNav

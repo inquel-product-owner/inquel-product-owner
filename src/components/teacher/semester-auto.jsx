@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import store from "../../redux/store";
 import Header from "./navbar";
 import SideNav from "./sidenav";
+import Select from "react-select";
 import { Link } from "react-router-dom";
 import { Modal, Alert, Spinner } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
@@ -639,7 +640,6 @@ class SemesterAuto extends Component {
             attempts: [],
             selectedAttempt: "",
             question_type: [],
-            disableAttempt: false,
 
             page_loading: true,
             is_formSubmitted: false,
@@ -777,12 +777,10 @@ class SemesterAuto extends Component {
                         duration: duration,
                         selectedAttempt: selectedAttempt,
                         page_loading: false,
-                        disableAttempt: true,
                     });
                 } else {
                     this.setState({
                         page_loading: false,
-                        disableAttempt: false,
                     });
                 }
             })
@@ -814,12 +812,12 @@ class SemesterAuto extends Component {
 
     handleAttempt = (event) => {
         this.setState({
-            selectedAttempt: event.target.value,
+            selectedAttempt: event.value,
         });
 
-        if (event.target.value !== "") {
+        if (event.value !== "") {
             fetch(
-                `${this.url}/teacher/subject/${this.subjectId}/semester/${this.semesterId}/filter/?attempts=${event.target.value}`,
+                `${this.url}/teacher/subject/${this.subjectId}/semester/${this.semesterId}/filter/?attempts=${event.value}`,
                 {
                     method: "GET",
                     headers: this.headers,
@@ -1230,37 +1228,32 @@ class SemesterAuto extends Component {
                                         />
                                     </div>
                                     <div className="col-md-4">
-                                        <select
-                                            name="attempt"
-                                            id="attempt"
-                                            className="form-control form-shadow"
-                                            onChange={this.handleAttempt}
-                                            value={this.state.selectedAttempt}
-                                            disabled={
-                                                this.state.disableAttempt
-                                                    ? true
-                                                    : false
+                                        <Select
+                                            className="basic-single"
+                                            placeholder={
+                                                this.state.selectedAttempt !==
+                                                ""
+                                                    ? this.state.selectedAttempt
+                                                    : "Select attempt"
                                             }
+                                            value={[]}
+                                            isSearchable={true}
+                                            name="attempt"
+                                            options={
+                                                this.state.attempts.length !== 0
+                                                    ? this.state.attempts.map(
+                                                          (data, index) => {
+                                                              return {
+                                                                  value: data,
+                                                                  label: data,
+                                                              };
+                                                          }
+                                                      )
+                                                    : ""
+                                            }
+                                            onChange={this.handleAttempt}
                                             required
-                                        >
-                                            <option value="">
-                                                Select attempt
-                                            </option>
-                                            {this.state.attempts.length !== 0
-                                                ? this.state.attempts.map(
-                                                      (data, index) => {
-                                                          return (
-                                                              <option
-                                                                  value={data}
-                                                                  key={index}
-                                                              >
-                                                                  {data}
-                                                              </option>
-                                                          );
-                                                      }
-                                                  )
-                                                : ""}
-                                        </select>
+                                        />
                                     </div>
                                 </div>
                             </div>
