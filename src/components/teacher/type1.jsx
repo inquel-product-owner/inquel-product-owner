@@ -2265,7 +2265,7 @@ class SubjectType1 extends Component {
                     />
                 ) : null}
 
-                {/* MCQ Deletion Modal */}
+                {/* File viewing Modal */}
                 {this.state.showModal ? (
                     <FileModal
                         show={this.state.showModal}
