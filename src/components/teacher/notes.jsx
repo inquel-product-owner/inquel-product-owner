@@ -392,6 +392,7 @@ class SubjectNotes extends Component {
             notes_id: "",
             notes_name: "",
             image: [],
+            url: "",
 
             page_loading: true,
             is_formSubmited: false,
@@ -453,14 +454,21 @@ class SubjectNotes extends Component {
                 console.log(result);
                 if (result.sts === true && result.data.length !== 0) {
                     this.setState({
-                        title: result.data[0].notes_name,
-                        content: result.data[0].notes_content,
+                        title:
+                            result.data[0].notes_name !== undefined
+                                ? result.data[0].notes_name
+                                : "",
+                        content:
+                            result.data[0].notes_content !== undefined
+                                ? result.data[0].notes_content
+                                : "",
                         limited:
                             result.data[0].notes_name !== undefined
                                 ? result.data[0].limited
                                 : false,
                         notes_id: result.data[0].notes_id,
                         notes_name: result.data[0].notes_name,
+                        url: result.data[0].direct_question_urls,
                     });
                 }
                 this.setState({
@@ -504,17 +512,27 @@ class SubjectNotes extends Component {
             this.setState({
                 errorMsg: "Please add notes title",
                 showErrorAlert: true,
+                showLoader: false,
             });
         } else if (this.state.content === "") {
             this.setState({
                 errorMsg: "Please add notes data",
                 showErrorAlert: true,
+                showLoader: false,
             });
         } else {
-            if (this.state.notes_id === "") {
-                this.handlePOST();
+            if (this.state.url.length !== 0) {
+                this.setState({
+                    errorMsg: "Notes already exists!",
+                    showErrorAlert: true,
+                    showLoader: false,
+                });
             } else {
-                this.handlePATCH();
+                if (this.state.notes_id === "") {
+                    this.handlePOST();
+                } else {
+                    this.handlePATCH();
+                }
             }
         }
     };
@@ -637,7 +655,10 @@ class SubjectNotes extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name={this.props.subject_name} togglenav={this.toggleSideNav} />
+                <Header
+                    name={this.props.subject_name}
+                    togglenav={this.toggleSideNav}
+                />
 
                 {/* Sidebar */}
                 <SideNav

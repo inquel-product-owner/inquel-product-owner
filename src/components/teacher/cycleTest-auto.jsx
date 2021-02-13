@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import store from "../../redux/store";
 import Header from "./navbar";
 import SideNav from "./sidenav";
-// import Select from "react-select";
+import Select from "react-select";
 import { Link } from "react-router-dom";
 import { Modal, Alert, Spinner } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
@@ -642,7 +642,6 @@ class CycleTestAuto extends Component {
             attempts: [],
             selectedAttempt: "",
             question_type: [],
-            disableAttempt: false,
 
             page_loading: true,
             is_formSubmitted: false,
@@ -781,12 +780,10 @@ class CycleTestAuto extends Component {
                         duration: duration,
                         selectedAttempt: selectedAttempt,
                         page_loading: false,
-                        disableAttempt: true,
                     });
                 } else {
                     this.setState({
                         page_loading: false,
-                        disableAttempt: false,
                     });
                 }
             })
@@ -822,37 +819,6 @@ class CycleTestAuto extends Component {
         //     });
     };
 
-    // componentDidUpdate = (prevProps, prevState) => {
-    //     if (this.props.match.params.chapterId !== this.chapterId) {
-    //         this.setState(
-    //             {
-    //                 chapterId: this.props.match.params.chapterId,
-    //                 page_loading: true,
-    //             },
-    //             () => {
-    //                 this.loadAttemptData();
-    //                 this.loadSectionData();
-    //             }
-    //         );
-    //     }
-    // };
-
-    // handleSelect = (event) => {
-    //     this.props.history.push({
-    //         pathname: `/teacher/subject/${this.subjectId}/chapter/${event.value}/cycle/${this.cycle_testId}`,
-    //     });
-    //     this.setState(
-    //         {
-    //             chapterId: event.value,
-    //             page_loading: true,
-    //         },
-    //         () => {
-    //             this.loadAttemptData();
-    //             this.loadSectionData();
-    //         }
-    //     );
-    // };
-
     handleSectionData = (index, event, type) => {
         const section = [...this.state.sections];
         if (type === "name") {
@@ -871,12 +837,12 @@ class CycleTestAuto extends Component {
 
     handleAttempt = (event) => {
         this.setState({
-            selectedAttempt: event.target.value,
+            selectedAttempt: event.value,
         });
 
-        if (event.target.value !== "") {
+        if (event.value !== "") {
             fetch(
-                `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/filter/?chapter_id=${this.chapterId}&attempts=${event.target.value}`,
+                `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/filter/?chapter_id=${this.chapterId}&attempts=${event.value}`,
                 {
                     method: "GET",
                     headers: this.headers,
@@ -1275,26 +1241,6 @@ class CycleTestAuto extends Component {
                         <div className="row align-items-center mb-3">
                             <div className="col-md-8">
                                 <div className="row align-items-center">
-                                    {/* <div className="col-md-4">
-                                        <Select
-                                            className="basic-single"
-                                            placeholder={this.state.chapterName}
-                                            value={[]}
-                                            isSearchable={true}
-                                            name="chapter"
-                                            options={this.state.chapterList.map(
-                                                function (list) {
-                                                    return {
-                                                        value: list.chapter_id,
-                                                        label:
-                                                            list.chapter_name,
-                                                    };
-                                                }
-                                            )}
-                                            onChange={this.handleSelect}
-                                            required
-                                        />
-                                    </div> */}
                                     <div className="col-md-4">
                                         <input
                                             type="number"
@@ -1310,37 +1256,32 @@ class CycleTestAuto extends Component {
                                         />
                                     </div>
                                     <div className="col-md-4">
-                                        <select
-                                            name="attempt"
-                                            id="attempt"
-                                            className="form-control form-shadow"
-                                            onChange={this.handleAttempt}
-                                            value={this.state.selectedAttempt}
-                                            disabled={
-                                                this.state.disableAttempt
-                                                    ? true
-                                                    : false
+                                        <Select
+                                            className="basic-single"
+                                            placeholder={
+                                                this.state.selectedAttempt !==
+                                                ""
+                                                    ? this.state.selectedAttempt
+                                                    : "Select attempt"
                                             }
+                                            value={[]}
+                                            isSearchable={true}
+                                            name="attempt"
+                                            options={
+                                                this.state.attempts.length !== 0
+                                                    ? this.state.attempts.map(
+                                                          (data, index) => {
+                                                              return {
+                                                                  value: data,
+                                                                  label: data,
+                                                              };
+                                                          }
+                                                      )
+                                                    : ""
+                                            }
+                                            onChange={this.handleAttempt}
                                             required
-                                        >
-                                            <option value="">
-                                                Select attempt
-                                            </option>
-                                            {this.state.attempts.length !== 0
-                                                ? this.state.attempts.map(
-                                                      (data, index) => {
-                                                          return (
-                                                              <option
-                                                                  value={data}
-                                                                  key={index}
-                                                              >
-                                                                  {data}
-                                                              </option>
-                                                          );
-                                                      }
-                                                  )
-                                                : ""}
-                                        </select>
+                                        />
                                     </div>
                                 </div>
                             </div>

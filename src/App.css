@@ -224,6 +224,10 @@ input[type="search"]:focus {
     border-bottom: 1px solid #621012;
 }
 
+.custom-file-label {
+    z-index: 0 !important;
+}
+
 /* Table */
 
 .table {
