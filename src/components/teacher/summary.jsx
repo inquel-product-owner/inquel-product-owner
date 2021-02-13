@@ -388,6 +388,7 @@ class SubjectSummary extends Component {
             summary_id: "",
             image: [],
             summary_name: "",
+            url: "",
 
             page_loading: true,
             is_formSubmited: false,
@@ -448,14 +449,21 @@ class SubjectSummary extends Component {
                 console.log(result);
                 if (result.sts === true && result.data.length !== 0) {
                     this.setState({
-                        title: result.data[0].summary_name,
-                        content: result.data[0].summary_content,
+                        title:
+                            result.data[0].summary_name !== undefined
+                                ? result.data[0].summary_name
+                                : "",
+                        content:
+                            result.data[0].summary_content !== undefined
+                                ? result.data[0].summary_content
+                                : "",
                         limited:
                             result.data[0].summary_name !== undefined
                                 ? result.data[0].limited
                                 : false,
                         summary_id: result.data[0].summary_id,
                         summary_name: result.data[0].summary_name,
+                        url: result.data[0].direct_question_urls,
                     });
                 }
                 this.setState({
@@ -498,17 +506,27 @@ class SubjectSummary extends Component {
             this.setState({
                 errorMsg: "Please add summary title",
                 showErrorAlert: true,
+                showLoader: false,
             });
         } else if (this.state.content === "") {
             this.setState({
                 errorMsg: "Please add summary data",
                 showErrorAlert: true,
+                showLoader: false,
             });
         } else {
-            if (this.state.summary_id === "") {
-                this.handlePOST();
+            if (this.state.url.length !== 0) {
+                this.setState({
+                    errorMsg: "Summary already exists!",
+                    showErrorAlert: true,
+                    showLoader: false,
+                });
             } else {
-                this.handlePATCH();
+                if (this.state.summary_id === "") {
+                    this.handlePOST();
+                } else {
+                    this.handlePATCH();
+                }
             }
         }
     };

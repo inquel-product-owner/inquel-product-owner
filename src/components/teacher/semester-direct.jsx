@@ -332,7 +332,6 @@ class SemesterDirect extends Component {
                                         type="datetime-local"
                                         name="exam_date"
                                         id="exam_date"
-                                        value={this.state.exam_date}
                                         className="form-control form-shadow"
                                         onChange={this.handleDate}
                                     />
@@ -347,7 +346,6 @@ class SemesterDirect extends Component {
                                         type="time"
                                         name="starts_at"
                                         id="starts_at"
-                                        value={this.state.starts_at}
                                         className="form-control form-shadow"
                                         onChange={this.handleTime}
                                     />
@@ -360,7 +358,6 @@ class SemesterDirect extends Component {
                                         type="time"
                                         name="ends_at"
                                         id="ends_at"
-                                        value={this.state.ends_at}
                                         className="form-control form-shadow"
                                         onChange={this.handleTime}
                                     />

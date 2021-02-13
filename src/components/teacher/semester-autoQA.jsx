@@ -58,6 +58,7 @@ class SemesterAutoQA extends Component {
                 let data = [];
                 let images = [];
                 let audio = [];
+                let duration = "";
                 if (result.data.results.length !== 0) {
                     for (let i = 0; i < result.data.results.length; i++) {
                         if (result.data.results[i] !== null) {
@@ -324,6 +325,7 @@ class SemesterAutoQA extends Component {
                             } else {
                                 continue;
                             }
+                            duration = result.data.results[i].duration;
                         } else {
                             continue;
                         }
@@ -331,6 +333,7 @@ class SemesterAutoQA extends Component {
                 }
                 this.setState({
                     data: data,
+                    duration: duration,
                     page_loading: false,
                 });
             })
@@ -369,7 +372,10 @@ class SemesterAutoQA extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name={this.props.subject_name} togglenav={this.toggleSideNav} />
+                <Header
+                    name={this.props.subject_name}
+                    togglenav={this.toggleSideNav}
+                />
 
                 {/* Sidebar */}
                 <SideNav
@@ -395,7 +401,9 @@ class SemesterAutoQA extends Component {
                         <div className="card primary-bg text-white small mb-4">
                             <div className="card-body">
                                 <div className="row">
-                                    <div className="col-md-7">{this.props.section_name}</div>
+                                    <div className="col-md-7">
+                                        {this.props.section_name}
+                                    </div>
                                     <div className="col-md-5">
                                         <div className="row">
                                             <div className="col-md-4">
@@ -408,7 +416,8 @@ class SemesterAutoQA extends Component {
                                                 Questions
                                             </div>
                                             <div className="col-md-4">
-                                                Total time: {this.state.duration} mins
+                                                Total time:{" "}
+                                                {this.state.duration} mins
                                             </div>
                                         </div>
                                     </div>

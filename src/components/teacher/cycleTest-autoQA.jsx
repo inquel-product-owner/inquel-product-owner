@@ -61,6 +61,7 @@ class CycleTestAutoQA extends Component {
                 let data = [];
                 let images = [];
                 let audio = [];
+                let duration = "";
                 if (result.data.results.length !== 0) {
                     for (let i = 0; i < result.data.results.length; i++) {
                         if (result.data.results[i] !== null) {
@@ -327,6 +328,7 @@ class CycleTestAutoQA extends Component {
                             } else {
                                 continue;
                             }
+                            duration = result.data.results[i].duration;
                         } else {
                             continue;
                         }
@@ -334,6 +336,7 @@ class CycleTestAutoQA extends Component {
                 }
                 this.setState({
                     data: data,
+                    duration: duration,
                     page_loading: false,
                 });
             })

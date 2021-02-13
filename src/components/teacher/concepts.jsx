@@ -278,14 +278,16 @@ class FileModal extends Component {
                                         )}
                                     </Tab.Pane>
                                     <Tab.Pane eventKey="video">
-                                        {this.state.video.path !== null ? (
-                                            <video
-                                                controls
-                                                src={this.state.video.path}
-                                            ></video>
-                                        ) : (
-                                            "Video not uploaded"
-                                        )}
+                                        <div className="card">
+                                            {this.state.video.path !== null ? (
+                                                <video
+                                                    controls
+                                                    src={this.state.video.path}
+                                                ></video>
+                                            ) : (
+                                                "Video not uploaded"
+                                            )}
+                                        </div>
                                     </Tab.Pane>
                                     <Tab.Pane eventKey="audio">
                                         {this.state.audio.map((item, index) => {
@@ -601,7 +603,7 @@ class SubjectConcepts extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.props.chapter_name} Concepts - Teacher | IQLabs`;
+        document.title = `${this.props.topic_name} Concepts - Teacher | IQLabs`;
 
         this.loadConceptData();
     };
@@ -1818,25 +1820,25 @@ class SubjectConcepts extends Component {
                                                         <div className="card-body">
                                                             <div className="row">
                                                                 <div className="col-md-11">
-                                                            {/* Front-view */}
-                                                            <div className="card">
-                                                                <div
-                                                                    className="card-body"
-                                                                    onClick={() =>
-                                                                        this.handleFlip(
-                                                                            c_index
-                                                                        )
-                                                                    }
-                                                                    dangerouslySetInnerHTML={{
-                                                                        __html:
-                                                                            concept
-                                                                                .content
-                                                                                .terms,
-                                                                    }}
-                                                                ></div>
-                                                            </div>
-                                                            </div>
-                                                            <div className="col-md-1 pl-0 text-right">
+                                                                    {/* Front-view */}
+                                                                    <div className="card">
+                                                                        <div
+                                                                            className="card-body"
+                                                                            onClick={() =>
+                                                                                this.handleFlip(
+                                                                                    c_index
+                                                                                )
+                                                                            }
+                                                                            dangerouslySetInnerHTML={{
+                                                                                __html:
+                                                                                    concept
+                                                                                        .content
+                                                                                        .terms,
+                                                                            }}
+                                                                        ></div>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="col-md-1 pl-0 text-right">
                                                                     <button
                                                                         className="btn btn-light bg-white"
                                                                         onClick={() =>
@@ -1844,10 +1846,10 @@ class SubjectConcepts extends Component {
                                                                                 concept
                                                                                     .content
                                                                                     .images,
-                                                                                    concept
+                                                                                concept
                                                                                     .content
                                                                                     .video,
-                                                                                    concept
+                                                                                concept
                                                                                     .content
                                                                                     .audio
                                                                             )
@@ -1863,9 +1865,7 @@ class SubjectConcepts extends Component {
                                                         <div className="card-body">
                                                             <div className="row">
                                                                 {/* definition */}
-                                                                <div
-                                                                    className="col-md-11 pr-md-0"
-                                                                >
+                                                                <div className="col-md-11 pr-md-0">
                                                                     {/* Back-view */}
                                                                     <div className="card">
                                                                         <div
@@ -1943,7 +1943,7 @@ class SubjectConcepts extends Component {
                                                                         }
                                                                     )}
                                                                 </div> */}
-                                                            <div className="col-md-1 pl-0 text-right">
+                                                                <div className="col-md-1 pl-0 text-right">
                                                                     <button
                                                                         className="btn btn-light bg-white"
                                                                         onClick={() =>
@@ -1951,10 +1951,10 @@ class SubjectConcepts extends Component {
                                                                                 concept
                                                                                     .content
                                                                                     .images,
-                                                                                    concept
+                                                                                concept
                                                                                     .content
                                                                                     .video,
-                                                                                    concept
+                                                                                concept
                                                                                     .content
                                                                                     .audio
                                                                             )
