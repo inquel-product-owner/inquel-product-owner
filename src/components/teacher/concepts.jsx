@@ -5,7 +5,17 @@ import Header from "./navbar";
 import SideNav from "./sidenav";
 import CKeditor from "../sharedComponents/CKeditor";
 import ReactSwitch from "../sharedComponents/switchComponent";
-import { Accordion, Card, Alert, Spinner, Modal } from "react-bootstrap";
+import {
+    Accordion,
+    Card,
+    Alert,
+    Spinner,
+    Modal,
+    Tab,
+    Row,
+    Col,
+    Nav,
+} from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import ReactCardFlip from "react-card-flip";
 import Loading from "../sharedComponents/loader";
@@ -155,11 +165,156 @@ class ConceptsDeleteModal extends Component {
     }
 }
 
+class FileModal extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            image: this.props.image,
+            video: this.props.video,
+            audio: this.props.audio,
+            selectedImage: 0,
+            selectedImageData: [],
+        };
+        this.url = baseUrl + teacherUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
+    }
+
+    changeImage = (image_index) => {
+        const images = [...this.state.image];
+        if (this.state.selectedImage === image_index) {
+            this.setState({
+                selectedImage: "",
+                selectedImageData: [],
+            });
+        } else {
+            this.setState({
+                selectedImage: image_index,
+                selectedImageData: images[image_index],
+            });
+        }
+    };
+
+    render() {
+        const video = this.state.video;
+        return (
+            <Modal
+                show={this.props.show}
+                onHide={this.props.onHide}
+                size="lg"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Header closeButton>Uploaded Files</Modal.Header>
+                <Modal.Body>
+                    <Tab.Container
+                        id="left-tabs-example"
+                        defaultActiveKey="image"
+                    >
+                        <Row>
+                            <Col sm={3} className="mb-3 mb-md-0">
+                                <Nav variant="pills" className="flex-column">
+                                    <Nav.Item>
+                                        <Nav.Link eventKey="image">
+                                            Image
+                                        </Nav.Link>
+                                    </Nav.Item>
+                                    <Nav.Item>
+                                        <Nav.Link eventKey="video">
+                                            Video
+                                        </Nav.Link>
+                                    </Nav.Item>
+                                    <Nav.Item>
+                                        <Nav.Link eventKey="audio">
+                                            Audio
+                                        </Nav.Link>
+                                    </Nav.Item>
+                                </Nav>
+                            </Col>
+                            <Col sm={9}>
+                                <Tab.Content>
+                                    <Tab.Pane eventKey="image">
+                                        {this.state.image.map(
+                                            (images, index) => {
+                                                return images.path !== "" ? (
+                                                    <div
+                                                        key={index}
+                                                        className="card preview-img-sm bg-light shadow-sm mb-2"
+                                                        style={{
+                                                            backgroundImage: `url(${images.path})`,
+                                                        }}
+                                                        onClick={() =>
+                                                            this.changeImage(
+                                                                index
+                                                            )
+                                                        }
+                                                    ></div>
+                                                ) : null;
+                                            }
+                                        )}
+                                        {this.state.selectedImageData.length !==
+                                        0 ? (
+                                            <div className="card shadow-sm">
+                                                <img
+                                                    src={
+                                                        this.state
+                                                            .selectedImageData
+                                                            .path
+                                                    }
+                                                    alt={
+                                                        this.state
+                                                            .selectedImageData
+                                                            .file_name
+                                                    }
+                                                    className="img-fluid rounded-lg"
+                                                />
+                                            </div>
+                                        ) : (
+                                            ""
+                                        )}
+                                    </Tab.Pane>
+                                    <Tab.Pane eventKey="video">
+                                        {this.state.video.path !== null ? (
+                                            <video
+                                                controls
+                                                src={this.state.video.path}
+                                            ></video>
+                                        ) : (
+                                            "Video not uploaded"
+                                        )}
+                                    </Tab.Pane>
+                                    <Tab.Pane eventKey="audio">
+                                        {this.state.audio.map((item, index) => {
+                                            return item.path !== null ? (
+                                                <audio
+                                                    src={item.path}
+                                                    controls
+                                                ></audio>
+                                            ) : (
+                                                "Audio not uploaded"
+                                            );
+                                        })}
+                                    </Tab.Pane>
+                                </Tab.Content>
+                            </Col>
+                        </Row>
+                    </Tab.Container>
+                </Modal.Body>
+            </Modal>
+        );
+    }
+}
+
 class SubjectConcepts extends Component {
     constructor(props) {
         super(props);
         this.state = {
             showSideNav: false,
+            showModal: false,
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
@@ -178,9 +333,11 @@ class SubjectConcepts extends Component {
             isForm_submitted: false,
 
             activeConcept: "",
-            selectedImageConcept: "",
-            selectedImageData: [],
+            // selectedImageConcept: "",
+            // selectedImageData: [],
             selectedImage: "",
+            selectedVideo: "",
+            selectedAudio: "",
             flipState: [false],
             selectedConcept: [],
 
@@ -235,6 +392,15 @@ class SubjectConcepts extends Component {
     toggleSideNav = () => {
         this.setState({
             showSideNav: !this.state.showSideNav,
+        });
+    };
+
+    toggleModal = (image, video, audio) => {
+        this.setState({
+            showModal: !this.state.showModal,
+            selectedImage: image,
+            selectedVideo: video,
+            selectedAudio: audio,
         });
     };
 
@@ -748,14 +914,14 @@ class SubjectConcepts extends Component {
                         },
                         () => {
                             setTimeout(() => {
-                            this.setState({
-                                showEdit_option: false,
-                                contentCollapsed: true,
-                                imageCollapsed: true,
-                                audioCollapsed: true,
-                                settingsCollapsed: true,
-                                page_loading: true,
-                            });
+                                this.setState({
+                                    showEdit_option: false,
+                                    contentCollapsed: true,
+                                    imageCollapsed: true,
+                                    audioCollapsed: true,
+                                    settingsCollapsed: true,
+                                    page_loading: true,
+                                });
                                 this.loadConceptData();
                             }, 2000);
                         }
@@ -910,25 +1076,25 @@ class SubjectConcepts extends Component {
         }
     };
 
-    changeImage = (image_index, q_index) => {
-        const images = [...this.state.concepts];
-        if (
-            this.state.selectedImage === image_index &&
-            this.state.selectedImageConcept === q_index
-        ) {
-            this.setState({
-                selectedImage: "",
-                selectedImageConcept: "",
-                selectedImageData: [],
-            });
-        } else {
-            this.setState({
-                selectedImage: image_index,
-                selectedImageConcept: q_index,
-                selectedImageData: images[q_index].content.images[image_index],
-            });
-        }
-    };
+    // changeImage = (image_index, q_index) => {
+    //     const images = [...this.state.concepts];
+    //     if (
+    //         this.state.selectedImage === image_index &&
+    //         this.state.selectedImageConcept === q_index
+    //     ) {
+    //         this.setState({
+    //             selectedImage: "",
+    //             selectedImageConcept: "",
+    //             selectedImageData: [],
+    //         });
+    //     } else {
+    //         this.setState({
+    //             selectedImage: image_index,
+    //             selectedImageConcept: q_index,
+    //             selectedImageData: images[q_index].content.images[image_index],
+    //         });
+    //     }
+    // };
 
     clearImages = () => {
         const values = [...this.state.concepts];
@@ -973,7 +1139,7 @@ class SubjectConcepts extends Component {
             ].content.video.path = URL.createObjectURL(event.target.files[0]);
             values[this.state.activeConcept].content.video.video =
                 event.target.files[0];
-                values[this.state.activeConcept].content.video.url = "";
+            values[this.state.activeConcept].content.video.url = "";
             this.setState({
                 concepts: values,
                 btnDisabled: false,
@@ -984,8 +1150,7 @@ class SubjectConcepts extends Component {
 
     handleVideoUrl = (event) => {
         const values = [...this.state.concepts];
-        values[this.state.activeConcept].content.video.url =
-            event.target.value;
+        values[this.state.activeConcept].content.video.url = event.target.value;
         values[this.state.activeConcept].content.video.path =
             event.target.value;
         values[this.state.activeConcept].content.video.file_name = "";
@@ -1494,7 +1659,10 @@ class SubjectConcepts extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name={this.props.subject_name} togglenav={this.toggleSideNav} />
+                <Header
+                    name={this.props.subject_name}
+                    togglenav={this.toggleSideNav}
+                />
 
                 {/* Sidebar */}
                 <SideNav
@@ -1516,6 +1684,17 @@ class SubjectConcepts extends Component {
                     />
                 ) : null}
 
+                {/* File viewing Modal */}
+                {this.state.showModal ? (
+                    <FileModal
+                        show={this.state.showModal}
+                        onHide={this.toggleModal}
+                        image={this.state.selectedImage}
+                        video={this.state.selectedVideo}
+                        audio={this.state.selectedAudio}
+                    />
+                ) : null}
+
                 <div
                     className={`section content ${
                         this.state.showSideNav ? "active" : ""
@@ -1523,7 +1702,7 @@ class SubjectConcepts extends Component {
                 >
                     <div className="container-fluid">
                         <div className="row">
-                            {/* ------------------------------ MCQ Column ------------------------------ */}
+                            {/* ------------------------------ Terms Column ------------------------------ */}
                             <div
                                 className={`${
                                     this.state.showEdit_option
@@ -1637,6 +1816,8 @@ class SubjectConcepts extends Component {
                                                 >
                                                     <div className="card shadow-sm">
                                                         <div className="card-body">
+                                                            <div className="row">
+                                                                <div className="col-md-11">
                                                             {/* Front-view */}
                                                             <div className="card">
                                                                 <div
@@ -1654,6 +1835,28 @@ class SubjectConcepts extends Component {
                                                                     }}
                                                                 ></div>
                                                             </div>
+                                                            </div>
+                                                            <div className="col-md-1 pl-0 text-right">
+                                                                    <button
+                                                                        className="btn btn-light bg-white"
+                                                                        onClick={() =>
+                                                                            this.toggleModal(
+                                                                                concept
+                                                                                    .content
+                                                                                    .images,
+                                                                                    concept
+                                                                                    .content
+                                                                                    .video,
+                                                                                    concept
+                                                                                    .content
+                                                                                    .audio
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <i className="far fa-folder-open"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div className="card shadow-sm">
@@ -1661,19 +1864,7 @@ class SubjectConcepts extends Component {
                                                             <div className="row">
                                                                 {/* definition */}
                                                                 <div
-                                                                    className={`${
-                                                                        this
-                                                                            .state
-                                                                            .selectedImageData
-                                                                            .length !==
-                                                                            0 &&
-                                                                        this
-                                                                            .state
-                                                                            .selectedImageConcept ===
-                                                                            c_index
-                                                                            ? "col-md-9"
-                                                                            : "col-md-11 pr-md-0"
-                                                                    }`}
+                                                                    className="col-md-11 pr-md-0"
                                                                 >
                                                                     {/* Back-view */}
                                                                     <div className="card">
@@ -1694,7 +1885,7 @@ class SubjectConcepts extends Component {
                                                                     </div>
                                                                 </div>
                                                                 {/* image preview */}
-                                                                {this.state
+                                                                {/* {this.state
                                                                     .selectedImageData
                                                                     .length !==
                                                                     0 &&
@@ -1722,8 +1913,8 @@ class SubjectConcepts extends Component {
                                                                     </div>
                                                                 ) : (
                                                                     ""
-                                                                )}
-                                                                <div className="col-md-1 d-flex justify-content-md-center justify-content-around flex-wrap">
+                                                                )} */}
+                                                                {/* <div className="col-md-1 d-flex justify-content-md-center justify-content-around flex-wrap">
                                                                     {concept.content.images.map(
                                                                         (
                                                                             images,
@@ -1751,6 +1942,26 @@ class SubjectConcepts extends Component {
                                                                             );
                                                                         }
                                                                     )}
+                                                                </div> */}
+                                                            <div className="col-md-1 pl-0 text-right">
+                                                                    <button
+                                                                        className="btn btn-light bg-white"
+                                                                        onClick={() =>
+                                                                            this.toggleModal(
+                                                                                concept
+                                                                                    .content
+                                                                                    .images,
+                                                                                    concept
+                                                                                    .content
+                                                                                    .video,
+                                                                                    concept
+                                                                                    .content
+                                                                                    .audio
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <i className="far fa-folder-open"></i>
+                                                                    </button>
                                                                 </div>
                                                             </div>
                                                         </div>
