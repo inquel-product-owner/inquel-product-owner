@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import axios from "axios";
 import Header from "./navbar";
 import SideNav from "./sidenav";
@@ -140,6 +141,11 @@ class DeleteModal extends Component {
     }
 }
 
+const mapStateToProps = (state) => ({
+    subject_name: state.subject_name,
+    chapter_name: state.chapter_name,
+});
+
 class SummaryUpload extends Component {
     constructor(props) {
         super(props);
@@ -268,7 +274,7 @@ class SummaryUpload extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.chapterId} Summary - Teacher | IQLabs`;
+        document.title = `${this.props.chapter_name} Summary - Teacher | IQLabs`;
 
         this.loadSummaryData();
     };
@@ -411,7 +417,10 @@ class SummaryUpload extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="Subject name" togglenav={this.toggleSideNav} />
+                <Header
+                    name={this.props.subject_name}
+                    togglenav={this.toggleSideNav}
+                />
 
                 {/* Sidebar */}
                 <SideNav
@@ -453,7 +462,7 @@ class SummaryUpload extends Component {
                                             <span className="font-weight-bold">
                                                 Summary:
                                             </span>{" "}
-                                            Chapter name
+                                            {this.props.chapter_name}
                                         </p>
                                     </div>
                                     <div className="col-md-6 d-flex align-items-center justify-content-end">
@@ -637,4 +646,4 @@ class SummaryUpload extends Component {
     }
 }
 
-export default SummaryUpload;
+export default connect(mapStateToProps)(SummaryUpload);

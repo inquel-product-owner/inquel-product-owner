@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import axios from "axios";
 import Header from "./navbar";
 import SideNav from "./sidenav";
@@ -6,6 +7,12 @@ import { Spinner, Alert } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import { Document, Page, pdfjs } from "react-pdf";
 import Loading from "../sharedComponents/loader";
+
+const mapStateToProps = (state) => ({
+    subject_name: state.subject_name,
+    chapter_name: state.chapter_name,
+    cycle_name: state.cycle_name,
+});
 
 class CyleTestDirect extends Component {
     constructor(props) {
@@ -95,7 +102,7 @@ class CyleTestDirect extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.chapterName} - Teacher | IQLabs`;
+        document.title = `${this.props.chapter_name} - Teacher | IQLabs`;
 
         this.loadCycletestData();
     };
@@ -286,7 +293,10 @@ class CyleTestDirect extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="Subject name" togglenav={this.toggleSideNav} />
+                <Header
+                    name={this.props.subject_name}
+                    togglenav={this.toggleSideNav}
+                />
 
                 {/* Sidebar */}
                 <SideNav
@@ -311,7 +321,7 @@ class CyleTestDirect extends Component {
                         <div className="row mb-4">
                             <div className="col-md-6">
                                 <h5 className="primary-text mb-0">
-                                    {this.chapterName}
+                                    {this.props.cycle_name}
                                 </h5>
                             </div>
                         </div>
@@ -533,4 +543,4 @@ class CyleTestDirect extends Component {
     }
 }
 
-export default CyleTestDirect;
+export default connect(mapStateToProps)(CyleTestDirect);

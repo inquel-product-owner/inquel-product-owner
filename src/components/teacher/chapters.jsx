@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import store from "../../redux/store";
+import { connect } from "react-redux";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { Card, Accordion, Modal, Alert, Spinner } from "react-bootstrap";
@@ -321,6 +323,11 @@ class CycleTestModal extends Component {
     }
 }
 
+const mapStateToProps = (state) => ({
+    subject_name: state.subject_name,
+    chapter_name: state.chapter_name,
+});
+
 class Chapters extends Component {
     constructor(props) {
         super(props);
@@ -583,14 +590,28 @@ class Chapters extends Component {
                                         <Link
                                             to={`${this.props.match.url}/${data.topic_name}/notes/upload`}
                                         >
-                                            <button className="btn btn-sm btn-primary mr-2">
+                                            <button
+                                                className="btn btn-sm btn-primary mr-2"
+                                                onClick={() =>
+                                                    this.dispatchTopic(
+                                                        data.topic_name
+                                                    )
+                                                }
+                                            >
                                                 <i className="fas fa-file-upload fa-sm"></i>
                                             </button>
                                         </Link>
                                         <Link
                                             to={`${this.props.match.url}/${data.topic_name}/notes`}
                                         >
-                                            <button className="btn btn-sm btn-primary">
+                                            <button
+                                                className="btn btn-sm btn-primary"
+                                                onClick={() =>
+                                                    this.dispatchTopic(
+                                                        data.topic_name
+                                                    )
+                                                }
+                                            >
                                                 <i className="fas fa-file-medical fa-sm"></i>
                                             </button>
                                         </Link>
@@ -599,7 +620,14 @@ class Chapters extends Component {
                                         <Link
                                             to={`${this.props.match.url}/${data.topic_name}/match`}
                                         >
-                                            <button className="btn btn-primary btn-sm">
+                                            <button
+                                                className="btn btn-primary btn-sm"
+                                                onClick={() =>
+                                                    this.dispatchTopic(
+                                                        data.topic_name
+                                                    )
+                                                }
+                                            >
                                                 View / Edit
                                             </button>
                                         </Link>
@@ -608,7 +636,14 @@ class Chapters extends Component {
                                         <Link
                                             to={`${this.props.match.url}/${data.topic_name}/concepts`}
                                         >
-                                            <button className="btn btn-primary btn-sm">
+                                            <button
+                                                className="btn btn-primary btn-sm"
+                                                onClick={() =>
+                                                    this.dispatchTopic(
+                                                        data.topic_name
+                                                    )
+                                                }
+                                            >
                                                 View / Edit
                                             </button>
                                         </Link>
@@ -617,7 +652,14 @@ class Chapters extends Component {
                                         <Link
                                             to={`${this.props.match.url}/${data.topic_name}/type1`}
                                         >
-                                            <button className="btn btn-primary btn-sm">
+                                            <button
+                                                className="btn btn-primary btn-sm"
+                                                onClick={() =>
+                                                    this.dispatchTopic(
+                                                        data.topic_name
+                                                    )
+                                                }
+                                            >
                                                 View / Edit
                                             </button>
                                         </Link>
@@ -626,7 +668,14 @@ class Chapters extends Component {
                                         <Link
                                             to={`${this.props.match.url}/${data.topic_name}/type2`}
                                         >
-                                            <button className="btn btn-primary btn-sm">
+                                            <button
+                                                className="btn btn-primary btn-sm"
+                                                onClick={() =>
+                                                    this.dispatchTopic(
+                                                        data.topic_name
+                                                    )
+                                                }
+                                            >
                                                 View / Edit
                                             </button>
                                         </Link>
@@ -649,12 +698,20 @@ class Chapters extends Component {
         );
     };
 
+    dispatchTopic = (data) => {
+        store.dispatch({ type: "TOPIC", payload: data });
+    };
+
+    dispatchCycle = (data) => {
+        store.dispatch({ type: "CYCLE", payload: data });
+    };
+
     render() {
         document.title = `${this.state.chapterName} - Teacher | IQLabs`;
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="Subject name" togglenav={this.toggleSideNav} />
+                <Header name={this.props.subject_name} togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
                 <SideNav
@@ -844,7 +901,14 @@ class Chapters extends Component {
                                                                                   <Link
                                                                                       to={`${this.props.match.url}/cycle/${data.cycle_test_id}`}
                                                                                   >
-                                                                                      <button className="btn btn-primary btn-sm">
+                                                                                      <button
+                                                                                          className="btn btn-primary btn-sm"
+                                                                                          onClick={() =>
+                                                                                              this.dispatchCycle(
+                                                                                                  data.cycle_test_name
+                                                                                              )
+                                                                                          }
+                                                                                      >
                                                                                           Auto
                                                                                       </button>
                                                                                   </Link>
@@ -858,7 +922,14 @@ class Chapters extends Component {
                                                                                   <Link
                                                                                       to={`${this.props.match.url}/cycle/${data.cycle_test_id}/direct`}
                                                                                   >
-                                                                                      <button className="btn btn-primary btn-sm ml-2">
+                                                                                      <button
+                                                                                          className="btn btn-primary btn-sm ml-2"
+                                                                                          onClick={() =>
+                                                                                              this.dispatchCycle(
+                                                                                                  data.cycle_test_name
+                                                                                              )
+                                                                                          }
+                                                                                      >
                                                                                           Direct
                                                                                           Test
                                                                                       </button>
@@ -904,4 +975,4 @@ class Chapters extends Component {
     }
 }
 
-export default Chapters;
+export default connect(mapStateToProps)(Chapters);

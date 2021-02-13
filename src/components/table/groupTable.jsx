@@ -12,6 +12,7 @@ import {
 import "./material.css";
 import "./grid-overview.css";
 import { Link } from "react-router-dom";
+import store from "../../redux/store";
 
 function valid_fromDate(props) {
     var newDate = new Date(props.valid_from).toLocaleDateString();
@@ -121,10 +122,17 @@ class GroupTable extends Component {
         }
     }
 
+    dispatch = (data) => {
+        store.dispatch({ type: "GROUP", payload: data });
+    };
+
     viewTemplate = (props) => {
         return (
             <Link to={`/${this.props.path}/group/${props.id}`}>
-                <button className="btn btn-link btn-sm">
+                <button
+                    className="btn btn-link btn-sm"
+                    onClick={() => this.dispatch(props.group_name)}
+                >
                     <i className="fas fa-eye"></i>
                 </button>
             </Link>
