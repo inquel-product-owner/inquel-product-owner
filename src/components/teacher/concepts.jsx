@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from "react";
+import { connect } from "react-redux";
 import axios from "axios";
 import Header from "./navbar";
 import SideNav from "./sidenav";
@@ -8,6 +9,12 @@ import { Accordion, Card, Alert, Spinner, Modal } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import ReactCardFlip from "react-card-flip";
 import Loading from "../sharedComponents/loader";
+
+const mapStateToProps = (state) => ({
+    subject_name: state.subject_name,
+    chapter_name: state.chapter_name,
+    topic_name: state.topic_name,
+});
 
 class ConceptsDeleteModal extends Component {
     constructor(props) {
@@ -428,7 +435,7 @@ class SubjectConcepts extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.chapterId} Concepts - Teacher | IQLabs`;
+        document.title = `${this.props.chapter_name} Concepts - Teacher | IQLabs`;
 
         this.loadConceptData();
     };
@@ -1487,7 +1494,7 @@ class SubjectConcepts extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="Subject name" togglenav={this.toggleSideNav} />
+                <Header name={this.props.subject_name} togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
                 <SideNav
@@ -1537,7 +1544,7 @@ class SubjectConcepts extends Component {
                                 <div className="row align-items-center">
                                     <div className="col-md-6">
                                         <h5 className="primary-text">
-                                            {`${this.chapterId} - Concepts`}
+                                            {`${this.props.chapter_name} | ${this.props.topic_name} - Concepts`}
                                         </h5>
                                     </div>
                                     <div className="col-md-6">
@@ -2495,4 +2502,4 @@ class SubjectConcepts extends Component {
     }
 }
 
-export default SubjectConcepts;
+export default connect(mapStateToProps)(SubjectConcepts);

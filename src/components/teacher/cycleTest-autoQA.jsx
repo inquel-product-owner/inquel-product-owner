@@ -1,8 +1,16 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import Loading from "../sharedComponents/loader";
+
+const mapStateToProps = (state) => ({
+    subject_name: state.subject_name,
+    chapter_name: state.chapter_name,
+    cycle_name: state.cycle_name,
+    section_name: state.section_name,
+});
 
 class CycleTestAutoQA extends Component {
     constructor(props) {
@@ -335,7 +343,7 @@ class CycleTestAutoQA extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.chapterId} - Teacher | IQLabs`;
+        document.title = `${this.props.cycle_name} - Teacher | IQLabs`;
 
         this.loadQAData();
     };
@@ -364,7 +372,10 @@ class CycleTestAutoQA extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="Subject name" togglenav={this.toggleSideNav} />
+                <Header
+                    name={this.props.subject_name}
+                    togglenav={this.toggleSideNav}
+                />
 
                 {/* Sidebar */}
                 <SideNav
@@ -390,7 +401,9 @@ class CycleTestAutoQA extends Component {
                         <div className="card primary-bg text-white small mb-4">
                             <div className="card-body">
                                 <div className="row">
-                                    <div className="col-md-7">Section name</div>
+                                    <div className="col-md-7">
+                                        {this.props.section_name}
+                                    </div>
                                     <div className="col-md-5">
                                         <div className="row">
                                             <div className="col-md-4">
@@ -403,7 +416,8 @@ class CycleTestAutoQA extends Component {
                                                 Questions
                                             </div>
                                             <div className="col-md-4">
-                                                Total time: {this.state.duration} mins
+                                                Total time:{" "}
+                                                {this.state.duration} mins
                                             </div>
                                         </div>
                                     </div>
@@ -669,4 +683,4 @@ class CycleTestAutoQA extends Component {
     }
 }
 
-export default CycleTestAutoQA;
+export default connect(mapStateToProps)(CycleTestAutoQA);

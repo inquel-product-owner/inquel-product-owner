@@ -1,8 +1,14 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import Loading from "../sharedComponents/loader";
+
+const mapStateToProps = (state) => ({
+    subject_name: state.subject_name,
+    section_name: state.section_name,
+});
 
 class SemesterAutoQA extends Component {
     constructor(props) {
@@ -334,7 +340,7 @@ class SemesterAutoQA extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.chapterName} - Teacher | IQLabs`;
+        document.title = `${this.props.section_name} - Teacher | IQLabs`;
 
         this.loadQAData();
     };
@@ -363,7 +369,7 @@ class SemesterAutoQA extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="Subject name" togglenav={this.toggleSideNav} />
+                <Header name={this.props.subject_name} togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
                 <SideNav
@@ -389,7 +395,7 @@ class SemesterAutoQA extends Component {
                         <div className="card primary-bg text-white small mb-4">
                             <div className="card-body">
                                 <div className="row">
-                                    <div className="col-md-7">Section name</div>
+                                    <div className="col-md-7">{this.props.section_name}</div>
                                     <div className="col-md-5">
                                         <div className="row">
                                             <div className="col-md-4">
@@ -668,4 +674,4 @@ class SemesterAutoQA extends Component {
     }
 }
 
-export default SemesterAutoQA;
+export default connect(mapStateToProps)(SemesterAutoQA);

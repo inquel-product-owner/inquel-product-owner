@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import Header from "./navbar";
 import SideNav from "./sidenav";
@@ -7,6 +8,10 @@ import Loading from "../sharedComponents/loader";
 import Paginations from "../sharedComponents/pagination";
 import SubjectTable from "../table/subjectTable";
 import CarouselCard from "../sharedComponents/owlCarousel";
+
+const mapStateToProps = (state) => ({
+    group_name: state.group_name,
+});
 
 class Group extends Component {
     constructor(props) {
@@ -80,15 +85,12 @@ class Group extends Component {
     }
 
     render() {
-        document.title =
-            this.state.groupItem.length !== 0
-                ? this.state.groupItem.group_name + " - Teacher | IQLabs"
-                : "Groups - Teacher | IQLabs";
+        document.title = `${this.props.group_name} - Teacher | IQLabs`;
         return (
             <div className="wrapper">
                 {/* Navbar */}
                 <Header
-                    name={this.state.groupItem.group_name}
+                    name={this.props.group_name}
                     togglenav={this.toggleSideNav}
                 />
 
@@ -106,7 +108,7 @@ class Group extends Component {
                     <div className="container-fluid">
                         {/* Back button */}
                         <button
-                            className="btn btn-primary-invert btn-sm mb-2"
+                            className="btn btn-primary-invert btn-sm mb-3"
                             onClick={this.props.history.goBack}
                         >
                             <i className="fas fa-chevron-left fa-sm"></i> Back
@@ -114,7 +116,7 @@ class Group extends Component {
 
                         <div className="row align-items-center mb-3">
                             <div className="col-3">
-                                <h4>{this.state.groupItem.group_name}</h4>
+                                <h4>{this.props.group_name}</h4>
                             </div>
                             <div className="col-9 text-right">
                                 <Link
@@ -215,4 +217,4 @@ class Group extends Component {
     }
 }
 
-export default Group;
+export default connect(mapStateToProps)(Group);

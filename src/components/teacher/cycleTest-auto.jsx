@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
+import store from "../../redux/store";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 // import Select from "react-select";
@@ -6,6 +8,12 @@ import { Link } from "react-router-dom";
 import { Modal, Alert, Spinner } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import Loading from "../sharedComponents/loader";
+
+const mapStateToProps = (state) => ({
+    subject_name: state.subject_name,
+    chapter_name: state.chapter_name,
+    cycle_name: state.cycle_name,
+});
 
 class Scorecard extends Component {
     constructor(props) {
@@ -256,10 +264,7 @@ class Scorecard extends Component {
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
-                <Modal.Header
-                    closeButton
-                    className="align-items-center"
-                >
+                <Modal.Header closeButton className="align-items-center">
                     Scorecard Configuration
                     {this.state.page_loading ? (
                         <Spinner
@@ -1209,13 +1214,20 @@ class CycleTestAuto extends Component {
         });
     };
 
+    dispatchSection = (data) => {
+        store.dispatch({ type: "SECTION", payload: data });
+    };
+
     render() {
         let filterData = [...this.state.filterData];
-        document.title = `${this.state.chapterName} Auto - Teacher | IQLabs`;
+        document.title = `${this.props.chapter_name} Auto - Teacher | IQLabs`;
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="Subject name" togglenav={this.toggleSideNav} />
+                <Header
+                    name={this.props.subject_name}
+                    togglenav={this.toggleSideNav}
+                />
 
                 {/* Sidebar */}
                 <SideNav
@@ -1254,7 +1266,7 @@ class CycleTestAuto extends Component {
                         <div className="card shadow-sm mb-3">
                             <div className="card-body text-center">
                                 <h6 className="mb-0">
-                                    {this.state.chapterName}
+                                    {this.props.cycle_name}
                                 </h6>
                             </div>
                         </div>
@@ -1606,7 +1618,14 @@ class CycleTestAuto extends Component {
                                                                 <Link
                                                                     to={`${this.props.match.url}/section/${section.section_id}/?attempt=${this.state.selectedAttempt}`}
                                                                 >
-                                                                    <button className="btn btn-primary-invert btn-sm shadow-sm">
+                                                                    <button
+                                                                        className="btn btn-primary-invert btn-sm shadow-sm"
+                                                                        onClick={() =>
+                                                                            this.dispatchSection(
+                                                                                section.section_name
+                                                                            )
+                                                                        }
+                                                                    >
                                                                         <i className="fas fa-eye"></i>
                                                                     </button>
                                                                 </Link>
@@ -1653,4 +1672,4 @@ class CycleTestAuto extends Component {
     }
 }
 
-export default CycleTestAuto;
+export default connect(mapStateToProps)(CycleTestAuto);

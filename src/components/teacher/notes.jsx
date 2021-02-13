@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import axios from "axios";
 import Header from "./navbar";
 import SideNav from "./sidenav";
@@ -8,6 +9,12 @@ import { Modal, Alert, Spinner } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import CKeditor from "../sharedComponents/CKeditor";
 import Loading from "../sharedComponents/loader";
+
+const mapStateToProps = (state) => ({
+    subject_name: state.subject_name,
+    chapter_name: state.chapter_name,
+    topic_name: state.topic_name,
+});
 
 class ImageUploadModal extends Component {
     constructor(props) {
@@ -469,7 +476,7 @@ class SubjectNotes extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.chapterId} Notes - Teacher | IQLabs`;
+        document.title = `${this.props.chapter_name} Notes - Teacher | IQLabs`;
 
         this.loadNotesData();
     };
@@ -630,7 +637,7 @@ class SubjectNotes extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="Subject name" togglenav={this.toggleSideNav} />
+                <Header name={this.props.subject_name} togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
                 <SideNav
@@ -688,8 +695,8 @@ class SubjectNotes extends Component {
                                             <span className="font-weight-bold">
                                                 Notes:
                                             </span>{" "}
-                                            {this.chapterId} |{" "}
-                                            {this.topicName}
+                                            {this.props.chapter_name} |{" "}
+                                            {this.props.topic_name}
                                         </p>
                                     </div>
                                     <div className="col-md-6 d-flex align-items-center justify-content-end">
@@ -810,4 +817,4 @@ class SubjectNotes extends Component {
     }
 }
 
-export default SubjectNotes;
+export default connect(mapStateToProps)(SubjectNotes);

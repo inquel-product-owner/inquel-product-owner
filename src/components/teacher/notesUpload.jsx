@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import axios from "axios";
 import Header from "./navbar";
 import SideNav from "./sidenav";
@@ -7,6 +8,12 @@ import { Spinner, Alert, Modal } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import { Document, Page, pdfjs } from "react-pdf";
 import Loading from "../sharedComponents/loader";
+
+const mapStateToProps = (state) => ({
+    subject_name: state.subject_name,
+    chapter_name: state.chapter_name,
+    topic_name: state.topic_name,
+});
 
 class DeleteModal extends Component {
     constructor(props) {
@@ -272,7 +279,7 @@ class NotesUpload extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.chapterId} Notes - Teacher | IQLabs`;
+        document.title = `${this.props.chapter_name} Notes - Teacher | IQLabs`;
 
         this.loadNotesData();
     };
@@ -416,7 +423,7 @@ class NotesUpload extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="Subject name" togglenav={this.toggleSideNav} />
+                <Header name={this.props.subject_name} togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
                 <SideNav
@@ -460,8 +467,8 @@ class NotesUpload extends Component {
                                             <span className="font-weight-bold">
                                                 Notes:
                                             </span>{" "}
-                                            {this.chapterId} |{" "}
-                                            {this.topicName}
+                                            {this.props.chapter_name} |{" "}
+                                            {this.props.topic_name}
                                         </p>
                                     </div>
                                     <div className="col-md-6 d-flex align-items-center justify-content-end">
@@ -644,4 +651,4 @@ class NotesUpload extends Component {
     }
 }
 
-export default NotesUpload;
+export default connect(mapStateToProps)(NotesUpload);

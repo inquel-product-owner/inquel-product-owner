@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from "react";
+import { connect } from "react-redux";
 import axios from "axios";
 import Header from "./navbar";
 import SideNav from "./sidenav";
@@ -17,6 +18,12 @@ import {
 } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import Loading from "../sharedComponents/loader";
+
+const mapStateToProps = (state) => ({
+    subject_name: state.subject_name,
+    chapter_name: state.chapter_name,
+    topic_name: state.topic_name,
+});
 
 class MCQDeleteModal extends Component {
     constructor(props) {
@@ -654,7 +661,7 @@ class SubjectType1 extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.chapterId} Type 1 MCQ - Teacher | IQLabs`;
+        document.title = `${this.props.chapter_name} Type 1 MCQ - Teacher | IQLabs`;
 
         fetch(`${this.url}/teacher/status/data/?theme=1&complexity=1`, {
             headers: this.headers,
@@ -2236,7 +2243,7 @@ class SubjectType1 extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="Subject name" togglenav={this.toggleSideNav} />
+                <Header name={this.props.subject_name} togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
                 <SideNav
@@ -2297,7 +2304,7 @@ class SubjectType1 extends Component {
                                 <div className="row align-items-center">
                                     <div className="col-md-6">
                                         <h5 className="primary-text">
-                                            {`${this.chapterId} - MCQ`}
+                                            {`${this.props.chapter_name} | ${this.props.topic_name} - MCQ`}
                                         </h5>
                                     </div>
                                     <div className="col-md-6">
@@ -4013,4 +4020,4 @@ class SubjectType1 extends Component {
     }
 }
 
-export default SubjectType1;
+export default connect(mapStateToProps)(SubjectType1);
