@@ -278,7 +278,7 @@ class FileModal extends Component {
                                     </Tab.Pane>
                                     <Tab.Pane eventKey="video">
                                         {this.state.video.path !== null ? (
-                                            <video
+                                            <video controls
                                                 src={this.state.video.path}
                                             ></video>
                                         ) : (
@@ -288,7 +288,7 @@ class FileModal extends Component {
                                     <Tab.Pane eventKey="audio">
                                         {this.state.audio.map((item, index) => {
                                             return item.path !== null ? (
-                                                <audio src={item.path}></audio>
+                                                <audio src={item.path} controls></audio>
                                             ) : (
                                                 "Audio not uploaded"
                                             );
