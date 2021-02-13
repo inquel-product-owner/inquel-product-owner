@@ -12,6 +12,7 @@ import {
 import "./material.css";
 import "./grid-overview.css";
 import { Link } from "react-router-dom";
+import store from "../../redux/store";
 
 class SubjectTable extends Component {
     constructor() {
@@ -65,10 +66,14 @@ class SubjectTable extends Component {
         }
     }
 
+    dispatch = (data) => {
+        store.dispatch({ type: "SUBJECT", payload: data });
+    };
+
     viewTemplate = (props) => {
         return (
             <Link to={`/${this.props.path}/subject/${props.id}`}>
-                <button className="btn btn-link btn-sm">
+                <button className="btn btn-link btn-sm" onClick={() => this.dispatch(props.subject_name)}>
                     <i className="fas fa-eye"></i>
                 </button>
             </Link>

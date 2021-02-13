@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import axios from "axios";
 import Header from "./navbar";
 import SideNav from "./sidenav";
@@ -6,6 +7,11 @@ import { Spinner, Alert } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import { Document, Page, pdfjs } from "react-pdf";
 import Loading from "../sharedComponents/loader";
+
+const mapStateToProps = (state) => ({
+    subject_name: state.subject_name,
+    semester_name: state.semester_name,
+});
 
 class SemesterDirect extends Component {
     constructor(props) {
@@ -94,7 +100,7 @@ class SemesterDirect extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `Semester name - Teacher | IQLabs`;
+        document.title = `${this.props.semester_name} - Teacher | IQLabs`;
 
         this.loadSemesterData();
     };
@@ -284,7 +290,10 @@ class SemesterDirect extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="Subject name" togglenav={this.toggleSideNav} />
+                <Header
+                    name={this.props.subject_name}
+                    togglenav={this.toggleSideNav}
+                />
 
                 {/* Sidebar */}
                 <SideNav
@@ -309,7 +318,7 @@ class SemesterDirect extends Component {
                         <div className="row mb-4">
                             <div className="col-md-6">
                                 <h5 className="primary-text mb-0">
-                                    Semester name
+                                    {this.props.semester_name}
                                 </h5>
                             </div>
                         </div>
@@ -323,6 +332,7 @@ class SemesterDirect extends Component {
                                         type="datetime-local"
                                         name="exam_date"
                                         id="exam_date"
+                                        value={this.state.exam_date}
                                         className="form-control form-shadow"
                                         onChange={this.handleDate}
                                     />
@@ -337,6 +347,7 @@ class SemesterDirect extends Component {
                                         type="time"
                                         name="starts_at"
                                         id="starts_at"
+                                        value={this.state.starts_at}
                                         className="form-control form-shadow"
                                         onChange={this.handleTime}
                                     />
@@ -349,6 +360,7 @@ class SemesterDirect extends Component {
                                         type="time"
                                         name="ends_at"
                                         id="ends_at"
+                                        value={this.state.ends_at}
                                         className="form-control form-shadow"
                                         onChange={this.handleTime}
                                     />
@@ -528,4 +540,4 @@ class SemesterDirect extends Component {
     }
 }
 
-export default SemesterDirect;
+export default connect(mapStateToProps)(SemesterDirect);

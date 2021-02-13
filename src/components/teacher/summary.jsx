@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import axios from "axios";
 import Header from "./navbar";
 import SideNav from "./sidenav";
@@ -11,6 +12,11 @@ import Loading from "../sharedComponents/loader";
 // import { CKEditor } from "@ckeditor/ckeditor5-react";
 // import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 // import CKFinder from "@ckeditor/ckeditor5-ckfinder/src/ckfinder";
+
+const mapStateToProps = (state) => ({
+    subject_name: state.subject_name,
+    chapter_name: state.chapter_name,
+});
 
 class ImageUploadModal extends Component {
     constructor(props) {
@@ -116,10 +122,7 @@ class ImageUploadModal extends Component {
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
-                <Modal.Header
-                    closeButton
-                    className="align-items-center"
-                >
+                <Modal.Header closeButton className="align-items-center">
                     Upload Image
                     {this.state.showLoader ? (
                         <Spinner
@@ -468,7 +471,7 @@ class SubjectSummary extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.chapterId} Summary - Teacher | IQLabs`;
+        document.title = `${this.props.chapter_name} Summary - Teacher | IQLabs`;
 
         this.loadSummaryData();
     };
@@ -620,7 +623,10 @@ class SubjectSummary extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="Subject name" togglenav={this.toggleSideNav} />
+                <Header
+                    name={this.props.subject_name}
+                    togglenav={this.toggleSideNav}
+                />
 
                 {/* Sidebar */}
                 <SideNav
@@ -675,12 +681,13 @@ class SubjectSummary extends Component {
                                             <span className="font-weight-bold">
                                                 Summary:
                                             </span>{" "}
-                                            Chapter name
+                                            {this.props.chapter_name}
                                         </p>
                                     </div>
                                     <div className="col-md-6 d-flex align-items-center justify-content-end">
                                         {this.state.summary_id !== "" &&
-                                        this.state.summary_name !== undefined ? (
+                                        this.state.summary_name !==
+                                            undefined ? (
                                             <button
                                                 className="btn btn-primary btn-sm mr-2"
                                                 onClick={this.toggleDeleteModal}
@@ -811,4 +818,4 @@ class SubjectSummary extends Component {
     }
 }
 
-export default SubjectSummary;
+export default connect(mapStateToProps)(SubjectSummary);

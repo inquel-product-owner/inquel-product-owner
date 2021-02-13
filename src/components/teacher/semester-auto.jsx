@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
+import store from "../../redux/store";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { Link } from "react-router-dom";
@@ -603,6 +605,11 @@ class Scorecard extends Component {
     }
 }
 
+const mapStateToProps = (state) => ({
+    subject_name: state.subject_name,
+    semester_name: state.semester_name,
+});
+
 class SemesterAuto extends Component {
     constructor(props) {
         super(props);
@@ -1148,13 +1155,20 @@ class SemesterAuto extends Component {
         });
     };
 
+    dispatchSection = (data) => {
+        store.dispatch({ type: "SECTION", payload: data });
+    };
+
     render() {
         let filterData = [...this.state.filterData];
-        document.title = `Semester Auto - Teacher | IQLabs`;
+        document.title = `${this.props.semester_name} Auto - Teacher | IQLabs`;
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="Subject name" togglenav={this.toggleSideNav} />
+                <Header
+                    name={this.props.subject_name}
+                    togglenav={this.toggleSideNav}
+                />
 
                 {/* Sidebar */}
                 <SideNav
@@ -1192,7 +1206,7 @@ class SemesterAuto extends Component {
                         <div className="card shadow-sm mb-3">
                             <div className="card-body text-center">
                                 <h6 className="primary-text mb-0">
-                                    Semester name
+                                    {this.props.semester_name}
                                 </h6>
                             </div>
                         </div>
@@ -1524,7 +1538,14 @@ class SemesterAuto extends Component {
                                                                 <Link
                                                                     to={`${this.props.match.url}/section/${section.section_id}/?attempt=${this.state.selectedAttempt}`}
                                                                 >
-                                                                    <button className="btn btn-primary-invert btn-sm shadow-sm">
+                                                                    <button
+                                                                        className="btn btn-primary-invert btn-sm shadow-sm"
+                                                                        onClick={() =>
+                                                                            this.dispatchSection(
+                                                                                section.section_name
+                                                                            )
+                                                                        }
+                                                                    >
                                                                         <i className="fas fa-eye"></i>
                                                                     </button>
                                                                 </Link>
@@ -1571,4 +1592,4 @@ class SemesterAuto extends Component {
     }
 }
 
-export default SemesterAuto;
+export default connect(mapStateToProps)(SemesterAuto);

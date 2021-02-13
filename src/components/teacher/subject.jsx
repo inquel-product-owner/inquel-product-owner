@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import store from "../../redux/store";
+import { connect } from "react-redux";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { Link } from "react-router-dom";
@@ -973,6 +975,10 @@ class SemesterEditModal extends Component {
 //     }
 // }
 
+const mapStateToProps = (state) => ({
+    subject_name: state.subject_name,
+});
+
 class SubjectChapters extends Component {
     constructor(props) {
         super(props);
@@ -1111,7 +1117,7 @@ class SubjectChapters extends Component {
     };
 
     componentDidMount = () => {
-        document.title = "Subject name - Teacher | IQLabs";
+        document.title = `${this.props.subject_name} - Teacher | IQLabs`;
 
         this.loadChapterData();
         this.loadSemesterData();
@@ -1171,11 +1177,22 @@ class SubjectChapters extends Component {
         }
     };
 
+    dispatchChapter = (data) => {
+        store.dispatch({ type: "CHAPTER", payload: data });
+    };
+
+    dispatchSemester = (data) => {
+        store.dispatch({ type: "SEMESTER", payload: data });
+    };
+
     render() {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="Subject name" togglenav={this.toggleSideNav} />
+                <Header
+                    name={this.props.subject_name}
+                    togglenav={this.toggleSideNav}
+                />
 
                 {/* Sidebar */}
                 <SideNav
@@ -1279,7 +1296,9 @@ class SubjectChapters extends Component {
                         {/* Header area */}
                         <div className="row align-items-center">
                             <div className="col-md-2">
-                                <h5 className="primary-text">Subject name</h5>
+                                <h5 className="primary-text">
+                                    {this.props.subject_name}
+                                </h5>
                             </div>
                             <div className="col-md-10">
                                 <div className="d-flex flex-wrap justify-content-end mb-4">
@@ -1351,7 +1370,14 @@ class SubjectChapters extends Component {
                                                                                       to={`${this.props.match.url}/chapter/${chapter.chapter_id}/summary/upload`}
                                                                                       className="primary-text"
                                                                                   >
-                                                                                      <button className="btn btn-primary btn-sm mr-2">
+                                                                                      <button
+                                                                                          className="btn btn-primary btn-sm mr-2"
+                                                                                          onClick={() =>
+                                                                                              this.dispatchChapter(
+                                                                                                  chapter.chapter_name
+                                                                                              )
+                                                                                          }
+                                                                                      >
                                                                                           <i className="fas fa-file-upload"></i>
                                                                                       </button>
                                                                                   </Link>
@@ -1359,7 +1385,14 @@ class SubjectChapters extends Component {
                                                                                       to={`${this.props.match.url}/chapter/${chapter.chapter_id}/summary`}
                                                                                       className="primary-text"
                                                                                   >
-                                                                                      <button className="btn btn-primary btn-sm">
+                                                                                      <button
+                                                                                          className="btn btn-primary btn-sm"
+                                                                                          onClick={() =>
+                                                                                              this.dispatchChapter(
+                                                                                                  chapter.chapter_name
+                                                                                              )
+                                                                                          }
+                                                                                      >
                                                                                           <i className="fas fa-file-medical"></i>
                                                                                       </button>
                                                                                   </Link>
@@ -1368,7 +1401,14 @@ class SubjectChapters extends Component {
                                                                                   <Link
                                                                                       to={`${this.props.match.url}/chapter/${chapter.chapter_id}`}
                                                                                   >
-                                                                                      <button className="btn btn-primary btn-sm">
+                                                                                      <button
+                                                                                          className="btn btn-primary btn-sm"
+                                                                                          onClick={() =>
+                                                                                              this.dispatchChapter(
+                                                                                                  chapter.chapter_name
+                                                                                              )
+                                                                                          }
+                                                                                      >
                                                                                           Add
                                                                                       </button>
                                                                                   </Link>
@@ -1415,7 +1455,14 @@ class SubjectChapters extends Component {
                                                                           <Link
                                                                               to={`${this.props.match.url}/semester/${data.semester_id}`}
                                                                           >
-                                                                              <button className="btn btn-primary btn-sm">
+                                                                              <button
+                                                                                  className="btn btn-primary btn-sm"
+                                                                                  onClick={() =>
+                                                                                      this.dispatchSemester(
+                                                                                          data.semester_name
+                                                                                      )
+                                                                                  }
+                                                                              >
                                                                                   Auto
                                                                               </button>
                                                                           </Link>
@@ -1429,7 +1476,14 @@ class SubjectChapters extends Component {
                                                                           <Link
                                                                               to={`${this.props.match.url}/semester/${data.semester_id}/direct`}
                                                                           >
-                                                                              <button className="btn btn-primary btn-sm ml-2">
+                                                                              <button
+                                                                                  className="btn btn-primary btn-sm ml-2"
+                                                                                  onClick={() =>
+                                                                                      this.dispatchSemester(
+                                                                                          data.semester_name
+                                                                                      )
+                                                                                  }
+                                                                              >
                                                                                   Direct
                                                                                   Test
                                                                               </button>
@@ -1489,7 +1543,14 @@ class SubjectChapters extends Component {
                                                                       to={`${this.props.match.url}/chapter/${chapter.chapter_id}/summary/upload`}
                                                                       className="primary-text"
                                                                   >
-                                                                      <button className="btn btn-primary btn-sm mr-2">
+                                                                      <button
+                                                                          className="btn btn-primary btn-sm mr-2"
+                                                                          onClick={() =>
+                                                                              this.dispatchChapter(
+                                                                                  chapter.chapter_name
+                                                                              )
+                                                                          }
+                                                                      >
                                                                           <i className="fas fa-file-upload"></i>
                                                                       </button>
                                                                   </Link>
@@ -1497,7 +1558,14 @@ class SubjectChapters extends Component {
                                                                       to={`${this.props.match.url}/chapter/${chapter.chapter_id}/summary`}
                                                                       className="primary-text"
                                                                   >
-                                                                      <button className="btn btn-primary btn-sm">
+                                                                      <button
+                                                                          className="btn btn-primary btn-sm"
+                                                                          onClick={() =>
+                                                                              this.dispatchChapter(
+                                                                                  chapter.chapter_name
+                                                                              )
+                                                                          }
+                                                                      >
                                                                           <i className="fas fa-file-medical"></i>
                                                                       </button>
                                                                   </Link>
@@ -1506,7 +1574,14 @@ class SubjectChapters extends Component {
                                                                   <Link
                                                                       to={`${this.props.match.url}/chapter/${chapter.chapter_id}`}
                                                                   >
-                                                                      <button className="btn btn-primary btn-sm">
+                                                                      <button
+                                                                          className="btn btn-primary btn-sm"
+                                                                          onClick={() =>
+                                                                              this.dispatchChapter(
+                                                                                  chapter.chapter_name
+                                                                              )
+                                                                          }
+                                                                      >
                                                                           Add
                                                                       </button>
                                                                   </Link>
@@ -1564,4 +1639,4 @@ class SubjectChapters extends Component {
     }
 }
 
-export default SubjectChapters;
+export default connect(mapStateToProps)(SubjectChapters);
