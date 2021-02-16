@@ -629,6 +629,10 @@ class ProfileList extends Component {
             activeStudentPage: 1,
             totalStudentCount: 0,
             showSideNav: false,
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
 
             activeTab: "teacher",
             showStudentModal: false,

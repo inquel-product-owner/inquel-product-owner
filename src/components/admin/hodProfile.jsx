@@ -11,6 +11,7 @@ import Loading from "../sharedComponents/loader";
 import GroupTable from "../table/groupTable";
 import Paginations from "../sharedComponents/pagination";
 import ReactSwitch from "../sharedComponents/switchComponent";
+import dateFormat from "dateformat";
 
 class HodProfile extends Component {
     constructor(props) {
@@ -155,15 +156,6 @@ class HodProfile extends Component {
             });
     };
 
-    apiDateConversion = (date) => {
-        var d = new Date(date).toLocaleDateString();
-        var datearray = d.split("/");
-        var year = datearray[2];
-        var month = datearray[0];
-        var day = datearray[1];
-        return `${year}-${month}-${day} 00:00:00`;
-    };
-
     loadHodData = () => {
         fetch(`${this.url}/hod/${this.hodId}/`, {
             headers: this.headers,
@@ -180,11 +172,13 @@ class HodProfile extends Component {
                         result.data.permissions[0].sub_category,
                     selectedDiscipline: result.data.permissions[0].discipline,
                     selectedBoard: result.data.permissions[0].board,
-                    selectedValid_from: this.apiDateConversion(
-                        result.data.permissions[0].valid_from
+                    selectedValid_from: dateFormat(
+                        result.data.permissions[0].valid_from,
+                        "yyyy-mm-dd '00:00:00'"
                     ),
-                    selectedValid_to: this.apiDateConversion(
-                        result.data.permissions[0].valid_to
+                    selectedValid_to: dateFormat(
+                        result.data.permissions[0].valid_to,
+                        "yyyy-mm-dd '00:00:00'"
                     ),
                     progressivescore: result.data.permissions[0].prog_sco_card,
                     type1: result.data.permissions[0].type_1_q,
@@ -348,20 +342,20 @@ class HodProfile extends Component {
 
     handleValid_from = (event) => {
         this.setState({
-            selectedValid_from: `${event.target.value} 00:00:00`,
+            selectedValid_from: `${dateFormat(
+                event.target.value,
+                "yyyy-mm-dd"
+            )} 00:00:00`,
         });
     };
 
     handleValid_to = (event) => {
         this.setState({
-            selectedValid_to: `${event.target.value} 00:00:00`,
+            selectedValid_to: `${dateFormat(
+                event.target.value,
+                "yyyy-mm-dd"
+            )} 00:00:00`,
         });
-    };
-
-    dateConversion = (date) => {
-        var d = new Date(date).toLocaleDateString();
-        var datearray = d.split("/");
-        return datearray[1] + "/" + datearray[0] + "/" + datearray[2];
     };
 
     handlePSChange = () => {
@@ -648,9 +642,10 @@ class HodProfile extends Component {
                                             Valid From
                                         </p>
                                         <p className="mb-0">
-                                            {this.dateConversion(
+                                            {dateFormat(
                                                 this.state.permissions
-                                                    .valid_from
+                                                    .valid_from,
+                                                "dd/mm/yyyy"
                                             )}
                                         </p>
                                     </div>
@@ -659,8 +654,9 @@ class HodProfile extends Component {
                                             Valid To
                                         </p>
                                         <p className="mb-0">
-                                            {this.dateConversion(
-                                                this.state.permissions.valid_to
+                                            {dateFormat(
+                                                this.state.permissions.valid_to,
+                                                "dd/mm/yyyy"
                                             )}
                                         </p>
                                     </div>
@@ -1174,7 +1170,7 @@ class HodProfile extends Component {
                                         <div className="row mb-2">
                                             <div className="col-9">
                                                 <p className="primary-text small mb-0 font-weight-bold">
-                                                    Notes download
+                                                    Notes
                                                 </p>
                                             </div>
                                             <div className="col-3 text-right">

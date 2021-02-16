@@ -18,6 +18,7 @@ import {
 } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import Loading from "../sharedComponents/loader";
+import AlertModal from "../sharedComponents/alertModal";
 
 const mapStateToProps = (state) => ({
     subject_name: state.subject_name,
@@ -321,6 +322,8 @@ class SubjectType1 extends Component {
         this.state = {
             showSideNav: false,
             showModal: false,
+            showAlertModal: false,
+            alertMsg: "",
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
@@ -447,224 +450,266 @@ class SubjectType1 extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                let data = [];
-                let keyboards = [];
-                let images = [];
-                let audio = [];
-                let response = result.data.results[0].mcq;
-                if (response.length !== 0) {
-                    for (let i = 0; i < response.length; i++) {
-                        images = [];
-                        audio = [];
-                        if (response[i].files.length !== 0) {
-                            // image
-                            if (response[i].files[0].type1_image_1) {
-                                images.push({
-                                    title:
-                                        response[i].files[0]
-                                            .type1_image_1_title,
-                                    file_name: "",
-                                    image: null,
-                                    path: response[i].files[0].type1_image_1,
-                                });
-                            }
-                            if (response[i].files[0].type1_image_2) {
-                                images.push({
-                                    title:
-                                        response[i].files[0]
-                                            .type1_image_2_title,
-                                    file_name: "",
-                                    image: null,
-                                    path: response[i].files[0].type1_image_2,
-                                });
-                            }
-                            if (response[i].files[0].type1_image_3) {
-                                images.push({
-                                    title:
-                                        response[i].files[0]
-                                            .type1_image_3_title,
-                                    file_name: "",
-                                    image: null,
-                                    path: response[i].files[0].type1_image_3,
-                                });
-                            }
-                            if (response[i].files[0].type1_image_4) {
-                                images.push({
-                                    title:
-                                        response[i].files[0]
-                                            .type1_image_4_title,
-                                    file_name: "",
-                                    image: null,
-                                    path: response[i].files[0].type1_image_4,
-                                });
+                console.log(result.sts);
+                if (result.sts === true) {
+                    let data = [];
+                    let keyboards = [];
+                    let images = [];
+                    let audio = [];
+                    let response = result.data.results[0].mcq;
+                    if (response.length !== 0) {
+                        for (let i = 0; i < response.length; i++) {
+                            images = [];
+                            audio = [];
+                            if (response[i].files.length !== 0) {
+                                // image
+                                if (response[i].files[0].type1_image_1) {
+                                    images.push({
+                                        title:
+                                            response[i].files[0]
+                                                .type1_image_1_title,
+                                        file_name: "",
+                                        image: null,
+                                        path:
+                                            response[i].files[0].type1_image_1,
+                                    });
+                                }
+                                if (response[i].files[0].type1_image_2) {
+                                    images.push({
+                                        title:
+                                            response[i].files[0]
+                                                .type1_image_2_title,
+                                        file_name: "",
+                                        image: null,
+                                        path:
+                                            response[i].files[0].type1_image_2,
+                                    });
+                                }
+                                if (response[i].files[0].type1_image_3) {
+                                    images.push({
+                                        title:
+                                            response[i].files[0]
+                                                .type1_image_3_title,
+                                        file_name: "",
+                                        image: null,
+                                        path:
+                                            response[i].files[0].type1_image_3,
+                                    });
+                                }
+                                if (response[i].files[0].type1_image_4) {
+                                    images.push({
+                                        title:
+                                            response[i].files[0]
+                                                .type1_image_4_title,
+                                        file_name: "",
+                                        image: null,
+                                        path:
+                                            response[i].files[0].type1_image_4,
+                                    });
+                                }
+
+                                // audio
+                                if (response[i].files[0].type1_audio_1) {
+                                    audio.push({
+                                        title:
+                                            response[i].files[0]
+                                                .type1_audio_1_title,
+                                        file_name: "",
+                                        audio: null,
+                                        path:
+                                            response[i].files[0].type1_audio_1,
+                                    });
+                                }
+                                if (response[i].files[0].type1_audio_2) {
+                                    audio.push({
+                                        title:
+                                            response[i].files[0]
+                                                .type1_audio_2_title,
+                                        file_name: "",
+                                        audio: null,
+                                        path:
+                                            response[i].files[0].type1_audio_2,
+                                    });
+                                }
                             }
 
-                            // audio
-                            if (response[i].files[0].type1_audio_1) {
-                                audio.push({
-                                    title:
-                                        response[i].files[0]
-                                            .type1_audio_1_title,
-                                    file_name: "",
-                                    audio: null,
-                                    path: response[i].files[0].type1_audio_1,
-                                });
+                            // video
+                            var path = "";
+                            if (response[i].files.length !== 0) {
+                                if (response[i].files[0].paste_video_url) {
+                                    path = response[i].files[0].paste_video_url;
+                                }
+                                if (response[i].files[0].type1_video_1) {
+                                    path = response[i].files[0].type1_video_1;
+                                }
                             }
-                            if (response[i].files[0].type1_audio_2) {
-                                audio.push({
-                                    title:
-                                        response[i].files[0]
-                                            .type1_audio_2_title,
-                                    file_name: "",
-                                    audio: null,
-                                    path: response[i].files[0].type1_audio_2,
-                                });
-                            }
-                        }
 
-                        // video
-                        var path = "";
-                        if (response[i].files.length !== 0) {
-                            if (response[i].files[0].paste_video_url) {
-                                path = response[i].files[0].paste_video_url;
-                            }
-                            if (response[i].files[0].type1_video_1) {
-                                path = response[i].files[0].type1_video_1;
-                            }
-                        }
-
-                        data.push({
-                            chapter_id: this.props.match.params.chapterId,
-                            topic_name: this.props.match.params.topicName,
-                            question: response[i].question,
-                            question_random_id: response[i].question_random_id,
-                            is_image_uploaded:
-                                response[i].files.length !== 0 ? true : false,
-                            content: {
-                                mcq: response[i].mcq,
-                                fill_in: response[i].fill_in,
-                                boolean: response[i].boolean,
-                                fillin_answer:
-                                    response[i].fillin_answer.length !== 0
-                                        ? response[i].fillin_answer
-                                        : [""],
-                                boolean_question:
-                                    response[i].boolean_question.length !== 0
-                                        ? response[i].boolean_question
-                                        : [
-                                              {
-                                                  correct: false,
-                                                  content: "True",
-                                              },
-                                              {
-                                                  correct: false,
-                                                  content: "False",
-                                              },
-                                          ],
-                                options:
-                                    response[i].options.length !== 0
-                                        ? response[i].options
-                                        : [
-                                              { correct: false, content: "" },
-                                              { correct: false, content: "" },
-                                              { correct: false, content: "" },
-                                              { correct: false, content: "" },
-                                          ],
-                                explanation: response[i].explanation,
-                                images:
-                                    images.length === 0
-                                        ? [
-                                              {
-                                                  title: "",
-                                                  file_name: "",
-                                                  image: null,
-                                                  path: "",
-                                              },
-                                          ]
-                                        : images,
-                                video: {
-                                    title:
-                                        response[i].files.length !== 0 &&
-                                        response[i].files[0].type1_video_1_title
-                                            ? response[i].files[0]
-                                                  .type1_video_1_title
-                                            : "",
-                                    file_name: "",
-                                    video: null,
-                                    path: path,
-                                    url: "",
+                            data.push({
+                                chapter_id: this.props.match.params.chapterId,
+                                topic_name: this.props.match.params.topicName,
+                                question: response[i].question,
+                                question_random_id:
+                                    response[i].question_random_id,
+                                is_image_uploaded:
+                                    response[i].files.length !== 0
+                                        ? true
+                                        : false,
+                                content: {
+                                    mcq: response[i].mcq,
+                                    fill_in: response[i].fill_in,
+                                    boolean: response[i].boolean,
+                                    fillin_answer:
+                                        response[i].fillin_answer.length !== 0
+                                            ? response[i].fillin_answer
+                                            : [""],
+                                    boolean_question:
+                                        response[i].boolean_question.length !==
+                                        0
+                                            ? response[i].boolean_question
+                                            : [
+                                                  {
+                                                      correct: false,
+                                                      content: "True",
+                                                  },
+                                                  {
+                                                      correct: false,
+                                                      content: "False",
+                                                  },
+                                              ],
+                                    options:
+                                        response[i].options.length !== 0
+                                            ? response[i].options
+                                            : [
+                                                  {
+                                                      correct: false,
+                                                      content: "",
+                                                  },
+                                                  {
+                                                      correct: false,
+                                                      content: "",
+                                                  },
+                                                  {
+                                                      correct: false,
+                                                      content: "",
+                                                  },
+                                                  {
+                                                      correct: false,
+                                                      content: "",
+                                                  },
+                                              ],
+                                    explanation: response[i].explanation,
+                                    images:
+                                        images.length === 0
+                                            ? [
+                                                  {
+                                                      title: "",
+                                                      file_name: "",
+                                                      image: null,
+                                                      path: "",
+                                                  },
+                                              ]
+                                            : images,
+                                    video: {
+                                        title:
+                                            response[i].files.length !== 0 &&
+                                            response[i].files[0]
+                                                .type1_video_1_title
+                                                ? response[i].files[0]
+                                                      .type1_video_1_title
+                                                : "",
+                                        file_name: "",
+                                        video: null,
+                                        path: path,
+                                        url: "",
+                                    },
+                                    audio:
+                                        audio.length === 0
+                                            ? [
+                                                  {
+                                                      title: "",
+                                                      file_name: "",
+                                                      audio: null,
+                                                      path: "",
+                                                  },
+                                                  {
+                                                      title: "",
+                                                      file_name: "",
+                                                      audio: null,
+                                                      path: "",
+                                                  },
+                                              ]
+                                            : audio,
                                 },
-                                audio:
-                                    audio.length === 0
-                                        ? [
-                                              {
-                                                  title: "",
-                                                  file_name: "",
-                                                  audio: null,
-                                                  path: "",
-                                              },
-                                              {
-                                                  title: "",
-                                                  file_name: "",
-                                                  audio: null,
-                                                  path: "",
-                                              },
-                                          ]
-                                        : audio,
-                            },
-                            properties: {
-                                marks: response[i].properties.marks,
-                                complexity: response[i].properties.complexity,
-                                priority: response[i].properties.priority,
-                                theme: response[i].properties.theme,
-                                test: response[i].properties.test,
-                                semester: response[i].properties.semester,
-                                quiz: response[i].properties.quiz,
-                                learn: response[i].properties.learn,
-                            },
-                            settings: {
-                                virtual_keyboard:
-                                    response[i].settings.virtual_keyboard,
-                                limited: response[i].settings.limited,
-                            },
-                        });
+                                properties: {
+                                    marks: response[i].properties.marks,
+                                    complexity:
+                                        response[i].properties.complexity,
+                                    priority: response[i].properties.priority,
+                                    theme: response[i].properties.theme,
+                                    test: response[i].properties.test,
+                                    semester: response[i].properties.semester,
+                                    quiz: response[i].properties.quiz,
+                                    learn: response[i].properties.learn,
+                                },
+                                settings: {
+                                    virtual_keyboard:
+                                        response[i].settings.virtual_keyboard,
+                                    limited: response[i].settings.limited,
+                                },
+                            });
 
-                        // Keyboards
-                        let boards = {
-                            all: false,
-                            chemistry: false,
-                            physics: false,
-                            maths: false,
-                        };
-                        let virtual_keyboard =
-                            response[i].settings.virtual_keyboard;
-                        for (let j = 0; j < virtual_keyboard.length; j++) {
-                            if (virtual_keyboard[j] === "All") {
-                                boards.all = true;
-                                boards.chemistry = true;
-                                boards.maths = true;
-                                boards.physics = true;
-                            } else if (virtual_keyboard[j] === "Chemistry") {
-                                boards.chemistry = true;
-                            } else if (virtual_keyboard[j] === "Physics") {
-                                boards.physics = true;
-                            } else if (virtual_keyboard[j] === "Maths") {
-                                boards.maths = true;
+                            // Keyboards
+                            let boards = {
+                                all: false,
+                                chemistry: false,
+                                physics: false,
+                                maths: false,
+                            };
+                            let virtual_keyboard =
+                                response[i].settings.virtual_keyboard;
+                            for (let j = 0; j < virtual_keyboard.length; j++) {
+                                if (virtual_keyboard[j] === "All") {
+                                    boards.all = true;
+                                    boards.chemistry = true;
+                                    boards.maths = true;
+                                    boards.physics = true;
+                                } else if (
+                                    virtual_keyboard[j] === "Chemistry"
+                                ) {
+                                    boards.chemistry = true;
+                                } else if (virtual_keyboard[j] === "Physics") {
+                                    boards.physics = true;
+                                } else if (virtual_keyboard[j] === "Maths") {
+                                    boards.maths = true;
+                                }
                             }
+                            keyboards.push(boards);
                         }
-                        keyboards.push(boards);
+                        this.setState({
+                            questions: data,
+                            keyboards: keyboards,
+                            page_loading: false,
+                        });
+                    } else {
+                        this.setState({
+                            page_loading: false,
+                        });
+                    }
+                } else {
+                    if (result.detail) {
+                        this.setState({
+                            alertMsg: result.detail,
+                        });
+                    } else {
+                        this.setState({
+                            alertMsg: result.msg,
+                        });
                     }
                     this.setState({
-                        questions: data,
-                        keyboards: keyboards,
-                        page_loading: false,
-                    });
-                } else {
-                    this.setState({
+                        showAlertModal: true,
                         page_loading: false,
                     });
                 }
-                console.log(result);
             })
             .catch((err) => {
                 console.log(err);
@@ -2287,6 +2332,14 @@ class SubjectType1 extends Component {
                         image={this.state.selectedImage}
                         video={this.state.selectedVideo}
                         audio={this.state.selectedAudio}
+                    />
+                ) : null}
+
+                {this.state.showAlertModal ? (
+                    <AlertModal
+                        show={this.state.showAlertModal}
+                        msg={this.state.alertMsg}
+                        goBack={this.props.history.goBack}
                     />
                 ) : null}
 

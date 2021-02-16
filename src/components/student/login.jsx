@@ -61,7 +61,7 @@ function ForgotPasswordModal(props) {
             aria-labelledby="contained-modal-title-vcenter"
             centered
         >
-            <Modal.Header closeButton className="primary-text h5">
+            <Modal.Header closeButton>
                 Forgot password
             </Modal.Header>
             <Modal.Body>
@@ -300,9 +300,9 @@ class StudentLogin extends Component {
                             <div className="col-md-5">
                                 <div className="card shadow py-2">
                                     <div className="card-body ">
-                                        <h3 className="primary-text mb-4">
-                                            LOGIN
-                                        </h3>
+                                        <h4 className="primary-text mb-4">
+                                            STUDENT LOGIN
+                                        </h4>
                                         <Alert
                                             variant="danger"
                                             show={this.state.showErrorAlert}

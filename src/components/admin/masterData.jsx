@@ -154,21 +154,15 @@ class MasterData extends Component {
                     }`}
                 >
                     <div className="container-fluid">
-                        {/* Back button */}
-                        <button
-                            className="btn btn-primary-invert btn-sm mb-2"
-                            onClick={this.props.history.goBack}
-                        >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
-                        </button>
-
-                        <div className="d-flex flex-wrap mb-4">
-                            <Link to="/admin/course-management">
-                                <button className="btn btn-secondary btn-sm mr-1">
-                                    Course Master Data{" "}
-                                    <i className="fas fa-chevron-right fa-sm ml-2"></i>
-                                </button>
-                            </Link>
+                        <div className="d-flex justify-content-between flex-wrap mb-4">
+                            {/* Back button */}
+                            <button
+                                className="btn btn-primary-invert btn-sm mr-2"
+                                onClick={this.props.history.goBack}
+                            >
+                                <i className="fas fa-chevron-left fa-sm"></i>{" "}
+                                Back
+                            </button>
                             <Link to="/admin/course-management/discounts">
                                 <button className="btn btn-outline-secondary btn-sm">
                                     Discounts Configuration{" "}
@@ -237,7 +231,7 @@ class MasterData extends Component {
                                             />
                                         </div>
 
-                                        <button className="btn btn-light btn-sm btn-block mb-2">
+                                        <button className="btn btn-light btn-sm btn-block shadow-sm mb-2">
                                             Add +
                                         </button>
 
@@ -277,7 +271,7 @@ class MasterData extends Component {
                                             />
                                         </div>
 
-                                        <button className="btn btn-light btn-sm btn-block">
+                                        <button className="btn btn-light btn-sm btn-block shadow-sm">
                                             Add +
                                         </button>
                                     </div>
@@ -318,7 +312,7 @@ class MasterData extends Component {
                                                             Data not available
                                                         </p>
                                                     )}
-                                                    <button className="btn btn-light btn-sm btn-block">
+                                                    <button className="btn btn-light btn-sm btn-block shadow-sm">
                                                         Add +
                                                     </button>
                                                 </div>
@@ -351,7 +345,7 @@ class MasterData extends Component {
                                                             Data not available
                                                         </p>
                                                     )}
-                                                    <button className="btn btn-light btn-sm btn-block">
+                                                    <button className="btn btn-light btn-sm btn-block shadow-sm">
                                                         Add +
                                                     </button>
                                                 </div>
@@ -384,7 +378,7 @@ class MasterData extends Component {
                                                             Data not available
                                                         </p>
                                                     )}
-                                                    <button className="btn btn-light btn-sm btn-block">
+                                                    <button className="btn btn-light btn-sm btn-block shadow-sm">
                                                         Add +
                                                     </button>
                                                 </div>
@@ -429,7 +423,7 @@ class MasterData extends Component {
                                                             Data not available
                                                         </p>
                                                     )}
-                                                    <button className="btn btn-light btn-sm btn-block">
+                                                    <button className="btn btn-light btn-sm btn-block shadow-sm">
                                                         Add +
                                                     </button>
                                                 </div>
@@ -474,7 +468,7 @@ class MasterData extends Component {
                                                             Data not available
                                                         </p>
                                                     )}
-                                                    <button className="btn btn-light btn-sm btn-block">
+                                                    <button className="btn btn-light btn-sm btn-block shadow-sm">
                                                         Add +
                                                     </button>
                                                 </div>

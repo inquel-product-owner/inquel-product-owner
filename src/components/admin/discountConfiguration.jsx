@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import Header from "./navbar";
 import SideNav from "./sidenav";
-import { Link } from "react-router-dom";
 
 class DiscountConfiguration extends Component {
     constructor(props) {
@@ -47,27 +46,9 @@ class DiscountConfiguration extends Component {
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
 
-                        <div className="row mb-3">
-                            <div className="col-md-6 order-md-1 order-2">
-                                <h5 className="primary-text">
-                                    Discount Configuration
-                                </h5>
-                            </div>
-                            <div className="col-md-6 text-left text-md-right order-md-2 order-1 mb-4 mb-md-0">
-                                <Link to="/admin/course-management">
-                                    <button className="btn btn-outline-secondary btn-sm mr-1">
-                                        Course Master Data{" "}
-                                        <i className="fas fa-chevron-right fa-sm ml-2"></i>
-                                    </button>
-                                </Link>
-                                <Link to="/admin/course-management/discounts">
-                                    <button className="btn btn-secondary btn-sm">
-                                        Discounts Configuration{" "}
-                                        <i className="fas fa-chevron-right fa-sm ml-2"></i>
-                                    </button>
-                                </Link>
-                            </div>
-                        </div>
+                        <h5 className="primary-text mb-3">
+                            Discount Configuration
+                        </h5>
 
                         {/* Discount data */}
                         <div className="card shadow-sm">

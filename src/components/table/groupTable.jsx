@@ -13,17 +13,14 @@ import "./material.css";
 import "./grid-overview.css";
 import { Link } from "react-router-dom";
 import store from "../../redux/store";
+import dateFormat from "dateformat";
 
 function valid_fromDate(props) {
-    var newDate = new Date(props.valid_from).toLocaleDateString();
-    var datearray = newDate.split("/");
-    return datearray[1] + "/" + datearray[0] + "/" + datearray[2];
+    return dateFormat(props.valid_from, "dd/mm/yyyy");
 }
 
 function valid_toDate(props) {
-    var newDate = new Date(props.valid_to).toLocaleDateString();
-    var datearray = newDate.split("/");
-    return datearray[1] + "/" + datearray[0] + "/" + datearray[2];
+    return dateFormat(props.valid_to, "dd/mm/yyyy");
 }
 
 function teacherView(props) {

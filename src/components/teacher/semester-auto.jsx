@@ -18,9 +18,7 @@ class Scorecard extends Component {
             showErrorAlert: false,
             showSuccessAlert: false,
             showLoader: false,
-            average: "",
-            good: "",
-            improve: "",
+            scorecard: [],
             page_loading: true,
         };
         this.subjectId = this.props.subjectId;
@@ -47,9 +45,7 @@ class Scorecard extends Component {
                 console.log(result);
                 if (result.sts === true) {
                     this.setState({
-                        average: result.data.average,
-                        good: result.data.good,
-                        improve: result.data.improve,
+                        scorecard: result.data,
                     });
                 } else {
                     if (result.detail) {
@@ -91,9 +87,7 @@ class Scorecard extends Component {
                         Object.keys(result.data.score_card_config).length !== 0
                     ) {
                         this.setState({
-                            average: result.data.score_card_config.average,
-                            good: result.data.score_card_config.good,
-                            improve: result.data.score_card_config.improve,
+                            scorecard: result.data.score_card_config,
                             page_loading: false,
                         });
                     } else {
@@ -124,72 +118,28 @@ class Scorecard extends Component {
         this.loadScoreCard();
     };
 
-    handleRange = (index, event, category) => {
-        const average = this.state.average;
-        const good = this.state.good;
-        const improve = this.state.improve;
+    handleData = (event, category, type, index) => {
+        let scorecard = this.state.scorecard;
 
-        if (category === "average") {
-            average.range[index] = Number(event.target.value);
-            this.setState({
-                average: average,
-            });
+        if (type === "remarks") {
+            var temp = Object.entries(scorecard);
+            for (let i = 0; i < Object.keys(scorecard).length; i++) {
+                if (temp[i][0] === category) {
+                    temp[i][0] = event.target.value;
+                } else {
+                    continue;
+                }
+            }
+            scorecard = Object.fromEntries(temp);
+        } else if (type === "range") {
+            scorecard[category][type][index] = Number(event.target.value);
+        } else {
+            scorecard[category][type] = event.target.value;
         }
-        if (category === "good") {
-            good.range[index] = Number(event.target.value);
-            this.setState({
-                good: good,
-            });
-        }
-        if (category === "improve") {
-            improve.range[index] = Number(event.target.value);
-            this.setState({
-                improve: improve,
-            });
-        }
-    };
 
-    handleData = (event, category, type) => {
-        const average = this.state.average;
-        const good = this.state.good;
-        const improve = this.state.improve;
-
-        if (category === "average") {
-            if (type === "retake") {
-                average.retake = event.target.value;
-            } else if (type === "reduction") {
-                average.reduction = event.target.value;
-            } else if (type === "reduction_duration") {
-                average.reduction_duration = event.target.value;
-            }
-            this.setState({
-                average: average,
-            });
-        }
-        if (category === "good") {
-            if (type === "retake") {
-                good.retake = event.target.value;
-            } else if (type === "reduction") {
-                good.reduction = event.target.value;
-            } else if (type === "reduction_duration") {
-                good.reduction_duration = event.target.value;
-            }
-            this.setState({
-                good: good,
-            });
-        }
-        if (category === "improve") {
-            if (type === "retake") {
-                improve.retake = event.target.value;
-            } else if (type === "reduction") {
-                improve.reduction = event.target.value;
-            } else if (type === "reduction_duration") {
-                improve.reduction_duration = event.target.value;
-            }
-            this.setState({
-                improve: improve,
-            });
-        }
+        this.setState({
+            scorecard: scorecard,
+        });
     };
 
     handleSubmit = () => {
@@ -206,11 +156,7 @@ class Scorecard extends Component {
                 headers: this.headers,
                 body: JSON.stringify({
                     semester_id: this.semesterId,
-                    score_card_config: {
-                        average: this.state.average,
-                        good: this.state.good,
-                        improve: this.state.improve,
-                    },
+                    score_card_config: this.state.scorecard,
                 }),
             }
         )
@@ -246,9 +192,6 @@ class Scorecard extends Component {
     };
 
     render() {
-        const average = this.state.average;
-        const good = this.state.good;
-        const improve = this.state.improve;
         return (
             <Modal
                 show={this.props.show}
@@ -303,280 +246,142 @@ class Scorecard extends Component {
                             <thead>
                                 <th scope="col">Range in %</th>
                                 <th scope="col">Retake Duration</th>
-                                <th scope="col">Reducation %</th>
-                                <th scope="col">Reducation Duration</th>
+                                <th scope="col">Reduction %</th>
+                                <th scope="col">Reduction Duration</th>
                                 <th scope="col">Remarks</th>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td className="d-flex align-items-center">
-                                        <input
-                                            type="number"
-                                            name="range1"
-                                            value={
-                                                improve !== ""
-                                                    ? improve.range[0]
-                                                    : ""
-                                            }
-                                            onChange={(event) =>
-                                                this.handleRange(
-                                                    0,
-                                                    event,
-                                                    "improve"
-                                                )
-                                            }
-                                            className="form-control form-shadow"
-                                        />
-                                        <span className="mx-2">to</span>
-                                        <input
-                                            type="number"
-                                            name="range2"
-                                            value={
-                                                improve !== ""
-                                                    ? improve.range[1]
-                                                    : ""
-                                            }
-                                            onChange={(event) =>
-                                                this.handleRange(
-                                                    1,
-                                                    event,
-                                                    "improve"
-                                                )
-                                            }
-                                            className="form-control form-shadow"
-                                        />
-                                    </td>
-                                    <td>
-                                        <input
-                                            type="text"
-                                            name="retake"
-                                            value={improve.retake}
-                                            className="form-control form-shadow"
-                                            onChange={(event) =>
-                                                this.handleData(
-                                                    event,
-                                                    "improve",
-                                                    "retake"
-                                                )
-                                            }
-                                        />
-                                    </td>
-                                    <td>
-                                        <input
-                                            type="text"
-                                            name="reducation"
-                                            value={improve.reduction}
-                                            className="form-control form-shadow"
-                                            onChange={(event) =>
-                                                this.handleData(
-                                                    event,
-                                                    "improve",
-                                                    "reduction"
-                                                )
-                                            }
-                                        />
-                                    </td>
-                                    <td>
-                                        <input
-                                            type="text"
-                                            name="duration"
-                                            value={improve.reduction_duration}
-                                            className="form-control form-shadow"
-                                            onChange={(event) =>
-                                                this.handleData(
-                                                    event,
-                                                    "improve",
-                                                    "reduction_duration"
-                                                )
-                                            }
-                                        />
-                                    </td>
-                                    <td>
-                                        <div className="card bg-danger shadow-sm">
-                                            <div className="card-body text-center py-2 px-4">
-                                                Improve
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td className="d-flex align-items-center">
-                                        <input
-                                            type="number"
-                                            name="range1"
-                                            value={
-                                                average !== ""
-                                                    ? average.range[0]
-                                                    : ""
-                                            }
-                                            onChange={(event) =>
-                                                this.handleRange(
-                                                    0,
-                                                    event,
-                                                    "average"
-                                                )
-                                            }
-                                            className="form-control form-shadow"
-                                        />
-                                        <span className="mx-2">to</span>
-                                        <input
-                                            type="number"
-                                            name="range2"
-                                            value={
-                                                average !== ""
-                                                    ? average.range[1]
-                                                    : ""
-                                            }
-                                            onChange={(event) =>
-                                                this.handleRange(
-                                                    1,
-                                                    event,
-                                                    "average"
-                                                )
-                                            }
-                                            className="form-control form-shadow"
-                                        />
-                                    </td>
-                                    <td>
-                                        <input
-                                            type="text"
-                                            name="retake"
-                                            value={average.retake}
-                                            className="form-control form-shadow"
-                                            onChange={(event) =>
-                                                this.handleData(
-                                                    event,
-                                                    "average",
-                                                    "retake"
-                                                )
-                                            }
-                                        />
-                                    </td>
-                                    <td>
-                                        <input
-                                            type="text"
-                                            name="reducation"
-                                            value={average.reduction}
-                                            className="form-control form-shadow"
-                                            onChange={(event) =>
-                                                this.handleData(
-                                                    event,
-                                                    "average",
-                                                    "reduction"
-                                                )
-                                            }
-                                        />
-                                    </td>
-                                    <td>
-                                        <input
-                                            type="text"
-                                            name="duration"
-                                            value={average.reduction_duration}
-                                            className="form-control form-shadow"
-                                            onChange={(event) =>
-                                                this.handleData(
-                                                    event,
-                                                    "average",
-                                                    "reduction_duration"
-                                                )
-                                            }
-                                        />
-                                    </td>
-                                    <td>
-                                        <div className="card bg-warning shadow-sm">
-                                            <div className="card-body text-center py-2 px-4">
-                                                Average
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td className="d-flex align-items-center">
-                                        <input
-                                            type="number"
-                                            name="range1"
-                                            value={
-                                                good !== "" ? good.range[0] : ""
-                                            }
-                                            onChange={(event) =>
-                                                this.handleRange(
-                                                    0,
-                                                    event,
-                                                    "good"
-                                                )
-                                            }
-                                            className="form-control form-shadow"
-                                        />
-                                        <span className="mx-2">to</span>
-                                        <input
-                                            type="number"
-                                            name="range2"
-                                            value={
-                                                good !== "" ? good.range[1] : ""
-                                            }
-                                            onChange={(event) =>
-                                                this.handleRange(
-                                                    1,
-                                                    event,
-                                                    "good"
-                                                )
-                                            }
-                                            className="form-control form-shadow"
-                                        />
-                                    </td>
-                                    <td>
-                                        <input
-                                            type="text"
-                                            name="retake"
-                                            value={good.retake}
-                                            className="form-control form-shadow"
-                                            onChange={(event) =>
-                                                this.handleData(
-                                                    event,
-                                                    "good",
-                                                    "retake"
-                                                )
-                                            }
-                                        />
-                                    </td>
-                                    <td>
-                                        <input
-                                            type="text"
-                                            name="reducation"
-                                            value={good.reduction}
-                                            className="form-control form-shadow"
-                                            onChange={(event) =>
-                                                this.handleData(
-                                                    event,
-                                                    "good",
-                                                    "reduction"
-                                                )
-                                            }
-                                        />
-                                    </td>
-                                    <td>
-                                        <input
-                                            type="text"
-                                            name="duration"
-                                            value={good.reduction_duration}
-                                            className="form-control form-shadow"
-                                            onChange={(event) =>
-                                                this.handleData(
-                                                    event,
-                                                    "good",
-                                                    "reduction_duration"
-                                                )
-                                            }
-                                        />
-                                    </td>
-                                    <td>
-                                        <div className="card bg-success shadow-sm">
-                                            <div className="card-body text-center py-2 px-4">
-                                                Good
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
+                                {Object.keys(this.state.scorecard).length !== 0
+                                    ? Object.entries(this.state.scorecard).map(
+                                          ([key, value], index) => {
+                                              return (
+                                                  <tr key={index}>
+                                                      <td className="d-flex align-items-center">
+                                                          <input
+                                                              type="number"
+                                                              name="range1"
+                                                              value={
+                                                                  value.range[0]
+                                                              }
+                                                              onChange={(
+                                                                  event
+                                                              ) =>
+                                                                  this.handleData(
+                                                                      event,
+                                                                      key,
+                                                                      "range",
+                                                                      0
+                                                                  )
+                                                              }
+                                                              className="form-control form-shadow"
+                                                          />
+                                                          <span className="mx-2">
+                                                              to
+                                                          </span>
+                                                          <input
+                                                              type="number"
+                                                              name="range2"
+                                                              value={
+                                                                  value.range[1]
+                                                              }
+                                                              onChange={(
+                                                                  event
+                                                              ) =>
+                                                                  this.handleData(
+                                                                      event,
+                                                                      key,
+                                                                      "range",
+                                                                      1
+                                                                  )
+                                                              }
+                                                              className="form-control form-shadow"
+                                                          />
+                                                      </td>
+                                                      <td>
+                                                          <input
+                                                              type="text"
+                                                              name="retake"
+                                                              value={
+                                                                  value.retake
+                                                              }
+                                                              className="form-control form-shadow"
+                                                              onChange={(
+                                                                  event
+                                                              ) =>
+                                                                  this.handleData(
+                                                                      event,
+                                                                      key,
+                                                                      "retake"
+                                                                  )
+                                                              }
+                                                          />
+                                                      </td>
+                                                      <td>
+                                                          <input
+                                                              type="text"
+                                                              name="reducation"
+                                                              value={
+                                                                  value.reduction
+                                                              }
+                                                              className="form-control form-shadow"
+                                                              onChange={(
+                                                                  event
+                                                              ) =>
+                                                                  this.handleData(
+                                                                      event,
+                                                                      key,
+                                                                      "reduction"
+                                                                  )
+                                                              }
+                                                          />
+                                                      </td>
+                                                      <td>
+                                                          <input
+                                                              type="text"
+                                                              name="duration"
+                                                              value={
+                                                                  value.reduction_duration
+                                                              }
+                                                              className="form-control form-shadow"
+                                                              onChange={(
+                                                                  event
+                                                              ) =>
+                                                                  this.handleData(
+                                                                      event,
+                                                                      key,
+                                                                      "reduction_duration"
+                                                                  )
+                                                              }
+                                                          />
+                                                      </td>
+                                                      <td>
+                                                          <input
+                                                              type="text"
+                                                              name="remarks"
+                                                              className="form-control form-shadow"
+                                                              style={{
+                                                                  borderColor:
+                                                                      value.color,
+                                                                  borderWidth:
+                                                                      "2px",
+                                                              }}
+                                                              value={key}
+                                                              onChange={(
+                                                                  event
+                                                              ) =>
+                                                                  this.handleData(
+                                                                      event,
+                                                                      key,
+                                                                      "remarks"
+                                                                  )
+                                                              }
+                                                          />
+                                                      </td>
+                                                  </tr>
+                                              );
+                                          }
+                                      )
+                                    : null}
                             </tbody>
                         </table>
                     </div>
