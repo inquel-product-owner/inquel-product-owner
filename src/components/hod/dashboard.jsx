@@ -319,7 +319,7 @@ class Dashboard extends Component {
                                     <div className="col-6 text-right">
                                         <Link to="/hod/groups/configuration">
                                             <button className="btn btn-primary btn-sm mr-2">
-                                                Add new
+                                                Group Configuration
                                             </button>
                                         </Link>
                                         <button className="btn btn-primary btn-sm">

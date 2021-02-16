@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { Tabs, Tab, Modal, Alert, Spinner } from "react-bootstrap";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl.js";
 import Select from "react-select";
-import Switch from "react-switch";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import HODTable from "../table/hodTable";
@@ -10,6 +9,7 @@ import Loading from "../sharedComponents/loader";
 import StudentTable from "../table/studentTable";
 import Paginations from "../sharedComponents/pagination";
 import ReactSwitch from "../sharedComponents/switchComponent";
+import dateFormat from "dateformat";
 
 class HODModal extends Component {
     constructor(props) {
@@ -18,28 +18,30 @@ class HODModal extends Component {
             email: "",
             username: "",
             password: "",
-            category: [],
-            subcategory: [],
-            discipline: [],
-            board: [],
-            selectedCategory: "",
-            selectedSubcategory: "",
-            selectedDiscipline: "",
-            selectedBoard: "",
-            selectedValid_from: "",
-            selectedValid_to: "",
+            categoryItems: [],
+            subCategoryItems: [],
+            disciplineItems: [],
+            boardItems: [],
+
+            category: "",
+            sub_category: "",
+            discipline: "",
+            board: "",
+            valid_from: "",
+            valid_to: "",
             progressivescore: false,
             type1: false,
             type2: false,
             quiz: false,
             match: false,
-            notesdownload: false,
+            notes: false,
             summary: false,
             directquestion: false,
             configure: false,
             simulationexam: false,
             lockingoftest: false,
             mobileapp: false,
+
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
@@ -68,10 +70,10 @@ class HODModal extends Component {
             .then((res) => res.json())
             .then((result) => {
                 this.setState({
-                    category: result.data.CATEGORY,
-                    board: result.data.BOARD,
-                    selectedCategory: "",
-                    selectedSubcategory: "",
+                    categoryItems: result.data.CATEGORY,
+                    boardItems: result.data.BOARD,
+                    category: "",
+                    sub_category: "",
                 });
                 console.log(result);
             })
@@ -104,12 +106,12 @@ class HODModal extends Component {
                                 email: this.state.email,
                                 username: this.state.username,
                                 password: this.state.password,
-                                category: this.state.selectedCategory,
-                                sub_category: this.state.selectedSubcategory,
-                                discipline: this.state.selectedDiscipline,
-                                board: this.state.selectedBoard,
-                                valid_from: this.state.selectedValid_from,
-                                valid_to: this.state.selectedValid_to,
+                                category: this.state.category,
+                                sub_category: this.state.sub_category,
+                                discipline: this.state.discipline,
+                                board: this.state.board,
+                                valid_from: this.state.valid_from,
+                                valid_to: this.state.valid_to,
                                 prog_sco_card: this.state.progressivescore,
                                 type_1_q: this.state.type1,
                                 type_2_q: this.state.type2,
@@ -120,7 +122,7 @@ class HODModal extends Component {
                                 summary: this.state.summary,
                                 sim_exam: this.state.simulationexam,
                                 lock_test: this.state.lockingoftest,
-                                copy_download: this.state.notesdownload,
+                                copy_download: this.state.notes,
                                 android_app: this.state.mobileapp,
                             },
                         },
@@ -153,13 +155,13 @@ class HODModal extends Component {
 
     handleCategory = (event) => {
         this.setState({
-            selectedCategory: event.value,
+            category: event.value,
         });
         this.setState({
-            subcategory: [],
-            discipline: [],
-            selectedSubcategory: "",
-            selectedDiscipline: "",
+            subCategoryItems: [],
+            disciplineItems: [],
+            sub_category: "",
+            discipline: "",
             subcategory_loading: true,
         });
 
@@ -171,7 +173,7 @@ class HODModal extends Component {
                 .then((res) => res.json())
                 .then((result) => {
                     this.setState({
-                        subcategory: result.data.sub_category,
+                        subCategoryItems: result.data.sub_category,
                         subcategory_loading: false,
                     });
                     console.log(result);
@@ -184,17 +186,17 @@ class HODModal extends Component {
 
     handleSubcategory = (event) => {
         this.setState({
-            selectedSubcategory: event.value,
+            sub_category: event.value,
         });
         this.setState({
-            discipline: [],
-            selectedDiscipline: "",
+            disciplineItems: [],
+            discipline: "",
             discipline_loading: true,
         });
 
         if (event.value !== "") {
             fetch(
-                `${this.url}/data/filter/?category=${this.state.selectedCategory}&sub_category=${event.value}`,
+                `${this.url}/data/filter/?category=${this.state.category}&sub_category=${event.value}`,
                 {
                     headers: this.headers,
                     method: "GET",
@@ -204,7 +206,7 @@ class HODModal extends Component {
                 .then((result) => {
                     console.log(result);
                     this.setState({
-                        discipline: result.data.DISCIPLINE,
+                        disciplineItems: result.data.DISCIPLINE,
                         discipline_loading: false,
                     });
                     console.log(result);
@@ -217,35 +219,34 @@ class HODModal extends Component {
 
     handleDiscipline = (event) => {
         this.setState({
-            selectedDiscipline: event.value,
+            discipline: event.value,
         });
     };
 
     handleBoard = (event) => {
         this.setState({
-            selectedBoard: event.value,
+            board: event.value,
         });
     };
 
-    handleValid_from = (event) => {
+    handleDate = (event) => {
         this.setState({
-            selectedValid_from: `${event.target.value} 00:00:00`,
-        });
-    };
-
-    handleValid_to = (event) => {
-        this.setState({
-            selectedValid_to: `${event.target.value} 00:00:00`,
+            [event.target.name]: `${dateFormat(
+                event.target.value,
+                "yyyy-mm-dd"
+            )} 00:00:00`,
         });
     };
 
     handleChange = (event) => {
-        const target = event.target;
-        const value = target.value;
-        const name = target.name;
-
         this.setState({
-            [name]: value,
+            [event.target.name]: event.target.value,
+        });
+    };
+
+    handleSwitch = (event) => {
+        this.setState({
+            [event.target.name]: !event.target.value,
         });
     };
 
@@ -276,7 +277,7 @@ class HODModal extends Component {
     };
     handleNotesChange = () => {
         this.setState({
-            notesdownload: !this.state.notesdownload,
+            notes: !this.state.notes,
         });
     };
     handleSummaryChange = () => {
@@ -324,7 +325,7 @@ class HODModal extends Component {
             type2: !this.state.selectAll,
             quiz: !this.state.selectAll,
             match: !this.state.selectAll,
-            notesdownload: !this.state.selectAll,
+            notes: !this.state.selectAll,
             summary: !this.state.selectAll,
             directquestion: !this.state.selectAll,
             configure: !this.state.selectAll,
@@ -357,7 +358,7 @@ class HODModal extends Component {
                         }}
                         dismissible
                     >
-                        {this.state.errorMsg}
+                        <span></span> {this.state.errorMsg}
                     </Alert>
                     <Alert
                         variant="success"
@@ -444,7 +445,6 @@ class HODModal extends Component {
                         <div className="row mb-2">
                             <div className="col-md-6">
                                 <h6 className="primary-text mb-3">Details</h6>
-
                                 <div className="form-group">
                                     <label htmlFor="category">Category</label>
                                     <Select
@@ -452,7 +452,7 @@ class HODModal extends Component {
                                         placeholder="Select category"
                                         isSearchable={true}
                                         name="category"
-                                        options={this.state.category.map(
+                                        options={this.state.categoryItems.map(
                                             function (list) {
                                                 return {
                                                     value: list.code,
@@ -472,7 +472,7 @@ class HODModal extends Component {
                                         className="basic-single"
                                         placeholder="Select subcategory"
                                         isDisabled={
-                                            this.state.selectedCategory === ""
+                                            this.state.category === ""
                                                 ? true
                                                 : false
                                         }
@@ -482,8 +482,8 @@ class HODModal extends Component {
                                                 : false
                                         }
                                         isSearchable={true}
-                                        name="subcategory"
-                                        options={this.state.subcategory.map(
+                                        name="sub_category"
+                                        options={this.state.subCategoryItems.map(
                                             function (list) {
                                                 return {
                                                     value: list.code,
@@ -503,8 +503,7 @@ class HODModal extends Component {
                                         className="basic-single"
                                         placeholder="Select discipline"
                                         isDisabled={
-                                            this.state.selectedSubcategory ===
-                                            ""
+                                            this.state.sub_category === ""
                                                 ? true
                                                 : false
                                         }
@@ -516,7 +515,7 @@ class HODModal extends Component {
                                         isSearchable={true}
                                         name="discipline"
                                         options={Object.entries(
-                                            this.state.discipline
+                                            this.state.disciplineItems
                                         ).map(([key, value]) => {
                                             return {
                                                 value: key,
@@ -536,14 +535,14 @@ class HODModal extends Component {
                                         placeholder="Select board"
                                         isSearchable={true}
                                         name="board"
-                                        options={this.state.board.map(function (
-                                            list
-                                        ) {
-                                            return {
-                                                value: list.code,
-                                                label: list.title,
-                                            };
-                                        })}
+                                        options={this.state.boardItems.map(
+                                            (list) => {
+                                                return {
+                                                    value: list.code,
+                                                    label: list.title,
+                                                };
+                                            }
+                                        )}
                                         onChange={this.handleBoard}
                                         required
                                     />
@@ -557,7 +556,7 @@ class HODModal extends Component {
                                         name="valid_from"
                                         id="valid_from"
                                         className="form-control form-shadow"
-                                        onChange={this.handleValid_from}
+                                        onChange={this.handleDate}
                                     />
                                 </div>
                                 <div className="form-group">
@@ -567,7 +566,7 @@ class HODModal extends Component {
                                         name="valid_to"
                                         id="valid_to"
                                         className="form-control form-shadow"
-                                        onChange={this.handleValid_to}
+                                        onChange={this.handleDate}
                                     />
                                 </div>
                             </div>
@@ -585,20 +584,9 @@ class HODModal extends Component {
                                         >
                                             Select All
                                         </label>
-                                        <Switch
+                                        <ReactSwitch
                                             checked={this.state.selectAll}
                                             onChange={this.handleSelectAll}
-                                            onColor="#efd2ac"
-                                            onHandleColor="#621012"
-                                            handleDiameter={12}
-                                            uncheckedIcon={false}
-                                            checkedIcon={false}
-                                            boxShadow="0px 1px 5px rgba(0, 0, 0, 0.6)"
-                                            activeBoxShadow="0px 0px 1px 10px rgba(0, 0, 0, 0.2)"
-                                            height={18}
-                                            width={35}
-                                            className="react-switch"
-                                            id="select-all"
                                         />
                                     </div>
                                 </div>
@@ -672,12 +660,12 @@ class HODModal extends Component {
                                 <div className="row mb-3">
                                     <div className="col-9">
                                         <p className="primary-text small mb-0 font-weight-bold">
-                                            Notes download
+                                            Notes
                                         </p>
                                     </div>
                                     <div className="col-3 text-right">
                                         <ReactSwitch
-                                            checked={this.state.notesdownload}
+                                            checked={this.state.notes}
                                             onChange={this.handleNotesChange}
                                         />
                                     </div>

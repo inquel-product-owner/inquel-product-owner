@@ -104,9 +104,9 @@ class Login extends Component {
                             <div className="col-md-5">
                                 <div className="card shadow py-4">
                                     <div className="card-body ">
-                                        <h3 className="primary-text mb-4">
-                                            LOGIN
-                                        </h3>
+                                        <h4 className="primary-text mb-4">
+                                            ADMIN LOGIN
+                                        </h4>
                                         <Alert
                                             variant="danger"
                                             show={this.state.showErrorAlert}

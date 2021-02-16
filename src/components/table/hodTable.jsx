@@ -13,6 +13,7 @@ import "./material.css";
 import "./grid-overview.css";
 import userimage from "../../assets/user.png";
 import { Link } from "react-router-dom";
+import dateFormat from "dateformat";
 
 function statusTemplate(props) {
     return (
@@ -61,9 +62,10 @@ function nameTemplate(props) {
 }
 
 function dateTemplate(props) {
-    var newDate = new Date(props.date_joined).toLocaleDateString();
-    var datearray = newDate.split("/");
-    return datearray[1] + "/" + datearray[0] + "/" + datearray[2];
+    return dateFormat(
+        props.date_joined,
+        "dd/mm/yyyy"
+    );
 }
 
 function viewTemplate(props) {
@@ -256,7 +258,6 @@ class HODTable extends Component {
                                 allowSorting={false}
                                 allowFiltering={false}
                                 template={viewTemplate}
-                                clipMode="EllipsisWithTooltip"
                                 width="130"
                             />
                         </ColumnsDirective>

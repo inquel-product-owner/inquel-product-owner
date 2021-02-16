@@ -3,7 +3,14 @@ import store from "../../redux/store";
 import { connect } from "react-redux";
 import Header from "./navbar";
 import SideNav from "./sidenav";
-import { Card, Accordion, Modal, Alert, Spinner } from "react-bootstrap";
+import {
+    Card,
+    Accordion,
+    Modal,
+    Alert,
+    Spinner,
+    Dropdown,
+} from "react-bootstrap";
 import Select from "react-select";
 import { Link } from "react-router-dom";
 import Loading from "../sharedComponents/loader";
@@ -323,6 +330,149 @@ class CycleTestModal extends Component {
     }
 }
 
+class CycleEditModal extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            cycle_test_id: this.props.data.cycle_test_id,
+            cycle_test_name: this.props.data.cycle_test_name,
+
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: false,
+        };
+        this.url = baseUrl + teacherUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
+    }
+
+    handleSubmit = (event) => {
+        event.preventDefault();
+
+        this.setState({
+            showLoader: true,
+            showErrorAlert: false,
+            showSuccessAlert: false,
+        });
+
+        fetch(`${this.url}/teacher/subject/${this.props.subjectId}/cycle/`, {
+            headers: this.headers,
+            method: "PATCH",
+            body: JSON.stringify({
+                chapter_id: this.props.chapter_id,
+                cycle_test_id: this.state.cycle_test_id,
+                cycle_test_name: this.state.cycle_test_name,
+            }),
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        showLoader: false,
+                    });
+                    this.props.formSubmission(true);
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    handleCycleTest = (event) => {
+        this.setState({
+            cycle_test_name: event.target.value,
+        });
+    };
+
+    render() {
+        return (
+            <Modal
+                show={this.props.show}
+                onHide={this.props.onHide}
+                size="md"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Header closeButton>Edit Cycle Test</Modal.Header>
+                <Modal.Body>
+                    <Alert
+                        variant="danger"
+                        show={this.state.showErrorAlert}
+                        onClose={() => {
+                            this.setState({
+                                showErrorAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.errorMsg}
+                    </Alert>
+                    <Alert
+                        variant="success"
+                        show={this.state.showSuccessAlert}
+                        onClose={() => {
+                            this.setState({
+                                showSuccessAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.successMsg}
+                    </Alert>
+
+                    <form onSubmit={this.handleSubmit} autoComplete="off">
+                        <div className="form-group">
+                            <label htmlFor="cycle">Cycle Test Name</label>
+                            <input
+                                type="text"
+                                name="cycle"
+                                id="cycle"
+                                className="form-control borders"
+                                onChange={this.handleCycleTest}
+                                placeholder="Cycle test name"
+                                value={this.state.cycle_test_name}
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <button className="btn btn-primary btn-sm btn-block">
+                                {this.state.showLoader ? (
+                                    <Spinner
+                                        as="span"
+                                        animation="border"
+                                        size="sm"
+                                        role="status"
+                                        aria-hidden="true"
+                                        className="mr-2"
+                                    />
+                                ) : (
+                                    ""
+                                )}
+                                Update
+                            </button>
+                        </div>
+                    </form>
+                </Modal.Body>
+            </Modal>
+        );
+    }
+}
+
 const mapStateToProps = (state) => ({
     subject_name: state.subject_name,
     chapter_name: state.chapter_name,
@@ -335,6 +485,8 @@ class Chapters extends Component {
             showSideNav: false,
             showModal: false,
             showCycleTestModal: false,
+            showCycle_EditModal: false,
+
             collapsed: false,
             chapterList: [],
             chapterId: "",
@@ -346,6 +498,8 @@ class Chapters extends Component {
                 chapter_structure: [],
             },
             cycle_test: [],
+            selectedCycleData: [],
+
             page_loading: true,
             is_topicFormSubmitted: false,
             is_cycleTestFormSubmitted: false,
@@ -382,6 +536,13 @@ class Chapters extends Component {
     toggleCycleTestModal = (index) => {
         this.setState({
             showCycleTestModal: !this.state.showCycleTestModal,
+        });
+    };
+
+    toggleCycle_EditModal = (data) => {
+        this.setState({
+            selectedCycleData: data,
+            showCycle_EditModal: !this.state.showCycle_EditModal,
         });
     };
 
@@ -530,6 +691,7 @@ class Chapters extends Component {
             setTimeout(() => {
                 this.setState({
                     showCycleTestModal: false,
+                    showCycle_EditModal: false,
                 });
             }, 1000);
         }
@@ -693,7 +855,7 @@ class Chapters extends Component {
                         </div>
                     </Card.Header>
                 </div>
-                <div className="ml-md-4">{nestedTopics}</div>
+                <div className="ml-md-3">{nestedTopics}</div>
             </div>
         );
     };
@@ -711,7 +873,10 @@ class Chapters extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name={this.props.subject_name} togglenav={this.toggleSideNav} />
+                <Header
+                    name={this.props.subject_name}
+                    togglenav={this.toggleSideNav}
+                />
 
                 {/* Sidebar */}
                 <SideNav
@@ -733,7 +898,7 @@ class Chapters extends Component {
                     ""
                 )}
 
-                {/* Topic modal */}
+                {/* Cycle test modal */}
                 {this.state.showCycleTestModal ? (
                     <CycleTestModal
                         show={this.state.showCycleTestModal}
@@ -741,6 +906,20 @@ class Chapters extends Component {
                         formSubmission={this.cycleTest_formSubmission}
                         subjectId={this.subjectId}
                         chapter_id={this.state.chapterId}
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Cycle test edit modal */}
+                {this.state.showCycle_EditModal ? (
+                    <CycleEditModal
+                        show={this.state.showCycle_EditModal}
+                        onHide={this.toggleCycle_EditModal}
+                        formSubmission={this.cycleTest_formSubmission}
+                        subjectId={this.subjectId}
+                        chapter_id={this.state.chapterId}
+                        data={this.state.selectedCycleData}
                     />
                 ) : (
                     ""
@@ -880,20 +1059,20 @@ class Chapters extends Component {
                                                           (data, index) => {
                                                               return (
                                                                   <div
-                                                                      className="card card-body shadow-sm light-bg mb-2 py-3"
+                                                                      className="card card-header shadow-sm light-bg mb-2"
                                                                       key={
                                                                           index
                                                                       }
                                                                   >
                                                                       <div className="row align-items-center">
                                                                           <div className="col-md-6">
-                                                                              <p className="small font-weight-bold mb-0">
+                                                                              <p className="small primary-text font-weight-bold mb-0">
                                                                                   {
                                                                                       data.cycle_test_name
                                                                                   }
                                                                               </p>
                                                                           </div>
-                                                                          <div className="col-md-6 text-right">
+                                                                          <div className="col-md-6 d-flex align-items-center justify-content-end">
                                                                               {data.direct_question ===
                                                                                   undefined ||
                                                                               data.direct_question ===
@@ -937,6 +1116,31 @@ class Chapters extends Component {
                                                                               ) : (
                                                                                   ""
                                                                               )}
+                                                                              <Dropdown>
+                                                                                  <Dropdown.Toggle
+                                                                                      variant="white"
+                                                                                      className="btn btn-link btn-sm shadow-none caret-off ml-2"
+                                                                                  >
+                                                                                      <i className="fas fa-ellipsis-v"></i>
+                                                                                  </Dropdown.Toggle>
+
+                                                                                  <Dropdown.Menu>
+                                                                                      <Dropdown.Item
+                                                                                          onClick={() =>
+                                                                                              this.toggleCycle_EditModal(
+                                                                                                  data
+                                                                                              )
+                                                                                          }
+                                                                                      >
+                                                                                          <i className="far fa-edit fa-sm mr-1"></i>{" "}
+                                                                                          Edit
+                                                                                      </Dropdown.Item>
+                                                                                      <Dropdown.Item>
+                                                                                          <i className="far fa-trash-alt fa-sm mr-1"></i>{" "}
+                                                                                          Delete
+                                                                                      </Dropdown.Item>
+                                                                                  </Dropdown.Menu>
+                                                                              </Dropdown>
                                                                           </div>
                                                                       </div>
                                                                   </div>
