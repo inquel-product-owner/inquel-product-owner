@@ -306,8 +306,28 @@ input[type="search"]:focus {
 /* Dropdown */
 
 .dropdown-menu {
+    border: 1px solid #621012;
     right: 0;
     left: auto;
+}
+
+.dropdown-item {
+    font-size: 14px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.dropdown-item:hover, .dropdown-item:focus {
+    background-color: #efd2ac;
+    color: #621012;
+}
+
+.caret-off::before {
+    display: none;
+}
+
+.caret-off::after {
+    display: none;
 }
 
 /* Border */
@@ -441,15 +461,29 @@ input[type="search"]:focus {
     font-size: 14px;
 }
 
+.alert-danger::before {
+    content: "\f057";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-right: 8px;
+}
+
+.alert-success::before {
+    content: "\f058";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-right: 8px;
+}
+
 .alert-dismissible .close {
     padding: 0.5rem 1rem;
     top: -6%;
     font-size: 22px;
 }
 
-.alert::first-letter {
+/* .alert::nth-letter(odd) {
     text-transform: uppercase;
-}
+} */
 
 /* Modal */
 

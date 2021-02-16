@@ -6,6 +6,7 @@ import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
 import Loading from "../sharedComponents/loader";
 import GroupTable from "../table/groupTable";
 import Paginations from "../sharedComponents/pagination";
+import dateFormat from "dateformat";
 
 class GroupModal extends Component {
     constructor() {
@@ -13,6 +14,7 @@ class GroupModal extends Component {
         this.state = {
             groupName: "",
             groupDesc: "",
+            levels: "",
             valid_from: "",
             valid_to: "",
             errorMsg: "",
@@ -35,7 +37,7 @@ class GroupModal extends Component {
         const name = event.target.name;
         const value = event.target.value;
         this.setState({
-            [name]: `${value} 00:00:00`,
+            [name]: `${dateFormat(value, "yyyy-mm-dd hh:MM:ss")}`,
         });
     };
 
@@ -74,6 +76,11 @@ class GroupModal extends Component {
                         showSuccessAlert: true,
                         showLoader: false,
                     });
+                    setTimeout(() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }, 3000);
                     this.props.formSubmission(true);
                 } else {
                     this.setState({
@@ -81,6 +88,11 @@ class GroupModal extends Component {
                         showErrorAlert: true,
                         showLoader: false,
                     });
+                    setTimeout(() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }, 3000);
                 }
             })
             .catch((err) => {
@@ -123,6 +135,7 @@ class GroupModal extends Component {
                     >
                         {this.state.successMsg}
                     </Alert>
+
                     <form onSubmit={this.handleSubmit} autoComplete="off">
                         <div className="form-group">
                             <label htmlFor="groupName">Group name</label>
@@ -139,30 +152,44 @@ class GroupModal extends Component {
                             <textarea
                                 name="groupDesc"
                                 id="groupDesc"
-                                rows="5"
+                                rows="4"
                                 className="form-control borders"
                                 onChange={this.handleGroupData}
                             ></textarea>
                         </div>
                         <div className="form-group">
-                            <label htmlFor="valid_from">Valid from</label>
-                            <input
-                                type="date"
-                                name="valid_from"
-                                id="valid_from"
+                            <label htmlFor="levels">Level</label>
+                            <select
+                                name="levels"
+                                id="levels"
+                                onChange={this.handleGroupData}
                                 className="form-control borders"
-                                onChange={this.handleDate}
-                            />
+                                required
+                            >
+                                <option value="">Select levels</option>
+                            </select>
                         </div>
-                        <div className="form-group">
-                            <label htmlFor="valid_to">Valid to</label>
-                            <input
-                                type="date"
-                                name="valid_to"
-                                id="valid_to"
-                                className="form-control borders"
-                                onChange={this.handleDate}
-                            />
+                        <div className="row">
+                            <div className="col-md-6 form-group">
+                                <label htmlFor="valid_from">Valid from</label>
+                                <input
+                                    type="date"
+                                    name="valid_from"
+                                    id="valid_from"
+                                    className="form-control borders"
+                                    onChange={this.handleDate}
+                                />
+                            </div>
+                            <div className="col-md-6 form-group">
+                                <label htmlFor="valid_to">Valid to</label>
+                                <input
+                                    type="date"
+                                    name="valid_to"
+                                    id="valid_to"
+                                    className="form-control borders"
+                                    onChange={this.handleDate}
+                                />
+                            </div>
                         </div>
                         <div className="form-group">
                             <button className="btn btn-primary btn-sm btn-block">
@@ -193,7 +220,7 @@ class GroupConfiguration extends Component {
         super(props);
         this.state = {
             showSideNav: false,
-            groupModalShow: false,
+            showModal: false,
             groupItem: [],
             activeGroupPage: 1,
             totalGroupCount: 0,
@@ -215,9 +242,9 @@ class GroupConfiguration extends Component {
         });
     };
 
-    addGroupModal = () => {
+    toggleModal = () => {
         this.setState({
-            groupModalShow: !this.state.groupModalShow,
+            showModal: !this.state.showModal,
         });
     };
 
@@ -272,7 +299,7 @@ class GroupConfiguration extends Component {
             });
             setTimeout(() => {
                 this.setState({
-                    groupModalShow: false,
+                    showModal: false,
                 });
             }, 1000);
         }
@@ -296,8 +323,8 @@ class GroupConfiguration extends Component {
 
                 {/* Add Subject modal */}
                 <GroupModal
-                    show={this.state.groupModalShow}
-                    onHide={this.addGroupModal}
+                    show={this.state.showModal}
+                    onHide={this.toggleModal}
                     formSubmission={this.formSubmission}
                 />
 
@@ -322,7 +349,7 @@ class GroupConfiguration extends Component {
                             <div className="col-6 text-right">
                                 <button
                                     className="btn btn-primary btn-sm"
-                                    onClick={this.addGroupModal}
+                                    onClick={this.toggleModal}
                                 >
                                     Add new
                                 </button>

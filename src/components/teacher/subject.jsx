@@ -551,7 +551,7 @@ class ChapterEditModal extends Component {
                                 ) : (
                                     ""
                                 )}
-                                Save
+                                Update
                             </button>
                         </div>
                     </form>
@@ -693,7 +693,7 @@ class SemesterEditModal extends Component {
                                 ) : (
                                     ""
                                 )}
-                                Save
+                                Update
                             </button>
                         </div>
                     </form>
@@ -998,6 +998,7 @@ class SubjectChapters extends Component {
 
             selectedChapter: "",
             selectedSemester: "",
+            is_independent: false,
 
             page_loading: true,
             is_chapterSubmitted: false,
@@ -1081,6 +1082,7 @@ class SubjectChapters extends Component {
             .then((result) => {
                 this.setState({
                     subjectItems: result.data.results,
+                    is_independent: result.data.is_independent,
                     page_loading: false,
                 });
                 console.log(result);
@@ -1469,25 +1471,32 @@ class SubjectChapters extends Component {
                                                                       ) : (
                                                                           ""
                                                                       )}
-                                                                      {data.direct_question ===
-                                                                          undefined ||
-                                                                      data.direct_question ===
-                                                                          true ? (
-                                                                          <Link
-                                                                              to={`${this.props.match.url}/semester/${data.semester_id}/direct`}
-                                                                          >
-                                                                              <button
-                                                                                  className="btn btn-primary btn-sm ml-2"
-                                                                                  onClick={() =>
-                                                                                      this.dispatchSemester(
-                                                                                          data.semester_name
-                                                                                      )
-                                                                                  }
+                                                                      {this
+                                                                          .state
+                                                                          .is_independent ===
+                                                                      false ? (
+                                                                          data.direct_question ===
+                                                                              undefined ||
+                                                                          data.direct_question ===
+                                                                              true ? (
+                                                                              <Link
+                                                                                  to={`${this.props.match.url}/semester/${data.semester_id}/direct`}
                                                                               >
-                                                                                  Direct
-                                                                                  Test
-                                                                              </button>
-                                                                          </Link>
+                                                                                  <button
+                                                                                      className="btn btn-primary btn-sm ml-2"
+                                                                                      onClick={() =>
+                                                                                          this.dispatchSemester(
+                                                                                              data.semester_name
+                                                                                          )
+                                                                                      }
+                                                                                  >
+                                                                                      Direct
+                                                                                      Test
+                                                                                  </button>
+                                                                              </Link>
+                                                                          ) : (
+                                                                              ""
+                                                                          )
                                                                       ) : (
                                                                           ""
                                                                       )}
@@ -1617,19 +1626,24 @@ class SubjectChapters extends Component {
                                 </table>
                             </div>
                         </div>
-
-                        <button
-                            className="btn btn-tomato btn-block shadow-sm mb-2"
-                            onClick={this.toggleModal}
-                        >
-                            Add Chapter
-                        </button>
-                        <button
-                            className="btn btn-tomato btn-block shadow-sm"
-                            onClick={this.toggleSemesterModal}
-                        >
-                            Add Semester Exam
-                        </button>
+                        {this.state.is_independent === false ? (
+                            <>
+                                <button
+                                    className="btn btn-tomato btn-block shadow-sm mb-2"
+                                    onClick={this.toggleModal}
+                                >
+                                    Add Chapter
+                                </button>
+                                <button
+                                    className="btn btn-tomato btn-block shadow-sm"
+                                    onClick={this.toggleSemesterModal}
+                                >
+                                    Add Semester Exam
+                                </button>
+                            </>
+                        ) : (
+                            ""
+                        )}
                         {/* Loading component */}
                         {this.state.page_loading ? <Loading /> : ""}
                     </div>

@@ -13,6 +13,7 @@ import "./material.css";
 import "./grid-overview.css";
 import userimage from "../../assets/user.png";
 import { Link } from "react-router-dom";
+import dateFormat from "dateformat";
 
 function statusTemplate(props) {
     return (
@@ -61,9 +62,7 @@ function nameTemplate(props) {
 }
 
 function dateTemplate(props) {
-    var newDate = new Date(props.date_joined).toLocaleDateString();
-    var datearray = newDate.split("/");
-    return datearray[1] + "/" + datearray[0] + "/" + datearray[2];
+    return dateFormat(props.date_joined, "dd/mm/yyyy");
 }
 
 class TeacherTable extends Component {
@@ -94,10 +93,6 @@ class TeacherTable extends Component {
         };
         this.toolbarOptions = ["Search"];
     }
-
-    handleTeacher = () => {
-        console.log("I'm triggered");
-    };
 
     onQueryCellInfo(args) {
         if (args.column.field === "is_active") {
