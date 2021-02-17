@@ -1062,7 +1062,7 @@ class CycleTestAuto extends Component {
                                     </div>
                                     <div className="col-md-4">
                                         <Select
-                                            className="basic-single"
+                                            className="basic-single form-shadow"
                                             placeholder={
                                                 this.state.selectedAttempt !==
                                                 ""

@@ -1647,6 +1647,73 @@ class SubjectConcepts extends Component {
         }
     };
 
+    // -------------------------- Publishing the concept --------------------------
+
+    handlePublish = () => {
+        this.setState({
+            showSuccessAlert: false,
+            showErrorAlert: false,
+            showLoader: true,
+        });
+
+        const concepts = [...this.state.concepts];
+        let id = [];
+        for (let i = 0; i < concepts.length; i++) {
+            if (concepts[i].concepts_random_id !== "") {
+                id.push(concepts[i].concepts_random_id);
+            } else {
+                continue;
+            }
+        }
+
+        if (id.length !== 0) {
+            fetch(
+                `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/publish/`,
+                {
+                    headers: this.headers,
+                    method: "POST",
+                    body: JSON.stringify({
+                        concept_ids: id,
+                        chapter_id: this.chapterId,
+                        topic_name: this.topicName,
+                    }),
+                }
+            )
+                .then((res) => res.json())
+                .then((result) => {
+                    console.log(result);
+                    if (result.sts === true) {
+                        this.setState({
+                            successMsg: result.msg,
+                            showSuccessAlert: true,
+                            showLoader: false,
+                        });
+                    } else {
+                        if (result.detail) {
+                            this.setState({
+                                errorMsg: result.detail,
+                            });
+                        } else {
+                            this.setState({
+                                errorMsg: result.msg,
+                            });
+                        }
+                        this.setState({
+                            showErrorAlert: true,
+                            showLoader: false,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        } else {
+            this.setState({
+                showLoader: false,
+            });
+        }
+    };
+
     handleFlip = (index) => {
         const flips = [...this.state.flipState];
         flips[index] = !flips[index];
@@ -1665,6 +1732,34 @@ class SubjectConcepts extends Component {
                     name={this.props.subject_name}
                     togglenav={this.toggleSideNav}
                 />
+
+                {/* Alert message */}
+                <Alert
+                    variant="danger"
+                    className="fixed-top"
+                    show={this.state.showErrorAlert}
+                    onClose={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
+                    dismissible
+                >
+                    {this.state.errorMsg}
+                </Alert>
+                <Alert
+                    variant="success"
+                    className="fixed-top"
+                    show={this.state.showSuccessAlert}
+                    onClose={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    dismissible
+                >
+                    {this.state.successMsg}
+                </Alert>
 
                 {/* Sidebar */}
                 <SideNav
@@ -1730,7 +1825,22 @@ class SubjectConcepts extends Component {
                                     </div>
                                     <div className="col-md-6">
                                         <div className="d-flex flex-wrap justify-content-end mb-4">
-                                            <button className="btn btn-primary btn-sm mr-1">
+                                            <button
+                                                className="btn btn-primary btn-sm mr-1"
+                                                onClick={this.handlePublish}
+                                            >
+                                                {this.state.showLoader ? (
+                                                    <Spinner
+                                                        as="span"
+                                                        animation="border"
+                                                        size="sm"
+                                                        role="status"
+                                                        aria-hidden="true"
+                                                        className="mr-2"
+                                                    />
+                                                ) : (
+                                                    ""
+                                                )}
                                                 Publish
                                             </button>
                                             <button className="btn btn-primary btn-sm mr-1">
