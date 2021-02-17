@@ -156,7 +156,7 @@ class GroupModal extends Component {
                         this.setState({
                             showErrorAlert: false,
                         });
-                    }, 3000);
+                    }, 4000);
                 }
             })
             .catch((err) => {
@@ -224,7 +224,7 @@ class GroupModal extends Component {
                             ></textarea>
                         </div>
                         <div className="row">
-                            <div className="form-group col-md-6">
+                            <div className="form-group col-md-4">
                                 <label htmlFor="category">Category</label>
                                 <input
                                     type="text"
@@ -235,7 +235,7 @@ class GroupModal extends Component {
                                     disabled
                                 />
                             </div>
-                            <div className="form-group col-md-6">
+                            <div className="form-group col-md-4">
                                 <label htmlFor="sub_category">
                                     Sub Category
                                 </label>
@@ -244,6 +244,17 @@ class GroupModal extends Component {
                                     name="sub_category"
                                     id="sub_category"
                                     value={this.props.sub_category}
+                                    className="form-control borders"
+                                    disabled
+                                />
+                            </div>
+                            <div className="form-group col-md-4">
+                                <label htmlFor="discipline">Discipline</label>
+                                <input
+                                    type="text"
+                                    name="discipline"
+                                    id="discipline"
+                                    value={this.props.discipline}
                                     className="form-control borders"
                                     disabled
                                 />
@@ -336,6 +347,7 @@ class GroupConfiguration extends Component {
             totalGroupCount: 0,
             category: "",
             sub_category: "",
+            discipline: "",
             valid_from: "",
             valid_to: "",
             page_loading: true,
@@ -374,6 +386,7 @@ class GroupConfiguration extends Component {
                     totalGroupCount: result.data.count,
                     category: result.data.category,
                     sub_category: result.data.sub_category,
+                    discipline: result.data.discipline,
                     valid_from: dateFormat(
                         result.data.hod_valid_from,
                         "yyyy-mm-dd"
@@ -453,6 +466,7 @@ class GroupConfiguration extends Component {
                         formSubmission={this.formSubmission}
                         category={this.state.category}
                         sub_category={this.state.sub_category}
+                        discipline={this.state.discipline}
                         valid_from={this.state.valid_from}
                         valid_to={this.state.valid_to}
                     />
