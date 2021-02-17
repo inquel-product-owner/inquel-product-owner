@@ -191,23 +191,6 @@ class SubjectModal extends Component {
                                 onChange={this.handleTeacher}
                                 required
                             />
-                            {/* <select
-                                name="teacher_id"
-                                id="teacher_id"
-                                className="form-control borders"
-                                onChange={this.handleInput}
-                            >
-                                <option value="">Select teacher</option>
-                                {this.state.teacherData.map((list, index) => {
-                                    return (
-                                        <option value={list.id} key={index}>
-                                            {list.full_name !== ""
-                                                ? list.full_name
-                                                : list.username}
-                                        </option>
-                                    );
-                                })}
-                            </select> */}
                         </div>
                         <div className="form-group">
                             <button className="btn btn-primary btn-sm btn-block">
@@ -376,7 +359,7 @@ class Group extends Component {
                         <div className="row align-items-center mb-3 mt-2">
                             <div className="col-3">
                                 <h5 className="primary-text">
-                                    {this.state.groupItems.group_name}
+                                    {this.state.groupItems.group_name} - {this.state.groupItems.level}
                                 </h5>
                             </div>
                             <div className="col-9 text-right">

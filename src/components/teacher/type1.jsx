@@ -450,7 +450,7 @@ class SubjectType1 extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result.sts);
+                console.log(result);
                 if (result.sts === true) {
                     let data = [];
                     let keyboards = [];
@@ -1875,7 +1875,7 @@ class SubjectType1 extends Component {
         }
     };
 
-    // -------------------------- Adding new question --------------------------
+    // -------------------------- Adding, Removing, Deleting question --------------------------
 
     addNewQuestion = () => {
         const values = [...this.state.questions];
@@ -2293,6 +2293,73 @@ class SubjectType1 extends Component {
         }
     };
 
+    // -------------------------- Publishing the question --------------------------
+
+    handlePublish = () => {
+        this.setState({
+            showSuccessAlert: false,
+            showErrorAlert: false,
+            showLoader: true,
+        });
+
+        const questions = [...this.state.questions];
+        let id = [];
+        for (let i = 0; i < questions.length; i++) {
+            if (questions[i].question_random_id !== "") {
+                id.push(questions[i].question_random_id);
+            } else {
+                continue;
+            }
+        }
+
+        if (id.length !== 0) {
+            fetch(
+                `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/publish/`,
+                {
+                    headers: this.headers,
+                    method: "POST",
+                    body: JSON.stringify({
+                        question_ids: id,
+                        chapter_id: this.chapterId,
+                        topic_name: this.topicName,
+                    }),
+                }
+            )
+                .then((res) => res.json())
+                .then((result) => {
+                    console.log(result);
+                    if (result.sts === true) {
+                        this.setState({
+                            successMsg: result.msg,
+                            showSuccessAlert: true,
+                            showLoader: false,
+                        });
+                    } else {
+                        if (result.detail) {
+                            this.setState({
+                                errorMsg: result.detail,
+                            });
+                        } else {
+                            this.setState({
+                                errorMsg: result.msg,
+                            });
+                        }
+                        this.setState({
+                            showErrorAlert: true,
+                            showLoader: false,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        } else {
+            this.setState({
+                showLoader: false,
+            });
+        }
+    };
+
     render() {
         let data = [...this.state.questions];
         let boards = [...this.state.keyboards];
@@ -2303,6 +2370,34 @@ class SubjectType1 extends Component {
                     name={this.props.subject_name}
                     togglenav={this.toggleSideNav}
                 />
+
+                {/* Alert message */}
+                <Alert
+                    variant="danger"
+                    className="fixed-top"
+                    show={this.state.showErrorAlert}
+                    onClose={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
+                    dismissible
+                >
+                    {this.state.errorMsg}
+                </Alert>
+                <Alert
+                    variant="success"
+                    className="fixed-top"
+                    show={this.state.showSuccessAlert}
+                    onClose={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    dismissible
+                >
+                    {this.state.successMsg}
+                </Alert>
 
                 {/* Sidebar */}
                 <SideNav
@@ -2376,7 +2471,22 @@ class SubjectType1 extends Component {
                                     </div>
                                     <div className="col-md-6">
                                         <div className="d-flex flex-wrap justify-content-end mb-4">
-                                            <button className="btn btn-primary btn-sm mr-1">
+                                            <button
+                                                className="btn btn-primary btn-sm mr-1"
+                                                onClick={this.handlePublish}
+                                            >
+                                                {this.state.showLoader ? (
+                                                    <Spinner
+                                                        as="span"
+                                                        animation="border"
+                                                        size="sm"
+                                                        role="status"
+                                                        aria-hidden="true"
+                                                        className="mr-2"
+                                                    />
+                                                ) : (
+                                                    ""
+                                                )}
                                                 Publish
                                             </button>
                                             <button className="btn btn-primary btn-sm mr-1">

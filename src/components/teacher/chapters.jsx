@@ -944,7 +944,7 @@ class Chapters extends Component {
                         <div className="row align-items-center mb-3">
                             <div className="col-md-4">
                                 <Select
-                                    className="basic-single"
+                                    className="basic-single form-shadow"
                                     placeholder={this.state.chapterName}
                                     value={[]}
                                     isSearchable={true}

@@ -194,6 +194,12 @@ class GroupTable extends Component {
                                 allowSorting={false}
                                 allowFiltering={false}
                             />
+                            <ColumnDirective
+                                field="level"
+                                headerText="Level"
+                                clipMode="EllipsisWithTooltip"
+                                filter={this.excel}
+                            />
                             {this.props.valid_from ? (
                                 <ColumnDirective
                                     field="valid_from"
