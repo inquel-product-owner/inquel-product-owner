@@ -14,8 +14,6 @@ class ChapterModal extends Component {
         this.state = {
             chapter_name: "",
             weightage: "",
-            chapter_status: "",
-            status: [],
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
@@ -31,23 +29,6 @@ class ChapterModal extends Component {
         };
     }
 
-    componentDidMount = () => {
-        fetch(`${this.url}/teacher/subject/${this.props.subjectId}/chapter/`, {
-            headers: this.headers,
-            method: "GET",
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                this.setState({
-                    status: result.data.chapter_status.chapters,
-                });
-                console.log(result);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
     handleSubmit = (event) => {
         event.preventDefault();
 
@@ -62,7 +43,6 @@ class ChapterModal extends Component {
             method: "POST",
             body: JSON.stringify({
                 chapter_name: this.state.chapter_name,
-                chapter_status: this.state.chapter_status,
                 weightage: this.state.weightage,
             }),
         })
@@ -98,12 +78,6 @@ class ChapterModal extends Component {
     handleWeightage = (event) => {
         this.setState({
             weightage: event.target.value,
-        });
-    };
-
-    handleStatus = (event) => {
-        this.setState({
-            chapter_status: event.target.value,
         });
     };
 
@@ -167,25 +141,6 @@ class ChapterModal extends Component {
                                 placeholder="Weightage"
                                 required
                             />
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="status">Status</label>
-                            <select
-                                name="status"
-                                id="status"
-                                className="form-control borders"
-                                onChange={this.handleStatus}
-                                required
-                            >
-                                <option value="">Select an option</option>
-                                {this.state.status.map((list, index) => {
-                                    return (
-                                        <option value={list} key={index}>
-                                            {list}
-                                        </option>
-                                    );
-                                })}
-                            </select>
                         </div>
                         <div className="form-group">
                             <button className="btn btn-primary btn-sm btn-block">
@@ -1471,10 +1426,9 @@ class SubjectChapters extends Component {
                                                                       ) : (
                                                                           ""
                                                                       )}
-                                                                      {this
+                                                                      {!this
                                                                           .state
-                                                                          .is_independent ===
-                                                                      false ? (
+                                                                          .is_independent ? (
                                                                           data.direct_question ===
                                                                               undefined ||
                                                                           data.direct_question ===
@@ -1626,7 +1580,7 @@ class SubjectChapters extends Component {
                                 </table>
                             </div>
                         </div>
-                        {this.state.is_independent === false ? (
+                        {!this.state.is_independent ? (
                             <>
                                 <button
                                     className="btn btn-tomato btn-block shadow-sm mb-2"

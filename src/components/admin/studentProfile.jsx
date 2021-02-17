@@ -5,6 +5,7 @@ import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
 import Loading from "../sharedComponents/loader";
+import { Badge } from "react-bootstrap";
 
 class StudentProfile extends Component {
     constructor(props) {
@@ -106,11 +107,35 @@ class StudentProfile extends Component {
                                             {this.state.studentItems.length !==
                                             0
                                                 ? this.state.studentItems
-                                                      .full_name
+                                                      .full_name !== ""
+                                                    ? this.state.studentItems
+                                                          .full_name
+                                                    : this.state.studentItems
+                                                          .username
                                                 : ""}
                                         </h5>
                                         <p className="mb-0">
-                                            {this.props.match.params.studentId}
+                                            {this.state.studentItems.length !==
+                                            0 ? (
+                                                this.state.studentItems
+                                                    .is_active ? (
+                                                    <Badge
+                                                        variant="success"
+                                                        className="ml-1"
+                                                    >
+                                                        Active
+                                                    </Badge>
+                                                ) : (
+                                                    <Badge
+                                                        variant="danger"
+                                                        className="ml-1"
+                                                    >
+                                                        Not active
+                                                    </Badge>
+                                                )
+                                            ) : (
+                                                ""
+                                            )}
                                         </p>
                                     </div>
                                 </div>

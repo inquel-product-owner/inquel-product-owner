@@ -448,7 +448,7 @@ class HODModal extends Component {
                                 <div className="form-group">
                                     <label htmlFor="category">Category</label>
                                     <Select
-                                        className="basic-single"
+                                        className="basic-single form-shadow"
                                         placeholder="Select category"
                                         isSearchable={true}
                                         name="category"
@@ -469,7 +469,7 @@ class HODModal extends Component {
                                         Sub Category
                                     </label>
                                     <Select
-                                        className="basic-single"
+                                        className="basic-single form-shadow"
                                         placeholder="Select subcategory"
                                         isDisabled={
                                             this.state.category === ""
@@ -500,7 +500,7 @@ class HODModal extends Component {
                                         Discipline
                                     </label>
                                     <Select
-                                        className="basic-single"
+                                        className="basic-single form-shadow"
                                         placeholder="Select discipline"
                                         isDisabled={
                                             this.state.sub_category === ""
@@ -531,7 +531,7 @@ class HODModal extends Component {
                                         Board / University
                                     </label>
                                     <Select
-                                        className="basic-single"
+                                        className="basic-single form-shadow"
                                         placeholder="Select board"
                                         isSearchable={true}
                                         name="board"

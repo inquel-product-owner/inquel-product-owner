@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Modal, Alert, Spinner } from "react-bootstrap";
 import Header from "./navbar";
 import SideNav from "./sidenav";
+import Select from "react-select";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
 import Loading from "../sharedComponents/loader";
 import SubjectTable from "../table/subjectTable";
@@ -13,13 +14,54 @@ class SubjectModal extends Component {
         super();
         this.state = {
             subjectName: "",
+            teacher_id: "",
+            teacherData: [],
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
             showLoader: false,
         };
+        this.url = baseUrl + hodUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
     }
+
+    componentDidMount = () => {
+        fetch(`${this.url}/hod/teacher/`, {
+            headers: this.headers,
+            method: "GET",
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        teacherData: result.data,
+                    });
+                } else {
+                    if (result.detail) {
+                        this.setState({
+                            errorMsg: result.detail,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.msg,
+                        });
+                    }
+                    this.setState({
+                        showErrorAlert: true,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
 
     handleSubmit = (event) => {
         event.preventDefault();
@@ -43,6 +85,7 @@ class SubjectModal extends Component {
             body: JSON.stringify({
                 subject_name: this.state.subjectName,
                 group_id: this.props.groupId,
+                teacher_id: this.state.teacher_id,
             }),
         })
             .then((res) => res.json())
@@ -68,9 +111,15 @@ class SubjectModal extends Component {
             });
     };
 
-    handleSubject = (event) => {
+    handleInput = (event) => {
         this.setState({
             subjectName: event.target.value,
+        });
+    };
+
+    handleTeacher = (event) => {
+        this.setState({
+            teacher_id: event.value.toString(),
         });
     };
 
@@ -117,9 +166,48 @@ class SubjectModal extends Component {
                                 name="subject"
                                 id="subject"
                                 className="form-control borders"
-                                onChange={this.handleSubject}
+                                placeholder="Enter subject name"
+                                onChange={this.handleInput}
                                 required
                             />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="teacher_id">Teacher</label>
+                            <Select
+                                className="basic-single borders"
+                                placeholder="Select teacher"
+                                isSearchable={true}
+                                name="teacher_id"
+                                id="teacher_id"
+                                options={this.state.teacherData.map((list) => {
+                                    return {
+                                        value: list.id,
+                                        label:
+                                            list.full_name !== ""
+                                                ? list.full_name
+                                                : list.username,
+                                    };
+                                })}
+                                onChange={this.handleTeacher}
+                                required
+                            />
+                            {/* <select
+                                name="teacher_id"
+                                id="teacher_id"
+                                className="form-control borders"
+                                onChange={this.handleInput}
+                            >
+                                <option value="">Select teacher</option>
+                                {this.state.teacherData.map((list, index) => {
+                                    return (
+                                        <option value={list.id} key={index}>
+                                            {list.full_name !== ""
+                                                ? list.full_name
+                                                : list.username}
+                                        </option>
+                                    );
+                                })}
+                            </select> */}
                         </div>
                         <div className="form-group">
                             <button className="btn btn-primary btn-sm btn-block">
@@ -150,7 +238,7 @@ class Group extends Component {
         super(props);
         this.state = {
             showSideNav: false,
-            subjectModalShow: false,
+            showModal: false,
             groupItems: [],
             subjectItems: [],
             activeSubjectPage: 1,
@@ -158,6 +246,7 @@ class Group extends Component {
             page_loading: true,
             is_formSubmited: false,
         };
+        this.groupId = this.props.match.params.groupId;
         this.url = baseUrl + hodUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
@@ -173,14 +262,14 @@ class Group extends Component {
         });
     };
 
-    addSubjectModal = () => {
+    toggleModal = () => {
         this.setState({
-            subjectModalShow: !this.state.subjectModalShow,
+            showModal: !this.state.showModal,
         });
     };
 
     loadSubjectData = () => {
-        fetch(`${this.url}/hod/group/${this.props.match.params.groupId}`, {
+        fetch(`${this.url}/hod/group/${this.groupId}/`, {
             headers: this.headers,
             method: "GET",
         })
@@ -229,7 +318,7 @@ class Group extends Component {
             });
             setTimeout(() => {
                 this.setState({
-                    subjectModalShow: false,
+                    showModal: false,
                 });
             }, 1000);
         }
@@ -259,11 +348,11 @@ class Group extends Component {
                 />
 
                 {/* Add Subject modal */}
-                {this.state.subjectModalShow ? (
+                {this.state.showModal ? (
                     <SubjectModal
-                        show={this.state.subjectModalShow}
-                        onHide={this.addSubjectModal}
-                        groupId={this.props.match.params.groupId}
+                        show={this.state.showModal}
+                        onHide={this.toggleModal}
+                        groupId={this.groupId}
                         formSubmission={this.formSubmission}
                     />
                 ) : (
@@ -323,7 +412,7 @@ class Group extends Component {
                                     <div className="col-md-9 text-right">
                                         <button
                                             className="btn btn-primary btn-sm mr-2"
-                                            onClick={this.addSubjectModal}
+                                            onClick={this.toggleModal}
                                         >
                                             Add new
                                         </button>
