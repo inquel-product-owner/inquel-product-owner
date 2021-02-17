@@ -6,6 +6,7 @@ import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
 import Loading from "../sharedComponents/loader";
 import Paginations from "../sharedComponents/pagination";
 import StudentTable from "../table/studentTable";
+import { Badge } from "react-bootstrap";
 
 class HodStudentList extends Component {
     constructor(props) {
@@ -134,18 +135,43 @@ class HodStudentList extends Component {
                                                         : profilepic
                                                     : profilepic
                                             }
-                                            alt={`${this.state.hodItems.first_name} ${this.state.hodItems.last_name}`}
+                                            alt={this.state.hodItems.full_name}
                                             className="img-fluid profile-pic"
                                         />
                                     </div>
                                     <div className="col-md-10 col-9 pl-0">
                                         <h5 className="primary-text">
                                             {this.state.hodItems.length !== 0
-                                                ? `${this.state.hodItems.first_name} ${this.state.hodItems.last_name}`
+                                                ? this.state.hodItems
+                                                      .full_name !== ""
+                                                    ? this.state.hodItems
+                                                          .full_name
+                                                    : this.state.hodItems
+                                                          .username
                                                 : ""}
                                         </h5>
                                         <p className="mb-0">
-                                            {this.props.match.params.hodId}
+                                            {this.state.hodItems.length !==
+                                            0 ? (
+                                                this.state.hodItems
+                                                    .is_active ? (
+                                                    <Badge
+                                                        variant="success"
+                                                        className="ml-1"
+                                                    >
+                                                        Active
+                                                    </Badge>
+                                                ) : (
+                                                    <Badge
+                                                        variant="danger"
+                                                        className="ml-1"
+                                                    >
+                                                        Not active
+                                                    </Badge>
+                                                )
+                                            ) : (
+                                                ""
+                                            )}
                                         </p>
                                     </div>
                                 </div>

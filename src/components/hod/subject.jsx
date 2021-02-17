@@ -12,42 +12,20 @@ class ChapterModal extends Component {
         this.state = {
             showSideNav: false,
             teacherData: [],
-            chapterStatus: [],
-            courseStructure: "",
-            selectedStatus: "",
-            selectedTeacher: "",
+            chapter: "",
+            teacher: "",
             weightage: "",
-            subjectItem: [],
             successMsg: "",
             errorMsg: "",
             showSuccessAlert: false,
             showErrorAlert: false,
             showLoader: false,
         };
-        this.subjectId = this.props.subjectId;
     }
 
-    handleCourse = (event) => {
+    handleInput = (event) => {
         this.setState({
-            courseStructure: event.target.value,
-        });
-    };
-
-    handleWeightage = (event) => {
-        this.setState({
-            weightage: event.target.value,
-        });
-    };
-
-    handleStatus = (event) => {
-        this.setState({
-            selectedStatus: event.target.value,
-        });
-    };
-
-    handleTeacher = (event) => {
-        this.setState({
-            selectedTeacher: event.target.value,
+            [event.target.name]: event.target.value,
         });
     };
 
@@ -60,15 +38,14 @@ class ChapterModal extends Component {
             Authorization: authToken,
         };
 
-        fetch(`${url}/hod/subject/${this.subjectId}/assign/teacher/`, {
+        fetch(`${url}/hod/teacher/`, {
             headers: headers,
             method: "GET",
         })
             .then((res) => res.json())
             .then((result) => {
                 this.setState({
-                    teacherData: result.data.teachers,
-                    chapterStatus: result.data.chapter_status.chapters,
+                    teacherData: result.data,
                 });
                 console.log(result);
             })
@@ -94,13 +71,12 @@ class ChapterModal extends Component {
             Authorization: authToken,
         };
 
-        fetch(`${url}/hod/subject/${this.subjectId}/assign/teacher/`, {
+        fetch(`${url}/hod/subject/${this.props.subjectId}/assign/teacher/`, {
             headers: headers,
             method: "POST",
             body: JSON.stringify({
-                chapter_name: this.state.courseStructure,
-                chapter_status: this.state.selectedStatus,
-                teacher_id: this.state.selectedTeacher,
+                chapter_name: this.state.chapter,
+                teacher_id: this.state.teacher,
                 weightage: this.state.weightage,
             }),
         })
@@ -170,28 +146,9 @@ class ChapterModal extends Component {
                                 name="chapter"
                                 id="chapter"
                                 className="form-control borders"
-                                onChange={this.handleCourse}
+                                onChange={this.handleInput}
                                 required
                             />
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="status">Status</label>
-                            <select
-                                name="status"
-                                id="status"
-                                className="form-control borders"
-                                onChange={this.handleStatus}
-                                required
-                            >
-                                <option value="">Select an option</option>
-                                {this.state.chapterStatus.map((list, index) => {
-                                    return (
-                                        <option value={list} key={index}>
-                                            {list}
-                                        </option>
-                                    );
-                                })}
-                            </select>
                         </div>
                         <div className="form-group">
                             <label htmlFor="teacher">Teacher</label>
@@ -199,14 +156,16 @@ class ChapterModal extends Component {
                                 name="teacher"
                                 id="teacher"
                                 className="form-control borders"
-                                onChange={this.handleTeacher}
+                                onChange={this.handleInput}
                                 required
                             >
                                 <option value="">Select teacher</option>
                                 {this.state.teacherData.map((list, index) => {
                                     return (
                                         <option value={list.id} key={index}>
-                                            {list.username}
+                                            {list.full_name !== ""
+                                                ? list.full_name
+                                                : list.username}
                                         </option>
                                     );
                                 })}
@@ -219,7 +178,7 @@ class ChapterModal extends Component {
                                 name="weightage"
                                 id="weightage"
                                 className="form-control borders"
-                                onChange={this.handleWeightage}
+                                onChange={this.handleInput}
                                 required
                             />
                         </div>
@@ -260,6 +219,7 @@ class Subject extends Component {
             chapterData: [],
             page_loading: true,
         };
+        this.subjectId = this.props.match.params.subjectId;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
             Accept: "application/json",
@@ -280,13 +240,10 @@ class Subject extends Component {
     };
 
     loadSubjectData = () => {
-        fetch(
-            `${this.url}/hod/subjects/${this.props.match.params.subjectId}/chapters/`,
-            {
-                headers: this.headers,
-                method: "GET",
-            }
-        )
+        fetch(`${this.url}/hod/subjects/${this.subjectId}/chapters/`, {
+            headers: this.headers,
+            method: "GET",
+        })
             .then((res) => res.json())
             .then((result) => {
                 this.setState({
@@ -355,7 +312,7 @@ class Subject extends Component {
                         show={this.state.showModal}
                         onHide={this.toggleModal}
                         formSubmission={this.formSubmission}
-                        subjectId={this.props.match.params.subjectId}
+                        subjectId={this.subjectId}
                     />
                 ) : null}
 
@@ -390,9 +347,7 @@ class Subject extends Component {
                                 >
                                     Add New
                                 </button>
-                                <Link
-                                    to={`/hod/subject/${this.props.match.params.subjectId}/configure`}
-                                >
+                                <Link to={`${this.props.match.url}/configure`}>
                                     <button className="btn btn-primary btn-sm">
                                         Configure Course
                                     </button>
@@ -429,7 +384,7 @@ class Subject extends Component {
                                                           <tr key={index}>
                                                               <td>
                                                                   <Link
-                                                                      to={`/chapter/${this.props.match.params.subjectId}/${list.chapter_name}`}
+                                                                      to={`/chapter/${this.subjectId}/${list.chapter_name}`}
                                                                       className="primary-text"
                                                                   >
                                                                       {
