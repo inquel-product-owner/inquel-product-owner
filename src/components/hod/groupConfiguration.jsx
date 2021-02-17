@@ -14,16 +14,60 @@ class GroupModal extends Component {
         this.state = {
             groupName: "",
             groupDesc: "",
-            levels: "",
+            level_code: "",
+            level_name: "",
             valid_from: "",
             valid_to: "",
+            levelItems: [],
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
             showLoader: false,
         };
+        this.url = baseUrl + hodUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
     }
+
+    componentDidMount = () => {
+        fetch(
+            `${this.url}/hod/group/levels/?category=${this.props.category}&sub_category=${this.props.sub_category}`,
+            {
+                headers: this.headers,
+                method: "GET",
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        levelItems: result.data.LEVELS,
+                    });
+                } else {
+                    if (result.detail) {
+                        this.setState({
+                            errorMsg: result.detail,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.msg,
+                        });
+                    }
+                    this.setState({
+                        showErrorAlert: true,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
 
     handleGroupData = (event) => {
         const name = event.target.name;
@@ -37,7 +81,25 @@ class GroupModal extends Component {
         const name = event.target.name;
         const value = event.target.value;
         this.setState({
-            [name]: `${dateFormat(value, "yyyy-mm-dd hh:MM:ss")}`,
+            [name]: `${dateFormat(value, "yyyy-mm-dd")} 00:00:00`,
+        });
+    };
+
+    handleLevels = (event) => {
+        let temp = Object.entries(this.state.levelItems);
+        let code = "";
+        let name = "";
+        for (let i = 0; i < Object.keys(this.state.levelItems).length; i++) {
+            if (temp[i][0] === event.target.value) {
+                code = temp[i][0];
+                name = temp[i][1];
+            } else {
+                continue;
+            }
+        }
+        this.setState({
+            level_code: code,
+            level_name: name,
         });
     };
 
@@ -63,6 +125,8 @@ class GroupModal extends Component {
             body: JSON.stringify({
                 group_name: this.state.groupName,
                 group_description: this.state.groupDesc,
+                level_code: this.state.level_code,
+                level_name: this.state.level_name,
                 valid_from: this.state.valid_from,
                 valid_to: this.state.valid_to,
             }),
@@ -145,6 +209,7 @@ class GroupModal extends Component {
                                 id="groupName"
                                 className="form-control borders"
                                 onChange={this.handleGroupData}
+                                required
                             />
                         </div>
                         <div className="form-group">
@@ -155,18 +220,59 @@ class GroupModal extends Component {
                                 rows="4"
                                 className="form-control borders"
                                 onChange={this.handleGroupData}
+                                required
                             ></textarea>
+                        </div>
+                        <div className="row">
+                            <div className="form-group col-md-6">
+                                <label htmlFor="category">Category</label>
+                                <input
+                                    type="text"
+                                    name="category"
+                                    id="category"
+                                    value={this.props.category}
+                                    className="form-control borders"
+                                    disabled
+                                />
+                            </div>
+                            <div className="form-group col-md-6">
+                                <label htmlFor="sub_category">
+                                    Sub Category
+                                </label>
+                                <input
+                                    type="text"
+                                    name="sub_category"
+                                    id="sub_category"
+                                    value={this.props.sub_category}
+                                    className="form-control borders"
+                                    disabled
+                                />
+                            </div>
                         </div>
                         <div className="form-group">
                             <label htmlFor="levels">Level</label>
                             <select
                                 name="levels"
                                 id="levels"
-                                onChange={this.handleGroupData}
+                                onChange={this.handleLevels}
                                 className="form-control borders"
                                 required
                             >
                                 <option value="">Select levels</option>
+                                {Object.keys(this.state.levelItems).length !== 0
+                                    ? Object.entries(this.state.levelItems).map(
+                                          ([key, value], index) => {
+                                              return (
+                                                  <option
+                                                      value={key}
+                                                      key={index}
+                                                  >
+                                                      {value}
+                                                  </option>
+                                              );
+                                          }
+                                      )
+                                    : null}
                             </select>
                         </div>
                         <div className="row">
@@ -177,6 +283,8 @@ class GroupModal extends Component {
                                     name="valid_from"
                                     id="valid_from"
                                     className="form-control borders"
+                                    min={this.props.valid_from}
+                                    max={this.props.valid_to}
                                     onChange={this.handleDate}
                                 />
                             </div>
@@ -187,6 +295,8 @@ class GroupModal extends Component {
                                     name="valid_to"
                                     id="valid_to"
                                     className="form-control borders"
+                                    min={this.props.valid_from}
+                                    max={this.props.valid_to}
                                     onChange={this.handleDate}
                                 />
                             </div>
@@ -224,6 +334,10 @@ class GroupConfiguration extends Component {
             groupItem: [],
             activeGroupPage: 1,
             totalGroupCount: 0,
+            category: "",
+            sub_category: "",
+            valid_from: "",
+            valid_to: "",
             page_loading: true,
             is_formSubmited: false,
         };
@@ -258,6 +372,16 @@ class GroupConfiguration extends Component {
                 this.setState({
                     groupItem: result.data.results,
                     totalGroupCount: result.data.count,
+                    category: result.data.category,
+                    sub_category: result.data.sub_category,
+                    valid_from: dateFormat(
+                        result.data.hod_valid_from,
+                        "yyyy-mm-dd"
+                    ),
+                    valid_to: dateFormat(
+                        result.data.hod_valid_to,
+                        "yyyy-mm-dd"
+                    ),
                     page_loading: false,
                 });
                 console.log(result);
@@ -321,12 +445,20 @@ class GroupConfiguration extends Component {
                     activeLink="dashboard"
                 />
 
-                {/* Add Subject modal */}
-                <GroupModal
-                    show={this.state.showModal}
-                    onHide={this.toggleModal}
-                    formSubmission={this.formSubmission}
-                />
+                {/* Add Group modal */}
+                {this.state.showModal ? (
+                    <GroupModal
+                        show={this.state.showModal}
+                        onHide={this.toggleModal}
+                        formSubmission={this.formSubmission}
+                        category={this.state.category}
+                        sub_category={this.state.sub_category}
+                        valid_from={this.state.valid_from}
+                        valid_to={this.state.valid_to}
+                    />
+                ) : (
+                    ""
+                )}
 
                 <div
                     className={`section content ${

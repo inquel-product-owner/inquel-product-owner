@@ -181,7 +181,7 @@ class MasterData extends Component {
                                                 Option
                                             </label>
                                             <Select
-                                                className="basic-single"
+                                                className="basic-single form-shadow"
                                                 placeholder="Select option"
                                                 isSearchable={true}
                                                 name="option"
@@ -208,7 +208,7 @@ class MasterData extends Component {
                                                 Category
                                             </label>
                                             <Select
-                                                className="basic-single"
+                                                className="basic-single form-shadow"
                                                 placeholder="Select category"
                                                 isDisabled={
                                                     this.state.activeType ===
@@ -231,7 +231,7 @@ class MasterData extends Component {
                                             />
                                         </div>
 
-                                        <button className="btn btn-light btn-sm btn-block shadow-sm mb-2">
+                                        <button className="btn btn-light btn-sm btn-block border-secondary mb-2">
                                             Add +
                                         </button>
 
@@ -240,7 +240,7 @@ class MasterData extends Component {
                                                 Sub Category
                                             </label>
                                             <Select
-                                                className="basic-single"
+                                                className="basic-single form-shadow"
                                                 placeholder="Select subcategory"
                                                 isDisabled={
                                                     this.state
@@ -271,7 +271,7 @@ class MasterData extends Component {
                                             />
                                         </div>
 
-                                        <button className="btn btn-light btn-sm btn-block shadow-sm">
+                                        <button className="btn btn-light btn-sm btn-block border-secondary">
                                             Add +
                                         </button>
                                     </div>
@@ -312,7 +312,7 @@ class MasterData extends Component {
                                                             Data not available
                                                         </p>
                                                     )}
-                                                    <button className="btn btn-light btn-sm btn-block shadow-sm">
+                                                    <button className="btn btn-light btn-sm btn-block border-secondary">
                                                         Add +
                                                     </button>
                                                 </div>
@@ -345,7 +345,7 @@ class MasterData extends Component {
                                                             Data not available
                                                         </p>
                                                     )}
-                                                    <button className="btn btn-light btn-sm btn-block shadow-sm">
+                                                    <button className="btn btn-light btn-sm btn-block border-secondary">
                                                         Add +
                                                     </button>
                                                 </div>
@@ -378,7 +378,7 @@ class MasterData extends Component {
                                                             Data not available
                                                         </p>
                                                     )}
-                                                    <button className="btn btn-light btn-sm btn-block shadow-sm">
+                                                    <button className="btn btn-light btn-sm btn-block border-secondary">
                                                         Add +
                                                     </button>
                                                 </div>
@@ -423,7 +423,7 @@ class MasterData extends Component {
                                                             Data not available
                                                         </p>
                                                     )}
-                                                    <button className="btn btn-light btn-sm btn-block shadow-sm">
+                                                    <button className="btn btn-light btn-sm btn-block border-secondary">
                                                         Add +
                                                     </button>
                                                 </div>
@@ -468,7 +468,7 @@ class MasterData extends Component {
                                                             Data not available
                                                         </p>
                                                     )}
-                                                    <button className="btn btn-light btn-sm btn-block shadow-sm">
+                                                    <button className="btn btn-light btn-sm btn-block border-secondary">
                                                         Add +
                                                     </button>
                                                 </div>

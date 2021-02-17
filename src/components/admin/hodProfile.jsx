@@ -74,44 +74,53 @@ class HodProfile extends Component {
             showConfigSuccessAlert: false,
             showConfigLoader: true,
         });
-        fetch(`${this.url}/hod/${this.hodId}/`, {
-            headers: this.headers,
-            method: "PUT",
-            body: JSON.stringify({
-                prog_sco_card: this.state.progressivescore,
-                type_1_q: this.state.type1,
-                type_2_q: this.state.type2,
-                direct_q: this.state.directquestion,
-                quiz: this.state.quiz,
-                match: this.state.match,
-                config_course: this.state.configure,
-                sim_exam: this.state.simulationexam,
-                lock_test: this.state.lockingoftest,
-                copy_download: this.state.notesdownload,
-                android_app: this.state.mobileapp,
-                summary: this.state.summary,
-            }),
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts) {
-                    this.setState({
-                        successMsgConfig: result.msg,
-                        showConfigSuccessAlert: true,
-                        showConfigLoader: false,
-                    });
-                } else {
-                    this.setState({
-                        errorMsgConfig: result.msg,
-                        showConfigErrorAlert: true,
-                        showConfigLoader: false,
-                    });
-                }
+
+        if (this.state.hodItems.is_active) {
+            fetch(`${this.url}/hod/${this.hodId}/`, {
+                headers: this.headers,
+                method: "PUT",
+                body: JSON.stringify({
+                    prog_sco_card: this.state.progressivescore,
+                    type_1_q: this.state.type1,
+                    type_2_q: this.state.type2,
+                    direct_q: this.state.directquestion,
+                    quiz: this.state.quiz,
+                    match: this.state.match,
+                    config_course: this.state.configure,
+                    sim_exam: this.state.simulationexam,
+                    lock_test: this.state.lockingoftest,
+                    copy_download: this.state.notesdownload,
+                    android_app: this.state.mobileapp,
+                    summary: this.state.summary,
+                }),
             })
-            .catch((err) => {
-                console.log(err);
+                .then((res) => res.json())
+                .then((result) => {
+                    console.log(result);
+                    if (result.sts === true) {
+                        this.setState({
+                            successMsgConfig: result.msg,
+                            showConfigSuccessAlert: true,
+                            showConfigLoader: false,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsgConfig: result.msg,
+                            showConfigErrorAlert: true,
+                            showConfigLoader: false,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        } else {
+            this.setState({
+                errorMsgConfig: "Can't update inactive HOD!",
+                showConfigErrorAlert: true,
+                showConfigLoader: false,
             });
+        }
     };
 
     handleDetails = () => {
@@ -120,40 +129,49 @@ class HodProfile extends Component {
             showDetailsSuccessAlert: false,
             showDetailsLoader: true,
         });
-        fetch(`${this.url}/hod/${this.hodId}/`, {
-            headers: this.headers,
-            method: "PUT",
-            body: JSON.stringify({
-                category: this.state.selectedCategory,
-                sub_category: this.state.selectedSubcategory,
-                discipline: this.state.selectedDiscipline,
-                board: this.state.selectedBoard,
-                valid_from: this.state.selectedValid_from,
-                valid_to: this.state.selectedValid_to,
-            }),
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts) {
-                    this.setState({
-                        successMsgDetails: result.msg,
-                        showDetailsSuccessAlert: true,
-                        showDetailsLoader: false,
-                        is_formSubmited: true,
-                        page_loading: true,
-                    });
-                } else {
-                    this.setState({
-                        errorMsgDetails: result.msg,
-                        showDetailsErrorAlert: true,
-                        showDetailsLoader: false,
-                    });
-                }
+
+        if (this.state.hodItems.is_active) {
+            fetch(`${this.url}/hod/${this.hodId}/`, {
+                headers: this.headers,
+                method: "PUT",
+                body: JSON.stringify({
+                    category: this.state.selectedCategory,
+                    sub_category: this.state.selectedSubcategory,
+                    discipline: this.state.selectedDiscipline,
+                    board: this.state.selectedBoard,
+                    valid_from: this.state.selectedValid_from,
+                    valid_to: this.state.selectedValid_to,
+                }),
             })
-            .catch((err) => {
-                console.log(err);
+                .then((res) => res.json())
+                .then((result) => {
+                    console.log(result);
+                    if (result.sts === true) {
+                        this.setState({
+                            successMsgDetails: result.msg,
+                            showDetailsSuccessAlert: true,
+                            showDetailsLoader: false,
+                            is_formSubmited: true,
+                            page_loading: true,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsgDetails: result.msg,
+                            showDetailsErrorAlert: true,
+                            showDetailsLoader: false,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        } else {
+            this.setState({
+                errorMsgDetails: "Can't update inactive HOD!",
+                showDetailsErrorAlert: true,
+                showDetailsLoader: false,
             });
+        }
     };
 
     loadHodData = () => {
@@ -476,7 +494,10 @@ class HodProfile extends Component {
                                                                 : profilepic
                                                             : profilepic
                                                     }
-                                                    alt={`${this.state.hodItems.first_name} ${this.state.hodItems.last_name}`}
+                                                    alt={
+                                                        this.state.hodItems
+                                                            .full_name
+                                                    }
                                                     className="img-fluid profile-pic"
                                                 />
                                             </div>
@@ -484,14 +505,17 @@ class HodProfile extends Component {
                                                 <h5 className="primary-text">
                                                     {this.state.hodItems
                                                         .length !== 0
-                                                        ? `${this.state.hodItems.first_name} ${this.state.hodItems.last_name}`
+                                                        ? this.state.hodItems
+                                                              .full_name !== ""
+                                                            ? this.state
+                                                                  .hodItems
+                                                                  .full_name
+                                                            : this.state
+                                                                  .hodItems
+                                                                  .username
                                                         : ""}
                                                 </h5>
                                                 <p className="mb-0">
-                                                    {
-                                                        this.props.match.params
-                                                            .hodId
-                                                    }{" "}
                                                     {this.state.hodItems
                                                         .length !== 0 ? (
                                                         this.state.hodItems
@@ -874,7 +898,7 @@ class HodProfile extends Component {
                                                 Category
                                             </label>
                                             <Select
-                                                className="basic-single"
+                                                className="basic-single form-shadow"
                                                 placeholder="Select category"
                                                 isSearchable={true}
                                                 name="category"
@@ -898,7 +922,7 @@ class HodProfile extends Component {
                                                 Sub Category
                                             </label>
                                             <Select
-                                                className="basic-single"
+                                                className="basic-single form-shadow"
                                                 placeholder="Select subcategory"
                                                 isDisabled={
                                                     this.state
@@ -936,7 +960,7 @@ class HodProfile extends Component {
                                                 Discipline
                                             </label>
                                             <Select
-                                                className="basic-single"
+                                                className="basic-single form-shadow"
                                                 placeholder="Select discipline"
                                                 isDisabled={
                                                     this.state
@@ -973,7 +997,7 @@ class HodProfile extends Component {
                                                 Board / University
                                             </label>
                                             <Select
-                                                className="basic-single"
+                                                className="basic-single form-shadow"
                                                 placeholder="Select board"
                                                 isSearchable={true}
                                                 name="board"
@@ -1063,7 +1087,7 @@ class HodProfile extends Component {
                                             show={
                                                 this.state.showConfigErrorAlert
                                             }
-                                            className="mb-2"
+                                            className="mb-3"
                                             onClose={() => {
                                                 this.setState({
                                                     showConfigErrorAlert: false,
@@ -1079,7 +1103,7 @@ class HodProfile extends Component {
                                                 this.state
                                                     .showConfigSuccessAlert
                                             }
-                                            className="mb-2"
+                                            className="mb-3"
                                             onClose={() => {
                                                 this.setState({
                                                     showConfigSuccessAlert: false,

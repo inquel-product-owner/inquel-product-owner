@@ -499,6 +499,7 @@ class Chapters extends Component {
             },
             cycle_test: [],
             selectedCycleData: [],
+            is_independent: false,
 
             page_loading: true,
             is_topicFormSubmitted: false,
@@ -622,6 +623,7 @@ class Chapters extends Component {
             .then((result) => {
                 this.setState({
                     chapterList: result.data.results,
+                    is_independent: result.data.is_independent,
                 });
                 console.log(result);
             })
@@ -1094,28 +1096,32 @@ class Chapters extends Component {
                                                                               ) : (
                                                                                   ""
                                                                               )}
-                                                                              {data.direct_question ===
-                                                                                  undefined ||
-                                                                              data.direct_question ===
-                                                                                  true ? (
-                                                                                  <Link
-                                                                                      to={`${this.props.match.url}/cycle/${data.cycle_test_id}/direct`}
-                                                                                  >
-                                                                                      <button
-                                                                                          className="btn btn-primary btn-sm ml-2"
-                                                                                          onClick={() =>
-                                                                                              this.dispatchCycle(
-                                                                                                  data.cycle_test_name
-                                                                                              )
-                                                                                          }
+                                                                              {!this
+                                                                                  .state
+                                                                                  .is_independent ? (
+                                                                                  data.direct_question ===
+                                                                                      undefined ||
+                                                                                  data.direct_question ===
+                                                                                      true ? (
+                                                                                      <Link
+                                                                                          to={`${this.props.match.url}/cycle/${data.cycle_test_id}/direct`}
                                                                                       >
-                                                                                          Direct
-                                                                                          Test
-                                                                                      </button>
-                                                                                  </Link>
-                                                                              ) : (
-                                                                                  ""
-                                                                              )}
+                                                                                          <button
+                                                                                              className="btn btn-primary btn-sm ml-2"
+                                                                                              onClick={() =>
+                                                                                                  this.dispatchCycle(
+                                                                                                      data.cycle_test_name
+                                                                                                  )
+                                                                                              }
+                                                                                          >
+                                                                                              Direct
+                                                                                              Test
+                                                                                          </button>
+                                                                                      </Link>
+                                                                                  ) : (
+                                                                                      ""
+                                                                                  )
+                                                                              ) : null}
                                                                               <Dropdown>
                                                                                   <Dropdown.Toggle
                                                                                       variant="white"
