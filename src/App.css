@@ -641,13 +641,12 @@ input[type="search"]:focus {
 }
 
 .preview-img-sm {
-    width: 35px;
-    height: 35px;
+    width: 100%;
+    height: 50px;
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
     cursor: zoom-in;
-    border-radius: 50% !important;
 }
 
 .preview-img-lg {
