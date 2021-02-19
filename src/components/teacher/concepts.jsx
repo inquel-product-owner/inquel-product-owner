@@ -12,13 +12,14 @@ import {
     Spinner,
     Modal,
     Tab,
-    Row,
-    Col,
     Nav,
 } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import ReactCardFlip from "react-card-flip";
 import Loading from "../sharedComponents/loader";
+import AlertModal from "../sharedComponents/alertModal";
+import { Player } from "video-react";
+import "video-react/dist/video-react.css";
 
 const mapStateToProps = (state) => ({
     subject_name: state.subject_name,
@@ -186,104 +187,151 @@ class FileModal extends Component {
 
     changeImage = (image_index) => {
         const images = [...this.state.image];
-        if (this.state.selectedImage === image_index) {
+        this.setState({
+            selectedImage: image_index,
+            selectedImageData: images[image_index],
+        });
+    };
+
+    componentDidMount = () => {
+        const images = [...this.state.image];
+        if (images[0].path !== null) {
             this.setState({
-                selectedImage: "",
-                selectedImageData: [],
-            });
-        } else {
-            this.setState({
-                selectedImage: image_index,
-                selectedImageData: images[image_index],
+                selectedImageData: images[0],
             });
         }
     };
 
     render() {
-        const video = this.state.video;
+        let audio = "";
         return (
             <Modal
                 show={this.props.show}
                 onHide={this.props.onHide}
+                backdrop="static"
                 size="lg"
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
                 <Modal.Header closeButton>Uploaded Files</Modal.Header>
-                <Modal.Body>
+                <Modal.Body className="py-0">
                     <Tab.Container
                         id="left-tabs-example"
                         defaultActiveKey="image"
                     >
-                        <Row>
-                            <Col sm={3} className="mb-3 mb-md-0">
+                        <div className="row">
+                            <div
+                                className="col-md-3 py-3 mb-3 mb-md-0"
+                                style={{ borderRight: "1px solid #ccc" }}
+                            >
                                 <Nav variant="pills" className="flex-column">
-                                    <Nav.Item>
+                                    <Nav.Item className="primary-nav-item">
                                         <Nav.Link eventKey="image">
                                             Image
                                         </Nav.Link>
                                     </Nav.Item>
-                                    <Nav.Item>
+                                    <Nav.Item className="primary-nav-item">
                                         <Nav.Link eventKey="video">
                                             Video
                                         </Nav.Link>
                                     </Nav.Item>
-                                    <Nav.Item>
+                                    <Nav.Item className="primary-nav-item">
                                         <Nav.Link eventKey="audio">
                                             Audio
                                         </Nav.Link>
                                     </Nav.Item>
                                 </Nav>
-                            </Col>
-                            <Col sm={9}>
+                            </div>
+                            <div className="col-md-9 py-3">
                                 <Tab.Content>
                                     <Tab.Pane eventKey="image">
-                                        {this.state.image.map(
-                                            (images, index) => {
-                                                return images.path !== "" ? (
-                                                    <div
-                                                        key={index}
-                                                        className="card preview-img-sm bg-light shadow-sm mb-2"
-                                                        style={{
-                                                            backgroundImage: `url(${images.path})`,
-                                                        }}
-                                                        onClick={() =>
-                                                            this.changeImage(
-                                                                index
-                                                            )
-                                                        }
-                                                    ></div>
-                                                ) : null;
-                                            }
-                                        )}
-                                        {this.state.selectedImageData.length !==
-                                        0 ? (
+                                        {this.state.selectedImageData.path !==
+                                        "" ? (
                                             <div className="card shadow-sm">
-                                                <img
-                                                    src={
-                                                        this.state
-                                                            .selectedImageData
-                                                            .path
-                                                    }
-                                                    alt={
-                                                        this.state
-                                                            .selectedImageData
-                                                            .file_name
-                                                    }
-                                                    className="img-fluid rounded-lg"
-                                                />
+                                                <div className="card-header text-center font-weight-bold tomato-bg">
+                                                    {this.state
+                                                        .selectedImageData
+                                                        .length !== 0
+                                                        ? this.state
+                                                              .selectedImageData
+                                                              .title
+                                                        : ""}
+                                                </div>
+                                                {/* Single image view */}
+                                                <div className="card-body text-center p-0">
+                                                    {this.state
+                                                        .selectedImageData
+                                                        .length !== 0 ? (
+                                                        <img
+                                                            src={
+                                                                this.state
+                                                                    .selectedImageData
+                                                                    .path
+                                                            }
+                                                            alt={
+                                                                this.state
+                                                                    .selectedImageData
+                                                                    .file_name
+                                                            }
+                                                            className="img-fluid"
+                                                        />
+                                                    ) : (
+                                                        ""
+                                                    )}
+                                                </div>
+                                                {/* Thumbnails */}
+                                                <div className="card-footer tomato-bg">
+                                                    <div className="row justify-content-center">
+                                                        {this.state.image.map(
+                                                            (images, index) => {
+                                                                return images.path !==
+                                                                    "" ? (
+                                                                    <div
+                                                                        key={
+                                                                            index
+                                                                        }
+                                                                        className="col-md-3"
+                                                                    >
+                                                                        <div
+                                                                            className={`card preview-img-sm ${
+                                                                                this
+                                                                                    .state
+                                                                                    .selectedImage ===
+                                                                                index
+                                                                                    ? "border-primary shadow"
+                                                                                    : ""
+                                                                            }`}
+                                                                            style={{
+                                                                                backgroundImage: `url(${images.path})`,
+                                                                            }}
+                                                                            onClick={() =>
+                                                                                this.changeImage(
+                                                                                    index
+                                                                                )
+                                                                            }
+                                                                        ></div>
+                                                                    </div>
+                                                                ) : null;
+                                                            }
+                                                        )}
+                                                    </div>
+                                                </div>
                                             </div>
                                         ) : (
-                                            ""
+                                            "No images to display"
                                         )}
                                     </Tab.Pane>
                                     <Tab.Pane eventKey="video">
                                         <div className="card">
-                                            {this.state.video.path !== null ? (
-                                                <video
-                                                    controls
-                                                    src={this.state.video.path}
-                                                ></video>
+                                            {this.state.video.path !== "" ? (
+                                                <Player>
+                                                    <source
+                                                        src={
+                                                            this.state.video
+                                                                .path
+                                                        }
+                                                    />
+                                                </Player>
                                             ) : (
                                                 "Video not uploaded"
                                             )}
@@ -291,19 +339,27 @@ class FileModal extends Component {
                                     </Tab.Pane>
                                     <Tab.Pane eventKey="audio">
                                         {this.state.audio.map((item, index) => {
-                                            return item.path !== null ? (
+                                            audio =
+                                                item.path !== ""
+                                                    ? item.path
+                                                    : "";
+                                            return item.path !== "" ? (
                                                 <audio
+                                                    key={index}
                                                     src={item.path}
                                                     controls
                                                 ></audio>
                                             ) : (
-                                                "Audio not uploaded"
+                                                ""
                                             );
                                         })}
+                                        {audio === ""
+                                            ? "Audio not uploaded"
+                                            : ""}
                                     </Tab.Pane>
                                 </Tab.Content>
-                            </Col>
-                        </Row>
+                            </div>
+                        </div>
                     </Tab.Container>
                 </Modal.Body>
             </Modal>
@@ -322,6 +378,9 @@ class SubjectConcepts extends Component {
             showErrorAlert: false,
             showSuccessAlert: false,
             showLoader: false,
+            showPublishErrorAlert: false,
+            showPublishSuccessAlert: false,
+            showPublishLoader: false,
             page_loading: true,
             btnDisabled: false,
             showConceptDelete_Modal: false,
@@ -335,13 +394,11 @@ class SubjectConcepts extends Component {
             isForm_submitted: false,
 
             activeConcept: "",
-            // selectedImageConcept: "",
-            // selectedImageData: [],
             selectedImage: "",
             selectedVideo: "",
             selectedAudio: "",
             flipState: [false],
-            selectedConcept: [],
+            selectedConcept: "",
 
             keyboards: [
                 { all: false, chemistry: false, physics: false, maths: false },
@@ -417,182 +474,216 @@ class SubjectConcepts extends Component {
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
-                let data = [];
-                let keyboards = [];
-                let images = [];
-                let audio = [];
-                let response = result.data.results[0].concepts;
-                if (response.length !== 0) {
-                    for (let i = 0; i < response.length; i++) {
-                        images = [];
-                        audio = [];
-                        if (response[i].files.length !== 0) {
-                            // image
-                            if (response[i].files[0].concepts_image_1) {
-                                images.push({
-                                    title:
-                                        response[i].files[0]
-                                            .concepts_image_1_title,
-                                    file_name: "",
-                                    image: null,
-                                    path: response[i].files[0].concepts_image_1,
-                                });
-                            }
-                            if (response[i].files[0].concepts_image_2) {
-                                images.push({
-                                    title:
-                                        response[i].files[0]
-                                            .concepts_image_2_title,
-                                    file_name: "",
-                                    image: null,
-                                    path: response[i].files[0].concepts_image_2,
-                                });
-                            }
-                            if (response[i].files[0].concepts_image_3) {
-                                images.push({
-                                    title:
-                                        response[i].files[0]
-                                            .concepts_image_3_title,
-                                    file_name: "",
-                                    image: null,
-                                    path: response[i].files[0].concepts_image_3,
-                                });
-                            }
-                            if (response[i].files[0].concepts_image_4) {
-                                images.push({
-                                    title:
-                                        response[i].files[0]
-                                            .concepts_image_4_title,
-                                    file_name: "",
-                                    image: null,
-                                    path: response[i].files[0].concepts_image_4,
-                                });
+                if (result.sts === true) {
+                    let data = [];
+                    let keyboards = [];
+                    let images = [];
+                    let audio = [];
+                    let response = result.data.results[0].concepts;
+                    if (response.length !== 0) {
+                        for (let i = 0; i < response.length; i++) {
+                            images = [];
+                            audio = [];
+                            if (response[i].files.length !== 0) {
+                                // image
+                                if (response[i].files[0].concepts_image_1) {
+                                    images.push({
+                                        title:
+                                            response[i].files[0]
+                                                .concepts_image_1_title,
+                                        file_name: "",
+                                        image: null,
+                                        path:
+                                            response[i].files[0]
+                                                .concepts_image_1,
+                                    });
+                                }
+                                if (response[i].files[0].concepts_image_2) {
+                                    images.push({
+                                        title:
+                                            response[i].files[0]
+                                                .concepts_image_2_title,
+                                        file_name: "",
+                                        image: null,
+                                        path:
+                                            response[i].files[0]
+                                                .concepts_image_2,
+                                    });
+                                }
+                                if (response[i].files[0].concepts_image_3) {
+                                    images.push({
+                                        title:
+                                            response[i].files[0]
+                                                .concepts_image_3_title,
+                                        file_name: "",
+                                        image: null,
+                                        path:
+                                            response[i].files[0]
+                                                .concepts_image_3,
+                                    });
+                                }
+                                if (response[i].files[0].concepts_image_4) {
+                                    images.push({
+                                        title:
+                                            response[i].files[0]
+                                                .concepts_image_4_title,
+                                        file_name: "",
+                                        image: null,
+                                        path:
+                                            response[i].files[0]
+                                                .concepts_image_4,
+                                    });
+                                }
+
+                                // audio
+                                if (response[i].files[0].concepts_audio_1) {
+                                    audio.push({
+                                        title:
+                                            response[i].files[0]
+                                                .concepts_audio_1_title,
+                                        file_name: "",
+                                        audio: null,
+                                        path:
+                                            response[i].files[0]
+                                                .concepts_audio_1,
+                                    });
+                                }
+                                if (response[i].files[0].concepts_audio_2) {
+                                    audio.push({
+                                        title:
+                                            response[i].files[0]
+                                                .concepts_audio_2_title,
+                                        file_name: "",
+                                        audio: null,
+                                        path:
+                                            response[i].files[0]
+                                                .concepts_audio_2,
+                                    });
+                                }
                             }
 
-                            // audio
-                            if (response[i].files[0].concepts_audio_1) {
-                                audio.push({
-                                    title:
-                                        response[i].files[0]
-                                            .concepts_audio_1_title,
-                                    file_name: "",
-                                    audio: null,
-                                    path: response[i].files[0].concepts_audio_1,
-                                });
+                            // video
+                            var path = "";
+                            if (response[i].files.length !== 0) {
+                                if (response[i].files[0].paste_video_url) {
+                                    path = response[i].files[0].paste_video_url;
+                                }
+                                if (response[i].files[0].concepts_video_1) {
+                                    path =
+                                        response[i].files[0].concepts_video_1;
+                                }
                             }
-                            if (response[i].files[0].concepts_audio_2) {
-                                audio.push({
-                                    title:
-                                        response[i].files[0]
-                                            .concepts_audio_2_title,
-                                    file_name: "",
-                                    audio: null,
-                                    path: response[i].files[0].concepts_audio_2,
-                                });
-                            }
-                        }
 
-                        // video
-                        var path = "";
-                        if (response[i].files.length !== 0) {
-                            if (response[i].files[0].paste_video_url) {
-                                path = response[i].files[0].paste_video_url;
-                            }
-                            if (response[i].files[0].concepts_video_1) {
-                                path = response[i].files[0].concepts_video_1;
-                            }
-                        }
-
-                        data.push({
-                            chapter_id: this.props.match.params.chapterId,
-                            topic_name: this.props.match.params.topicName,
-                            concepts_random_id: response[i].concepts_random_id,
-                            is_image_uploaded:
-                                response[i].files.length !== 0 ? true : false,
-                            content: {
-                                terms: response[i].terms,
-                                definition: response[i].definition,
-                                images:
-                                    images.length === 0
-                                        ? [
-                                              {
-                                                  title: "",
-                                                  file_name: "",
-                                                  image: null,
-                                                  path: "",
-                                              },
-                                          ]
-                                        : images,
-                                video: {
-                                    title:
-                                        response[i].files.length !== 0 &&
-                                        response[i].files[0]
-                                            .concepts_video_1_title
-                                            ? response[i].files[0]
-                                                  .concepts_video_1_title
-                                            : "",
-                                    file_name: "",
-                                    video: null,
-                                    path: path,
-                                    url: "",
+                            data.push({
+                                chapter_id: this.props.match.params.chapterId,
+                                topic_name: this.props.match.params.topicName,
+                                concepts_random_id:
+                                    response[i].concepts_random_id,
+                                is_image_uploaded:
+                                    response[i].files.length !== 0
+                                        ? true
+                                        : false,
+                                content: {
+                                    terms: response[i].terms,
+                                    definition: response[i].definition,
+                                    images:
+                                        images.length === 0
+                                            ? [
+                                                  {
+                                                      title: "",
+                                                      file_name: "",
+                                                      image: null,
+                                                      path: "",
+                                                  },
+                                              ]
+                                            : images,
+                                    video: {
+                                        title:
+                                            response[i].files.length !== 0 &&
+                                            response[i].files[0]
+                                                .concepts_video_1_title
+                                                ? response[i].files[0]
+                                                      .concepts_video_1_title
+                                                : "",
+                                        file_name: "",
+                                        video: null,
+                                        path: path,
+                                        url: "",
+                                    },
+                                    audio:
+                                        audio.length === 0
+                                            ? [
+                                                  {
+                                                      title: "",
+                                                      file_name: "",
+                                                      audio: null,
+                                                      path: "",
+                                                  },
+                                                  {
+                                                      title: "",
+                                                      file_name: "",
+                                                      audio: null,
+                                                      path: "",
+                                                  },
+                                              ]
+                                            : audio,
                                 },
-                                audio:
-                                    audio.length === 0
-                                        ? [
-                                              {
-                                                  title: "",
-                                                  file_name: "",
-                                                  audio: null,
-                                                  path: "",
-                                              },
-                                              {
-                                                  title: "",
-                                                  file_name: "",
-                                                  audio: null,
-                                                  path: "",
-                                              },
-                                          ]
-                                        : audio,
-                            },
-                            settings: {
-                                virtual_keyboard:
-                                    response[i].settings.virtual_keyboard,
-                                limited: response[i].settings.limited,
-                            },
-                        });
+                                settings: {
+                                    virtual_keyboard:
+                                        response[i].settings.virtual_keyboard,
+                                    limited: response[i].settings.limited,
+                                },
+                            });
 
-                        // Keyboards
-                        let boards = {
-                            all: false,
-                            chemistry: false,
-                            physics: false,
-                            maths: false,
-                        };
-                        let virtual_keyboard =
-                            response[i].settings.virtual_keyboard;
-                        for (let j = 0; j < virtual_keyboard.length; j++) {
-                            if (virtual_keyboard[j] === "All") {
-                                boards.all = true;
-                                boards.chemistry = true;
-                                boards.maths = true;
-                                boards.physics = true;
-                            } else if (virtual_keyboard[j] === "Chemistry") {
-                                boards.chemistry = true;
-                            } else if (virtual_keyboard[j] === "Physics") {
-                                boards.physics = true;
-                            } else if (virtual_keyboard[j] === "Maths") {
-                                boards.maths = true;
+                            // Keyboards
+                            let boards = {
+                                all: false,
+                                chemistry: false,
+                                physics: false,
+                                maths: false,
+                            };
+                            let virtual_keyboard =
+                                response[i].settings.virtual_keyboard;
+                            for (let j = 0; j < virtual_keyboard.length; j++) {
+                                if (virtual_keyboard[j] === "All") {
+                                    boards.all = true;
+                                    boards.chemistry = true;
+                                    boards.maths = true;
+                                    boards.physics = true;
+                                } else if (
+                                    virtual_keyboard[j] === "Chemistry"
+                                ) {
+                                    boards.chemistry = true;
+                                } else if (virtual_keyboard[j] === "Physics") {
+                                    boards.physics = true;
+                                } else if (virtual_keyboard[j] === "Maths") {
+                                    boards.maths = true;
+                                }
                             }
+                            keyboards.push(boards);
                         }
-                        keyboards.push(boards);
+                        this.setState({
+                            concepts: data,
+                            keyboards: keyboards,
+                            page_loading: false,
+                        });
+                    } else {
+                        this.setState({
+                            page_loading: false,
+                        });
+                    }
+                } else {
+                    if (result.detail) {
+                        this.setState({
+                            alertMsg: result.detail,
+                        });
+                    } else {
+                        this.setState({
+                            alertMsg: result.msg,
+                        });
                     }
                     this.setState({
-                        concepts: data,
-                        keyboards: keyboards,
-                        page_loading: false,
-                    });
-                } else {
-                    this.setState({
+                        showAlertModal: true,
                         page_loading: false,
                     });
                 }
@@ -1078,26 +1169,6 @@ class SubjectConcepts extends Component {
         }
     };
 
-    // changeImage = (image_index, q_index) => {
-    //     const images = [...this.state.concepts];
-    //     if (
-    //         this.state.selectedImage === image_index &&
-    //         this.state.selectedImageConcept === q_index
-    //     ) {
-    //         this.setState({
-    //             selectedImage: "",
-    //             selectedImageConcept: "",
-    //             selectedImageData: [],
-    //         });
-    //     } else {
-    //         this.setState({
-    //             selectedImage: image_index,
-    //             selectedImageConcept: q_index,
-    //             selectedImageData: images[q_index].content.images[image_index],
-    //         });
-    //     }
-    // };
-
     clearImages = () => {
         const values = [...this.state.concepts];
         values[this.state.activeConcept].content.images = [
@@ -1408,14 +1479,6 @@ class SubjectConcepts extends Component {
                 showConceptDelete_Modal: !this.state.showConceptDelete_Modal,
             });
         } else {
-            if (this.state.selectedImageConcept === index) {
-                this.setState({
-                    selectedImageConcept: "",
-                    selectedImageData: [],
-                    selectedImage: "",
-                });
-            }
-
             flips.splice(index, 1);
             keyboards.splice(index, 1);
             values.splice(index, 1);
@@ -1559,14 +1622,6 @@ class SubjectConcepts extends Component {
             keyboards.splice(this.state.activeConcept, 1);
             values.splice(this.state.activeConcept, 1);
 
-            if (this.state.selectedImageConcept === this.state.activeConcept) {
-                this.setState({
-                    selectedImageConcept: "",
-                    selectedImageData: [],
-                    selectedImage: "",
-                });
-            }
-
             this.setState(
                 {
                     concepts: values,
@@ -1651,9 +1706,9 @@ class SubjectConcepts extends Component {
 
     handlePublish = () => {
         this.setState({
-            showSuccessAlert: false,
-            showErrorAlert: false,
-            showLoader: true,
+            showPublishSuccessAlert: false,
+            showPublishErrorAlert: false,
+            showPublishLoader: true,
         });
 
         const concepts = [...this.state.concepts];
@@ -1685,8 +1740,8 @@ class SubjectConcepts extends Component {
                     if (result.sts === true) {
                         this.setState({
                             successMsg: result.msg,
-                            showSuccessAlert: true,
-                            showLoader: false,
+                            showPublishSuccessAlert: true,
+                            showPublishLoader: false,
                         });
                     } else {
                         if (result.detail) {
@@ -1699,8 +1754,8 @@ class SubjectConcepts extends Component {
                             });
                         }
                         this.setState({
-                            showErrorAlert: true,
-                            showLoader: false,
+                            showPublishErrorAlert: true,
+                            showPublishLoader: false,
                         });
                     }
                 })
@@ -1709,7 +1764,7 @@ class SubjectConcepts extends Component {
                 });
         } else {
             this.setState({
-                showLoader: false,
+                showPublishLoader: false,
             });
         }
     };
@@ -1737,10 +1792,10 @@ class SubjectConcepts extends Component {
                 <Alert
                     variant="danger"
                     className="fixed-top"
-                    show={this.state.showErrorAlert}
+                    show={this.state.showPublishErrorAlert}
                     onClose={() => {
                         this.setState({
-                            showErrorAlert: false,
+                            showPublishErrorAlert: false,
                         });
                     }}
                     dismissible
@@ -1750,10 +1805,10 @@ class SubjectConcepts extends Component {
                 <Alert
                     variant="success"
                     className="fixed-top"
-                    show={this.state.showSuccessAlert}
+                    show={this.state.showPublishSuccessAlert}
                     onClose={() => {
                         this.setState({
-                            showSuccessAlert: false,
+                            showPublishSuccessAlert: false,
                         });
                     }}
                     dismissible
@@ -1789,6 +1844,15 @@ class SubjectConcepts extends Component {
                         image={this.state.selectedImage}
                         video={this.state.selectedVideo}
                         audio={this.state.selectedAudio}
+                    />
+                ) : null}
+
+                {/* ALert modal */}
+                {this.state.showAlertModal ? (
+                    <AlertModal
+                        show={this.state.showAlertModal}
+                        msg={this.state.alertMsg}
+                        goBack={this.props.history.goBack}
                     />
                 ) : null}
 
@@ -1829,7 +1893,7 @@ class SubjectConcepts extends Component {
                                                 className="btn btn-primary btn-sm mr-1"
                                                 onClick={this.handlePublish}
                                             >
-                                                {this.state.showLoader ? (
+                                                {this.state.showPublishLoader ? (
                                                     <Spinner
                                                         as="span"
                                                         animation="border"
@@ -1928,46 +1992,22 @@ class SubjectConcepts extends Component {
                                                 >
                                                     <div className="card shadow-sm">
                                                         <div className="card-body">
-                                                            <div className="row">
-                                                                <div className="col-md-11">
-                                                                    {/* Front-view */}
-                                                                    <div className="card">
-                                                                        <div
-                                                                            className="card-body"
-                                                                            onClick={() =>
-                                                                                this.handleFlip(
-                                                                                    c_index
-                                                                                )
-                                                                            }
-                                                                            dangerouslySetInnerHTML={{
-                                                                                __html:
-                                                                                    concept
-                                                                                        .content
-                                                                                        .terms,
-                                                                            }}
-                                                                        ></div>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="col-md-1 pl-0 text-right">
-                                                                    <button
-                                                                        className="btn btn-light bg-white"
-                                                                        onClick={() =>
-                                                                            this.toggleModal(
-                                                                                concept
-                                                                                    .content
-                                                                                    .images,
-                                                                                concept
-                                                                                    .content
-                                                                                    .video,
-                                                                                concept
-                                                                                    .content
-                                                                                    .audio
-                                                                            )
-                                                                        }
-                                                                    >
-                                                                        <i className="far fa-folder-open"></i>
-                                                                    </button>
-                                                                </div>
+                                                            {/* Front-view */}
+                                                            <div className="card">
+                                                                <div
+                                                                    className="card-body"
+                                                                    onClick={() =>
+                                                                        this.handleFlip(
+                                                                            c_index
+                                                                        )
+                                                                    }
+                                                                    dangerouslySetInnerHTML={{
+                                                                        __html:
+                                                                            concept
+                                                                                .content
+                                                                                .terms,
+                                                                    }}
+                                                                ></div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1994,68 +2034,10 @@ class SubjectConcepts extends Component {
                                                                         ></div>
                                                                     </div>
                                                                 </div>
-                                                                {/* image preview */}
-                                                                {/* {this.state
-                                                                    .selectedImageData
-                                                                    .length !==
-                                                                    0 &&
-                                                                this.state
-                                                                    .selectedImageConcept ===
-                                                                    c_index ? (
-                                                                    <div className="col-md-2 mb-2 mb-md-0 pr-md-0">
-                                                                        <div className="card shadow-sm">
-                                                                            <img
-                                                                                src={
-                                                                                    this
-                                                                                        .state
-                                                                                        .selectedImageData
-                                                                                        .path
-                                                                                }
-                                                                                alt={
-                                                                                    this
-                                                                                        .state
-                                                                                        .selectedImageData
-                                                                                        .file_name
-                                                                                }
-                                                                                className="img-fluid rounded-lg"
-                                                                            />
-                                                                        </div>
-                                                                    </div>
-                                                                ) : (
-                                                                    ""
-                                                                )} */}
-                                                                {/* <div className="col-md-1 d-flex justify-content-md-center justify-content-around flex-wrap">
-                                                                    {concept.content.images.map(
-                                                                        (
-                                                                            images,
-                                                                            index
-                                                                        ) => {
-                                                                            return images.path !==
-                                                                                "" ? (
-                                                                                <div
-                                                                                    key={
-                                                                                        index
-                                                                                    }
-                                                                                    className="card preview-img-sm bg-light shadow-sm"
-                                                                                    style={{
-                                                                                        backgroundImage: `url(${images.path})`,
-                                                                                    }}
-                                                                                    onClick={() =>
-                                                                                        this.changeImage(
-                                                                                            index,
-                                                                                            c_index
-                                                                                        )
-                                                                                    }
-                                                                                ></div>
-                                                                            ) : (
-                                                                                ""
-                                                                            );
-                                                                        }
-                                                                    )}
-                                                                </div> */}
-                                                                <div className="col-md-1 pl-0 text-right">
+                                                                {/* File modal button */}
+                                                                <div className="col-1 pl-0 text-right">
                                                                     <button
-                                                                        className="btn btn-light bg-white"
+                                                                        className="btn btn-light bg-white shadow-sm"
                                                                         onClick={() =>
                                                                             this.toggleModal(
                                                                                 concept
@@ -2377,7 +2359,7 @@ class SubjectConcepts extends Component {
                                                         this.image_limit ? (
                                                             <div className="form-group mb-0">
                                                                 <button
-                                                                    className="btn btn-light btn-block border-secondary bg-white btn-sm"
+                                                                    className="btn btn-light btn-block border-secondary btn-sm"
                                                                     onClick={
                                                                         this
                                                                             .handleAddImageFields

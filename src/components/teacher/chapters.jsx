@@ -1016,12 +1016,15 @@ class Chapters extends Component {
                                                     <div className="row align-items-center">
                                                         <div className="col-1">
                                                             <span>
-                                                                {this.state
-                                                                    .collapsed ? (
-                                                                    <i className="fas fa-plus-circle"></i>
-                                                                ) : (
-                                                                    <i className="fas fa-minus-circle"></i>
-                                                                )}
+                                                                <i
+                                                                    className={`fas fa-chevron-circle-down ${
+                                                                        this
+                                                                            .state
+                                                                            .collapsed
+                                                                            ? "fa-rotate-270"
+                                                                            : ""
+                                                                    }`}
+                                                                ></i>
                                                             </span>
                                                         </div>
                                                         <div className="col-1 small font-weight-bold">

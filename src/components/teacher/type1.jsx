@@ -17,6 +17,8 @@ import {
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import Loading from "../sharedComponents/loader";
 import AlertModal from "../sharedComponents/alertModal";
+import { Player } from "video-react";
+import "video-react/dist/video-react.css";
 
 const mapStateToProps = (state) => ({
     subject_name: state.subject_name,
@@ -200,6 +202,7 @@ class FileModal extends Component {
     };
 
     render() {
+        let audio = "";
         return (
             <Modal
                 show={this.props.show}
@@ -241,76 +244,93 @@ class FileModal extends Component {
                             <div className="col-md-9 py-3">
                                 <Tab.Content>
                                     <Tab.Pane eventKey="image">
-                                        <div className="card shadow-sm">
-                                            <div className="card-header text-center font-weight-bold tomato-bg">
-                                                {this.state.selectedImageData
-                                                    .length !== 0
-                                                    ? this.state
-                                                          .selectedImageData
-                                                          .title
-                                                    : ""}
-                                            </div>
-                                            <div className="card-body p-0">
-                                                {this.state.selectedImageData
-                                                    .length !== 0 ? (
-                                                    <img
-                                                        src={
-                                                            this.state
-                                                                .selectedImageData
-                                                                .path
-                                                        }
-                                                        alt={
-                                                            this.state
-                                                                .selectedImageData
-                                                                .file_name
-                                                        }
-                                                        className="img-fluid"
-                                                    />
-                                                ) : (
-                                                    ""
-                                                )}
-                                            </div>
-                                            <div className="card-footer tomato-bg">
-                                                <div className="row justify-content-center">
-                                                    {this.state.image.map(
-                                                        (images, index) => {
-                                                            return images.path !==
-                                                                "" ? (
-                                                                <div
-                                                                    key={index}
-                                                                    className="col-md-3"
-                                                                >
-                                                                    <div
-                                                                        className="card preview-img-sm shadow-sm"
-                                                                        style={{
-                                                                            backgroundImage: `url(${images.path})`,
-                                                                        }}
-                                                                        onClick={() =>
-                                                                            this.changeImage(
-                                                                                index
-                                                                            )
-                                                                        }
-                                                                    ></div>
-                                                                </div>
-                                                            ) : null;
-                                                        }
+                                        {this.state.selectedImageData.path !==
+                                        "" ? (
+                                            <div className="card shadow-sm">
+                                                <div className="card-header text-center font-weight-bold tomato-bg">
+                                                    {this.state
+                                                        .selectedImageData
+                                                        .length !== 0
+                                                        ? this.state
+                                                              .selectedImageData
+                                                              .title
+                                                        : ""}
+                                                </div>
+                                                {/* Single image view */}
+                                                <div className="card-body text-center p-0">
+                                                    {this.state
+                                                        .selectedImageData
+                                                        .length !== 0 ? (
+                                                        <img
+                                                            src={
+                                                                this.state
+                                                                    .selectedImageData
+                                                                    .path
+                                                            }
+                                                            alt={
+                                                                this.state
+                                                                    .selectedImageData
+                                                                    .file_name
+                                                            }
+                                                            className="img-fluid"
+                                                        />
+                                                    ) : (
+                                                        ""
                                                     )}
                                                 </div>
+                                                {/* Thumbnails */}
+                                                <div className="card-footer tomato-bg">
+                                                    <div className="row justify-content-center">
+                                                        {this.state.image.map(
+                                                            (images, index) => {
+                                                                return images.path !==
+                                                                    "" ? (
+                                                                    <div
+                                                                        key={
+                                                                            index
+                                                                        }
+                                                                        className="col-md-3"
+                                                                    >
+                                                                        <div
+                                                                            className={`card preview-img-sm ${
+                                                                                this
+                                                                                    .state
+                                                                                    .selectedImage ===
+                                                                                index
+                                                                                    ? "border-primary shadow"
+                                                                                    : ""
+                                                                            }`}
+                                                                            style={{
+                                                                                backgroundImage: `url(${images.path})`,
+                                                                            }}
+                                                                            onClick={() =>
+                                                                                this.changeImage(
+                                                                                    index
+                                                                                )
+                                                                            }
+                                                                        ></div>
+                                                                    </div>
+                                                                ) : null;
+                                                            }
+                                                        )}
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
+                                        ) : (
+                                            "No images to display"
+                                        )}
                                     </Tab.Pane>
                                     <Tab.Pane eventKey="video">
                                         <div className="card">
-                                            {this.state.video.path !== null ? (
-                                                <div class="embed-responsive embed-responsive-16by9">
-                                                    <video
-                                                        controls
+                                            {this.state.video.path !== "" ? (
+                                                <Player>
+                                                    <source
                                                         src={
                                                             this.state.video
                                                                 .path
                                                         }
-                                                    ></video>
-                                                </div>
+                                                    />
+                                                </Player>
                                             ) : (
                                                 "Video not uploaded"
                                             )}
@@ -318,16 +338,23 @@ class FileModal extends Component {
                                     </Tab.Pane>
                                     <Tab.Pane eventKey="audio">
                                         {this.state.audio.map((item, index) => {
-                                            return item.path !== null ? (
+                                            audio =
+                                                item.path !== ""
+                                                    ? item.path
+                                                    : "";
+                                            return item.path !== "" ? (
                                                 <audio
                                                     key={index}
                                                     src={item.path}
                                                     controls
                                                 ></audio>
                                             ) : (
-                                                "Audio not uploaded"
+                                                ""
                                             );
                                         })}
+                                        {audio === ""
+                                            ? "Audio not uploaded"
+                                            : ""}
                                     </Tab.Pane>
                                 </Tab.Content>
                             </div>
@@ -352,6 +379,9 @@ class SubjectType1 extends Component {
             showErrorAlert: false,
             showSuccessAlert: false,
             showLoader: false,
+            showPublishErrorAlert: false,
+            showPublishSuccessAlert: false,
+            showPublishLoader: false,
             page_loading: true,
             btnDisabled: false,
             showMCQDelete_Modal: false,
@@ -366,12 +396,10 @@ class SubjectType1 extends Component {
             isForm_submitted: false,
 
             activeQuestion: "",
-            // selectedImageQuestion: "",
-            // selectedImageData: [],
             selectedImage: "",
             selectedVideo: "",
             selectedAudio: "",
-            selectedQuestion: [],
+            selectedQuestion: "",
 
             keyboards: [
                 { all: false, chemistry: false, physics: false, maths: false },
@@ -1588,26 +1616,6 @@ class SubjectType1 extends Component {
         }
     };
 
-    // changeImage = (image_index, q_index) => {
-    //     const images = [...this.state.questions];
-    //     if (
-    //         this.state.selectedImage === image_index &&
-    //         this.state.selectedImageQuestion === q_index
-    //     ) {
-    //         this.setState({
-    //             selectedImage: "",
-    //             selectedImageQuestion: "",
-    //             selectedImageData: [],
-    //         });
-    //     } else {
-    //         this.setState({
-    //             selectedImage: image_index,
-    //             selectedImageQuestion: q_index,
-    //             selectedImageData: images[q_index].content.images[image_index],
-    //         });
-    //     }
-    // };
-
     clearImages = () => {
         const values = [...this.state.questions];
         values[this.state.activeQuestion].content.images = [
@@ -1983,14 +1991,6 @@ class SubjectType1 extends Component {
                 showMCQDelete_Modal: !this.state.showMCQDelete_Modal,
             });
         } else {
-            // if (this.state.selectedImageQuestion === index) {
-            //     this.setState({
-            //         selectedImageQuestion: "",
-            //         selectedImageData: [],
-            //         selectedImage: "",
-            //     });
-            // }
-
             keyboards.splice(index, 1);
             values.splice(index, 1);
             this.setState(
@@ -2199,16 +2199,6 @@ class SubjectType1 extends Component {
             keyboards.splice(this.state.activeQuestion, 1);
             values.splice(this.state.activeQuestion, 1);
 
-            // if (
-            //     this.state.selectedImageQuestion === this.state.activeQuestion
-            // ) {
-            //     this.setState({
-            //         selectedImageQuestion: "",
-            //         selectedImageData: [],
-            //         selectedImage: "",
-            //     });
-            // }
-
             this.setState(
                 {
                     questions: values,
@@ -2320,9 +2310,9 @@ class SubjectType1 extends Component {
 
     handlePublish = () => {
         this.setState({
-            showSuccessAlert: false,
-            showErrorAlert: false,
-            showLoader: true,
+            showPublishSuccessAlert: false,
+            showPublishErrorAlert: false,
+            showPublishLoader: true,
         });
 
         const questions = [...this.state.questions];
@@ -2354,8 +2344,8 @@ class SubjectType1 extends Component {
                     if (result.sts === true) {
                         this.setState({
                             successMsg: result.msg,
-                            showSuccessAlert: true,
-                            showLoader: false,
+                            showPublishSuccessAlert: true,
+                            showPublishLoader: false,
                         });
                     } else {
                         if (result.detail) {
@@ -2368,8 +2358,8 @@ class SubjectType1 extends Component {
                             });
                         }
                         this.setState({
-                            showErrorAlert: true,
-                            showLoader: false,
+                            showPublishErrorAlert: true,
+                            showPublishLoader: false,
                         });
                     }
                 })
@@ -2378,7 +2368,7 @@ class SubjectType1 extends Component {
                 });
         } else {
             this.setState({
-                showLoader: false,
+                showPublishLoader: false,
             });
         }
     };
@@ -2398,10 +2388,10 @@ class SubjectType1 extends Component {
                 <Alert
                     variant="danger"
                     className="fixed-top"
-                    show={this.state.showErrorAlert}
+                    show={this.state.showPublishErrorAlert}
                     onClose={() => {
                         this.setState({
-                            showErrorAlert: false,
+                            showPublishErrorAlert: false,
                         });
                     }}
                     dismissible
@@ -2411,10 +2401,10 @@ class SubjectType1 extends Component {
                 <Alert
                     variant="success"
                     className="fixed-top"
-                    show={this.state.showSuccessAlert}
+                    show={this.state.showPublishSuccessAlert}
                     onClose={() => {
                         this.setState({
-                            showSuccessAlert: false,
+                            showPublishSuccessAlert: false,
                         });
                     }}
                     dismissible
@@ -2453,6 +2443,7 @@ class SubjectType1 extends Component {
                     />
                 ) : null}
 
+                {/* ALert modal */}
                 {this.state.showAlertModal ? (
                     <AlertModal
                         show={this.state.showAlertModal}
@@ -2498,7 +2489,8 @@ class SubjectType1 extends Component {
                                                 className="btn btn-primary btn-sm mr-1"
                                                 onClick={this.handlePublish}
                                             >
-                                                {this.state.showLoader ? (
+                                                {this.state
+                                                    .showPublishLoader ? (
                                                     <Spinner
                                                         as="span"
                                                         animation="border"
@@ -2731,70 +2723,7 @@ class SubjectType1 extends Component {
                                                                         ""
                                                                     )}
                                                                 </div>
-                                                                {/* image preview */}
-                                                                {/* {this.state
-                                                                    .selectedImageData
-                                                                    .length !==
-                                                                    0 &&
-                                                                this.state
-                                                                    .selectedImageQuestion ===
-                                                                    q_index ? (
-                                                                    <div className="col-md-2 mb-2 mb-md-0 pr-md-0">
-                                                                        <div className="card shadow-sm">
-                                                                            <img
-                                                                                src={
-                                                                                    this
-                                                                                        .state
-                                                                                        .selectedImageData
-                                                                                        .path
-                                                                                }
-                                                                                alt={
-                                                                                    this
-                                                                                        .state
-                                                                                        .selectedImageData
-                                                                                        .file_name
-                                                                                }
-                                                                                className="img-fluid rounded-lg"
-                                                                            />
-                                                                        </div>
-                                                                    </div>
-                                                                ) : (
-                                                                    ""
-                                                                )} */}
-                                                                {/* <div className="col-md-1 d-flex justify-content-md-center justify-content-around flex-wrap">
-                                                                    {question.content.images.map(
-                                                                        (
-                                                                            images,
-                                                                            index
-                                                                        ) => {
-                                                                            return images.path !==
-                                                                                "" ? (
-                                                                                <div
-                                                                                    key={
-                                                                                        index
-                                                                                    }
-                                                                                    className="card preview-img-sm bg-light shadow-sm"
-                                                                                    style={{
-                                                                                        backgroundImage: `url(${images.path})`,
-                                                                                    }}
-                                                                                    onClick={() =>
-                                                                                        this.changeImage(
-                                                                                            index,
-                                                                                            q_index
-                                                                                        )
-                                                                                    }
-                                                                                ></div>
-                                                                            ) : (
-                                                                                <div
-                                                                                    key={
-                                                                                        index
-                                                                                    }
-                                                                                    className="card preview-img-sm bg-light shadow-sm"
-                                                                                ></div>
-                                                                            );
-                                                                        }
-                                                                    )}
-                                                                </div> */}
+                                                                {/* File modal button */}
                                                                 <div className="col-1 pl-0 text-right">
                                                                     <button
                                                                         className="btn btn-light bg-white shadow-sm"
@@ -3131,7 +3060,7 @@ class SubjectType1 extends Component {
                                                                 .option_limit ? (
                                                                 <div className="form-group col-12 mb-0">
                                                                     <button
-                                                                        className="btn btn-light btn-block border-secondary bg-white btn-sm"
+                                                                        className="btn btn-light btn-block border-secondary btn-sm"
                                                                         onClick={
                                                                             this
                                                                                 .handleAddOptionFields
@@ -3220,7 +3149,7 @@ class SubjectType1 extends Component {
                                                             )}
                                                             <div className="form-group col-12 mb-0">
                                                                 <button
-                                                                    className="btn btn-light btn-block border-secondary bg-white btn-sm"
+                                                                    className="btn btn-light btn-block border-secondary btn-sm"
                                                                     onClick={
                                                                         this
                                                                             .handleAddAnswerFields
@@ -3443,7 +3372,7 @@ class SubjectType1 extends Component {
                                                         this.image_limit ? (
                                                             <div className="form-group mb-0">
                                                                 <button
-                                                                    className="btn btn-light btn-block border-secondary bg-white btn-sm"
+                                                                    className="btn btn-light btn-block border-secondary btn-sm"
                                                                     onClick={
                                                                         this
                                                                             .handleAddImageFields
