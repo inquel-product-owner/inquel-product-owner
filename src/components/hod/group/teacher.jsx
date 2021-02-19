@@ -1,9 +1,10 @@
 import React, { Component } from "react";
 import { Tab, Row, Col, Nav } from "react-bootstrap";
-import Header from "./navbar";
-import SideNav from "./sidenav";
-import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
-import Loading from "../sharedComponents/loader";
+import { Link } from "react-router-dom";
+import Header from "../navbar";
+import SideNav from "../sidenav";
+import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
+import Loading from "../../sharedComponents/loader";
 
 function EmptyData() {
     return (
@@ -22,6 +23,7 @@ class GroupTeachers extends Component {
             teacherItems: [],
             page_loading: true,
         };
+        this.groupId = this.props.match.params.groupId;
     }
 
     toggleSideNav = () => {
@@ -40,17 +42,14 @@ class GroupTeachers extends Component {
         };
 
         Promise.all([
-            fetch(`${url}/hod/group/${this.props.match.params.groupId}`, {
+            fetch(`${url}/hod/group/${this.groupId}`, {
                 headers: headers,
                 method: "GET",
             }).then((res) => res.json()),
-            fetch(
-                `${url}/hod/group/${this.props.match.params.groupId}/teacher/`,
-                {
-                    headers: headers,
-                    method: "GET",
-                }
-            ).then((res) => res.json()),
+            fetch(`${url}/hod/group/${this.groupId}/teacher/`, {
+                headers: headers,
+                method: "GET",
+            }).then((res) => res.json()),
         ])
             .then((result) => {
                 this.setState({
@@ -66,11 +65,7 @@ class GroupTeachers extends Component {
     };
 
     render() {
-        document.title =
-            this.state.groupItem.length !== 0
-                ? this.state.groupItem.group_name +
-                  " Teacher List - HOD | IQLabs"
-                : "Group Teacher List - HOD | IQLabs";
+        document.title = "Group Teachers - HOD | IQLabs";
         return (
             <div className="wrapper">
                 {/* Navbar */}
@@ -100,14 +95,30 @@ class GroupTeachers extends Component {
                         </button>
 
                         {/* Filter area */}
-                        <div className="row align-items-center">
-                            <div className="col-md-2">
-                                <h5 className="primary-text">
-                                    Teacher Profile
-                                </h5>
+                        <div className="row align-items-center mb-3">
+                            <div className="col-md-4">
+                                <nav aria-label="breadcrumb">
+                                    <ol className="breadcrumb">
+                                        <li className="breadcrumb-item">
+                                            <Link to="/hod">
+                                                <i className="fas fa-home fa-sm"></i>
+                                            </Link>
+                                        </li>
+                                        <li className="breadcrumb-item">
+                                            <Link
+                                                to={`/hod/group/${this.groupId}`}
+                                            >
+                                                Group
+                                            </Link>
+                                        </li>
+                                        <li className="breadcrumb-item active">
+                                            Teacher
+                                        </li>
+                                    </ol>
+                                </nav>
                             </div>
-                            <div className="col-md-10 text-right">
-                                <div className="row justify-content-end mb-4">
+                            <div className="col-md-8 text-right">
+                                <div className="row justify-content-end">
                                     <div className="col-md-3 pr-md-0">
                                         <form>
                                             <div className="form-group">
@@ -162,9 +173,10 @@ class GroupTeachers extends Component {
                                                                             index
                                                                         }
                                                                     >
-                                                                        {
-                                                                            list.full_name
-                                                                        }
+                                                                        {list.full_name !==
+                                                                        ""
+                                                                            ? list.full_name
+                                                                            : list.username}
                                                                     </Nav.Link>
                                                                 </Nav.Item>
                                                             );

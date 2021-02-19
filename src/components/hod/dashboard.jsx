@@ -317,7 +317,7 @@ class Dashboard extends Component {
                                         <h4>Groups</h4>
                                     </div>
                                     <div className="col-6 text-right">
-                                        <Link to="/hod/groups/configuration">
+                                        <Link to="/hod/group">
                                             <button className="btn btn-primary btn-sm mr-2">
                                                 Group Configuration
                                             </button>

@@ -1,13 +1,13 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { Modal, Alert, Spinner } from "react-bootstrap";
-import Header from "./navbar";
-import SideNav from "./sidenav";
+import Header from "../navbar";
+import SideNav from "../sidenav";
 import Select from "react-select";
-import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
-import Loading from "../sharedComponents/loader";
-import SubjectTable from "../table/subjectTable";
-import Paginations from "../sharedComponents/pagination";
+import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
+import Loading from "../../sharedComponents/loader";
+import SubjectTable from "../../table/subjectTable";
+import Paginations from "../../sharedComponents/pagination";
 
 class SubjectModal extends Component {
     constructor() {
@@ -65,13 +65,6 @@ class SubjectModal extends Component {
 
     handleSubmit = (event) => {
         event.preventDefault();
-        var url = baseUrl + hodUrl;
-        var authToken = localStorage.getItem("Authorization");
-        var headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: authToken,
-        };
 
         this.setState({
             showLoader: true,
@@ -79,8 +72,8 @@ class SubjectModal extends Component {
             showSuccessAlert: false,
         });
 
-        fetch(`${url}/hod/create/subject/`, {
-            headers: headers,
+        fetch(`${this.url}/hod/create/subject/`, {
+            headers: this.headers,
             method: "POST",
             body: JSON.stringify({
                 subject_name: this.state.subjectName,
@@ -357,29 +350,35 @@ class Group extends Component {
                         </button>
 
                         <div className="row align-items-center mb-3 mt-2">
-                            <div className="col-3">
-                                <h5 className="primary-text">
-                                    {this.state.groupItems.group_name} - {this.state.groupItems.level}
-                                </h5>
+                            <div className="col-6">
+                                <nav aria-label="breadcrumb">
+                                    <ol className="breadcrumb">
+                                        <li className="breadcrumb-item">
+                                            <Link to="/hod">
+                                                <i className="fas fa-home fa-sm"></i>
+                                            </Link>
+                                        </li>
+                                        <li className="breadcrumb-item active">
+                                            <span>Group:</span>
+                                            {
+                                                this.state.groupItems.group_name
+                                            } - {this.state.groupItems.level}
+                                        </li>
+                                    </ol>
+                                </nav>
                             </div>
-                            <div className="col-9 text-right">
-                                <Link
-                                    to={`/hod/group/${this.props.match.params.groupId}/student`}
-                                >
+                            <div className="col-6 text-right">
+                                <Link to={`${this.props.match.url}/student`}>
                                     <button className="btn btn-primary btn-sm mr-2">
                                         Student
                                     </button>
                                 </Link>
-                                <Link
-                                    to={`/hod/group/${this.props.match.params.groupId}/teacher`}
-                                >
+                                <Link to={`${this.props.match.url}/teacher`}>
                                     <button className="btn btn-primary btn-sm mr-2">
                                         Teacher
                                     </button>
                                 </Link>
-                                <Link
-                                    to={`/hod/group/${this.props.match.params.groupId}/details`}
-                                >
+                                <Link to={`${this.props.match.url}/details`}>
                                     <button className="btn btn-primary btn-sm">
                                         Configuration
                                     </button>
@@ -413,7 +412,7 @@ class Group extends Component {
                             </div>
                             <SubjectTable
                                 subjectItems={this.state.subjectItems}
-                                path="hod"
+                                path={`hod/group/${this.groupId}`}
                             />
                             <div className="card-body p-3">
                                 {this.state.totalSubjectCount >= 10 ? (

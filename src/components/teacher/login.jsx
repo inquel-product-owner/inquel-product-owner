@@ -2,7 +2,7 @@ import React, { Component, useState } from "react";
 import { Navbar, Alert, Spinner, Modal } from "react-bootstrap";
 import logo from "../../assets/IQ_Labs_V5.png";
 import { Link, Redirect } from "react-router-dom";
-import { baseUrl, accountsUrl } from "../../shared/baseUrl.js";
+import { baseUrl, accountsUrl, adminPathUrl } from "../../shared/baseUrl.js";
 
 function ForgotPasswordModal(props) {
     const [email, setEmail] = useState("");
@@ -184,6 +184,7 @@ class TeacherLogin extends Component {
             .then((res) => res.json())
             .then((result) => {
                 if (result.sts === true) {
+                    // Loggout from all the dashboard if the user is logged in
                     if (localStorage.getItem("Authorization")) {
                         fetch(`${this.url}/logout/`, {
                             headers: this.headers,
@@ -192,8 +193,49 @@ class TeacherLogin extends Component {
                             .then((res) => res.json())
                             .then((results) => {
                                 if (results.sts === true) {
-                                    localStorage.clear();
                                     console.log(results);
+
+                                    localStorage.clear();
+
+                                    localStorage.setItem(
+                                        "Authorization",
+                                        `Token ${result.token}`
+                                    );
+                                    localStorage.setItem(
+                                        "is_teacher",
+                                        result.is_teacher
+                                    );
+                                    localStorage.setItem(
+                                        "Username",
+                                        result.username
+                                    );
+                                    this.setState({
+                                        showLoader: false,
+                                    });
+                                }
+                            })
+                            .catch((err) => {
+                                console.log(err);
+                            });
+                    } else if (localStorage.getItem("Inquel-Auth")) {
+                        var url = baseUrl + adminPathUrl;
+                        var authToken = localStorage.getItem("Inquel-Auth");
+                        var headers = {
+                            Accept: "application/json",
+                            "Content-Type": "application/json",
+                            "Inquel-Auth": authToken,
+                        };
+
+                        fetch(`${url}/logout/`, {
+                            headers: headers,
+                            method: "POST",
+                        })
+                            .then((res) => res.json())
+                            .then((results) => {
+                                if (results.sts === true) {
+                                    console.log(results);
+
+                                    localStorage.clear();
 
                                     localStorage.setItem(
                                         "Authorization",

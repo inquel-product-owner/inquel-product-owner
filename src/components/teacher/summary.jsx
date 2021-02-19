@@ -64,7 +64,7 @@ class ImageUploadModal extends Component {
                 showErrorAlert: true,
                 showLoader: false,
             });
-        } else if (event.target.files[0].size > 5000000) {
+        } else if (event.target.files[0].size > 5242880) {
             this.setState({
                 errorMsg: "File sixe exceeds more then 5MB!",
                 showErrorAlert: true,

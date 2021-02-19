@@ -3,17 +3,22 @@ import { Switch, Route, Redirect } from "react-router-dom";
 
 import HODLogin from "./login";
 import Dashboard from "./dashboard";
-import Group from "./group";
-import GroupConfiguration from "./groupConfiguration";
-import GroupDetails from "./groupDetails";
-import GroupStudents from "./groupStudents";
-import GroupTeachers from "./groupTeachers";
+import Account from "./account";
+
+import Group from "./group/group";
+import GroupConfiguration from "./group/configuration";
+import GroupDetails from "./group/details";
+import GroupStudents from "./group/student";
+import GroupStudentProfile from "./group/studentProfile";
+import GroupTeachers from "./group/teacher";
+import GroupSubject from "./group/subject";
+
 import ProfileList from "./profileList";
 import StudentProfile from "./studentProfile";
 import TeacherProfile from "./teacherProfile";
+
 import CourseScorecard from "./courseScorecard";
 import Subject from "./subject";
-// import SubjectAssigning from "./subjectAssigning";
 import SubjectConfiguration from "./subjectConfiguration";
 
 import EmailVerification from "./emailVerification";
@@ -34,15 +39,18 @@ const hodRoutes = (
                 )
             }
         />
+
+        {/* ---------- Group routings ---------- */}
+
         <Route
             exact
-            path="/hod/login"
-            render={() =>
-                localStorage.getItem("Authorization") &&
-                localStorage.getItem("is_hod") ? (
-                    <Redirect to="/hod" />
+            path="/hod/group"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
                 ) : (
-                    <HODLogin />
+                    <GroupConfiguration {...props} />
                 )
             }
         />
@@ -55,18 +63,6 @@ const hodRoutes = (
                     <Redirect to="/hod/login" />
                 ) : (
                     <Group {...props} />
-                )
-            }
-        />
-        <Route
-            exact
-            path="/hod/groups/configuration"
-            render={(props) =>
-                !localStorage.getItem("Authorization") ||
-                !localStorage.getItem("is_hod") ? (
-                    <Redirect to="/hod/login" />
-                ) : (
-                    <GroupConfiguration {...props} />
                 )
             }
         />
@@ -96,6 +92,18 @@ const hodRoutes = (
         />
         <Route
             exact
+            path="/hod/group/:groupId/student/:studentId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <GroupStudentProfile {...props} />
+                )
+            }
+        />
+        <Route
+            exact
             path="/hod/group/:groupId/teacher"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
@@ -106,6 +114,72 @@ const hodRoutes = (
                 )
             }
         />
+        <Route
+            exact
+            path="/hod/group/:groupId/subject/:subjectId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <GroupSubject {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/hod/group/:groupId/subject/:subjectId/configure"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <SubjectConfiguration {...props} />
+                )
+            }
+        />
+
+        {/* ---------- Independent subject routings ---------- */}
+
+        <Route
+            exact
+            path="/hod/course/:courseId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <CourseScorecard {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/hod/subject/:subjectId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <Subject {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/hod/subject/:subjectId/configure"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <SubjectConfiguration {...props} />
+                )
+            }
+        />
+
+        {/* ---------- Profile routings ---------- */}
+
         <Route
             exact
             path="/hod/profile"
@@ -142,59 +216,39 @@ const hodRoutes = (
                 )
             }
         />
-        <Route
-            exact
-            path="/hod/course/:courseId"
-            render={(props) =>
-                !localStorage.getItem("Authorization") ||
-                !localStorage.getItem("is_hod") ? (
-                    <Redirect to="/hod/login" />
-                ) : (
-                    <CourseScorecard {...props} />
-                )
-            }
-        />
-        <Route
-            exact
-            path="/hod/subject/:subjectId"
-            render={(props) =>
-                !localStorage.getItem("Authorization") ||
-                !localStorage.getItem("is_hod") ? (
-                    <Redirect to="/hod/login" />
-                ) : (
-                    <Subject {...props} />
-                )
-            }
-        />
-        {/* <Route
-            exact
-            path="/hod/subject/:subjectId/assign"
-            render={(props) =>
-                !localStorage.getItem("Authorization") ||
-                !localStorage.getItem("is_hod") ? (
-                    <Redirect to="/hod/login" />
-                ) : (
-                    <SubjectAssigning {...props} />
-                )
-            }
-        /> */}
-        <Route
-            exact
-            path="/hod/subject/:subjectId/configure"
-            render={(props) =>
-                !localStorage.getItem("Authorization") ||
-                !localStorage.getItem("is_hod") ? (
-                    <Redirect to="/hod/login" />
-                ) : (
-                    <SubjectConfiguration {...props} />
-                )
-            }
-        />
+
+        {/* ---------- Account & Login routings ---------- */}
+
         <Route
             exact
             path="/hod/account/activation/:tokenId"
             render={(props) => <EmailVerification {...props} />}
         />
+        <Route
+            exact
+            path="/hod/account"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <Account {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/hod/login"
+            render={() =>
+                localStorage.getItem("Authorization") &&
+                localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod" />
+                ) : (
+                    <HODLogin />
+                )
+            }
+        />
+
         {teacherRoutes}
         <Route path="*" component={errorPage} />
     </Switch>

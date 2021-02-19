@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { Badge } from "react-bootstrap";
-import profilepic from "../../assets/user.png";
-import Header from "./navbar";
-import SideNav from "./sidenav";
-import { baseUrl, hodUrl } from "../../shared/baseUrl";
-import Loading from "../sharedComponents/loader";
+import profilepic from "../../../assets/user.png";
+import Header from "../navbar";
+import SideNav from "../sidenav";
+import { baseUrl, hodUrl } from "../../../shared/baseUrl";
+import Loading from "../../sharedComponents/loader";
 
 class GroupStudentProfile extends Component {
     constructor(props) {
@@ -15,6 +15,7 @@ class GroupStudentProfile extends Component {
             studentItems: [],
             page_loading: true,
         };
+        this.groupId = this.props.match.params.groupId;
         this.studentId = this.props.match.params.studentId;
     }
 
@@ -87,7 +88,14 @@ class GroupStudentProfile extends Component {
                                     </Link>
                                 </li>
                                 <li className="breadcrumb-item">
-                                    <Link to="/hod/profile#student">
+                                    <Link to={`/hod/group/${this.groupId}`}>
+                                        Group
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item">
+                                    <Link
+                                        to={`/hod/group/${this.groupId}/student`}
+                                    >
                                         Student
                                     </Link>
                                 </li>

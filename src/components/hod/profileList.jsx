@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from "react";
 import Header from "./navbar";
 import SideNav from "./sidenav";
+import { Link } from "react-router-dom";
 import { Tabs, Tab, Dropdown, Modal, Spinner, Alert } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
 import Loading from "../sharedComponents/loader";
@@ -112,40 +113,40 @@ class AddStudentModal extends Component {
                 centered
             >
                 <Modal.Header closeButton>Create Student</Modal.Header>
-                <Modal.Body>
-                    <Alert
-                        variant="success"
-                        show={this.state.showSuccessAlert}
-                        onClose={() => {
-                            this.setState({
-                                showSuccessAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.successMsg}
-                    </Alert>
-                    <Alert
-                        variant="danger"
-                        show={this.state.showErrorAlert}
-                        onClose={() => {
-                            this.setState({
-                                showErrorAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        <h6>Existing email</h6>
-                        {this.state.errorMsg.map((email, index) => {
-                            return (
-                                <p className="small mb-2" key={index}>
-                                    {email}
-                                </p>
-                            );
-                        })}
-                    </Alert>
+                <form onSubmit={this.handleSubmit} autoComplete="off">
+                    <Modal.Body>
+                        <Alert
+                            variant="success"
+                            show={this.state.showSuccessAlert}
+                            onClose={() => {
+                                this.setState({
+                                    showSuccessAlert: false,
+                                });
+                            }}
+                            dismissible
+                        >
+                            {this.state.successMsg}
+                        </Alert>
+                        <Alert
+                            variant="danger"
+                            show={this.state.showErrorAlert}
+                            onClose={() => {
+                                this.setState({
+                                    showErrorAlert: false,
+                                });
+                            }}
+                            dismissible
+                        >
+                            <h6>Existing email</h6>
+                            {this.state.errorMsg.map((email, index) => {
+                                return (
+                                    <p className="small mb-2" key={index}>
+                                        {email}
+                                    </p>
+                                );
+                            })}
+                        </Alert>
 
-                    <form onSubmit={this.handleSubmit} autoComplete="off">
                         {this.state.email.map((inputField, index) => (
                             <Fragment key={index}>
                                 <div className="form-group">
@@ -208,25 +209,28 @@ class AddStudentModal extends Component {
                                 </div>
                             </Fragment>
                         ))}
-                        <div className="form-group">
-                            <button className="btn btn-primary btn-sm btn-block mt-2">
-                                {this.state.showLoader ? (
-                                    <Spinner
-                                        as="span"
-                                        animation="border"
-                                        size="sm"
-                                        role="status"
-                                        aria-hidden="true"
-                                        className="mr-2"
-                                    />
-                                ) : (
-                                    ""
-                                )}
-                                Add student
-                            </button>
-                        </div>
-                    </form>
-                </Modal.Body>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <button
+                            type="submit"
+                            className="btn btn-primary btn-block"
+                        >
+                            {this.state.showLoader ? (
+                                <Spinner
+                                    as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    aria-hidden="true"
+                                    className="mr-2"
+                                />
+                            ) : (
+                                ""
+                            )}
+                            Add student
+                        </button>
+                    </Modal.Footer>
+                </form>
             </Modal>
         );
     }
@@ -342,33 +346,33 @@ class AddTeacherModal extends Component {
                 centered
             >
                 <Modal.Header closeButton>Create Teacher</Modal.Header>
-                <Modal.Body>
-                    <Alert
-                        variant="danger"
-                        show={this.state.showErrorAlert}
-                        onClose={() => {
-                            this.setState({
-                                showErrorAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.errorMsg}
-                    </Alert>
-                    <Alert
-                        variant="success"
-                        show={this.state.showSuccessAlert}
-                        onClose={() => {
-                            this.setState({
-                                showSuccessAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.successMsg}
-                    </Alert>
+                <form onSubmit={this.handleSubmit} autoComplete="off">
+                    <Modal.Body>
+                        <Alert
+                            variant="danger"
+                            show={this.state.showErrorAlert}
+                            onClose={() => {
+                                this.setState({
+                                    showErrorAlert: false,
+                                });
+                            }}
+                            dismissible
+                        >
+                            {this.state.errorMsg}
+                        </Alert>
+                        <Alert
+                            variant="success"
+                            show={this.state.showSuccessAlert}
+                            onClose={() => {
+                                this.setState({
+                                    showSuccessAlert: false,
+                                });
+                            }}
+                            dismissible
+                        >
+                            {this.state.successMsg}
+                        </Alert>
 
-                    <form onSubmit={this.handleSubmit} autoComplete="off">
                         <div className="form-group">
                             <label htmlFor="email">Email</label>
                             <input
@@ -428,25 +432,28 @@ class AddTeacherModal extends Component {
                                 </div>
                             </div>
                         </div>
-                        <div className="form-group">
-                            <button className="btn btn-primary btn-block mt-2">
-                                {this.state.showLoader ? (
-                                    <Spinner
-                                        as="span"
-                                        animation="border"
-                                        size="sm"
-                                        role="status"
-                                        aria-hidden="true"
-                                        className="mr-2"
-                                    />
-                                ) : (
-                                    ""
-                                )}
-                                Create teacher
-                            </button>
-                        </div>
-                    </form>
-                </Modal.Body>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <button
+                            type="submit"
+                            className="btn btn-primary btn-block"
+                        >
+                            {this.state.showLoader ? (
+                                <Spinner
+                                    as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    aria-hidden="true"
+                                    className="mr-2"
+                                />
+                            ) : (
+                                ""
+                            )}
+                            Create teacher
+                        </button>
+                    </Modal.Footer>
+                </form>
             </Modal>
         );
     }
@@ -901,48 +908,69 @@ class ProfileList extends Component {
                     <div className="container-fluid">
                         {/* Back button */}
                         <button
-                            className="btn btn-primary-invert btn-sm mb-2"
+                            className="btn btn-primary-invert btn-sm mb-3"
                             onClick={this.props.history.goBack}
                         >
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
 
-                        <div className="d-flex flex-wrap justify-content-end mb-3">
-                            <button
-                                className="btn btn-primary btn-sm mr-1"
-                                onClick={this.handleProfileAdding}
-                            >
-                                Add New
-                            </button>
-                            <button
-                                className="btn btn-primary btn-sm mr-1"
-                                onClick={this.handleDelete}
-                            >
-                                Delete
-                            </button>
-                            <button className="btn btn-primary btn-sm mr-1">
-                                Enable
-                            </button>
-                            <button className="btn btn-primary btn-sm mr-1">
-                                Disable
-                            </button>
-                            <Dropdown>
-                                <Dropdown.Toggle
-                                    variant="primary"
-                                    id="dropdown-basic"
-                                    className="btn-sm"
+                        <div className="row align-items-center mb-3">
+                            <div className="col-md-6">
+                                {/* Breadcrumb */}
+                                <nav aria-label="breadcrumb">
+                                    <ol className="breadcrumb">
+                                        <li className="breadcrumb-item">
+                                            <Link to="/hod">
+                                                <i className="fas fa-home fa-sm"></i>
+                                            </Link>
+                                        </li>
+                                        <li className="breadcrumb-item active">
+                                            {this.state.activeTab === "teacher"
+                                                ? "Teacher"
+                                                : "Student"}
+                                        </li>
+                                    </ol>
+                                </nav>
+                            </div>
+                            <div className="col-md-6 d-flex justify-content-end">
+                                <button
+                                    className="btn btn-primary btn-sm mr-1"
+                                    onClick={this.handleProfileAdding}
                                 >
-                                    Notify
-                                </Dropdown.Toggle>
+                                    Add New
+                                </button>
+                                <button
+                                    className="btn btn-primary btn-sm mr-1"
+                                    onClick={this.handleDelete}
+                                >
+                                    Delete
+                                </button>
+                                <button className="btn btn-primary btn-sm mr-1">
+                                    Enable
+                                </button>
+                                <button className="btn btn-primary btn-sm mr-1">
+                                    Disable
+                                </button>
+                                <Dropdown>
+                                    <Dropdown.Toggle
+                                        variant="primary"
+                                        id="dropdown-basic"
+                                        className="btn-sm"
+                                    >
+                                        Notify
+                                    </Dropdown.Toggle>
 
-                                <Dropdown.Menu>
-                                    <Dropdown.Item>Notify All</Dropdown.Item>
-                                    <div className="dropdown-divider"></div>
-                                    <Dropdown.Item>
-                                        Notify Selected
-                                    </Dropdown.Item>
-                                </Dropdown.Menu>
-                            </Dropdown>
+                                    <Dropdown.Menu>
+                                        <Dropdown.Item>
+                                            Notify All
+                                        </Dropdown.Item>
+                                        <div className="dropdown-divider"></div>
+                                        <Dropdown.Item>
+                                            Notify Selected
+                                        </Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                            </div>
                         </div>
 
                         <Tabs

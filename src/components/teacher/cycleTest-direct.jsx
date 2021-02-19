@@ -7,6 +7,7 @@ import { Spinner, Alert } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import { Document, Page, pdfjs } from "react-pdf";
 import Loading from "../sharedComponents/loader";
+import dateFormat from "dateformat";
 
 const mapStateToProps = (state) => ({
     subject_name: state.subject_name,
@@ -24,6 +25,7 @@ class CyleTestDirect extends Component {
             showErrorAlert: false,
             showSuccessAlert: false,
             showLoader: false,
+
             pdf: {
                 file_name: null,
                 file: null,
@@ -31,6 +33,9 @@ class CyleTestDirect extends Component {
             exam_date: "",
             starts_at: "",
             ends_at: "",
+            valid_from: "",
+            valid_to: "",
+
             path: null,
             numPages: null,
             pageNumber: 1,
@@ -73,9 +78,29 @@ class CyleTestDirect extends Component {
                             result.data.direct_question_urls.length !== 0
                                 ? result.data.direct_question_urls[0]
                                 : null,
-                        exam_date: result.data.exam_date,
-                        starts_at: result.data.starts_at,
-                        ends_at: result.data.ends_at,
+                        exam_date:
+                            result.data.exam_date !== null
+                                ? dateFormat(
+                                      result.data.exam_date,
+                                      "yyyy-mm-dd 00:00:00"
+                                  )
+                                : "",
+                        starts_at:
+                            result.data.starts_at !== null
+                                ? dateFormat(result.data.starts_at, "HH:MM:ss")
+                                : "",
+                        ends_at:
+                            result.data.ends_at !== null
+                                ? dateFormat(result.data.ends_at, "HH:MM:ss")
+                                : "",
+                        valid_from: dateFormat(
+                            result.group_valid_from,
+                            "yyyy-mm-dd"
+                        ),
+                        valid_to: dateFormat(
+                            result.group_valid_to,
+                            "yyyy-mm-dd"
+                        ),
                     });
                 } else {
                     if (result.detail) {
@@ -118,7 +143,7 @@ class CyleTestDirect extends Component {
                 showErrorAlert: true,
                 btnDisabled: true,
             });
-        } else if (event.target.files[0].size > 5000000) {
+        } else if (event.target.files[0].size > 5242880) {
             this.setState({
                 errorMsg: "File sixe exceeds more then 5MB!",
                 showErrorAlert: true,
@@ -134,12 +159,11 @@ class CyleTestDirect extends Component {
     };
 
     handleDate = (event) => {
-        let date = new Date(event.target.value);
-
         this.setState({
-            exam_date: `${date.getFullYear()}-${
-                date.getMonth() + 1
-            }-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`,
+            exam_date: `${dateFormat(
+                event.target.value,
+                "yyyy-mm-dd"
+            )} 00:00:00`,
         });
     };
 
@@ -184,7 +208,7 @@ class CyleTestDirect extends Component {
         const pdf = this.state.pdf;
         let extension = "";
 
-        if (directTest.file !== null) {
+        if (directTest.file_name !== null) {
             extension = pdf.file_name.split(".");
         }
 
@@ -217,7 +241,7 @@ class CyleTestDirect extends Component {
                 errorMsg: "Invalid file format!",
                 showErrorAlert: true,
             });
-        } else if (pdf.file.size > 5000000) {
+        } else if (pdf.file.size > 5242880) {
             this.setState({
                 errorMsg: "File sixe exceeds more then 5MB!",
                 showErrorAlert: true,
@@ -332,10 +356,16 @@ class CyleTestDirect extends Component {
                                 <div className="form-group">
                                     <label htmlFor="date">Exam Date:</label>
                                     <input
-                                        type="datetime-local"
+                                        type="date"
                                         name="exam_date"
                                         id="exam_date"
                                         className="form-control form-shadow"
+                                        value={dateFormat(
+                                            this.state.exam_date,
+                                            "yyyy-mm-dd"
+                                        )}
+                                        min={this.state.valid_from}
+                                        max={this.state.valid_to}
                                         onChange={this.handleDate}
                                     />
                                 </div>
@@ -350,6 +380,7 @@ class CyleTestDirect extends Component {
                                         name="starts_at"
                                         id="starts_at"
                                         className="form-control form-shadow"
+                                        value={this.state.starts_at}
                                         onChange={this.handleTime}
                                     />
                                 </div>
@@ -362,6 +393,7 @@ class CyleTestDirect extends Component {
                                         name="ends_at"
                                         id="ends_at"
                                         className="form-control form-shadow"
+                                        value={this.state.ends_at}
                                         onChange={this.handleTime}
                                     />
                                 </div>

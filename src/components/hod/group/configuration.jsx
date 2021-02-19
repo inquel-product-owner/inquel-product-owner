@@ -1,11 +1,12 @@
 import React, { Component } from "react";
 import { Modal, Alert, Spinner } from "react-bootstrap";
-import Header from "./navbar";
-import SideNav from "./sidenav";
-import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
-import Loading from "../sharedComponents/loader";
-import GroupTable from "../table/groupTable";
-import Paginations from "../sharedComponents/pagination";
+import Header from "../navbar";
+import SideNav from "../sidenav";
+import { Link } from "react-router-dom";
+import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
+import Loading from "../../sharedComponents/loader";
+import GroupTable from "../../table/groupTable";
+import Paginations from "../../sharedComponents/pagination";
 import dateFormat from "dateformat";
 
 class GroupModal extends Component {
@@ -488,9 +489,21 @@ class GroupConfiguration extends Component {
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
 
-                        <div className="row align-items-center mb-3 mt-2">
+                        <div className="row align-items-center mb-3">
                             <div className="col-6">
-                                <h5 className="primary-text">Configuration</h5>
+                                {/* Breadcrumb */}
+                                <nav aria-label="breadcrumb">
+                                    <ol className="breadcrumb">
+                                        <li className="breadcrumb-item">
+                                            <Link to="/hod">
+                                                <i className="fas fa-home fa-sm"></i>
+                                            </Link>
+                                        </li>
+                                        <li className="breadcrumb-item active">
+                                            Group Configuration
+                                        </li>
+                                    </ol>
+                                </nav>
                             </div>
                             <div className="col-6 text-right">
                                 <button
@@ -505,7 +518,7 @@ class GroupConfiguration extends Component {
                         <div className="card shadow-sm">
                             <GroupTable
                                 groupItems={this.state.groupItem}
-                                path="hod"
+                                path={`hod/group/${this.groupId}`}
                                 valid_from={true}
                                 valid_to={true}
                                 teacher={true}
