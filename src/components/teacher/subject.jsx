@@ -1274,6 +1274,7 @@ class SubjectChapters extends Component {
                                             <th scope="col">
                                                 Chapter structure
                                             </th>
+                                            <th scope="col">Status</th>
                                             <th scope="col">Weightage</th>
                                             <th scope="col">Summary</th>
                                             <th
@@ -1316,6 +1317,46 @@ class SubjectChapters extends Component {
                                                                                   {
                                                                                       chapter.chapter_name
                                                                                   }
+                                                                              </td>
+                                                                              <td>
+                                                                                  {chapter.chapter_status ===
+                                                                                  "Yet to start" ? (
+                                                                                      <span className="text-danger">
+                                                                                          {
+                                                                                              chapter.chapter_status
+                                                                                          }
+                                                                                      </span>
+                                                                                  ) : chapter.chapter_status ===
+                                                                                    "Approved" ? (
+                                                                                      <span className="text-success">
+                                                                                          {
+                                                                                              chapter.chapter_status
+                                                                                          }
+                                                                                      </span>
+                                                                                  ) : chapter.chapter_status ===
+                                                                                    "In Progress" ? (
+                                                                                      <span className="text-warning">
+                                                                                          {
+                                                                                              chapter.chapter_status
+                                                                                          }
+                                                                                      </span>
+                                                                                  ) : chapter.chapter_status ===
+                                                                                    "Review" ? (
+                                                                                      <span className="text-primary">
+                                                                                          {
+                                                                                              chapter.chapter_status
+                                                                                          }
+                                                                                      </span>
+                                                                                  ) : chapter.chapter_status ===
+                                                                                    "Ready for review" ? (
+                                                                                      <span className="text-primary">
+                                                                                          {
+                                                                                              chapter.chapter_status
+                                                                                          }
+                                                                                      </span>
+                                                                                  ) : (
+                                                                                      chapter.chapter_status
+                                                                                  )}
                                                                               </td>
                                                                               <td>
                                                                                   {
@@ -1402,6 +1443,7 @@ class SubjectChapters extends Component {
                                                                           data.semester_name
                                                                       }
                                                                   </td>
+                                                                  <td></td>
                                                                   <td></td>
                                                                   <td></td>
                                                                   <td className="text-right">
@@ -1495,6 +1537,46 @@ class SubjectChapters extends Component {
                                                                   {
                                                                       chapter.chapter_name
                                                                   }
+                                                              </td>
+                                                              <td>
+                                                                  {chapter.chapter_status ===
+                                                                  "Yet to start" ? (
+                                                                      <span className="text-danger">
+                                                                          {
+                                                                              chapter.chapter_status
+                                                                          }
+                                                                      </span>
+                                                                  ) : chapter.chapter_status ===
+                                                                    "Approved" ? (
+                                                                      <span className="text-success">
+                                                                          {
+                                                                              chapter.chapter_status
+                                                                          }
+                                                                      </span>
+                                                                  ) : chapter.chapter_status ===
+                                                                    "In Progress" ? (
+                                                                      <span className="text-warning">
+                                                                          {
+                                                                              chapter.chapter_status
+                                                                          }
+                                                                      </span>
+                                                                  ) : chapter.chapter_status ===
+                                                                    "Review" ? (
+                                                                      <span className="text-primary">
+                                                                          {
+                                                                              chapter.chapter_status
+                                                                          }
+                                                                      </span>
+                                                                  ) : chapter.chapter_status ===
+                                                                    "Ready for review" ? (
+                                                                      <span className="text-primary">
+                                                                          {
+                                                                              chapter.chapter_status
+                                                                          }
+                                                                      </span>
+                                                                  ) : (
+                                                                      chapter.chapter_status
+                                                                  )}
                                                               </td>
                                                               <td>
                                                                   {

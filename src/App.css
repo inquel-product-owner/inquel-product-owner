@@ -34,6 +34,10 @@ body {
     background-color: #fff9f0 !important;
 }
 
+.tomato-bg {
+    background-color: #ffa88b !important;
+}
+
 /* Text */
 
 .primary-text {
@@ -298,6 +302,21 @@ input[type="search"]:focus {
 .nav-pills .grey-item .show > .nav-link {
     color: black;
     background-color: #ddd;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.nav-pills .primary-nav-item .nav-link {
+    color: #621012;
+    background-color: #efd2ac;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.nav-pills .primary-nav-item .nav-link.active,
+.nav-pills .primary-nav-item .show > .nav-link {
+    color: white;
+    background-color: #621012;
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 }
 
@@ -659,4 +678,54 @@ input[type="search"]:focus {
 .PDFPage > canvas {
     max-width: 100%;
     height: auto !important;
+}
+
+/* Breadcrumb */
+
+.breadcrumb {
+    background-color: transparent;
+    padding: 0;
+    margin: 0;
+}
+
+.breadcrumb-item a {
+    color: #621012 !important;
+    font-weight: 600;
+}
+
+.breadcrumb-item a:hover {
+    opacity: 0.8;
+}
+
+.breadcrumb-item .active {
+    font-weight: 500;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "\f105" !important;
+    font-family: "Font Awesome 5 Free" !important;
+    font-weight: 600;
+}
+
+.breadcrumb-item span {
+    font-weight: 600;
+    margin-right: 5px;
+}
+
+/* Badge */
+
+.badge-success {
+    background-color: #ccffcc !important;
+    color: #008000 !important;
+    font-weight: 500;
+    padding: 5px;
+    font-size: 12px;
+}
+
+.badge-danger {
+    background-color: #ffd7cc !important;
+    color: #e60000 !important;
+    font-weight: 500;
+    padding: 5px;
+    font-size: 12px;
 }

@@ -1,221 +1,13 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import Header from "./navbar";
-import SideNav from "./sidenav";
+import Header from "../navbar";
+import SideNav from "../sidenav";
 import Select from "react-select";
-import { Modal, Alert, Spinner } from "react-bootstrap";
-import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
-import Loading from "../sharedComponents/loader";
+import { Modal, Spinner, Alert } from "react-bootstrap";
+import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
+import Loading from "../../sharedComponents/loader";
 
-class ChapterModal extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            teacherData: [],
-            chapter: "",
-            teacher: "",
-            weightage: "",
-            successMsg: "",
-            errorMsg: "",
-            showSuccessAlert: false,
-            showErrorAlert: false,
-            showLoader: false,
-        };
-    }
-
-    handleInput = (event) => {
-        this.setState({
-            [event.target.name]: event.target.value,
-        });
-    };
-
-    handleTeacher = (event) => {
-        this.setState({
-            teacher: event.value.toString(),
-        });
-    };
-
-    componentDidMount = () => {
-        var url = baseUrl + hodUrl;
-        var authToken = localStorage.getItem("Authorization");
-        var headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: authToken,
-        };
-
-        fetch(`${url}/hod/teacher/`, {
-            headers: headers,
-            method: "GET",
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                this.setState({
-                    teacherData: result.data,
-                });
-                console.log(result);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    handleSubmit = (event) => {
-        event.preventDefault();
-
-        this.setState({
-            showErrorAlert: false,
-            showSuccessAlert: false,
-            showLoader: true,
-        });
-
-        var url = baseUrl + hodUrl;
-        var authToken = localStorage.getItem("Authorization");
-        var headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: authToken,
-        };
-
-        fetch(`${url}/hod/subject/${this.props.subjectId}/assign/teacher/`, {
-            headers: headers,
-            method: "POST",
-            body: JSON.stringify({
-                chapter_name: this.state.chapter,
-                teacher_id: this.state.teacher,
-                weightage: this.state.weightage,
-            }),
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                if (result.sts === true) {
-                    this.setState({
-                        successMsg: result.msg,
-                        showSuccessAlert: true,
-                        showLoader: false,
-                    });
-                    this.props.formSubmission(true);
-                } else {
-                    this.setState({
-                        errorMsg: result.msg,
-                        showErrorAlert: true,
-                        showLoader: false,
-                    });
-                }
-                console.log(result);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    render() {
-        return (
-            <Modal
-                show={this.props.show}
-                onHide={this.props.onHide}
-                size="md"
-                aria-labelledby="contained-modal-title-vcenter"
-                centered
-            >
-                <Modal.Header closeButton>Create Chapter</Modal.Header>
-                <form onSubmit={this.handleSubmit} autoComplete="off">
-                    <Modal.Body>
-                        <Alert
-                            variant="danger"
-                            show={this.state.showErrorAlert}
-                            onClose={() => {
-                                this.setState({
-                                    showErrorAlert: false,
-                                });
-                            }}
-                            dismissible
-                        >
-                            {this.state.errorMsg}
-                        </Alert>
-                        <Alert
-                            variant="success"
-                            show={this.state.showSuccessAlert}
-                            onClose={() => {
-                                this.setState({
-                                    showSuccessAlert: false,
-                                });
-                            }}
-                            dismissible
-                        >
-                            {this.state.successMsg}
-                        </Alert>
-                        <div className="form-group">
-                            <label htmlFor="chapter">Chapter name</label>
-                            <input
-                                type="text"
-                                name="chapter"
-                                id="chapter"
-                                className="form-control borders"
-                                onChange={this.handleInput}
-                                required
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="teacher">Teacher</label>
-                            <Select
-                                className="basic-single borders"
-                                placeholder="Select teacher"
-                                isSearchable={true}
-                                name="teacher_id"
-                                id="teacher_id"
-                                options={this.state.teacherData.map((list) => {
-                                    return {
-                                        value: list.id,
-                                        label:
-                                            list.full_name !== ""
-                                                ? list.full_name
-                                                : list.username,
-                                    };
-                                })}
-                                onChange={this.handleTeacher}
-                                required
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="weightage">Weightage</label>
-                            <input
-                                type="text"
-                                name="weightage"
-                                id="weightage"
-                                className="form-control borders"
-                                onChange={this.handleInput}
-                                required
-                            />
-                        </div>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <button
-                            type="submit"
-                            className="btn btn-primary btn-block"
-                        >
-                            {this.state.showLoader ? (
-                                <Spinner
-                                    as="span"
-                                    animation="border"
-                                    size="sm"
-                                    role="status"
-                                    aria-hidden="true"
-                                    className="mr-2"
-                                />
-                            ) : (
-                                ""
-                            )}
-                            Save
-                        </button>
-                    </Modal.Footer>
-                </form>
-            </Modal>
-        );
-    }
-}
-
-class ChapterReassignModal extends Component {
+class SubjectReassignModal extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -275,17 +67,14 @@ class ChapterReassignModal extends Component {
                 showLoader: false,
             });
         } else {
-            fetch(
-                `${this.url}/hod/subject/${this.props.subjectId}/assign/teacher/`,
-                {
-                    headers: this.headers,
-                    method: "PATCH",
-                    body: JSON.stringify({
-                        chapter_id: this.props.chapter_id,
-                        teacher_id: this.state.teacher,
-                    }),
-                }
-            )
+            fetch(`${this.url}/hod/create/subject/`, {
+                headers: this.headers,
+                method: "PATCH",
+                body: JSON.stringify({
+                    subject_id: this.props.subjectId,
+                    teacher_id: this.state.teacher,
+                }),
+            })
                 .then((res) => res.json())
                 .then((result) => {
                     console.log(result);
@@ -319,7 +108,7 @@ class ChapterReassignModal extends Component {
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
-                <Modal.Header closeButton>Chapter Re-assigning</Modal.Header>
+                <Modal.Header closeButton>Subject Re-assigning</Modal.Header>
                 <form onSubmit={this.handleSubmit} autoComplete="off">
                     <Modal.Body>
                         <Alert
@@ -394,26 +183,27 @@ class ChapterReassignModal extends Component {
     }
 }
 
-class Subject extends Component {
+class GroupSubject extends Component {
     constructor(props) {
         super(props);
         this.state = {
             showSideNav: false,
             showModal: false,
             showReassignModal: false,
+            groupItem: [],
             subjectItems: [],
             chapterData: [],
-            chapter_id: "",
             page_loading: true,
         };
+        this.groupId = this.props.match.params.groupId;
         this.subjectId = this.props.match.params.subjectId;
-        this.url = baseUrl + hodUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
             Accept: "application/json",
             "Content-Type": "application/json",
             Authorization: this.authToken,
         };
+        this.url = baseUrl + hodUrl;
     }
 
     toggleSideNav = () => {
@@ -422,14 +212,9 @@ class Subject extends Component {
         });
     };
 
-    toggleModal = () => {
-        this.setState({ showModal: !this.state.showModal });
-    };
-
-    toggleReassignModal = (data) => {
+    toggleReassignModal = () => {
         this.setState({
             showReassignModal: !this.state.showReassignModal,
-            chapter_id: data,
         });
     };
 
@@ -453,6 +238,21 @@ class Subject extends Component {
     };
 
     componentDidMount = () => {
+        fetch(`${this.url}/hod/group/${this.groupId}`, {
+            headers: this.headers,
+            method: "GET",
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                this.setState({
+                    groupItem: result.data,
+                });
+                console.log(result);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+
         this.loadSubjectData();
     };
 
@@ -484,15 +284,12 @@ class Subject extends Component {
 
     render() {
         document.title =
-            this.state.subjectItems.length !== 0
-                ? this.state.subjectItems.subject_name +
-                  " Subject - HOD | IQLabs"
-                : "Subject - HOD | IQLabs";
+            this.state.subjectItems.subject_name + " Subject - HOD | IQLabs";
         return (
             <div className="wrapper">
                 {/* Navbar */}
                 <Header
-                    name={this.state.subjectItems.subject_name}
+                    name={this.state.groupItem.group_name}
                     togglenav={this.toggleSideNav}
                 />
 
@@ -502,24 +299,13 @@ class Subject extends Component {
                     activeLink="dashboard"
                 />
 
-                {/* Chapter Modal */}
-                {this.state.showModal ? (
-                    <ChapterModal
-                        show={this.state.showModal}
-                        onHide={this.toggleModal}
-                        formSubmission={this.formSubmission}
-                        subjectId={this.subjectId}
-                    />
-                ) : null}
-
-                {/* Chapter reassign Modal */}
+                {/* Subject reassign Modal */}
                 {this.state.showReassignModal ? (
-                    <ChapterReassignModal
+                    <SubjectReassignModal
                         show={this.state.showReassignModal}
                         onHide={this.toggleReassignModal}
                         formSubmission={this.formSubmission}
                         subjectId={this.subjectId}
-                        chapter_id={this.state.chapter_id}
                     />
                 ) : null}
 
@@ -547,6 +333,13 @@ class Subject extends Component {
                                                 <i className="fas fa-home fa-sm"></i>
                                             </Link>
                                         </li>
+                                        <li className="breadcrumb-item">
+                                            <Link
+                                                to={`/hod/group/${this.groupId}`}
+                                            >
+                                                Group
+                                            </Link>
+                                        </li>
                                         <li className="breadcrumb-item active">
                                             <span>Subject:</span>
                                             {
@@ -560,9 +353,9 @@ class Subject extends Component {
                             <div className="col-md-6 text-center text-md-right">
                                 <button
                                     className="btn btn-primary btn-sm mr-2"
-                                    onClick={this.toggleModal}
+                                    onClick={this.toggleReassignModal}
                                 >
-                                    Add New
+                                    Re assign
                                 </button>
                                 <Link to={`${this.props.match.url}/configure`}>
                                     <button className="btn btn-primary btn-sm">
@@ -584,7 +377,6 @@ class Subject extends Component {
                                             <th scope="col">
                                                 Teacher assigned
                                             </th>
-                                            <th scope="col"></th>
                                             <th scope="col">View</th>
                                         </tr>
                                     </thead>
@@ -647,18 +439,6 @@ class Subject extends Component {
                                                                   }
                                                               </td>
                                                               <td>
-                                                                  <button
-                                                                      className="btn btn-primary-invert btn-sm"
-                                                                      onClick={() =>
-                                                                          this.toggleReassignModal(
-                                                                              list.chapter_id
-                                                                          )
-                                                                      }
-                                                                  >
-                                                                      Re assign
-                                                                  </button>
-                                                              </td>
-                                                              <td>
                                                                   <button className="btn btn-primary-invert btn-sm shadow-sm">
                                                                       <i className="far fa-eye"></i>
                                                                   </button>
@@ -681,4 +461,4 @@ class Subject extends Component {
     }
 }
 
-export default Subject;
+export default GroupSubject;

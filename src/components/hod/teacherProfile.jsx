@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import profilepic from "../../assets/user.png";
 import Header from "./navbar";
 import SideNav from "./sidenav";
+import { Link } from "react-router-dom";
+import { Badge } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../shared/baseUrl";
 import Loading from "../sharedComponents/loader";
 import GroupTable from "../table/groupTable";
@@ -144,11 +146,30 @@ class TeacherProfile extends Component {
                     <div className="container-fluid">
                         {/* Back button */}
                         <button
-                            className="btn btn-primary-invert btn-sm mb-2"
+                            className="btn btn-primary-invert btn-sm mb-3"
                             onClick={this.props.history.goBack}
                         >
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
+
+                        {/* Breadcrumb */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb mb-3">
+                                <li className="breadcrumb-item">
+                                    <Link to="/hod">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item">
+                                    <Link to="/hod/profile#teacher">
+                                        Teacher
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    Profile
+                                </li>
+                            </ol>
+                        </nav>
 
                         {/* Teacher Details */}
                         <div className="row align-items-center mb-4">
@@ -172,10 +193,35 @@ class TeacherProfile extends Component {
                                     </div>
                                     <div className="col-md-10 col-9 pl-0">
                                         <h5 className="primary-text">
-                                            {this.state.teacherItems.full_name}
+                                            {this.state.teacherItems
+                                                .full_name !== ""
+                                                ? this.state.teacherItems
+                                                      .full_name
+                                                : this.state.teacherItems
+                                                      .username}
                                         </h5>
                                         <p className="mb-0">
-                                            {this.state.teacherItems.id}
+                                            {this.state.teacherItems.length !==
+                                            0 ? (
+                                                this.state.teacherItems
+                                                    .is_active ? (
+                                                    <Badge
+                                                        variant="success"
+                                                        className="ml-1"
+                                                    >
+                                                        Active
+                                                    </Badge>
+                                                ) : (
+                                                    <Badge
+                                                        variant="danger"
+                                                        className="ml-1"
+                                                    >
+                                                        Inactive
+                                                    </Badge>
+                                                )
+                                            ) : (
+                                                ""
+                                            )}
                                         </p>
                                     </div>
                                 </div>

@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Navbar, Spinner, Alert } from "react-bootstrap";
 import logo from "../../assets/IQ_Labs_V5.png";
 import { Link, Redirect } from "react-router-dom";
-import { baseUrl, adminPathUrl } from "../../shared/baseUrl.js";
+import { baseUrl, adminPathUrl, accountsUrl } from "../../shared/baseUrl.js";
 
 class Login extends Component {
     constructor(props) {
@@ -11,10 +11,16 @@ class Login extends Component {
             username: "",
             password: "",
             errorMsg: "",
-            items: [],
             showLoader: false,
             showErrorAlert: false,
             showPassword: false,
+        };
+        this.url = baseUrl + accountsUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
         };
     }
 
@@ -53,19 +59,45 @@ class Login extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                this.setState({
-                    items: result,
-                });
-                if (result.sts) {
-                    localStorage.clear();
-                    localStorage.setItem(
-                        "Inquel-Auth",
-                        `Token ${result.token}`
-                    );
-                    localStorage.setItem("Username", result.username);
-                    this.setState({
-                        showLoader: false,
-                    });
+                if (result.sts === true) {
+                    if (localStorage.getItem("Authorization")) {
+                        fetch(`${this.url}/logout/`, {
+                            headers: this.headers,
+                            method: "POST",
+                        })
+                            .then((res) => res.json())
+                            .then((results) => {
+                                if (results.sts === true) {
+                                    console.log(results);
+
+                                    localStorage.clear();
+
+                                    localStorage.setItem(
+                                        "Inquel-Auth",
+                                        `Token ${result.token}`
+                                    );
+                                    localStorage.setItem(
+                                        "Username",
+                                        result.username
+                                    );
+                                    this.setState({
+                                        showLoader: false,
+                                    });
+                                }
+                            })
+                            .catch((err) => {
+                                console.log(err);
+                            });
+                    } else {
+                        localStorage.setItem(
+                            "Inquel-Auth",
+                            `Token ${result.token}`
+                        );
+                        localStorage.setItem("Username", result.username);
+                        this.setState({
+                            showLoader: false,
+                        });
+                    }
                 }
                 if (!result.sts && result.msg) {
                     this.setState({

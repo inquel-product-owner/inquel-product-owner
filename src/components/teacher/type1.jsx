@@ -12,8 +12,6 @@ import {
     Spinner,
     Modal,
     Tab,
-    Row,
-    Col,
     Nav,
 } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
@@ -186,96 +184,120 @@ class FileModal extends Component {
 
     changeImage = (image_index) => {
         const images = [...this.state.image];
-        if (this.state.selectedImage === image_index) {
+        this.setState({
+            selectedImage: image_index,
+            selectedImageData: images[image_index],
+        });
+    };
+
+    componentDidMount = () => {
+        const images = [...this.state.image];
+        if (images[0].path !== null) {
             this.setState({
-                selectedImage: "",
-                selectedImageData: [],
-            });
-        } else {
-            this.setState({
-                selectedImage: image_index,
-                selectedImageData: images[image_index],
+                selectedImageData: images[0],
             });
         }
     };
 
     render() {
-        const video = this.state.video;
         return (
             <Modal
                 show={this.props.show}
                 onHide={this.props.onHide}
+                backdrop="static"
                 size="lg"
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
                 <Modal.Header closeButton>Uploaded Files</Modal.Header>
-                <Modal.Body>
+                <Modal.Body className="py-0">
                     <Tab.Container
                         id="left-tabs-example"
                         defaultActiveKey="image"
                     >
-                        <Row>
-                            <Col sm={3} className="mb-3 mb-md-0">
+                        <div className="row">
+                            <div
+                                className="col-md-3 py-3 mb-3 mb-md-0"
+                                style={{ borderRight: "1px solid #ccc" }}
+                            >
                                 <Nav variant="pills" className="flex-column">
-                                    <Nav.Item>
+                                    <Nav.Item className="primary-nav-item">
                                         <Nav.Link eventKey="image">
                                             Image
                                         </Nav.Link>
                                     </Nav.Item>
-                                    <Nav.Item>
+                                    <Nav.Item className="primary-nav-item">
                                         <Nav.Link eventKey="video">
                                             Video
                                         </Nav.Link>
                                     </Nav.Item>
-                                    <Nav.Item>
+                                    <Nav.Item className="primary-nav-item">
                                         <Nav.Link eventKey="audio">
                                             Audio
                                         </Nav.Link>
                                     </Nav.Item>
                                 </Nav>
-                            </Col>
-                            <Col sm={9}>
+                            </div>
+                            <div className="col-md-9 py-3">
                                 <Tab.Content>
                                     <Tab.Pane eventKey="image">
-                                        {this.state.image.map(
-                                            (images, index) => {
-                                                return images.path !== "" ? (
-                                                    <div
-                                                        key={index}
-                                                        className="card preview-img-sm bg-light shadow-sm mb-2"
-                                                        style={{
-                                                            backgroundImage: `url(${images.path})`,
-                                                        }}
-                                                        onClick={() =>
-                                                            this.changeImage(
-                                                                index
-                                                            )
-                                                        }
-                                                    ></div>
-                                                ) : null;
-                                            }
-                                        )}
-                                        {this.state.selectedImageData.length !==
-                                        0 ? (
-                                            <div className="card shadow-sm">
-                                                <img
-                                                    src={
-                                                        this.state
-                                                            .selectedImageData
-                                                            .path
-                                                    }
-                                                    alt={
-                                                        this.state
-                                                            .selectedImageData
-                                                            .file_name
-                                                    }
-                                                    className="img-fluid rounded-lg"
-                                                />
+                                        <div className="card shadow-sm">
+                                            <div className="card-header text-center font-weight-bold tomato-bg">
+                                                {this.state.selectedImageData
+                                                    .length !== 0
+                                                    ? this.state
+                                                          .selectedImageData
+                                                          .title
+                                                    : ""}
                                             </div>
-                                        ) : (
-                                            ""
-                                        )}
+                                            <div className="card-body p-0">
+                                                {this.state.selectedImageData
+                                                    .length !== 0 ? (
+                                                    <img
+                                                        src={
+                                                            this.state
+                                                                .selectedImageData
+                                                                .path
+                                                        }
+                                                        alt={
+                                                            this.state
+                                                                .selectedImageData
+                                                                .file_name
+                                                        }
+                                                        className="img-fluid"
+                                                    />
+                                                ) : (
+                                                    ""
+                                                )}
+                                            </div>
+                                            <div className="card-footer tomato-bg">
+                                                <div className="row justify-content-center">
+                                                    {this.state.image.map(
+                                                        (images, index) => {
+                                                            return images.path !==
+                                                                "" ? (
+                                                                <div
+                                                                    key={index}
+                                                                    className="col-md-3"
+                                                                >
+                                                                    <div
+                                                                        className="card preview-img-sm shadow-sm"
+                                                                        style={{
+                                                                            backgroundImage: `url(${images.path})`,
+                                                                        }}
+                                                                        onClick={() =>
+                                                                            this.changeImage(
+                                                                                index
+                                                                            )
+                                                                        }
+                                                                    ></div>
+                                                                </div>
+                                                            ) : null;
+                                                        }
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
                                     </Tab.Pane>
                                     <Tab.Pane eventKey="video">
                                         <div className="card">
@@ -298,6 +320,7 @@ class FileModal extends Component {
                                         {this.state.audio.map((item, index) => {
                                             return item.path !== null ? (
                                                 <audio
+                                                    key={index}
                                                     src={item.path}
                                                     controls
                                                 ></audio>
@@ -307,8 +330,8 @@ class FileModal extends Component {
                                         })}
                                     </Tab.Pane>
                                 </Tab.Content>
-                            </Col>
-                        </Row>
+                            </div>
+                        </div>
                     </Tab.Container>
                 </Modal.Body>
             </Modal>
@@ -2572,7 +2595,7 @@ class SubjectType1 extends Component {
                                                         <div className="card-body">
                                                             <div className="row">
                                                                 {/* Questions & options */}
-                                                                <div className="col-md-11 pr-md-0">
+                                                                <div className="col-11 pr-md-0">
                                                                     <div className="form-group">
                                                                         <div className="card form-shadow">
                                                                             <div
@@ -2772,9 +2795,9 @@ class SubjectType1 extends Component {
                                                                         }
                                                                     )}
                                                                 </div> */}
-                                                                <div className="col-md-1 pl-0 text-right">
+                                                                <div className="col-1 pl-0 text-right">
                                                                     <button
-                                                                        className="btn btn-light bg-white"
+                                                                        className="btn btn-light bg-white shadow-sm"
                                                                         onClick={() =>
                                                                             this.toggleModal(
                                                                                 question
