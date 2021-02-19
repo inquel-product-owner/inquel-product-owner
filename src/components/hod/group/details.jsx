@@ -1,8 +1,9 @@
 import React, { Component } from "react";
-import Header from "./navbar";
-import SideNav from "./sidenav";
-import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
-import Loading from "../sharedComponents/loader";
+import Header from "../navbar";
+import SideNav from "../sidenav";
+import { Link } from "react-router-dom";
+import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
+import Loading from "../../sharedComponents/loader";
 
 class GroupDetails extends Component {
     constructor(props) {
@@ -12,6 +13,7 @@ class GroupDetails extends Component {
             groupItem: [],
             page_loading: true,
         };
+        this.groupId = this.props.match.params.groupId;
     }
 
     toggleSideNav = () => {
@@ -29,7 +31,7 @@ class GroupDetails extends Component {
             Authorization: authToken,
         };
 
-        fetch(`${url}/hod/group/${this.props.match.params.groupId}`, {
+        fetch(`${url}/hod/group/${this.groupId}`, {
             headers: headers,
             method: "GET",
         })
@@ -47,10 +49,7 @@ class GroupDetails extends Component {
     };
 
     render() {
-        document.title =
-            this.state.groupItem.length !== 0
-                ? this.state.groupItem.group_name + " Details - HOD | IQLabs"
-                : "Group Details - HOD | IQLabs";
+        document.title = "Group Details - HOD | IQLabs";
         return (
             <div className="wrapper">
                 {/* Navbar */}
@@ -73,7 +72,7 @@ class GroupDetails extends Component {
                     <div className="container-fluid">
                         {/* Back button */}
                         <button
-                            className="btn btn-primary-invert btn-sm mb-2"
+                            className="btn btn-primary-invert btn-sm mb-3"
                             onClick={this.props.history.goBack}
                         >
                             <i className="fas fa-chevron-left fa-sm"></i> Back
@@ -81,7 +80,27 @@ class GroupDetails extends Component {
 
                         <div className="row">
                             <div className="col-md-8">
-                                <h5 className="primary-text mb-3">Details</h5>
+                                {/* Breadcrumb */}
+                                <nav aria-label="breadcrumb">
+                                    <ol className="breadcrumb mb-3">
+                                        <li className="breadcrumb-item">
+                                            <Link to="/hod">
+                                                <i className="fas fa-home fa-sm"></i>
+                                            </Link>
+                                        </li>
+                                        <li className="breadcrumb-item">
+                                            <Link
+                                                to={`/hod/group/${this.groupId}`}
+                                            >
+                                                Group
+                                            </Link>
+                                        </li>
+                                        <li className="breadcrumb-item active">
+                                            Details
+                                        </li>
+                                    </ol>
+                                </nav>
+
                                 <div className="card shadow-sm">
                                     <div className="table-responsive">
                                         <table className="table table-xl">
@@ -170,11 +189,6 @@ class GroupDetails extends Component {
                                             </tbody>
                                         </table>
                                     </div>
-                                    {/* <div className="card-body">
-                                        <button className="btn btn-light btn-sm btn-block shadow-sm">
-                                            Add
-                                        </button>
-                                    </div> */}
                                     <div className="card-footer"></div>
                                 </div>
                             </div>

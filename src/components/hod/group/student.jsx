@@ -1,11 +1,12 @@
 import React, { Component } from "react";
 import { Dropdown, Modal, Alert, Spinner } from "react-bootstrap";
-import Header from "./navbar";
-import SideNav from "./sidenav";
-import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
-import Loading from "../sharedComponents/loader";
-import Paginations from "../sharedComponents/pagination";
-import StudentTable from "../table/studentTable";
+import Header from "../navbar";
+import SideNav from "../sidenav";
+import { Link } from "react-router-dom";
+import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
+import Loading from "../../sharedComponents/loader";
+import Paginations from "../../sharedComponents/pagination";
+import StudentTable from "../../table/studentTable";
 
 class StudentAssignModal extends Component {
     constructor(props) {
@@ -241,6 +242,7 @@ class GroupStudents extends Component {
             totalStudentCount: 0,
             page_loading: true,
         };
+        this.groupId = this.props.match.params.groupId;
         this.url = baseUrl + hodUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
@@ -264,7 +266,7 @@ class GroupStudents extends Component {
 
     loadStudentData = () => {
         fetch(
-            `${this.url}/hod/group/${this.props.match.params.groupId}/student/?page=${this.state.activeStudentPage}`,
+            `${this.url}/hod/group/${this.groupId}/student/?page=${this.state.activeStudentPage}`,
             {
                 headers: this.headers,
                 method: "GET",
@@ -285,7 +287,7 @@ class GroupStudents extends Component {
     };
 
     componentDidMount = () => {
-        fetch(`${this.url}/hod/group/${this.props.match.params.groupId}`, {
+        fetch(`${this.url}/hod/group/${this.groupId}`, {
             headers: this.headers,
             method: "GET",
         })
@@ -340,11 +342,7 @@ class GroupStudents extends Component {
     }
 
     render() {
-        document.title =
-            this.state.groupItem.length !== 0
-                ? this.state.groupItem.group_name +
-                  " Student List - HOD | IQLabs"
-                : "Group Student List - HOD | IQLabs";
+        document.title = "Group Students - HOD | IQLabs";
         return (
             <div className="wrapper">
                 {/* Navbar */}
@@ -359,12 +357,12 @@ class GroupStudents extends Component {
                     activeLink="dashboard"
                 />
 
-                {/* Add Subject modal */}
+                {/* Add student modal */}
                 {this.state.showStudentModal ? (
                     <StudentAssignModal
                         show={this.state.showStudentModal}
                         onHide={this.toggleStudentModal}
-                        groupId={this.props.match.params.groupId}
+                        groupId={this.groupId}
                         formSubmission={this.formSubmission}
                     />
                 ) : (
@@ -387,12 +385,28 @@ class GroupStudents extends Component {
 
                         {/* Filter area */}
                         <div className="row align-items-center">
-                            <div className="col-md-2">
-                                <h5 className="primary-text">
-                                    Students Profile
-                                </h5>
+                            <div className="col-md-6">
+                                <nav aria-label="breadcrumb">
+                                    <ol className="breadcrumb">
+                                        <li className="breadcrumb-item">
+                                            <Link to="/hod">
+                                                <i className="fas fa-home fa-sm"></i>
+                                            </Link>
+                                        </li>
+                                        <li className="breadcrumb-item">
+                                            <Link
+                                                to={`/hod/group/${this.groupId}`}
+                                            >
+                                                Group
+                                            </Link>
+                                        </li>
+                                        <li className="breadcrumb-item active">
+                                            Student
+                                        </li>
+                                    </ol>
+                                </nav>
                             </div>
-                            <div className="col-md-10">
+                            <div className="col-md-6">
                                 <div className="d-flex flex-wrap justify-content-end mb-4">
                                     <button
                                         className="btn btn-primary btn-sm mr-1"
@@ -430,7 +444,7 @@ class GroupStudents extends Component {
                         <div className="card shadow-sm">
                             <StudentTable
                                 studentItems={this.state.studentItem}
-                                path="hod"
+                                path={`hod/group/${this.groupId}`}
                                 category={true}
                             />
                             <div className="card-body p-3">

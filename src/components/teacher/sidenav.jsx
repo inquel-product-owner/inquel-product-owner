@@ -75,7 +75,7 @@ class SideNav extends Component {
                         >
                             <button className="btn sidebar-btn btn-sm mb-3">
                                 <i
-                                    className="fas fa-user-circle"
+                                    className="fas fa-user"
                                     style={{ marginLeft: "-1.5px" }}
                                 ></i>
                             </button>

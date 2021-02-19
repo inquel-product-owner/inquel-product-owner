@@ -92,7 +92,13 @@ class Header extends Component {
                                 </Dropdown.Toggle>
 
                                 <Dropdown.Menu>
+                                    <Dropdown.Item as={Link} to="/teacher/account">
+                                        <i className="fas fa-user mr-2"></i> My
+                                        Profile
+                                    </Dropdown.Item>
+                                    <Dropdown.Divider />
                                     <Dropdown.Item onClick={this.handleLogout}>
+                                        <i className="fas fa-sign-out-alt mr-2"></i>{" "}
                                         Logout
                                     </Dropdown.Item>
                                 </Dropdown.Menu>
