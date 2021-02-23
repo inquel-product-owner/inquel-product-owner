@@ -52,6 +52,10 @@ body {
     color: white !important;
 }
 
+.font-weight-bold-600 {
+    font-weight: 600;
+}
+
 /* Card */
 
 .card {
@@ -371,7 +375,7 @@ input[type="search"]:focus {
 /* Login */
 
 .login,
-.login .row {
+.login .page-row {
     min-height: 70vh;
     padding-top: 2rem;
     padding-bottom: 2rem;
@@ -611,6 +615,55 @@ input[type="search"]:focus {
 .alice-carousel__dots-item:not(.__custom):hover,
 .alice-carousel__dots-item:not(.__custom).__active {
     background-color: #621012;
+}
+
+.slick-prev {
+    left: -15px;
+    top: 40%;
+}
+
+.slick-next {
+    right: -12px;
+    top: 40%;
+}
+
+.slick-prev, .slick-next {
+    color: #621012;
+    background: transparent;
+    border-radius: 50%;
+}
+
+.slick-prev:before, .slick-next:before {
+    opacity: 1;
+    color: #621012;
+    font-size: 25px;
+}
+
+.slick-prev:hover, .slick-prev:focus, .slick-next:hover, .slick-next:focus {
+    color: #621012;
+    background: transparent;
+}
+
+.slick-dots {
+    bottom: -30px;
+    position: unset;
+}
+
+.slick-dots li.slick-active button:before {
+    opacity: 1;
+    color: #621012;
+}
+
+.slick-dots li button:before {
+    font-size: 10px;
+}
+
+.slick-dots li button:hover:before, .slick-dots li button:focus:before {
+    color: #621012;
+}
+
+.slick-list {
+    padding-bottom: 10px;
 }
 
 /* Accordion */

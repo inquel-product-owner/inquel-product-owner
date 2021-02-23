@@ -851,16 +851,16 @@ class ProfileList extends Component {
     render() {
         document.title =
             this.state.activeTab === "teacher"
-                ? "Teacher Profiles - HOD | IQLabs"
-                : "Student Profiles - HOD | IQLabs";
+                ? "Teacher List - HOD | IQLabs"
+                : "Student List - HOD | IQLabs";
         return (
             <div className="wrapper">
                 {/* Navbar */}
                 <Header
                     name={
                         this.state.activeTab === "teacher"
-                            ? "Teacher Profiles"
-                            : "Student Profiles"
+                            ? "Teacher List"
+                            : "Student List"
                     }
                     togglenav={this.toggleSideNav}
                 />

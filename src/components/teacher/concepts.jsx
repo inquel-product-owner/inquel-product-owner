@@ -20,6 +20,7 @@ import Loading from "../sharedComponents/loader";
 import AlertModal from "../sharedComponents/alertModal";
 import { Player } from "video-react";
 import "video-react/dist/video-react.css";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 
 const mapStateToProps = (state) => ({
     subject_name: state.subject_name,
@@ -373,14 +374,24 @@ class SubjectConcepts extends Component {
         this.state = {
             showSideNav: false,
             showModal: false,
+
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
             showLoader: false,
+
             showPublishErrorAlert: false,
             showPublishSuccessAlert: false,
             showPublishLoader: false,
+
+            showImageErrorAlert: false,
+            showVideoErrorAlert: false,
+            showAudioErrorAlert: false,
+            showImageSuccessAlert: false,
+            showVideoSuccessAlert: false,
+            showAudioSuccessAlert: false,
+
             page_loading: true,
             btnDisabled: false,
             showConceptDelete_Modal: false,
@@ -425,7 +436,6 @@ class SubjectConcepts extends Component {
                         },
                         audio: [
                             { title: "", file_name: "", audio: null, path: "" },
-                            { title: "", file_name: "", audio: null, path: "" },
                         ],
                     },
                     settings: {
@@ -436,6 +446,7 @@ class SubjectConcepts extends Component {
             ],
         };
         this.image_limit = 4;
+        this.audio_limit = 2;
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
         this.topicName = this.props.match.params.topicName;
@@ -613,12 +624,6 @@ class SubjectConcepts extends Component {
                                     audio:
                                         audio.length === 0
                                             ? [
-                                                  {
-                                                      title: "",
-                                                      file_name: "",
-                                                      audio: null,
-                                                      path: "",
-                                                  },
                                                   {
                                                       title: "",
                                                       file_name: "",
@@ -1138,19 +1143,117 @@ class SubjectConcepts extends Component {
 
     handleRemoveImageFields = (index) => {
         const values = [...this.state.concepts];
-        values[this.state.activeConcept].content.images.splice(index, 1);
+
         this.setState({
-            concepts: values,
+            showImageSuccessAlert: false,
+            showImageErrorAlert: false,
         });
+
+        if (
+            values[this.state.activeConcept].concepts_random_id !== "" &&
+            values[this.state.activeConcept].is_image_uploaded === true
+        ) {
+            let body = {
+                chapter_id: this.chapterId,
+                topic_name: this.topicName,
+                concepts_random_id:
+                    values[this.state.activeConcept].concepts_random_id,
+            };
+            body[`concepts_image_${index + 1}_title`] =
+                values[this.state.activeConcept].content.images[index].title;
+
+            fetch(
+                `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/files/`,
+                {
+                    method: "DELETE",
+                    headers: this.headers,
+                    body: JSON.stringify(body),
+                }
+            )
+                .then((res) => res.json())
+                .then((result) => {
+                    console.log(result);
+                    if (result.sts === true) {
+                        this.setState({
+                            successMsg: result.msg,
+                            showImageSuccessAlert: true,
+                        });
+                        values[this.state.activeConcept].content.images.splice(
+                            index,
+                            1
+                        );
+                        this.setState(
+                            {
+                                concepts: values,
+                            },
+                            () => {
+                                if (
+                                    values[this.state.activeConcept].content
+                                        .images.length === 0
+                                ) {
+                                    values[
+                                        this.state.activeConcept
+                                    ].content.images.push({
+                                        title: "",
+                                        file_name: "",
+                                        image: null,
+                                        path: "",
+                                    });
+                                }
+                                this.setState({
+                                    concepts: values,
+                                });
+                            }
+                        );
+                    } else {
+                        this.setState({
+                            errorMsg: result.detail
+                                ? result.detail
+                                : result.msg,
+                            showImageErrorAlert: true,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        } else {
+            values[this.state.activeConcept].content.images.splice(index, 1);
+            this.setState(
+                {
+                    concepts: values,
+                },
+                () => {
+                    if (
+                        values[this.state.activeConcept].content.images
+                            .length === 0
+                    ) {
+                        values[this.state.activeConcept].content.images.push({
+                            title: "",
+                            file_name: "",
+                            image: null,
+                            path: "",
+                        });
+                    }
+                    this.setState({
+                        concepts: values,
+                    });
+                }
+            );
+        }
     };
 
     handleImageFile = (index, event) => {
+        this.setState({
+            showImageErrorAlert: false,
+        });
+
         let values = [...this.state.concepts];
         const file = event.target.files[0].name.toLowerCase();
         if (!file.match(/\.(jpg|jpeg|png|webp)$/)) {
             this.setState({
                 errorMsg: "Please select valid image file",
-                showErrorAlert: true,
+                showImageErrorAlert: true,
                 btnDisabled: true,
             });
         } else {
@@ -1164,7 +1267,7 @@ class SubjectConcepts extends Component {
             this.setState({
                 concepts: values,
                 btnDisabled: false,
-                showErrorAlert: false,
+                showImageErrorAlert: false,
             });
         }
     };
@@ -1196,12 +1299,16 @@ class SubjectConcepts extends Component {
     };
 
     handleVideoFile = (event) => {
+        this.setState({
+            showVideoErrorAlert: false,
+        });
+
         let values = [...this.state.concepts];
         const file = event.target.files[0].name.toLowerCase();
         if (!file.match(/\.(mpeg|flv|avi|mov|mp4|mkv)$/)) {
             this.setState({
                 errorMsg: "Please select valid video file",
-                showErrorAlert: true,
+                showVideoErrorAlert: true,
                 btnDisabled: true,
             });
         } else {
@@ -1216,7 +1323,7 @@ class SubjectConcepts extends Component {
             this.setState({
                 concepts: values,
                 btnDisabled: false,
-                showErrorAlert: false,
+                showVideoErrorAlert: false,
             });
         }
     };
@@ -1235,14 +1342,71 @@ class SubjectConcepts extends Component {
 
     clearVideo = () => {
         const values = [...this.state.concepts];
-        values[this.state.activeConcept].content.video.title = "";
-        values[this.state.activeConcept].content.video.file_name = "";
-        values[this.state.activeConcept].content.video.video = null;
-        values[this.state.activeConcept].content.video.path = "";
-        values[this.state.activeConcept].content.video.url = "";
-        this.setState({
-            concepts: values,
-        });
+
+        if (
+            values[this.state.activeConcept].concepts_random_id !== "" &&
+            values[this.state.activeConcept].is_image_uploaded === true
+        ) {
+            fetch(
+                `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/files/`,
+                {
+                    method: "DELETE",
+                    headers: this.headers,
+                    body: JSON.stringify({
+                        chapter_id: this.chapterId,
+                        topic_name: this.topicName,
+                        concepts_random_id:
+                            values[this.state.activeConcept].concepts_random_id,
+                        concepts_video_1_title:
+                            values[this.state.activeConcept].content.video
+                                .title,
+                    }),
+                }
+            )
+                .then((res) => res.json())
+                .then((result) => {
+                    console.log(result);
+                    if (result.sts === true) {
+                        this.setState({
+                            successMsg: result.msg,
+                            showVideoSuccessAlert: true,
+                        });
+                        values[this.state.activeConcept].content.video.title =
+                            "";
+                        values[
+                            this.state.activeConcept
+                        ].content.video.file_name = "";
+                        values[
+                            this.state.activeConcept
+                        ].content.video.video = null;
+                        values[this.state.activeConcept].content.video.path =
+                            "";
+                        values[this.state.activeConcept].content.video.url = "";
+                        this.setState({
+                            concepts: values,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.detail
+                                ? result.detail
+                                : result.msg,
+                            showVideoErrorAlert: true,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        } else {
+            values[this.state.activeConcept].content.video.title = "";
+            values[this.state.activeConcept].content.video.file_name = "";
+            values[this.state.activeConcept].content.video.video = null;
+            values[this.state.activeConcept].content.video.path = "";
+            values[this.state.activeConcept].content.video.url = "";
+            this.setState({
+                concepts: values,
+            });
+        }
     };
 
     // -------------------------- Audio --------------------------
@@ -1256,13 +1420,132 @@ class SubjectConcepts extends Component {
         });
     };
 
+    handleAddAudioFields = () => {
+        const values = [...this.state.concepts];
+        values[this.state.activeConcept].content.audio.push({
+            title: "",
+            file_name: "",
+            audio: null,
+            path: "",
+        });
+        this.setState({
+            concepts: values,
+        });
+    };
+
+    handleRemoveAudioFields = (index) => {
+        const values = [...this.state.concepts];
+
+        this.setState({
+            showAudioSuccessAlert: false,
+            showAudioErrorAlert: false,
+        });
+
+        if (
+            values[this.state.activeConcept].concepts_random_id !== "" &&
+            values[this.state.activeConcept].is_image_uploaded === true
+        ) {
+            let body = {
+                chapter_id: this.chapterId,
+                topic_name: this.topicName,
+                concepts_random_id:
+                    values[this.state.activeConcept].concepts_random_id,
+            };
+            body[`concepts_audio_${index + 1}_title`] =
+                values[this.state.activeConcept].content.audio[index].title;
+
+            fetch(
+                `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/files/`,
+                {
+                    method: "DELETE",
+                    headers: this.headers,
+                    body: JSON.stringify(body),
+                }
+            )
+                .then((res) => res.json())
+                .then((result) => {
+                    console.log(result);
+                    if (result.sts === true) {
+                        this.setState({
+                            successMsg: result.msg,
+                            showAudioSuccessAlert: true,
+                        });
+                        values[this.state.activeConcept].content.audio.splice(
+                            index,
+                            1
+                        );
+                        this.setState(
+                            {
+                                concepts: values,
+                            },
+                            () => {
+                                if (
+                                    values[this.state.activeConcept].content
+                                        .audio.length === 0
+                                ) {
+                                    values[
+                                        this.state.activeConcept
+                                    ].content.audio.push({
+                                        title: "",
+                                        file_name: "",
+                                        audio: null,
+                                        path: "",
+                                    });
+                                }
+                                this.setState({
+                                    concepts: values,
+                                });
+                            }
+                        );
+                    } else {
+                        this.setState({
+                            errorMsg: result.detail
+                                ? result.detail
+                                : result.msg,
+                            showAudioErrorAlert: true,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        } else {
+            values[this.state.activeConcept].content.audio.splice(index, 1);
+            this.setState(
+                {
+                    concepts: values,
+                },
+                () => {
+                    if (
+                        values[this.state.activeConcept].content.audio
+                            .length === 0
+                    ) {
+                        values[this.state.activeConcept].content.audio.push({
+                            title: "",
+                            file_name: "",
+                            audio: null,
+                            path: "",
+                        });
+                    }
+                    this.setState({
+                        concepts: values,
+                    });
+                }
+            );
+        }
+    };
+
     handleAudioFile = (index, event) => {
+        this.setState({
+            showAudioErrorAlert: false,
+        });
+
         const values = [...this.state.concepts];
         const file = event.target.files[0].name.toLowerCase();
         if (!file.match(/\.(wav|mp3)$/)) {
             this.setState({
                 errorMsg: "Please select valid audio file",
-                showErrorAlert: true,
+                showAudioErrorAlert: true,
                 btnDisabled: true,
             });
         } else {
@@ -1276,7 +1559,7 @@ class SubjectConcepts extends Component {
             this.setState({
                 concepts: values,
                 btnDisabled: false,
-                showErrorAlert: false,
+                showAudioErrorAlert: false,
             });
         }
     };
@@ -1284,7 +1567,6 @@ class SubjectConcepts extends Component {
     clearAudios = () => {
         const values = [...this.state.concepts];
         values[this.state.activeConcept].content.audio = [
-            { title: "", file_name: "", audio: null, path: "" },
             { title: "", file_name: "", audio: null, path: "" },
         ];
         this.setState({
@@ -1441,10 +1723,7 @@ class SubjectConcepts extends Component {
                     path: "",
                     url: "",
                 },
-                audio: [
-                    { title: "", file_name: "", audio: null, path: "" },
-                    { title: "", file_name: "", audio: null, path: "" },
-                ],
+                audio: [{ title: "", file_name: "", audio: null, path: "" }],
             },
             settings: {
                 virtual_keyboard: [],
@@ -1487,6 +1766,7 @@ class SubjectConcepts extends Component {
                     concepts: values,
                     keyboards: keyboards,
                     flipState: flips,
+                    activeConcept: "",
                 },
                 () => {
                     if (values.length === 0) {
@@ -1521,12 +1801,6 @@ class SubjectConcepts extends Component {
                                     url: "",
                                 },
                                 audio: [
-                                    {
-                                        title: "",
-                                        file_name: "",
-                                        audio: null,
-                                        path: "",
-                                    },
                                     {
                                         title: "",
                                         file_name: "",
@@ -1585,10 +1859,7 @@ class SubjectConcepts extends Component {
                     path: "",
                     url: "",
                 },
-                audio: [
-                    { title: "", file_name: "", audio: null, path: "" },
-                    { title: "", file_name: "", audio: null, path: "" },
-                ],
+                audio: [{ title: "", file_name: "", audio: null, path: "" }],
             },
             settings: {
                 virtual_keyboard: values[index].settings.virtual_keyboard,
@@ -1627,6 +1898,7 @@ class SubjectConcepts extends Component {
                     concepts: values,
                     keyboards: keyboards,
                     flipState: flips,
+                    activeConcept: "",
                 },
                 () => {
                     if (values.length === 0) {
@@ -1661,12 +1933,6 @@ class SubjectConcepts extends Component {
                                     url: "",
                                 },
                                 audio: [
-                                    {
-                                        title: "",
-                                        file_name: "",
-                                        audio: null,
-                                        path: "",
-                                    },
                                     {
                                         title: "",
                                         file_name: "",
@@ -1780,6 +2046,32 @@ class SubjectConcepts extends Component {
     render() {
         let data = [...this.state.concepts];
         let boards = [...this.state.keyboards];
+        let isImageAvailable = false;
+        if (this.state.activeConcept !== "") {
+            for (
+                let i = 0;
+                i < data[this.state.activeConcept].content.images.length;
+                i++
+            ) {
+                isImageAvailable =
+                    data[this.state.activeConcept].content.images[i].path !== ""
+                        ? true
+                        : false;
+            }
+        }
+        let isAudioAvailable = false;
+        if (this.state.activeConcept !== "") {
+            for (
+                let i = 0;
+                i < data[this.state.activeConcept].content.audio.length;
+                i++
+            ) {
+                isAudioAvailable =
+                    data[this.state.activeConcept].content.audio[i].path !== ""
+                        ? true
+                        : false;
+            }
+        }
         return (
             <div className="wrapper">
                 {/* Navbar */}
@@ -1893,7 +2185,8 @@ class SubjectConcepts extends Component {
                                                 className="btn btn-primary btn-sm mr-1"
                                                 onClick={this.handlePublish}
                                             >
-                                                {this.state.showPublishLoader ? (
+                                                {this.state
+                                                    .showPublishLoader ? (
                                                     <Spinner
                                                         as="span"
                                                         animation="border"
@@ -2232,11 +2525,62 @@ class SubjectConcepts extends Component {
                                             <Accordion.Collapse eventKey="1">
                                                 <Card.Body className="p-3">
                                                     {/* ---------- Image ---------- */}
+
+                                                    <Alert
+                                                        variant="danger"
+                                                        show={
+                                                            this.state
+                                                                .showImageErrorAlert
+                                                        }
+                                                        onClose={() => {
+                                                            this.setState({
+                                                                showImageErrorAlert: false,
+                                                            });
+                                                        }}
+                                                        className="mb-2"
+                                                        dismissible
+                                                    >
+                                                        {this.state.errorMsg}
+                                                    </Alert>
+                                                    <Alert
+                                                        variant="success"
+                                                        show={
+                                                            this.state
+                                                                .showImageSuccessAlert
+                                                        }
+                                                        onClose={() => {
+                                                            this.setState({
+                                                                showImageSuccessAlert: false,
+                                                            });
+                                                        }}
+                                                        className="mb-2"
+                                                        dismissible
+                                                    >
+                                                        {this.state.successMsg}
+                                                    </Alert>
+
                                                     <div className="form-group">
                                                         <div className="row align-items-center mb-2">
                                                             <div className="col-md-6">
                                                                 <p className="mb-0">
                                                                     Image
+                                                                    <OverlayTrigger
+                                                                        key="right"
+                                                                        placement="right"
+                                                                        overlay={
+                                                                            <Tooltip id="tooltip">
+                                                                                You
+                                                                                can
+                                                                                upload
+                                                                                Max
+                                                                                of
+                                                                                04
+                                                                                Images
+                                                                            </Tooltip>
+                                                                        }
+                                                                    >
+                                                                        <i className="fas fa-info-circle fa-xs ml-2"></i>
+                                                                    </OverlayTrigger>
                                                                 </p>
                                                             </div>
                                                             <div className="col-md-6 text-right">
@@ -2299,14 +2643,14 @@ class SubjectConcepts extends Component {
                                                                             >
                                                                                 <button
                                                                                     type="button"
-                                                                                    className="btn btn-light btn-sm shadow-none font-weight-bold"
+                                                                                    className="btn btn-light btn-sm shadow-none"
                                                                                     onClick={() =>
                                                                                         this.handleRemoveImageFields(
                                                                                             index
                                                                                         )
                                                                                     }
                                                                                 >
-                                                                                    -
+                                                                                    <i className="fas fa-times fa-sm"></i>
                                                                                 </button>
                                                                             </div>
                                                                         </div>
@@ -2364,6 +2708,12 @@ class SubjectConcepts extends Component {
                                                                         this
                                                                             .handleAddImageFields
                                                                     }
+                                                                    disabled={
+                                                                        isImageAvailable ===
+                                                                        true
+                                                                            ? false
+                                                                            : true
+                                                                    }
                                                                 >
                                                                     Add +
                                                                 </button>
@@ -2374,6 +2724,40 @@ class SubjectConcepts extends Component {
                                                     </div>
 
                                                     {/* ---------- Video ---------- */}
+
+                                                    <Alert
+                                                        variant="danger"
+                                                        show={
+                                                            this.state
+                                                                .showVideoErrorAlert
+                                                        }
+                                                        onClose={() => {
+                                                            this.setState({
+                                                                showVideoErrorAlert: false,
+                                                            });
+                                                        }}
+                                                        className="mb-2"
+                                                        dismissible
+                                                    >
+                                                        {this.state.errorMsg}
+                                                    </Alert>
+                                                    <Alert
+                                                        variant="success"
+                                                        show={
+                                                            this.state
+                                                                .showVideoSuccessAlert
+                                                        }
+                                                        onClose={() => {
+                                                            this.setState({
+                                                                showVideoSuccessAlert: false,
+                                                            });
+                                                        }}
+                                                        className="mb-2"
+                                                        dismissible
+                                                    >
+                                                        {this.state.successMsg}
+                                                    </Alert>
+
                                                     <div className="form-group">
                                                         <div className="row align-items-center mb-2">
                                                             <div className="col-md-6">
@@ -2515,8 +2899,42 @@ class SubjectConcepts extends Component {
                                             <Accordion.Collapse eventKey="2">
                                                 <Card.Body className="p-3">
                                                     {/* ---------- Audio ---------- */}
+
+                                                    <Alert
+                                                        variant="danger"
+                                                        show={
+                                                            this.state
+                                                                .showAudioErrorAlert
+                                                        }
+                                                        onClose={() => {
+                                                            this.setState({
+                                                                showAudioErrorAlert: false,
+                                                            });
+                                                        }}
+                                                        className="mb-2"
+                                                        dismissible
+                                                    >
+                                                        {this.state.errorMsg}
+                                                    </Alert>
+                                                    <Alert
+                                                        variant="success"
+                                                        show={
+                                                            this.state
+                                                                .showAudioSuccessAlert
+                                                        }
+                                                        onClose={() => {
+                                                            this.setState({
+                                                                showAudioSuccessAlert: false,
+                                                            });
+                                                        }}
+                                                        className="mb-2"
+                                                        dismissible
+                                                    >
+                                                        {this.state.successMsg}
+                                                    </Alert>
+
                                                     <div className="form-group">
-                                                        <div className="text-right">
+                                                        <div className="text-right mb-2">
                                                             <button
                                                                 className="btn btn-link btn-sm shadow-none"
                                                                 onClick={
@@ -2538,28 +2956,55 @@ class SubjectConcepts extends Component {
                                                                 <Fragment
                                                                     key={index}
                                                                 >
-                                                                    <input
-                                                                        type="text"
-                                                                        className="form-control form-control-sm border-secondary mb-1"
-                                                                        id={`audio${index}`}
-                                                                        name="audio"
-                                                                        autoComplete="off"
-                                                                        placeholder={`Audio title 0${
-                                                                            index +
-                                                                            1
-                                                                        }`}
-                                                                        value={
-                                                                            options.title
-                                                                        }
-                                                                        onChange={(
-                                                                            event
-                                                                        ) =>
-                                                                            this.handleAudioTitle(
-                                                                                index,
+                                                                    <div
+                                                                        className="input-group border-secondary mb-1"
+                                                                        style={{
+                                                                            borderRadius:
+                                                                                "6px",
+                                                                        }}
+                                                                    >
+                                                                        <input
+                                                                            type="text"
+                                                                            className="form-control form-control-sm"
+                                                                            id={`audio${index}`}
+                                                                            name="audio"
+                                                                            placeholder={`Audio title 0${
+                                                                                index +
+                                                                                1
+                                                                            }`}
+                                                                            value={
+                                                                                options.title
+                                                                            }
+                                                                            onChange={(
                                                                                 event
-                                                                            )
-                                                                        }
-                                                                    />
+                                                                            ) =>
+                                                                                this.handleAudioTitle(
+                                                                                    index,
+                                                                                    event
+                                                                                )
+                                                                            }
+                                                                            autoComplete="off"
+                                                                        />
+                                                                        <div className="input-group-append">
+                                                                            <div
+                                                                                className="btn-group"
+                                                                                role="group"
+                                                                                aria-label="Basic example"
+                                                                            >
+                                                                                <button
+                                                                                    type="button"
+                                                                                    className="btn btn-light btn-sm shadow-none"
+                                                                                    onClick={() =>
+                                                                                        this.handleRemoveAudioFields(
+                                                                                            index
+                                                                                        )
+                                                                                    }
+                                                                                >
+                                                                                    <i className="fas fa-times fa-sm"></i>
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
                                                                     <div className="custom-file mb-2">
                                                                         <input
                                                                             type="file"
@@ -2599,6 +3044,32 @@ class SubjectConcepts extends Component {
                                                             Select only .wav
                                                             .mp3
                                                         </small>
+
+                                                        {data[
+                                                            this.state
+                                                                .activeConcept
+                                                        ].content.audio.length <
+                                                        this.audio_limit ? (
+                                                            <div className="form-group mb-0">
+                                                                <button
+                                                                    className="btn btn-light btn-block border-secondary btn-sm"
+                                                                    onClick={
+                                                                        this
+                                                                            .handleAddAudioFields
+                                                                    }
+                                                                    disabled={
+                                                                        isAudioAvailable ===
+                                                                        true
+                                                                            ? false
+                                                                            : true
+                                                                    }
+                                                                >
+                                                                    Add +
+                                                                </button>
+                                                            </div>
+                                                        ) : (
+                                                            ""
+                                                        )}
                                                     </div>
                                                 </Card.Body>
                                             </Accordion.Collapse>

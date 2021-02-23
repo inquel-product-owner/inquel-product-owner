@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Tab, Row, Col, Nav, Card, Accordion } from "react-bootstrap";
-import Header from "./navbar";
-import SideNav from "./sidenav";
+import Header from "./shared/navbar";
+import SideNav from "./shared/sidenav";
 import Loading from "../sharedComponents/loader";
 import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
 

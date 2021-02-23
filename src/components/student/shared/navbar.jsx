@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 import { Navbar, Nav, Dropdown } from "react-bootstrap";
 import { Link, Redirect } from "react-router-dom";
-import logo from "../../assets/IQ_Labs_V5.png";
-import userpic from "../../assets/user.png";
-import { baseUrl, accountsUrl } from "../../shared/baseUrl";
-import Logout from "../sharedComponents/handleLogout";
+import logo from "../../../assets/IQ_Labs_V5.png";
+import userpic from "../../../assets/user.png";
+import { baseUrl, accountsUrl } from "../../../shared/baseUrl";
+import Logout from "../../sharedComponents/handleLogout";
 
 class Header extends Component {
     constructor(props) {

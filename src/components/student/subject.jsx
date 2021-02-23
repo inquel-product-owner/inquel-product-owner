@@ -1,10 +1,10 @@
 import React, { Component } from "react";
-import Header from "./navbar";
-import SideNav from "./sidenav";
+import Header from "./shared/navbar";
+import SideNav from "./shared/sidenav";
 import { Card, Accordion } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
-class CourseScorecard extends Component {
+class Subject extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -19,17 +19,17 @@ class CourseScorecard extends Component {
     };
 
     componentDidMount = () => {
-        document.title = "Course Name - HOD | IQLabs";
+        document.title = "Subject Name - Student | IQLabs";
     };
 
     render() {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="Course Name" togglenav={this.toggleSideNav} />
+                <Header name="Subject Name" togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
-                <SideNav shownav={this.state.showSideNav} />
+                <SideNav shownav={this.state.showSideNav} activeLink="dashboard" />
 
                 <div
                     className={`section content ${
@@ -55,18 +55,8 @@ class CourseScorecard extends Component {
                                                 <i className="fas fa-home fa-sm"></i>
                                             </Link>
                                         </li>
-                                        <li className="breadcrumb-item">
-                                            <Link
-                                                to="#"
-                                                onClick={
-                                                    this.props.history.goBack
-                                                }
-                                            >
-                                                Student
-                                            </Link>
-                                        </li>
                                         <li className="breadcrumb-item active">
-                                            <span>Course:</span>
+                                            <span>Subject:</span>
                                             10th Mathematics
                                         </li>
                                     </ol>
@@ -170,7 +160,10 @@ class CourseScorecard extends Component {
                                                 </Accordion.Toggle>
                                                 <Accordion.Collapse eventKey="0">
                                                     <Card className="pl-5">
-                                                        <Card.Header className="bg-light my-2">
+                                                        <Card.Header
+                                                            eventKey="0"
+                                                            className="bg-light my-2"
+                                                        >
                                                             <div className="row">
                                                                 <div className="col-md-5 mb-2 mb-md-0">
                                                                     <div className="row">
@@ -201,7 +194,10 @@ class CourseScorecard extends Component {
                                                                 </div>
                                                             </div>
                                                         </Card.Header>
-                                                        <Card.Header className="bg-light">
+                                                        <Card.Header
+                                                            eventKey="0"
+                                                            className="bg-light"
+                                                        >
                                                             <div className="row">
                                                                 <div className="col-md-5 mb-2 mb-md-0">
                                                                     <div className="row">
@@ -271,4 +267,4 @@ class CourseScorecard extends Component {
     }
 }
 
-export default CourseScorecard;
+export default Subject;

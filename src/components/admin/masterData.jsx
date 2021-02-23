@@ -154,21 +154,38 @@ class MasterData extends Component {
                     }`}
                 >
                     <div className="container-fluid">
-                        <div className="d-flex justify-content-between flex-wrap mb-4">
-                            {/* Back button */}
-                            <button
-                                className="btn btn-primary-invert btn-sm mr-2"
-                                onClick={this.props.history.goBack}
-                            >
-                                <i className="fas fa-chevron-left fa-sm"></i>{" "}
-                                Back
-                            </button>
-                            <Link to="/admin/course-management/discounts">
-                                <button className="btn btn-outline-secondary btn-sm">
-                                    Discounts Configuration{" "}
-                                    <i className="fas fa-chevron-right fa-sm ml-2"></i>
-                                </button>
-                            </Link>
+                        {/* Back button */}
+                        <button
+                            className="btn btn-primary-invert btn-sm mb-3"
+                            onClick={this.props.history.goBack}
+                        >
+                            <i className="fas fa-chevron-left fa-sm"></i> Back
+                        </button>
+
+                        <div className="row align-items-center mb-3">
+                            <div className="col-md-6">
+                                {/* Breadcrumb */}
+                                <nav aria-label="breadcrumb">
+                                    <ol className="breadcrumb">
+                                        <li className="breadcrumb-item">
+                                            <Link to="/admin">
+                                                <i className="fas fa-home fa-sm"></i>
+                                            </Link>
+                                        </li>
+                                        <li className="breadcrumb-item active">
+                                            Master Data
+                                        </li>
+                                    </ol>
+                                </nav>
+                            </div>
+                            <div className="col-md-6 text-right">
+                                <Link to={`${this.props.match.url}/discounts`}>
+                                    <button className="btn btn-outline-secondary btn-sm">
+                                        Discounts Configuration{" "}
+                                        <i className="fas fa-chevron-right fa-sm ml-2"></i>
+                                    </button>
+                                </Link>
+                            </div>
                         </div>
 
                         {/* Options */}

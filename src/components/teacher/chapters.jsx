@@ -57,6 +57,7 @@ class TopicModal extends Component {
                             topic_name: topic_name,
                             topic_num: `${parentId}.${i.child.length + 1}`,
                             parent_id: parentId,
+                            next_topic: "",
                             child: [],
                         },
                     ];
@@ -74,6 +75,7 @@ class TopicModal extends Component {
                     chapters.chapter_structure.length + 1
                 }`,
                 parent_id: this.props.activeTopic,
+                next_topic: "",
                 child: [],
             });
         } else {

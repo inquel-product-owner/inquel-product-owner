@@ -132,7 +132,7 @@ class Login extends Component {
                 </Navbar>
                 <div className="login">
                     <div className="container">
-                        <div className="row justify-content-center align-items-center">
+                        <div className="row justify-content-center align-items-center page-row">
                             <div className="col-md-5">
                                 <div className="card shadow py-4">
                                     <div className="card-body ">

@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { Card, Accordion } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 class CourseView extends Component {
     constructor(props) {
@@ -18,14 +19,14 @@ class CourseView extends Component {
     };
 
     componentDidMount = () => {
-        document.title = "Course - Admin | IQLabs";
+        document.title = "Course Name - Admin | IQLabs";
     };
 
     render() {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="Course" togglenav={this.toggleSideNav} />
+                <Header name="Course Name" togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
                 <SideNav shownav={this.state.showSideNav} activeLink="course" />
@@ -38,7 +39,7 @@ class CourseView extends Component {
                     <div className="container-fluid">
                         {/* Back button */}
                         <button
-                            className="btn btn-primary-invert btn-sm mb-2"
+                            className="btn btn-primary-invert btn-sm mb-3"
                             onClick={this.props.history.goBack}
                         >
                             <i className="fas fa-chevron-left fa-sm"></i> Back
@@ -46,18 +47,34 @@ class CourseView extends Component {
 
                         <div className="row align-items-center mb-4">
                             <div className="col-md-6">
-                                <h5 className="primary-text">
-                                    Course - 10th Mathematics
-                                </h5>
+                                {/* Breadcrumb */}
+                                <nav aria-label="breadcrumb">
+                                    <ol className="breadcrumb">
+                                        <li className="breadcrumb-item">
+                                            <Link to="/admin">
+                                                <i className="fas fa-home fa-sm"></i>
+                                            </Link>
+                                        </li>
+                                        <li className="breadcrumb-item">
+                                            <Link to="#" onClick={this.props.history.goBack}>
+                                                Student
+                                            </Link>
+                                        </li>
+                                        <li className="breadcrumb-item active">
+                                            <span>Course:</span>
+                                            10th Mathematics
+                                        </li>
+                                    </ol>
+                                </nav>
                             </div>
                             <div className="col-md-6 d-flex justify-content-start justify-content-md-end">
-                                <button className="btn btn-primary mr-2">
+                                <button className="btn btn-primary btn-sm mr-1">
                                     My
                                 </button>
-                                <button className="btn btn-primary mr-2">
+                                <button className="btn btn-primary btn-sm mr-1">
                                     Personal
                                 </button>
-                                <button className="btn btn-primary">
+                                <button className="btn btn-primary btn-sm">
                                     Simulation
                                 </button>
                             </div>

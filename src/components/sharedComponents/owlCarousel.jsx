@@ -36,7 +36,7 @@ class CarouselCard extends Component {
             >
                 <div className="col-md-11">
                     <Link
-                        to="/teacher"
+                        to="/"
                         style={{
                             textDecoration: "none",
                         }}
@@ -52,15 +52,23 @@ class CarouselCard extends Component {
                                 className="card-img-top"
                                 alt="Course"
                             />
-                            <div className="card-body primary-bg text-white text-center p-2">
-                                01
+                            <div className="card-body primary-bg text-white p-2">
+                                <div className="row">
+                                    <div className="col-9">Subject</div>
+                                    <div className="col-3 text-right">
+                                        4.{" "}
+                                        <span className="small">
+                                            <i className="fas fa-star ml-1 fa-sm"></i>
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </Link>
                 </div>
                 <div className="col-md-11">
                     <Link
-                        to="/teacher"
+                        to="/"
                         style={{
                             textDecoration: "none",
                         }}
@@ -76,15 +84,23 @@ class CarouselCard extends Component {
                                 className="card-img-top"
                                 alt="Course"
                             />
-                            <div className="card-body primary-bg text-white text-center p-2">
-                                02
+                            <div className="card-body primary-bg text-white p-2">
+                                <div className="row">
+                                    <div className="col-9">Subject</div>
+                                    <div className="col-3 text-right">
+                                        4.{" "}
+                                        <span className="small">
+                                            <i className="fas fa-star ml-1 fa-sm"></i>
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </Link>
                 </div>
                 <div className="col-md-11">
                     <Link
-                        to="/teacher"
+                        to="/"
                         style={{
                             textDecoration: "none",
                         }}
@@ -100,15 +116,23 @@ class CarouselCard extends Component {
                                 className="card-img-top"
                                 alt="Course"
                             />
-                            <div className="card-body primary-bg text-white text-center p-2">
-                                03
+                            <div className="card-body primary-bg text-white p-2">
+                                <div className="row">
+                                    <div className="col-9">Subject</div>
+                                    <div className="col-3 text-right">
+                                        4.{" "}
+                                        <span className="small">
+                                            <i className="fas fa-star ml-1 fa-sm"></i>
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </Link>
                 </div>
                 <div className="col-md-11">
                     <Link
-                        to="/teacher"
+                        to="/"
                         style={{
                             textDecoration: "none",
                         }}
@@ -124,15 +148,23 @@ class CarouselCard extends Component {
                                 className="card-img-top"
                                 alt="Course"
                             />
-                            <div className="card-body primary-bg text-white text-center p-2">
-                                04
+                            <div className="card-body primary-bg text-white p-2">
+                                <div className="row">
+                                    <div className="col-9">Subject</div>
+                                    <div className="col-3 text-right">
+                                        4.{" "}
+                                        <span className="small">
+                                            <i className="fas fa-star ml-1 fa-sm"></i>
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </Link>
                 </div>
                 <div className="col-md-11">
                     <Link
-                        to="/teacher"
+                        to="/"
                         style={{
                             textDecoration: "none",
                         }}
@@ -148,8 +180,16 @@ class CarouselCard extends Component {
                                 className="card-img-top"
                                 alt="Course"
                             />
-                            <div className="card-body primary-bg text-white text-center p-2">
-                                05
+                            <div className="card-body primary-bg text-white p-2">
+                                <div className="row">
+                                    <div className="col-9">Subject</div>
+                                    <div className="col-3 text-right">
+                                        4.{" "}
+                                        <span className="small">
+                                            <i className="fas fa-star ml-1 fa-sm"></i>
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </Link>
