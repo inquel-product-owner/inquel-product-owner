@@ -5,6 +5,7 @@ import SideNav from "./sidenav";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
 import Loading from "../sharedComponents/loader";
 import { Badge } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 class HodStudentProfile extends Component {
     constructor(props) {
@@ -14,6 +15,8 @@ class HodStudentProfile extends Component {
             studentItems: [],
             page_loading: true,
         };
+        this.hodId = this.props.match.params.hodId;
+        this.studentId = this.props.match.params.studentId;
     }
 
     toggleSideNav = () => {
@@ -25,8 +28,6 @@ class HodStudentProfile extends Component {
     componentDidMount = () => {
         document.title = "Student Profile - Admin | IQLabs";
 
-        const hodId = this.props.match.params.hodId;
-        const studentId = this.props.match.params.studentId;
         var url = baseUrl + adminPathUrl;
         var authToken = localStorage.getItem("Inquel-Auth");
         var headers = {
@@ -35,7 +36,7 @@ class HodStudentProfile extends Component {
             "Inquel-Auth": authToken,
         };
 
-        fetch(`${url}/hod/${hodId}/student/${studentId}/`, {
+        fetch(`${url}/hod/${this.hodId}/student/${this.studentId}/`, {
             headers: headers,
             method: "GET",
         })
@@ -72,11 +73,38 @@ class HodStudentProfile extends Component {
                     <div className="container-fluid">
                         {/* Back button */}
                         <button
-                            className="btn btn-primary-invert btn-sm mb-2"
+                            className="btn btn-primary-invert btn-sm mb-3"
                             onClick={this.props.history.goBack}
                         >
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
+
+                        {/* Breadcrumb */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb mb-3">
+                                <li className="breadcrumb-item">
+                                    <Link to="/admin">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item">
+                                    <Link to={`/admin/hod/${this.hodId}`}>
+                                        HOD
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item">
+                                    <Link
+                                        to="#"
+                                        onClick={this.props.history.goBack}
+                                    >
+                                        Student
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    Profile
+                                </li>
+                            </ol>
+                        </nav>
 
                         {/* Student details */}
                         <div className="row align-items-center mb-4">

@@ -7,6 +7,7 @@ import Loading from "../sharedComponents/loader";
 import Paginations from "../sharedComponents/pagination";
 import StudentTable from "../table/studentTable";
 import { Badge } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 class HodStudentList extends Component {
     constructor(props) {
@@ -58,7 +59,7 @@ class HodStudentList extends Component {
     };
 
     componentDidMount = () => {
-        document.title = "HOD Student list - Admin | IQLabs";
+        document.title = "Student list - Admin | IQLabs";
 
         fetch(`${this.url}/hod/${this.hodId}/`, {
             headers: this.headers,
@@ -96,10 +97,7 @@ class HodStudentList extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header
-                    name="HOD Student List"
-                    togglenav={this.toggleSideNav}
-                />
+                <Header name="Student List" togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
                 <SideNav
@@ -115,11 +113,33 @@ class HodStudentList extends Component {
                     <div className="container-fluid">
                         {/* Back button */}
                         <button
-                            className="btn btn-primary-invert btn-sm mb-2"
+                            className="btn btn-primary-invert btn-sm mb-3"
                             onClick={this.props.history.goBack}
                         >
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
+
+                        {/* Breadcrumb */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb mb-3">
+                                <li className="breadcrumb-item">
+                                    <Link to="/admin">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item">
+                                    <Link
+                                        to="#"
+                                        onClick={this.props.history.goBack}
+                                    >
+                                        HOD
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    Student
+                                </li>
+                            </ol>
+                        </nav>
 
                         <div className="row align-items-center mb-4">
                             <div className="col-md-6">
@@ -182,7 +202,7 @@ class HodStudentList extends Component {
                         <div className="card shadow-sm">
                             <StudentTable
                                 studentItems={this.state.studentItems}
-                                path={`admin/hod/${this.props.match.params.hodId}`}
+                                path={`admin/hod/${this.hodId}`}
                                 category={true}
                             />
                             <div className="card-body p-3">

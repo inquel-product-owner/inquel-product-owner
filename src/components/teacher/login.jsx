@@ -325,7 +325,7 @@ class TeacherLogin extends Component {
                 </Navbar>
                 <div className="login">
                     <div className="container">
-                        <div className="row justify-content-center align-items-center">
+                        <div className="row justify-content-center align-items-center page-row">
                             <div className="col-md-5">
                                 <div className="card shadow py-2">
                                     <div className="card-body ">
@@ -455,20 +455,12 @@ class TeacherLogin extends Component {
                                             or
                                         </p>
                                         <div className="d-flex justify-content-center mb-3">
-                                            <div className="col-md-8">
-                                                <div className="d-flex">
-                                                    <div className="col-6 text-center">
-                                                        <button className="btn btn-primary btn-sm">
-                                                            <i className="fab fa-google"></i>
-                                                        </button>
-                                                    </div>
-                                                    <div className="col-6 text-center">
-                                                        <button className="btn btn-primary btn-sm">
-                                                            <i className="fab fa-facebook"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            <button className="btn btn-primary btn-sm mr-3">
+                                                <i className="fab fa-google"></i>
+                                            </button>
+                                            <button className="btn btn-primary btn-sm">
+                                                <i className="fab fa-facebook"></i>
+                                            </button>
                                         </div>
                                         <p className="text-center small mb-0">
                                             Don't have an account?{" "}

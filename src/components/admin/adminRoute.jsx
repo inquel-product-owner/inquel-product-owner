@@ -82,7 +82,7 @@ const adminRoutes = (
             }
         />
         <Route
-            path="/admin/hod/:hodId/teachers"
+            path="/admin/hod/:hodId/teacher"
             render={(props) =>
                 !localStorage.getItem("Inquel-Auth") ? (
                     <Redirect to="/admin/login" />

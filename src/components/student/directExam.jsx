@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import Header from "./navbar";
-import SideNav from "./sidenav";
+import Header from "./shared/navbar";
+import SideNav from "./shared/sidenav";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 
 class DirectExam extends Component {

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import Header from "./navbar";
-import SideNav from "./sidenav";
+import Header from "./shared/navbar";
+import SideNav from "./shared/sidenav";
 import dummyImg from "../../assets/code.jpg";
 import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
 

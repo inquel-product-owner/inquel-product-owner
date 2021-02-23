@@ -10,6 +10,7 @@ import StudentTable from "../table/studentTable";
 import Paginations from "../sharedComponents/pagination";
 import ReactSwitch from "../sharedComponents/switchComponent";
 import dateFormat from "dateformat";
+import { Link } from "react-router-dom";
 
 class HODModal extends Component {
     constructor(props) {
@@ -933,16 +934,16 @@ class Profiles extends Component {
     render() {
         document.title =
             this.state.activeTab === "hod"
-                ? "HOD Profiles - Admin | IQLabs"
-                : "Student Profiles - Admin | IQLabs";
+                ? "HOD List - Admin | IQLabs"
+                : "Student List - Admin | IQLabs";
         return (
             <div className="wrapper">
                 {/* Navbar */}
                 <Header
                     name={
                         this.state.activeTab === "hod"
-                            ? "HOD Profiles"
-                            : "Student Profiles"
+                            ? "HOD List"
+                            : "Student List"
                     }
                     togglenav={this.toggleSideNav}
                 />
@@ -972,35 +973,54 @@ class Profiles extends Component {
                     <div className="container-fluid">
                         {/* Back button */}
                         <button
-                            className="btn btn-primary-invert btn-sm mb-2 mb-md-0"
+                            className="btn btn-primary-invert btn-sm mb-3"
                             onClick={this.props.history.goBack}
                         >
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
 
-                        <div className="d-flex flex-wrap justify-content-center justify-content-md-end mb-4">
-                            {this.state.activeTab === "hod" ? (
+                        <div className="row align-items-center mb-3">
+                            <div className="col-md-6">
+                                {/* Breadcrumb */}
+                                <nav aria-label="breadcrumb">
+                                    <ol className="breadcrumb">
+                                        <li className="breadcrumb-item">
+                                            <Link to="/admin">
+                                                <i className="fas fa-home fa-sm"></i>
+                                            </Link>
+                                        </li>
+                                        <li className="breadcrumb-item active">
+                                            {this.state.activeTab === "hod"
+                                                ? "HOD"
+                                                : "Student"}
+                                        </li>
+                                    </ol>
+                                </nav>
+                            </div>
+                            <div className="col-md-6 d-flex justify-content-end">
+                                {this.state.activeTab === "hod" ? (
+                                    <button
+                                        className="btn btn-primary btn-sm mr-1"
+                                        onClick={this.toggleModal}
+                                    >
+                                        Add New
+                                    </button>
+                                ) : (
+                                    ""
+                                )}
                                 <button
                                     className="btn btn-primary btn-sm mr-1"
-                                    onClick={this.toggleModal}
+                                    onClick={this.triggerDelete}
                                 >
-                                    Add New
+                                    Delete
                                 </button>
-                            ) : (
-                                ""
-                            )}
-                            <button
-                                className="btn btn-primary btn-sm mr-1"
-                                onClick={this.triggerDelete}
-                            >
-                                Delete
-                            </button>
-                            <button className="btn btn-primary btn-sm mr-1">
-                                Enable
-                            </button>
-                            <button className="btn btn-primary btn-sm">
-                                Disable
-                            </button>
+                                <button className="btn btn-primary btn-sm mr-1">
+                                    Enable
+                                </button>
+                                <button className="btn btn-primary btn-sm">
+                                    Disable
+                                </button>
+                            </div>
                         </div>
 
                         <Tabs

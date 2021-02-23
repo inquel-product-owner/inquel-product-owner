@@ -3,6 +3,8 @@ import ReactDOM from "react-dom";
 import "bootstrap/dist/css/bootstrap.css";
 import "@fortawesome/fontawesome-free/css/all.css";
 import "react-alice-carousel/lib/alice-carousel.css";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";

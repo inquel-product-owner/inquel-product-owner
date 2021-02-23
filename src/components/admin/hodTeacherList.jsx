@@ -1,10 +1,11 @@
 import React, { Component } from "react";
-import { Tab, Row, Col, Nav, Badge } from "react-bootstrap";
-import profilepic from "../../assets/user.png";
 import Header from "./navbar";
 import SideNav from "./sidenav";
+import profilepic from "../../assets/user.png";
+import { Tab, Row, Col, Nav, Badge } from "react-bootstrap";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
 import Loading from "../sharedComponents/loader";
+import { Link } from "react-router-dom";
 
 function EmptyData() {
     return (
@@ -23,6 +24,7 @@ class HodTeacherList extends Component {
             hodItems: [],
             page_loading: true,
         };
+        this.hodId = this.props.match.params.hodId;
     }
 
     toggleSideNav = () => {
@@ -34,7 +36,6 @@ class HodTeacherList extends Component {
     componentDidMount = () => {
         document.title = "Teacher Profile - Admin | IQLabs";
 
-        const hodId = this.props.match.params.hodId;
         var url = baseUrl + adminPathUrl;
         var authToken = localStorage.getItem("Inquel-Auth");
         var headers = {
@@ -44,11 +45,11 @@ class HodTeacherList extends Component {
         };
 
         Promise.all([
-            fetch(`${url}/hod/${hodId}/`, {
+            fetch(`${url}/hod/${this.hodId}/`, {
                 headers: headers,
                 method: "GET",
             }).then((res) => res.json()),
-            fetch(`${url}/hod/${hodId}/teacher/`, {
+            fetch(`${url}/hod/${this.hodId}/teacher/`, {
                 headers: headers,
                 method: "GET",
             }).then((res) => res.json()),
@@ -70,10 +71,7 @@ class HodTeacherList extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header
-                    name="HOD Teacher List"
-                    togglenav={this.toggleSideNav}
-                />
+                <Header name="Teacher List" togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
                 <SideNav
@@ -89,11 +87,33 @@ class HodTeacherList extends Component {
                     <div className="container-fluid">
                         {/* Back button */}
                         <button
-                            className="btn btn-primary-invert btn-sm mb-2"
+                            className="btn btn-primary-invert btn-sm mb-3"
                             onClick={this.props.history.goBack}
                         >
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
+
+                        {/* Breadcrumb */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb mb-3">
+                                <li className="breadcrumb-item">
+                                    <Link to="/admin">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item">
+                                    <Link
+                                        to="#"
+                                        onClick={this.props.history.goBack}
+                                    >
+                                        HOD
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    Teacher
+                                </li>
+                            </ol>
+                        </nav>
 
                         {/* HOD Details */}
                         <div className="row align-items-center mb-4">
