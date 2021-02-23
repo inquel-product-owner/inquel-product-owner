@@ -1,8 +1,9 @@
 import React, { Component, useState } from "react";
-import { Navbar, Alert, Spinner, Modal } from "react-bootstrap";
-import logo from "../../assets/IQ_Labs_V5.png";
+import { Alert, Spinner, Modal } from "react-bootstrap";
 import { Link, Redirect } from "react-router-dom";
 import { baseUrl, accountsUrl, adminPathUrl } from "../../shared/baseUrl.js";
+import Footer from "./shared/footer";
+import AccountNavbar from "./shared/accountNavbar";
 
 function ForgotPasswordModal(props) {
     const [email, setEmail] = useState("");
@@ -61,9 +62,7 @@ function ForgotPasswordModal(props) {
             aria-labelledby="contained-modal-title-vcenter"
             centered
         >
-            <Modal.Header closeButton>
-                Forgot password
-            </Modal.Header>
+            <Modal.Header closeButton>Forgot password</Modal.Header>
             <Modal.Body>
                 <Alert
                     variant="danger"
@@ -329,22 +328,22 @@ class StudentLogin extends Component {
                     ""
                 )}
 
-                <Navbar className="secondary-bg py-2 px-4">
-                    <Navbar.Brand>
-                        <Link to="/">
-                            <img src={logo} alt="Logo" />
-                        </Link>
-                    </Navbar.Brand>
-                </Navbar>
+                <AccountNavbar />
+
                 <div className="login">
                     <div className="container">
-                        <div className="row justify-content-center align-items-center">
+                        <div className="row justify-content-center align-items-center page-row">
                             <div className="col-md-5">
                                 <div className="card shadow py-2">
                                     <div className="card-body ">
-                                        <h4 className="primary-text mb-4">
+                                        <h4 className="primary-text">
                                             STUDENT LOGIN
                                         </h4>
+                                        <p className="small text-muted">
+                                            Enjoy unlimited learning | Enjoy 7
+                                            days Free Trails
+                                        </p>
+
                                         <Alert
                                             variant="danger"
                                             show={this.state.showErrorAlert}
@@ -357,6 +356,7 @@ class StudentLogin extends Component {
                                         >
                                             {this.state.errorMsg}
                                         </Alert>
+
                                         <form
                                             onSubmit={this.handleSubmit}
                                             autoComplete="off"
@@ -468,25 +468,17 @@ class StudentLogin extends Component {
                                             or
                                         </p>
                                         <div className="d-flex justify-content-center mb-3">
-                                            <div className="col-md-8">
-                                                <div className="d-flex">
-                                                    <div className="col-6 text-center">
-                                                        <button className="btn btn-primary btn-sm">
-                                                            <i className="fab fa-google"></i>
-                                                        </button>
-                                                    </div>
-                                                    <div className="col-6 text-center">
-                                                        <button className="btn btn-primary btn-sm">
-                                                            <i className="fab fa-facebook"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            <button className="btn btn-primary btn-sm mr-3">
+                                                <i className="fab fa-google"></i>
+                                            </button>
+                                            <button className="btn btn-primary btn-sm">
+                                                <i className="fab fa-facebook"></i>
+                                            </button>
                                         </div>
                                         <p className="text-center small mb-0">
                                             Don't have an account?{" "}
                                             <Link
-                                                to=""
+                                                to="/student/register"
                                                 className="primary-text font-weight-bold"
                                             >
                                                 Join Inquel Online Learning
@@ -498,41 +490,9 @@ class StudentLogin extends Component {
                         </div>
                     </div>
                 </div>
-                <footer className="primary-bg p-4">
-                    <div className="container-fluid">
-                        <div className="row">
-                            <div className="col-md-6">
-                                <p className="mb-3 mb-md-0 text-white text-center text-md-left">
-                                    &copy;2020 Inquel inc. Powered By{" "}
-                                    <a
-                                        href="https://sachirva.com/"
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="secondary-text"
-                                    >
-                                        Sachirva Technology Solutions
-                                    </a>
-                                </p>
-                            </div>
-                            <div className="col-md-6 ">
-                                <div className="d-flex justify-content-center justify-content-md-end ">
-                                    <Link to="/" className="text-white">
-                                        <i className="fab fa-facebook-f mr-4"></i>
-                                    </Link>
-                                    <Link to="/" className="text-white">
-                                        <i className="fab fa-twitter mr-4"></i>
-                                    </Link>
-                                    <Link to="/" className="text-white">
-                                        <i className="fab fa-instagram mr-4"></i>
-                                    </Link>
-                                    <Link to="/" className="text-white">
-                                        <i className="fab fa-linkedin-in mr-4"></i>
-                                    </Link>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </footer>
+
+                {/* Footer */}
+                <Footer />
             </>
         );
     }

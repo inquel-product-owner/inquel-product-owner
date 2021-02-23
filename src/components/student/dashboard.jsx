@@ -1,24 +1,60 @@
 import React, { Component } from "react";
-import Header from "./navbar";
-import SideNav from "./sidenav";
+import Header from "./shared/navbar";
+import SideNav from "./shared/sidenav";
 import courseimg from "../../assets/code.jpg";
 import { Link } from "react-router-dom";
-import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
+import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
 import CarouselCard from "../sharedComponents/owlCarousel";
+import Footer from "./shared/footer";
+import Loading from "../sharedComponents/loader";
+import AlertModal from "../sharedComponents/alertModal";
+import Slider from "react-slick";
 
 class Dashboard extends Component {
     constructor(props) {
         super(props);
         this.state = {
             showSideNav: false,
+            subjectItems: [],
             page_loading: true,
+            showAlertModal: false,
         };
-        this.url = baseUrl + teacherUrl;
+        this.url = baseUrl + studentUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
             Accept: "application/json",
             "Content-Type": "application/json",
             Authorization: this.authToken,
+        };
+        this.settings = {
+            dots: true,
+            infinite: false,
+            speed: 500,
+            slidesToShow: 4,
+            slidesToScroll: 1,
+            initialSlide: 0,
+            responsive: [
+                {
+                    breakpoint: 1024,
+                    settings: {
+                        slidesToShow: 3,
+                    },
+                },
+                {
+                    breakpoint: 600,
+                    settings: {
+                        slidesToShow: 1,
+                        dots: false,
+                    },
+                },
+                {
+                    breakpoint: 480,
+                    settings: {
+                        slidesToShow: 1,
+                        dots: false,
+                    },
+                },
+            ],
         };
     }
 
@@ -30,7 +66,32 @@ class Dashboard extends Component {
 
     componentDidMount = () => {
         document.title = "Dashboard - Student | IQLabs";
+
+        fetch(`${this.url}/student/subject`, {
+            method: "GET",
+            headers: this.headers,
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        subjectItems: result.data,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        alertMsg: result.detail ? result.detail : result.msg,
+                        showAlertModal: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     };
+
     render() {
         return (
             <div className="wrapper">
@@ -42,6 +103,15 @@ class Dashboard extends Component {
                     shownav={this.state.showSideNav}
                     activeLink="dashboard"
                 />
+
+                {/* ALert modal */}
+                {this.state.showAlertModal ? (
+                    <AlertModal
+                        show={this.state.showAlertModal}
+                        msg={this.state.alertMsg}
+                        goBack={this.props.history.goBack}
+                    />
+                ) : null}
 
                 <div
                     className={`section content pb-0 ${
@@ -63,103 +133,115 @@ class Dashboard extends Component {
                         <div className="row mb-4">
                             <div className="col-md-2">
                                 <div
-                                    className="card"
+                                    className="card light-bg shadow-sm"
                                     style={{
                                         cursor: "pointer",
                                     }}
                                 >
-                                    <img
-                                        src={courseimg}
-                                        className="card-img-top"
-                                        alt="Course"
-                                    />
-                                    <div className="card-body primary-bg text-white text-center p-2">
-                                        01
+                                    <div className="card-body p-3">
+                                        <img
+                                            src={courseimg}
+                                            className="img-fluid rounded shadow-sm mb-2"
+                                            alt="Course"
+                                        />
+                                        <p className="primary-text font-weight-bold-600 text-center mb-0">
+                                            Course
+                                        </p>
                                     </div>
                                 </div>
                             </div>
                             <div className="col-md-2">
                                 <div
-                                    className="card"
+                                    className="card light-bg shadow-sm"
                                     style={{
                                         cursor: "pointer",
                                     }}
                                 >
-                                    <img
-                                        src={courseimg}
-                                        className="card-img-top"
-                                        alt="Course"
-                                    />
-                                    <div className="card-body primary-bg text-white text-center p-2">
-                                        02
+                                    <div className="card-body p-3">
+                                        <img
+                                            src={courseimg}
+                                            className="img-fluid rounded shadow-sm mb-2"
+                                            alt="Course"
+                                        />
+                                        <p className="primary-text font-weight-bold-600 text-center mb-0">
+                                            Course
+                                        </p>
                                     </div>
                                 </div>
                             </div>
                             <div className="col-md-2">
                                 <div
-                                    className="card"
+                                    className="card light-bg shadow-sm"
                                     style={{
                                         cursor: "pointer",
                                     }}
                                 >
-                                    <img
-                                        src={courseimg}
-                                        className="card-img-top"
-                                        alt="Course"
-                                    />
-                                    <div className="card-body primary-bg text-white text-center p-2">
-                                        03
+                                    <div className="card-body p-3">
+                                        <img
+                                            src={courseimg}
+                                            className="img-fluid rounded shadow-sm mb-2"
+                                            alt="Course"
+                                        />
+                                        <p className="primary-text font-weight-bold-600 text-center mb-0">
+                                            Course
+                                        </p>
                                     </div>
                                 </div>
                             </div>
                             <div className="col-md-2">
                                 <div
-                                    className="card"
+                                    className="card light-bg shadow-sm"
                                     style={{
                                         cursor: "pointer",
                                     }}
                                 >
-                                    <img
-                                        src={courseimg}
-                                        className="card-img-top"
-                                        alt="Course"
-                                    />
-                                    <div className="card-body primary-bg text-white text-center p-2">
-                                        04
+                                    <div className="card-body p-3">
+                                        <img
+                                            src={courseimg}
+                                            className="img-fluid rounded shadow-sm mb-2"
+                                            alt="Course"
+                                        />
+                                        <p className="primary-text font-weight-bold-600 text-center mb-0">
+                                            Course
+                                        </p>
                                     </div>
                                 </div>
                             </div>
                             <div className="col-md-2">
                                 <div
-                                    className="card"
+                                    className="card light-bg shadow-sm"
                                     style={{
                                         cursor: "pointer",
                                     }}
                                 >
-                                    <img
-                                        src={courseimg}
-                                        className="card-img-top"
-                                        alt="Course"
-                                    />
-                                    <div className="card-body primary-bg text-white text-center p-2">
-                                        05
+                                    <div className="card-body p-3">
+                                        <img
+                                            src={courseimg}
+                                            className="img-fluid rounded shadow-sm mb-2"
+                                            alt="Course"
+                                        />
+                                        <p className="primary-text font-weight-bold-600 text-center mb-0">
+                                            Course
+                                        </p>
                                     </div>
                                 </div>
                             </div>
                             <div className="col-md-2">
                                 <div
-                                    className="card"
+                                    className="card light-bg shadow-sm"
                                     style={{
                                         cursor: "pointer",
                                     }}
                                 >
-                                    <img
-                                        src={courseimg}
-                                        className="card-img-top"
-                                        alt="Course"
-                                    />
-                                    <div className="card-body primary-bg text-white text-center p-2">
-                                        06
+                                    <div className="card-body p-3">
+                                        <img
+                                            src={courseimg}
+                                            className="img-fluid rounded shadow-sm mb-2"
+                                            alt="Course"
+                                        />
+                                        <p className="primary-text font-weight-bold-600 text-center mb-0">
+                                            Course
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -182,7 +264,52 @@ class Dashboard extends Component {
                                 </div>
                             </div>
                             <div className="card-body">
-                                <CarouselCard />
+                                <Slider {...this.settings}>
+                                    {this.state.subjectItems.map(
+                                        (data, index) => {
+                                            return (
+                                                <div
+                                                    className="px-3"
+                                                    key={index}
+                                                >
+                                                    <Link
+                                                        to={`/student/subject/${data.id}`}
+                                                        className="text-decoration-none"
+                                                    >
+                                                        <div
+                                                            className="card"
+                                                            style={{
+                                                                cursor:
+                                                                    "pointer",
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={courseimg}
+                                                                className="card-img-top"
+                                                                alt="Course"
+                                                            />
+                                                            <div className="card-body primary-bg text-white p-2">
+                                                                <div className="row">
+                                                                    <div className="col-9">
+                                                                        {
+                                                                            data.subject_name
+                                                                        }
+                                                                    </div>
+                                                                    <div className="col-3 text-right">
+                                                                        4.{" "}
+                                                                        <span className="small">
+                                                                            <i className="fas fa-star ml-1 fa-sm"></i>
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </Link>
+                                                </div>
+                                            );
+                                        }
+                                    )}
+                                </Slider>
                             </div>
                         </div>
 
@@ -228,6 +355,118 @@ class Dashboard extends Component {
                             </div>
                         </div>
 
+                        {/* Topics recommended */}
+                        <div className="card shadow-sm mb-4">
+                            <div className="card-header">
+                                <h5>Topic Recommended For You</h5>
+                            </div>
+                            <div className="card-body">
+                                <div className="row mb-3">
+                                    <div className="col-md-3 mb-3">
+                                        <Link
+                                            to=""
+                                            className="text-decoration-none"
+                                        >
+                                            <div className="card primary-bg text-white">
+                                                <div className="card-body text-center p-3">
+                                                    Topics 01
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    </div>
+                                    <div className="col-md-3 mb-3">
+                                        <Link
+                                            to=""
+                                            className="text-decoration-none"
+                                        >
+                                            <div className="card primary-bg text-white">
+                                                <div className="card-body text-center p-3">
+                                                    Topics 02
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    </div>
+                                    <div className="col-md-3 mb-3">
+                                        <Link
+                                            to=""
+                                            className="text-decoration-none"
+                                        >
+                                            <div className="card primary-bg text-white">
+                                                <div className="card-body text-center p-3">
+                                                    Topics 03
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    </div>
+                                    <div className="col-md-3 mb-3">
+                                        <Link
+                                            to=""
+                                            className="text-decoration-none"
+                                        >
+                                            <div className="card primary-bg text-white">
+                                                <div className="card-body text-center p-3">
+                                                    Topics 04
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    </div>
+                                    <div className="col-md-3 mb-3">
+                                        <Link
+                                            to=""
+                                            className="text-decoration-none"
+                                        >
+                                            <div className="card primary-bg text-white">
+                                                <div className="card-body text-center p-3">
+                                                    Topics 05
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    </div>
+                                    <div className="col-md-3 mb-3">
+                                        <Link
+                                            to=""
+                                            className="text-decoration-none"
+                                        >
+                                            <div className="card primary-bg text-white">
+                                                <div className="card-body text-center p-3">
+                                                    Topics 06
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    </div>
+                                    <div className="col-md-3 mb-3">
+                                        <Link
+                                            to=""
+                                            className="text-decoration-none"
+                                        >
+                                            <div className="card primary-bg text-white">
+                                                <div className="card-body text-center p-3">
+                                                    Topics 07
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    </div>
+                                    <div className="col-md-3 mb-3">
+                                        <Link
+                                            to=""
+                                            className="text-decoration-none"
+                                        >
+                                            <div className="card primary-bg text-white">
+                                                <div className="card-body text-center p-3">
+                                                    Topics 08
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    </div>
+                                </div>
+                                <div className="text-center">
+                                    <button className="btn btn-primary btn-sm">
+                                        View all topics
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
                         {/* Featured */}
                         <div className="card shadow-sm mb-4">
                             <div className="card-header">
@@ -253,7 +492,7 @@ class Dashboard extends Component {
                     <div className="light-bg p-3">
                         <div className="row justify-content-center align-items-center">
                             <div className="col-md-4">
-                                <h5 className="primary-text text-md-right text-center">
+                                <h5 className="primary-text text-md-right text-center mb-0">
                                     Subscribe for New updates
                                 </h5>
                             </div>
@@ -270,206 +509,10 @@ class Dashboard extends Component {
                     </div>
 
                     {/* Footer */}
-                    <div className="secondary-bg p-5">
-                        <div className="row mb-3">
-                            <div className="col-md-3">
-                                <h5 className="font-weight-bold primary-text mb-3">
-                                    SUBJECTS
-                                </h5>
-                                <p className="mb-2">
-                                    <Link to="" className="primary-text">
-                                        Arts
-                                    </Link>
-                                </p>
-                                <p className="mb-2">
-                                    <Link to="" className="primary-text">
-                                        Maths
-                                    </Link>
-                                </p>
-                                <p className="mb-2">
-                                    <Link to="" className="primary-text">
-                                        Science
-                                    </Link>
-                                </p>
-                                <p className="mb-2">
-                                    <Link to="" className="primary-text">
-                                        Social Science
-                                    </Link>
-                                </p>
-                                <p className="mb-2">
-                                    <Link to="" className="primary-text">
-                                        Degreee course
-                                    </Link>
-                                </p>
-                                <p className="mb-2">
-                                    <Link to="" className="primary-text">
-                                        Medical courses
-                                    </Link>
-                                </p>
-                                <p className="mb-2">
-                                    <Link to="" className="primary-text">
-                                        Comitative Exams
-                                    </Link>
-                                </p>
-                                <p className="mb-2">
-                                    <Link to="" className="primary-text">
-                                        Open Source
-                                    </Link>
-                                </p>
-                                <p>
-                                    <Link to="" className="primary-text">
-                                        Classes
-                                    </Link>
-                                </p>
-                            </div>
-                            <div className="col-md-3">
-                                <h5 className="font-weight-bold primary-text mb-3">
-                                    FEATURES
-                                </h5>
-                                <p className="mb-2">
-                                    <Link to="" className="primary-text">
-                                        Premium Content
-                                    </Link>
-                                </p>
-                                <p className="mb-2">
-                                    <Link to="" className="primary-text">
-                                        Flashcards
-                                    </Link>
-                                </p>
-                                <p className="mb-2">
-                                    <Link to="" className="primary-text">
-                                        Free Courses
-                                    </Link>
-                                </p>
-                                <p className="mb-2">
-                                    <Link to="" className="primary-text">
-                                        Course Catalogue
-                                    </Link>
-                                </p>
-                                <p className="mb-2">
-                                    <Link to="" className="primary-text">
-                                        Leader Board
-                                    </Link>
-                                </p>
-                                <p className="mb-2">
-                                    <Link to="" className="primary-text">
-                                        Study Guide
-                                    </Link>
-                                </p>
-                                <p>
-                                    <Link to="" className="primary-text">
-                                        Buy A Course
-                                    </Link>
-                                </p>
-                            </div>
-                            <div className="col-md-3">
-                                <h5 className="font-weight-bold primary-text mb-3">
-                                    HELP
-                                </h5>
-                                <p className="mb-2">
-                                    <Link to="" className="primary-text">
-                                        Sign Up
-                                    </Link>
-                                </p>
-                                <p className="mb-2">
-                                    <Link to="" className="primary-text">
-                                        Help Center
-                                    </Link>
-                                </p>
-                                <p className="mb-2">
-                                    <Link to="" className="primary-text">
-                                        Students
-                                    </Link>
-                                </p>
-                                <p>
-                                    <Link to="" className="primary-text">
-                                        Technical Help Center
-                                    </Link>
-                                </p>
-                            </div>
-                            <div className="col-md-3">
-                                <h5 className="font-weight-bold primary-text mb-3">
-                                    ABOUT
-                                </h5>
-                                <p className="mb-2">
-                                    <Link to="" className="primary-text">
-                                        Company
-                                    </Link>
-                                </p>
-                                <p className="mb-2">
-                                    <Link to="" className="primary-text">
-                                        Blog
-                                    </Link>
-                                </p>
-                                <p className="mb-2">
-                                    <Link to="" className="primary-text">
-                                        Latest Updates
-                                    </Link>
-                                </p>
-                                <p className="mb-2">
-                                    <Link to="" className="primary-text">
-                                        Careers
-                                    </Link>
-                                </p>
-                                <p className="mb-2">
-                                    <Link to="" className="primary-text">
-                                        How Inquel Works?
-                                    </Link>
-                                </p>
-                                <p className="mb-2">
-                                    <Link to="" className="primary-text">
-                                        Privacy Policy
-                                    </Link>
-                                </p>
-                                <p className="mb-2">
-                                    <Link to="" className="primary-text">
-                                        Terms & Conditions
-                                    </Link>
-                                </p>
-                                <p>
-                                    <Link to="" className="primary-text">
-                                        Legal Notice
-                                    </Link>
-                                </p>
-                            </div>
-                        </div>
-                        <div className="row justify-content-center">
-                            <div className="col-md-4 d-flex justify-content-around">
-                                <p>
-                                    <Link to="" className="text-dark">
-                                        <i className="fab fa-facebook-f fa-2x"></i>
-                                    </Link>
-                                </p>
-                                <p>
-                                    <Link to="" className="text-dark">
-                                        <i className="fab fa-twitter fa-2x"></i>
-                                    </Link>
-                                </p>
-                                <p>
-                                    <Link to="" className="text-dark">
-                                        <i className="fab fa-linkedin-in fa-2x"></i>
-                                    </Link>
-                                </p>
-                                <p>
-                                    <Link to="" className="text-dark">
-                                        <i className="fab fa-instagram fa-2x"></i>
-                                    </Link>
-                                </p>
-                            </div>
-                        </div>
-                        <div className="dropdown-divider mb-3"></div>
-                        <h6 className="font-weight-bold text-center mb-0">
-                            &copy;2020 Inquel inc. Powered By{" "}
-                            <a
-                                href="https://sachirva.com/"
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-dark"
-                            >
-                                Sachirva Technology Solutions
-                            </a>
-                        </h6>
-                    </div>
+                    <Footer />
+
+                    {/* Loading component */}
+                    {this.state.page_loading ? <Loading /> : ""}
                 </div>
             </div>
         );

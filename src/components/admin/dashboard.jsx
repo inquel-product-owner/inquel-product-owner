@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import Header from "./navbar";
 import SideNav from "./sidenav";
-import { Tabs, Tab, Modal } from "react-bootstrap";
+import { Tabs, Tab, Modal, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import Switch from "react-switch";
 import courseimg from "../../assets/code.jpg";
@@ -1071,6 +1071,18 @@ class Dashboard extends Component {
                                         className="btn-group btn-group-toggle"
                                         data-toggle="buttons"
                                     >
+                                        <OverlayTrigger
+                                            key="top"
+                                            placement="top"
+                                            overlay={
+                                                <Tooltip
+                                                    id="tooltip"
+                                                    className="text-left"
+                                                >
+                                                    Table View
+                                                </Tooltip>
+                                            }
+                                        >
                                         <label
                                             className={`btn btn-light ${
                                                 this.state.tableView
@@ -1090,6 +1102,19 @@ class Dashboard extends Component {
                                             />{" "}
                                             <i className="fas fa-th-list"></i>
                                         </label>
+                                        </OverlayTrigger>
+                                        <OverlayTrigger
+                                            key="top"
+                                            placement="top"
+                                            overlay={
+                                                <Tooltip
+                                                    id="tooltip"
+                                                    className="text-left"
+                                                >
+                                                    Card View
+                                                </Tooltip>
+                                            }
+                                        >
                                         <label
                                             className={`btn btn-light ${
                                                 this.state.tableView
@@ -1109,6 +1134,7 @@ class Dashboard extends Component {
                                             />{" "}
                                             <i className="fas fa-th-large"></i>
                                         </label>
+                                        </OverlayTrigger>
                                     </div>
                                 </div>
 

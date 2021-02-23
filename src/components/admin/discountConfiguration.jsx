@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import Header from "./navbar";
 import SideNav from "./sidenav";
+import { Link } from "react-router-dom";
 
 class DiscountConfiguration extends Component {
     constructor(props) {
@@ -40,15 +41,33 @@ class DiscountConfiguration extends Component {
                     <div className="container-fluid">
                         {/* Back button */}
                         <button
-                            className="btn btn-primary-invert btn-sm mb-2"
+                            className="btn btn-primary-invert btn-sm mb-3"
                             onClick={this.props.history.goBack}
                         >
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
 
-                        <h5 className="primary-text mb-3">
-                            Discount Configuration
-                        </h5>
+                        {/* Breadcrumb */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb">
+                                <li className="breadcrumb-item mb-3">
+                                    <Link to="/admin">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item">
+                                    <Link
+                                        to="#"
+                                        onClick={this.props.history.goBack}
+                                    >
+                                        Master Data
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    Discount Configuration
+                                </li>
+                            </ol>
+                        </nav>
 
                         {/* Discount data */}
                         <div className="card shadow-sm">

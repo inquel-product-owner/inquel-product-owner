@@ -69,7 +69,6 @@ class Account extends Component {
                         >
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
-
                         
                         {/* Loading component */}
                         {this.state.page_loading ? <Loading /> : ""}

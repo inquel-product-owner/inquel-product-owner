@@ -13,6 +13,8 @@ import {
     Modal,
     Tab,
     Nav,
+    OverlayTrigger,
+    Tooltip,
 } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import Loading from "../sharedComponents/loader";
@@ -373,15 +375,25 @@ class SubjectType1 extends Component {
             showSideNav: false,
             showModal: false,
             showAlertModal: false,
+
             alertMsg: "",
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
             showLoader: false,
+
             showPublishErrorAlert: false,
             showPublishSuccessAlert: false,
             showPublishLoader: false,
+
+            showImageErrorAlert: false,
+            showVideoErrorAlert: false,
+            showAudioErrorAlert: false,
+            showImageSuccessAlert: false,
+            showVideoSuccessAlert: false,
+            showAudioSuccessAlert: false,
+
             page_loading: true,
             btnDisabled: false,
             showMCQDelete_Modal: false,
@@ -440,7 +452,6 @@ class SubjectType1 extends Component {
                         },
                         audio: [
                             { title: "", file_name: "", audio: null, path: "" },
-                            { title: "", file_name: "", audio: null, path: "" },
                         ],
                     },
                     properties: {
@@ -462,6 +473,7 @@ class SubjectType1 extends Component {
         };
         this.option_limit = 6;
         this.image_limit = 4;
+        this.audio_limit = 2;
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
         this.topicName = this.props.match.params.topicName;
@@ -682,12 +694,6 @@ class SubjectType1 extends Component {
                                                       audio: null,
                                                       path: "",
                                                   },
-                                                  {
-                                                      title: "",
-                                                      file_name: "",
-                                                      audio: null,
-                                                      path: "",
-                                                  },
                                               ]
                                             : audio,
                                 },
@@ -747,16 +753,8 @@ class SubjectType1 extends Component {
                         });
                     }
                 } else {
-                    if (result.detail) {
-                        this.setState({
-                            alertMsg: result.detail,
-                        });
-                    } else {
-                        this.setState({
-                            alertMsg: result.msg,
-                        });
-                    }
                     this.setState({
+                        alertMsg: result.detail ? result.detail : result.msg,
                         showAlertModal: true,
                         page_loading: false,
                     });
@@ -920,6 +918,12 @@ class SubjectType1 extends Component {
                 showErrorAlert: true,
                 showLoader: false,
             });
+        } else if (data[this.state.activeQuestion].properties.marks === "") {
+            this.setState({
+                errorMsg: "Marks is required",
+                showErrorAlert: true,
+                showLoader: false,
+            });
         } else if (
             data[this.state.activeQuestion].properties.complexity === ""
         ) {
@@ -928,21 +932,15 @@ class SubjectType1 extends Component {
                 showErrorAlert: true,
                 showLoader: false,
             });
-        } else if (data[this.state.activeQuestion].properties.theme === "") {
-            this.setState({
-                errorMsg: "Theme is reuired",
-                showErrorAlert: true,
-                showLoader: false,
-            });
-        } else if (data[this.state.activeQuestion].properties.marks === "") {
-            this.setState({
-                errorMsg: "Marks is required",
-                showErrorAlert: true,
-                showLoader: false,
-            });
         } else if (data[this.state.activeQuestion].properties.priority === "") {
             this.setState({
                 errorMsg: "Priority is required",
+                showErrorAlert: true,
+                showLoader: false,
+            });
+        } else if (data[this.state.activeQuestion].properties.theme === "") {
+            this.setState({
+                errorMsg: "Theme is reuired",
                 showErrorAlert: true,
                 showLoader: false,
             });
@@ -1127,6 +1125,7 @@ class SubjectType1 extends Component {
                 questionData[this.state.activeQuestion].question_random_id
             );
 
+            // Video
             if (
                 questionData[this.state.activeQuestion].content.video.url !== ""
             ) {
@@ -1150,6 +1149,7 @@ class SubjectType1 extends Component {
                 );
             }
 
+            // Image
             for (
                 let i = 0;
                 i <
@@ -1177,6 +1177,7 @@ class SubjectType1 extends Component {
                 }
             }
 
+            // Audio
             for (
                 let i = 0;
                 i <
@@ -1567,37 +1568,117 @@ class SubjectType1 extends Component {
 
     handleRemoveImageFields = (index) => {
         const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.images.splice(index, 1);
-        this.setState(
-            {
-                questions: values,
-            },
-            () => {
-                if (
-                    values[this.state.activeQuestion].content.images.length ===
-                    0
-                ) {
-                    values[this.state.activeQuestion].content.images.push({
-                        title: "",
-                        file_name: "",
-                        image: null,
-                        path: "",
+
+        this.setState({
+            showImageSuccessAlert: false,
+            showImageErrorAlert: false,
+        });
+
+        if (
+            values[this.state.activeQuestion].question_random_id !== "" &&
+            values[this.state.activeQuestion].is_image_uploaded === true
+        ) {
+            let body = {
+                chapter_id: this.chapterId,
+                topic_name: this.topicName,
+                question_random_id:
+                    values[this.state.activeQuestion].question_random_id,
+            };
+            body[`type1_image_${index + 1}_title`] =
+                values[this.state.activeQuestion].content.images[index].title;
+
+            fetch(
+                `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/files/`,
+                {
+                    method: "DELETE",
+                    headers: this.headers,
+                    body: JSON.stringify(body),
+                }
+            )
+                .then((res) => res.json())
+                .then((result) => {
+                    console.log(result);
+                    if (result.sts === true) {
+                        this.setState({
+                            successMsg: result.msg,
+                            showImageSuccessAlert: true,
+                        });
+                        values[this.state.activeQuestion].content.images.splice(
+                            index,
+                            1
+                        );
+                        this.setState(
+                            {
+                                questions: values,
+                            },
+                            () => {
+                                if (
+                                    values[this.state.activeQuestion].content
+                                        .images.length === 0
+                                ) {
+                                    values[
+                                        this.state.activeQuestion
+                                    ].content.images.push({
+                                        title: "",
+                                        file_name: "",
+                                        image: null,
+                                        path: "",
+                                    });
+                                }
+                                this.setState({
+                                    questions: values,
+                                });
+                            }
+                        );
+                    } else {
+                        this.setState({
+                            errorMsg: result.detail
+                                ? result.detail
+                                : result.msg,
+                            showImageErrorAlert: true,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        } else {
+            values[this.state.activeQuestion].content.images.splice(index, 1);
+            this.setState(
+                {
+                    questions: values,
+                },
+                () => {
+                    if (
+                        values[this.state.activeQuestion].content.images
+                            .length === 0
+                    ) {
+                        values[this.state.activeQuestion].content.images.push({
+                            title: "",
+                            file_name: "",
+                            image: null,
+                            path: "",
+                        });
+                    }
+                    this.setState({
+                        questions: values,
                     });
                 }
-                this.setState({
-                    questions: values,
-                });
-            }
-        );
+            );
+        }
     };
 
     handleImageFile = (index, event) => {
+        this.setState({
+            showImageErrorAlert: false,
+        });
+
         const values = [...this.state.questions];
         const file = event.target.files[0].name.toLowerCase();
         if (!file.match(/\.(jpg|jpeg|png|webp)$/)) {
             this.setState({
                 errorMsg: "Please select valid image file",
-                showErrorAlert: true,
+                showImageErrorAlert: true,
                 btnDisabled: true,
             });
         } else {
@@ -1611,7 +1692,7 @@ class SubjectType1 extends Component {
             this.setState({
                 questions: values,
                 btnDisabled: false,
-                showErrorAlert: false,
+                showImageErrorAlert: false,
             });
         }
     };
@@ -1643,12 +1724,16 @@ class SubjectType1 extends Component {
     };
 
     handleVideoFile = (event) => {
+        this.setState({
+            showVideoErrorAlert: false,
+        });
+
         let values = [...this.state.questions];
         const file = event.target.files[0].name.toLowerCase();
         if (!file.match(/\.(mpeg|flv|avi|mov|mp4|mkv)$/)) {
             this.setState({
                 errorMsg: "Please select valid video file",
-                showErrorAlert: true,
+                showVideoErrorAlert: true,
                 btnDisabled: true,
             });
         } else {
@@ -1663,7 +1748,7 @@ class SubjectType1 extends Component {
             this.setState({
                 questions: values,
                 btnDisabled: false,
-                showErrorAlert: false,
+                showVideoErrorAlert: false,
             });
         }
     };
@@ -1682,14 +1767,73 @@ class SubjectType1 extends Component {
 
     clearVideo = () => {
         const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.video.title = "";
-        values[this.state.activeQuestion].content.video.file_name = "";
-        values[this.state.activeQuestion].content.video.video = null;
-        values[this.state.activeQuestion].content.video.path = "";
-        values[this.state.activeQuestion].content.video.url = "";
-        this.setState({
-            questions: values,
-        });
+
+        if (
+            values[this.state.activeQuestion].question_random_id !== "" &&
+            values[this.state.activeQuestion].is_image_uploaded === true
+        ) {
+            fetch(
+                `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/files/`,
+                {
+                    method: "DELETE",
+                    headers: this.headers,
+                    body: JSON.stringify({
+                        chapter_id: this.chapterId,
+                        topic_name: this.topicName,
+                        question_random_id:
+                            values[this.state.activeQuestion]
+                                .question_random_id,
+                        type1_video_1_title:
+                            values[this.state.activeQuestion].content.video
+                                .title,
+                    }),
+                }
+            )
+                .then((res) => res.json())
+                .then((result) => {
+                    console.log(result);
+                    if (result.sts === true) {
+                        this.setState({
+                            successMsg: result.msg,
+                            showVideoSuccessAlert: true,
+                        });
+                        values[this.state.activeQuestion].content.video.title =
+                            "";
+                        values[
+                            this.state.activeQuestion
+                        ].content.video.file_name = "";
+                        values[
+                            this.state.activeQuestion
+                        ].content.video.video = null;
+                        values[this.state.activeQuestion].content.video.path =
+                            "";
+                        values[this.state.activeQuestion].content.video.url =
+                            "";
+                        this.setState({
+                            questions: values,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.detail
+                                ? result.detail
+                                : result.msg,
+                            showVideoErrorAlert: true,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        } else {
+            values[this.state.activeQuestion].content.video.title = "";
+            values[this.state.activeQuestion].content.video.file_name = "";
+            values[this.state.activeQuestion].content.video.video = null;
+            values[this.state.activeQuestion].content.video.path = "";
+            values[this.state.activeQuestion].content.video.url = "";
+            this.setState({
+                questions: values,
+            });
+        }
     };
 
     // -------------------------- Audio --------------------------
@@ -1703,13 +1847,132 @@ class SubjectType1 extends Component {
         });
     };
 
+    handleAddAudioFields = () => {
+        const values = [...this.state.questions];
+        values[this.state.activeQuestion].content.audio.push({
+            title: "",
+            file_name: "",
+            audio: null,
+            path: "",
+        });
+        this.setState({
+            questions: values,
+        });
+    };
+
+    handleRemoveAudioFields = (index) => {
+        const values = [...this.state.questions];
+
+        this.setState({
+            showAudioSuccessAlert: false,
+            showAudioErrorAlert: false,
+        });
+
+        if (
+            values[this.state.activeQuestion].question_random_id !== "" &&
+            values[this.state.activeQuestion].is_image_uploaded === true
+        ) {
+            let body = {
+                chapter_id: this.chapterId,
+                topic_name: this.topicName,
+                question_random_id:
+                    values[this.state.activeQuestion].question_random_id,
+            };
+            body[`type1_audio_${index + 1}_title`] =
+                values[this.state.activeQuestion].content.audio[index].title;
+
+            fetch(
+                `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/files/`,
+                {
+                    method: "DELETE",
+                    headers: this.headers,
+                    body: JSON.stringify(body),
+                }
+            )
+                .then((res) => res.json())
+                .then((result) => {
+                    console.log(result);
+                    if (result.sts === true) {
+                        this.setState({
+                            successMsg: result.msg,
+                            showAudioSuccessAlert: true,
+                        });
+                        values[this.state.activeQuestion].content.audio.splice(
+                            index,
+                            1
+                        );
+                        this.setState(
+                            {
+                                questions: values,
+                            },
+                            () => {
+                                if (
+                                    values[this.state.activeQuestion].content
+                                        .audio.length === 0
+                                ) {
+                                    values[
+                                        this.state.activeQuestion
+                                    ].content.audio.push({
+                                        title: "",
+                                        file_name: "",
+                                        audio: null,
+                                        path: "",
+                                    });
+                                }
+                                this.setState({
+                                    questions: values,
+                                });
+                            }
+                        );
+                    } else {
+                        this.setState({
+                            errorMsg: result.detail
+                                ? result.detail
+                                : result.msg,
+                            showAudioErrorAlert: true,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        } else {
+            values[this.state.activeQuestion].content.audio.splice(index, 1);
+            this.setState(
+                {
+                    questions: values,
+                },
+                () => {
+                    if (
+                        values[this.state.activeQuestion].content.audio
+                            .length === 0
+                    ) {
+                        values[this.state.activeQuestion].content.audio.push({
+                            title: "",
+                            file_name: "",
+                            audio: null,
+                            path: "",
+                        });
+                    }
+                    this.setState({
+                        questions: values,
+                    });
+                }
+            );
+        }
+    };
+
     handleAudioFile = (index, event) => {
+        this.setState({
+            showAudioErrorAlert: false,
+        });
+
         const values = [...this.state.questions];
         const file = event.target.files[0].name.toLowerCase();
         if (!file.match(/\.(wav|mp3)$/)) {
             this.setState({
                 errorMsg: "Please select valid audio file",
-                showErrorAlert: true,
+                showAudioErrorAlert: true,
                 btnDisabled: true,
             });
         } else {
@@ -1723,7 +1986,7 @@ class SubjectType1 extends Component {
             this.setState({
                 questions: values,
                 btnDisabled: false,
-                showErrorAlert: false,
+                showAudioErrorAlert: false,
             });
         }
     };
@@ -1731,7 +1994,6 @@ class SubjectType1 extends Component {
     clearAudios = () => {
         const values = [...this.state.questions];
         values[this.state.activeQuestion].content.audio = [
-            { title: "", file_name: "", audio: null, path: "" },
             { title: "", file_name: "", audio: null, path: "" },
         ];
         this.setState({
@@ -1947,10 +2209,7 @@ class SubjectType1 extends Component {
                     path: "",
                     url: "",
                 },
-                audio: [
-                    { title: "", file_name: "", audio: null, path: "" },
-                    { title: "", file_name: "", audio: null, path: "" },
-                ],
+                audio: [{ title: "", file_name: "", audio: null, path: "" }],
             },
             properties: {
                 marks: "",
@@ -1997,6 +2256,7 @@ class SubjectType1 extends Component {
                 {
                     questions: values,
                     keyboards: keyboards,
+                    activeQuestion: "",
                 },
                 () => {
                     if (values.length === 0) {
@@ -2044,12 +2304,6 @@ class SubjectType1 extends Component {
                                     url: "",
                                 },
                                 audio: [
-                                    {
-                                        title: "",
-                                        file_name: "",
-                                        audio: null,
-                                        path: "",
-                                    },
                                     {
                                         title: "",
                                         file_name: "",
@@ -2155,10 +2409,7 @@ class SubjectType1 extends Component {
                     path: "",
                     url: "",
                 },
-                audio: [
-                    { title: "", file_name: "", audio: null, path: "" },
-                    { title: "", file_name: "", audio: null, path: "" },
-                ],
+                audio: [{ title: "", file_name: "", audio: null, path: "" }],
             },
             properties: {
                 marks: values[index].properties.marks,
@@ -2203,6 +2454,7 @@ class SubjectType1 extends Component {
                 {
                     questions: values,
                     keyboards: keyboards,
+                    activeQuestion: "",
                 },
                 () => {
                     if (values.length === 0) {
@@ -2256,12 +2508,6 @@ class SubjectType1 extends Component {
                                     url: "",
                                 },
                                 audio: [
-                                    {
-                                        title: "",
-                                        file_name: "",
-                                        audio: null,
-                                        path: "",
-                                    },
                                     {
                                         title: "",
                                         file_name: "",
@@ -2376,6 +2622,33 @@ class SubjectType1 extends Component {
     render() {
         let data = [...this.state.questions];
         let boards = [...this.state.keyboards];
+        let isImageAvailable = false;
+        if (this.state.activeQuestion !== "") {
+            for (
+                let i = 0;
+                i < data[this.state.activeQuestion].content.images.length;
+                i++
+            ) {
+                isImageAvailable =
+                    data[this.state.activeQuestion].content.images[i].path !==
+                    ""
+                        ? true
+                        : false;
+            }
+        }
+        let isAudioAvailable = false;
+        if (this.state.activeQuestion !== "") {
+            for (
+                let i = 0;
+                i < data[this.state.activeQuestion].content.audio.length;
+                i++
+            ) {
+                isAudioAvailable =
+                    data[this.state.activeQuestion].content.audio[i].path !== ""
+                        ? true
+                        : false;
+            }
+        }
         return (
             <div className="wrapper">
                 {/* Navbar */}
@@ -3245,11 +3518,62 @@ class SubjectType1 extends Component {
                                                     </div>
 
                                                     {/* ---------- Image ---------- */}
+
+                                                    <Alert
+                                                        variant="danger"
+                                                        show={
+                                                            this.state
+                                                                .showImageErrorAlert
+                                                        }
+                                                        onClose={() => {
+                                                            this.setState({
+                                                                showImageErrorAlert: false,
+                                                            });
+                                                        }}
+                                                        className="mb-2"
+                                                        dismissible
+                                                    >
+                                                        {this.state.errorMsg}
+                                                    </Alert>
+                                                    <Alert
+                                                        variant="success"
+                                                        show={
+                                                            this.state
+                                                                .showImageSuccessAlert
+                                                        }
+                                                        onClose={() => {
+                                                            this.setState({
+                                                                showImageSuccessAlert: false,
+                                                            });
+                                                        }}
+                                                        className="mb-2"
+                                                        dismissible
+                                                    >
+                                                        {this.state.successMsg}
+                                                    </Alert>
+
                                                     <div className="form-group">
                                                         <div className="row align-items-center mb-2">
                                                             <div className="col-md-6">
                                                                 <p className="mb-0">
                                                                     Image
+                                                                    <OverlayTrigger
+                                                                        key="right"
+                                                                        placement="right"
+                                                                        overlay={
+                                                                            <Tooltip id="tooltip">
+                                                                                You
+                                                                                can
+                                                                                upload
+                                                                                Max
+                                                                                of
+                                                                                04
+                                                                                Images
+                                                                            </Tooltip>
+                                                                        }
+                                                                    >
+                                                                        <i className="fas fa-info-circle fa-xs ml-2"></i>
+                                                                    </OverlayTrigger>
                                                                 </p>
                                                             </div>
                                                             <div className="col-md-6 text-right">
@@ -3312,14 +3636,14 @@ class SubjectType1 extends Component {
                                                                             >
                                                                                 <button
                                                                                     type="button"
-                                                                                    className="btn btn-light btn-sm shadow-none font-weight-bold"
+                                                                                    className="btn btn-light btn-sm shadow-none"
                                                                                     onClick={() =>
                                                                                         this.handleRemoveImageFields(
                                                                                             index
                                                                                         )
                                                                                     }
                                                                                 >
-                                                                                    -
+                                                                                    <i className="fas fa-times fa-sm"></i>
                                                                                 </button>
                                                                             </div>
                                                                         </div>
@@ -3377,6 +3701,12 @@ class SubjectType1 extends Component {
                                                                         this
                                                                             .handleAddImageFields
                                                                     }
+                                                                    disabled={
+                                                                        isImageAvailable ===
+                                                                        true
+                                                                            ? false
+                                                                            : true
+                                                                    }
                                                                 >
                                                                     Add +
                                                                 </button>
@@ -3387,6 +3717,40 @@ class SubjectType1 extends Component {
                                                     </div>
 
                                                     {/* ---------- Video ---------- */}
+
+                                                    <Alert
+                                                        variant="danger"
+                                                        show={
+                                                            this.state
+                                                                .showVideoErrorAlert
+                                                        }
+                                                        onClose={() => {
+                                                            this.setState({
+                                                                showVideoErrorAlert: false,
+                                                            });
+                                                        }}
+                                                        className="mb-2"
+                                                        dismissible
+                                                    >
+                                                        {this.state.errorMsg}
+                                                    </Alert>
+                                                    <Alert
+                                                        variant="success"
+                                                        show={
+                                                            this.state
+                                                                .showVideoSuccessAlert
+                                                        }
+                                                        onClose={() => {
+                                                            this.setState({
+                                                                showVideoSuccessAlert: false,
+                                                            });
+                                                        }}
+                                                        className="mb-2"
+                                                        dismissible
+                                                    >
+                                                        {this.state.successMsg}
+                                                    </Alert>
+
                                                     <div className="form-group">
                                                         <div className="row align-items-center mb-2">
                                                             <div className="col-md-6">
@@ -3501,11 +3865,62 @@ class SubjectType1 extends Component {
                                                     </div>
 
                                                     {/* ---------- Audio ---------- */}
+
+                                                    <Alert
+                                                        variant="danger"
+                                                        show={
+                                                            this.state
+                                                                .showAudioErrorAlert
+                                                        }
+                                                        onClose={() => {
+                                                            this.setState({
+                                                                showAudioErrorAlert: false,
+                                                            });
+                                                        }}
+                                                        className="mb-2"
+                                                        dismissible
+                                                    >
+                                                        {this.state.errorMsg}
+                                                    </Alert>
+                                                    <Alert
+                                                        variant="success"
+                                                        show={
+                                                            this.state
+                                                                .showAudioSuccessAlert
+                                                        }
+                                                        onClose={() => {
+                                                            this.setState({
+                                                                showAudioSuccessAlert: false,
+                                                            });
+                                                        }}
+                                                        className="mb-2"
+                                                        dismissible
+                                                    >
+                                                        {this.state.successMsg}
+                                                    </Alert>
+
                                                     <div className="form-group">
                                                         <div className="row align-items-center mb-2">
                                                             <div className="col-md-6">
                                                                 <p className="mb-0">
                                                                     Audio
+                                                                    <OverlayTrigger
+                                                                        key="right"
+                                                                        placement="right"
+                                                                        overlay={
+                                                                            <Tooltip id="tooltip">
+                                                                                You
+                                                                                can
+                                                                                upload
+                                                                                Max
+                                                                                of
+                                                                                02
+                                                                                Audio
+                                                                            </Tooltip>
+                                                                        }
+                                                                    >
+                                                                        <i className="fas fa-info-circle fa-xs ml-2"></i>
+                                                                    </OverlayTrigger>
                                                                 </p>
                                                             </div>
                                                             <div className="col-md-6 text-right">
@@ -3531,28 +3946,55 @@ class SubjectType1 extends Component {
                                                                 <Fragment
                                                                     key={index}
                                                                 >
-                                                                    <input
-                                                                        type="text"
-                                                                        className="form-control form-control-sm border-secondary mb-1"
-                                                                        id={`audio${index}`}
-                                                                        name="audio"
-                                                                        placeholder={`Audio title 0${
-                                                                            index +
-                                                                            1
-                                                                        }`}
-                                                                        value={
-                                                                            options.title
-                                                                        }
-                                                                        onChange={(
-                                                                            event
-                                                                        ) =>
-                                                                            this.handleAudioTitle(
-                                                                                index,
+                                                                    <div
+                                                                        className="input-group border-secondary mb-1"
+                                                                        style={{
+                                                                            borderRadius:
+                                                                                "6px",
+                                                                        }}
+                                                                    >
+                                                                        <input
+                                                                            type="text"
+                                                                            className="form-control form-control-sm"
+                                                                            id={`audio${index}`}
+                                                                            name="audio"
+                                                                            placeholder={`Audio title 0${
+                                                                                index +
+                                                                                1
+                                                                            }`}
+                                                                            value={
+                                                                                options.title
+                                                                            }
+                                                                            onChange={(
                                                                                 event
-                                                                            )
-                                                                        }
-                                                                        autoComplete="off"
-                                                                    />
+                                                                            ) =>
+                                                                                this.handleAudioTitle(
+                                                                                    index,
+                                                                                    event
+                                                                                )
+                                                                            }
+                                                                            autoComplete="off"
+                                                                        />
+                                                                        <div className="input-group-append">
+                                                                            <div
+                                                                                className="btn-group"
+                                                                                role="group"
+                                                                                aria-label="Basic example"
+                                                                            >
+                                                                                <button
+                                                                                    type="button"
+                                                                                    className="btn btn-light btn-sm shadow-none"
+                                                                                    onClick={() =>
+                                                                                        this.handleRemoveAudioFields(
+                                                                                            index
+                                                                                        )
+                                                                                    }
+                                                                                >
+                                                                                    <i className="fas fa-times fa-sm"></i>
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
                                                                     <div className="custom-file mb-2">
                                                                         <input
                                                                             type="file"
@@ -3592,6 +4034,32 @@ class SubjectType1 extends Component {
                                                             Select only .wav
                                                             .mp3
                                                         </small>
+
+                                                        {data[
+                                                            this.state
+                                                                .activeQuestion
+                                                        ].content.audio.length <
+                                                        this.audio_limit ? (
+                                                            <div className="form-group mb-0">
+                                                                <button
+                                                                    className="btn btn-light btn-block border-secondary btn-sm"
+                                                                    onClick={
+                                                                        this
+                                                                            .handleAddAudioFields
+                                                                    }
+                                                                    disabled={
+                                                                        isAudioAvailable ===
+                                                                        true
+                                                                            ? false
+                                                                            : true
+                                                                    }
+                                                                >
+                                                                    Add +
+                                                                </button>
+                                                            </div>
+                                                        ) : (
+                                                            ""
+                                                        )}
                                                     </div>
                                                 </Card.Body>
                                             </Accordion.Collapse>

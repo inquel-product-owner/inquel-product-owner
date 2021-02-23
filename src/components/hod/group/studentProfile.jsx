@@ -94,7 +94,8 @@ class GroupStudentProfile extends Component {
                                 </li>
                                 <li className="breadcrumb-item">
                                     <Link
-                                        to={`/hod/group/${this.groupId}/student`}
+                                        to="#"
+                                        onClick={this.props.history.goBack}
                                     >
                                         Student
                                     </Link>
