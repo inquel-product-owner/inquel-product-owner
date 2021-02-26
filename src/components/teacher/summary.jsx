@@ -9,9 +9,6 @@ import { Modal, Alert, Spinner } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import CKeditor from "../sharedComponents/CKeditor";
 import Loading from "../sharedComponents/loader";
-// import { CKEditor } from "@ckeditor/ckeditor5-react";
-// import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-// import CKFinder from "@ckeditor/ckeditor5-ckfinder/src/ckfinder";
 
 const mapStateToProps = (state) => ({
     subject_name: state.subject_name,
@@ -811,21 +808,6 @@ class SubjectSummary extends Component {
                                 data={this.state.content}
                                 onChange={this.onEditorChange}
                             />
-                            {/* <CKEditor
-                                editor={ClassicEditor}
-                                data="<p>Hello from CKEditor 5!</p>"
-                                config={{
-                                    plugins: [CKFinder],
-                                    toolbar: ["ckfinder"],
-                                    ckfinder: {
-                                        uploadUrl:
-                                            "https://example.com/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Images&responseType=json",
-                                        options: {
-                                            resourceType: "Images",
-                                        },
-                                    },
-                                }}
-                            /> */}
                         </div>
                         {/* Loading component */}
                         {this.state.page_loading ? <Loading /> : ""}

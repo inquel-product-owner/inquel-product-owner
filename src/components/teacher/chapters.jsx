@@ -1073,7 +1073,7 @@ class Chapters extends Component {
                                                                   >
                                                                       <div className="row align-items-center">
                                                                           <div className="col-md-6">
-                                                                              <p className="small primary-text font-weight-bold mb-0">
+                                                                              <p className="small primary-text font-weight-bold-600 mb-0">
                                                                                   {
                                                                                       data.cycle_test_name
                                                                                   }

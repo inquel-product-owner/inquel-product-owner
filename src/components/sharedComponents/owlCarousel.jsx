@@ -1,60 +1,76 @@
 import React, { Component } from "react";
-import AliceCarousel from "react-alice-carousel";
+import Slider from "react-slick";
 import courseimg from "../../assets/code.jpg";
 import { Link } from "react-router-dom";
 
 class CarouselCard extends Component {
-    constructor() {
-        super();
-        this.state = { width: "" };
-        this.responsive = {
-            0: {
-                items: 1,
-            },
-            600: {
-                items: 2,
-            },
-            1024: {
-                items: 4,
-            },
-        };
-    }
-
-    componentDidMount = () => {
-        this.setState({
-            width: window.innerWidth,
-        });
-    };
-
     render() {
+        var settings = {
+            dots: true,
+            infinite: false,
+            speed: 500,
+            slidesToShow: 4,
+            slidesToScroll: 4,
+            initialSlide: 0,
+            responsive: [
+                {
+                    breakpoint: 1024,
+                    settings: {
+                        slidesToShow: 2,
+                        slidesToScroll: 2,
+                        dots: true,
+                    },
+                },
+                {
+                    breakpoint: 600,
+                    settings: {
+                        slidesToShow: 1,
+                        slidesToScroll: 1,
+                        dots: false,
+                    },
+                },
+                {
+                    breakpoint: 480,
+                    settings: {
+                        slidesToShow: 1,
+                        slidesToScroll: 1,
+                        dots: false,
+                    },
+                },
+            ],
+        };
         return (
-            <AliceCarousel
-                mouseDragEnabled={true}
-                disableDotsControls={this.state.width < 768 ? true : false}
-                responsive={this.responsive}
-                infinite={true}
-            >
-                <div className="col-md-11">
-                    <Link
-                        to="/"
-                        style={{
-                            textDecoration: "none",
-                        }}
-                    >
+            <Slider {...settings}>
+                <div className="px-3">
+                    <div className="card">
+                        <img
+                            src={courseimg}
+                            className="card-img-top"
+                            alt="Course"
+                        />
                         <div
-                            className="card"
+                            className="text-right mt-2"
                             style={{
-                                cursor: "pointer",
+                                position: "absolute",
+                                right: "5px",
                             }}
                         >
-                            <img
-                                src={courseimg}
-                                className="card-img-top"
-                                alt="Course"
-                            />
-                            <div className="card-body primary-bg text-white p-2">
+                            <button className="btn btn-primary-invert btn-sm mr-1">
+                                <i className="far fa-heart"></i>
+                            </button>
+                            <button className="btn btn-primary btn-sm mr-1">
+                                <i className="fas fa-cart-plus"></i>
+                            </button>
+                        </div>
+                        <Link to="" className="text-decoration-none">
+                            <div
+                                className="card-body primary-bg text-white p-2"
+                                style={{
+                                    cursor: "pointer",
+                                }}
+                            >
                                 <div className="row">
-                                    <div className="col-9">Subject</div>
+                                    <div className="col-9">01</div>
                                     <div className="col-3 text-right">
                                         4.{" "}
                                         <span className="small">
@@ -63,30 +79,39 @@ class CarouselCard extends Component {
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </Link>
+                        </Link>
+                    </div>
                 </div>
-                <div className="col-md-11">
-                    <Link
-                        to="/"
-                        style={{
-                            textDecoration: "none",
-                        }}
-                    >
+                <div className="px-3">
+                    <div className="card">
+                        <img
+                            src={courseimg}
+                            className="card-img-top"
+                            alt="Course"
+                        />
                         <div
-                            className="card"
+                            className="text-right mt-2"
                             style={{
-                                cursor: "pointer",
+                                position: "absolute",
+                                right: "5px",
                             }}
                         >
-                            <img
-                                src={courseimg}
-                                className="card-img-top"
-                                alt="Course"
-                            />
-                            <div className="card-body primary-bg text-white p-2">
+                            <button className="btn btn-primary-invert btn-sm mr-1">
+                                <i className="far fa-heart"></i>
+                            </button>
+                            <button className="btn btn-primary btn-sm mr-1">
+                                <i className="fas fa-cart-plus"></i>
+                            </button>
+                        </div>
+                        <Link to="" className="text-decoration-none">
+                            <div
+                                className="card-body primary-bg text-white p-2"
+                                style={{
+                                    cursor: "pointer",
+                                }}
+                            >
                                 <div className="row">
-                                    <div className="col-9">Subject</div>
+                                    <div className="col-9">02</div>
                                     <div className="col-3 text-right">
                                         4.{" "}
                                         <span className="small">
@@ -95,30 +120,39 @@ class CarouselCard extends Component {
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </Link>
+                        </Link>
+                    </div>
                 </div>
-                <div className="col-md-11">
-                    <Link
-                        to="/"
-                        style={{
-                            textDecoration: "none",
-                        }}
-                    >
+                <div className="px-3">
+                    <div className="card">
+                        <img
+                            src={courseimg}
+                            className="card-img-top"
+                            alt="Course"
+                        />
                         <div
-                            className="card"
+                            className="text-right mt-2"
                             style={{
-                                cursor: "pointer",
+                                position: "absolute",
+                                right: "5px",
                             }}
                         >
-                            <img
-                                src={courseimg}
-                                className="card-img-top"
-                                alt="Course"
-                            />
-                            <div className="card-body primary-bg text-white p-2">
+                            <button className="btn btn-primary-invert btn-sm mr-1">
+                                <i className="far fa-heart"></i>
+                            </button>
+                            <button className="btn btn-primary btn-sm mr-1">
+                                <i className="fas fa-cart-plus"></i>
+                            </button>
+                        </div>
+                        <Link to="" className="text-decoration-none">
+                            <div
+                                className="card-body primary-bg text-white p-2"
+                                style={{
+                                    cursor: "pointer",
+                                }}
+                            >
                                 <div className="row">
-                                    <div className="col-9">Subject</div>
+                                    <div className="col-9">03</div>
                                     <div className="col-3 text-right">
                                         4.{" "}
                                         <span className="small">
@@ -127,30 +161,39 @@ class CarouselCard extends Component {
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </Link>
+                        </Link>
+                    </div>
                 </div>
-                <div className="col-md-11">
-                    <Link
-                        to="/"
-                        style={{
-                            textDecoration: "none",
-                        }}
-                    >
+                <div className="px-3">
+                    <div className="card">
+                        <img
+                            src={courseimg}
+                            className="card-img-top"
+                            alt="Course"
+                        />
                         <div
-                            className="card"
+                            className="text-right mt-2"
                             style={{
-                                cursor: "pointer",
+                                position: "absolute",
+                                right: "5px",
                             }}
                         >
-                            <img
-                                src={courseimg}
-                                className="card-img-top"
-                                alt="Course"
-                            />
-                            <div className="card-body primary-bg text-white p-2">
+                            <button className="btn btn-primary-invert btn-sm mr-1">
+                                <i className="far fa-heart"></i>
+                            </button>
+                            <button className="btn btn-primary btn-sm mr-1">
+                                <i className="fas fa-cart-plus"></i>
+                            </button>
+                        </div>
+                        <Link to="" className="text-decoration-none">
+                            <div
+                                className="card-body primary-bg text-white p-2"
+                                style={{
+                                    cursor: "pointer",
+                                }}
+                            >
                                 <div className="row">
-                                    <div className="col-9">Subject</div>
+                                    <div className="col-9">04</div>
                                     <div className="col-3 text-right">
                                         4.{" "}
                                         <span className="small">
@@ -159,30 +202,39 @@ class CarouselCard extends Component {
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </Link>
+                        </Link>
+                    </div>
                 </div>
-                <div className="col-md-11">
-                    <Link
-                        to="/"
-                        style={{
-                            textDecoration: "none",
-                        }}
-                    >
+                <div className="px-3">
+                    <div className="card">
+                        <img
+                            src={courseimg}
+                            className="card-img-top"
+                            alt="Course"
+                        />
                         <div
-                            className="card"
+                            className="text-right mt-2"
                             style={{
-                                cursor: "pointer",
+                                position: "absolute",
+                                right: "5px",
                             }}
                         >
-                            <img
-                                src={courseimg}
-                                className="card-img-top"
-                                alt="Course"
-                            />
-                            <div className="card-body primary-bg text-white p-2">
+                            <button className="btn btn-primary-invert btn-sm mr-1">
+                                <i className="far fa-heart"></i>
+                            </button>
+                            <button className="btn btn-primary btn-sm mr-1">
+                                <i className="fas fa-cart-plus"></i>
+                            </button>
+                        </div>
+                        <Link to="" className="text-decoration-none">
+                            <div
+                                className="card-body primary-bg text-white p-2"
+                                style={{
+                                    cursor: "pointer",
+                                }}
+                            >
                                 <div className="row">
-                                    <div className="col-9">Subject</div>
+                                    <div className="col-9">05</div>
                                     <div className="col-3 text-right">
                                         4.{" "}
                                         <span className="small">
@@ -191,10 +243,10 @@ class CarouselCard extends Component {
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </Link>
+                        </Link>
+                    </div>
                 </div>
-            </AliceCarousel>
+            </Slider>
         );
     }
 }
