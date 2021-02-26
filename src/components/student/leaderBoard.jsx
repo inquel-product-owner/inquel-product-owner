@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import SideNav from "./shared/sidenav";
 import Header from "./shared/navbar";
 import { Tabs, Tab } from "react-bootstrap";
+import { Link } from "react-router-dom";
 import Loading from "../sharedComponents/loader";
 import LeaderboardTable from "../table/leaderboardTable";
 import Paginations from "../sharedComponents/pagination";
@@ -75,6 +76,20 @@ class Leaderboard extends Component {
                         >
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
+
+                        {/* Breadcrumb */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb">
+                                <li className="breadcrumb-item mb-3">
+                                    <Link to="/student">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    Leaderboard
+                                </li>
+                            </ol>
+                        </nav>
 
                         {/* Leaderboard table */}
                         <Tabs

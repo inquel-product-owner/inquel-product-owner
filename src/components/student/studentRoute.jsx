@@ -15,6 +15,7 @@ import EmailVerify from "./emailVerification";
 import errorPage from "../404";
 import StudentLogin from "./login";
 import StudentRegister from "./register";
+import Profile from "./profile";
 
 const studentRoutes = (
     <Switch>
@@ -27,6 +28,18 @@ const studentRoutes = (
                     <Redirect to="/student/login" />
                 ) : (
                     <Dashboard />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/student/profile"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/student/login" />
+                ) : (
+                    <Profile {...props} />
                 )
             }
         />
@@ -47,7 +60,7 @@ const studentRoutes = (
         />
         <Route
             exact
-            path="/student/subject/:subjectId/:chapterName/summary"
+            path="/student/subject/:subjectId/chapter/:chapterId/summary"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (
@@ -59,7 +72,7 @@ const studentRoutes = (
         />
         <Route
             exact
-            path="/student/subject/:subjectId/:chapterName/:topicName/notes"
+            path="/student/subject/:subjectId/chapter/:chapterId/:topicName/notes"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (

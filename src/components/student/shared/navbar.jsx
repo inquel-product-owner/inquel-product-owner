@@ -94,7 +94,7 @@ class Header extends Component {
                                 <Dropdown.Menu>
                                     <Dropdown.Item
                                         as={Link}
-                                        to="/student/account"
+                                        to="/student/profile"
                                     >
                                         <i className="fas fa-user mr-2"></i> My
                                         Profile
