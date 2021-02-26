@@ -26,36 +26,6 @@ class Dashboard extends Component {
             "Content-Type": "application/json",
             Authorization: this.authToken,
         };
-        this.settings = {
-            dots: true,
-            infinite: false,
-            speed: 500,
-            slidesToShow: 4,
-            slidesToScroll: 1,
-            initialSlide: 0,
-            responsive: [
-                {
-                    breakpoint: 1024,
-                    settings: {
-                        slidesToShow: 3,
-                    },
-                },
-                {
-                    breakpoint: 600,
-                    settings: {
-                        slidesToShow: 1,
-                        dots: false,
-                    },
-                },
-                {
-                    breakpoint: 480,
-                    settings: {
-                        slidesToShow: 1,
-                        dots: false,
-                    },
-                },
-            ],
-        };
     }
 
     toggleSideNav = () => {
@@ -93,6 +63,40 @@ class Dashboard extends Component {
     };
 
     render() {
+        var settings = {
+            dots: true,
+            infinite: false,
+            speed: 500,
+            slidesToShow: 4,
+            slidesToScroll: 4,
+            initialSlide: 0,
+            responsive: [
+                {
+                    breakpoint: 1024,
+                    settings: {
+                        slidesToShow: 2,
+                        slidesToScroll: 2,
+                        dots: true,
+                    },
+                },
+                {
+                    breakpoint: 600,
+                    settings: {
+                        slidesToShow: 1,
+                        slidesToScroll: 1,
+                        dots: false,
+                    },
+                },
+                {
+                    breakpoint: 480,
+                    settings: {
+                        slidesToShow: 1,
+                        slidesToScroll: 1,
+                        dots: false,
+                    },
+                },
+            ],
+        };
         return (
             <div className="wrapper">
                 {/* Navbar */}
@@ -264,52 +268,72 @@ class Dashboard extends Component {
                                 </div>
                             </div>
                             <div className="card-body">
-                                <Slider {...this.settings}>
+                                {this.state.subjectItems.length > 0 ? (
+                                <Slider {...settings}>
                                     {this.state.subjectItems.map(
-                                        (data, index) => {
-                                            return (
-                                                <div
-                                                    className="px-3"
-                                                    key={index}
-                                                >
-                                                    <Link
-                                                        to={`/student/subject/${data.id}`}
-                                                        className="text-decoration-none"
-                                                    >
-                                                        <div
-                                                            className="card"
-                                                            style={{
-                                                                cursor:
-                                                                    "pointer",
-                                                            }}
-                                                        >
-                                                            <img
-                                                                src={courseimg}
-                                                                className="card-img-top"
-                                                                alt="Course"
-                                                            />
-                                                            <div className="card-body primary-bg text-white p-2">
-                                                                <div className="row">
-                                                                    <div className="col-9">
-                                                                        {
-                                                                            data.subject_name
-                                                                        }
-                                                                    </div>
-                                                                    <div className="col-3 text-right">
-                                                                        4.{" "}
-                                                                        <span className="small">
-                                                                            <i className="fas fa-star ml-1 fa-sm"></i>
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </Link>
-                                                </div>
-                                            );
-                                        }
-                                    )}
-                                </Slider>
+                                              (data, index) => {
+                                                  return (
+                                                      <div
+                                                          className="px-3"
+                                                          data-index={index}
+                                                          key={index}
+                                                      >
+                                                          <div className="card">
+                                                              <img
+                                                                  src={
+                                                                      courseimg
+                                                                  }
+                                                                  className="card-img-top"
+                                                                  alt="Course"
+                                                              />
+                                                              <div
+                                                                  className="text-right mt-2"
+                                                                  style={{
+                                                                      position:
+                                                                          "absolute",
+                                                                      right:
+                                                                          "5px",
+                                                                  }}
+                                                              >
+                                                                  <button className="btn btn-primary-invert btn-sm mr-1">
+                                                                      <i className="far fa-heart"></i>
+                                                                  </button>
+                                                                  <button className="btn btn-primary btn-sm mr-1">
+                                                                      <i className="fas fa-cart-plus"></i>
+                                                                  </button>
+                                                              </div>
+                                                              <Link
+                                                                  to={`/student/subject/${data.id}`}
+                                                                  className="text-decoration-none"
+                                                              >
+                                                                  <div
+                                                                      className="card-body primary-bg text-white p-2"
+                                                                      style={{
+                                                                          cursor:
+                                                                              "pointer",
+                                                                      }}
+                                                                  >
+                                                                      <div className="row">
+                                                                          <div className="col-9">
+                                                                              {
+                                                                                  data.subject_name
+                                                                              }
+                                                                          </div>
+                                                                          <div className="col-3 text-right">
+                                                                              4.{" "}
+                                                                              <span className="small">
+                                                                                  <i className="fas fa-star ml-1 fa-sm"></i>
+                                                                              </span>
+                                                                          </div>
+                                                                      </div>
+                                                                  </div>
+                                                              </Link>
+                                                          </div>
+                                                      </div>
+                                                  );
+                                              }
+                                          )}
+                                </Slider>):null}
                             </div>
                         </div>
 

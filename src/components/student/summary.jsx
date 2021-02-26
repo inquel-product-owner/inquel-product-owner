@@ -1,17 +1,27 @@
 import React, { Component } from "react";
-import { Tab, Row, Col, Nav } from "react-bootstrap";
+import { Tab, Nav } from "react-bootstrap";
 import Header from "./shared/navbar";
 import SideNav from "./shared/sidenav";
+import { Link } from "react-router-dom";
 import Loading from "../sharedComponents/loader";
+import AlertModal from "../sharedComponents/alertModal";
 import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
+import { Document, Page, pdfjs } from "react-pdf";
 
 class Summary extends Component {
     constructor(props) {
         super(props);
         this.state = {
             showSideNav: false,
+            subjectItems: [],
+            summaryData: "",
+            chapterId: this.props.match.params.chapterId,
+            page_loading: true,
+            showAlertModal: false,
+            numPages: null,
+            pageNumber: 1,
         };
-        this.chapterName = this.props.match.params.chapterName;
+        this.subjectId = this.props.match.params.subjectId;
         this.url = baseUrl + studentUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
@@ -19,6 +29,7 @@ class Summary extends Component {
             "Content-Type": "application/json",
             Authorization: this.authToken,
         };
+        pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
     }
 
     toggleSideNav = () => {
@@ -27,18 +38,120 @@ class Summary extends Component {
         });
     };
 
+    loadSummaryData = () => {
+        fetch(
+            `${this.url}/student/subject/${this.subjectId}/chapter/${this.state.chapterId}/summary/`,
+            {
+                method: "GET",
+                headers: this.headers,
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        summaryData: result.data,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        alertMsg: result.detail ? result.detail : result.msg,
+                        showAlertModal: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    componentDidMount = () => {
+        this.setState(
+            {
+                chapterId: this.props.match.params.chapterId,
+            },
+            () => {
+                this.loadSummaryData();
+            }
+        );
+
+        fetch(`${this.url}/student/subject/${this.subjectId}/`, {
+            method: "GET",
+            headers: this.headers,
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        subjectItems: result.data,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        alertMsg: result.detail ? result.detail : result.msg,
+                        showAlertModal: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    handleSelect = (index) => {
+        this.setState(
+            {
+                chapterId: index,
+                page_loading: true,
+            },
+            () => {
+                this.loadSummaryData();
+            }
+        );
+    };
+
+    onDocumentLoadSuccess = ({ numPages }) => {
+        this.setState({ numPages });
+    };
+
+    goToPrevPage = () =>
+        this.setState((state) => ({ pageNumber: state.pageNumber - 1 }));
+    goToNextPage = () =>
+        this.setState((state) => ({ pageNumber: state.pageNumber + 1 }));
+
     render() {
-        document.title = "Summary - Student | IQLabs";
+        document.title = `${this.state.chapter_name} Summary - Student | IQLabs`;
+        const chapter = this.state.subjectItems;
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="Subject name" togglenav={this.toggleSideNav} />
+                <Header
+                    name={
+                        this.state.subjectItems.subject_name !== undefined
+                            ? this.state.subjectItems.subject_name
+                            : ""
+                    }
+                    togglenav={this.toggleSideNav}
+                />
 
                 {/* Sidebar */}
                 <SideNav
                     shownav={this.state.showSideNav}
                     activeLink="dashboard"
                 />
+
+                {/* ALert modal */}
+                {this.state.showAlertModal ? (
+                    <AlertModal
+                        show={this.state.showAlertModal}
+                        msg={this.state.alertMsg}
+                        goBack={this.props.history.goBack}
+                    />
+                ) : null}
 
                 <div
                     className={`section content ${
@@ -54,119 +167,199 @@ class Summary extends Component {
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
 
-                        <div className="card shadow-sm mb-3">
-                            <div className="card-body">
-                                <div className="row align-items-center">
-                                    <div className="col-md-6">
-                                        <h6 className="primary-text mb-0">
-                                            {`Summary :: ${this.chapterName}`}
-                                        </h6>
-                                    </div>
-                                    <div className="col-md-6 text-right">
-                                        <button className="btn btn-primary btn-sm">
-                                            Publish
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        {/* Breadcrumb */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb mb-3">
+                                <li className="breadcrumb-item">
+                                    <Link to="/student">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item">
+                                    <Link
+                                        to="#"
+                                        onClick={this.props.history.goBack}
+                                    >
+                                        Course
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    Summary
+                                </li>
+                            </ol>
+                        </nav>
 
-                        {/* Teacher list */}
+                        {/* Chapter list */}
                         <div className="card shadow-sm">
                             <div className="card-body">
                                 <Tab.Container
                                     id="left-tabs-example"
-                                    defaultActiveKey="0"
+                                    defaultActiveKey={this.state.chapterId}
                                 >
-                                    <Row>
-                                        <Col sm={3} className="mb-3 mb-md-0">
-                                            <div className="card shadow-sm">
+                                    <div className="row">
+                                        <div className="col-md-3 mb-2 mb-md-0 border-right">
                                             <Nav
                                                 variant="pills"
                                                 className="flex-column"
                                             >
-                                                <Nav.Item className="grey-item">
-                                                    <Nav.Link eventKey="0" className="p-3">
-                                                        Chapter 01
-                                                    </Nav.Link>
-                                                </Nav.Item>
-                                                <Nav.Item className="grey-item">
-                                                    <Nav.Link eventKey="1" className="p-3">
-                                                        Chapter 02
-                                                    </Nav.Link>
-                                                </Nav.Item>
-                                                <Nav.Item className="grey-item">
-                                                    <Nav.Link eventKey="2" className="p-3">
-                                                        Chapter 03
-                                                    </Nav.Link>
-                                                </Nav.Item>
-                                            </Nav></div>
-                                        </Col>
-                                        <Col sm={9} className="pl-md-0">
+                                                {chapter.length !== 0
+                                                    ? chapter.chapters
+                                                          .length !== 0
+                                                        ? chapter.chapters.map(
+                                                              (data, index) => {
+                                                                  return (
+                                                                      <Nav.Item
+                                                                          className="grey-item"
+                                                                          key={
+                                                                              index
+                                                                          }
+                                                                          onClick={() =>
+                                                                              this.handleSelect(
+                                                                                  data.chapter_id
+                                                                              )
+                                                                          }
+                                                                      >
+                                                                          <Nav.Link
+                                                                              eventKey={
+                                                                                  data.chapter_id
+                                                                              }
+                                                                              className="p-3"
+                                                                          >
+                                                                              {
+                                                                                  data.chapter_name
+                                                                              }
+                                                                          </Nav.Link>
+                                                                      </Nav.Item>
+                                                                  );
+                                                              }
+                                                          )
+                                                        : null
+                                                    : null}
+                                            </Nav>
+                                        </div>
+                                        <div className="col-md-9 pl-md-0">
                                             <Tab.Content>
-                                                <Tab.Pane eventKey="0">
-                                                    <div className="card shadow-sm">
+                                                <Tab.Pane
+                                                    eventKey={
+                                                        this.state.chapterId
+                                                    }
+                                                >
+                                                    <div className="card">
                                                         <div className="card-body">
-                                                            1 Lorem ipsum dolor
-                                                            sit amet,
-                                                            consectetur
-                                                            adipisicing elit.
-                                                            Sit tempora ratione
-                                                            saepe quos repellat
-                                                            soluta quo sint,
-                                                            nemo ad dolores
-                                                            mollitia adipisci
-                                                            provident animi
-                                                            accusantium ea
-                                                            obcaecati
-                                                            consequatur quam
-                                                            magnam!
-                                                        </div>
-                                                    </div>
-                                                </Tab.Pane>
-                                                <Tab.Pane eventKey="1">
-                                                    <div className="card shadow-sm">
-                                                        <div className="card-body">
-                                                            2 Lorem ipsum dolor
-                                                            sit amet,
-                                                            consectetur
-                                                            adipisicing elit.
-                                                            Sit tempora ratione
-                                                            saepe quos repellat
-                                                            soluta quo sint,
-                                                            nemo ad dolores
-                                                            mollitia adipisci
-                                                            provident animi
-                                                            accusantium ea
-                                                            obcaecati
-                                                            consequatur quam
-                                                            magnam!
-                                                        </div>
-                                                    </div>
-                                                </Tab.Pane>
-                                                <Tab.Pane eventKey="2">
-                                                    <div className="card shadow-sm">
-                                                        <div className="card-body">
-                                                            3 Lorem ipsum dolor
-                                                            sit amet,
-                                                            consectetur
-                                                            adipisicing elit.
-                                                            Sit tempora ratione
-                                                            saepe quos repellat
-                                                            soluta quo sint,
-                                                            nemo ad dolores
-                                                            mollitia adipisci
-                                                            provident animi
-                                                            accusantium ea
-                                                            obcaecati
-                                                            consequatur quam
-                                                            magnam!
+                                                            {this.state
+                                                                .summaryData
+                                                                .length !== 0
+                                                                ? this.state.summaryData.map(
+                                                                      (
+                                                                          data,
+                                                                          index
+                                                                      ) => {
+                                                                          return data.direct_question_urls !==
+                                                                              undefined ? (
+                                                                              <div className="text-center">
+                                                                                  <div id="ResumeContainer py-3">
+                                                                                      <Document
+                                                                                          file={
+                                                                                              data
+                                                                                                  .direct_question_urls[0]
+                                                                                          }
+                                                                                          onLoadSuccess={
+                                                                                              this
+                                                                                                  .onDocumentLoadSuccess
+                                                                                          }
+                                                                                          className={
+                                                                                              "PDFDocument"
+                                                                                          }
+                                                                                      >
+                                                                                          <Page
+                                                                                              pageNumber={
+                                                                                                  this
+                                                                                                      .state
+                                                                                                      .pageNumber
+                                                                                              }
+                                                                                              className={
+                                                                                                  "PDFPagee shadow"
+                                                                                              }
+                                                                                          />
+                                                                                      </Document>
+                                                                                  </div>
+                                                                                  <p className="my-3">
+                                                                                      Page{" "}
+                                                                                      {
+                                                                                          this
+                                                                                              .state
+                                                                                              .pageNumber
+                                                                                      }{" "}
+                                                                                      of{" "}
+                                                                                      {
+                                                                                          this
+                                                                                              .state
+                                                                                              .numPages
+                                                                                      }
+                                                                                  </p>
+                                                                                  <nav>
+                                                                                      <button
+                                                                                          className="btn btn-primary btn-sm mr-2"
+                                                                                          onClick={
+                                                                                              this
+                                                                                                  .goToPrevPage
+                                                                                          }
+                                                                                          disabled={
+                                                                                              this
+                                                                                                  .state
+                                                                                                  .pageNumber ===
+                                                                                              1
+                                                                                                  ? true
+                                                                                                  : false
+                                                                                          }
+                                                                                      >
+                                                                                          Prev
+                                                                                      </button>
+                                                                                      <button
+                                                                                          className="btn btn-primary btn-sm"
+                                                                                          onClick={
+                                                                                              this
+                                                                                                  .goToNextPage
+                                                                                          }
+                                                                                          disabled={
+                                                                                              this
+                                                                                                  .state
+                                                                                                  .numPages ===
+                                                                                              this
+                                                                                                  .state
+                                                                                                  .pageNumber
+                                                                                                  ? true
+                                                                                                  : false
+                                                                                          }
+                                                                                      >
+                                                                                          Next
+                                                                                      </button>
+                                                                                  </nav>
+                                                                              </div>
+                                                                          ) : (
+                                                                              <>
+                                                                                  <div className="h5 font-weight-bold-600 mb-2">
+                                                                                      {
+                                                                                          data.summary_name
+                                                                                      }
+                                                                                  </div>
+                                                                                  <div
+                                                                                      dangerouslySetInnerHTML={{
+                                                                                          __html:
+                                                                                              data.summary_content,
+                                                                                      }}
+                                                                                  ></div>
+                                                                              </>
+                                                                          );
+                                                                      }
+                                                                  )
+                                                                : null}
                                                         </div>
                                                     </div>
                                                 </Tab.Pane>
                                             </Tab.Content>
-                                        </Col>
-                                    </Row>
+                                        </div>
+                                    </div>
                                 </Tab.Container>
                             </div>
                         </div>

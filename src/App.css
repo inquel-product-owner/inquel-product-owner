@@ -38,6 +38,10 @@ body {
     background-color: #ffa88b !important;
 }
 
+.pinkrange-bg {
+    background-color: #ffe7bf !important;
+}
+
 /* Text */
 
 .primary-text {
@@ -489,18 +493,16 @@ input[type="search"]:focus {
     font-size: 14px;
 }
 
-.alert-danger::before {
-    content: "\f057";
-    font-family: "Font Awesome 5 Free";
-    font-weight: 900;
-    margin-right: 8px;
+.alert-top {
+    padding: 0.8rem 1rem;
+    width: 50%;
+    top: 0;
+    margin: 0 auto;
+    transition: all .5s ease-in-out;
 }
 
-.alert-success::before {
-    content: "\f058";
-    font-family: "Font Awesome 5 Free";
-    font-weight: 900;
-    margin-right: 8px;
+.alert-top.show {
+    top: 13%;
 }
 
 .alert-dismissible .close {
@@ -509,9 +511,14 @@ input[type="search"]:focus {
     font-size: 22px;
 }
 
-/* .alert::nth-letter(odd) {
+.alert-top .close {
+    padding: 0.8rem 1rem;
+    outline: none;
+}
+
+.alert::nth-letter(odd) {
     text-transform: uppercase;
-} */
+}
 
 /* Modal */
 
@@ -572,7 +579,7 @@ input[type="search"]:focus {
 
 /* carousel */
 
-.alice-carousel__prev-btn,
+/* .alice-carousel__prev-btn,
 .alice-carousel__next-btn {
     position: absolute;
     top: 30%;
@@ -615,31 +622,34 @@ input[type="search"]:focus {
 .alice-carousel__dots-item:not(.__custom):hover,
 .alice-carousel__dots-item:not(.__custom).__active {
     background-color: #621012;
-}
+} */
 
 .slick-prev {
     left: -15px;
-    top: 40%;
 }
 
 .slick-next {
     right: -12px;
-    top: 40%;
 }
 
-.slick-prev, .slick-next {
+.slick-prev,
+.slick-next {
     color: #621012;
     background: transparent;
     border-radius: 50%;
 }
 
-.slick-prev:before, .slick-next:before {
+.slick-prev:before,
+.slick-next:before {
     opacity: 1;
     color: #621012;
     font-size: 25px;
 }
 
-.slick-prev:hover, .slick-prev:focus, .slick-next:hover, .slick-next:focus {
+.slick-prev:hover,
+.slick-prev:focus,
+.slick-next:hover,
+.slick-next:focus {
     color: #621012;
     background: transparent;
 }
@@ -658,12 +668,17 @@ input[type="search"]:focus {
     font-size: 10px;
 }
 
-.slick-dots li button:hover:before, .slick-dots li button:focus:before {
+.slick-dots li button:hover:before,
+.slick-dots li button:focus:before {
     color: #621012;
 }
 
 .slick-list {
     padding-bottom: 10px;
+}
+
+.slick-track {
+    margin-left: 0;
 }
 
 /* Accordion */
