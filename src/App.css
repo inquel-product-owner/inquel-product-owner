@@ -10,7 +10,7 @@ body {
 }
 
 .navbar-brand img {
-    width: 120px;
+    width: 100px;
     height: auto;
 }
 
@@ -96,30 +96,31 @@ body {
 
 /* Button */
 
+.btn {
+    box-shadow: none !important;
+}
+
 .btn-primary {
     background-color: #621012;
     outline: none;
     border: 1px solid #621012;
-    color: white;
 }
 
 .btn-primary:active {
-    background-color: transparent !important;
-    color: #621012 !important;
-    border: 1px solid #621012 !important;
+    background-color: #621012;
+    border: 1px solid #621012;
+    box-shadow: 0 5px 8px -2px rgba(0,0,0,.25) !important;
 }
 
 .btn-primary:hover {
-    background-color: transparent;
-    color: #621012;
+    background-color: #621012;
     border: 1px solid #621012;
+    box-shadow: 0 5px 8px -2px rgba(0,0,0,.25) !important;
 }
 
 .btn-primary:focus {
-    background-color: transparent;
-    color: #621012;
-    border: 1px solid #621012;
-    box-shadow: none;
+    background-color: #621012 !important;
+    border: 1px solid #621012 !important;
 }
 
 .btn-primary.disabled,
@@ -183,6 +184,12 @@ body {
 
 .btn-tomato:hover {
     background-color: #ff9673;
+}
+
+/* Shadow */
+
+.shadow-sm {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
 }
 
 /* Form */
@@ -388,13 +395,19 @@ input[type="search"]:focus {
 /* Section */
 
 .section {
-    padding-top: 6rem;
+    padding-top: 5.5rem;
     padding-bottom: 4rem;
     min-height: 100vh;
 }
 
 .wrapper {
     display: flex;
+    width: 100%;
+}
+
+.exam-section {
+    padding-top: 1.5rem;
+    padding-bottom: 3rem;
     width: 100%;
 }
 
@@ -412,7 +425,7 @@ input[type="search"]:focus {
     transition: all 0.3s;
     margin-left: 0;
     overflow-y: auto;
-    padding-top: 6rem;
+    padding-top: 5.5rem;
 }
 
 #sidebar.active {
@@ -499,6 +512,18 @@ input[type="search"]:focus {
     top: 0;
     margin: 0 auto;
     transition: all .5s ease-in-out;
+}
+
+@media screen and (max-width:768px) {
+    .alert-top {
+        width: 80%;
+    }
+}
+
+@media screen and (max-width:425px) {
+    .alert-top {
+        width: 95%;
+    }
 }
 
 .alert-top.show {

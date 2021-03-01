@@ -295,11 +295,8 @@ class Dashboard extends Component {
                                                                           "5px",
                                                                   }}
                                                               >
-                                                                  <button className="btn btn-primary-invert btn-sm mr-1">
+                                                                  <button className="btn btn-primary-invert btn-sm">
                                                                       <i className="far fa-heart"></i>
-                                                                  </button>
-                                                                  <button className="btn btn-primary btn-sm mr-1">
-                                                                      <i className="fas fa-cart-plus"></i>
                                                                   </button>
                                                               </div>
                                                               <Link

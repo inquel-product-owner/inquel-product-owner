@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import axios from "axios";
 import Header from "./navbar";
 import SideNav from "./sidenav";
+import { Link } from "react-router-dom";
 import { Spinner, Alert } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import { Document, Page, pdfjs } from "react-pdf";
@@ -24,6 +25,7 @@ class SemesterDirect extends Component {
             showErrorAlert: false,
             showSuccessAlert: false,
             showLoader: false,
+            isFileUploaded: false,
 
             pdf: {
                 file_name: null,
@@ -72,6 +74,10 @@ class SemesterDirect extends Component {
                 console.log(result);
                 if (result.sts === true) {
                     this.setState({
+                        isFileUploaded:
+                            result.data.direct_question_urls.length === 0
+                                ? false
+                                : true,
                         path:
                             result.data.direct_question_urls.length !== 0
                                 ? result.data.direct_question_urls[0]
@@ -192,7 +198,9 @@ class SemesterDirect extends Component {
         form_data.append("exam_date", this.state.exam_date);
         form_data.append("starts_at", this.state.starts_at);
         form_data.append("ends_at", this.state.ends_at);
-        form_data.append("semester_file_1", directTest.file);
+        if (directTest.file !== null) {
+            form_data.append("semester_file_1", directTest.file);
+        }
 
         const options = {
             headers: {
@@ -202,20 +210,7 @@ class SemesterDirect extends Component {
             },
         };
 
-        const pdf = this.state.pdf;
-        let extension = "";
-
-        if (directTest.file_name !== null) {
-            extension = pdf.file_name.split(".");
-        }
-
-        if (directTest.file === null) {
-            this.setState({
-                errorMsg: "Please upload a file",
-                showErrorAlert: true,
-                showLoader: false,
-            });
-        } else if (this.state.exam_date === "") {
+        if (this.state.exam_date === "") {
             this.setState({
                 errorMsg: "Please select Exam date",
                 showErrorAlert: true,
@@ -233,6 +228,29 @@ class SemesterDirect extends Component {
                 showErrorAlert: true,
                 showLoader: false,
             });
+        } else {
+            if (this.state.isFileUploaded === true) {
+                this.handlePATCH(form_data, options, directTest);
+            } else {
+                this.handlePOST(form_data, options, directTest);
+            }
+        }
+    };
+
+    handlePOST = (form_data, options, directTest) => {
+        const pdf = this.state.pdf;
+        let extension = "";
+
+        if (directTest.file_name !== null) {
+            extension = pdf.file_name.split(".");
+        }
+
+        if (directTest.file === null) {
+            this.setState({
+                errorMsg: "Please upload a file",
+                showErrorAlert: true,
+                showLoader: false,
+            });
         } else if (extension[extension.length - 1].toLowerCase() !== "pdf") {
             this.setState({
                 errorMsg: "Invalid file format!",
@@ -246,6 +264,84 @@ class SemesterDirect extends Component {
         } else {
             axios
                 .post(
+                    `${this.url}/teacher/subject/${this.subjectId}/semester/${this.semesterId}/files/`,
+                    form_data,
+                    options
+                )
+                .then((result) => {
+                    console.log(result);
+                    if (result.data.sts === true) {
+                        this.setState(
+                            {
+                                successMsg: result.data.msg,
+                                showSuccessAlert: true,
+                                showLoader: false,
+                                path: result.data.url,
+                            },
+                            () => {
+                                this.setState({
+                                    page_loading: true,
+                                });
+                                this.loadSemesterData();
+                            }
+                        );
+                    } else if (result.data.sts === false) {
+                        if (result.data.detail) {
+                            this.setState({
+                                errorMsg: result.data.detail,
+                            });
+                        } else {
+                            this.setState({
+                                errorMsg: result.data.msg,
+                            });
+                        }
+                        this.setState({
+                            showErrorAlert: true,
+                            showLoader: false,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    if (err.response.data.detail) {
+                        this.setState({
+                            errorMsg: err.response.data.detail,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: err.response.data.msg,
+                        });
+                    }
+                    this.setState({
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                });
+        }
+    };
+
+    handlePATCH = (form_data, options, directTest) => {
+        const pdf = this.state.pdf;
+        let extension = "";
+
+        if (directTest.file_name !== null) {
+            extension = pdf.file_name.split(".");
+        }
+
+        if (extension !== "") {
+            if (extension[extension.length - 1].toLowerCase() !== "pdf") {
+                this.setState({
+                    errorMsg: "Invalid file format!",
+                    showErrorAlert: true,
+                });
+            } else if (pdf.file.size > 5242880) {
+                this.setState({
+                    errorMsg: "File sixe exceeds more then 5MB!",
+                    showErrorAlert: true,
+                });
+            }
+        } else {
+            axios
+                .patch(
                     `${this.url}/teacher/subject/${this.subjectId}/semester/${this.semesterId}/files/`,
                     form_data,
                     options
@@ -345,6 +441,13 @@ class SemesterDirect extends Component {
                                     {this.props.semester_name}
                                 </h5>
                             </div>
+                            <div className="col-md-6 text-right">
+                                <Link to={`${this.props.match.url}/student/1`}>
+                                    <button className="btn btn-primary btn-sm">
+                                        Evaluate Student
+                                    </button>
+                                </Link>
+                            </div>
                         </div>
 
                         {/* Header configuration */}
@@ -397,167 +500,140 @@ class SemesterDirect extends Component {
                             </div>
                         </div>
 
-                        <div className="row justify-content-center">
-                            <div className="col-md-9">
-                                <div className="card light-bg shadow-sm">
-                                    <div className="card-body">
-                                        <div className="row justify-content-center">
-                                            <div className="col-md-6">
-                                                <Alert
-                                                    variant="danger"
-                                                    show={
-                                                        this.state
-                                                            .showErrorAlert
-                                                    }
-                                                    onClose={() => {
-                                                        this.setState({
-                                                            showErrorAlert: false,
-                                                        });
-                                                    }}
-                                                    dismissible
-                                                >
-                                                    {this.state.errorMsg}
-                                                </Alert>
-                                                <Alert
-                                                    variant="success"
-                                                    show={
-                                                        this.state
-                                                            .showSuccessAlert
-                                                    }
-                                                    onClose={() => {
-                                                        this.setState({
-                                                            showSuccessAlert: false,
-                                                        });
-                                                    }}
-                                                    dismissible
-                                                >
-                                                    {this.state.successMsg}
-                                                </Alert>
+                        <div className="card light-bg shadow-sm">
+                            <div className="card-body">
+                                <div className="row justify-content-center">
+                                    <div className="col-md-4">
+                                        <Alert
+                                            variant="danger"
+                                            show={this.state.showErrorAlert}
+                                            onClose={() => {
+                                                this.setState({
+                                                    showErrorAlert: false,
+                                                });
+                                            }}
+                                            dismissible
+                                        >
+                                            {this.state.errorMsg}
+                                        </Alert>
+                                        <Alert
+                                            variant="success"
+                                            show={this.state.showSuccessAlert}
+                                            onClose={() => {
+                                                this.setState({
+                                                    showSuccessAlert: false,
+                                                });
+                                            }}
+                                            dismissible
+                                        >
+                                            {this.state.successMsg}
+                                        </Alert>
 
-                                                <div className="custom-file">
-                                                    <input
-                                                        type="file"
-                                                        className="custom-file-input"
-                                                        id="question"
-                                                        accept=".pdf"
-                                                        aria-describedby="inputGroupFileAddon01"
-                                                        onChange={(event) =>
-                                                            this.handleFile(
-                                                                event
-                                                            )
-                                                        }
-                                                    />
-                                                    <label
-                                                        className="custom-file-label mb-0"
-                                                        htmlFor="question"
-                                                    >
-                                                        {this.state.pdf
-                                                            .file_name === null
-                                                            ? "Choose file"
-                                                            : this.state.pdf
-                                                                  .file_name}
-                                                    </label>
-                                                </div>
-                                                <small
-                                                    id="passwordHelpBlock"
-                                                    className="form-text text-muted mb-2"
-                                                >
-                                                    Select only pdf format & Max
-                                                    file upload size is 5MB
-                                                </small>
-
-                                                <button
-                                                    className="btn btn-primary btn-block btn-sm"
-                                                    onClick={this.handleSubmit}
-                                                    disabled={
-                                                        this.state.btnDisabled
-                                                    }
-                                                >
-                                                    {this.state.showLoader ? (
-                                                        <Spinner
-                                                            as="span"
-                                                            animation="border"
-                                                            size="sm"
-                                                            role="status"
-                                                            aria-hidden="true"
-                                                            className="mr-2"
-                                                        />
-                                                    ) : (
-                                                        ""
-                                                    )}
-                                                    Upload
-                                                </button>
-                                            </div>
+                                        <div className="custom-file">
+                                            <input
+                                                type="file"
+                                                className="custom-file-input"
+                                                id="question"
+                                                accept=".pdf"
+                                                aria-describedby="inputGroupFileAddon01"
+                                                onChange={(event) =>
+                                                    this.handleFile(event)
+                                                }
+                                            />
+                                            <label
+                                                className="custom-file-label mb-0"
+                                                htmlFor="question"
+                                            >
+                                                {this.state.pdf.file_name ===
+                                                null
+                                                    ? "Choose file"
+                                                    : this.state.pdf.file_name}
+                                            </label>
                                         </div>
-                                    </div>
-                                    <div className="card-body secondary-bg primary-text text-center">
-                                        {this.state.path === null ? (
-                                            "Your uploads will appear here"
-                                        ) : (
-                                            <>
-                                                <div id="ResumeContainer">
-                                                    <Document
-                                                        file={this.state.path}
-                                                        onLoadSuccess={
-                                                            this
-                                                                .onDocumentLoadSuccess
-                                                        }
-                                                        className={
-                                                            "PDFDocument"
-                                                        }
-                                                    >
-                                                        <Page
-                                                            pageNumber={
-                                                                this.state
-                                                                    .pageNumber
-                                                            }
-                                                            className={
-                                                                "PDFPagee shadow"
-                                                            }
-                                                        />
-                                                    </Document>
-                                                </div>
-                                                <p className="my-3">
-                                                    Page {this.state.pageNumber}{" "}
-                                                    of {this.state.numPages}
-                                                </p>
-                                                <nav>
-                                                    <button
-                                                        className="btn btn-primary btn-sm mr-2"
-                                                        onClick={
-                                                            this.goToPrevPage
-                                                        }
-                                                        disabled={
-                                                            this.state
-                                                                .pageNumber ===
-                                                            1
-                                                                ? true
-                                                                : false
-                                                        }
-                                                    >
-                                                        Prev
-                                                    </button>
-                                                    <button
-                                                        className="btn btn-primary btn-sm"
-                                                        onClick={
-                                                            this.goToNextPage
-                                                        }
-                                                        disabled={
-                                                            this.state
-                                                                .numPages ===
-                                                            this.state
-                                                                .pageNumber
-                                                                ? true
-                                                                : false
-                                                        }
-                                                    >
-                                                        Next
-                                                    </button>
-                                                </nav>
-                                            </>
-                                        )}
+                                        <small
+                                            id="passwordHelpBlock"
+                                            className="form-text text-muted mb-2"
+                                        >
+                                            Select only pdf format & Max file
+                                            upload size is 5MB
+                                        </small>
+
+                                        <button
+                                            className="btn btn-primary btn-block btn-sm"
+                                            onClick={this.handleSubmit}
+                                            disabled={this.state.btnDisabled}
+                                        >
+                                            {this.state.showLoader ? (
+                                                <Spinner
+                                                    as="span"
+                                                    animation="border"
+                                                    size="sm"
+                                                    role="status"
+                                                    aria-hidden="true"
+                                                    className="mr-2"
+                                                />
+                                            ) : (
+                                                ""
+                                            )}
+                                            Upload
+                                        </button>
                                     </div>
                                 </div>
+                            </div>
+                            <div className="card-body secondary-bg primary-text text-center">
+                                {this.state.path === null ? (
+                                    "Your uploads will appear here"
+                                ) : (
+                                    <>
+                                        <div id="ResumeContainer">
+                                            <Document
+                                                file={this.state.path}
+                                                onLoadSuccess={
+                                                    this.onDocumentLoadSuccess
+                                                }
+                                                className={"PDFDocument"}
+                                            >
+                                                <Page
+                                                    pageNumber={
+                                                        this.state.pageNumber
+                                                    }
+                                                    className={
+                                                        "PDFPagee shadow"
+                                                    }
+                                                />
+                                            </Document>
+                                        </div>
+                                        <p className="my-3">
+                                            Page {this.state.pageNumber} of{" "}
+                                            {this.state.numPages}
+                                        </p>
+                                        <nav>
+                                            <button
+                                                className="btn btn-primary btn-sm mr-2"
+                                                onClick={this.goToPrevPage}
+                                                disabled={
+                                                    this.state.pageNumber === 1
+                                                        ? true
+                                                        : false
+                                                }
+                                            >
+                                                Prev
+                                            </button>
+                                            <button
+                                                className="btn btn-primary btn-sm"
+                                                onClick={this.goToNextPage}
+                                                disabled={
+                                                    this.state.numPages ===
+                                                    this.state.pageNumber
+                                                        ? true
+                                                        : false
+                                                }
+                                            >
+                                                Next
+                                            </button>
+                                        </nav>
+                                    </>
+                                )}
                             </div>
                         </div>
                         {/* Loading component */}
