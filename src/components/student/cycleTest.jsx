@@ -26,6 +26,7 @@ class ExamStartModal extends Component {
             Authorization: this.authToken,
         };
     }
+    
     componentDidMount = () => {
         fetch(
             `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/cycletest/`,

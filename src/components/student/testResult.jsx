@@ -9,6 +9,8 @@ class TestResult extends Component {
         super(props);
         this.state = {
             subject_name: "",
+            cycle_test: [],
+            semester: [],
 
             errorMsg: "",
             successMsg: "",
@@ -37,8 +39,8 @@ class TestResult extends Component {
         });
     };
 
-    componentDidMount = () => {
-        fetch(`${this.url}/student/subject/${this.subjectId}/`, {
+    loadTestResultData = () => {
+        fetch(`${this.url}/student/subject/${this.subjectId}/testanalysis/`, {
             method: "GET",
             headers: this.headers,
         })
@@ -47,7 +49,8 @@ class TestResult extends Component {
                 console.log(result);
                 if (result.sts === true) {
                     this.setState({
-                        subject_name: result.data.subject_name,
+                        cycle_test: result.data.cycle_tests,
+                        semester: result.data.semesters,
                         page_loading: false,
                     });
                 } else {
@@ -61,6 +64,33 @@ class TestResult extends Component {
             .catch((err) => {
                 console.log(err);
             });
+    };
+
+    componentDidMount = () => {
+        fetch(`${this.url}/student/subject/${this.subjectId}/`, {
+            method: "GET",
+            headers: this.headers,
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        subject_name: result.data.subject_name,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+
+        this.loadTestResultData();
     };
 
     render() {
@@ -102,27 +132,53 @@ class TestResult extends Component {
                                     </div>
                                 </div>
 
-                                <div className="card light-bg shadow-sm mb-2">
-                                    <div className="row align-items-center font-weight-bold-600 small">
-                                        <div className="col-3">
-                                            <div className="card card-body secondary-bg p-3">
-                                                Cycle test 01
-                                            </div>
-                                        </div>
-                                        <div className="col-9"></div>
-                                    </div>
-                                </div>
-                                <div className="card light-bg shadow-sm mb-2">
-                                    <div className="row align-items-center font-weight-bold-600 small">
-                                        <div className="col-3">
-                                            <div className="card card-body secondary-bg p-3">
-                                                Semester Exam 01
-                                            </div>
-                                        </div>
-                                        <div className="col-9"></div>
-                                    </div>
-                                </div>
+                                {/* Cycle test list */}
+                                {this.state.cycle_test.length !== 0
+                                    ? this.state.cycle_test.map(
+                                          (data, index) => {
+                                              return (
+                                                  <div
+                                                      className="card light-bg shadow-sm mb-2"
+                                                      key={index}
+                                                  >
+                                                      <div className="row align-items-center font-weight-bold-600 small">
+                                                          <div className="col-3">
+                                                              <div className="card card-body secondary-bg p-3">
+                                                                  {
+                                                                      data.cycle_test_name
+                                                                  }
+                                                              </div>
+                                                          </div>
+                                                          <div className="col-9"></div>
+                                                      </div>
+                                                  </div>
+                                              );
+                                          }
+                                      )
+                                    : ""}
 
+                                {/* Semester list */}
+                                {this.state.semester.length !== 0
+                                    ? this.state.semester.map((data, index) => {
+                                          return (
+                                              <div
+                                                  className="card light-bg shadow-sm mb-2"
+                                                  key={index}
+                                              >
+                                                  <div className="row align-items-center font-weight-bold-600 small">
+                                                      <div className="col-3">
+                                                          <div className="card card-body secondary-bg p-3">
+                                                              {
+                                                                  data.semester_name
+                                                              }
+                                                          </div>
+                                                      </div>
+                                                      <div className="col-9"></div>
+                                                  </div>
+                                              </div>
+                                          );
+                                      })
+                                    : ""}
                             </div>
                         </div>
                     </div>
