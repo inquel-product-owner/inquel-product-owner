@@ -592,7 +592,7 @@ class Profile extends Component {
                                                     </div>
                                                 </div>
 
-                                                <div className="dropdown-divider"></div>
+                                                {/* <div className="dropdown-divider"></div>
 
                                                 <h6 className="primary-text my-3">
                                                     Address
@@ -686,7 +686,7 @@ class Profile extends Component {
                                                             />
                                                         </div>
                                                     </div>
-                                                </div>
+                                                </div> */}
 
                                                 <div className="dropdown-divider"></div>
 
@@ -788,7 +788,7 @@ class Profile extends Component {
                                                 </div>
                                             </div>
 
-                                            <div className="dropdown-divider"></div>
+                                            {/* <div className="dropdown-divider"></div>
 
                                             <h6 className="primary-text my-3">
                                                 Address
@@ -842,7 +842,7 @@ class Profile extends Component {
                                                         }
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </div> */}
                                         </div>
                                     </div>
                                 )}

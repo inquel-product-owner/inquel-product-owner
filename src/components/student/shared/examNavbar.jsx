@@ -33,7 +33,7 @@ class Header extends Component {
                                 <i className="fas fa-cog"></i>
                             </button>
                             <button
-                                className="btn btn-light bg-white border-0 btn-sm"
+                                className="btn btn-light bg-white border-0 shadow-none btn-sm"
                                 onClick={this.props.goBack}
                             >
                                 <i className="fas fa-times"></i>
