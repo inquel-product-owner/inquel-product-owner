@@ -26,7 +26,7 @@ class Logout extends React.Component {
     };
 
     onIdle = () => {
-        if (!this.state.isTimedOut) {
+        if (!this.state.isTimedOut && localStorage.getItem("Authorization")) {
             this.idleTimer.reset();
             this.setState({ isTimedOut: true });
 

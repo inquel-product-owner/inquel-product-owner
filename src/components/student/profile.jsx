@@ -228,9 +228,13 @@ class Profile extends Component {
         });
     };
 
-    toggleAlert = () => {
+    toggleSuccessAlert = () => {
         this.setState({
             showSuccessAlert: false,
+        });
+    };
+    toggleErrorAlert = () => {
+        this.setState({
             showErrorAlert: false,
         });
     };
@@ -366,7 +370,8 @@ class Profile extends Component {
                     successMsg={this.state.successMsg}
                     showErrorAlert={this.state.showErrorAlert}
                     showSuccessAlert={this.state.showSuccessAlert}
-                    toggleAlert={this.toggleAlert}
+                    toggleSuccessAlert={this.toggleSuccessAlert}
+                    toggleErrorAlert={this.toggleErrorAlert}
                 />
 
                 {/* Sidebar */}

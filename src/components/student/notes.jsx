@@ -4,7 +4,7 @@ import Header from "./shared/navbar";
 import SideNav from "./shared/sidenav";
 import { Link } from "react-router-dom";
 import Loading from "../sharedComponents/loader";
-import AlertModal from "../sharedComponents/alertModal";
+import AlertBox from "../sharedComponents/alert";
 import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
 import { Document, Page, pdfjs } from "react-pdf";
 
@@ -17,9 +17,10 @@ class Notes extends Component {
             subjectItems: [],
             notesData: "",
             chapterId: this.props.match.params.chapterId,
-            topicName: this.props.match.params.topicName,
+            topicName: "",
             page_loading: true,
-            showAlertModal: false,
+            errorMsg: "",
+            showErrorAlert: false,
             numPages: null,
             pageNumber: 1,
         };
@@ -31,13 +32,18 @@ class Notes extends Component {
             "Content-Type": "application/json",
             Authorization: this.authToken,
         };
-        this.collapsed = [];
         pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
     }
 
     toggleSideNav = () => {
         this.setState({
             showSideNav: !this.state.showSideNav,
+        });
+    };
+
+    toggleErrorAlert = () => {
+        this.setState({
+            showErrorAlert: false,
         });
     };
 
@@ -54,6 +60,7 @@ class Notes extends Component {
         });
     };
 
+    // loads notes data
     loadNotesData = () => {
         fetch(
             `${this.url}/student/subject/${this.subjectId}/chapter/${this.state.chapterId}/notes/?topic_name=${this.state.topicName}`,
@@ -72,8 +79,8 @@ class Notes extends Component {
                     });
                 } else {
                     this.setState({
-                        alertMsg: result.detail ? result.detail : result.msg,
-                        showAlertModal: true,
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
                         page_loading: false,
                     });
                 }
@@ -84,16 +91,6 @@ class Notes extends Component {
     };
 
     componentDidMount = () => {
-        this.setState(
-            {
-                chapterId: this.props.match.params.chapterId,
-                topicName: this.props.match.params.topicName,
-            },
-            () => {
-                this.loadNotesData();
-            }
-        );
-
         fetch(`${this.url}/student/subject/${this.subjectId}/`, {
             method: "GET",
             headers: this.headers,
@@ -104,19 +101,44 @@ class Notes extends Component {
                 if (result.sts === true) {
                     this.setState({
                         subjectItems: result.data,
-                        page_loading: false,
                     });
                     let collapsed = [];
+                    let topicName = "";
                     for (let i = 0; i < result.data.chapters.length; i++) {
-                        collapsed.push(i === 0 ? false : true);
+                        // adds collapse state
+                        collapsed.push(
+                            result.data.chapters[i].chapter_id ===
+                                this.state.chapterId
+                                ? false
+                                : true
+                        );
+                        // extract topic name from the current chapter
+                        if (
+                            result.data.chapters[i].chapter_id ===
+                            this.state.chapterId
+                        ) {
+                            topicName =
+                                result.data.chapters[i].topics.length !== 0
+                                    ? result.data.chapters[i].topics[0]
+                                          .chapter_structure[0].topic_name
+                                    : "Topic";
+                        } else {
+                            continue;
+                        }
                     }
-                    this.setState({
-                        collapsed: collapsed,
-                    });
+                    this.setState(
+                        {
+                            collapsed: collapsed,
+                            topicName: topicName,
+                        },
+                        () => {
+                            this.loadNotesData();
+                        }
+                    );
                 } else {
                     this.setState({
-                        alertMsg: result.detail ? result.detail : result.msg,
-                        showAlertModal: true,
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
                         page_loading: false,
                     });
                 }
@@ -126,6 +148,7 @@ class Notes extends Component {
             });
     };
 
+    // loads data on selecting a topic
     handleSelect = (chapterId, topicName) => {
         this.setState(
             {
@@ -148,6 +171,7 @@ class Notes extends Component {
     goToNextPage = () =>
         this.setState((state) => ({ pageNumber: state.pageNumber + 1 }));
 
+    // topic list
     topic = (data, index, chapter_id) => {
         const nestedTopics = (data.child || []).map((topic, index) => {
             return this.topic(topic, index, chapter_id);
@@ -195,20 +219,21 @@ class Notes extends Component {
                     togglenav={this.toggleSideNav}
                 />
 
+                {/* ALert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg="NODATA"
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={false}
+                    toggleSuccessAlert=""
+                    toggleErrorAlert={this.toggleErrorAlert}
+                />
+
                 {/* Sidebar */}
                 <SideNav
                     shownav={this.state.showSideNav}
                     activeLink="dashboard"
                 />
-
-                {/* ALert modal */}
-                {this.state.showAlertModal ? (
-                    <AlertModal
-                        show={this.state.showAlertModal}
-                        msg={this.state.alertMsg}
-                        goBack={this.props.history.goBack}
-                    />
-                ) : null}
 
                 <div
                     className={`section content ${
@@ -246,24 +271,22 @@ class Notes extends Component {
                             </ol>
                         </nav>
 
-                        {/* Chapter list */}
                         <div className="card shadow-sm">
                             <div className="card-body">
                                 <div className="row">
+                                    {/* Chapter list */}
                                     <div className="col-md-3 mb-2 mb-md-0 border-right">
                                         <div className="card">
-                                            <Accordion defaultActiveKey="chapter-0">
+                                            <Accordion
+                                                defaultActiveKey={
+                                                    this.state.chapterId
+                                                }
+                                            >
                                                 {chapter.length !== 0
                                                     ? chapter.chapters
                                                           .length !== 0
                                                         ? chapter.chapters.map(
                                                               (data, index) => {
-                                                                  this.collapsed.push(
-                                                                      index ===
-                                                                          0
-                                                                          ? false
-                                                                          : true
-                                                                  );
                                                                   return (
                                                                       <Card
                                                                           className="mb-1"
@@ -275,7 +298,9 @@ class Notes extends Component {
                                                                               as={
                                                                                   Card.Header
                                                                               }
-                                                                              eventKey={`chapter-${index}`}
+                                                                              eventKey={
+                                                                                  data.chapter_id
+                                                                              }
                                                                               className="pinkrange-bg shadow-sm mb-2"
                                                                               style={{
                                                                                   cursor:
@@ -314,7 +339,9 @@ class Notes extends Component {
                                                                           </Accordion.Toggle>
 
                                                                           <Accordion.Collapse
-                                                                              eventKey={`chapter-${index}`}
+                                                                              eventKey={
+                                                                                  data.chapter_id
+                                                                              }
                                                                           >
                                                                               <Card>
                                                                                   {/* Topic list */}
@@ -347,6 +374,7 @@ class Notes extends Component {
                                             </Accordion>
                                         </div>
                                     </div>
+                                    {/* Notes data */}
                                     <div className="col-md-9 pl-md-0">
                                         <div className="card">
                                             <div className="card-body">

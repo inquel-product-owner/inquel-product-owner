@@ -91,18 +91,6 @@ const teacherRoutes = (
         />
         <Route
             exact
-            path="/teacher/student/:studentId/direct-test"
-            render={(props) =>
-                !localStorage.getItem("Authorization") ||
-                !localStorage.getItem("is_teacher") ? (
-                    <Redirect to="/teacher/login" />
-                ) : (
-                    <EvaluateStudents {...props} />
-                )
-            }
-        />
-        <Route
-            exact
             path="/teacher/subject/:subjectId"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
@@ -235,6 +223,18 @@ const teacherRoutes = (
         />
         <Route
             exact
+            path="/teacher/subject/:subjectId/semester/:semesterId/direct/student/:studentId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <EvaluateStudents {...props} />
+                )
+            }
+        />
+        <Route
+            exact
             path="/teacher/subject/:subjectId/chapter/:chapterId/cycle/:cycle_testId"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
@@ -266,6 +266,18 @@ const teacherRoutes = (
                     <Redirect to="/teacher/login" />
                 ) : (
                     <CyleTestDirect {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/teacher/subject/:subjectId/chapter/:chapterId/cycle/:cycle_testId/direct/student/:studentId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <EvaluateStudents {...props} />
                 )
             }
         />

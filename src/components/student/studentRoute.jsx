@@ -5,8 +5,11 @@ import Dashboard from "./dashboard";
 import Leaderboard from "./leaderBoard";
 
 import Subject from "./subject";
+import TestResult from "./testResult";
 import Summary from "./summary";
 import Notes from "./notes";
+import FlashCard from "./learnFlashCard";
+
 import CycleTest from "./cycleTest";
 import DirectExam from "./directExam";
 import CycleTestQA from "./cycleTestQA";
@@ -48,13 +51,25 @@ const studentRoutes = (
 
         <Route
             exact
-            path="/student/subject/:subjectId/"
+            path="/student/subject/:subjectId"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (
                     <Redirect to="/student/login" />
                 ) : (
                     <Subject {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/student/subject/:subjectId/results"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/student/login" />
+                ) : (
+                    <TestResult {...props} />
                 )
             }
         />
@@ -72,7 +87,7 @@ const studentRoutes = (
         />
         <Route
             exact
-            path="/student/subject/:subjectId/chapter/:chapterId/:topicName/notes"
+            path="/student/subject/:subjectId/chapter/:chapterId/notes"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (
@@ -84,7 +99,22 @@ const studentRoutes = (
         />
         <Route
             exact
-            path="/student/subject/:subjectId/:chapterName/cycle-test"
+            path="/student/subject/:subjectId/chapter/:chapterId/:topicName/learn"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/student/login" />
+                ) : (
+                    <FlashCard {...props} />
+                )
+            }
+        />
+
+        {/* ---------- Cycle test ---------- */}
+
+        <Route
+            exact
+            path="/student/subject/:subjectId/chapter/:chapterId/cycle/:cycleTestId"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (
@@ -96,7 +126,7 @@ const studentRoutes = (
         />
         <Route
             exact
-            path="/student/subject/:subjectId/:chapterName/:sectionId/cycle-test"
+            path="/student/subject/:subjectId/chapter/:chapterId/cycle/:cycleTestId/test"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (
@@ -108,7 +138,7 @@ const studentRoutes = (
         />
         <Route
             exact
-            path="/student/subject/:subjectId/:chapterName/direct-exam"
+            path="/student/subject/:subjectId/chapter/:chapterId/cycle/:cycleTestId/direct"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (
