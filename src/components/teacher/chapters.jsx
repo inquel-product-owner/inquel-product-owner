@@ -15,6 +15,7 @@ import Select from "react-select";
 import { Link } from "react-router-dom";
 import Loading from "../sharedComponents/loader";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
+import AlertBox from "../sharedComponents/alert";
 
 class TopicModal extends Component {
     constructor(props) {
@@ -48,7 +49,7 @@ class TopicModal extends Component {
 
         const chapters = this.state.chapters;
 
-        function formatData(arr, parentId, topic_name) {
+        function formatData(arr, parentId, topic_name, ancestor) {
             arr.forEach((i) => {
                 if (i.topic_num === parentId) {
                     i.child = [
@@ -59,10 +60,11 @@ class TopicModal extends Component {
                             parent_id: parentId,
                             next_topic: "",
                             child: [],
+                            ancestor: ancestor,
                         },
                     ];
                 } else {
-                    formatData(i.child, parentId, topic_name);
+                    formatData(i.child, parentId, topic_name, ancestor);
                 }
             });
             return arr;
@@ -77,12 +79,16 @@ class TopicModal extends Component {
                 parent_id: this.props.activeTopic,
                 next_topic: "",
                 child: [],
+                ancestor: `${this.props.activeTopic}.${
+                    chapters.chapter_structure.length + 1
+                }`,
             });
         } else {
             chapters.chapter_structure = formatData(
                 chapters.chapter_structure,
                 this.props.activeTopic,
-                this.state.topic_name
+                this.state.topic_name,
+                this.props.ancestor
             );
         }
 
@@ -494,6 +500,7 @@ class Chapters extends Component {
             chapterId: "",
             chapterName: "",
             activeTopic: "",
+            ancestor: "",
             chapters: {
                 topic_id: "",
                 chapter_id: this.props.match.params.chapterId,
@@ -501,8 +508,13 @@ class Chapters extends Component {
             },
             cycle_test: [],
             selectedCycleData: [],
+            next_topic: [],
             is_independent: false,
 
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
             page_loading: true,
             is_topicFormSubmitted: false,
             is_cycleTestFormSubmitted: false,
@@ -523,16 +535,28 @@ class Chapters extends Component {
         });
     };
 
+    toggleSuccessAlert = () => {
+        this.setState({
+            showSuccessAlert: false,
+        });
+    };
+    toggleErrorAlert = () => {
+        this.setState({
+            showErrorAlert: false,
+        });
+    };
+
     toggleCollapse = () => {
         this.setState({
             collapsed: !this.state.collapsed,
         });
     };
 
-    toggleModal = (index) => {
+    toggleModal = (index, ancestor) => {
         this.setState({
             showModal: !this.state.showModal,
             activeTopic: index,
+            ancestor: ancestor,
         });
     };
 
@@ -574,6 +598,10 @@ class Chapters extends Component {
                             result.data.chapter_name !== undefined
                                 ? result.data.chapter_name
                                 : "Chapter name",
+                        next_topic:
+                            result.data.topics_list !== undefined
+                                ? result.data.topics_list
+                                : [],
                         page_loading: false,
                     });
                 }
@@ -720,9 +748,56 @@ class Chapters extends Component {
         );
     };
 
-    topic = (data, index) => {
+    handleNextTopic = (event, topic_num, topic_id) => {
+        this.setState({
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            page_loading: true,
+        });
+
+        if (event.target.value !== "") {
+            fetch(
+                `${this.url}/teacher/subject/${this.subjectId}/chapter/topics/next/`,
+                {
+                    method: "POST",
+                    headers: this.headers,
+                    body: JSON.stringify({
+                        chapter_id: this.state.chapterId,
+                        topic_num: topic_num,
+                        topic_id: topic_id,
+                        next_topic: event.target.value,
+                    }),
+                }
+            )
+                .then((res) => res.json())
+                .then((result) => {
+                    if (result.sts === true) {
+                        this.setState({
+                            successMsg: result.msg,
+                            showSuccessAlert: true,
+                        });
+                        this.loadChapterData();
+                    } else {
+                        this.setState({
+                            errorMsg: result.detail
+                                ? result.detail
+                                : result.msg,
+                            showErrorAlert: true,
+                            page_loading: false,
+                        });
+                    }
+                });
+        } else {
+            this.setState({
+                errorMsg: "Select a topic",
+                showErrorAlert: true,
+            });
+        }
+    };
+
+    topic = (data, index, topic_id) => {
         const nestedTopics = (data.child || []).map((topic, index) => {
-            return this.topic(topic, index);
+            return this.topic(topic, index, topic_id);
         });
 
         return (
@@ -733,14 +808,16 @@ class Chapters extends Component {
                 >
                     <button
                         className="btn btn-primary-invert shadow-sm ml-2"
-                        onClick={() => this.toggleModal(data.topic_num)}
+                        onClick={() =>
+                            this.toggleModal(data.topic_num, data.ancestor)
+                        }
                     >
                         <i className="fas fa-plus-circle"></i>
                     </button>
                     <Card.Header className="small light-bg w-100">
                         <div className="row align-items-center">
                             <div className="col-md-4 mb-2 mb-md-0">
-                                <div className="row">
+                                <div className="row align-items-center">
                                     <div className="col-md-2 col-3">
                                         {data.topic_num}
                                     </div>
@@ -800,7 +877,7 @@ class Chapters extends Component {
                                     </div>
                                     <div className="col-md-2 mb-2 mb-md-0">
                                         <Link
-                                            to={`${this.props.match.url}/${data.topic_name}/concepts`}
+                                            to={`${this.props.match.url}/${data.topic_name}/${data.ancestor}/concepts`}
                                         >
                                             <button
                                                 className="btn btn-primary btn-sm"
@@ -816,7 +893,7 @@ class Chapters extends Component {
                                     </div>
                                     <div className="col-md-2 mb-2 mb-md-0">
                                         <Link
-                                            to={`${this.props.match.url}/${data.topic_name}/type1`}
+                                            to={`${this.props.match.url}/${data.topic_name}/${data.ancestor}/type1`}
                                         >
                                             <button
                                                 className="btn btn-primary btn-sm"
@@ -850,8 +927,37 @@ class Chapters extends Component {
                                         <select
                                             name="next_topic"
                                             className="form-control form-control-sm border-secondary"
+                                            value={data.next_topic}
+                                            onChange={(event) =>
+                                                this.handleNextTopic(
+                                                    event,
+                                                    data.topic_num,
+                                                    topic_id
+                                                )
+                                            }
                                         >
-                                            <option value="">Next topic</option>
+                                            <option value="">Select...</option>
+                                            {this.state.next_topic !== undefined
+                                                ? this.state.next_topic
+                                                      .length !== 0
+                                                    ? this.state.next_topic.map(
+                                                          (topic, index) => {
+                                                              return (
+                                                                  <option
+                                                                      value={
+                                                                          topic
+                                                                      }
+                                                                      key={
+                                                                          index
+                                                                      }
+                                                                  >
+                                                                      {topic}
+                                                                  </option>
+                                                              );
+                                                          }
+                                                      )
+                                                    : ""
+                                                : ""}
                                         </select>
                                     </div>
                                 </div>
@@ -882,6 +988,16 @@ class Chapters extends Component {
                     togglenav={this.toggleSideNav}
                 />
 
+                {/* ALert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={this.toggleSuccessAlert}
+                    toggleErrorAlert={this.toggleErrorAlert}
+                />
+
                 {/* Sidebar */}
                 <SideNav
                     shownav={this.state.showSideNav}
@@ -897,6 +1013,7 @@ class Chapters extends Component {
                         subjectId={this.subjectId}
                         chapters={this.state.chapters}
                         activeTopic={this.state.activeTopic}
+                        ancestor={this.state.ancestor}
                     />
                 ) : (
                     ""
@@ -1053,7 +1170,10 @@ class Chapters extends Component {
                                                           (data, index) => {
                                                               return this.topic(
                                                                   data,
-                                                                  index
+                                                                  index,
+                                                                  this.state
+                                                                      .chapters
+                                                                      .topic_id
                                                               );
                                                           }
                                                       )
@@ -1168,7 +1288,7 @@ class Chapters extends Component {
 
                         <button
                             className="btn btn-tomato btn-block shadow-sm"
-                            onClick={() => this.toggleModal("1")}
+                            onClick={() => this.toggleModal("1", "0")}
                         >
                             Add Topic
                         </button>

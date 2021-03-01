@@ -114,7 +114,7 @@ class Subject extends Component {
                         for (let i = 0; i < topics[chapter_index].length; i++) {
                             if (
                                 topics_completed[chapter_index].includes(
-                                    topics[chapter_index][i].topic_name
+                                    topics[chapter_index][i].topic_num
                                 )
                             ) {
                                 topics[chapter_index][i].isCompleted = true;
@@ -227,7 +227,7 @@ class Subject extends Component {
                 topics[chapter_index][i].isCompleted = !topics[chapter_index][i]
                     .isCompleted;
             }
-            temp[topics[chapter_index][i].topic_name] =
+            temp[topics[chapter_index][i].topic_num] =
                 topics[chapter_index][i].isCompleted;
         }
 
@@ -249,7 +249,7 @@ class Subject extends Component {
             } else {
                 topics[chapter_index][i].isCompleted = true;
             }
-            temp[topics[chapter_index][i].topic_name] =
+            temp[topics[chapter_index][i].topic_num] =
                 topics[chapter_index][i].isCompleted;
         }
 
@@ -267,7 +267,7 @@ class Subject extends Component {
             {
                 method: "POST",
                 headers: this.headers,
-                body: JSON.stringify({ topic_name: data }),
+                body: JSON.stringify({ topic_num: data }),
             }
         )
             .then((res) => res.json())
@@ -292,6 +292,7 @@ class Subject extends Component {
                     this.setState({
                         errorMsg: result.detail ? result.detail : result.msg,
                         showErrorAlert: true,
+                        page_loading: false,
                     });
                 }
             })
@@ -320,7 +321,7 @@ class Subject extends Component {
                                 </div>
                                 <div className="col-md-10 col-9">
                                     <Link
-                                        to={`${this.props.match.url}/chapter/${data.chapter_id}/${data.topic_name}/learn`}
+                                        to={`${this.props.match.url}/chapter/${chapter_id}/${data.topic_name}/learn`}
                                         className="primary-text"
                                     >
                                         {data.topic_name}
@@ -338,15 +339,15 @@ class Subject extends Component {
                                 <div className="col-md-2 mb-2 mb-md-0">
                                     Remarks
                                 </div>
-                                <div className="col-md-2 mb-2 mb-md-0">1.2</div>
+                                <div className="col-md-2 mb-2 mb-md-0">{data.next_topic}</div>
                                 <div className="col-md-2 mb-2 mb-md-0 text-right">
                                     <button
-                                        className={`btn btn-sm ${
+                                        className={`btn btn-sm shadow-none ${
                                             topics_completed[chapter_index] !==
                                             undefined
                                                 ? topics_completed[
                                                       chapter_index
-                                                  ].includes(data.topic_name)
+                                                  ].includes(data.topic_num)
                                                     ? "text-success"
                                                     : "text-muted"
                                                 : "text-muted"
@@ -406,7 +407,7 @@ class Subject extends Component {
                                                 <Link
                                                     to={`${this.props.match.url}/chapter/${data.chapter_id}/cycle/${data.cycle_test_id}/direct`}
                                                 >
-                                                    <button className="btn btn-primary btn-sm">
+                                                    <button className="btn btn-primary btn-sm shadow-none">
                                                         Start
                                                     </button>
                                                 </Link>
@@ -414,7 +415,7 @@ class Subject extends Component {
                                                 <Link
                                                     to={`${this.props.match.url}/chapter/${data.chapter_id}/cycle/${data.cycle_test_id}`}
                                                 >
-                                                    <button className="btn btn-primary btn-sm">
+                                                    <button className="btn btn-primary btn-sm shadow-none">
                                                         Start
                                                     </button>
                                                 </Link>
@@ -651,7 +652,7 @@ class Subject extends Component {
                                                                           <div className="col-md-2 mb-2 mb-md-0"></div>
                                                                           <div className="col-md-2 text-right mb-2 mb-md-0">
                                                                               <button
-                                                                                  className={`btn btn-sm ${
+                                                                                  className={`btn btn-sm shadow-none ${
                                                                                       this
                                                                                           .state
                                                                                           .topics

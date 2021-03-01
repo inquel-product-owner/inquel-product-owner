@@ -5,22 +5,13 @@ import Header from "./navbar";
 import SideNav from "./sidenav";
 import CKeditor from "../sharedComponents/CKeditor";
 import ReactSwitch from "../sharedComponents/switchComponent";
-import {
-    Accordion,
-    Card,
-    Alert,
-    Spinner,
-    Modal,
-    Tab,
-    Nav,
-} from "react-bootstrap";
+import { Accordion, Card, Alert, Spinner, Modal } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import ReactCardFlip from "react-card-flip";
 import Loading from "../sharedComponents/loader";
 import AlertModal from "../sharedComponents/alertModal";
-import { Player } from "video-react";
-import "video-react/dist/video-react.css";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import FileModal from "./shared/fileExplorer";
 
 const mapStateToProps = (state) => ({
     subject_name: state.subject_name,
@@ -167,207 +158,6 @@ class ConceptsDeleteModal extends Component {
     }
 }
 
-class FileModal extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            image: this.props.image,
-            video: this.props.video,
-            audio: this.props.audio,
-            selectedImage: 0,
-            selectedImageData: [],
-        };
-        this.url = baseUrl + teacherUrl;
-        this.authToken = localStorage.getItem("Authorization");
-        this.headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: this.authToken,
-        };
-    }
-
-    changeImage = (image_index) => {
-        const images = [...this.state.image];
-        this.setState({
-            selectedImage: image_index,
-            selectedImageData: images[image_index],
-        });
-    };
-
-    componentDidMount = () => {
-        const images = [...this.state.image];
-        if (images[0].path !== null) {
-            this.setState({
-                selectedImageData: images[0],
-            });
-        }
-    };
-
-    render() {
-        let audio = "";
-        return (
-            <Modal
-                show={this.props.show}
-                onHide={this.props.onHide}
-                backdrop="static"
-                size="lg"
-                aria-labelledby="contained-modal-title-vcenter"
-                centered
-            >
-                <Modal.Header closeButton>Uploaded Files</Modal.Header>
-                <Modal.Body className="py-0">
-                    <Tab.Container
-                        id="left-tabs-example"
-                        defaultActiveKey="image"
-                    >
-                        <div className="row">
-                            <div
-                                className="col-md-3 py-3 mb-3 mb-md-0"
-                                style={{ borderRight: "1px solid #ccc" }}
-                            >
-                                <Nav variant="pills" className="flex-column">
-                                    <Nav.Item className="primary-nav-item">
-                                        <Nav.Link eventKey="image">
-                                            Image
-                                        </Nav.Link>
-                                    </Nav.Item>
-                                    <Nav.Item className="primary-nav-item">
-                                        <Nav.Link eventKey="video">
-                                            Video
-                                        </Nav.Link>
-                                    </Nav.Item>
-                                    <Nav.Item className="primary-nav-item">
-                                        <Nav.Link eventKey="audio">
-                                            Audio
-                                        </Nav.Link>
-                                    </Nav.Item>
-                                </Nav>
-                            </div>
-                            <div className="col-md-9 py-3">
-                                <Tab.Content>
-                                    <Tab.Pane eventKey="image">
-                                        {this.state.selectedImageData.path !==
-                                        "" ? (
-                                            <div className="card shadow-sm">
-                                                <div className="card-header text-center font-weight-bold tomato-bg">
-                                                    {this.state
-                                                        .selectedImageData
-                                                        .length !== 0
-                                                        ? this.state
-                                                              .selectedImageData
-                                                              .title
-                                                        : ""}
-                                                </div>
-                                                {/* Single image view */}
-                                                <div className="card-body text-center p-0">
-                                                    {this.state
-                                                        .selectedImageData
-                                                        .length !== 0 ? (
-                                                        <img
-                                                            src={
-                                                                this.state
-                                                                    .selectedImageData
-                                                                    .path
-                                                            }
-                                                            alt={
-                                                                this.state
-                                                                    .selectedImageData
-                                                                    .file_name
-                                                            }
-                                                            className="img-fluid"
-                                                        />
-                                                    ) : (
-                                                        ""
-                                                    )}
-                                                </div>
-                                                {/* Thumbnails */}
-                                                <div className="card-footer tomato-bg">
-                                                    <div className="row justify-content-center">
-                                                        {this.state.image.map(
-                                                            (images, index) => {
-                                                                return images.path !==
-                                                                    "" ? (
-                                                                    <div
-                                                                        key={
-                                                                            index
-                                                                        }
-                                                                        className="col-md-3"
-                                                                    >
-                                                                        <div
-                                                                            className={`card preview-img-sm ${
-                                                                                this
-                                                                                    .state
-                                                                                    .selectedImage ===
-                                                                                index
-                                                                                    ? "border-primary shadow"
-                                                                                    : ""
-                                                                            }`}
-                                                                            style={{
-                                                                                backgroundImage: `url(${images.path})`,
-                                                                            }}
-                                                                            onClick={() =>
-                                                                                this.changeImage(
-                                                                                    index
-                                                                                )
-                                                                            }
-                                                                        ></div>
-                                                                    </div>
-                                                                ) : null;
-                                                            }
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            "No images to display"
-                                        )}
-                                    </Tab.Pane>
-                                    <Tab.Pane eventKey="video">
-                                        <div className="card">
-                                            {this.state.video.path !== "" ? (
-                                                <Player>
-                                                    <source
-                                                        src={
-                                                            this.state.video
-                                                                .path
-                                                        }
-                                                    />
-                                                </Player>
-                                            ) : (
-                                                "Video not uploaded"
-                                            )}
-                                        </div>
-                                    </Tab.Pane>
-                                    <Tab.Pane eventKey="audio">
-                                        {this.state.audio.map((item, index) => {
-                                            audio =
-                                                item.path !== ""
-                                                    ? item.path
-                                                    : "";
-                                            return item.path !== "" ? (
-                                                <audio
-                                                    key={index}
-                                                    src={item.path}
-                                                    controls
-                                                ></audio>
-                                            ) : (
-                                                ""
-                                            );
-                                        })}
-                                        {audio === ""
-                                            ? "Audio not uploaded"
-                                            : ""}
-                                    </Tab.Pane>
-                                </Tab.Content>
-                            </div>
-                        </div>
-                    </Tab.Container>
-                </Modal.Body>
-            </Modal>
-        );
-    }
-}
-
 class SubjectConcepts extends Component {
     constructor(props) {
         super(props);
@@ -450,6 +240,7 @@ class SubjectConcepts extends Component {
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
         this.topicName = this.props.match.params.topicName;
+        this.ancestor = this.props.match.params.ancestor;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
@@ -741,8 +532,9 @@ class SubjectConcepts extends Component {
                 headers: this.headers,
                 method: "POST",
                 body: JSON.stringify({
-                    chapter_id: this.props.match.params.chapterId,
-                    topic_name: this.props.match.params.topicName,
+                    chapter_id: this.chapterId,
+                    topic_name: this.topicName,
+                    ancestor: this.ancestor,
                     content: {
                         terms: data[this.state.activeConcept].content.terms,
                         definition:
@@ -796,8 +588,9 @@ class SubjectConcepts extends Component {
                 headers: this.headers,
                 method: "PUT",
                 body: JSON.stringify({
-                    chapter_id: this.props.match.params.chapterId,
-                    topic_name: this.props.match.params.topicName,
+                    chapter_id: this.chapterId,
+                    topic_name: this.topicName,
+                    ancestor: this.ancestor,
                     concepts_random_id:
                         data[this.state.activeConcept].concepts_random_id,
                     content: {
@@ -984,9 +777,10 @@ class SubjectConcepts extends Component {
                                 audioCollapsed: true,
                                 settingsCollapsed: true,
                                 page_loading: true,
+                                activeConcept:''
                             });
                             this.loadConceptData();
-                        }, 2000);
+                        }, 1000);
                     }
                 );
             }
@@ -1019,9 +813,10 @@ class SubjectConcepts extends Component {
                                     audioCollapsed: true,
                                     settingsCollapsed: true,
                                     page_loading: true,
+                                    activeConcept:''
                                 });
                                 this.loadConceptData();
-                            }, 2000);
+                            }, 1000);
                         }
                     );
                 } else {
@@ -1071,9 +866,10 @@ class SubjectConcepts extends Component {
                                     audioCollapsed: true,
                                     settingsCollapsed: true,
                                     page_loading: true,
+                                    activeConcept:''
                                 });
                                 this.loadConceptData();
-                            }, 2000);
+                            }, 1000);
                         }
                     );
                 } else {
@@ -2048,28 +1844,34 @@ class SubjectConcepts extends Component {
         let boards = [...this.state.keyboards];
         let isImageAvailable = false;
         if (this.state.activeConcept !== "") {
-            for (
-                let i = 0;
-                i < data[this.state.activeConcept].content.images.length;
-                i++
-            ) {
-                isImageAvailable =
-                    data[this.state.activeConcept].content.images[i].path !== ""
-                        ? true
-                        : false;
+            if (data[this.state.activeConcept].content !== undefined) {
+                for (
+                    let i = 0;
+                    i < data[this.state.activeConcept].content.images.length;
+                    i++
+                ) {
+                    isImageAvailable =
+                        data[this.state.activeConcept].content.images[i]
+                            .path !== ""
+                            ? true
+                            : false;
+                }
             }
         }
         let isAudioAvailable = false;
         if (this.state.activeConcept !== "") {
-            for (
-                let i = 0;
-                i < data[this.state.activeConcept].content.audio.length;
-                i++
-            ) {
-                isAudioAvailable =
-                    data[this.state.activeConcept].content.audio[i].path !== ""
-                        ? true
-                        : false;
+            if (data[this.state.activeConcept].content !== undefined) {
+                for (
+                    let i = 0;
+                    i < data[this.state.activeConcept].content.audio.length;
+                    i++
+                ) {
+                    isAudioAvailable =
+                        data[this.state.activeConcept].content.audio[i].path !==
+                        ""
+                            ? true
+                            : false;
+                }
             }
         }
         return (
@@ -2283,28 +2085,70 @@ class SubjectConcepts extends Component {
                                                     }
                                                     flipDirection="vertical"
                                                 >
-                                                    <div className="card shadow-sm">
+                                                    <div
+                                                        className={`card shadow-sm ${
+                                                            this.state
+                                                                .activeConcept ===
+                                                            c_index
+                                                                ? "border-primary"
+                                                                : ""
+                                                        }`}
+                                                    >
                                                         <div className="card-body">
-                                                            {/* Front-view */}
-                                                            <div className="card">
-                                                                <div
-                                                                    className="card-body"
-                                                                    onClick={() =>
-                                                                        this.handleFlip(
-                                                                            c_index
-                                                                        )
-                                                                    }
-                                                                    dangerouslySetInnerHTML={{
-                                                                        __html:
-                                                                            concept
-                                                                                .content
-                                                                                .terms,
-                                                                    }}
-                                                                ></div>
+                                                            <div className="row">
+                                                                {/* term */}
+                                                                <div className="col-md-11 pr-md-0">
+                                                                    {/* Front-view */}
+                                                                    <div className="card">
+                                                                        <div
+                                                                            className="card-body"
+                                                                            onClick={() =>
+                                                                                this.handleFlip(
+                                                                                    c_index
+                                                                                )
+                                                                            }
+                                                                            dangerouslySetInnerHTML={{
+                                                                                __html:
+                                                                                    concept
+                                                                                        .content
+                                                                                        .terms,
+                                                                            }}
+                                                                        ></div>
+                                                                    </div>
+                                                                </div>
+                                                                {/* File modal button */}
+                                                                <div className="col-1 pl-0 text-right">
+                                                                    <button
+                                                                        className="btn btn-light bg-white shadow-sm"
+                                                                        onClick={() =>
+                                                                            this.toggleModal(
+                                                                                concept
+                                                                                    .content
+                                                                                    .images,
+                                                                                concept
+                                                                                    .content
+                                                                                    .video,
+                                                                                concept
+                                                                                    .content
+                                                                                    .audio
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <i className="far fa-folder-open"></i>
+                                                                    </button>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div className="card shadow-sm">
+                                                    <div
+                                                        className={`card shadow-sm ${
+                                                            this.state
+                                                                .activeConcept ===
+                                                            c_index
+                                                                ? "border-primary"
+                                                                : ""
+                                                        }`}
+                                                    >
                                                         <div className="card-body">
                                                             <div className="row">
                                                                 {/* definition */}
@@ -2397,6 +2241,7 @@ class SubjectConcepts extends Component {
                                                     imageCollapsed: true,
                                                     audioCollapsed: true,
                                                     settingsCollapsed: true,
+                                                    activeConcept:''
                                                 });
                                             }}
                                         >
