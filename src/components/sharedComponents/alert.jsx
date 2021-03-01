@@ -8,8 +8,8 @@ class AlertBox extends React.Component {
             this.props.showSuccessAlert === true
         ) {
             setTimeout(() => {
-                this.props.toggleAlert();
-            }, 5000);
+                this.props.toggleSuccessAlert();
+            }, 3000);
         }
         // if (
         //     prevProps.showErrorAlert !== this.props.showErrorAlert &&
@@ -29,7 +29,7 @@ class AlertBox extends React.Component {
                     className="fixed-top alert-top shadow-sm"
                     show={this.props.showErrorAlert}
                     onClose={() => {
-                        this.props.toggleAlert();
+                        this.props.toggleErrorAlert();
                     }}
                     dismissible
                 >
@@ -43,7 +43,7 @@ class AlertBox extends React.Component {
                     className="fixed-top alert-top shadow-sm"
                     show={this.props.showSuccessAlert}
                     onClose={() => {
-                        this.props.toggleAlert();
+                        this.props.toggleSuccessAlert();
                     }}
                     dismissible
                 >

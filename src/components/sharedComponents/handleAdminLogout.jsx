@@ -10,7 +10,6 @@ class Logout extends React.Component {
         this.state = {
             timeout: 1000 * 60 * 30,
             showModal: false,
-            userLoggedIn: false,
             isTimedOut: false,
             isLoggedOut: false,
         };
@@ -26,7 +25,7 @@ class Logout extends React.Component {
     };
 
     onIdle = () => {
-        if (!this.state.isTimedOut) {
+        if (!this.state.isTimedOut && localStorage.getItem("Inquel-Auth")) {
             this.setState({ showModal: true });
             this.idleTimer.reset();
             this.setState({ isTimedOut: true });

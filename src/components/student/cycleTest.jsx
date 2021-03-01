@@ -1,22 +1,23 @@
 import React, { Component } from "react";
-import Header from "./shared/navbar";
-import SideNav from "./shared/sidenav";
-import Select from "react-select";
+import Header from "./shared/examNavbar";
 import { Link } from "react-router-dom";
-import { Modal, Alert, Spinner } from "react-bootstrap";
+import { Modal, Alert } from "react-bootstrap";
 import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
+import AlertBox from "../sharedComponents/alert";
 import Loading from "../sharedComponents/loader";
 
-class Scorecard extends Component {
-    constructor() {
-        super();
+class ExamStartModal extends Component {
+    constructor(props) {
+        super(props);
         this.state = {
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
-            showLoader: false,
         };
+        this.subjectId = this.props.subjectId;
+        this.chapterId = this.props.chapterId;
+        this.cycleTestId = this.props.cycleTestId;
         this.url = baseUrl + studentUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
@@ -25,17 +26,34 @@ class Scorecard extends Component {
             Authorization: this.authToken,
         };
     }
+    componentDidMount = () => {
+        fetch(
+            `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/cycletest/`,
+            {
+                method: "POST",
+                headers: this.headers,
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
 
     render() {
         return (
             <Modal
                 show={this.props.show}
                 onHide={this.props.onHide}
-                size="lg"
+                size="md"
+                backdrop="static"
+                keyboard={false}
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
-                <Modal.Header closeButton>Scorecard Configuration</Modal.Header>
                 <Modal.Body>
                     <Alert
                         variant="danger"
@@ -61,87 +79,7 @@ class Scorecard extends Component {
                     >
                         {this.state.successMsg}
                     </Alert>
-
-                    <div className="table-responsive">
-                        <table className="table">
-                            <thead>
-                                <th scope="col">Range in %</th>
-                                <th scope="col">Retake Duration</th>
-                                <th scope="col">Reducation %</th>
-                                <th scope="col">Reducation Duration</th>
-                                <th scope="col">Remarks</th>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td className="d-flex align-items-center">
-                                        <input
-                                            type="number"
-                                            name="range1"
-                                            id="range1"
-                                            className="form-control form-shadow"
-                                        />
-                                        to
-                                        <input
-                                            type="number"
-                                            name="range2"
-                                            id="range2"
-                                            className="form-control form-shadow"
-                                        />
-                                    </td>
-                                    <td>
-                                        <input
-                                            type="text"
-                                            name="retake"
-                                            id="retake"
-                                            className="form-control form-shadow"
-                                        />
-                                    </td>
-                                    <td>
-                                        <input
-                                            type="text"
-                                            name="reducation"
-                                            id="reducation"
-                                            className="form-control form-shadow"
-                                        />
-                                    </td>
-                                    <td>
-                                        <input
-                                            type="text"
-                                            name="duration"
-                                            id="duration"
-                                            className="form-control form-shadow"
-                                        />
-                                    </td>
-                                    <td>
-                                        <input
-                                            type="text"
-                                            name="remarks"
-                                            id="remarks"
-                                            className="form-control form-shadow"
-                                        />
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
                 </Modal.Body>
-                <Modal.Footer className="text-right">
-                    <button className="btn btn-primary">
-                        {this.state.showLoader ? (
-                            <Spinner
-                                as="span"
-                                animation="border"
-                                size="sm"
-                                role="status"
-                                aria-hidden="true"
-                                className="mr-2"
-                            />
-                        ) : (
-                            ""
-                        )}
-                        Save & Close
-                    </button>
-                </Modal.Footer>
             </Modal>
         );
     }
@@ -151,15 +89,20 @@ class CycleTest extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
-            showModal: false,
-            chapterList: [],
-            chapterName: "",
+            subject_name: "",
+            chapter_name: "",
+            cycleTestItem: [],
+
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
             page_loading: true,
-            is_formSubmitted: false,
+            showModal: false,
         };
         this.subjectId = this.props.match.params.subjectId;
-        this.chapterName = this.props.match.params.chapterName;
+        this.chapterId = this.props.match.params.chapterId;
+        this.cycleTestId = this.props.match.params.cycleTestId;
         this.url = baseUrl + studentUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
@@ -169,9 +112,14 @@ class CycleTest extends Component {
         };
     }
 
-    toggleSideNav = () => {
+    toggleSuccessAlert = () => {
         this.setState({
-            showSideNav: !this.state.showSideNav,
+            showSuccessAlert: false,
+        });
+    };
+    toggleErrorAlert = () => {
+        this.setState({
+            showErrorAlert: false,
         });
     };
 
@@ -181,270 +129,181 @@ class CycleTest extends Component {
         });
     };
 
-    componentDidMount = () => {
-        this.setState({
-            chapterName: this.props.match.params.chapterName,
-        });
-
-        fetch(`${this.url}/student/subject/${this.subjectId}/`, {
-            headers: this.headers,
-            method: "GET",
-        })
+    loadCycleTestData = () => {
+        fetch(
+            `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/cycletest/?cycle_test_id=${this.cycleTestId}`,
+            {
+                method: "GET",
+                headers: this.headers,
+            }
+        )
             .then((res) => res.json())
             .then((result) => {
-                this.setState({
-                    chapterList: result.data.results,
-                    page_loading: false,
-                });
                 console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        cycleTestItem: result.data,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
             });
     };
 
-    componentDidUpdate = (prevProps, prevState) => {
-        if (this.props.match.params.chapterName !== this.state.chapterName) {
-            this.setState({
-                chapterName: this.props.match.params.chapterName,
+    componentDidMount = () => {
+        fetch(`${this.url}/student/subject/${this.subjectId}/`, {
+            method: "GET",
+            headers: this.headers,
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    let chapter_name = "";
+                    // extract currently selected chapter name
+                    for (let i = 0; i < result.data.chapters.length; i++) {
+                        if (
+                            result.data.chapters[i].chapter_id ===
+                            this.chapterId
+                        ) {
+                            chapter_name = result.data.chapters[i].chapter_name;
+                        } else {
+                            continue;
+                        }
+                    }
+                    this.setState({
+                        subject_name: result.data.subject_name,
+                        chapter_name: chapter_name,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
             });
-        }
 
-        if (
-            prevState.is_formSubmitted !== this.state.is_formSubmitted &&
-            this.state.is_formSubmitted === true
-        ) {
-            this.loadChapterData();
-            this.setState({
-                is_formSubmitted: false,
-            });
-        }
-    };
-
-    formSubmission = (is_formSubmitted) => {
-        if (is_formSubmitted) {
-            this.setState({
-                is_formSubmitted: true,
-            });
-        }
-    };
-
-    handleSelect = (event) => {
-        this.props.history.push({
-            pathname: `/student/subject/${this.subjectId}/${event.value}`,
-        });
-        this.setState({
-            chapterName: event.value,
-        });
+        this.loadCycleTestData();
     };
 
     render() {
-        document.title = `${this.state.chapterName} - Student | IQLabs`;
+        document.title = `${this.state.chapter_name} Cycle Test - Teacher | IQLabs`;
         return (
-            <div className="wrapper">
+            <>
                 {/* Navbar */}
-                <Header name="Subject name" togglenav={this.toggleSideNav} />
-
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="dashboard"
+                <Header
+                    name={this.state.subject_name}
+                    chapter_name={`${this.state.chapter_name} - ${this.state.cycleTestItem.cycle_test_name}`}
+                    goBack={this.props.history.goBack}
                 />
 
-                {/* Scorecard modal */}
-                {this.state.showModal ? (
-                    <Scorecard
-                        show={this.state.showModal}
-                        onHide={this.toggleModal}
-                        formSubmission={this.formSubmission}
-                        subjectId={this.props.match.params.subjectId}
-                    />
-                ) : (
-                    ""
-                )}
+                {/* ALert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={this.toggleSuccessAlert}
+                    toggleErrorAlert={this.toggleErrorAlert}
+                />
 
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                >
+                {/* Add Subject modal */}
+                <ExamStartModal
+                    show={this.state.showModal}
+                    onHide={this.toggleModal}
+                    subjectId={this.subjectId}
+                    chapterId={this.chapterId}
+                    cycleTestId={this.cycleTestId}
+                />
+
+                <div className="exam-section">
                     <div className="container-fluid">
-                        {/* Back button */}
-                        <button
-                            className="btn btn-primary-invert btn-sm mb-3"
-                            onClick={this.props.history.goBack}
-                        >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
-                        </button>
-
-                        <div className="card shadow-sm mb-3">
-                            <div className="card-body text-center">
-                                <h6 className="mb-0">{this.chapterName}</h6>
-                            </div>
-                        </div>
-
-                        {/* Header configuration */}
-                        <div className="row align-items-center mb-3">
+                        <div className="row justify-content-center">
                             <div className="col-md-8">
-                                <div className="row align-items-center">
-                                    <div className="col-md-4">
-                                        <Select
-                                            className="basic-single"
-                                            placeholder={this.state.chapterName}
-                                            value={[]}
-                                            isSearchable={true}
-                                            name="chapter"
-                                            options={this.state.chapterList.map(
-                                                function (list) {
-                                                    return {
-                                                        value:
-                                                            list.chapter_name,
-                                                        label:
-                                                            list.chapter_name,
-                                                    };
-                                                }
-                                            )}
-                                            onChange={this.handleSelect}
-                                            required
-                                        />
+                                <div className="row align-items-center font-weight-bold-600 primary-text mb-3">
+                                    <div className="col-md-7">
+                                        {
+                                            this.state.cycleTestItem
+                                                .cycle_test_name
+                                        }
                                     </div>
-                                    <div className="col-md-4">
-                                        <div className="card shadow-sm">
-                                            <div className="card-body text-center py-2">
-                                                180 mins
-                                            </div>
-                                        </div>
+                                    <div className="col-md-3">
+                                        Total Time:{" "}
+                                        {
+                                            this.state.cycleTestItem
+                                                .auto_test_duration
+                                        }{" "}
+                                        mins
                                     </div>
-                                    <div className="col-md-4">
-                                        <select
-                                            name="attempt"
-                                            id="attempt"
-                                            className="form-control form-shadow"
+                                    <div className="col-md-2 text-right">
+                                        <Link
+                                            to={`${this.props.match.url}/test`}
                                         >
-                                            <option value="attempt 01">
-                                                Attempt 01
-                                            </option>
-                                            <option value="attempt 02">
-                                                Attempt 02
-                                            </option>
-                                            <option value="attempt 03">
-                                                Attempt 03
-                                            </option>
-                                            <option value="attempt 04">
-                                                Attempt 04
-                                            </option>
-                                        </select>
+                                            <button className="btn btn-primary btn-sm">
+                                                Start
+                                            </button>
+                                        </Link>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="col-md-4 text-right">
-                                <button
-                                    className="btn btn-primary btn-sm"
-                                    onClick={this.toggleModal}
-                                >
-                                    Score Configuration
-                                </button>
+
+                                <div className="card card-body secondary-bg shadow-sm mb-3">
+                                    <div className="row align-items-center font-weight-bold-600 small">
+                                        <div className="col-8">Sections</div>
+                                        <div className="col-4">
+                                            No. of Questions
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {Object.entries(this.state.cycleTestItem)
+                                    .length !== 0
+                                    ? this.state.cycleTestItem.auto_test
+                                          .length !== 0
+                                        ? this.state.cycleTestItem.auto_test.map(
+                                              (data, index) => {
+                                                  return (
+                                                      <div
+                                                          className="card card-body light-bg shadow-sm p-3 mb-2"
+                                                          key={index}
+                                                      >
+                                                          <div className="row align-items-center small">
+                                                              <div className="col-8">
+                                                                  {
+                                                                      data.section_name
+                                                                  }
+                                                              </div>
+                                                              <div className="col-4">
+                                                                  {
+                                                                      data.total_questions
+                                                                  }{" "}
+                                                                  Questions
+                                                              </div>
+                                                          </div>
+                                                      </div>
+                                                  );
+                                              }
+                                          )
+                                        : ""
+                                    : ""}
                             </div>
                         </div>
-
-                        <div className="card shadow-sm">
-                            <div className="table-responsive">
-                                <table className="table">
-                                    <thead className="primary-bg text-white">
-                                        <tr>
-                                            <th scope="col">Section</th>
-                                            <th scope="col">
-                                                Section Description
-                                            </th>
-                                            <th scope="col" className="tom">
-                                                No. of Questions
-                                            </th>
-                                            <th scope="col">Question Type</th>
-                                            <th scope="col">Category</th>
-                                            <th scope="col">Marks</th>
-                                            <th scope="col">View</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <input
-                                                    type="text"
-                                                    className="form-control form-shadow"
-                                                    placeholder="01"
-                                                />
-                                            </td>
-                                            <td>
-                                                <input
-                                                    type="text"
-                                                    className="form-control form-shadow"
-                                                    placeholder="Section Description 01"
-                                                />
-                                            </td>
-                                            <td>
-                                                <input
-                                                    className="form-control form-shadow"
-                                                    type="number"
-                                                    value="0"
-                                                />
-                                            </td>
-                                            <td>
-                                                <select
-                                                    name="type"
-                                                    id="type"
-                                                    className="form-control form-shadow"
-                                                >
-                                                    <option value="type1">
-                                                        Type 1
-                                                    </option>
-                                                    <option value="type2">
-                                                        Type 2
-                                                    </option>
-                                                </select>
-                                            </td>
-                                            <td>
-                                                <select
-                                                    name="category"
-                                                    id="category"
-                                                    className="form-control form-shadow"
-                                                >
-                                                    <option value="mcq">
-                                                        MCQ
-                                                    </option>
-                                                </select>
-                                            </td>
-                                            <td>
-                                                <input
-                                                    className="form-control form-shadow"
-                                                    type="number"
-                                                    value="0"
-                                                />
-                                            </td>
-                                            <td>
-                                                <Link
-                                                    to={`/teacher/subject/${this.subjectId}/${this.chapterName}/01/cycle-test`}
-                                                >
-                                                    <button className="btn btn-link shadow-sm">
-                                                        <i className="fas fa-eye"></i>
-                                                    </button>
-                                                </Link>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <div className="card-body">
-                                <button className="btn btn-light btn-block shadow-sm">
-                                    Add Section +
-                                </button>
-                            </div>
-                        </div>
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
-            </div>
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </>
         );
     }
 }

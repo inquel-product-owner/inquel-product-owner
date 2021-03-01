@@ -4,7 +4,7 @@ import Header from "./shared/navbar";
 import SideNav from "./shared/sidenav";
 import { Link } from "react-router-dom";
 import Loading from "../sharedComponents/loader";
-import AlertModal from "../sharedComponents/alertModal";
+import AlertBox from "../sharedComponents/alert";
 import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
 import { Document, Page, pdfjs } from "react-pdf";
 
@@ -16,8 +16,10 @@ class Summary extends Component {
             subjectItems: [],
             summaryData: "",
             chapterId: this.props.match.params.chapterId,
+            chapter_name: "",
             page_loading: true,
-            showAlertModal: false,
+            errorMsg: "",
+            showErrorAlert: false,
             numPages: null,
             pageNumber: 1,
         };
@@ -38,6 +40,13 @@ class Summary extends Component {
         });
     };
 
+    toggleErrorAlert = () => {
+        this.setState({
+            showErrorAlert: false,
+        });
+    };
+
+    // loads summary data
     loadSummaryData = () => {
         fetch(
             `${this.url}/student/subject/${this.subjectId}/chapter/${this.state.chapterId}/summary/`,
@@ -56,8 +65,8 @@ class Summary extends Component {
                     });
                 } else {
                     this.setState({
-                        alertMsg: result.detail ? result.detail : result.msg,
-                        showAlertModal: true,
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
                         page_loading: false,
                     });
                 }
@@ -87,12 +96,26 @@ class Summary extends Component {
                 if (result.sts === true) {
                     this.setState({
                         subjectItems: result.data,
-                        page_loading: false,
+                    });
+                    let chapter_name = "";
+                    // extract currently selected chapter name
+                    for (let i = 0; i < result.data.chapters.length; i++) {
+                        if (
+                            result.data.chapters[i].chapter_id ===
+                            this.state.chapterId
+                        ) {
+                            chapter_name = result.data.chapters[i].chapter_name;
+                        } else {
+                            continue;
+                        }
+                    }
+                    this.setState({
+                        chapter_name: chapter_name,
                     });
                 } else {
                     this.setState({
-                        alertMsg: result.detail ? result.detail : result.msg,
-                        showAlertModal: true,
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
                         page_loading: false,
                     });
                 }
@@ -102,10 +125,12 @@ class Summary extends Component {
             });
     };
 
-    handleSelect = (index) => {
+    // loads data on selecting a chapter
+    handleSelect = (index, chapter_name) => {
         this.setState(
             {
                 chapterId: index,
+                chapter_name: chapter_name,
                 page_loading: true,
             },
             () => {
@@ -138,20 +163,21 @@ class Summary extends Component {
                     togglenav={this.toggleSideNav}
                 />
 
+                {/* ALert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg="NODATA"
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={false}
+                    toggleSuccessAlert=""
+                    toggleErrorAlert={this.toggleErrorAlert}
+                />
+
                 {/* Sidebar */}
                 <SideNav
                     shownav={this.state.showSideNav}
                     activeLink="dashboard"
                 />
-
-                {/* ALert modal */}
-                {this.state.showAlertModal ? (
-                    <AlertModal
-                        show={this.state.showAlertModal}
-                        msg={this.state.alertMsg}
-                        goBack={this.props.history.goBack}
-                    />
-                ) : null}
 
                 <div
                     className={`section content ${
@@ -189,7 +215,6 @@ class Summary extends Component {
                             </ol>
                         </nav>
 
-                        {/* Chapter list */}
                         <div className="card shadow-sm">
                             <div className="card-body">
                                 <Tab.Container
@@ -197,6 +222,7 @@ class Summary extends Component {
                                     defaultActiveKey={this.state.chapterId}
                                 >
                                     <div className="row">
+                                        {/* chapter list */}
                                         <div className="col-md-3 mb-2 mb-md-0 border-right">
                                             <Nav
                                                 variant="pills"
@@ -215,7 +241,8 @@ class Summary extends Component {
                                                                           }
                                                                           onClick={() =>
                                                                               this.handleSelect(
-                                                                                  data.chapter_id
+                                                                                  data.chapter_id,
+                                                                                  data.chapter_name
                                                                               )
                                                                           }
                                                                       >
@@ -237,6 +264,7 @@ class Summary extends Component {
                                                     : null}
                                             </Nav>
                                         </div>
+                                        {/* summary data */}
                                         <div className="col-md-9 pl-md-0">
                                             <Tab.Content>
                                                 <Tab.Pane
@@ -256,7 +284,12 @@ class Summary extends Component {
                                                                       ) => {
                                                                           return data.direct_question_urls !==
                                                                               undefined ? (
-                                                                              <div className="text-center">
+                                                                              <div
+                                                                                  className="text-center"
+                                                                                  key={
+                                                                                      index
+                                                                                  }
+                                                                              >
                                                                                   <div id="ResumeContainer py-3">
                                                                                       <Document
                                                                                           file={
@@ -337,7 +370,11 @@ class Summary extends Component {
                                                                                   </nav>
                                                                               </div>
                                                                           ) : (
-                                                                              <>
+                                                                              <div
+                                                                                  key={
+                                                                                      index
+                                                                                  }
+                                                                              >
                                                                                   <div className="h5 font-weight-bold-600 mb-2">
                                                                                       {
                                                                                           data.summary_name
@@ -349,7 +386,7 @@ class Summary extends Component {
                                                                                               data.summary_content,
                                                                                       }}
                                                                                   ></div>
-                                                                              </>
+                                                                              </div>
                                                                           );
                                                                       }
                                                                   )
