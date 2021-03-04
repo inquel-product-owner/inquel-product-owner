@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import Header from "./shared/examNavbar";
+import { Link } from "react-router-dom";
 import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import AlertBox from "../sharedComponents/alert";
 import Loading from "../sharedComponents/loader";
 
@@ -149,7 +151,36 @@ class TestResult extends Component {
                                                                   }
                                                               </div>
                                                           </div>
-                                                          <div className="col-9"></div>
+                                                          {/* ----- Attempts score card ----- */}
+                                                          <div className="col-9">
+                                                              {data.student_cycle_test !==
+                                                              undefined
+                                                                  ? data.student_cycle_test.map(
+                                                                        (
+                                                                            attempt,
+                                                                            attempt_index
+                                                                        ) => {
+                                                                            return (
+                                                                                <OverlayTrigger
+                                                                                    key={
+                                                                                        attempt_index
+                                                                                    }
+                                                                                    placement="top"
+                                                                                    overlay={
+                                                                                        <Tooltip id="tooltip4">
+                                                                                            Good
+                                                                                        </Tooltip>
+                                                                                    }
+                                                                                >
+                                                                                    <Link to="#">
+                                                                                        <i className="fas fa-circle text-success fa-lg mx-2"></i>
+                                                                                    </Link>
+                                                                                </OverlayTrigger>
+                                                                            );
+                                                                        }
+                                                                    )
+                                                                  : ""}
+                                                          </div>
                                                       </div>
                                                   </div>
                                               );

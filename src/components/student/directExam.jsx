@@ -25,6 +25,7 @@ class DirectExam extends Component {
             pageNumber: 1,
             isFileUploaded: false,
             btnDisabled: true,
+            isExamStarted: true,
 
             errorMsg: "",
             successMsg: "",
@@ -80,7 +81,17 @@ class DirectExam extends Component {
                                 ? result.data.direct_question_urls[0]
                                 : null,
                         page_loading: false,
+                        isExamStarted: true,
                     });
+                    var currentDate = new Date();
+                    var examDate = new Date(result.data.exam_date);
+                    if (currentDate < examDate) {
+                        this.setState({
+                            isExamStarted: false,
+                            errorMsg: "Exam hasn't started yet...",
+                            showErrorAlert: true,
+                        });
+                    }
                 } else {
                     this.setState({
                         errorMsg: result.detail ? result.detail : result.msg,
@@ -316,6 +327,8 @@ class DirectExam extends Component {
 
     render() {
         document.title = `${this.state.chapter_name} Direct Exam - Teacher | IQLabs`;
+        var ends_at = new Date(this.state.cycleTestItem.ends_at);
+        var starts_at = new Date(this.state.cycleTestItem.starts_at);
         return (
             <>
                 {/* Navbar */}
@@ -386,14 +399,6 @@ class DirectExam extends Component {
                                     </p>
                                 </div>
                             </div>
-                            <div className="col-md-2">
-                                <div className="form-group">
-                                    <p className="mb-2 font-weight-bold-600">
-                                        Test Number:
-                                    </p>
-                                    <p className="small mb-0">1</p>
-                                </div>
-                            </div>
                         </div>
 
                         <div className="card light-bg shadow-sm">
@@ -402,7 +407,7 @@ class DirectExam extends Component {
                                     <div className="card secondary-bg">
                                         <div className="card-body small font-weight-bold-600 text-center p-3">
                                             <div className="row">
-                                                <div className="col-4">
+                                                <div className="col-6">
                                                     <p className="mb-0">
                                                         Subject:{" "}
                                                         {
@@ -411,14 +416,12 @@ class DirectExam extends Component {
                                                         }
                                                     </p>
                                                 </div>
-                                                <div className="col-4">
+                                                <div className="col-6">
                                                     <p className="mb-0">
-                                                        Level: 10
-                                                    </p>
-                                                </div>
-                                                <div className="col-4">
-                                                    <p className="mb-0">
-                                                        Duration: 120 min.
+                                                        Duration:{" "}
+                                                        {(ends_at - starts_at) /
+                                                            60000}{" "}
+                                                        min.
                                                     </p>
                                                 </div>
                                             </div>
@@ -429,75 +432,85 @@ class DirectExam extends Component {
 
                             {/* File uploading */}
                             <div className="card-body">
-                                <div className="row justify-content-center mb-4">
-                                    <div className="col-md-5">
-                                        <div className="custom-file">
-                                            <input
-                                                type="file"
-                                                className="custom-file-input"
-                                                id="question"
-                                                accept=".pdf"
-                                                aria-describedby="inputGroupFileAddon01"
-                                                onChange={(event) =>
-                                                    this.handleFile(event)
-                                                }
-                                            />
-                                            <label
-                                                className="custom-file-label mb-0"
-                                                htmlFor="question"
-                                            >
-                                                {this.state.pdf.file_name ===
-                                                null
-                                                    ? "Choose file"
-                                                    : this.state.pdf.file_name}
-                                            </label>
-                                        </div>
-                                        <small
-                                            id="passwordHelpBlock"
-                                            className="form-text text-muted mb-2"
-                                        >
-                                            Select only pdf format & Max file
-                                            upload size is 5MB
-                                        </small>
-
-                                        <div className="row">
-                                            <div className="col-6">
-                                                <a
-                                                    href={
-                                                        this.state.question_url
+                                {this.state.isExamStarted ? (
+                                    <div className="row justify-content-center mb-4">
+                                        <div className="col-md-5">
+                                            <div className="custom-file">
+                                                <input
+                                                    type="file"
+                                                    className="custom-file-input"
+                                                    id="question"
+                                                    accept=".pdf"
+                                                    aria-describedby="inputGroupFileAddon01"
+                                                    onChange={(event) =>
+                                                        this.handleFile(event)
                                                     }
-                                                    className="btn btn-primary btn-block btn-sm"
-                                                    download
+                                                />
+                                                <label
+                                                    className="custom-file-label mb-0"
+                                                    htmlFor="question"
                                                 >
-                                                    Download Question
-                                                </a>
+                                                    {this.state.pdf
+                                                        .file_name === null
+                                                        ? "Choose file"
+                                                        : this.state.pdf
+                                                              .file_name}
+                                                </label>
                                             </div>
-                                            <div className="col-6">
-                                                <button
-                                                    className="btn btn-primary btn-block btn-sm"
-                                                    onClick={this.handleSubmit}
-                                                    disabled={
-                                                        this.state.btnDisabled
-                                                    }
-                                                >
-                                                    {this.state.showLoader ? (
-                                                        <Spinner
-                                                            as="span"
-                                                            animation="border"
-                                                            size="sm"
-                                                            role="status"
-                                                            aria-hidden="true"
-                                                            className="mr-2"
-                                                        />
-                                                    ) : (
-                                                        ""
-                                                    )}
-                                                    Upload Answer
-                                                </button>
+                                            <small
+                                                id="passwordHelpBlock"
+                                                className="form-text text-muted mb-2"
+                                            >
+                                                Select only pdf format & Max
+                                                file upload size is 5MB
+                                            </small>
+
+                                            <div className="row">
+                                                <div className="col-6">
+                                                    <a
+                                                        href={
+                                                            this.state
+                                                                .question_url
+                                                        }
+                                                        className="btn btn-primary btn-block btn-sm"
+                                                        download
+                                                    >
+                                                        Download Question
+                                                    </a>
+                                                </div>
+                                                <div className="col-6">
+                                                    <button
+                                                        className="btn btn-primary btn-block btn-sm"
+                                                        onClick={
+                                                            this.handleSubmit
+                                                        }
+                                                        disabled={
+                                                            this.state
+                                                                .btnDisabled
+                                                        }
+                                                    >
+                                                        {this.state
+                                                            .showLoader ? (
+                                                            <Spinner
+                                                                as="span"
+                                                                animation="border"
+                                                                size="sm"
+                                                                role="status"
+                                                                aria-hidden="true"
+                                                                className="mr-2"
+                                                            />
+                                                        ) : (
+                                                            ""
+                                                        )}
+                                                        Upload Answer
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                ) : (
+                                    ""
+                                )}
 
                                 {/* File displaying */}
                                 <div

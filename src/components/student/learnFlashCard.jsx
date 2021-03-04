@@ -525,7 +525,7 @@ class FlashCard extends Component {
                                     path = response[i].files[0].type1_video_1;
                                 }
                             }
-
+                            console.log(response[i]);
                             data.push({
                                 question: response[i].question,
                                 question_random_id:
@@ -534,14 +534,30 @@ class FlashCard extends Component {
                                     mcq: response[i].mcq,
                                     fill_in: response[i].fill_in,
                                     boolean: response[i].boolean,
-                                    fillin_answer:
-                                        response[i].fillin_answer.length !== 0
+                                    fillin_answer: [
+                                        response[i].fillin_answer !== undefined
                                             ? response[i].fillin_answer
+                                                  .length !== 0
+                                                ? response[i].fillin_answer
+                                                : [""]
                                             : [""],
+                                    ],
                                     boolean_question:
-                                        response[i].boolean_question.length !==
-                                        0
+                                        response[i].boolean_question !==
+                                        undefined
                                             ? response[i].boolean_question
+                                                  .length !== 0
+                                                ? response[i].boolean_question
+                                                : [
+                                                      {
+                                                          correct: false,
+                                                          content: "True",
+                                                      },
+                                                      {
+                                                          correct: false,
+                                                          content: "False",
+                                                      },
+                                                  ]
                                             : [
                                                   {
                                                       correct: false,
@@ -552,9 +568,32 @@ class FlashCard extends Component {
                                                       content: "False",
                                                   },
                                               ],
+                                    mcq_answers:
+                                        response[i].mcq_answers !== undefined
+                                            ? response[i].mcq_answers
+                                            : 0,
                                     options:
-                                        response[i].options.length !== 0
-                                            ? response[i].options
+                                        response[i].options !== undefined
+                                            ? response[i].options.length !== 0
+                                                ? response[i].options
+                                                : [
+                                                      {
+                                                          correct: false,
+                                                          content: "",
+                                                      },
+                                                      {
+                                                          correct: false,
+                                                          content: "",
+                                                      },
+                                                      {
+                                                          correct: false,
+                                                          content: "",
+                                                      },
+                                                      {
+                                                          correct: false,
+                                                          content: "",
+                                                      },
+                                                  ]
                                             : [
                                                   {
                                                       correct: false,
@@ -714,7 +753,7 @@ class FlashCard extends Component {
                                     <div className="row">
                                         <div className="col-md-6">
                                             <div
-                                                className="card card-body success-bg"
+                                                className="card card-body success-bg h-100"
                                                 style={{
                                                     minHeight: "100px",
                                                 }}
@@ -722,13 +761,14 @@ class FlashCard extends Component {
                                                 <p className="font-weight-bold-600 mb-2">
                                                     Correct answer:
                                                 </p>
-                                                {question.length !== 0
-                                                    ? question.answers
-                                                          .length !== 0
-                                                        ? question.answers.map(
+                                                {explanation.answer === false
+                                                    ? explanation.answers !==
+                                                          undefined &&
+                                                      explanation.answers
+                                                          .lenght !== 0
+                                                        ? explanation.answers.map(
                                                               (data, index) => {
-                                                                  return explanation.answer ===
-                                                                      true ? (
+                                                                  return (
                                                                       <p
                                                                           className="small mb-2"
                                                                           key={
@@ -737,8 +777,24 @@ class FlashCard extends Component {
                                                                       >
                                                                           {data}
                                                                       </p>
-                                                                  ) : (
-                                                                      ""
+                                                                  );
+                                                              }
+                                                          )
+                                                        : ""
+                                                    : question.length !== 0
+                                                    ? question.answers
+                                                          .length !== 0
+                                                        ? question.answers.map(
+                                                              (data, index) => {
+                                                                  return (
+                                                                      <p
+                                                                          className="small mb-2"
+                                                                          key={
+                                                                              index
+                                                                          }
+                                                                      >
+                                                                          {data}
+                                                                      </p>
                                                                   );
                                                               }
                                                           )
@@ -749,7 +805,7 @@ class FlashCard extends Component {
                                         {explanation.answer === false ? (
                                             <div className="col-md-6">
                                                 <div
-                                                    className="card card-body danger-bg"
+                                                    className="card card-body danger-bg h-100"
                                                     style={{
                                                         minHeight: "100px",
                                                     }}
@@ -830,13 +886,14 @@ class FlashCard extends Component {
                                             </div>
                                         );
                                     }
-                                ) // ---------- True or False ----------
-                            ) : data[index].content.boolean === true ? (
+                                )
+                            ) : // ---------- True or False ----------
+                            data[index].content.boolean === true ? (
                                 data[index].content.boolean_question.map(
                                     (option, boolean_index) => {
                                         return (
                                             <div
-                                                className="form-check"
+                                                className="form-check mb-3"
                                                 key={boolean_index}
                                             >
                                                 <input
@@ -900,6 +957,27 @@ class FlashCard extends Component {
                             ""
                         )}
 
+                        {/* ----- Multiple choice notes ----- */}
+                        {explanation.length !== 0 ? (
+                            explanation.explanation === "" ? (
+                                data[index].content.mcq_answers !==
+                                undefined ? (
+                                    data[index].content.mcq_answers > 1 ? (
+                                        <div className="small">
+                                            <b>Note:</b>{" "}
+                                            {data[index].content.mcq_answers}{" "}
+                                            answers are correct
+                                        </div>
+                                    ) : null
+                                ) : null
+                            ) : (
+                                ""
+                            )
+                        ) : (
+                            ""
+                        )}
+
+                        {/* ----- Check button ----- */}
                         {explanation.length !== 0 ? (
                             explanation.explanation === "" ? (
                                 <div className="row mt-4">
@@ -1197,6 +1275,7 @@ class FlashCard extends Component {
                 });
                 explanation.push({
                     answer: false,
+                    answers: [],
                     explanation: "",
                 });
             });
@@ -1275,6 +1354,8 @@ class FlashCard extends Component {
                     if (result.sts === true) {
                         explanation[this.state.activeData].answer =
                             result.answer;
+                        explanation[this.state.activeData].answers =
+                            result.data.answers;
                         explanation[this.state.activeData].explanation =
                             result.data.explanation;
                         this.setState({
