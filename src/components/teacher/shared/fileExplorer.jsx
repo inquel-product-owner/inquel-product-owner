@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Modal, Tab, Nav } from "react-bootstrap";
 import { Player } from "video-react";
 import "video-react/dist/video-react.css";
-import Slider from "react-slick";
+// import Slider from "react-slick";
 
 class FileModal extends Component {
     constructor(props) {
@@ -11,18 +11,27 @@ class FileModal extends Component {
             image: this.props.image,
             video: this.props.video,
             audio: this.props.audio,
-            selectedImage: "",
+            selectedImage: 0,
+            selectedImageData: this.props.image[0],
             activeTab: "image",
-            nav1: null,
-            nav2: null,
+            // nav1: this.slider1,
+            // nav2: this.slider2,
         };
     }
 
-    componentDidMount = () => {
+    changeImage = (index) => {
+        const image = this.state.image;
         this.setState({
-            nav1: this.slider1,
-            nav2: this.slider2,
+            selectedImage: index,
+            selectedImageData: image[index],
         });
+    };
+
+    componentDidMount = () => {
+        // this.setState({
+        //     nav1: this.slider1,
+        //     nav2: this.slider2,
+        // });
     };
 
     toggleNav = (type) => {
@@ -33,11 +42,11 @@ class FileModal extends Component {
 
     render() {
         let audio = "";
-        const settingsMain = {
-            arrows: false,
-            fade: true,
-            adaptiveHeight: true,
-        };
+        // const settingsMain = {
+        //     arrows: false,
+        //     fade: true,
+        //     adaptiveHeight: true,
+        // };
         return (
             <Modal
                 show={this.props.show}
@@ -87,74 +96,90 @@ class FileModal extends Component {
                             </div>
                             <div className="col-md-9 py-3">
                                 {this.state.activeTab === "image" ? (
-                                    <div className="row justify-content-center">
-                                        <div className="col-md-10">
-                                            <Slider
-                                                {...settingsMain}
-                                                asNavFor={this.state.nav2}
-                                                ref={(slider) =>
-                                                    (this.slider1 = slider)
-                                                }
-                                            >
-                                                {this.state.image.map(
-                                                    (image, index) => {
-                                                        return image.path !==
-                                                            "" ? (
-                                                            <div
-                                                                className="card mb-2"
-                                                                key={index}
-                                                            >
+                                    this.state.selectedImageData.path !== "" ? (
+                                        <div className="row justify-content-center">
+                                            <div className="col-md-10">
+                                                <div className="card">
+                                                    {/* Single image view */}
+                                                    <div className="card-body text-center p-0">
+                                                        {this.state
+                                                            .selectedImageData
+                                                            .length !== 0 ? (
+                                                            <>
                                                                 <img
                                                                     src={
-                                                                        image.path
+                                                                        this
+                                                                            .state
+                                                                            .selectedImageData
+                                                                            .path
                                                                     }
-                                                                    className="card-img-top rounded-lg shadow-sm"
                                                                     alt={
-                                                                        image.title
+                                                                        this
+                                                                            .state
+                                                                            .selectedImageData
+                                                                            .file_name
                                                                     }
+                                                                    className="img-fluid rounded-lg"
                                                                 />
                                                                 <div className="card-body primary-text font-weight-bold-600 text-center small p-2">
                                                                     {
-                                                                        image.title
+                                                                        this
+                                                                            .state
+                                                                            .selectedImageData
+                                                                            .title
                                                                     }
                                                                 </div>
-                                                            </div>
-                                                        ) : null;
-                                                    }
-                                                )}
-                                            </Slider>
-                                            <Slider
-                                                slidesToShow={3}
-                                                swipeToSlide={true}
-                                                focusOnSelect={true}
-                                                centerMode={true}
-                                                centerPadding="10px"
-                                                asNavFor={this.state.nav1}
-                                                ref={(slider) =>
-                                                    (this.slider2 = slider)
-                                                }
-                                            >
-                                                {this.state.image.map(
-                                                    (image, index) => {
-                                                        return image.path !==
-                                                            "" ? (
-                                                            <div
-                                                                className="col-12"
-                                                                key={index}
-                                                            >
-                                                                <div
-                                                                    className="card shadow-sm preview-img-sm"
-                                                                    style={{
-                                                                        backgroundImage: `url(${image.path})`,
-                                                                    }}
-                                                                ></div>
-                                                            </div>
-                                                        ) : null;
-                                                    }
-                                                )}
-                                            </Slider>
+                                                            </>
+                                                        ) : (
+                                                            ""
+                                                        )}
+                                                    </div>
+                                                    {/* Thumbnails */}
+                                                    <div className="card-footer px-0">
+                                                        <div className="row justify-content-center">
+                                                            {this.state.image.map(
+                                                                (
+                                                                    images,
+                                                                    index
+                                                                ) => {
+                                                                    return images.path !==
+                                                                        "" ? (
+                                                                        <div
+                                                                            key={
+                                                                                index
+                                                                            }
+                                                                            className="col-md-3"
+                                                                        >
+                                                                            <div
+                                                                                className={`card preview-img-sm shadow-sm ${
+                                                                                    this
+                                                                                        .state
+                                                                                        .selectedImage ===
+                                                                                    index
+                                                                                        ? "border-primary"
+                                                                                        : ""
+                                                                                }`}
+                                                                                style={{
+                                                                                    backgroundImage: `url(${images.path})`,
+                                                                                }}
+                                                                                onClick={() =>
+                                                                                    this.changeImage(
+                                                                                        index
+                                                                                    )
+                                                                                }
+                                                                            ></div>
+                                                                        </div>
+                                                                    ) : null;
+                                                                }
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
+                                    ) : (
+                                        "Images not uploaded..."
+                                    )
                                 ) : null}
 
                                 {/* Video tab */}
@@ -271,3 +296,48 @@ export default FileModal;
 //         </div>
 //     </div>
 // </div>
+
+// {/* <>
+//     <Slider
+//         {...settingsMain}
+//         asNavFor={this.state.nav2}
+//         ref={(slider) => (this.slider1 = slider)}
+//     >
+//         {this.state.image.map((image, index) => {
+//             return image.path !== "" ? (
+//                 <div className="card mb-2" key={index}>
+//                     <img
+//                         src={image.path}
+//                         className="card-img-top rounded-lg shadow-sm"
+//                         alt={image.title}
+//                     />
+//                     <div className="card-body primary-text font-weight-bold-600 text-center small p-2">
+//                         {image.title}
+//                     </div>
+//                 </div>
+//             ) : null;
+//         })}
+//     </Slider>
+//     <Slider
+//         slidesToShow={this.props.image.length}
+//         swipeToSlide={true}
+//         focusOnSelect={true}
+//         centerMode={true}
+//         centerPadding="10px"
+//         asNavFor={this.state.nav1}
+//         ref={(slider) => (this.slider2 = slider)}
+//     >
+//         {this.state.image.map((image, index) => {
+//             return image.path !== "" ? (
+//                 <div className="col-12" key={index}>
+//                     <div
+//                         className="card shadow-sm preview-img-sm"
+//                         style={{
+//                             backgroundImage: `url(${image.path})`,
+//                         }}
+//                     ></div>
+//                 </div>
+//             ) : null;
+//         })}
+//     </Slider>
+// </>; */}

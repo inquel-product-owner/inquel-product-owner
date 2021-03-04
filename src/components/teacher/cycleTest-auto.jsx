@@ -436,6 +436,7 @@ class CycleTestAuto extends Component {
                     question_type: "",
                     category: "",
                     any_questions: "",
+                    no_questions: "",
                     total_questions: "",
                     marks: "",
                     total_marks: "",
@@ -538,11 +539,13 @@ class CycleTestAuto extends Component {
                             question_type: result.data[i].question_type,
                             category: result.data[i].category,
                             any_questions: result.data[i].any_questions,
-                            total_questions: result.data[i].total_questions,
+                            no_questions: result.data[i].total_questions,
+                            total_questions: '',
                             marks: result.data[i].mark,
                             total_marks: result.data[i].total_marks,
                         });
-                        duration = result.data[i].duration;
+                        duration =
+                            result.duration !== null ? result.duration : "";
                         selectedAttempt = result.data[i].attempts;
                         fetch(
                             `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/filter/?chapter_id=${this.chapterId}&attempts=${selectedAttempt}&question_type=${result.data[i].question_type}`,
@@ -598,30 +601,8 @@ class CycleTestAuto extends Component {
     };
 
     componentDidMount = () => {
-        // this.setState(
-        //     {
-        //         chapterId: this.props.match.params.chapterId,
-        //     },
-        //     () => {
-        //     }
-        // );
         this.loadAttemptData();
         this.loadSectionData();
-
-        // fetch(`${this.url}/teacher/subject/${this.subjectId}/`, {
-        //     headers: this.headers,
-        //     method: "GET",
-        // })
-        //     .then((res) => res.json())
-        //     .then((result) => {
-        //         this.setState({
-        //             chapterList: result.data.results,
-        //         });
-        //         console.log(result);
-        //     })
-        //     .catch((err) => {
-        //         console.log(err);
-        //     });
     };
 
     handleSectionData = (index, event, type) => {
@@ -634,6 +615,8 @@ class CycleTestAuto extends Component {
                 section[index].total_marks =
                     Number(section[index].marks) * Number(event.target.value);
             }
+        } else if (type === "no_questions") {
+            section[index].no_questions = Number(event.target.value);
         }
         this.setState({
             sections: section,
@@ -721,6 +704,9 @@ class CycleTestAuto extends Component {
                 .then((result) => {
                     console.log(result);
                     const section = [...this.state.sections];
+                    section[index].no_questions = Number(
+                        result.data.total_questions
+                    );
                     section[index].total_questions = Number(
                         result.data.total_questions
                     );
@@ -806,7 +792,18 @@ class CycleTestAuto extends Component {
         } else if (
             section[index].any_questions === "" ||
             section[index].any_questions === 0 ||
-            section[index].any_questions > section[index].total_questions
+            section[index].any_questions > section[index].no_questions
+        ) {
+            this.setState({
+                errorMsg:
+                    "Enter any questions within the range of No. of question",
+                showErrorAlert: true,
+                page_loading: false,
+            });
+        } else if (
+            section[index].no_questions === "" ||
+            section[index].no_questions === 0 ||
+            section[index].no_questions > section[index].total_questions
         ) {
             this.setState({
                 errorMsg:
@@ -843,7 +840,7 @@ class CycleTestAuto extends Component {
                     section_description: section[index].section_name,
                     question_type: section[index].question_type,
                     category: section[index].category,
-                    total_questions: section[index].total_questions,
+                    total_questions: section[index].no_questions,
                     any_questions: section[index].any_questions,
                     mark: section[index].marks,
                     total_marks: section[index].total_marks,
@@ -906,7 +903,7 @@ class CycleTestAuto extends Component {
                     section_description: section[index].section_name,
                     question_type: section[index].question_type,
                     category: section[index].category,
-                    total_questions: section[index].total_questions,
+                    total_questions: section[index].no_questions,
                     any_questions: section[index].any_questions,
                     mark: section[index].marks,
                     total_marks: section[index].total_marks,
@@ -964,6 +961,8 @@ class CycleTestAuto extends Component {
             question_type: "",
             category: "",
             any_questions: "",
+            no_questions: "",
+            total_questions: "",
             marks: "",
             total_marks: "",
         });
@@ -1136,6 +1135,7 @@ class CycleTestAuto extends Component {
                                             </th>
                                             <th scope="col">Question Type</th>
                                             <th scope="col">Category</th>
+                                            <th scope="col">Any Questions</th>
                                             <th scope="col">
                                                 No. of Questions
                                             </th>
@@ -1163,7 +1163,7 @@ class CycleTestAuto extends Component {
                                                                 <i className="fas fa-minus-circle"></i>
                                                             </button>
                                                         </td>
-                                                        <td width="250px">
+                                                        <td width="200px">
                                                             <input
                                                                 type="text"
                                                                 className="form-control form-control-sm form-shadow"
@@ -1311,6 +1311,30 @@ class CycleTestAuto extends Component {
                                                                 }
                                                                 min="1"
                                                                 max={
+                                                                    section.no_questions
+                                                                }
+                                                                required
+                                                            />
+                                                        </td>
+                                                        <td width="160px">
+                                                            <input
+                                                                className="form-control form-control-sm form-shadow"
+                                                                type="number"
+                                                                value={
+                                                                    section.no_questions
+                                                                }
+                                                                placeholder="No. of questions"
+                                                                onChange={(
+                                                                    event
+                                                                ) =>
+                                                                    this.handleSectionData(
+                                                                        index,
+                                                                        event,
+                                                                        "no_questions"
+                                                                    )
+                                                                }
+                                                                min="1"
+                                                                max={
                                                                     section.total_questions
                                                                 }
                                                                 required
@@ -1330,7 +1354,7 @@ class CycleTestAuto extends Component {
                                                         <td>
                                                             <input
                                                                 className="form-control form-control-sm form-shadow"
-                                                                type="number"
+                                                                type="text"
                                                                 placeholder="Marks"
                                                                 value={
                                                                     section.marks
