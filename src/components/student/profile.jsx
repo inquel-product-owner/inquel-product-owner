@@ -3,12 +3,14 @@ import axios from "axios";
 import Header from "./shared/navbar";
 import SideNav from "./shared/sidenav";
 import { Link } from "react-router-dom";
+import Select from "react-select";
 import { Spinner, Modal, Alert } from "react-bootstrap";
 import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
 import Loading from "../sharedComponents/loader";
 import userpic from "../../assets/user-v1.png";
 import AlertBox from "../sharedComponents/alert";
 import dateFormat from "dateformat";
+import { country } from "../../shared/countries.js";
 
 class ImageUploadModal extends Component {
     constructor(props) {
@@ -261,6 +263,14 @@ class Profile extends Component {
         });
     };
 
+    handleSelect = (event) => {
+        let data = this.state.studentItems;
+        data.country_code = event.value;
+        this.setState({
+            studentItems: data,
+        });
+    };
+
     loadStudentData = () => {
         fetch(`${this.url}/student/profile/`, {
             method: "GET",
@@ -307,7 +317,9 @@ class Profile extends Component {
             body: JSON.stringify({
                 first_name: this.state.studentItems.first_name,
                 last_name: this.state.studentItems.last_name,
-                phone_num: this.state.studentItems.phone_num,
+                phone_num:
+                    this.state.studentItems.country_code +
+                    this.state.studentItems.phone_num,
                 date_of_birth: dateFormat(
                     this.state.studentItems.date_of_birth,
                     "yyyy-mm-dd"
@@ -356,6 +368,21 @@ class Profile extends Component {
                 page_loading: true,
             });
         }, 1000);
+    };
+
+    renderValue = (data) => {
+        return (
+            <span>
+                <img
+                    src={data.flag}
+                    alt=""
+                    className="img-fluid"
+                    width="25px"
+                    height="auto"
+                />{" "}
+                {data.isoCode} - {data.dialCode}
+            </span>
+        );
     };
 
     render() {
@@ -550,21 +577,70 @@ class Profile extends Component {
                                                             <label htmlFor="phone_num">
                                                                 Phone
                                                             </label>
-                                                            <input
-                                                                type="text"
-                                                                name="phone_num"
-                                                                id="phone_num"
-                                                                className="form-control border-secondary"
-                                                                value={
-                                                                    this.state
-                                                                        .studentItems
-                                                                        .phone_num
-                                                                }
-                                                                onChange={
-                                                                    this
-                                                                        .handleInput
-                                                                }
-                                                            />
+                                                            <div className="d-flex border-secondary rounded-lg">
+                                                                <div
+                                                                    style={{
+                                                                        width:
+                                                                            "35%",
+                                                                    }}
+                                                                >
+                                                                    <Select
+                                                                        className="basic-single border-right"
+                                                                        defaultValue={{
+                                                                            label: this
+                                                                                .state
+                                                                                .studentItems
+                                                                                .country_code,
+                                                                            value: this
+                                                                                .state
+                                                                                .studentItems
+                                                                                .country_code,
+                                                                        }}
+                                                                        isSearchable={
+                                                                            false
+                                                                        }
+                                                                        name="country_code"
+                                                                        options={country.map(
+                                                                            (
+                                                                                list
+                                                                            ) => {
+                                                                                return {
+                                                                                    value:
+                                                                                        list.dialCode,
+                                                                                    label: this.renderValue(
+                                                                                        list
+                                                                                    ),
+                                                                                };
+                                                                            }
+                                                                        )}
+                                                                        onChange={
+                                                                            this
+                                                                                .handleSelect
+                                                                        }
+                                                                        required
+                                                                    />
+                                                                </div>
+                                                                <div>
+                                                                    <input
+                                                                        type="text"
+                                                                        name="phone_num"
+                                                                        id="phone"
+                                                                        className="form-control form-control-lg"
+                                                                        onChange={
+                                                                            this
+                                                                                .handleInput
+                                                                        }
+                                                                        value={
+                                                                            this
+                                                                                .state
+                                                                                .studentItems
+                                                                                .phone_num
+                                                                        }
+                                                                        placeholder="Enter phone number"
+                                                                        required
+                                                                    />
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
@@ -706,7 +782,11 @@ class Profile extends Component {
                                                             this.handleInput
                                                         }
                                                     >
-                                                        {this.state.description}
+                                                        {
+                                                            this.state
+                                                                .studentItems
+                                                                .description
+                                                        }
                                                     </textarea>
                                                 </div>
                                                 {this.state.showEditOption ? (
@@ -766,11 +846,7 @@ class Profile extends Component {
                                                         <p className="small font-weight-bold-600 mb-2">
                                                             Phone
                                                         </p>
-                                                        {
-                                                            this.state
-                                                                .studentItems
-                                                                .phone_num
-                                                        }
+                                                        {`${this.state.studentItems.country_code}-${this.state.studentItems.phone_num}`}
                                                     </div>
                                                 </div>
                                                 <div className="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">

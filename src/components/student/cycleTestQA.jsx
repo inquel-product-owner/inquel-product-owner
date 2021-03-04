@@ -15,6 +15,8 @@ class CycleTestQA extends Component {
             examInfo: [],
             sections: [],
             activeSection: 0,
+            activeImageData: "",
+            activeImageQuestion: 0,
 
             errorMsg: "",
             successMsg: "",
@@ -152,9 +154,9 @@ class CycleTestQA extends Component {
                         page_loading: false,
                     });
                     this.startTimer();
-                    console.log(date)
-                    console.log(endTime)
-                    console.log(dateFormat("Wed, 03 Mar 2021 05:40:52 GMT"))
+                    console.log(date);
+                    console.log(endTime);
+                    console.log(dateFormat("Wed, 03 Mar 2021 05:40:52 GMT"));
                     // currentDate = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
                     // (currentDate - endDate.getTime()) / 1000
                 } else {
@@ -241,13 +243,21 @@ class CycleTestQA extends Component {
                         {
                             successMsg: result.msg,
                             showSuccessAlert: true,
-                            page_loading: false,
                         },
                         () => {
                             setTimeout(() => {
-                                this.props.history.goBack();
-                                localStorage.removeItem("data");
-                                localStorage.removeItem("duration");
+                                this.setState(
+                                    {
+                                        page_loading: false,
+                                    },
+                                    () => {
+                                        setTimeout(() => {
+                                            this.props.history.goBack();
+                                            localStorage.removeItem("data");
+                                            localStorage.removeItem("duration");
+                                        }, 1000);
+                                    }
+                                );
                             }, 1000);
                         }
                     );
@@ -267,11 +277,15 @@ class CycleTestQA extends Component {
     handleNext = () => {
         this.setState({
             activeSection: this.state.activeSection + 1,
+            activeImageData: "",
+            activeImageQuestion: "",
         });
     };
     handlePrev = () => {
         this.setState({
             activeSection: this.state.activeSection - 1,
+            activeImageData: "",
+            activeImageQuestion: "",
         });
     };
 
@@ -471,10 +485,19 @@ class CycleTestQA extends Component {
                                                       <div className="row">
                                                           <div
                                                               className={`${
-                                                                  data.files !==
+                                                                  data.files ===
                                                                   undefined
-                                                                      ? "col-md-11"
-                                                                      : "col-12"
+                                                                      ? "col-md-12"
+                                                                      : this
+                                                                            .state
+                                                                            .activeImageData !==
+                                                                            "" &&
+                                                                        this
+                                                                            .state
+                                                                            .activeImageQuestion ===
+                                                                            data.question_random_id
+                                                                      ? "col-md-8"
+                                                                      : "col-md-11"
                                                               }`}
                                                           >
                                                               <p
@@ -681,55 +704,123 @@ class CycleTestQA extends Component {
                                                                   ) : null
                                                               ) : null}
                                                           </div>
-
                                                           {/* ----- Image section ----- */}
                                                           {data.files !==
                                                           undefined ? (
-                                                              <div className="col-md-1">
-                                                                  {data.files
-                                                                      .length !==
-                                                                  0
-                                                                      ? Object.entries(
-                                                                            data
-                                                                                .files[0]
-                                                                        ).map(
-                                                                            (
-                                                                                [
-                                                                                    key,
-                                                                                    value,
-                                                                                ],
-                                                                                index
-                                                                            ) => {
-                                                                                return key ===
-                                                                                    "type1_image_1" ||
-                                                                                    key ===
-                                                                                        "type1_image_2" ||
-                                                                                    key ===
-                                                                                        "type1_image_3" ||
-                                                                                    key ===
-                                                                                        "type1_image_4" ? (
-                                                                                    <div
-                                                                                        className={`card preview-img-xs shadow-sm mb-2 ${
-                                                                                            this
-                                                                                                .state
-                                                                                                .selectedImage ===
-                                                                                            index
-                                                                                                ? "border-primary"
-                                                                                                : ""
-                                                                                        }`}
-                                                                                        style={{
-                                                                                            backgroundImage: `url(${value})`,
-                                                                                        }}
-                                                                                        key={
-                                                                                            index
-                                                                                        }
-                                                                                    ></div>
-                                                                                ) : (
-                                                                                    ""
-                                                                                );
-                                                                            }
-                                                                        )
-                                                                      : ""}
+                                                              <div
+                                                                  className={
+                                                                      this.state
+                                                                          .activeImageQuestion ===
+                                                                      data.question_random_id
+                                                                          ? "col-md-4"
+                                                                          : "col-md-1"
+                                                                  }
+                                                              >
+                                                                  <div className="row">
+                                                                      {/* ---------- Single pic --------- */}
+                                                                      {this
+                                                                          .state
+                                                                          .activeImageData !==
+                                                                          "" &&
+                                                                      this.state
+                                                                          .activeImageQuestion ===
+                                                                          data.question_random_id ? (
+                                                                          <div className="col-9">
+                                                                              <div className="card">
+                                                                                  <img
+                                                                                      src={
+                                                                                          data.question_random_id ===
+                                                                                          this
+                                                                                              .state
+                                                                                              .activeImageQuestion
+                                                                                              ? this
+                                                                                                    .state
+                                                                                                    .activeImageData
+                                                                                              : ""
+                                                                                      }
+                                                                                      alt={
+                                                                                          this
+                                                                                              .state
+                                                                                              .chapter_name
+                                                                                      }
+                                                                                      className="img-fluid rounded-lg shadow-sm"
+                                                                                  />
+                                                                              </div>
+                                                                          </div>
+                                                                      ) : (
+                                                                          ""
+                                                                      )}
+                                                                      {/* ---------- Thumbnails ---------- */}
+                                                                      <div
+                                                                          className={
+                                                                              this
+                                                                                  .state
+                                                                                  .activeImageData !==
+                                                                                  "" &&
+                                                                              this
+                                                                                  .state
+                                                                                  .activeImageQuestion ===
+                                                                                  data.question_random_id
+                                                                                  ? "col-3"
+                                                                                  : "col-12"
+                                                                          }
+                                                                      >
+                                                                          {data
+                                                                              .files
+                                                                              .length !==
+                                                                          0
+                                                                              ? Object.entries(
+                                                                                    data
+                                                                                        .files[0]
+                                                                                ).map(
+                                                                                    (
+                                                                                        [
+                                                                                            key,
+                                                                                            value,
+                                                                                        ],
+                                                                                        index
+                                                                                    ) => {
+                                                                                        return key ===
+                                                                                            "type1_image_1" ||
+                                                                                            key ===
+                                                                                                "type1_image_2" ||
+                                                                                            key ===
+                                                                                                "type1_image_3" ||
+                                                                                            key ===
+                                                                                                "type1_image_4" ? (
+                                                                                            <div
+                                                                                                className={`card preview-img-xs shadow-sm mb-2 ${
+                                                                                                    this
+                                                                                                        .state
+                                                                                                        .selectedImage ===
+                                                                                                    index
+                                                                                                        ? "border-primary"
+                                                                                                        : ""
+                                                                                                }`}
+                                                                                                style={{
+                                                                                                    backgroundImage: `url(${value})`,
+                                                                                                }}
+                                                                                                key={
+                                                                                                    index
+                                                                                                }
+                                                                                                onClick={() => {
+                                                                                                    this.setState(
+                                                                                                        {
+                                                                                                            activeImageData: value,
+                                                                                                            activeImageQuestion:
+                                                                                                                data.question_random_id,
+                                                                                                        }
+                                                                                                    );
+                                                                                                }}
+                                                                                            ></div>
+                                                                                        ) : (
+                                                                                            ""
+                                                                                        );
+                                                                                    }
+                                                                                )
+                                                                              : ""}
+                                                                      </div>
+                                                                  </div>
                                                               </div>
                                                           ) : (
                                                               ""
