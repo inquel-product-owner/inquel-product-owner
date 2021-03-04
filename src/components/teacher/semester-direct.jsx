@@ -190,7 +190,7 @@ class SemesterDirect extends Component {
             showErrorAlert: false,
         });
 
-        const directTest = this.state.pdf;
+        const pdf = this.state.pdf;
 
         let form_data = new FormData();
 
@@ -198,8 +198,8 @@ class SemesterDirect extends Component {
         form_data.append("exam_date", this.state.exam_date);
         form_data.append("starts_at", this.state.starts_at);
         form_data.append("ends_at", this.state.ends_at);
-        if (directTest.file !== null) {
-            form_data.append("semester_file_1", directTest.file);
+        if (pdf.file !== null) {
+            form_data.append("semester_file_1", pdf.file);
         }
 
         const options = {
@@ -230,22 +230,22 @@ class SemesterDirect extends Component {
             });
         } else {
             if (this.state.isFileUploaded === true) {
-                this.handlePATCH(form_data, options, directTest);
+                this.handlePATCH(form_data, options);
             } else {
-                this.handlePOST(form_data, options, directTest);
+                this.handlePOST(form_data, options);
             }
         }
     };
 
-    handlePOST = (form_data, options, directTest) => {
+    handlePOST = (form_data, options) => {
         const pdf = this.state.pdf;
         let extension = "";
 
-        if (directTest.file_name !== null) {
+        if (pdf.file_name !== null) {
             extension = pdf.file_name.split(".");
         }
 
-        if (directTest.file === null) {
+        if (pdf.file === null) {
             this.setState({
                 errorMsg: "Please upload a file",
                 showErrorAlert: true,
@@ -258,7 +258,7 @@ class SemesterDirect extends Component {
             });
         } else if (pdf.file.size > 5242880) {
             this.setState({
-                errorMsg: "File sixe exceeds more then 5MB!",
+                errorMsg: "File size exceeds more then 5MB!",
                 showErrorAlert: true,
             });
         } else {
@@ -276,7 +276,7 @@ class SemesterDirect extends Component {
                                 successMsg: result.data.msg,
                                 showSuccessAlert: true,
                                 showLoader: false,
-                                path: result.data.url,
+                                pdf: { file: null, file_name: null },
                             },
                             () => {
                                 this.setState({
@@ -319,11 +319,11 @@ class SemesterDirect extends Component {
         }
     };
 
-    handlePATCH = (form_data, options, directTest) => {
+    handlePATCH = (form_data, options) => {
         const pdf = this.state.pdf;
         let extension = "";
 
-        if (directTest.file_name !== null) {
+        if (pdf.file_name !== null) {
             extension = pdf.file_name.split(".");
         }
 
@@ -335,9 +335,64 @@ class SemesterDirect extends Component {
                 });
             } else if (pdf.file.size > 5242880) {
                 this.setState({
-                    errorMsg: "File sixe exceeds more then 5MB!",
+                    errorMsg: "File size exceeds more then 5MB!",
                     showErrorAlert: true,
                 });
+            } else {
+                axios
+                    .patch(
+                        `${this.url}/teacher/subject/${this.subjectId}/semester/${this.semesterId}/files/`,
+                        form_data,
+                        options
+                    )
+                    .then((result) => {
+                        console.log(result);
+                        if (result.data.sts === true) {
+                            this.setState(
+                                {
+                                    successMsg: result.data.msg,
+                                    showSuccessAlert: true,
+                                    showLoader: false,
+                                    pdf: { file: null, file_name: null },
+                                },
+                                () => {
+                                    this.setState({
+                                        page_loading: true,
+                                    });
+                                    this.loadSemesterData();
+                                }
+                            );
+                        } else if (result.data.sts === false) {
+                            if (result.data.detail) {
+                                this.setState({
+                                    errorMsg: result.data.detail,
+                                });
+                            } else {
+                                this.setState({
+                                    errorMsg: result.data.msg,
+                                });
+                            }
+                            this.setState({
+                                showErrorAlert: true,
+                                showLoader: false,
+                            });
+                        }
+                    })
+                    .catch((err) => {
+                        if (err.response.data.detail) {
+                            this.setState({
+                                errorMsg: err.response.data.detail,
+                            });
+                        } else {
+                            this.setState({
+                                errorMsg: err.response.data.msg,
+                            });
+                        }
+                        this.setState({
+                            showErrorAlert: true,
+                            showLoader: false,
+                        });
+                    });
             }
         } else {
             axios
@@ -354,7 +409,7 @@ class SemesterDirect extends Component {
                                 successMsg: result.data.msg,
                                 showSuccessAlert: true,
                                 showLoader: false,
-                                path: result.data.url,
+                                pdf: { file: null, file_name: null },
                             },
                             () => {
                                 this.setState({

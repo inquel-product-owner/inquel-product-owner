@@ -51,7 +51,7 @@ function nameTemplate(props) {
                             ? props.profile_link
                             : userimage
                     }
-                    alt="HOD profile"
+                    alt={props.full_name}
                     width="23"
                     className="profile-pic"
                 />

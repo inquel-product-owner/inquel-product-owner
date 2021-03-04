@@ -18,6 +18,7 @@ class Notes extends Component {
             notesData: "",
             chapterId: this.props.match.params.chapterId,
             topicName: "",
+            topic_num: "",
             page_loading: true,
             errorMsg: "",
             showErrorAlert: false,
@@ -104,6 +105,7 @@ class Notes extends Component {
                     });
                     let collapsed = [];
                     let topicName = "";
+                    let topic_num = "";
                     for (let i = 0; i < result.data.chapters.length; i++) {
                         // adds collapse state
                         collapsed.push(
@@ -122,6 +124,11 @@ class Notes extends Component {
                                     ? result.data.chapters[i].topics[0]
                                           .chapter_structure[0].topic_name
                                     : "Topic";
+                            topic_num =
+                                result.data.chapters[i].topics.length !== 0
+                                    ? result.data.chapters[i].topics[0]
+                                          .chapter_structure[0].topic_num
+                                    : "1.1";
                         } else {
                             continue;
                         }
@@ -130,6 +137,7 @@ class Notes extends Component {
                         {
                             collapsed: collapsed,
                             topicName: topicName,
+                            topic_num: topic_num,
                         },
                         () => {
                             this.loadNotesData();
@@ -149,11 +157,12 @@ class Notes extends Component {
     };
 
     // loads data on selecting a topic
-    handleSelect = (chapterId, topicName) => {
+    handleSelect = (chapterId, topicName, topic_num) => {
         this.setState(
             {
                 chapterId: chapterId,
                 topicName: topicName,
+                topic_num: topic_num,
                 page_loading: true,
             },
             () => {
@@ -181,12 +190,16 @@ class Notes extends Component {
             <div key={index}>
                 <Card.Header
                     className={`small ${
-                        this.state.topicName === data.topic_name
+                        this.state.topic_num === data.topic_num
                             ? "light-bg"
                             : "bg-light"
                     } shadow-sm mb-2`}
                     onClick={() =>
-                        this.handleSelect(chapter_id, data.topic_name)
+                        this.handleSelect(
+                            chapter_id,
+                            data.topic_name,
+                            data.topic_num
+                        )
                     }
                     style={{ borderRadius: "8px", cursor: "pointer" }}
                 >
