@@ -2149,12 +2149,12 @@ class SubjectType1 extends Component {
         const values = [...this.state.questions];
         const keyboards = [...this.state.keyboards];
 
-        keyboards[values.length] = {
+        keyboards.splice(index + 1, 0, {
             all: keyboards[index].all,
             chemistry: keyboards[index].chemistry,
             physics: keyboards[index].physics,
             maths: keyboards[index].maths,
-        };
+        });
         const options = [];
         for (let i = 0; i < values[index].content.options.length; i++) {
             options[i] = {
@@ -2189,7 +2189,7 @@ class SubjectType1 extends Component {
         for (let i = 0; i < values[index].properties.quiz.length; i++) {
             quiz[i] = values[index].properties.quiz[i];
         }
-        values[values.length] = {
+        values.splice(index + 1, 0, {
             chapter_id: this.chapterId,
             topic_name: this.topicName,
             question: values[index].question,
@@ -2227,11 +2227,11 @@ class SubjectType1 extends Component {
                 virtual_keyboard: values[index].settings.virtual_keyboard,
                 limited: values[index].settings.limited,
             },
-        };
+        });
         this.setState({
             questions: values,
             keyboards: keyboards,
-            activeQuestion: values.length - 1,
+            activeQuestion: index + 1,
         });
     };
 

@@ -777,7 +777,7 @@ class SubjectConcepts extends Component {
                                 audioCollapsed: true,
                                 settingsCollapsed: true,
                                 page_loading: true,
-                                activeConcept:''
+                                activeConcept: "",
                             });
                             this.loadConceptData();
                         }, 1000);
@@ -813,7 +813,7 @@ class SubjectConcepts extends Component {
                                     audioCollapsed: true,
                                     settingsCollapsed: true,
                                     page_loading: true,
-                                    activeConcept:''
+                                    activeConcept: "",
                                 });
                                 this.loadConceptData();
                             }, 1000);
@@ -866,7 +866,7 @@ class SubjectConcepts extends Component {
                                     audioCollapsed: true,
                                     settingsCollapsed: true,
                                     page_loading: true,
-                                    activeConcept:''
+                                    activeConcept: "",
                                 });
                                 this.loadConceptData();
                             }, 1000);
@@ -1633,13 +1633,13 @@ class SubjectConcepts extends Component {
         const flips = [...this.state.flipState];
 
         flips.push(flips[index]);
-        keyboards.push({
+        keyboards.splice(index + 1, 0, {
             all: keyboards[index].all,
             chemistry: keyboards[index].chemistry,
             physics: keyboards[index].physics,
             maths: keyboards[index].maths,
         });
-        values.push({
+        values.splice(index + 1, 0, {
             chapter_id: this.chapterId,
             topic_name: this.topicName,
             concepts_random_id: "",
@@ -1666,7 +1666,7 @@ class SubjectConcepts extends Component {
             concepts: values,
             keyboards: keyboards,
             flipState: flips,
-            activeConcept: values.length - 1,
+            activeConcept: index + 1,
         });
     };
 
@@ -2241,7 +2241,7 @@ class SubjectConcepts extends Component {
                                                     imageCollapsed: true,
                                                     audioCollapsed: true,
                                                     settingsCollapsed: true,
-                                                    activeConcept:''
+                                                    activeConcept: "",
                                                 });
                                             }}
                                         >

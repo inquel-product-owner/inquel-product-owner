@@ -1,90 +1,117 @@
 import React, { Component } from "react";
 import Header from "./shared/examNavbar";
-import { Link } from "react-router-dom";
-import { Modal, Alert } from "react-bootstrap";
+// import { Modal, Alert } from "react-bootstrap";
 import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
 import AlertBox from "../sharedComponents/alert";
 import Loading from "../sharedComponents/loader";
 
-class ExamStartModal extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            errorMsg: "",
-            successMsg: "",
-            showErrorAlert: false,
-            showSuccessAlert: false,
-        };
-        this.subjectId = this.props.subjectId;
-        this.chapterId = this.props.chapterId;
-        this.cycleTestId = this.props.cycleTestId;
-        this.url = baseUrl + studentUrl;
-        this.authToken = localStorage.getItem("Authorization");
-        this.headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: this.authToken,
-        };
-    }
-    
-    componentDidMount = () => {
-        fetch(
-            `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/cycletest/`,
-            {
-                method: "POST",
-                headers: this.headers,
-            }
-        )
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
+// class ExamStartModal extends Component {
+//     constructor(props) {
+//         super(props);
+//         this.state = {
+//             errorMsg: "",
+//             successMsg: "",
+//             showErrorAlert: false,
+//             showSuccessAlert: false,
+//         };
+//         this.subjectId = this.props.subjectId;
+//         this.chapterId = this.props.chapterId;
+//         this.cycleTestId = this.props.cycleTestId;
+//         this.url = baseUrl + studentUrl;
+//         this.authToken = localStorage.getItem("Authorization");
+//         this.headers = {
+//             Accept: "application/json",
+//             "Content-Type": "application/json",
+//             Authorization: this.authToken,
+//         };
+//     }
 
-    render() {
-        return (
-            <Modal
-                show={this.props.show}
-                onHide={this.props.onHide}
-                size="md"
-                backdrop="static"
-                keyboard={false}
-                aria-labelledby="contained-modal-title-vcenter"
-                centered
-            >
-                <Modal.Body>
-                    <Alert
-                        variant="danger"
-                        show={this.state.showErrorAlert}
-                        onClose={() => {
-                            this.setState({
-                                showErrorAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.errorMsg}
-                    </Alert>
-                    <Alert
-                        variant="success"
-                        show={this.state.showSuccessAlert}
-                        onClose={() => {
-                            this.setState({
-                                showSuccessAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.successMsg}
-                    </Alert>
-                </Modal.Body>
-            </Modal>
-        );
-    }
-}
+//     componentDidMount = () => {
+//         fetch(
+//             `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/cycletest/`,
+//             {
+//                 method: "POST",
+//                 headers: this.headers,
+//             }
+//         )
+//             .then((res) => res.json())
+//             .then((result) => {
+//                 console.log(result);
+//             })
+//             .catch((err) => {
+//                 console.log(err);
+//             });
+//     };
+
+//     render() {
+//         return (
+//             <Modal
+//                 show={this.props.show}
+//                 onHide={this.props.onHide}
+//                 size="lg"
+//                 backdrop="static"
+//                 keyboard={false}
+//                 aria-labelledby="contained-modal-title-vcenter"
+//                 centered
+//             >
+//                 <Modal.Header closeButton>Exam Instruction</Modal.Header>
+//                 <Modal.Body>
+//                     <Alert
+//                         variant="danger"
+//                         show={this.state.showErrorAlert}
+//                         onClose={() => {
+//                             this.setState({
+//                                 showErrorAlert: false,
+//                             });
+//                         }}
+//                         dismissible
+//                     >
+//                         {this.state.errorMsg}
+//                     </Alert>
+//                     <Alert
+//                         variant="success"
+//                         show={this.state.showSuccessAlert}
+//                         onClose={() => {
+//                             this.setState({
+//                                 showSuccessAlert: false,
+//                             });
+//                         }}
+//                         dismissible
+//                     >
+//                         {this.state.successMsg}
+//                     </Alert>
+
+//                     <p className="font-weight-bold">A. General informat</p>
+//                     <ul type="1">
+// <li>The examination will comprise of Objective type Multiple Choice Questions (MCQs), True or False, Fill in answers</li>
+// <li></li>
+// <li></li>
+// <li></li>
+// <li></li>
+//                     </ul>
+
+// 1.
+// 2. All questions are compulsory and each carries One mark.
+// 3. The total number of questions, duration of examination, will be different based on
+// the course, the detail is available on your screen.
+// 4. The Subjects or topics covered in the exam will be as per the Syllabus.
+// 5. There will be NO NEGATIVE MARKING for the wrong answers.
+// B. Information & Instructions:
+// 1. The examination does not require using any paper, pen, pencil and calculator.
+// 2. Every student will take the examination on a Laptop/Desktop/Smart Phone
+// 3. On computer screen every student will be given objective type type Multiple Choice
+// Questions (MCQs).
+// 4. Each student will get questions and answers in different order selected randomly
+// from a fixed Question Databank.
+// 5. The students just need to click on the Right Choice / Correct option from the
+// multiple choices /options given with each question. For Multiple Choice Questions,
+// each question has four options, and the candidate has to click the appropriate
+// option.
+//                 </Modal.Body>
+//             </Modal>
+//         );
+//     }
+// }
 
 class CycleTest extends Component {
     constructor(props) {
@@ -99,7 +126,7 @@ class CycleTest extends Component {
             showErrorAlert: false,
             showSuccessAlert: false,
             page_loading: true,
-            showModal: false,
+            // showModal: false,
         };
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
@@ -124,11 +151,11 @@ class CycleTest extends Component {
         });
     };
 
-    toggleModal = () => {
-        this.setState({
-            showModal: !this.state.showModal,
-        });
-    };
+    // toggleModal = () => {
+    //     this.setState({
+    //         showModal: !this.state.showModal,
+    //     });
+    // };
 
     loadCycleTestData = () => {
         fetch(
@@ -199,6 +226,39 @@ class CycleTest extends Component {
         this.loadCycleTestData();
     };
 
+    handleExamStart = () => {
+        this.setState({
+            page_loading: true,
+        });
+
+        fetch(
+            `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/cycletest/auto/start/`,
+            {
+                method: "POST",
+                headers: this.headers,
+                body: JSON.stringify({
+                    cycle_test_id: this.cycleTestId,
+                }),
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.props.history.push(`${this.props.match.url}/test`)
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     render() {
         document.title = `${this.state.chapter_name} Cycle Test - Teacher | IQLabs`;
         return (
@@ -206,7 +266,7 @@ class CycleTest extends Component {
                 {/* Navbar */}
                 <Header
                     name={this.state.subject_name}
-                    chapter_name={`${this.state.chapter_name} - ${this.state.cycleTestItem.cycle_test_name}`}
+                    chapter_name={this.state.chapter_name}
                     goBack={this.props.history.goBack}
                 />
 
@@ -221,13 +281,13 @@ class CycleTest extends Component {
                 />
 
                 {/* Add Subject modal */}
-                <ExamStartModal
+                {/* <ExamStartModal
                     show={this.state.showModal}
                     onHide={this.toggleModal}
                     subjectId={this.subjectId}
                     chapterId={this.chapterId}
                     cycleTestId={this.cycleTestId}
-                />
+                /> */}
 
                 <div className="exam-section">
                     <div className="container-fluid">
@@ -249,13 +309,12 @@ class CycleTest extends Component {
                                         mins
                                     </div>
                                     <div className="col-md-2 text-right">
-                                        <Link
-                                            to={`${this.props.match.url}/test`}
+                                        <button
+                                            className="btn btn-primary btn-sm shadow-none"
+                                            onClick={this.handleExamStart}
                                         >
-                                            <button className="btn btn-primary btn-sm">
-                                                Start
-                                            </button>
-                                        </Link>
+                                            Start Exam
+                                        </button>
                                     </div>
                                 </div>
 
