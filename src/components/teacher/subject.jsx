@@ -7,6 +7,8 @@ import { Link } from "react-router-dom";
 import { Modal, Alert, Spinner } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import Loading from "../sharedComponents/loader";
+import { UpdateContentModal } from "../sharedComponents/updateModal";
+import { DeleteContentModal } from "../sharedComponents/deleteModal";
 
 class ChapterModal extends Component {
     constructor() {
@@ -516,420 +518,6 @@ class ChapterEditModal extends Component {
     }
 }
 
-class SemesterEditModal extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            semester_id: this.props.data.semester_id,
-            semester_name: this.props.data.semester_name,
-
-            errorMsg: "",
-            successMsg: "",
-            showErrorAlert: false,
-            showSuccessAlert: false,
-            showLoader: false,
-        };
-        this.url = baseUrl + teacherUrl;
-        this.authToken = localStorage.getItem("Authorization");
-        this.headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: this.authToken,
-        };
-    }
-
-    handleSubmit = (event) => {
-        event.preventDefault();
-
-        this.setState({
-            showLoader: true,
-            showErrorAlert: false,
-            showSuccessAlert: false,
-        });
-
-        fetch(`${this.url}/teacher/subject/${this.props.subjectId}/semester/`, {
-            headers: this.headers,
-            method: "PATCH",
-            body: JSON.stringify({
-                semester_id: this.state.semester_id,
-                semester_name: this.state.semester_name,
-            }),
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    this.setState({
-                        successMsg: result.msg,
-                        showSuccessAlert: true,
-                        showLoader: false,
-                    });
-                    this.props.formSubmission(true);
-                } else {
-                    this.setState({
-                        errorMsg: result.msg,
-                        showErrorAlert: true,
-                        showLoader: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    handleSemester = (event) => {
-        this.setState({
-            semester_name: event.target.value,
-        });
-    };
-
-    render() {
-        return (
-            <Modal
-                show={this.props.show}
-                onHide={this.props.onHide}
-                size="md"
-                aria-labelledby="contained-modal-title-vcenter"
-                centered
-            >
-                <Modal.Header closeButton>Edit Semester</Modal.Header>
-                <Modal.Body>
-                    <Alert
-                        variant="danger"
-                        show={this.state.showErrorAlert}
-                        onClose={() => {
-                            this.setState({
-                                showErrorAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.errorMsg}
-                    </Alert>
-                    <Alert
-                        variant="success"
-                        show={this.state.showSuccessAlert}
-                        onClose={() => {
-                            this.setState({
-                                showSuccessAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.successMsg}
-                    </Alert>
-
-                    <form onSubmit={this.handleSubmit} autoComplete="off">
-                        <div className="form-group">
-                            <label htmlFor="semester">Semester Name</label>
-                            <input
-                                type="text"
-                                name="semester"
-                                id="semester"
-                                className="form-control borders"
-                                onChange={this.handleSemester}
-                                placeholder="Semester name"
-                                value={this.state.semester_name}
-                                required
-                            />
-                        </div>
-                        <div className="form-group">
-                            <button className="btn btn-primary btn-sm btn-block">
-                                {this.state.showLoader ? (
-                                    <Spinner
-                                        as="span"
-                                        animation="border"
-                                        size="sm"
-                                        role="status"
-                                        aria-hidden="true"
-                                        className="mr-2"
-                                    />
-                                ) : (
-                                    ""
-                                )}
-                                Update
-                            </button>
-                        </div>
-                    </form>
-                </Modal.Body>
-            </Modal>
-        );
-    }
-}
-
-// class ChapterDeleteModal extends Component {
-//     constructor(props) {
-//         super(props);
-//         this.state = {
-//             errorMsg: "",
-//             successMsg: "",
-//             showErrorAlert: false,
-//             showSuccessAlert: false,
-//             showLoader: false,
-//         };
-//         this.url = baseUrl + teacherUrl;
-//         this.authToken = localStorage.getItem("Authorization");
-//         this.headers = {
-//             Accept: "application/json",
-//             "Content-Type": "application/json",
-//             Authorization: this.authToken,
-//         };
-//     }
-
-//     handleDelete = () => {
-//         this.setState({
-//             showSuccessAlert: false,
-//             showErrorAlert: false,
-//             showLoader: true,
-//         });
-
-//         fetch(`${this.url}/teacher/subject/${this.props.subjectId}/chapter/`, {
-//             method: "DELETE",
-//             headers: this.headers,
-//             body: JSON.stringify({ chapter_id: this.props.data.chapter_id }),
-//         })
-//             .then((res) => res.json())
-//             .then((result) => {
-//                 console.log(result);
-//                 if (result.sts === true) {
-//                     this.setState({
-//                         successMsg: result.msg,
-//                         showSuccessAlert: true,
-//                         showLoader: false,
-//                     });
-//                     this.props.chapterFormSubmission(true);
-//                 } else {
-//                     if (result.detail) {
-//                         this.setState({
-//                             errorMsg: result.detail,
-//                         });
-//                     } else {
-//                         this.setState({
-//                             errorMsg: result.msg,
-//                         });
-//                     }
-//                     this.setState({
-//                         showErrorAlert: true,
-//                         showLoader: false,
-//                     });
-//                 }
-//             })
-//             .catch((err) => {
-//                 console.log(err);
-//             });
-//     };
-
-//     render() {
-//         return (
-//             <Modal
-//                 show={this.props.show}
-//                 onHide={this.props.onHide}
-//                 size="md"
-//                 aria-labelledby="contained-modal-title-vcenter"
-//                 centered
-//             >
-//                 <Modal.Header closeButton>Delete Chapter</Modal.Header>
-//                 <Modal.Body>
-//                     <Alert
-//                         variant="danger"
-//                         show={this.state.showErrorAlert}
-//                         onClose={() => {
-//                             this.setState({
-//                                 showErrorAlert: false,
-//                             });
-//                         }}
-//                         dismissible
-//                     >
-//                         {this.state.errorMsg}
-//                     </Alert>
-//                     <Alert
-//                         variant="success"
-//                         show={this.state.showSuccessAlert}
-//                         onClose={() => {
-//                             this.setState({
-//                                 showSuccessAlert: false,
-//                             });
-//                         }}
-//                         dismissible
-//                     >
-//                         {this.state.successMsg}
-//                     </Alert>
-//                     <p className="mb-0">
-//                         Are you sure that you want to delete{" "}
-//                         <span className="font-weight-bold">
-//                             {this.props.data.chapter_name}
-//                         </span>
-//                         ?
-//                     </p>
-//                 </Modal.Body>
-//                 <Modal.Footer>
-//                     <button
-//                         className="btn btn-secondary btn-sm mr-2"
-//                         onClick={this.props.toggleModal}
-//                     >
-//                         Cancel
-//                     </button>
-//                     <button
-//                         className="btn btn-primary btn-sm"
-//                         onClick={this.handleDelete}
-//                     >
-//                         {this.state.showLoader ? (
-//                             <Spinner
-//                                 as="span"
-//                                 animation="border"
-//                                 size="sm"
-//                                 role="status"
-//                                 aria-hidden="true"
-//                                 className="mr-2"
-//                             />
-//                         ) : (
-//                             ""
-//                         )}
-//                         Delete
-//                     </button>
-//                 </Modal.Footer>
-//             </Modal>
-//         );
-//     }
-// }
-
-// class SemesterDeleteModal extends Component {
-//     constructor(props) {
-//         super(props);
-//         this.state = {
-//             errorMsg: "",
-//             successMsg: "",
-//             showErrorAlert: false,
-//             showSuccessAlert: false,
-//             showLoader: false,
-//         };
-//         this.url = baseUrl + teacherUrl;
-//         this.authToken = localStorage.getItem("Authorization");
-//         this.headers = {
-//             Accept: "application/json",
-//             "Content-Type": "application/json",
-//             Authorization: this.authToken,
-//         };
-//     }
-
-//     handleDelete = () => {
-//         this.setState({
-//             showSuccessAlert: false,
-//             showErrorAlert: false,
-//             showLoader: true,
-//         });
-
-//         fetch(`${this.url}/teacher/subject/${this.props.subjectId}/semester/`, {
-//             method: "DELETE",
-//             headers: this.headers,
-//             body: JSON.stringify({ semester_id: this.props.data.semester_id }),
-//         })
-//             .then((res) => res.json())
-//             .then((result) => {
-//                 console.log(result);
-//                 if (result.sts === true) {
-//                     this.setState({
-//                         successMsg: result.msg,
-//                         showSuccessAlert: true,
-//                         showLoader: false,
-//                     });
-//                     this.props.semesterFormSubmission(true);
-//                 } else {
-//                     if (result.detail) {
-//                         this.setState({
-//                             errorMsg: result.detail,
-//                         });
-//                     } else {
-//                         this.setState({
-//                             errorMsg: result.msg,
-//                         });
-//                     }
-//                     this.setState({
-//                         showErrorAlert: true,
-//                         showLoader: false,
-//                     });
-//                 }
-//             })
-//             .catch((err) => {
-//                 console.log(err);
-//             });
-//     };
-
-//     render() {
-//         return (
-//             <Modal
-//                 show={this.props.show}
-//                 onHide={this.props.onHide}
-//                 size="md"
-//                 aria-labelledby="contained-modal-title-vcenter"
-//                 centered
-//             >
-//                 <Modal.Header closeButton>Delete Semester</Modal.Header>
-//                 <Modal.Body>
-//                     <Alert
-//                         variant="danger"
-//                         show={this.state.showErrorAlert}
-//                         onClose={() => {
-//                             this.setState({
-//                                 showErrorAlert: false,
-//                             });
-//                         }}
-//                         dismissible
-//                     >
-//                         {this.state.errorMsg}
-//                     </Alert>
-//                     <Alert
-//                         variant="success"
-//                         show={this.state.showSuccessAlert}
-//                         onClose={() => {
-//                             this.setState({
-//                                 showSuccessAlert: false,
-//                             });
-//                         }}
-//                         dismissible
-//                     >
-//                         {this.state.successMsg}
-//                     </Alert>
-//                     <p className="mb-0">
-//                         Are you sure that you want to delete{" "}
-//                         <span className="font-weight-bold">
-//                             {this.props.data.semester_name}
-//                         </span>
-//                         ?
-//                     </p>
-//                 </Modal.Body>
-//                 <Modal.Footer>
-//                     <button
-//                         className="btn btn-secondary btn-sm mr-2"
-//                         onClick={this.props.toggleModal}
-//                     >
-//                         Cancel
-//                     </button>
-//                     <button
-//                         className="btn btn-primary btn-sm"
-//                         onClick={this.handleDelete}
-//                     >
-//                         {this.state.showLoader ? (
-//                             <Spinner
-//                                 as="span"
-//                                 animation="border"
-//                                 size="sm"
-//                                 role="status"
-//                                 aria-hidden="true"
-//                                 className="mr-2"
-//                             />
-//                         ) : (
-//                             ""
-//                         )}
-//                         Delete
-//                     </button>
-//                 </Modal.Footer>
-//             </Modal>
-//         );
-//     }
-// }
-
 const mapStateToProps = (state) => ({
     subject_name: state.subject_name,
 });
@@ -943,8 +531,7 @@ class SubjectChapters extends Component {
             showSemesterModal: false,
             showChapter_EditModal: false,
             showSemester_EditModal: false,
-            // showChapter_DeleteModal: false,
-            // showSemester_DeleteModal: false,
+            showSemester_DeleteModal: false,
 
             subjectItems: [], // Chapter data
             semesterItems: [], // Semester data
@@ -995,19 +582,12 @@ class SubjectChapters extends Component {
         });
     };
 
-    // toggleChapter_DeleteModal = (data) => {
-    //     this.setState({
-    //         selectedChapter: data,
-    //         showChapter_DeleteModal: !this.state.showChapter_DeleteModal,
-    //     });
-    // };
-
-    // toggleSemester_DeleteModal = (data) => {
-    //     this.setState({
-    //         selectedSemester: data,
-    //         showSemester_DeleteModal: !this.state.showSemester_DeleteModal,
-    //     });
-    // };
+    toggleSemester_DeleteModal = (data) => {
+        this.setState({
+            selectedSemester: data,
+            showSemester_DeleteModal: !this.state.showSemester_DeleteModal,
+        });
+    };
 
     toggleSemesterModal = () => {
         const chapter_id = this.state.chapter_id;
@@ -1197,44 +777,42 @@ class SubjectChapters extends Component {
 
                 {/* Semester Edit modal */}
                 {this.state.showSemester_EditModal ? (
-                    <SemesterEditModal
+                    <UpdateContentModal
                         show={this.state.showSemester_EditModal}
                         onHide={this.toggleSemester_EditModal}
                         formSubmission={this.semesterFormSubmission}
-                        subjectId={this.subjectId}
-                        data={this.state.selectedSemester}
+                        url={`${this.url}/teacher/subject/${this.subjectId}/semester/`}
+                        type="Semester"
+                        name={this.state.selectedSemester.semester_name}
+                        data={{
+                            semester_id: this.state.selectedSemester
+                                .semester_id,
+                            semester_name: this.state.selectedSemester
+                                .semester_name,
+                        }}
                     />
                 ) : (
                     ""
                 )}
 
-                {/* Chapter Delete modal */}
-                {/* {this.state.showChapter_DeleteModal ? (
-                    <ChapterDeleteModal
-                        show={this.state.showChapter_DeleteModal}
-                        onHide={this.toggleChapter_DeleteModal}
-                        formSubmission={this.chapterFormSubmission}
-                        subjectId={this.subjectId}
-                        data={this.state.selectedChapter}
-                        toggleModal={this.toggleChapter_DeleteModal}
-                    />
-                ) : (
-                    ""
-                )} */}
-
                 {/* Semester Delete modal */}
-                {/* {this.state.showSemester_DeleteModal ? (
-                    <SemesterDeleteModal
+                {this.state.showSemester_DeleteModal ? (
+                    <DeleteContentModal
                         show={this.state.showSemester_DeleteModal}
                         onHide={this.toggleSemester_DeleteModal}
                         formSubmission={this.semesterFormSubmission}
-                        subjectId={this.subjectId}
-                        data={this.state.selectedSemester}
+                        url={`${this.url}/teacher/subject/${this.subjectId}/semester/`}
+                        type="Semester"
+                        name={this.state.selectedSemester.semester_name}
+                        data={{
+                            semester_id: this.state.selectedSemester
+                                .semester_id,
+                        }}
                         toggleModal={this.toggleSemester_DeleteModal}
                     />
                 ) : (
                     ""
-                )} */}
+                )}
 
                 <div
                     className={`section content ${
@@ -1508,7 +1086,7 @@ class SubjectChapters extends Component {
                                                                       >
                                                                           <i className="far fa-edit"></i>
                                                                       </button>
-                                                                      {/* <button
+                                                                      <button
                                                                           className="btn btn-primary-invert shadow-sm btn-sm"
                                                                           onClick={() =>
                                                                               this.toggleSemester_DeleteModal(
@@ -1517,7 +1095,7 @@ class SubjectChapters extends Component {
                                                                           }
                                                                       >
                                                                           <i className="far fa-trash-alt"></i>
-                                                                      </button> */}
+                                                                      </button>
                                                                   </td>
                                                               </tr>
                                                           </React.Fragment>

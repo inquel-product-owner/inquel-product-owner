@@ -4,6 +4,7 @@ import { Switch, Route, Redirect } from "react-router-dom";
 import Dashboard from "./dashboard";
 import Leaderboard from "./leaderBoard";
 
+import Group from "./group";
 import Subject from "./subject";
 import TestResult from "./testResult";
 import Summary from "./summary";
@@ -49,6 +50,18 @@ const studentRoutes = (
 
         {/* ---------- Subject ---------- */}
 
+        <Route
+            exact
+            path="/student/group/:groupId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/student/login" />
+                ) : (
+                    <Group {...props} />
+                )
+            }
+        />
         <Route
             exact
             path="/student/subject/:subjectId"

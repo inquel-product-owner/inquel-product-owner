@@ -631,7 +631,7 @@ class CycleTestAutoQA extends Component {
                                                                               key={
                                                                                   index
                                                                               }
-                                                                              className="card preview-img-sm bg-light shadow-sm"
+                                                                              className="card preview-img-xs bg-light shadow-sm"
                                                                               style={{
                                                                                   backgroundImage: `url(${images.path})`,
                                                                               }}

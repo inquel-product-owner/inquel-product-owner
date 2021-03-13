@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import axios from "axios";
-import Header from "./shared/navbar";
-import SideNav from "./shared/sidenav";
+import Header from "./navbar";
+import SideNav from "./sidenav";
 import { Link } from "react-router-dom";
 import Select from "react-select";
 import { Spinner, Modal, Alert } from "react-bootstrap";
-import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
+import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
 import Loading from "../sharedComponents/loader";
 import userpic from "../../assets/user-v1.png";
 import AlertBox from "../sharedComponents/alert";
@@ -23,7 +23,7 @@ class ImageUploadModal extends Component {
             showSuccessAlert: false,
             showLoader: false,
         };
-        this.url = baseUrl + studentUrl;
+        this.url = baseUrl + hodUrl;
         this.authToken = localStorage.getItem("Authorization");
     }
 
@@ -63,10 +63,10 @@ class ImageUploadModal extends Component {
         } else {
             if (this.props.profile_link === null) {
                 axios
-                    .post(`${this.url}/student/profile/`, form_data, options)
+                    .post(`${this.url}/hod/profile/`, form_data, options)
                     .then((result) => {
                         console.log(result);
-                        if (result.data.url && result.data.sts === true) {
+                        if (result.data.sts === true) {
                             this.setState({
                                 successMsg: result.data.msg,
                                 showSuccessAlert: true,
@@ -88,10 +88,10 @@ class ImageUploadModal extends Component {
                     });
             } else {
                 axios
-                    .patch(`${this.url}/student/profile/`, form_data, options)
+                    .patch(`${this.url}/hod/profile/`, form_data, options)
                     .then((result) => {
                         console.log(result);
-                        if (result.data.url && result.data.sts === true) {
+                        if (result.data.sts === true) {
                             this.setState({
                                 successMsg: result.data.msg,
                                 showSuccessAlert: true,
@@ -201,7 +201,7 @@ class Profile extends Component {
         this.state = {
             showSideNav: false,
             showModal: false,
-            studentItems: [],
+            hodItems: [],
             showEditOption: false,
             page_loading: true,
             errorMsg: "",
@@ -211,7 +211,7 @@ class Profile extends Component {
             showImageLoader: false,
             showLoader: false,
         };
-        this.url = baseUrl + studentUrl;
+        this.url = baseUrl + hodUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
             Accept: "application/json",
@@ -239,31 +239,31 @@ class Profile extends Component {
     };
 
     handleInput = (event) => {
-        let data = this.state.studentItems;
+        let data = this.state.hodItems;
         data[event.target.name] = event.target.value;
         this.setState({
-            studentItems: data,
+            hodItems: data,
         });
     };
 
     handleDate = (event) => {
-        let data = this.state.studentItems;
+        let data = this.state.hodItems;
         data.date_of_birth = dateFormat(event.target.value, "yyyy-mm-dd");
         this.setState({
-            studentItems: data,
+            hodItems: data,
         });
     };
 
     handleSelect = (event) => {
-        let data = this.state.studentItems;
+        let data = this.state.hodItems;
         data.country_code = event.value;
         this.setState({
-            studentItems: data,
+            hodItems: data,
         });
     };
 
-    loadStudentData = () => {
-        fetch(`${this.url}/student/profile/`, {
+    loadTeacherData = () => {
+        fetch(`${this.url}/hod/profile/`, {
             method: "GET",
             headers: this.headers,
         })
@@ -272,7 +272,7 @@ class Profile extends Component {
                 console.log(result);
                 if (result.sts === true) {
                     this.setState({
-                        studentItems: result.data,
+                        hodItems: result.data,
                         page_loading: false,
                     });
                 } else {
@@ -289,9 +289,9 @@ class Profile extends Component {
     };
 
     componentDidMount = () => {
-        document.title = "My Profile - Student | IQLabs";
+        document.title = "My Profile - HOD | IQLabs";
 
-        this.loadStudentData();
+        this.loadTeacherData();
     };
 
     handleSubmit = (event) => {
@@ -302,21 +302,21 @@ class Profile extends Component {
             showLoader: true,
         });
 
-        fetch(`${this.url}/student/profile/`, {
+        fetch(`${this.url}/hod/profile/`, {
             method: "PUT",
             headers: this.headers,
             body: JSON.stringify({
-                first_name: this.state.studentItems.first_name,
-                last_name: this.state.studentItems.last_name,
-                username: this.state.studentItems.username,
+                first_name: this.state.hodItems.first_name,
+                last_name: this.state.hodItems.last_name,
+                username: this.state.hodItems.username,
                 phone_num:
-                    this.state.studentItems.country_code +
-                    this.state.studentItems.phone_num,
+                    this.state.hodItems.country_code +
+                    this.state.hodItems.phone_num,
                 date_of_birth: dateFormat(
-                    this.state.studentItems.date_of_birth,
+                    this.state.hodItems.date_of_birth,
                     "yyyy-mm-dd"
                 ),
-                description: this.state.studentItems.description,
+                description: this.state.hodItems.description,
             }),
         })
             .then((res) => res.json())
@@ -335,7 +335,7 @@ class Profile extends Component {
                                     showEditOption: false,
                                     page_loading: true,
                                 });
-                                this.loadStudentData();
+                                this.loadTeacherData();
                             }, 1000);
                         }
                     );
@@ -354,7 +354,7 @@ class Profile extends Component {
 
     formSubmission = () => {
         setTimeout(() => {
-            this.loadStudentData();
+            this.loadTeacherData();
             this.setState({
                 showModal: false,
                 page_loading: true,
@@ -412,7 +412,7 @@ class Profile extends Component {
                     <ImageUploadModal
                         show={this.state.showModal}
                         onHide={this.toggleModal}
-                        profile_link={this.state.studentItems.profile_link}
+                        profile_link={this.state.hodItems.profile_link}
                         formSubmission={this.formSubmission}
                     />
                 ) : (
@@ -469,20 +469,20 @@ class Profile extends Component {
                                         <div style={{ position: "relative" }}>
                                             <img
                                                 src={
-                                                    this.state.studentItems
+                                                    this.state.hodItems
                                                         .length !== 0
                                                         ? this.state
-                                                              .studentItems
+                                                              .hodItems
                                                               .profile_link !==
                                                           null
                                                             ? this.state
-                                                                  .studentItems
+                                                                  .hodItems
                                                                   .profile_link
                                                             : userpic
                                                         : userpic
                                                 }
                                                 alt={
-                                                    this.state.studentItems
+                                                    this.state.hodItems
                                                         .full_name
                                                 }
                                                 className="img-fluid shadow-sm mb-3"
@@ -499,12 +499,12 @@ class Profile extends Component {
                                             </button>
                                         </div>
                                         <p className="primary-text font-weight-bold-600 mb-2">
-                                            {this.state.studentItems.full_name}{" "}
+                                            {this.state.hodItems.full_name}{" "}
                                             - @
-                                            {this.state.studentItems.username}
+                                            {this.state.hodItems.username}
                                         </p>
                                         <p className="small mb-0">
-                                            {this.state.studentItems.email}
+                                            {this.state.hodItems.email}
                                         </p>
                                     </div>
                                 </div>
@@ -533,7 +533,7 @@ class Profile extends Component {
                                                                 className="form-control border-secondary"
                                                                 value={
                                                                     this.state
-                                                                        .studentItems
+                                                                        .hodItems
                                                                         .first_name
                                                                 }
                                                                 onChange={
@@ -555,7 +555,7 @@ class Profile extends Component {
                                                                 className="form-control border-secondary"
                                                                 value={
                                                                     this.state
-                                                                        .studentItems
+                                                                        .hodItems
                                                                         .last_name
                                                                 }
                                                                 onChange={
@@ -577,7 +577,7 @@ class Profile extends Component {
                                                                 className="form-control border-secondary"
                                                                 value={
                                                                     this.state
-                                                                        .studentItems
+                                                                        .hodItems
                                                                         .username
                                                                 }
                                                                 onChange={
@@ -604,11 +604,11 @@ class Profile extends Component {
                                                                         defaultValue={{
                                                                             label: this
                                                                                 .state
-                                                                                .studentItems
+                                                                                .hodItems
                                                                                 .country_code,
                                                                             value: this
                                                                                 .state
-                                                                                .studentItems
+                                                                                .hodItems
                                                                                 .country_code,
                                                                         }}
                                                                         isSearchable={
@@ -648,7 +648,7 @@ class Profile extends Component {
                                                                         value={
                                                                             this
                                                                                 .state
-                                                                                .studentItems
+                                                                                .hodItems
                                                                                 .phone_num
                                                                         }
                                                                         placeholder="Enter phone number"
@@ -670,7 +670,7 @@ class Profile extends Component {
                                                                 className="form-control border-secondary"
                                                                 value={dateFormat(
                                                                     this.state
-                                                                        .studentItems
+                                                                        .hodItems
                                                                         .date_of_birth,
                                                                     "yyyy-mm-dd"
                                                                 )}
@@ -701,7 +701,7 @@ class Profile extends Component {
                                                                 className="form-control border-secondary"
                                                                 value={
                                                                     this.state
-                                                                        .studentItems
+                                                                        .hodItems
                                                                         .city
                                                                 }
                                                                 onChange={
@@ -723,7 +723,7 @@ class Profile extends Component {
                                                                 className="form-control border-secondary"
                                                                 value={
                                                                     this.state
-                                                                        .studentItems
+                                                                        .hodItems
                                                                         .district
                                                                 }
                                                                 onChange={
@@ -745,7 +745,7 @@ class Profile extends Component {
                                                                 className="form-control border-secondary"
                                                                 value={
                                                                     this.state
-                                                                        .studentItems
+                                                                        .hodItems
                                                                         .state
                                                                 }
                                                                 onChange={
@@ -767,7 +767,7 @@ class Profile extends Component {
                                                                 className="form-control border-secondary"
                                                                 value={
                                                                     this.state
-                                                                        .studentItems
+                                                                        .hodItems
                                                                         .country
                                                                 }
                                                                 onChange={
@@ -799,7 +799,7 @@ class Profile extends Component {
                                                     >
                                                         {
                                                             this.state
-                                                                .studentItems
+                                                                .hodItems
                                                                 .description
                                                         }
                                                     </textarea>
@@ -839,7 +839,7 @@ class Profile extends Component {
                                                         </p>
                                                         {
                                                             this.state
-                                                                .studentItems
+                                                                .hodItems
                                                                 .first_name
                                                         }
                                                     </div>
@@ -851,7 +851,7 @@ class Profile extends Component {
                                                         </p>
                                                         {
                                                             this.state
-                                                                .studentItems
+                                                                .hodItems
                                                                 .last_name
                                                         }
                                                     </div>
@@ -863,7 +863,7 @@ class Profile extends Component {
                                                         </p>
                                                         {
                                                             this.state
-                                                                .studentItems
+                                                                .hodItems
                                                                 .username
                                                         }
                                                     </div>
@@ -875,7 +875,7 @@ class Profile extends Component {
                                                         </p>
                                                         {
                                                             this.state
-                                                                .studentItems
+                                                                .hodItems
                                                                 .email
                                                         }
                                                     </div>
@@ -885,7 +885,7 @@ class Profile extends Component {
                                                         <p className="small font-weight-bold-600 mb-2">
                                                             Phone
                                                         </p>
-                                                        {`${this.state.studentItems.country_code}-${this.state.studentItems.phone_num}`}
+                                                        {`${this.state.hodItems.country_code}-${this.state.hodItems.phone_num}`}
                                                     </div>
                                                 </div>
                                                 <div className="col-lg-4 col-sm-6 col-12">
@@ -895,7 +895,7 @@ class Profile extends Component {
                                                         </p>
                                                         {dateFormat(
                                                             this.state
-                                                                .studentItems
+                                                                .hodItems
                                                                 .date_of_birth,
                                                             "dd-mm-yyyy"
                                                         )}
@@ -916,7 +916,7 @@ class Profile extends Component {
                                                         </p>
                                                         {
                                                             this.state
-                                                                .studentItems
+                                                                .hodItems
                                                                 .city
                                                         }
                                                     </div>
@@ -928,7 +928,7 @@ class Profile extends Component {
                                                         </p>
                                                         {
                                                             this.state
-                                                                .studentItems
+                                                                .hodItems
                                                                 .district
                                                         }
                                                     </div>
@@ -940,7 +940,7 @@ class Profile extends Component {
                                                         </p>
                                                         {
                                                             this.state
-                                                                .studentItems
+                                                                .hodItems
                                                                 .state
                                                         }
                                                     </div>
@@ -952,7 +952,7 @@ class Profile extends Component {
                                                         </p>
                                                         {
                                                             this.state
-                                                                .studentItems
+                                                                .hodItems
                                                                 .country
                                                         }
                                                     </div>
@@ -964,7 +964,7 @@ class Profile extends Component {
                                                     About
                                                 </p>
                                                 {
-                                                    this.state.studentItems
+                                                    this.state.hodItems
                                                         .description
                                                 }
                                             </div>
