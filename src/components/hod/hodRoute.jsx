@@ -3,7 +3,7 @@ import { Switch, Route, Redirect } from "react-router-dom";
 
 import HODLogin from "./login";
 import Dashboard from "./dashboard";
-import Account from "./account";
+import Profile from "./profile";
 
 import Group from "./group/group";
 import GroupConfiguration from "./group/configuration";
@@ -232,7 +232,7 @@ const hodRoutes = (
                 !localStorage.getItem("is_hod") ? (
                     <Redirect to="/hod/login" />
                 ) : (
-                    <Account {...props} />
+                    <Profile {...props} />
                 )
             }
         />

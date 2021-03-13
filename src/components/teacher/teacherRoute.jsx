@@ -26,6 +26,7 @@ import EvaluateStudents from "./evaluateStudents";
 import Leaderboard from "./leaderBoard";
 import SummaryUpload from "./summaryUpload";
 import NotesUpload from "./notesUpload";
+import Profile from "./profile";
 
 const teacherRoutes = (
     <Switch>
@@ -38,6 +39,18 @@ const teacherRoutes = (
                     <Redirect to="/teacher/login" />
                 ) : (
                     <Dashboard />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/teacher/profile"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <Profile {...props} />
                 )
             }
         />
