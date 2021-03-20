@@ -271,6 +271,12 @@ input[type="search"]:focus {
     overflow: hidden;
 }
 
+/* thead {
+    border-top-left-radius: 8px !important;
+    border-top-right-radius: 8px !important;
+    overflow: hidden;
+} */
+
 .table th {
     border-top: none;
     font-size: 14px;
@@ -504,8 +510,8 @@ input[type="search"]:focus {
 
 .fp-container .fp-loader {
     top: 40%;
-    left: 50%;
-    z-index: 1000;
+    left: 40%;
+    z-index: 2000;
     position: absolute;
 }
 
@@ -545,6 +551,7 @@ input[type="search"]:focus {
     padding: 0.5rem 1rem;
     top: -6%;
     font-size: 22px;
+    outline: none;
 }
 
 .alert-top .close {
@@ -552,7 +559,7 @@ input[type="search"]:focus {
     outline: none;
 }
 
-.alert::nth-letter(odd) {
+.alert::first-letter {
     text-transform: uppercase;
 }
 
@@ -736,6 +743,10 @@ input[type="search"]:focus {
     border-top-right-radius: 8px;
 }
 
+.accordion > .card {
+    overflow: unset !important;
+}
+
 /* Content edit options */
 
 @media screen and (min-width: 769px) {
@@ -766,12 +777,15 @@ input[type="search"]:focus {
     cursor: zoom-in;
 }
 
-.preview-img-lg {
-    width: 100%;
-    height: 170px;
+.preview-img-circle {
+    width: 35px;
+    height: 35px;
+    margin-bottom: 5px;
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
+    cursor: zoom-in;
+    border-radius: 50% !important;
 }
 
 /* PDF Preview */

@@ -21,7 +21,9 @@ class Notes extends Component {
             topic_num: "",
             page_loading: true,
             errorMsg: "",
+            successMsg: "",
             showErrorAlert: false,
+            showSuccessAlert: false,
             numPages: null,
             pageNumber: 1,
         };
@@ -39,12 +41,6 @@ class Notes extends Component {
     toggleSideNav = () => {
         this.setState({
             showSideNav: !this.state.showSideNav,
-        });
-    };
-
-    toggleErrorAlert = () => {
-        this.setState({
-            showErrorAlert: false,
         });
     };
 
@@ -190,7 +186,8 @@ class Notes extends Component {
             <div key={index}>
                 <Card.Header
                     className={`small ${
-                        this.state.topic_num === data.topic_num
+                        this.state.topic_num === data.topic_num &&
+                        this.state.topicName === data.topic_name
                             ? "light-bg"
                             : "bg-light"
                     } shadow-sm mb-2`}
@@ -235,11 +232,19 @@ class Notes extends Component {
                 {/* ALert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
-                    successMsg="NODATA"
+                    successMsg={this.state.successMsg}
                     showErrorAlert={this.state.showErrorAlert}
-                    showSuccessAlert={false}
-                    toggleSuccessAlert=""
-                    toggleErrorAlert={this.toggleErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
                 />
 
                 {/* Sidebar */}
@@ -444,42 +449,51 @@ class Notes extends Component {
                                                                           }
                                                                       </p>
                                                                       <nav>
-                                                                          <button
-                                                                              className="btn btn-primary btn-sm mr-2"
-                                                                              onClick={
-                                                                                  this
-                                                                                      .goToPrevPage
-                                                                              }
-                                                                              disabled={
-                                                                                  this
-                                                                                      .state
-                                                                                      .pageNumber ===
-                                                                                  1
-                                                                                      ? true
-                                                                                      : false
-                                                                              }
-                                                                          >
-                                                                              Prev
-                                                                          </button>
-                                                                          <button
-                                                                              className="btn btn-primary btn-sm"
-                                                                              onClick={
-                                                                                  this
-                                                                                      .goToNextPage
-                                                                              }
-                                                                              disabled={
-                                                                                  this
-                                                                                      .state
-                                                                                      .numPages ===
-                                                                                  this
-                                                                                      .state
-                                                                                      .pageNumber
-                                                                                      ? true
-                                                                                      : false
-                                                                              }
-                                                                          >
-                                                                              Next
-                                                                          </button>
+                                                                          {this
+                                                                              .state
+                                                                              .numPages >
+                                                                          1 ? (
+                                                                              <>
+                                                                                  <button
+                                                                                      className="btn btn-primary btn-sm mr-2"
+                                                                                      onClick={
+                                                                                          this
+                                                                                              .goToPrevPage
+                                                                                      }
+                                                                                      disabled={
+                                                                                          this
+                                                                                              .state
+                                                                                              .pageNumber ===
+                                                                                          1
+                                                                                              ? true
+                                                                                              : false
+                                                                                      }
+                                                                                  >
+                                                                                      Prev
+                                                                                  </button>
+                                                                                  <button
+                                                                                      className="btn btn-primary btn-sm"
+                                                                                      onClick={
+                                                                                          this
+                                                                                              .goToNextPage
+                                                                                      }
+                                                                                      disabled={
+                                                                                          this
+                                                                                              .state
+                                                                                              .numPages ===
+                                                                                          this
+                                                                                              .state
+                                                                                              .pageNumber
+                                                                                              ? true
+                                                                                              : false
+                                                                                      }
+                                                                                  >
+                                                                                      Next
+                                                                                  </button>
+                                                                              </>
+                                                                          ) : (
+                                                                              ""
+                                                                          )}
                                                                       </nav>
                                                                   </div>
                                                               ) : (
@@ -503,7 +517,7 @@ class Notes extends Component {
                                                               );
                                                           }
                                                       )
-                                                    : null}
+                                                    : 'No content to display...'}
                                             </div>
                                         </div>
                                     </div>

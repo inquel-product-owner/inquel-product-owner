@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import profilepic from "../../assets/user.png";
+import profilepic from "../../assets/user-v1.png";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";

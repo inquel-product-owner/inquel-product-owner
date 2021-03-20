@@ -3,7 +3,9 @@ import Header from "./shared/examNavbar";
 import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
 import AlertBox from "../sharedComponents/alert";
 import Loading from "../sharedComponents/loader";
-import dateFormat from "dateformat";
+import Lightbox from "react-awesome-lightbox";
+import "react-awesome-lightbox/build/style.css";
+// import dateFormat from "dateformat";
 
 class CycleTestQA extends Component {
     constructor(props) {
@@ -12,11 +14,14 @@ class CycleTestQA extends Component {
             subject_name: "",
             chapter_name: "",
             cycleTestItem: [],
+            questionSection: [],
+            answerSection: [],
             examInfo: [],
-            sections: [],
-            activeSection: 0,
-            activeImageData: "",
-            activeImageQuestion: 0,
+            currentSectionIndex: 0,
+
+            selectedImageData: [],
+            startIndex: 0,
+            isLightBoxOpen: false,
 
             errorMsg: "",
             successMsg: "",
@@ -43,26 +48,12 @@ class CycleTestQA extends Component {
         };
     }
 
-    toggleSuccessAlert = () => {
-        this.setState({
-            showSuccessAlert: false,
-        });
-    };
-    toggleErrorAlert = () => {
-        this.setState({
-            showErrorAlert: false,
-        });
-    };
-
     // ---------- Loading the data ----------
 
-    // creates section structure
-    loopSectionStructure = () => {
-        const sections =
-            this.state.cycleTestItem.auto_test !== undefined
-                ? this.state.cycleTestItem.auto_test
-                : [];
-        let temp = [...this.state.sections];
+    // creates section structure for exam submission
+    loopAnswerSection = () => {
+        const sections = this.state.cycleTestItem.auto_test || [];
+        let temp = [...this.state.answerSection];
         let questions = [];
 
         if (localStorage.getItem("data")) {
@@ -84,9 +75,8 @@ class CycleTestQA extends Component {
                 });
             }
         }
-
         this.setState({
-            sections: temp,
+            answerSection: temp,
         });
     };
 
@@ -102,8 +92,12 @@ class CycleTestQA extends Component {
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
+                let sections = [];
+                let questions = [];
+                let images = [];
                 if (result.sts === true) {
                     var duration = "";
+                    let response = result.data.auto_test;
                     if (localStorage.getItem("duration")) {
                         duration = localStorage.getItem("duration");
                     } else if (result.data.auto_test_duration !== undefined) {
@@ -111,13 +105,139 @@ class CycleTestQA extends Component {
                     } else {
                         duration = 0;
                     }
+                    if (response.length !== 0) {
+                        response.forEach((data) => {
+                            questions = [];
+                            for (let i = 0; i < data.questions.length; i++) {
+                                images = [];
+                                if (
+                                    data.questions[i].files !== undefined &&
+                                    data.questions[i].files.length !== 0
+                                ) {
+                                    // image
+                                    if (
+                                        data.questions[i].files[0].type1_image_1
+                                    ) {
+                                        images.push({
+                                            title:
+                                                data.questions[i].files[0]
+                                                    .type1_image_1_title,
+                                            file_name: "",
+                                            image: null,
+                                            path:
+                                                data.questions[i].files[0]
+                                                    .type1_image_1,
+                                        });
+                                    }
+                                    if (
+                                        data.questions[i].files[0].type1_image_2
+                                    ) {
+                                        images.push({
+                                            title:
+                                                data.questions[i].files[0]
+                                                    .type1_image_2_title,
+                                            file_name: "",
+                                            image: null,
+                                            path:
+                                                data.questions[i].files[0]
+                                                    .type1_image_2,
+                                        });
+                                    }
+                                    if (
+                                        data.questions[i].files[0].type1_image_3
+                                    ) {
+                                        images.push({
+                                            title:
+                                                data.questions[i].files[0]
+                                                    .type1_image_3_title,
+                                            file_name: "",
+                                            image: null,
+                                            path:
+                                                data.questions[i].files[0]
+                                                    .type1_image_3,
+                                        });
+                                    }
+                                    if (
+                                        data.questions[i].files[0].type1_image_4
+                                    ) {
+                                        images.push({
+                                            title:
+                                                data.questions[i].files[0]
+                                                    .type1_image_4_title,
+                                            file_name: "",
+                                            image: null,
+                                            path:
+                                                data.questions[i].files[0]
+                                                    .type1_image_4,
+                                        });
+                                    }
+                                }
+
+                                questions.push({
+                                    question: data.questions[i].question,
+                                    question_random_id:
+                                        data.questions[i].question_random_id,
+                                    content: {
+                                        mcq: data.questions[i].mcq || false,
+                                        mcq_answers:
+                                            data.questions[i].mcq_answers || 1,
+                                        fill_in:
+                                            data.questions[i].fill_in || false,
+                                        boolean:
+                                            data.questions[i].boolean || false,
+                                        boolean_question: [
+                                            {
+                                                content: "True",
+                                            },
+                                            {
+                                                content: "False",
+                                            },
+                                        ],
+                                        options:
+                                            data.questions[i].options !==
+                                                undefined &&
+                                            data.questions[i].options.length !==
+                                                0
+                                                ? data.questions[i].options
+                                                : [
+                                                      {
+                                                          content: "",
+                                                      },
+                                                      {
+                                                          content: "",
+                                                      },
+                                                      {
+                                                          content: "",
+                                                      },
+                                                      {
+                                                          content: "",
+                                                      },
+                                                  ],
+                                        images:
+                                            images.length === 0
+                                                ? [
+                                                      {
+                                                          title: "",
+                                                          file_name: "",
+                                                          image: null,
+                                                          path: "",
+                                                      },
+                                                  ]
+                                                : images,
+                                    },
+                                });
+                            }
+                            sections.push(questions);
+                        });
+                    }
                     this.setState(
                         {
                             cycleTestItem: result.data,
+                            questionSection: sections,
                             seconds: duration,
                         },
                         () => {
-                            this.loopSectionStructure();
+                            this.loopAnswerSection();
                             this.loadExamInfo();
                         }
                     );
@@ -147,16 +267,16 @@ class CycleTestQA extends Component {
             .then((result) => {
                 console.log(result);
                 if (result.sts === true) {
-                    var date = new Date();
-                    var endTime = new Date(dateFormat(result.data.end_time));
+                    // var date = new Date();
+                    // var endTime = new Date(dateFormat(result.data.end_time));
                     this.setState({
                         examInfo: result.data,
                         page_loading: false,
                     });
                     this.startTimer();
-                    console.log(date);
-                    console.log(endTime);
-                    console.log(dateFormat("Wed, 03 Mar 2021 05:40:52 GMT"));
+                    // console.log(date);
+                    // console.log(endTime);
+                    // console.log(dateFormat("Wed, 03 Mar 2021 05:40:52 GMT"));
                     // currentDate = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
                     // (currentDate - endDate.getTime()) / 1000
                 } else {
@@ -218,7 +338,6 @@ class CycleTestQA extends Component {
 
     // ---------- Submitting the data ----------
 
-    // submits the exam
     handleSubmit = () => {
         this.setState({
             page_loading: true,
@@ -231,7 +350,7 @@ class CycleTestQA extends Component {
                 headers: this.headers,
                 body: JSON.stringify({
                     cycle_test_id: this.cycleTestId,
-                    sections: this.state.sections,
+                    sections: this.state.answerSection,
                 }),
             }
         )
@@ -246,18 +365,12 @@ class CycleTestQA extends Component {
                         },
                         () => {
                             setTimeout(() => {
-                                this.setState(
-                                    {
-                                        page_loading: false,
-                                    },
-                                    () => {
-                                        setTimeout(() => {
-                                            this.props.history.goBack();
-                                            localStorage.removeItem("data");
-                                            localStorage.removeItem("duration");
-                                        }, 1000);
-                                    }
-                                );
+                                this.setState({
+                                    page_loading: false,
+                                });
+                                this.props.history.goBack();
+                                localStorage.removeItem("data");
+                                localStorage.removeItem("duration");
                             }, 1000);
                         }
                     );
@@ -276,38 +389,47 @@ class CycleTestQA extends Component {
 
     handleNext = () => {
         this.setState({
-            activeSection: this.state.activeSection + 1,
-            activeImageData: "",
-            activeImageQuestion: "",
+            currentSectionIndex: this.state.currentSectionIndex + 1,
         });
     };
+
     handlePrev = () => {
         this.setState({
-            activeSection: this.state.activeSection - 1,
-            activeImageData: "",
-            activeImageQuestion: "",
+            currentSectionIndex: this.state.currentSectionIndex - 1,
         });
     };
 
     // ---------- handle option selection ----------
 
-    handleMCQ = (event, index) => {
-        let sections = [...this.state.sections];
-        if (event.target.checked) {
-            sections[this.state.activeSection].questions[index].answer.push(
-                event.target.value
-            );
-            this.setState({
-                sections: sections,
-            });
-            localStorage.setItem("data", JSON.stringify(sections));
-        } else {
-            sections[this.state.activeSection].questions[index].answer.splice(
-                sections[this.state.activeSection].questions[
+    handleMCQ = (event, index, type) => {
+        let sections = [...this.state.answerSection];
+        if (type === "checkbox") {
+            if (event.target.checked) {
+                sections[this.state.currentSectionIndex].questions[
                     index
-                ].answer.indexOf(event.target.value),
-                1
-            );
+                ].answer.push(event.target.value);
+                this.setState({
+                    sections: sections,
+                });
+                localStorage.setItem("data", JSON.stringify(sections));
+            } else {
+                sections[this.state.currentSectionIndex].questions[
+                    index
+                ].answer.splice(
+                    sections[this.state.currentSectionIndex].questions[
+                        index
+                    ].answer.indexOf(event.target.value),
+                    1
+                );
+                this.setState({
+                    sections: sections,
+                });
+                localStorage.setItem("data", JSON.stringify(sections));
+            }
+        } else if (type === "radio") {
+            sections[this.state.currentSectionIndex].questions[
+                index
+            ].answer[0] = event.target.value;
             this.setState({
                 sections: sections,
             });
@@ -316,16 +438,19 @@ class CycleTestQA extends Component {
     };
 
     handleFillin = (event, index) => {
-        let sections = [...this.state.sections];
+        let sections = [...this.state.answerSection];
         if (event.target.value !== "") {
-            sections[this.state.activeSection].questions[index].answer[0] =
-                event.target.value;
+            sections[this.state.currentSectionIndex].questions[
+                index
+            ].answer[0] = event.target.value;
             this.setState({
                 sections: sections,
             });
             localStorage.setItem("data", JSON.stringify(sections));
         } else {
-            sections[this.state.activeSection].questions[index].answer = [];
+            sections[this.state.currentSectionIndex].questions[
+                index
+            ].answer = [];
             this.setState({
                 sections: sections,
             });
@@ -334,8 +459,8 @@ class CycleTestQA extends Component {
     };
 
     handleBoolean = (event, index) => {
-        let sections = [...this.state.sections];
-        sections[this.state.activeSection].questions[index].answer[0] =
+        let sections = [...this.state.answerSection];
+        sections[this.state.currentSectionIndex].questions[index].answer[0] =
             event.target.value;
         this.setState({
             sections: sections,
@@ -375,7 +500,7 @@ class CycleTestQA extends Component {
             time: this.secondsToTime(seconds),
             seconds: seconds,
         });
-        // localStorage.setItem("duration", seconds);
+        localStorage.setItem("duration", seconds);
 
         // Check if we're at zero.
         if (seconds === 0) {
@@ -386,16 +511,44 @@ class CycleTestQA extends Component {
 
     // ---------- Image viewer ----------
 
+    changeImage = (images, index) => {
+        let imageArr = [];
+        this.setState({
+            selectedImageData: [],
+            startIndex: 0,
+        });
+        for (let i = 0; i < images.length; i++) {
+            imageArr.push({
+                url: images[i].path,
+                title: images[i].title,
+            });
+        }
+        this.setState({
+            selectedImageData: imageArr,
+            startIndex: index,
+            isLightBoxOpen: true,
+        });
+    };
+
     render() {
-        const sections =
+        document.title = `${
+            this.state.cycleTestItem.cycle_test_name || ""
+        } Exam - Student | IQLabs`;
+        const cycleTest =
             this.state.cycleTestItem.auto_test !== undefined
-                ? this.state.cycleTestItem.auto_test
+                ? this.state.cycleTestItem.auto_test[
+                      this.state.currentSectionIndex
+                  ]
                 : [];
-        const question =
-            this.state.sections[this.state.activeSection] !== undefined
-                ? this.state.sections[this.state.activeSection].questions !==
-                  undefined
-                    ? this.state.sections[this.state.activeSection].questions
+        const questionSection =
+            this.state.questionSection[this.state.currentSectionIndex] || [];
+        const answerSection =
+            this.state.answerSection[this.state.currentSectionIndex] !==
+            undefined
+                ? this.state.answerSection[this.state.currentSectionIndex]
+                      .questions !== undefined
+                    ? this.state.answerSection[this.state.currentSectionIndex]
+                          .questions
                     : []
                 : [];
         return (
@@ -413,9 +566,32 @@ class CycleTestQA extends Component {
                     successMsg={this.state.successMsg}
                     showErrorAlert={this.state.showErrorAlert}
                     showSuccessAlert={this.state.showSuccessAlert}
-                    toggleSuccessAlert={this.toggleSuccessAlert}
-                    toggleErrorAlert={this.toggleErrorAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
                 />
+
+                {/* Image lightbox */}
+                {this.state.isLightBoxOpen ? (
+                    <Lightbox
+                        images={this.state.selectedImageData}
+                        startIndex={this.state.startIndex}
+                        onClose={() => {
+                            this.setState({
+                                isLightBoxOpen: false,
+                            });
+                        }}
+                    />
+                ) : (
+                    ""
+                )}
 
                 <div className="exam-section">
                     <div className="container-fluid">
@@ -423,16 +599,15 @@ class CycleTestQA extends Component {
                         <div className="card card-body secondary-bg primary-text font-weight-bold-600 small mb-4 py-2">
                             <div className="row align-items-center">
                                 <div className="col-md-7">
-                                    {sections.length !== 0
-                                        ? sections[this.state.activeSection]
-                                              .section_description
+                                    {cycleTest.length !== 0
+                                        ? cycleTest.section_description
                                         : ""}
                                 </div>
                                 <div className="col-md-5">
                                     <div className="row align-items-center">
                                         <div className="col-md-3">
                                             Attempt{" "}
-                                            {this.state.examInfo.attempt}
+                                            {this.state.examInfo.attempt + 1}
                                         </div>
                                         <div className="col-md-3">
                                             {
@@ -461,386 +636,350 @@ class CycleTestQA extends Component {
                         </div>
 
                         {/* ---------- Q&A ---------- */}
-                        {sections.length !== 0
-                            ? sections[this.state.activeSection].questions !==
-                              undefined
-                                ? sections[
-                                      this.state.activeSection
-                                  ].questions.map((data, index) => {
-                                      return (
+                        {questionSection.length !== 0
+                            ? questionSection.map((data, index) => {
+                                  return (
+                                      <div
+                                          className="d-flex align-items-start justify-content mb-3"
+                                          key={index}
+                                      >
+                                          <button className="btn btn-light light-bg btn-sm border-0 shadow-sm mr-1 px-3 font-weight-bold-600 rounded-lg">
+                                              {index <= 8
+                                                  ? `0${index + 1}`
+                                                  : index + 1}
+                                          </button>
                                           <div
-                                              className="d-flex align-items-start justify-content mb-3"
-                                              key={index}
+                                              className="card light-bg shadow-sm"
+                                              style={{ width: "100%" }}
                                           >
-                                              <button className="btn btn-light light-bg btn-sm border-0 shadow-sm mr-1 px-3 font-weight-bold">
-                                                  {index <= 8
-                                                      ? `0${index + 1}`
-                                                      : index + 1}
-                                              </button>
-                                              <div
-                                                  className="card light-bg shadow-sm"
-                                                  style={{ width: "100%" }}
-                                              >
-                                                  <div className="card-body">
-                                                      <div className="row">
+                                              <div className="card-body">
+                                                  <div className="d-flex">
+                                                      {/* Questions & options */}
+                                                      <div
+                                                          style={{
+                                                              width: "100%",
+                                                          }}
+                                                      >
                                                           <div
-                                                              className={`${
-                                                                  data.files ===
-                                                                  undefined
-                                                                      ? "col-md-12"
-                                                                      : this
-                                                                            .state
-                                                                            .activeImageData !==
-                                                                            "" &&
-                                                                        this
-                                                                            .state
-                                                                            .activeImageQuestion ===
-                                                                            data.question_random_id
-                                                                      ? "col-md-8"
-                                                                      : "col-md-11"
-                                                              }`}
-                                                          >
-                                                              <p
-                                                                  className="font-weight-bold-600"
-                                                                  dangerouslySetInnerHTML={{
-                                                                      __html:
-                                                                          data.question,
-                                                                  }}
-                                                              ></p>
-                                                              <div className="row small">
-                                                                  {/* ----- MCQ ----- */}
-                                                                  {data.mcq ===
-                                                                  true ? (
-                                                                      data.options.map(
-                                                                          (
-                                                                              option,
-                                                                              option_index
-                                                                          ) => {
-                                                                              return (
-                                                                                  <div
-                                                                                      className="col-md-6 mb-3"
-                                                                                      key={
-                                                                                          option_index
-                                                                                      }
-                                                                                  >
-                                                                                      <div className="card card-body secondary-bg shadow-sm p-3">
-                                                                                          <div className="custom-control custom-checkbox">
-                                                                                              <input
-                                                                                                  type="checkbox"
-                                                                                                  className="custom-control-input"
-                                                                                                  id={`customCheck1${option_index}`}
-                                                                                                  value={
-                                                                                                      option.content
-                                                                                                  }
-                                                                                                  onChange={(
-                                                                                                      event
-                                                                                                  ) =>
-                                                                                                      this.handleMCQ(
-                                                                                                          event,
-                                                                                                          index
-                                                                                                      )
-                                                                                                  }
-                                                                                                  checked={
-                                                                                                      question.length !==
-                                                                                                      0
-                                                                                                          ? question[
-                                                                                                                index
-                                                                                                            ]
-                                                                                                                .answer
-                                                                                                                .length !==
-                                                                                                            0
-                                                                                                              ? question[
+                                                              className="font-weight-bold-600"
+                                                              dangerouslySetInnerHTML={{
+                                                                  __html:
+                                                                      data.question,
+                                                              }}
+                                                          ></div>
+
+                                                          <div className="row small">
+                                                              {/* ----- MCQ ----- */}
+                                                              {data.content
+                                                                  .mcq ===
+                                                              true ? (
+                                                                  data.content.options.map(
+                                                                      (
+                                                                          option,
+                                                                          option_index
+                                                                      ) => {
+                                                                          return (
+                                                                              <div
+                                                                                  className="col-md-6 mb-3"
+                                                                                  key={
+                                                                                      option_index
+                                                                                  }
+                                                                              >
+                                                                                  <div className="card card-body secondary-bg shadow-sm p-3">
+                                                                                      {data
+                                                                                          .content
+                                                                                          .mcq_answers !==
+                                                                                      undefined ? (
+                                                                                          data
+                                                                                              .content
+                                                                                              .mcq_answers >
+                                                                                          1 ? (
+                                                                                              <div className="custom-control custom-checkbox">
+                                                                                                  <input
+                                                                                                      type="checkbox"
+                                                                                                      className="custom-control-input"
+                                                                                                      id={`customCheck1${index}-${option_index}`}
+                                                                                                      value={
+                                                                                                          option.content
+                                                                                                      }
+                                                                                                      onChange={(
+                                                                                                          event
+                                                                                                      ) =>
+                                                                                                          this.handleMCQ(
+                                                                                                              event,
+                                                                                                              index,
+                                                                                                              "checkbox"
+                                                                                                          )
+                                                                                                      }
+                                                                                                      checked={
+                                                                                                          answerSection.length !==
+                                                                                                          0
+                                                                                                              ? answerSection[
                                                                                                                     index
-                                                                                                                ].answer.includes(
-                                                                                                                    option.content
-                                                                                                                )
-                                                                                                                  ? true
+                                                                                                                ]
+                                                                                                                    .answer
+                                                                                                                    .length !==
+                                                                                                                0
+                                                                                                                  ? answerSection[
+                                                                                                                        index
+                                                                                                                    ].answer.includes(
+                                                                                                                        option.content
+                                                                                                                    )
+                                                                                                                      ? true
+                                                                                                                      : false
                                                                                                                   : false
                                                                                                               : false
-                                                                                                          : false
-                                                                                                  }
-                                                                                              />
-                                                                                              <label
-                                                                                                  className="custom-control-label"
-                                                                                                  htmlFor={`customCheck1${option_index}`}
-                                                                                              >
-                                                                                                  {
-                                                                                                      option.content
-                                                                                                  }
-                                                                                              </label>
-                                                                                          </div>
-                                                                                      </div>
-                                                                                  </div>
-                                                                              );
-                                                                          }
-                                                                      )
-                                                                  ) : // ----- True or false -----
-                                                                  data.boolean ===
-                                                                    true ? (
-                                                                      data.boolean_question.map(
-                                                                          (
-                                                                              option,
-                                                                              boolean_index
-                                                                          ) => {
-                                                                              return (
-                                                                                  <div
-                                                                                      className="col-md-6 mb-3"
-                                                                                      key={
-                                                                                          boolean_index
-                                                                                      }
-                                                                                  >
-                                                                                      <div className="card card-body secondary-bg shadow-sm p-3">
-                                                                                          <div className="form-check">
-                                                                                              <input
-                                                                                                  className="form-check-input"
-                                                                                                  type="radio"
-                                                                                                  id={`customCheck1${boolean_index}`}
-                                                                                                  name={`radio${index}`}
-                                                                                                  value={
-                                                                                                      option.content
-                                                                                                  }
-                                                                                                  onChange={(
-                                                                                                      event
-                                                                                                  ) =>
-                                                                                                      this.handleBoolean(
-                                                                                                          event,
-                                                                                                          index
-                                                                                                      )
-                                                                                                  }
-                                                                                                  checked={
-                                                                                                      question.length !==
-                                                                                                      0
-                                                                                                          ? question[
-                                                                                                                index
-                                                                                                            ]
-                                                                                                                .answer
-                                                                                                                .length !==
-                                                                                                            0
-                                                                                                              ? question[
+                                                                                                      }
+                                                                                                  />
+                                                                                                  <label
+                                                                                                      className="custom-control-label"
+                                                                                                      htmlFor={`customCheck1${index}-${option_index}`}
+                                                                                                  >
+                                                                                                      {
+                                                                                                          option.content
+                                                                                                      }
+                                                                                                  </label>
+                                                                                              </div>
+                                                                                          ) : (
+                                                                                              <div className="custom-control custom-radio">
+                                                                                                  <input
+                                                                                                      type="radio"
+                                                                                                      id={`customRadio1${index}-${option_index}`}
+                                                                                                      name={`customRadio${index}`}
+                                                                                                      className="custom-control-input"
+                                                                                                      value={
+                                                                                                          option.content
+                                                                                                      }
+                                                                                                      onChange={(
+                                                                                                          event
+                                                                                                      ) =>
+                                                                                                          this.handleMCQ(
+                                                                                                              event,
+                                                                                                              index,
+                                                                                                              "radio"
+                                                                                                          )
+                                                                                                      }
+                                                                                                      checked={
+                                                                                                          answerSection.length !==
+                                                                                                          0
+                                                                                                              ? answerSection[
                                                                                                                     index
-                                                                                                                ].answer.includes(
-                                                                                                                    option.content
-                                                                                                                )
-                                                                                                                  ? true
+                                                                                                                ]
+                                                                                                                    .answer
+                                                                                                                    .length !==
+                                                                                                                0
+                                                                                                                  ? answerSection[
+                                                                                                                        index
+                                                                                                                    ].answer.includes(
+                                                                                                                        option.content
+                                                                                                                    )
+                                                                                                                      ? true
+                                                                                                                      : false
                                                                                                                   : false
                                                                                                               : false
+                                                                                                      }
+                                                                                                  />
+                                                                                                  <label
+                                                                                                      className="custom-control-label"
+                                                                                                      htmlFor={`customRadio1${index}-${option_index}`}
+                                                                                                  >
+                                                                                                      {
+                                                                                                          option.content
+                                                                                                      }
+                                                                                                  </label>
+                                                                                              </div>
+                                                                                          )
+                                                                                      ) : (
+                                                                                          ""
+                                                                                      )}
+                                                                                  </div>
+                                                                              </div>
+                                                                          );
+                                                                      }
+                                                                  )
+                                                              ) : // ----- True or false -----
+                                                              data.content
+                                                                    .boolean ===
+                                                                true ? (
+                                                                  data.content.boolean_question.map(
+                                                                      (
+                                                                          option,
+                                                                          boolean_index
+                                                                      ) => {
+                                                                          return (
+                                                                              <div
+                                                                                  className="col-md-6 mb-3"
+                                                                                  key={
+                                                                                      boolean_index
+                                                                                  }
+                                                                              >
+                                                                                  <div className="card card-body secondary-bg shadow-sm p-3">
+                                                                                      <div className="custom-control custom-radio">
+                                                                                          <input
+                                                                                              type="radio"
+                                                                                              id={`customRadio1${index}-${boolean_index}`}
+                                                                                              name={`customRadio${index}`}
+                                                                                              className="custom-control-input"
+                                                                                              value={
+                                                                                                  option.content
+                                                                                              }
+                                                                                              onChange={(
+                                                                                                  event
+                                                                                              ) =>
+                                                                                                  this.handleBoolean(
+                                                                                                      event,
+                                                                                                      index
+                                                                                                  )
+                                                                                              }
+                                                                                              checked={
+                                                                                                  answerSection.length !==
+                                                                                                  0
+                                                                                                      ? answerSection[
+                                                                                                            index
+                                                                                                        ]
+                                                                                                            .answer
+                                                                                                            .length !==
+                                                                                                        0
+                                                                                                          ? answerSection[
+                                                                                                                index
+                                                                                                            ].answer.includes(
+                                                                                                                option.content
+                                                                                                            )
+                                                                                                              ? true
+                                                                                                              : false
                                                                                                           : false
-                                                                                                  }
-                                                                                              />
-                                                                                              <label
-                                                                                                  className="form-check-label"
-                                                                                                  id={`customCheck1${boolean_index}`}
-                                                                                              >
-                                                                                                  {
-                                                                                                      option.content
-                                                                                                  }
-                                                                                              </label>
-                                                                                          </div>
+                                                                                                      : false
+                                                                                              }
+                                                                                          />
+                                                                                          <label
+                                                                                              className="custom-control-label"
+                                                                                              htmlFor={`customRadio1${index}-${boolean_index}`}
+                                                                                          >
+                                                                                              {
+                                                                                                  option.content
+                                                                                              }
+                                                                                          </label>
                                                                                       </div>
                                                                                   </div>
-                                                                              );
+                                                                              </div>
+                                                                          );
+                                                                      }
+                                                                  )
+                                                              ) : // ----- Fill in answers -----
+                                                              data.content
+                                                                    .fill_in ===
+                                                                true ? (
+                                                                  <div
+                                                                      className="col-md-6 mb-3"
+                                                                      key={
+                                                                          index
+                                                                      }
+                                                                  >
+                                                                      <input
+                                                                          type="text"
+                                                                          name="fill_in"
+                                                                          className="form-control borders"
+                                                                          placeholder="Type your answer here"
+                                                                          value={
+                                                                              answerSection.length !==
+                                                                              0
+                                                                                  ? answerSection[
+                                                                                        index
+                                                                                    ]
+                                                                                        .answer
+                                                                                        .length !==
+                                                                                    0
+                                                                                      ? answerSection[
+                                                                                            index
+                                                                                        ]
+                                                                                            .answer[0]
+                                                                                      : ""
+                                                                                  : ""
                                                                           }
-                                                                      )
-                                                                  ) : // ----- Fill in answers -----
-                                                                  data.fill_in ===
-                                                                    true ? (
+                                                                          onChange={(
+                                                                              event
+                                                                          ) =>
+                                                                              this.handleFillin(
+                                                                                  event,
+                                                                                  index
+                                                                              )
+                                                                          }
+                                                                          autoComplete="off"
+                                                                      />
+                                                                  </div>
+                                                              ) : null}
+                                                          </div>
+
+                                                          {/* ----- Multiple choice notes ----- */}
+                                                          {data.content
+                                                              .mcq_answers !==
+                                                          undefined ? (
+                                                              data.content
+                                                                  .mcq_answers >
+                                                              1 ? (
+                                                                  <div className="small">
+                                                                      <b>
+                                                                          Note:
+                                                                      </b>{" "}
+                                                                      {
+                                                                          data
+                                                                              .content
+                                                                              .mcq_answers
+                                                                      }{" "}
+                                                                      answers
+                                                                      are
+                                                                      correct
+                                                                  </div>
+                                                              ) : null
+                                                          ) : null}
+                                                      </div>
+                                                      {/* image preview */}
+                                                      <div className="ml-3">
+                                                          {data.content.images.map(
+                                                              (
+                                                                  images,
+                                                                  index
+                                                              ) => {
+                                                                  return images.path !==
+                                                                      "" ? (
                                                                       <div
-                                                                          className="col-md-6 mb-3"
                                                                           key={
                                                                               index
                                                                           }
-                                                                      >
-                                                                          <input
-                                                                              type="text"
-                                                                              name="fill_in"
-                                                                              className="form-control borders"
-                                                                              placeholder="Type your answer here"
-                                                                              value={
-                                                                                  question.length !==
-                                                                                  0
-                                                                                      ? question[
-                                                                                            index
-                                                                                        ]
-                                                                                            .answer
-                                                                                            .length !==
-                                                                                        0
-                                                                                          ? question[
-                                                                                                index
-                                                                                            ]
-                                                                                                .answer[0]
-                                                                                          : ""
-                                                                                      : ""
-                                                                              }
-                                                                              onChange={(
-                                                                                  event
-                                                                              ) =>
-                                                                                  this.handleFillin(
-                                                                                      event,
-                                                                                      index
-                                                                                  )
-                                                                              }
-                                                                              autoComplete="off"
-                                                                          />
-                                                                      </div>
-                                                                  ) : null}
-                                                              </div>
-
-                                                              {/* ----- Multiple choice notes ----- */}
-                                                              {data.mcq_answers !==
-                                                              undefined ? (
-                                                                  data.mcq_answers >
-                                                                  1 ? (
-                                                                      <div className="small">
-                                                                          <b>
-                                                                              Note:
-                                                                          </b>{" "}
-                                                                          {
-                                                                              data.mcq_answers
-                                                                          }{" "}
-                                                                          answers
-                                                                          are
-                                                                          correct
-                                                                      </div>
-                                                                  ) : null
-                                                              ) : null}
-                                                          </div>
-                                                          {/* ----- Image section ----- */}
-                                                          {data.files !==
-                                                          undefined ? (
-                                                              <div
-                                                                  className={
-                                                                      this.state
-                                                                          .activeImageQuestion ===
-                                                                      data.question_random_id
-                                                                          ? "col-md-4"
-                                                                          : "col-md-1"
-                                                                  }
-                                                              >
-                                                                  <div className="row">
-                                                                      {/* ---------- Single pic --------- */}
-                                                                      {this
-                                                                          .state
-                                                                          .activeImageData !==
-                                                                          "" &&
-                                                                      this.state
-                                                                          .activeImageQuestion ===
-                                                                          data.question_random_id ? (
-                                                                          <div className="col-9">
-                                                                              <div className="card">
-                                                                                  <img
-                                                                                      src={
-                                                                                          data.question_random_id ===
-                                                                                          this
-                                                                                              .state
-                                                                                              .activeImageQuestion
-                                                                                              ? this
-                                                                                                    .state
-                                                                                                    .activeImageData
-                                                                                              : ""
-                                                                                      }
-                                                                                      alt={
-                                                                                          this
-                                                                                              .state
-                                                                                              .chapter_name
-                                                                                      }
-                                                                                      className="img-fluid rounded-lg shadow-sm"
-                                                                                  />
-                                                                              </div>
-                                                                          </div>
-                                                                      ) : (
-                                                                          ""
-                                                                      )}
-                                                                      {/* ---------- Thumbnails ---------- */}
-                                                                      <div
-                                                                          className={
-                                                                              this
-                                                                                  .state
-                                                                                  .activeImageData !==
-                                                                                  "" &&
-                                                                              this
-                                                                                  .state
-                                                                                  .activeImageQuestion ===
-                                                                                  data.question_random_id
-                                                                                  ? "col-3"
-                                                                                  : "col-12"
+                                                                          className="card preview-img-circle shadow-sm"
+                                                                          style={{
+                                                                              backgroundImage: `url(${images.path})`,
+                                                                          }}
+                                                                          onClick={() =>
+                                                                              this.changeImage(
+                                                                                  data
+                                                                                      .content
+                                                                                      .images,
+                                                                                  index
+                                                                              )
                                                                           }
-                                                                      >
-                                                                          {data
-                                                                              .files
-                                                                              .length !==
-                                                                          0
-                                                                              ? Object.entries(
-                                                                                    data
-                                                                                        .files[0]
-                                                                                ).map(
-                                                                                    (
-                                                                                        [
-                                                                                            key,
-                                                                                            value,
-                                                                                        ],
-                                                                                        index
-                                                                                    ) => {
-                                                                                        return key ===
-                                                                                            "type1_image_1" ||
-                                                                                            key ===
-                                                                                                "type1_image_2" ||
-                                                                                            key ===
-                                                                                                "type1_image_3" ||
-                                                                                            key ===
-                                                                                                "type1_image_4" ? (
-                                                                                            <div
-                                                                                                className={`card preview-img-xs shadow-sm mb-2 ${
-                                                                                                    this
-                                                                                                        .state
-                                                                                                        .selectedImage ===
-                                                                                                    index
-                                                                                                        ? "border-primary"
-                                                                                                        : ""
-                                                                                                }`}
-                                                                                                style={{
-                                                                                                    backgroundImage: `url(${value})`,
-                                                                                                }}
-                                                                                                key={
-                                                                                                    index
-                                                                                                }
-                                                                                                onClick={() => {
-                                                                                                    this.setState(
-                                                                                                        {
-                                                                                                            activeImageData: value,
-                                                                                                            activeImageQuestion:
-                                                                                                                data.question_random_id,
-                                                                                                        }
-                                                                                                    );
-                                                                                                }}
-                                                                                            ></div>
-                                                                                        ) : (
-                                                                                            ""
-                                                                                        );
-                                                                                    }
-                                                                                )
-                                                                              : ""}
-                                                                      </div>
-                                                                  </div>
-                                                              </div>
-                                                          ) : (
-                                                              ""
+                                                                      ></div>
+                                                                  ) : (
+                                                                      ""
+                                                                  );
+                                                              }
                                                           )}
                                                       </div>
                                                   </div>
                                               </div>
                                           </div>
-                                      );
-                                  })
-                                : null
+                                      </div>
+                                  );
+                              })
                             : null}
 
                         {/* Navigation */}
-                        <div className="row">
-                            <div className="col-md-6">
+                        <div className="row align-items-center">
+                            <div className="col-3">
                                 <button
                                     className="btn btn-primary btn-sm shadow-none"
                                     disabled={
-                                        this.state.activeSection === 0
+                                        this.state.currentSectionIndex === 0
                                             ? true
                                             : false
                                     }
@@ -850,38 +989,38 @@ class CycleTestQA extends Component {
                                     Previous
                                 </button>
                             </div>
-                            <div className="col-md-6 text-right">
-                                {sections.length !== 0 ? (
-                                    this.state.activeSection <
-                                    sections.length - 1 ? (
-                                        <button
-                                            className="btn btn-primary btn-sm shadow-none"
-                                            onClick={this.handleNext}
-                                        >
-                                            Next
-                                            <i className="fas fa-angle-right ml-2"></i>
-                                        </button>
-                                    ) : (
-                                        <button
-                                            className="btn btn-primary btn-sm shadow-none"
-                                            onClick={this.handleSubmit}
-                                        >
-                                            Submit
-                                        </button>
-                                    )
-                                ) : (
+                            <div className="col-6">
+                                {this.state.currentSectionIndex ===
+                                this.state.questionSection.length - 1 ? (
                                     <button
-                                        className="btn btn-primary btn-sm shadow-none"
+                                        className="btn btn-primary btn-block shadow-none"
                                         onClick={this.handleSubmit}
                                     >
                                         Submit
-                                        <i className="fas fa-angle-right ml-2"></i>
                                     </button>
+                                ) : (
+                                    ""
                                 )}
+                            </div>
+                            <div className="col-3 text-right">
+                                <button
+                                    className="btn btn-primary btn-sm shadow-none"
+                                    disabled={
+                                        this.state.currentSectionIndex <
+                                        this.state.questionSection.length - 1
+                                            ? false
+                                            : true
+                                    }
+                                    onClick={this.handleNext}
+                                >
+                                    Next
+                                    <i className="fas fa-angle-right ml-2"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
+
                 {/* Loading component */}
                 {this.state.page_loading ? <Loading /> : ""}
             </>

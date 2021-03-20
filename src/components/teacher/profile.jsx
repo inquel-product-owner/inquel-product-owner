@@ -35,7 +35,7 @@ class ImageUploadModal extends Component {
         });
 
         let form_data = new FormData();
-        form_data.append("profile_image_1", event.target.files[0]);
+        form_data.append("teacher_profile_image_1", event.target.files[0]);
 
         const options = {
             headers: {
@@ -466,7 +466,11 @@ class Profile extends Component {
                             <div className="col-md-3 pl-md-4 mb-3 mb-md-0">
                                 <div className="card shadow-sm">
                                     <div className="card-body">
-                                        <div style={{ position: "relative" }}>
+                                        <div
+                                            style={{
+                                                position: "relative",
+                                            }}
+                                        >
                                             <img
                                                 src={
                                                     this.state.teacherItems
@@ -485,10 +489,10 @@ class Profile extends Component {
                                                     this.state.teacherItems
                                                         .full_name
                                                 }
-                                                className="img-fluid shadow-sm mb-3"
+                                                className="img-fluid rounded-lg shadow-sm mb-3"
                                             />
                                             <button
-                                                className="btn btn-light secondary-bg borders btn-block btn-sm"
+                                                className="btn btn-light secondary-bg borders btn-block btn-sm shadow-none"
                                                 onClick={this.toggleModal}
                                                 style={{
                                                     position: "absolute",
@@ -605,11 +609,21 @@ class Profile extends Component {
                                                                             label: this
                                                                                 .state
                                                                                 .teacherItems
-                                                                                .country_code,
+                                                                                .country_code
+                                                                                ? this
+                                                                                      .state
+                                                                                      .teacherItems
+                                                                                      .country_code
+                                                                                : "Country code",
                                                                             value: this
                                                                                 .state
                                                                                 .teacherItems
-                                                                                .country_code,
+                                                                                .country_code
+                                                                                ? this
+                                                                                      .state
+                                                                                      .teacherItems
+                                                                                      .country_code
+                                                                                : "Country code",
                                                                         }}
                                                                         isSearchable={
                                                                             false
@@ -804,28 +818,41 @@ class Profile extends Component {
                                                         }
                                                     </textarea>
                                                 </div>
-                                                {this.state.showEditOption ? (
-                                                    <button className="btn btn-primary btn-block btn-sm">
-                                                        {this.state
-                                                            .showLoader ? (
-                                                            <Spinner
-                                                                as="span"
-                                                                animation="border"
-                                                                size="sm"
-                                                                role="status"
-                                                                aria-hidden="true"
-                                                                className="mr-2"
-                                                            />
-                                                        ) : (
-                                                            ""
-                                                        )}
-                                                        Save and Close
-                                                    </button>
-                                                ) : null}
+                                                <div className="row">
+                                                    <div className="col-6">
+                                                        <button
+                                                            className="btn btn-secondary btn-sm btn-block"
+                                                            onClick={
+                                                                this.toggleEdit
+                                                            }
+                                                        >
+                                                            Close
+                                                        </button>
+                                                    </div>
+                                                    <div className="col-6">
+                                                        <button className="btn btn-primary btn-block btn-sm">
+                                                            {this.state
+                                                                .showLoader ? (
+                                                                <Spinner
+                                                                    as="span"
+                                                                    animation="border"
+                                                                    size="sm"
+                                                                    role="status"
+                                                                    aria-hidden="true"
+                                                                    className="mr-2"
+                                                                />
+                                                            ) : (
+                                                                ""
+                                                            )}
+                                                            Save
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </form>
                                     </div>
                                 ) : (
+                                    // Profile details GET
                                     <div className="card shadow-sm">
                                         <div className="card-body">
                                             <h6 className="primary-text mb-3">
@@ -885,7 +912,16 @@ class Profile extends Component {
                                                         <p className="small font-weight-bold-600 mb-2">
                                                             Phone
                                                         </p>
-                                                        {`${this.state.teacherItems.country_code}-${this.state.teacherItems.phone_num}`}
+                                                        {
+                                                            this.state
+                                                                .teacherItems
+                                                                .country_code
+                                                        }
+                                                        {
+                                                            this.state
+                                                                .teacherItems
+                                                                .phone_num
+                                                        }
                                                     </div>
                                                 </div>
                                                 <div className="col-lg-4 col-sm-6 col-12">

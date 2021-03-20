@@ -33,11 +33,10 @@ class Subject extends Component {
             subjectItems: [],
             topics: [],
             topics_completed: [],
-            topics_remarks: [],
             all_topics_completed: [],
 
             chapterEventKey: "chapter-0",
-            topicEventKey: "",
+            topicEventKey: "topic-0",
 
             errorMsg: "",
             successMsg: "",
@@ -64,13 +63,7 @@ class Subject extends Component {
 
     toggleCollapse = (index) => {
         this.setState({
-            chapterEventKey: this.state.chapterEventKey !== index ? index : "",
-        });
-    };
-
-    toggleTopicCollapse = (index) => {
-        this.setState({
-            topicEventKey: this.state.topicEventKey !== index ? index : "",
+            chapterEventKey: this.state.chapterEventKey !== index ? index : '',
         });
     };
 
@@ -91,7 +84,6 @@ class Subject extends Component {
                     let all_topics_completed = [
                         ...this.state.all_topics_completed,
                     ];
-                    let topics_remarks = [...this.state.topics_remarks];
                     topics_completed[chapter_index] =
                         result.data.topics_completed !== undefined
                             ? Array.isArray(result.data.topics_completed)
@@ -101,10 +93,6 @@ class Subject extends Component {
                     all_topics_completed[chapter_index] =
                         result.data.all_topics_completed !== undefined
                             ? result.data.all_topics_completed
-                            : "";
-                    topics_remarks[chapter_index] =
-                        result.data.topics_remarks !== undefined
-                            ? result.data.topics_remarks
                             : "";
 
                     // Updating the completed topics data in topics state
@@ -131,7 +119,6 @@ class Subject extends Component {
                         topics: topics,
                         topics_completed: topics_completed,
                         all_topics_completed: all_topics_completed,
-                        topics_remarks: topics_remarks,
                         page_loading: false,
                     });
                 } else {
@@ -312,9 +299,9 @@ class Subject extends Component {
         let topics_completed = [...this.state.topics_completed];
 
         return (
-            <div className="ml-md-3" key={index}>
+            <div key={index}>
                 <Card.Header
-                    className="small light-bg shadow-sm py-2 mb-2"
+                    className="small light-bg shadow-sm mb-2"
                     style={{ borderRadius: "8px" }}
                 >
                     <div className="row align-items-center">
@@ -340,7 +327,9 @@ class Subject extends Component {
                                 <div className="col-md-2 mb-2 mb-md-0"></div>
                                 <div className="col-md-2 mb-2 mb-md-0"></div>
                                 <div className="col-md-2 mb-2 mb-md-0"></div>
-                                <div className="col-md-2 mb-2 mb-md-0"></div>
+                                <div className="col-md-2 mb-2 mb-md-0">
+                                    Remarks
+                                </div>
                                 <div className="col-md-2 mb-2 mb-md-0">
                                     {data.next_topic}
                                 </div>
@@ -375,7 +364,7 @@ class Subject extends Component {
                         </div>
                     </div>
                 </Card.Header>
-                <div>{nestedTopics}</div>
+                <div className="ml-md-3">{nestedTopics}</div>
             </div>
         );
     };
@@ -660,9 +649,7 @@ class Subject extends Component {
                                                                               </Link>
                                                                           </div>
                                                                           <div className="col-md-2 mb-2 mb-md-0">
-                                                                              <div className="d-inline p-2 rounded">
-                                                                                  Remarks
-                                                                              </div>
+                                                                              Remarks
                                                                           </div>
                                                                           <div className="col-md-2 mb-2 mb-md-0"></div>
                                                                           <div className="col-md-2 text-right mb-2 mb-md-0">
@@ -742,230 +729,27 @@ class Subject extends Component {
                                                           <Accordion.Collapse
                                                               eventKey={`chapter-${index}`}
                                                           >
-                                                              <>
-                                                                  <Accordion>
-                                                                      {/* Topic list */}
-                                                                      {data.topics.map(
-                                                                          (
-                                                                              topic,
-                                                                              structure_index
-                                                                          ) => {
-                                                                              return topic.chapter_structure.map(
-                                                                                  (
+                                                              <Card>
+                                                                  {/* Topic list */}
+                                                                  {data.topics.map(
+                                                                      (
+                                                                          topic
+                                                                      ) => {
+                                                                          return topic.chapter_structure.map(
+                                                                              (
+                                                                                  topics,
+                                                                                  topic_index
+                                                                              ) => {
+                                                                                  return this.topic(
                                                                                       topics,
-                                                                                      topic_index
-                                                                                  ) => {
-                                                                                      return (
-                                                                                          <div
-                                                                                              key={
-                                                                                                  topic_index
-                                                                                              }
-                                                                                          >
-                                                                                              <Accordion.Toggle
-                                                                                                  as={
-                                                                                                      Card.Header
-                                                                                                  }
-                                                                                                  eventKey={`topic-${index}-${topic_index}`}
-                                                                                                  className="light-bg shadow-sm py-2 mb-2"
-                                                                                                  style={{
-                                                                                                      borderRadius:
-                                                                                                          "8px",
-                                                                                                  }}
-                                                                                                  onClick={() =>
-                                                                                                      this.toggleTopicCollapse(
-                                                                                                          `topic-${index}-${topic_index}`
-                                                                                                      )
-                                                                                                  }
-                                                                                              >
-                                                                                                  <div className="row align-items-center">
-                                                                                                      <div className="col-md-4 mb-2 mb-md-0">
-                                                                                                          <div className="row">
-                                                                                                              <div className="col-1">
-                                                                                                                  <span>
-                                                                                                                      <i
-                                                                                                                          className={`fas fa-chevron-circle-down ${
-                                                                                                                              this
-                                                                                                                                  .state
-                                                                                                                                  .topicEventKey ===
-                                                                                                                              `topic-${index}-${topic_index}`
-                                                                                                                                  ? ""
-                                                                                                                                  : "fa-rotate-270"
-                                                                                                                          }`}
-                                                                                                                      ></i>
-                                                                                                                  </span>
-                                                                                                              </div>
-                                                                                                              <div className="col-2 small font-weight-bold-600">
-                                                                                                                  {
-                                                                                                                      topics.topic_num
-                                                                                                                  }
-                                                                                                              </div>
-                                                                                                              <div className="col-9 small font-weight-bold-600">
-                                                                                                                  <Link
-                                                                                                                      to={`${this.props.match.url}/chapter/${data.chapter_id}/${topics.topic_name}/learn`}
-                                                                                                                      className="primary-text"
-                                                                                                                  >
-                                                                                                                      {
-                                                                                                                          topics.topic_name
-                                                                                                                      }
-                                                                                                                      <i className="fas fa-external-link-alt fa-xs ml-2"></i>
-                                                                                                                  </Link>
-                                                                                                              </div>
-                                                                                                          </div>
-                                                                                                      </div>
-
-                                                                                                      <div className="col-md-8 small primary-text font-weight-bold-600">
-                                                                                                          <div className="row align-items-center">
-                                                                                                              <div className="col-md-2 mb-2 mb-md-0"></div>
-                                                                                                              <div className="col-md-2 mb-2 mb-md-0"></div>
-                                                                                                              <div className="col-md-2 mb-2 mb-md-0"></div>
-                                                                                                              <div className="col-md-2 mb-2 mb-md-0">
-                                                                                                                  {this
-                                                                                                                      .state
-                                                                                                                      .topics_remarks[
-                                                                                                                      index
-                                                                                                                  ] !==
-                                                                                                                  undefined ? (
-                                                                                                                      this
-                                                                                                                          .state
-                                                                                                                          .topics_remarks[
-                                                                                                                          index
-                                                                                                                      ][
-                                                                                                                          topics
-                                                                                                                              .topic_num
-                                                                                                                      ] !==
-                                                                                                                      undefined ? (
-                                                                                                                          this
-                                                                                                                              .state
-                                                                                                                              .topics_remarks[
-                                                                                                                              index
-                                                                                                                          ][
-                                                                                                                              topics
-                                                                                                                                  .topic_num
-                                                                                                                          ]
-                                                                                                                              .remarks !==
-                                                                                                                          undefined ? (
-                                                                                                                              <div
-                                                                                                                                  className="text-white d-inline p-2 rounded"
-                                                                                                                                  style={{
-                                                                                                                                      backgroundColor: this
-                                                                                                                                          .state
-                                                                                                                                          .topics_remarks[
-                                                                                                                                          index
-                                                                                                                                      ][
-                                                                                                                                          topics
-                                                                                                                                              .topic_num
-                                                                                                                                      ]
-                                                                                                                                          .color,
-                                                                                                                                  }}
-                                                                                                                              >
-                                                                                                                                  {
-                                                                                                                                      this
-                                                                                                                                          .state
-                                                                                                                                          .topics_remarks[
-                                                                                                                                          index
-                                                                                                                                      ][
-                                                                                                                                          topics
-                                                                                                                                              .topic_num
-                                                                                                                                      ]
-                                                                                                                                          .remarks
-                                                                                                                                  }
-                                                                                                                              </div>
-                                                                                                                          ) : (
-                                                                                                                              ""
-                                                                                                                          )
-                                                                                                                      ) : null
-                                                                                                                  ) : null}
-                                                                                                              </div>
-                                                                                                              <div className="col-md-2 mb-2 mb-md-0">
-                                                                                                                  {
-                                                                                                                      topics.next_topic
-                                                                                                                  }
-                                                                                                              </div>
-                                                                                                              <div className="col-md-2 mb-2 mb-md-0 text-right">
-                                                                                                                  <button
-                                                                                                                      className={`btn btn-sm shadow-none ${
-                                                                                                                          this
-                                                                                                                              .state
-                                                                                                                              .topics_completed[
-                                                                                                                              index
-                                                                                                                          ] !==
-                                                                                                                          undefined
-                                                                                                                              ? this.state.topics_completed[
-                                                                                                                                    index
-                                                                                                                                ].includes(
-                                                                                                                                    topics.topic_num
-                                                                                                                                )
-                                                                                                                                  ? "text-success"
-                                                                                                                                  : "text-muted"
-                                                                                                                              : "text-muted"
-                                                                                                                      }`}
-                                                                                                                      style={{
-                                                                                                                          fontSize:
-                                                                                                                              "18px",
-                                                                                                                      }}
-                                                                                                                      onClick={() =>
-                                                                                                                          this.handleTopicCompletion(
-                                                                                                                              topics.topic_num,
-                                                                                                                              topics.topic_name,
-                                                                                                                              index,
-                                                                                                                              data.chapter_id
-                                                                                                                          )
-                                                                                                                      }
-                                                                                                                  >
-                                                                                                                      <i className="fas fa-check-circle"></i>
-                                                                                                                  </button>
-                                                                                                              </div>
-                                                                                                          </div>
-                                                                                                      </div>
-                                                                                                  </div>
-                                                                                              </Accordion.Toggle>
-
-                                                                                              <Accordion.Collapse
-                                                                                                  eventKey={`topic-${index}-${topic_index}`}
-                                                                                                  //   eventKey={
-                                                                                                  //       this
-                                                                                                  //           .state
-                                                                                                  //           .chapterEventKey ===
-                                                                                                  //       `chapter-${index}`
-                                                                                                  //           ? `topic-${index}-${topic_index}`
-                                                                                                  //           : ""
-                                                                                                  //   }
-                                                                                                  //   className={
-                                                                                                  //       this
-                                                                                                  //           .state
-                                                                                                  //           .topicEventKey ===
-                                                                                                  //       `topic-${index}-${topic_index}`
-                                                                                                  //           ? "show"
-                                                                                                  //           : ""
-                                                                                                  //   }
-                                                                                              >
-                                                                                                  <Card>
-                                                                                                      {/* Topic list */}
-                                                                                                      {(
-                                                                                                          topics.child ||
-                                                                                                          []
-                                                                                                      ).map(
-                                                                                                          (
-                                                                                                              child,
-                                                                                                              child_index
-                                                                                                          ) => {
-                                                                                                              return this.topic(
-                                                                                                                  child,
-                                                                                                                  child_index,
-                                                                                                                  index,
-                                                                                                                  data.chapter_id
-                                                                                                              );
-                                                                                                          }
-                                                                                                      )}
-                                                                                                  </Card>
-                                                                                              </Accordion.Collapse>
-                                                                                          </div>
-                                                                                      );
-                                                                                  }
-                                                                              );
-                                                                          }
-                                                                      )}
-                                                                  </Accordion>
+                                                                                      topic_index,
+                                                                                      index,
+                                                                                      data.chapter_id
+                                                                                  );
+                                                                              }
+                                                                          );
+                                                                      }
+                                                                  )}
 
                                                                   {/* Cycle test list */}
                                                                   {data.cycle_tests.map(
@@ -980,7 +764,7 @@ class Subject extends Component {
                                                                           );
                                                                       }
                                                                   )}
-                                                              </>
+                                                              </Card>
                                                           </Accordion.Collapse>
                                                       </Card>
                                                   );

@@ -4,6 +4,7 @@ import SideNav from "./sidenav";
 import { Link } from "react-router-dom";
 import { Tabs, Tab, Dropdown, Modal, Spinner, Alert } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
+import { paginationCount } from "../../shared/globalValues.js";
 import Loading from "../sharedComponents/loader";
 import TeacherTable from "../table/teacherTable";
 import StudentTable from "../table/studentTable";
@@ -990,7 +991,7 @@ class ProfileList extends Component {
                                         handleTeacherId={this.handleTeacherId}
                                     />
                                     <div className="card-body p-3">
-                                        {this.state.totalTeacherCount >= 10 ? (
+                                        {this.state.totalTeacherCount > paginationCount ? (
                                             <Paginations
                                                 activePage={
                                                     this.state.activeTeacherPage
@@ -1015,7 +1016,7 @@ class ProfileList extends Component {
                                         group={true}
                                     />
                                     <div className="card-body p-3">
-                                        {this.state.totalStudentCount >= 10 ? (
+                                        {this.state.totalStudentCount > paginationCount ? (
                                             <Paginations
                                                 activePage={
                                                     this.state.activeStudentPage

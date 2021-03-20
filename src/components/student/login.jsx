@@ -207,10 +207,6 @@ class StudentLogin extends Component {
                                         "is_student",
                                         result.is_student
                                     );
-                                    localStorage.setItem(
-                                        "Username",
-                                        result.username
-                                    );
                                     this.setState({
                                         showLoader: false,
                                     });
@@ -219,6 +215,7 @@ class StudentLogin extends Component {
                             .catch((err) => {
                                 console.log(err);
                             });
+                        // Logout the admin if he is logged in
                     } else if (localStorage.getItem("Inquel-Auth")) {
                         var url = baseUrl + adminPathUrl;
                         var authToken = localStorage.getItem("Inquel-Auth");
@@ -247,10 +244,6 @@ class StudentLogin extends Component {
                                         "is_student",
                                         result.is_student
                                     );
-                                    localStorage.setItem(
-                                        "Username",
-                                        result.username
-                                    );
                                     this.setState({
                                         showLoader: false,
                                     });
@@ -265,7 +258,6 @@ class StudentLogin extends Component {
                             `Token ${result.token}`
                         );
                         localStorage.setItem("is_student", result.is_student);
-                        localStorage.setItem("Username", result.username);
                         this.setState({
                             showLoader: false,
                         });

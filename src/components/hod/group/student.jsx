@@ -4,6 +4,7 @@ import Header from "../navbar";
 import SideNav from "../sidenav";
 import { Link } from "react-router-dom";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
+import { paginationCount } from "../../../shared/globalValues.js";
 import Loading from "../../sharedComponents/loader";
 import Paginations from "../../sharedComponents/pagination";
 import StudentTable from "../../table/studentTable";
@@ -449,7 +450,7 @@ class GroupStudents extends Component {
                                 category={true}
                             />
                             <div className="card-body p-3">
-                                {this.state.totalStudentCount >= 10 ? (
+                                {this.state.totalStudentCount > paginationCount ? (
                                     <Paginations
                                         activePage={
                                             this.state.activeStudentPage

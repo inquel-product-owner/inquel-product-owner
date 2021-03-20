@@ -3,6 +3,7 @@ import { Dropdown } from "react-bootstrap";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
+import { paginationCount } from "../../shared/globalValues.js";
 import Loading from "../sharedComponents/loader";
 import Paginations from "../sharedComponents/pagination";
 import StudentTable from "../table/studentTable";
@@ -160,7 +161,7 @@ class GroupStudents extends Component {
                                 path="teacher"
                             />
                             <div className="card-body p-3">
-                                {this.state.totalStudentCount >= 10 ? (
+                                {this.state.totalStudentCount > paginationCount ? (
                                     <Paginations
                                         activePage={
                                             this.state.activeStudentPage

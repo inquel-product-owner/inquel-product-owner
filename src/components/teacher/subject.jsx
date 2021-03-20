@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { Link } from "react-router-dom";
-import { Modal, Alert, Spinner } from "react-bootstrap";
+import { Modal, Alert, Spinner, Dropdown } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import Loading from "../sharedComponents/loader";
 import { UpdateContentModal } from "../sharedComponents/updateModal";
@@ -861,12 +861,6 @@ class SubjectChapters extends Component {
                                             >
                                                 Add content
                                             </th>
-                                            <th
-                                                scope="col"
-                                                className="text-right"
-                                            >
-                                                Action
-                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -973,7 +967,7 @@ class SubjectChapters extends Component {
                                                                                       </button>
                                                                                   </Link>
                                                                               </td>
-                                                                              <td className="text-right">
+                                                                              <td className="d-flex justify-content-end">
                                                                                   <Link
                                                                                       to={`${this.props.match.url}/chapter/${chapter.chapter_id}`}
                                                                                   >
@@ -988,33 +982,34 @@ class SubjectChapters extends Component {
                                                                                           Add
                                                                                       </button>
                                                                                   </Link>
-                                                                              </td>
-                                                                              <td className="text-right">
-                                                                                  <button
-                                                                                      className="btn btn-primary-invert shadow-sm btn-sm mr-1"
-                                                                                      onClick={() =>
-                                                                                          this.toggleChapter_EditModal(
-                                                                                              chapter
-                                                                                          )
-                                                                                      }
-                                                                                  >
-                                                                                      <i className="far fa-edit"></i>
-                                                                                  </button>
-                                                                                  {/* <button
-                                                                                      className="btn btn-primary-invert shadow-sm btn-sm"
-                                                                                      onClick={() =>
-                                                                                          this.toggleChapter_DeleteModal(
-                                                                                              chapter
-                                                                                          )
-                                                                                      }
-                                                                                  >
-                                                                                      <i className="far fa-trash-alt"></i>
-                                                                                  </button> */}
+
+                                                                                  <Dropdown>
+                                                                                      <Dropdown.Toggle
+                                                                                          variant="white"
+                                                                                          className="btn btn-link btn-sm shadow-none caret-off ml-2"
+                                                                                      >
+                                                                                          <i className="fas fa-ellipsis-v"></i>
+                                                                                      </Dropdown.Toggle>
+
+                                                                                      <Dropdown.Menu>
+                                                                                          <Dropdown.Item
+                                                                                              onClick={() =>
+                                                                                                  this.toggleChapter_EditModal(
+                                                                                                      chapter
+                                                                                                  )
+                                                                                              }
+                                                                                          >
+                                                                                              <i className="far fa-edit fa-sm mr-1"></i>{" "}
+                                                                                              Edit
+                                                                                          </Dropdown.Item>
+                                                                                      </Dropdown.Menu>
+                                                                                  </Dropdown>
                                                                               </td>
                                                                           </tr>
                                                                       ) : null;
                                                                   }
                                                               )}
+                                                              {/* Semester list */}
                                                               <tr key={index}>
                                                                   <td>
                                                                       {
@@ -1024,11 +1019,100 @@ class SubjectChapters extends Component {
                                                                   <td></td>
                                                                   <td></td>
                                                                   <td></td>
-                                                                  <td className="text-right">
-                                                                      {data.direct_question ===
-                                                                          undefined ||
-                                                                      data.direct_question ===
-                                                                          false ? (
+                                                                  <td className="d-flex justify-content-end">
+                                                                      {/* checks if both the permission exist */}
+                                                                      {data.auto_test_perm ===
+                                                                          true &&
+                                                                      data.direct_perm ===
+                                                                          true ? (
+                                                                          // checks if auto content is available
+                                                                          data.auto_test_question ===
+                                                                          true ? (
+                                                                              <Link
+                                                                                  to={`${this.props.match.url}/semester/${data.semester_id}`}
+                                                                              >
+                                                                                  <button
+                                                                                      className="btn btn-primary btn-sm"
+                                                                                      onClick={() =>
+                                                                                          this.dispatchSemester(
+                                                                                              data.semester_name
+                                                                                          )
+                                                                                      }
+                                                                                  >
+                                                                                      Auto
+                                                                                  </button>
+                                                                              </Link>
+                                                                          ) : // or if direct content is available
+                                                                          data.direct_question ===
+                                                                            true ? (
+                                                                              // checks if it is a independent subject
+                                                                              this
+                                                                                  .state
+                                                                                  .is_independent ===
+                                                                              false ? (
+                                                                                  <Link
+                                                                                      to={`${this.props.match.url}/semester/${data.semester_id}/direct`}
+                                                                                  >
+                                                                                      <button
+                                                                                          className="btn btn-primary btn-sm ml-2"
+                                                                                          onClick={() =>
+                                                                                              this.dispatchSemester(
+                                                                                                  data.semester_name
+                                                                                              )
+                                                                                          }
+                                                                                      >
+                                                                                          Direct
+                                                                                          Test
+                                                                                      </button>
+                                                                                  </Link>
+                                                                              ) : (
+                                                                                  ""
+                                                                              )
+                                                                          ) : (
+                                                                              // or display both the button
+                                                                              <>
+                                                                                  <Link
+                                                                                      to={`${this.props.match.url}/semester/${data.semester_id}`}
+                                                                                  >
+                                                                                      <button
+                                                                                          className="btn btn-primary btn-sm"
+                                                                                          onClick={() =>
+                                                                                              this.dispatchSemester(
+                                                                                                  data.semester_name
+                                                                                              )
+                                                                                          }
+                                                                                      >
+                                                                                          Auto
+                                                                                      </button>
+                                                                                  </Link>
+                                                                                  {/* checks if it is a independent subject */}
+                                                                                  {this
+                                                                                      .state
+                                                                                      .is_independent ===
+                                                                                  false ? (
+                                                                                      <Link
+                                                                                          to={`${this.props.match.url}/semester/${data.semester_id}/direct`}
+                                                                                      >
+                                                                                          <button
+                                                                                              className="btn btn-primary btn-sm ml-2"
+                                                                                              onClick={() =>
+                                                                                                  this.dispatchSemester(
+                                                                                                      data.semester_name
+                                                                                                  )
+                                                                                              }
+                                                                                          >
+                                                                                              Direct
+                                                                                              Test
+                                                                                          </button>
+                                                                                      </Link>
+                                                                                  ) : (
+                                                                                      ""
+                                                                                  )}
+                                                                              </>
+                                                                          )
+                                                                      ) : // checks if auto permission exist
+                                                                      data.auto_test_perm ===
+                                                                        true ? (
                                                                           <Link
                                                                               to={`${this.props.match.url}/semester/${data.semester_id}`}
                                                                           >
@@ -1043,16 +1127,14 @@ class SubjectChapters extends Component {
                                                                                   Auto
                                                                               </button>
                                                                           </Link>
-                                                                      ) : (
-                                                                          ""
-                                                                      )}
-                                                                      {!this
-                                                                          .state
-                                                                          .is_independent ? (
-                                                                          data.direct_question ===
-                                                                              undefined ||
-                                                                          data.direct_question ===
-                                                                              true ? (
+                                                                      ) : // checks if direct permission exist
+                                                                      data.direct_perm ===
+                                                                        true ? (
+                                                                          // checks if it is a independent subject
+                                                                          this
+                                                                              .state
+                                                                              .is_independent ===
+                                                                          false ? (
                                                                               <Link
                                                                                   to={`${this.props.match.url}/semester/${data.semester_id}/direct`}
                                                                               >
@@ -1072,30 +1154,40 @@ class SubjectChapters extends Component {
                                                                               ""
                                                                           )
                                                                       ) : (
+                                                                          // or else prints nothing
                                                                           ""
                                                                       )}
-                                                                  </td>
-                                                                  <td className="text-right">
-                                                                      <button
-                                                                          className="btn btn-primary-invert shadow-sm btn-sm mr-1"
-                                                                          onClick={() =>
-                                                                              this.toggleSemester_EditModal(
-                                                                                  data
-                                                                              )
-                                                                          }
-                                                                      >
-                                                                          <i className="far fa-edit"></i>
-                                                                      </button>
-                                                                      <button
-                                                                          className="btn btn-primary-invert shadow-sm btn-sm"
-                                                                          onClick={() =>
-                                                                              this.toggleSemester_DeleteModal(
-                                                                                  data
-                                                                              )
-                                                                          }
-                                                                      >
-                                                                          <i className="far fa-trash-alt"></i>
-                                                                      </button>
+                                                                      <Dropdown>
+                                                                          <Dropdown.Toggle
+                                                                              variant="white"
+                                                                              className="btn btn-link btn-sm shadow-none caret-off ml-2"
+                                                                          >
+                                                                              <i className="fas fa-ellipsis-v"></i>
+                                                                          </Dropdown.Toggle>
+
+                                                                          <Dropdown.Menu>
+                                                                              <Dropdown.Item
+                                                                                  onClick={() =>
+                                                                                      this.toggleSemester_EditModal(
+                                                                                          data
+                                                                                      )
+                                                                                  }
+                                                                              >
+                                                                                  <i className="far fa-edit fa-sm mr-1"></i>{" "}
+                                                                                  Edit
+                                                                              </Dropdown.Item>
+                                                                              <Dropdown.Item
+                                                                                  onClick={() =>
+                                                                                      this.toggleSemester_DeleteModal(
+                                                                                          data
+                                                                                      )
+                                                                                  }
+                                                                              >
+                                                                                  <i className="far fa-trash-alt fa-sm mr-1"></i>{" "}
+                                                                                  Delete
+                                                                              </Dropdown.Item>
+                                                                          </Dropdown.Menu>
+                                                                      </Dropdown>
                                                                   </td>
                                                               </tr>
                                                           </React.Fragment>
@@ -1193,7 +1285,7 @@ class SubjectChapters extends Component {
                                                                       </button>
                                                                   </Link>
                                                               </td>
-                                                              <td className="text-right">
+                                                              <td className="d-flex justify-content-end">
                                                                   <Link
                                                                       to={`${this.props.match.url}/chapter/${chapter.chapter_id}`}
                                                                   >
@@ -1208,28 +1300,28 @@ class SubjectChapters extends Component {
                                                                           Add
                                                                       </button>
                                                                   </Link>
-                                                              </td>
-                                                              <td className="text-right">
-                                                                  <button
-                                                                      className="btn btn-primary-invert shadow-sm btn-sm mr-1"
-                                                                      onClick={() =>
-                                                                          this.toggleChapter_EditModal(
-                                                                              chapter
-                                                                          )
-                                                                      }
-                                                                  >
-                                                                      <i className="far fa-edit"></i>
-                                                                  </button>
-                                                                  {/* <button
-                                                                      className="btn btn-primary-invert shadow-sm btn-sm"
-                                                                      onClick={() =>
-                                                                          this.toggleChapter_DeleteModal(
-                                                                              chapter
-                                                                          )
-                                                                      }
-                                                                  >
-                                                                      <i className="far fa-trash-alt"></i>
-                                                                  </button> */}
+
+                                                                  <Dropdown>
+                                                                      <Dropdown.Toggle
+                                                                          variant="white"
+                                                                          className="btn btn-link btn-sm shadow-none caret-off ml-2"
+                                                                      >
+                                                                          <i className="fas fa-ellipsis-v"></i>
+                                                                      </Dropdown.Toggle>
+
+                                                                      <Dropdown.Menu>
+                                                                          <Dropdown.Item
+                                                                              onClick={() =>
+                                                                                  this.toggleChapter_EditModal(
+                                                                                      chapter
+                                                                                  )
+                                                                              }
+                                                                          >
+                                                                              <i className="far fa-edit fa-sm mr-1"></i>{" "}
+                                                                              Edit
+                                                                          </Dropdown.Item>
+                                                                      </Dropdown.Menu>
+                                                                  </Dropdown>
                                                               </td>
                                                           </tr>
                                                       ) : null;

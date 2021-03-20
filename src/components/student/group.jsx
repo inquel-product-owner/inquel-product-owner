@@ -125,7 +125,10 @@ class Group extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name={this.state.groupData.group_name} togglenav={this.toggleSideNav} />
+                <Header
+                    name={this.state.groupData.group_name}
+                    togglenav={this.toggleSideNav}
+                />
 
                 {/* Sidebar */}
                 <SideNav

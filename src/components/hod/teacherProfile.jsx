@@ -1,10 +1,11 @@
 import React, { Component } from "react";
-import profilepic from "../../assets/user.png";
+import profilepic from "../../assets/user-v1.png";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { Link } from "react-router-dom";
 import { Badge } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../shared/baseUrl";
+import { paginationCount } from "../../shared/globalValues.js";
 import Loading from "../sharedComponents/loader";
 import GroupTable from "../table/groupTable";
 import SubjectTable from "../table/subjectTable";
@@ -272,7 +273,7 @@ class TeacherProfile extends Component {
                                 view={true}
                             />
                             <div className="card-body p-3">
-                                {this.state.totalGroupCount >= 10 ? (
+                                {this.state.totalGroupCount > paginationCount ? (
                                     <Paginations
                                         activePage={this.state.activeGroupPage}
                                         totalItemsCount={
@@ -297,7 +298,7 @@ class TeacherProfile extends Component {
                                 check={false}
                             />
                             <div className="card-body p-3">
-                                {this.state.totalSubjectCount >= 10 ? (
+                                {this.state.totalSubjectCount > paginationCount ? (
                                     <Paginations
                                         activePage={
                                             this.state.activeSubjectPage

@@ -5,6 +5,7 @@ import Header from "./navbar";
 import SideNav from "./sidenav";
 import courseimg from "../../assets/code.jpg";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
+import { paginationCount } from "../../shared/globalValues.js";
 import Loading from "../sharedComponents/loader";
 import GroupTable from "../table/groupTable";
 import SubjectTable from "../table/subjectTable";
@@ -335,7 +336,7 @@ class Dashboard extends Component {
                                 check={true}
                             />
                             <div className="card-body p-3">
-                                {this.state.totalGroupCount >= 10 ? (
+                                {this.state.totalGroupCount > paginationCount ? (
                                     <Paginations
                                         activePage={this.state.activeGroupPage}
                                         totalItemsCount={
@@ -380,7 +381,7 @@ class Dashboard extends Component {
                                 path="hod"
                             />
                             <div className="card-body p-3">
-                                {this.state.totalSubjectCount >= 10 ? (
+                                {this.state.totalSubjectCount > paginationCount ? (
                                     <Paginations
                                         activePage={
                                             this.state.activeSubjectPage

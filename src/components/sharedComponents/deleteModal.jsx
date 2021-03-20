@@ -109,13 +109,13 @@ export class DeleteContentModal extends Component {
                 </Modal.Body>
                 <Modal.Footer>
                     <button
-                        className="btn btn-secondary btn-sm mr-2"
+                        className="btn btn-link btn-sm shadow-none mr-2"
                         onClick={this.props.toggleModal}
                     >
                         Cancel
                     </button>
                     <button
-                        className="btn btn-primary btn-sm"
+                        className="btn btn-primary btn-sm shadow-none"
                         onClick={this.handleDelete}
                     >
                         {this.state.showLoader ? (
