@@ -1,11 +1,9 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import store from "../../redux/store";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import Select from "react-select";
-import { Link } from "react-router-dom";
-import { Modal, Alert, Spinner } from "react-bootstrap";
+import { Modal, Alert, Spinner, Dropdown } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import Loading from "../sharedComponents/loader";
 
@@ -432,7 +430,7 @@ class CycleTestAuto extends Component {
             sections: [
                 {
                     section_id: "",
-                    section_name: "",
+                    section_description: "",
                     question_type: "",
                     category: "",
                     any_questions: "",
@@ -442,7 +440,7 @@ class CycleTestAuto extends Component {
                     total_marks: "",
                 },
             ],
-            filterData: [{ category: [] }],
+            filterData: [{ category: [], marks: [] }],
 
             duration: "",
             attempts: [],
@@ -456,6 +454,7 @@ class CycleTestAuto extends Component {
         this.chapterId = this.props.match.params.chapterId;
         this.cycle_testId = this.props.match.params.cycle_testId;
         this.url = baseUrl + teacherUrl;
+        this.filterURL = `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/filter/`;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
             Accept: "application/json",
@@ -486,6 +485,7 @@ class CycleTestAuto extends Component {
         }
     };
 
+    // loads attempt and question type data
     loadAttemptData = () => {
         fetch(
             `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/filter/?chapter_id=${this.chapterId}`,
@@ -501,6 +501,8 @@ class CycleTestAuto extends Component {
                     if (result.data.attempts !== undefined) {
                         this.setState({
                             attempts: result.data.attempts,
+                            selectedAttempt: result.data.attempts[0],
+                            question_type: result.data.question_type,
                         });
                     }
                 } else {
@@ -527,38 +529,63 @@ class CycleTestAuto extends Component {
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
-                if (result.data.length !== 0 && Array.isArray(result.data)) {
+                if (
+                    result.data.auto_test !== undefined &&
+                    result.data.auto_test.length !== 0
+                ) {
                     const section = [];
                     let duration = "";
-                    let selectedAttempt = "";
                     const filterData = [];
-                    for (let i = 0; i < result.data.length; i++) {
+                    for (let i = 0; i < result.data.auto_test.length; i++) {
                         section.push({
-                            section_id: result.data[i].section_id,
-                            section_name: result.data[i].section_description,
-                            question_type: result.data[i].question_type,
-                            category: result.data[i].category,
-                            any_questions: result.data[i].any_questions,
-                            no_questions: result.data[i].total_questions,
-                            total_questions: '',
-                            marks: result.data[i].mark,
-                            total_marks: result.data[i].total_marks,
+                            section_id: result.data.auto_test[i].section_id,
+                            section_description:
+                                result.data.auto_test[i].section_description,
+                            question_type:
+                                result.data.auto_test[i].question_type,
+                            category: result.data.auto_test[i].category,
+                            any_questions:
+                                result.data.auto_test[i].any_questions,
+                            no_questions:
+                                result.data.auto_test[i].total_questions,
+                            marks: result.data.auto_test[i].mark,
+                            total_marks: result.data.auto_test[i].total_marks,
                         });
                         duration =
                             result.duration !== null ? result.duration : "";
-                        selectedAttempt = result.data[i].attempts;
-                        fetch(
-                            `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/filter/?chapter_id=${this.chapterId}&attempts=${selectedAttempt}&question_type=${result.data[i].question_type}`,
-                            {
-                                method: "GET",
-                                headers: this.headers,
-                            }
-                        )
-                            .then((res) => res.json())
+
+                        // loads question category data
+                        Promise.all([
+                            fetch(
+                                `${this.filterURL}?chapter_id=${this.chapterId}&question_type=${result.data.auto_test[i].question_type}`,
+                                {
+                                    method: "GET",
+                                    headers: this.headers,
+                                }
+                            ).then((res) => res.json()),
+                            fetch(
+                                `${this.filterURL}?chapter_id=${this.chapterId}&question_type=${result.data.auto_test[i].question_type}&category=${result.data.auto_test[i].category}`,
+                                {
+                                    method: "GET",
+                                    headers: this.headers,
+                                }
+                            ).then((res) => res.json()),
+                            fetch(
+                                `${this.filterURL}?chapter_id=${this.chapterId}&question_type=${result.data.auto_test[i].question_type}&category=${result.data.auto_test[i].category}&marks=${result.data.auto_test[i].mark}`,
+                                {
+                                    method: "GET",
+                                    headers: this.headers,
+                                }
+                            ).then((res) => res.json()),
+                        ])
                             .then((result) => {
+                                console.log(result);
                                 filterData.push({
-                                    category: result.data.category,
+                                    category: result[0].data.category,
+                                    marks: result[1].data.marks,
                                 });
+                                section[i].total_questions =
+                                    result[2].data.total_questions;
                                 this.setState({
                                     filterData: filterData,
                                 });
@@ -567,26 +594,9 @@ class CycleTestAuto extends Component {
                                 console.log(err);
                             });
                     }
-                    fetch(
-                        `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/filter/?chapter_id=${this.chapterId}&attempts=${selectedAttempt}`,
-                        {
-                            method: "GET",
-                            headers: this.headers,
-                        }
-                    )
-                        .then((res) => res.json())
-                        .then((result) => {
-                            this.setState({
-                                question_type: result.data.question_type,
-                            });
-                        })
-                        .catch((err) => {
-                            console.log(err);
-                        });
                     this.setState({
                         sections: section,
                         duration: duration,
-                        selectedAttempt: selectedAttempt,
                         page_loading: false,
                     });
                 } else {
@@ -608,15 +618,21 @@ class CycleTestAuto extends Component {
     handleSectionData = (index, event, type) => {
         const section = [...this.state.sections];
         if (type === "name") {
-            section[index].section_name = event.target.value;
+            section[index].section_description = event.target.value;
         } else if (type === "any_questions") {
-            section[index].any_questions = Number(event.target.value);
-            if (section[index].marks !== 0 || section[index].marks !== 0) {
+            if (section[index].marks !== "") {
+                section[index].any_questions = Number(event.target.value);
                 section[index].total_marks =
                     Number(section[index].marks) * Number(event.target.value);
+            } else {
+                section[index].any_questions = event.target.value;
             }
         } else if (type === "no_questions") {
-            section[index].no_questions = Number(event.target.value);
+            if (event.target.value !== "") {
+                section[index].no_questions = Number(event.target.value);
+            } else {
+                section[index].no_questions = event.target.value;
+            }
         }
         this.setState({
             sections: section,
@@ -627,38 +643,29 @@ class CycleTestAuto extends Component {
         this.setState({
             selectedAttempt: event.value,
         });
-
-        if (event.value !== "") {
-            fetch(
-                `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/filter/?chapter_id=${this.chapterId}&attempts=${event.value}`,
-                {
-                    method: "GET",
-                    headers: this.headers,
-                }
-            )
-                .then((res) => res.json())
-                .then((result) => {
-                    console.log(result);
-                    this.setState({
-                        question_type: result.data.question_type,
-                    });
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-        }
     };
 
+    // loads category data on selecting question type
     handleType = (index, event) => {
         const section = [...this.state.sections];
+        const filterData = [...this.state.filterData];
         section[index].question_type = event.target.value;
+        filterData[index].category = [];
+        section[index].category = "";
+        section[index].marks = "";
+        section[index].total_questions = "";
+        section[index].no_questions = "";
+        section[index].any_questions = "";
+        section[index].total_marks = "";
+        filterData[index].marks = [];
         this.setState({
             sections: section,
+            filterData: filterData,
         });
 
         if (event.target.value !== "") {
             fetch(
-                `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/filter/?chapter_id=${this.chapterId}&attempts=${this.state.selectedAttempt}&question_type=${event.target.value}`,
+                `${this.filterURL}?chapter_id=${this.chapterId}&question_type=${event.target.value}`,
                 {
                     method: "GET",
                     headers: this.headers,
@@ -685,16 +692,25 @@ class CycleTestAuto extends Component {
         }
     };
 
+    // loads marks data on selecting a category
     handleCategory = (index, event) => {
+        const filterData = [...this.state.filterData];
         const section = [...this.state.sections];
         section[index].category = event.target.value;
+        section[index].marks = "";
+        section[index].total_questions = "";
+        section[index].no_questions = "";
+        section[index].any_questions = "";
+        section[index].total_marks = "";
+        filterData[index].marks = [];
         this.setState({
             sections: section,
+            filterData: filterData,
         });
 
         if (event.target.value !== "") {
             fetch(
-                `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/filter/?chapter_id=${this.chapterId}&attempts=${this.state.selectedAttempt}&question_type=${section[index].question_type}&category=${event.target.value}`,
+                `${this.filterURL}?chapter_id=${this.chapterId}&question_type=${section[index].question_type}&category=${event.target.value}`,
                 {
                     method: "GET",
                     headers: this.headers,
@@ -703,13 +719,36 @@ class CycleTestAuto extends Component {
                 .then((res) => res.json())
                 .then((result) => {
                     console.log(result);
-                    const section = [...this.state.sections];
-                    section[index].no_questions = Number(
-                        result.data.total_questions
-                    );
-                    section[index].total_questions = Number(
-                        result.data.total_questions
-                    );
+                    filterData[index].marks = result.data.marks;
+                    this.setState({
+                        filterData: filterData,
+                    });
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        }
+    };
+
+    // loads total question on  selecting marks
+    handleMarks = (index, event) => {
+        const section = [...this.state.sections];
+
+        if (event.target.value !== "") {
+            section[index].marks = Number(event.target.value);
+
+            fetch(
+                `${this.filterURL}?chapter_id=${this.chapterId}&question_type=${section[index].question_type}&category=${section[index].category}&marks=${event.target.value}`,
+                {
+                    method: "GET",
+                    headers: this.headers,
+                }
+            )
+                .then((res) => res.json())
+                .then((result) => {
+                    console.log(result);
+                    section[index].total_questions =
+                        result.data.total_questions;
                     this.setState({
                         sections: section,
                     });
@@ -718,25 +757,12 @@ class CycleTestAuto extends Component {
                     console.log(err);
                 });
         } else {
+            section[index].marks = "";
             section[index].total_questions = "";
             this.setState({
                 sections: section,
             });
         }
-    };
-
-    handleMarks = (index, event) => {
-        const section = [...this.state.sections];
-
-        if (event.target.value !== 0 || event.target.value !== "") {
-            section[index].marks = Number(event.target.value);
-            section[index].total_marks =
-                section[index].any_questions * Number(event.target.value);
-        }
-
-        this.setState({
-            sections: section,
-        });
     };
 
     handleDuration = (event) => {
@@ -765,13 +791,7 @@ class CycleTestAuto extends Component {
                 showErrorAlert: true,
                 page_loading: false,
             });
-        } else if (this.state.selectedAttempt === "") {
-            this.setState({
-                errorMsg: "Please select a attempt",
-                showErrorAlert: true,
-                page_loading: false,
-            });
-        } else if (section[index].section_name === "") {
+        } else if (section[index].section_description === "") {
             this.setState({
                 errorMsg: "Enter the section name",
                 showErrorAlert: true,
@@ -786,6 +806,12 @@ class CycleTestAuto extends Component {
         } else if (section[index].category === "") {
             this.setState({
                 errorMsg: "Select a category",
+                showErrorAlert: true,
+                page_loading: false,
+            });
+        } else if (section[index].marks === "") {
+            this.setState({
+                errorMsg: "Select marks",
                 showErrorAlert: true,
                 page_loading: false,
             });
@@ -811,12 +837,6 @@ class CycleTestAuto extends Component {
                 showErrorAlert: true,
                 page_loading: false,
             });
-        } else if (section[index].marks === "" || section[index].marks === 0) {
-            this.setState({
-                errorMsg: "Enter valid marks",
-                showErrorAlert: true,
-                page_loading: false,
-            });
         } else {
             if (section[index].section_id === "") {
                 this.handlePOST(section, index);
@@ -835,9 +855,8 @@ class CycleTestAuto extends Component {
                 body: JSON.stringify({
                     cycle_test_id: this.cycle_testId,
                     chapter_id: this.chapterId,
-                    duration: this.state.duration,
-                    attempts: this.state.selectedAttempt,
-                    section_description: section[index].section_name,
+                    duration: this.state.duration.toString(),
+                    section_description: section[index].section_description,
                     question_type: section[index].question_type,
                     category: section[index].category,
                     total_questions: section[index].no_questions,
@@ -851,23 +870,18 @@ class CycleTestAuto extends Component {
             .then((result) => {
                 console.log(result);
                 if (result.sts === true) {
-                    section[index] = result.section_id;
                     this.setState({
                         successMsg: result.msg,
                         showSuccessAlert: true,
-                        page_loading: false,
-                        sections: section,
                     });
-                    setTimeout(() => {
-                        this.setState(
-                            {
-                                page_loading: true,
-                            },
-                            () => {
-                                this.loadSectionData();
-                            }
-                        );
-                    }, 3000);
+                    this.setState(
+                        {
+                            page_loading: true,
+                        },
+                        () => {
+                            this.loadSectionData();
+                        }
+                    );
                 } else {
                     if (result.detail) {
                         this.setState({
@@ -898,9 +912,6 @@ class CycleTestAuto extends Component {
                 body: JSON.stringify({
                     cycle_test_id: this.cycle_testId,
                     chapter_id: this.chapterId,
-                    duration: this.state.duration,
-                    attempts: this.state.selectedAttempt,
-                    section_description: section[index].section_name,
                     question_type: section[index].question_type,
                     category: section[index].category,
                     total_questions: section[index].no_questions,
@@ -913,24 +924,11 @@ class CycleTestAuto extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                if (result.data.sts === true) {
-                    section[index] = result.data.section_id;
+                if (result.sts === true) {
                     this.setState({
-                        successMsg: result.data.msg,
+                        successMsg: result.msg,
                         showSuccessAlert: true,
-                        page_loading: false,
-                        sections: section,
                     });
-                    setTimeout(() => {
-                        this.setState(
-                            {
-                                page_loading: true,
-                            },
-                            () => {
-                                this.loadSectionData();
-                            }
-                        );
-                    }, 3000);
                 } else {
                     if (result.detail) {
                         this.setState({
@@ -938,7 +936,55 @@ class CycleTestAuto extends Component {
                         });
                     } else {
                         this.setState({
-                            errorMsg: result.data.msg,
+                            errorMsg: result.msg,
+                        });
+                    }
+                    this.setState({
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+
+        fetch(
+            `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/auto/`,
+            {
+                method: "PATCH",
+                headers: this.headers,
+                body: JSON.stringify({
+                    chapter_id: this.chapterId,
+                    section_id: section[index].section_id,
+                    duration: this.state.duration.toString(),
+                    section_description: section[index].section_description,
+                }),
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                    });
+                    this.setState(
+                        {
+                            page_loading: true,
+                        },
+                        () => {
+                            this.loadSectionData();
+                        }
+                    );
+                } else {
+                    if (result.detail) {
+                        this.setState({
+                            errorMsg: result.detail,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.msg,
                         });
                     }
                     this.setState({
@@ -957,7 +1003,7 @@ class CycleTestAuto extends Component {
         const sections = [...this.state.sections];
         sections.push({
             section_id: "",
-            section_name: "",
+            section_description: "",
             question_type: "",
             category: "",
             any_questions: "",
@@ -966,30 +1012,138 @@ class CycleTestAuto extends Component {
             marks: "",
             total_marks: "",
         });
-        filterData.push({ category: [] });
+        filterData.push({ category: [], marks: [] });
         this.setState({
             sections: sections,
             filterData: filterData,
         });
     };
 
-    removeSection = (index) => {
-        const filterData = [...this.state.filterData];
-        const sections = [...this.state.sections];
-        sections.splice(index, 1);
-        filterData.splice(index, 1);
+    removeSection = (index, section_id) => {
         this.setState({
-            sections: sections,
-            filterData: filterData,
+            showSuccessAlert: false,
+            showErrorAlert: false,
+            showLoader: true,
         });
+
+        if (section_id !== "") {
+            fetch(
+                `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/auto/`,
+                {
+                    method: "DELETE",
+                    headers: this.headers,
+                    body: JSON.stringify({
+                        chapter_id: this.chapterId,
+                        section_id: section_id,
+                    }),
+                }
+            )
+                .then((res) => res.json())
+                .then((result) => {
+                    if (result.sts === true) {
+                        this.setState({
+                            successMsg: result.msg,
+                            showSuccessAlert: true,
+                            showLoader: true,
+                        });
+
+                        const filterData = [...this.state.filterData];
+                        const sections = [...this.state.sections];
+                        sections.splice(index, 1);
+                        filterData.splice(index, 1);
+                        this.setState(
+                            {
+                                sections: sections,
+                                filterData: filterData,
+                            },
+                            () => {
+                                if (this.state.sections.length === 0) {
+                                    sections.push({
+                                        section_id: "",
+                                        section_description: "",
+                                        question_type: "",
+                                        category: "",
+                                        any_questions: "",
+                                        no_questions: "",
+                                        total_questions: "",
+                                        marks: "",
+                                        total_marks: "",
+                                    });
+                                    filterData.push({
+                                        category: [],
+                                        marks: [],
+                                    });
+                                    this.setState({
+                                        sections: sections,
+                                        filterData: filterData,
+                                    });
+                                }
+                            }
+                        );
+                    } else {
+                        this.setState({
+                            errorMsg: result.detail
+                                ? result.detail
+                                : result.msg,
+                            showErrorAlert: true,
+                            showLoader: false,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        } else {
+            const filterData = [...this.state.filterData];
+            const sections = [...this.state.sections];
+            sections.splice(index, 1);
+            filterData.splice(index, 1);
+            this.setState(
+                {
+                    sections: sections,
+                    filterData: filterData,
+                },
+                () => {
+                    if (this.state.sections.length === 0) {
+                        sections.push({
+                            section_id: "",
+                            section_description: "",
+                            question_type: "",
+                            category: "",
+                            any_questions: "",
+                            no_questions: "",
+                            total_questions: "",
+                            marks: "",
+                            total_marks: "",
+                        });
+                        filterData.push({ category: [], marks: [] });
+                        this.setState({
+                            sections: sections,
+                            filterData: filterData,
+                        });
+                    }
+                }
+            );
+        }
     };
 
-    dispatchSection = (data) => {
-        store.dispatch({ type: "SECTION", payload: data });
+    sectionRedirect = (id) => {
+        this.setState({
+            showErrorAlert: false,
+        });
+        if (this.state.selectedAttempt === "") {
+            this.setState({
+                errorMsg: "Select attempt to preview section details",
+                showErrorAlert: true,
+            });
+        } else {
+            this.props.history.push(
+                `${this.props.match.url}/section/${id}/?attempt=${this.state.selectedAttempt}`
+            );
+        }
     };
 
     render() {
-        let filterData = [...this.state.filterData];
         document.title = `${this.props.chapter_name} Auto - Teacher | IQLabs`;
         return (
             <div className="wrapper">
@@ -1035,7 +1189,7 @@ class CycleTestAuto extends Component {
 
                         <div className="card shadow-sm mb-3">
                             <div className="card-body text-center">
-                                <h6 className="mb-0">
+                                <h6 className="primary-text mb-0">
                                     {this.props.cycle_name}
                                 </h6>
                             </div>
@@ -1052,7 +1206,7 @@ class CycleTestAuto extends Component {
                                             className="form-control form-shadow"
                                             placeholder="Enter duration (In minutes)"
                                             onChange={this.handleDuration}
-                                            value={this.state.duration}
+                                            value={this.state.duration || ''}
                                             autoComplete="off"
                                             min="1"
                                             max="360"
@@ -1068,7 +1222,6 @@ class CycleTestAuto extends Component {
                                                     ? this.state.selectedAttempt
                                                     : "Select attempt"
                                             }
-                                            value={[]}
                                             isSearchable={true}
                                             name="attempt"
                                             options={
@@ -1129,297 +1282,381 @@ class CycleTestAuto extends Component {
                                 <table className="table">
                                     <thead className="primary-bg text-white">
                                         <tr>
-                                            <th scope="col"></th>
                                             <th scope="col">
                                                 Section Description
                                             </th>
                                             <th scope="col">Question Type</th>
                                             <th scope="col">Category</th>
-                                            <th scope="col">Any Questions</th>
+                                            <th scope="col">Marks</th>
+                                            <th scope="col">Total Questions</th>
                                             <th scope="col">
                                                 No. of Questions
                                             </th>
-                                            <th scope="col">Total Questions</th>
-                                            <th scope="col">Marks</th>
+                                            <th scope="col">Any Questions</th>
                                             <th scope="col">Total Marks</th>
                                             <th scope="col">Action</th>
-                                            <th scope="col"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {this.state.sections.map(
-                                            (section, index) => {
-                                                return (
-                                                    <tr key={index}>
-                                                        <td>
-                                                            <button
-                                                                className="btn btn-primary-invert shadow-sm btn-sm"
-                                                                onClick={() =>
-                                                                    this.removeSection(
-                                                                        index
-                                                                    )
-                                                                }
-                                                            >
-                                                                <i className="fas fa-minus-circle"></i>
-                                                            </button>
-                                                        </td>
-                                                        <td width="200px">
-                                                            <input
-                                                                type="text"
-                                                                className="form-control form-control-sm form-shadow"
-                                                                placeholder="Section Description 01"
-                                                                value={
-                                                                    section.section_name
-                                                                }
-                                                                onChange={(
-                                                                    event
-                                                                ) =>
-                                                                    this.handleSectionData(
-                                                                        index,
-                                                                        event,
-                                                                        "name"
-                                                                    )
-                                                                }
-                                                                required
-                                                            />
-                                                        </td>
-                                                        <td width="150px">
-                                                            <select
-                                                                name="type"
-                                                                id="type"
-                                                                className="form-control form-control-sm form-shadow"
-                                                                onChange={(
-                                                                    event
-                                                                ) =>
-                                                                    this.handleType(
-                                                                        index,
-                                                                        event
-                                                                    )
-                                                                }
-                                                                value={
-                                                                    section.question_type
-                                                                }
-                                                                required
-                                                            >
-                                                                <option value="">
-                                                                    Select type
-                                                                </option>
-                                                                {this.state
-                                                                    .question_type
-                                                                    .length !==
-                                                                0
-                                                                    ? this.state.question_type.map(
-                                                                          (
-                                                                              data,
-                                                                              index
-                                                                          ) => {
-                                                                              return (
-                                                                                  <option
-                                                                                      value={
-                                                                                          data
-                                                                                      }
-                                                                                      key={
-                                                                                          index
-                                                                                      }
-                                                                                  >
-                                                                                      {data ===
-                                                                                      "type_1"
-                                                                                          ? "Type 1"
-                                                                                          : "type_2"
-                                                                                          ? "Type 2"
-                                                                                          : ""}
-                                                                                  </option>
-                                                                              );
-                                                                          }
-                                                                      )
-                                                                    : null}
-                                                            </select>
-                                                        </td>
-                                                        <td width="150px">
-                                                            <select
-                                                                name="category"
-                                                                id="category"
-                                                                className="form-control form-control-sm form-shadow"
-                                                                onChange={(
-                                                                    event
-                                                                ) =>
-                                                                    this.handleCategory(
-                                                                        index,
-                                                                        event
-                                                                    )
-                                                                }
-                                                                value={
-                                                                    section.category
-                                                                }
-                                                                required
-                                                            >
-                                                                <option value="">
-                                                                    Select
-                                                                    category
-                                                                </option>
-                                                                {filterData[
-                                                                    index
-                                                                ] !== undefined
-                                                                    ? filterData[
-                                                                          index
-                                                                      ].category
+                                        {this.state.sections.length !== 0
+                                            ? this.state.sections.map(
+                                                  (section, index) => {
+                                                      return (
+                                                          <tr key={index}>
+                                                              <td width="200px">
+                                                                  <input
+                                                                      type="text"
+                                                                      className="form-control form-control-sm border-secondary"
+                                                                      placeholder={`Section Description ${
+                                                                          index +
+                                                                          1
+                                                                      }`}
+                                                                      value={
+                                                                          section.section_description || ''
+                                                                      }
+                                                                      onChange={(
+                                                                          event
+                                                                      ) =>
+                                                                          this.handleSectionData(
+                                                                              index,
+                                                                              event,
+                                                                              "name"
+                                                                          )
+                                                                      }
+                                                                      required
+                                                                  />
+                                                              </td>
+                                                              <td width="150px">
+                                                                  <select
+                                                                      name="type"
+                                                                      id="type"
+                                                                      className="form-control form-control-sm border-secondary"
+                                                                      onChange={(
+                                                                          event
+                                                                      ) =>
+                                                                          this.handleType(
+                                                                              index,
+                                                                              event
+                                                                          )
+                                                                      }
+                                                                      value={
+                                                                          section.question_type || ''
+                                                                      }
+                                                                      required
+                                                                  >
+                                                                      <option value="">
+                                                                          Select
+                                                                          type
+                                                                      </option>
+                                                                      {this
+                                                                          .state
+                                                                          .question_type
                                                                           .length !==
                                                                       0
-                                                                        ? filterData[
-                                                                              index
-                                                                          ].category.map(
-                                                                              (
-                                                                                  data,
-                                                                                  c_index
-                                                                              ) => {
-                                                                                  return (
-                                                                                      <option
-                                                                                          value={
-                                                                                              data
-                                                                                          }
-                                                                                          key={
-                                                                                              c_index
-                                                                                          }
-                                                                                      >
-                                                                                          {
-                                                                                              data
-                                                                                          }
-                                                                                      </option>
-                                                                                  );
-                                                                              }
-                                                                          )
-                                                                        : null
-                                                                    : null}
-                                                            </select>
-                                                        </td>
-                                                        <td width="160px">
-                                                            <input
-                                                                className="form-control form-control-sm form-shadow"
-                                                                type="number"
-                                                                value={
-                                                                    section.any_questions
-                                                                }
-                                                                placeholder="No. of questions"
-                                                                onChange={(
-                                                                    event
-                                                                ) =>
-                                                                    this.handleSectionData(
-                                                                        index,
-                                                                        event,
-                                                                        "any_questions"
-                                                                    )
-                                                                }
-                                                                min="1"
-                                                                max={
-                                                                    section.no_questions
-                                                                }
-                                                                required
-                                                            />
-                                                        </td>
-                                                        <td width="160px">
-                                                            <input
-                                                                className="form-control form-control-sm form-shadow"
-                                                                type="number"
-                                                                value={
-                                                                    section.no_questions
-                                                                }
-                                                                placeholder="No. of questions"
-                                                                onChange={(
-                                                                    event
-                                                                ) =>
-                                                                    this.handleSectionData(
-                                                                        index,
-                                                                        event,
-                                                                        "no_questions"
-                                                                    )
-                                                                }
-                                                                min="1"
-                                                                max={
-                                                                    section.total_questions
-                                                                }
-                                                                required
-                                                            />
-                                                        </td>
-                                                        <td>
-                                                            <input
-                                                                className="form-control form-control-sm form-shadow"
-                                                                type="text"
-                                                                value={
-                                                                    section.total_questions
-                                                                }
-                                                                placeholder="Total question"
-                                                                disabled
-                                                            />
-                                                        </td>
-                                                        <td>
-                                                            <input
-                                                                className="form-control form-control-sm form-shadow"
-                                                                type="text"
-                                                                placeholder="Marks"
-                                                                value={
-                                                                    section.marks
-                                                                }
-                                                                onChange={(
-                                                                    event
-                                                                ) =>
-                                                                    this.handleMarks(
-                                                                        index,
-                                                                        event
-                                                                    )
-                                                                }
-                                                                min="0"
-                                                                required
-                                                            />
-                                                        </td>
-                                                        <td>
-                                                            <input
-                                                                className="form-control form-control-sm form-shadow"
-                                                                type="text"
-                                                                placeholder="Total marks"
-                                                                value={
-                                                                    section.total_marks
-                                                                }
-                                                                disabled
-                                                            />
-                                                        </td>
-                                                        {section.section_id !==
-                                                        "" ? (
-                                                            <td>
-                                                                <Link
-                                                                    to={`${this.props.match.url}/section/${section.section_id}/?attempt=${this.state.selectedAttempt}`}
-                                                                >
-                                                                    <button
-                                                                        className="btn btn-primary-invert btn-sm shadow-sm"
-                                                                        onClick={() =>
-                                                                            this.dispatchSection(
-                                                                                section.section_name
+                                                                          ? this.state.question_type.map(
+                                                                                (
+                                                                                    data,
+                                                                                    index
+                                                                                ) => {
+                                                                                    return (
+                                                                                        <option
+                                                                                            value={
+                                                                                                data || ''
+                                                                                            }
+                                                                                            key={
+                                                                                                index
+                                                                                            }
+                                                                                        >
+                                                                                            {data ===
+                                                                                            "type_1"
+                                                                                                ? "Type 1"
+                                                                                                : "type_2"
+                                                                                                ? "Type 2"
+                                                                                                : ""}
+                                                                                        </option>
+                                                                                    );
+                                                                                }
                                                                             )
-                                                                        }
-                                                                    >
-                                                                        <i className="fas fa-eye"></i>
-                                                                    </button>
-                                                                </Link>
-                                                            </td>
-                                                        ) : null}
-                                                        <td>
-                                                            <button
-                                                                className="btn btn-primary-invert btn-sm shadow-sm"
-                                                                onClick={(
-                                                                    event
-                                                                ) =>
-                                                                    this.handleSubmit(
-                                                                        index,
-                                                                        event
-                                                                    )
-                                                                }
-                                                            >
-                                                                Save
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                );
-                                            }
-                                        )}
+                                                                          : null}
+                                                                  </select>
+                                                              </td>
+                                                              <td width="150px">
+                                                                  <select
+                                                                      name="category"
+                                                                      className="form-control form-control-sm border-secondary"
+                                                                      onChange={(
+                                                                          event
+                                                                      ) =>
+                                                                          this.handleCategory(
+                                                                              index,
+                                                                              event
+                                                                          )
+                                                                      }
+                                                                      value={
+                                                                          section.category || ''
+                                                                      }
+                                                                      disabled={
+                                                                          section.question_type ===
+                                                                          ""
+                                                                              ? true
+                                                                              : false
+                                                                      }
+                                                                      required
+                                                                  >
+                                                                      <option value="">
+                                                                          Select
+                                                                          category
+                                                                      </option>
+                                                                      {this
+                                                                          .state
+                                                                          .filterData[
+                                                                          index
+                                                                      ] !==
+                                                                      undefined
+                                                                          ? this
+                                                                                .state
+                                                                                .filterData[
+                                                                                index
+                                                                            ]
+                                                                                .category
+                                                                                .length !==
+                                                                            0
+                                                                              ? this.state.filterData[
+                                                                                    index
+                                                                                ].category.map(
+                                                                                    (
+                                                                                        data,
+                                                                                        c_index
+                                                                                    ) => {
+                                                                                        return (
+                                                                                            <option
+                                                                                                value={
+                                                                                                    data || ''
+                                                                                                }
+                                                                                                key={
+                                                                                                    c_index
+                                                                                                }
+                                                                                            >
+                                                                                                {
+                                                                                                    data
+                                                                                                }
+                                                                                            </option>
+                                                                                        );
+                                                                                    }
+                                                                                )
+                                                                              : null
+                                                                          : null}
+                                                                  </select>
+                                                              </td>
+                                                              <td width="160px">
+                                                                  <select
+                                                                      name="marks"
+                                                                      id="marks"
+                                                                      className="form-control form-control-sm border-secondary"
+                                                                      value={
+                                                                          section.marks || ''
+                                                                      }
+                                                                      onChange={(
+                                                                          event
+                                                                      ) =>
+                                                                          this.handleMarks(
+                                                                              index,
+                                                                              event
+                                                                          )
+                                                                      }
+                                                                      disabled={
+                                                                          section.category ===
+                                                                          ""
+                                                                              ? true
+                                                                              : false
+                                                                      }
+                                                                      required
+                                                                  >
+                                                                      <option value="">
+                                                                          Select
+                                                                          marks
+                                                                      </option>
+                                                                      {this
+                                                                          .state
+                                                                          .filterData[
+                                                                          index
+                                                                      ] !==
+                                                                      undefined
+                                                                          ? this
+                                                                                .state
+                                                                                .filterData[
+                                                                                index
+                                                                            ]
+                                                                                .marks
+                                                                                .length !==
+                                                                            0
+                                                                              ? this.state.filterData[
+                                                                                    index
+                                                                                ].marks.map(
+                                                                                    (
+                                                                                        data,
+                                                                                        c_index
+                                                                                    ) => {
+                                                                                        return (
+                                                                                            <option
+                                                                                                value={
+                                                                                                    data || ''
+                                                                                                }
+                                                                                                key={
+                                                                                                    c_index
+                                                                                                }
+                                                                                            >
+                                                                                                {
+                                                                                                    data
+                                                                                                }
+                                                                                            </option>
+                                                                                        );
+                                                                                    }
+                                                                                )
+                                                                              : null
+                                                                          : null}
+                                                                  </select>
+                                                              </td>
+                                                              <td width="160px">
+                                                                  <input
+                                                                      className="form-control form-control-sm border-secondary"
+                                                                      type="text"
+                                                                      value={
+                                                                          section.total_questions || ''
+                                                                      }
+                                                                      placeholder="Total question"
+                                                                      disabled
+                                                                  />
+                                                              </td>
+                                                              <td width="160px">
+                                                                  <input
+                                                                      className="form-control form-control-sm border-secondary"
+                                                                      type="text"
+                                                                      value={
+                                                                          section.no_questions || ''
+                                                                      }
+                                                                      placeholder="No. of questions"
+                                                                      onChange={(
+                                                                          event
+                                                                      ) =>
+                                                                          this.handleSectionData(
+                                                                              index,
+                                                                              event,
+                                                                              "no_questions"
+                                                                          )
+                                                                      }
+                                                                      disabled={
+                                                                          section.total_questions ===
+                                                                          ""
+                                                                              ? true
+                                                                              : false
+                                                                      }
+                                                                      required
+                                                                  />
+                                                              </td>
+                                                              <td width="160px">
+                                                                  <input
+                                                                      className="form-control form-control-sm border-secondary"
+                                                                      type="text"
+                                                                      value={
+                                                                          section.any_questions || ''
+                                                                      }
+                                                                      placeholder="Any questions"
+                                                                      onChange={(
+                                                                          event
+                                                                      ) =>
+                                                                          this.handleSectionData(
+                                                                              index,
+                                                                              event,
+                                                                              "any_questions"
+                                                                          )
+                                                                      }
+                                                                      disabled={
+                                                                          section.no_questions ===
+                                                                          ""
+                                                                              ? true
+                                                                              : false
+                                                                      }
+                                                                      required
+                                                                  />
+                                                              </td>
+                                                              <td width="160px">
+                                                                  <input
+                                                                      className="form-control form-control-sm border-secondary"
+                                                                      type="text"
+                                                                      placeholder="Total marks"
+                                                                      value={
+                                                                          section.total_marks || ''
+                                                                      }
+                                                                      disabled
+                                                                  />
+                                                              </td>
+                                                              <td className="d-flex justify-content-end">
+                                                                  {section.section_id !==
+                                                                  "" ? (
+                                                                      <button
+                                                                          className="btn btn-primary-invert btn-sm shadow-sm"
+                                                                          onClick={() => {
+                                                                              this.sectionRedirect(
+                                                                                  section.section_id
+                                                                              );
+                                                                          }}
+                                                                      >
+                                                                          <i className="fas fa-eye"></i>
+                                                                      </button>
+                                                                  ) : null}
+
+                                                                  <Dropdown>
+                                                                      <Dropdown.Toggle
+                                                                          variant="white"
+                                                                          className="btn btn-link btn-sm shadow-none caret-off ml-2"
+                                                                      >
+                                                                          <i className="fas fa-ellipsis-v"></i>
+                                                                      </Dropdown.Toggle>
+
+                                                                      <Dropdown.Menu
+                                                                          className={`${
+                                                                              this
+                                                                                  .state
+                                                                                  .sections
+                                                                                  .length <=
+                                                                              2
+                                                                                  ? "position-fixed"
+                                                                                  : "position-absolute"
+                                                                          }`}
+                                                                      >
+                                                                          <Dropdown.Item
+                                                                              onClick={(
+                                                                                  event
+                                                                              ) =>
+                                                                                  this.handleSubmit(
+                                                                                      index,
+                                                                                      event
+                                                                                  )
+                                                                              }
+                                                                          >
+                                                                              <i className="far fa-save fa-sm mr-1"></i>{" "}
+                                                                              Save
+                                                                          </Dropdown.Item>
+                                                                          <Dropdown.Item
+                                                                              onClick={() =>
+                                                                                  this.removeSection(
+                                                                                      index,
+                                                                                      section.section_id
+                                                                                  )
+                                                                              }
+                                                                          >
+                                                                              <i className="far fa-trash-alt fa-sm mr-1"></i>{" "}
+                                                                              Delete
+                                                                          </Dropdown.Item>
+                                                                      </Dropdown.Menu>
+                                                                  </Dropdown>
+                                                              </td>
+                                                          </tr>
+                                                      );
+                                                  }
+                                              )
+                                            : ""}
                                     </tbody>
                                 </table>
                             </div>

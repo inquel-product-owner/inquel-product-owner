@@ -1,8 +1,9 @@
 import React, { Component } from "react";
-import profilepic from "../../assets/user.png";
+import profilepic from "../../assets/user-v1.png";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
+import { paginationCount } from "../../shared/globalValues.js";
 import Loading from "../sharedComponents/loader";
 import Paginations from "../sharedComponents/pagination";
 import StudentTable from "../table/studentTable";
@@ -206,7 +207,7 @@ class HodStudentList extends Component {
                                 category={true}
                             />
                             <div className="card-body p-3">
-                                {this.state.totalStudentCount >= 10 ? (
+                                {this.state.totalStudentCount > paginationCount ? (
                                     <Paginations
                                         activePage={
                                             this.state.activeStudentPage

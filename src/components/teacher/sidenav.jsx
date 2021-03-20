@@ -61,21 +61,7 @@ class SideNav extends Component {
                                 } btn-sm mb-3`}
                             >
                                 <i
-                                    className="fas fa-chalkboard-teacher"
-                                    style={{ marginLeft: "-1.5px" }}
-                                ></i>
-                            </button>
-                        </OverlayTrigger>
-                    </Link>
-                    <Link to="/teacher/account">
-                        <OverlayTrigger
-                            key="right"
-                            placement="right"
-                            overlay={<Tooltip id="tooltip">Account</Tooltip>}
-                        >
-                            <button className="btn sidebar-btn btn-sm mb-3">
-                                <i
-                                    className="fas fa-user"
+                                    className="fas fa-chart-bar"
                                     style={{ marginLeft: "-1.5px" }}
                                 ></i>
                             </button>

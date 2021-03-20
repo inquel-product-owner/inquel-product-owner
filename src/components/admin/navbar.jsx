@@ -2,9 +2,9 @@ import React, { Component } from "react";
 import { Navbar, Nav, Dropdown } from "react-bootstrap";
 import { Link, Redirect } from "react-router-dom";
 import logo from "../../assets/IQ_Labs_V5.png";
-import userpic from "../../assets/user.png";
+import userpic from "../../assets/user-v1.png";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
-import Logout from "../sharedComponents/handleAdminLogout";
+import { AdminLogout } from "../sharedComponents/handleLogout";
 
 class Header extends Component {
     constructor(props) {
@@ -44,7 +44,7 @@ class Header extends Component {
         }
         return (
             <>
-                <Logout path="admin" />
+                <AdminLogout path="admin" />
                 <Navbar
                     collapseOnSelect
                     expand="md"

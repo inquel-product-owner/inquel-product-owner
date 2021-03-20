@@ -485,10 +485,10 @@ class Profile extends Component {
                                                     this.state.studentItems
                                                         .full_name
                                                 }
-                                                className="img-fluid shadow-sm mb-3"
+                                                className="img-fluid rounded-lg shadow-sm mb-3"
                                             />
                                             <button
-                                                className="btn btn-light secondary-bg borders btn-block btn-sm"
+                                                className="btn btn-light secondary-bg borders btn-block btn-sm shadow-none"
                                                 onClick={this.toggleModal}
                                                 style={{
                                                     position: "absolute",
@@ -605,11 +605,21 @@ class Profile extends Component {
                                                                             label: this
                                                                                 .state
                                                                                 .studentItems
-                                                                                .country_code,
+                                                                                .country_code
+                                                                                ? this
+                                                                                      .state
+                                                                                      .studentItems
+                                                                                      .country_code
+                                                                                : "Country code",
                                                                             value: this
                                                                                 .state
                                                                                 .studentItems
-                                                                                .country_code,
+                                                                                .country_code
+                                                                                ? this
+                                                                                      .state
+                                                                                      .studentItems
+                                                                                      .country_code
+                                                                                : "Country code",
                                                                         }}
                                                                         isSearchable={
                                                                             false
@@ -804,28 +814,41 @@ class Profile extends Component {
                                                         }
                                                     </textarea>
                                                 </div>
-                                                {this.state.showEditOption ? (
-                                                    <button className="btn btn-primary btn-block btn-sm">
-                                                        {this.state
-                                                            .showLoader ? (
-                                                            <Spinner
-                                                                as="span"
-                                                                animation="border"
-                                                                size="sm"
-                                                                role="status"
-                                                                aria-hidden="true"
-                                                                className="mr-2"
-                                                            />
-                                                        ) : (
-                                                            ""
-                                                        )}
-                                                        Save and Close
-                                                    </button>
-                                                ) : null}
+                                                <div className="row">
+                                                    <div className="col-6">
+                                                        <button
+                                                            className="btn btn-secondary btn-sm btn-block"
+                                                            onClick={
+                                                                this.toggleEdit
+                                                            }
+                                                        >
+                                                            Close
+                                                        </button>
+                                                    </div>
+                                                    <div className="col-6">
+                                                        <button className="btn btn-primary btn-block btn-sm">
+                                                            {this.state
+                                                                .showLoader ? (
+                                                                <Spinner
+                                                                    as="span"
+                                                                    animation="border"
+                                                                    size="sm"
+                                                                    role="status"
+                                                                    aria-hidden="true"
+                                                                    className="mr-2"
+                                                                />
+                                                            ) : (
+                                                                ""
+                                                            )}
+                                                            Save
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </form>
                                     </div>
                                 ) : (
+                                    // Profile details GET
                                     <div className="card shadow-sm">
                                         <div className="card-body">
                                             <h6 className="primary-text mb-3">
@@ -885,7 +908,16 @@ class Profile extends Component {
                                                         <p className="small font-weight-bold-600 mb-2">
                                                             Phone
                                                         </p>
-                                                        {`${this.state.studentItems.country_code}-${this.state.studentItems.phone_num}`}
+                                                        {
+                                                            this.state
+                                                                .studentItems
+                                                                .country_code
+                                                        }
+                                                        {
+                                                            this.state
+                                                                .studentItems
+                                                                .phone_num
+                                                        }
                                                     </div>
                                                 </div>
                                                 <div className="col-lg-4 col-sm-6 col-12">

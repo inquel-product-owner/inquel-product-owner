@@ -19,7 +19,9 @@ class Summary extends Component {
             chapter_name: "",
             page_loading: true,
             errorMsg: "",
+            successMsg: "",
             showErrorAlert: false,
+            showSuccessAlert: false,
             numPages: null,
             pageNumber: 1,
         };
@@ -33,18 +35,6 @@ class Summary extends Component {
         };
         pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
     }
-
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
-
-    toggleErrorAlert = () => {
-        this.setState({
-            showErrorAlert: false,
-        });
-    };
 
     // loads summary data
     loadSummaryData = () => {
@@ -166,11 +156,19 @@ class Summary extends Component {
                 {/* ALert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
-                    successMsg="NODATA"
+                    successMsg={this.state.successMsg}
                     showErrorAlert={this.state.showErrorAlert}
-                    showSuccessAlert={false}
-                    toggleSuccessAlert=""
-                    toggleErrorAlert={this.toggleErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
                 />
 
                 {/* Sidebar */}
@@ -331,42 +329,51 @@ class Summary extends Component {
                                                                                       }
                                                                                   </p>
                                                                                   <nav>
-                                                                                      <button
-                                                                                          className="btn btn-primary btn-sm mr-2"
-                                                                                          onClick={
-                                                                                              this
-                                                                                                  .goToPrevPage
-                                                                                          }
-                                                                                          disabled={
-                                                                                              this
-                                                                                                  .state
-                                                                                                  .pageNumber ===
-                                                                                              1
-                                                                                                  ? true
-                                                                                                  : false
-                                                                                          }
-                                                                                      >
-                                                                                          Prev
-                                                                                      </button>
-                                                                                      <button
-                                                                                          className="btn btn-primary btn-sm"
-                                                                                          onClick={
-                                                                                              this
-                                                                                                  .goToNextPage
-                                                                                          }
-                                                                                          disabled={
-                                                                                              this
-                                                                                                  .state
-                                                                                                  .numPages ===
-                                                                                              this
-                                                                                                  .state
-                                                                                                  .pageNumber
-                                                                                                  ? true
-                                                                                                  : false
-                                                                                          }
-                                                                                      >
-                                                                                          Next
-                                                                                      </button>
+                                                                                      {this
+                                                                                          .state
+                                                                                          .numPages >
+                                                                                      1 ? (
+                                                                                          <>
+                                                                                              <button
+                                                                                                  className="btn btn-primary btn-sm mr-2"
+                                                                                                  onClick={
+                                                                                                      this
+                                                                                                          .goToPrevPage
+                                                                                                  }
+                                                                                                  disabled={
+                                                                                                      this
+                                                                                                          .state
+                                                                                                          .pageNumber ===
+                                                                                                      1
+                                                                                                          ? true
+                                                                                                          : false
+                                                                                                  }
+                                                                                              >
+                                                                                                  Prev
+                                                                                              </button>
+                                                                                              <button
+                                                                                                  className="btn btn-primary btn-sm"
+                                                                                                  onClick={
+                                                                                                      this
+                                                                                                          .goToNextPage
+                                                                                                  }
+                                                                                                  disabled={
+                                                                                                      this
+                                                                                                          .state
+                                                                                                          .numPages ===
+                                                                                                      this
+                                                                                                          .state
+                                                                                                          .pageNumber
+                                                                                                          ? true
+                                                                                                          : false
+                                                                                                  }
+                                                                                              >
+                                                                                                  Next
+                                                                                              </button>
+                                                                                          </>
+                                                                                      ) : (
+                                                                                          ""
+                                                                                      )}
                                                                                   </nav>
                                                                               </div>
                                                                           ) : (
@@ -390,7 +397,7 @@ class Summary extends Component {
                                                                           );
                                                                       }
                                                                   )
-                                                                : null}
+                                                                : 'No content to display...'}
                                                         </div>
                                                     </div>
                                                 </Tab.Pane>

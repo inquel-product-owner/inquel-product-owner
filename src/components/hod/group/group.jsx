@@ -5,6 +5,7 @@ import Header from "../navbar";
 import SideNav from "../sidenav";
 import Select from "react-select";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
+import { paginationCount } from "../../../shared/globalValues.js";
 import Loading from "../../sharedComponents/loader";
 import SubjectTable from "../../table/subjectTable";
 import Paginations from "../../sharedComponents/pagination";
@@ -415,7 +416,7 @@ class Group extends Component {
                                 path={`hod/group/${this.groupId}`}
                             />
                             <div className="card-body p-3">
-                                {this.state.totalSubjectCount >= 10 ? (
+                                {this.state.totalSubjectCount > paginationCount ? (
                                     <Paginations
                                         activePage={
                                             this.state.activeSubjectPage

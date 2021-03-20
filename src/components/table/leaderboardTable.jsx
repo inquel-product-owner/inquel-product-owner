@@ -11,7 +11,7 @@ import {
 } from "@syncfusion/ej2-react-grids";
 import "./material.css";
 import "./grid-overview.css";
-import userimage from "../../assets/user.png";
+import userimage from "../../assets/user-v1.png";
 
 function nameTemplate(props) {
     return (

@@ -633,7 +633,7 @@ class CyleTestDirect extends Component {
                                             ) : (
                                                 ""
                                             )}
-                                            Upload
+                                            Save
                                         </button>
                                     </div>
                                 </div>
@@ -664,29 +664,43 @@ class CyleTestDirect extends Component {
                                             {this.state.numPages}
                                         </p>
                                         <nav>
-                                            <button
-                                                className="btn btn-primary btn-sm mr-2"
-                                                onClick={this.goToPrevPage}
-                                                disabled={
-                                                    this.state.pageNumber === 1
-                                                        ? true
-                                                        : false
-                                                }
-                                            >
-                                                Prev
-                                            </button>
-                                            <button
-                                                className="btn btn-primary btn-sm"
-                                                onClick={this.goToNextPage}
-                                                disabled={
-                                                    this.state.numPages ===
-                                                    this.state.pageNumber
-                                                        ? true
-                                                        : false
-                                                }
-                                            >
-                                                Next
-                                            </button>
+                                            {this.state.numPages > 1 ? (
+                                                <>
+                                                    <button
+                                                        className="btn btn-primary btn-sm mr-2"
+                                                        onClick={
+                                                            this.goToPrevPage
+                                                        }
+                                                        disabled={
+                                                            this.state
+                                                                .pageNumber ===
+                                                            1
+                                                                ? true
+                                                                : false
+                                                        }
+                                                    >
+                                                        Prev
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-primary btn-sm"
+                                                        onClick={
+                                                            this.goToNextPage
+                                                        }
+                                                        disabled={
+                                                            this.state
+                                                                .numPages ===
+                                                            this.state
+                                                                .pageNumber
+                                                                ? true
+                                                                : false
+                                                        }
+                                                    >
+                                                        Next
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                ""
+                                            )}
                                         </nav>
                                     </>
                                 )}

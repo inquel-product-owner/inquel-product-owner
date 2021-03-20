@@ -2,186 +2,186 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import Header from "../navbar";
 import SideNav from "../sidenav";
-import Select from "react-select";
-import { Modal, Spinner, Alert } from "react-bootstrap";
+// import Select from "react-select";
+// import { Modal, Spinner, Alert } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import Loading from "../../sharedComponents/loader";
 
-class SubjectReassignModal extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            teacherData: [],
-            teacher: "",
-            successMsg: "",
-            errorMsg: "",
-            showSuccessAlert: false,
-            showErrorAlert: false,
-            showLoader: false,
-        };
-        this.url = baseUrl + hodUrl;
-        this.authToken = localStorage.getItem("Authorization");
-        this.headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: this.authToken,
-        };
-    }
+// class SubjectReassignModal extends Component {
+//     constructor(props) {
+//         super(props);
+//         this.state = {
+//             teacherData: [],
+//             teacher: "",
+//             successMsg: "",
+//             errorMsg: "",
+//             showSuccessAlert: false,
+//             showErrorAlert: false,
+//             showLoader: false,
+//         };
+//         this.url = baseUrl + hodUrl;
+//         this.authToken = localStorage.getItem("Authorization");
+//         this.headers = {
+//             Accept: "application/json",
+//             "Content-Type": "application/json",
+//             Authorization: this.authToken,
+//         };
+//     }
 
-    handleInput = (event) => {
-        this.setState({
-            teacher: event.value.toString(),
-        });
-    };
+//     handleInput = (event) => {
+//         this.setState({
+//             teacher: event.value.toString(),
+//         });
+//     };
 
-    componentDidMount = () => {
-        fetch(`${this.url}/hod/teacher/`, {
-            headers: this.headers,
-            method: "GET",
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                this.setState({
-                    teacherData: result.data,
-                });
-                console.log(result);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
+//     componentDidMount = () => {
+//         fetch(`${this.url}/hod/teacher/`, {
+//             headers: this.headers,
+//             method: "GET",
+//         })
+//             .then((res) => res.json())
+//             .then((result) => {
+//                 this.setState({
+//                     teacherData: result.data,
+//                 });
+//                 console.log(result);
+//             })
+//             .catch((err) => {
+//                 console.log(err);
+//             });
+//     };
 
-    handleSubmit = (event) => {
-        event.preventDefault();
+//     handleSubmit = (event) => {
+//         event.preventDefault();
 
-        this.setState({
-            showErrorAlert: false,
-            showSuccessAlert: false,
-            showLoader: true,
-        });
+//         this.setState({
+//             showErrorAlert: false,
+//             showSuccessAlert: false,
+//             showLoader: true,
+//         });
 
-        if (this.state.teacher === "") {
-            this.setState({
-                errorMsg: "Please select a teacher to assign",
-                showErrorAlert: true,
-                showLoader: false,
-            });
-        } else {
-            fetch(`${this.url}/hod/create/subject/`, {
-                headers: this.headers,
-                method: "PATCH",
-                body: JSON.stringify({
-                    subject_id: this.props.subjectId,
-                    teacher_id: this.state.teacher,
-                }),
-            })
-                .then((res) => res.json())
-                .then((result) => {
-                    console.log(result);
-                    if (result.sts === true) {
-                        this.setState({
-                            successMsg: result.msg,
-                            showSuccessAlert: true,
-                            showLoader: false,
-                        });
-                        this.props.formSubmission(true);
-                    } else {
-                        this.setState({
-                            errorMsg: result.msg,
-                            showErrorAlert: true,
-                            showLoader: false,
-                        });
-                    }
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-        }
-    };
+//         if (this.state.teacher === "") {
+//             this.setState({
+//                 errorMsg: "Please select a teacher to assign",
+//                 showErrorAlert: true,
+//                 showLoader: false,
+//             });
+//         } else {
+//             fetch(`${this.url}/hod/create/subject/`, {
+//                 headers: this.headers,
+//                 method: "PATCH",
+//                 body: JSON.stringify({
+//                     subject_id: this.props.subjectId,
+//                     teacher_id: this.state.teacher,
+//                 }),
+//             })
+//                 .then((res) => res.json())
+//                 .then((result) => {
+//                     console.log(result);
+//                     if (result.sts === true) {
+//                         this.setState({
+//                             successMsg: result.msg,
+//                             showSuccessAlert: true,
+//                             showLoader: false,
+//                         });
+//                         this.props.formSubmission(true);
+//                     } else {
+//                         this.setState({
+//                             errorMsg: result.msg,
+//                             showErrorAlert: true,
+//                             showLoader: false,
+//                         });
+//                     }
+//                 })
+//                 .catch((err) => {
+//                     console.log(err);
+//                 });
+//         }
+//     };
 
-    render() {
-        return (
-            <Modal
-                show={this.props.show}
-                onHide={this.props.onHide}
-                size="md"
-                aria-labelledby="contained-modal-title-vcenter"
-                centered
-            >
-                <Modal.Header closeButton>Subject Re-assigning</Modal.Header>
-                <form onSubmit={this.handleSubmit} autoComplete="off">
-                    <Modal.Body>
-                        <Alert
-                            variant="danger"
-                            show={this.state.showErrorAlert}
-                            onClose={() => {
-                                this.setState({
-                                    showErrorAlert: false,
-                                });
-                            }}
-                            dismissible
-                        >
-                            {this.state.errorMsg}
-                        </Alert>
-                        <Alert
-                            variant="success"
-                            show={this.state.showSuccessAlert}
-                            onClose={() => {
-                                this.setState({
-                                    showSuccessAlert: false,
-                                });
-                            }}
-                            dismissible
-                        >
-                            {this.state.successMsg}
-                        </Alert>
-                        <div className="form-group">
-                            <label htmlFor="teacher">Teacher</label>
-                            <Select
-                                className="basic-single borders"
-                                placeholder="Select teacher"
-                                isSearchable={true}
-                                name="teacher_id"
-                                id="teacher_id"
-                                options={this.state.teacherData.map((list) => {
-                                    return {
-                                        value: list.id,
-                                        label:
-                                            list.full_name !== ""
-                                                ? list.full_name
-                                                : list.username,
-                                    };
-                                })}
-                                onChange={this.handleInput}
-                                required
-                            />
-                        </div>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <button
-                            type="submit"
-                            className="btn btn-primary btn-block"
-                        >
-                            {this.state.showLoader ? (
-                                <Spinner
-                                    as="span"
-                                    animation="border"
-                                    size="sm"
-                                    role="status"
-                                    aria-hidden="true"
-                                    className="mr-2"
-                                />
-                            ) : (
-                                ""
-                            )}
-                            Save
-                        </button>
-                    </Modal.Footer>
-                </form>
-            </Modal>
-        );
-    }
-}
+//     render() {
+//         return (
+//             <Modal
+//                 show={this.props.show}
+//                 onHide={this.props.onHide}
+//                 size="md"
+//                 aria-labelledby="contained-modal-title-vcenter"
+//                 centered
+//             >
+//                 <Modal.Header closeButton>Subject Re-assigning</Modal.Header>
+//                 <form onSubmit={this.handleSubmit} autoComplete="off">
+//                     <Modal.Body>
+//                         <Alert
+//                             variant="danger"
+//                             show={this.state.showErrorAlert}
+//                             onClose={() => {
+//                                 this.setState({
+//                                     showErrorAlert: false,
+//                                 });
+//                             }}
+//                             dismissible
+//                         >
+//                             {this.state.errorMsg}
+//                         </Alert>
+//                         <Alert
+//                             variant="success"
+//                             show={this.state.showSuccessAlert}
+//                             onClose={() => {
+//                                 this.setState({
+//                                     showSuccessAlert: false,
+//                                 });
+//                             }}
+//                             dismissible
+//                         >
+//                             {this.state.successMsg}
+//                         </Alert>
+//                         <div className="form-group">
+//                             <label htmlFor="teacher">Teacher</label>
+//                             <Select
+//                                 className="basic-single borders"
+//                                 placeholder="Select teacher"
+//                                 isSearchable={true}
+//                                 name="teacher_id"
+//                                 id="teacher_id"
+//                                 options={this.state.teacherData.map((list) => {
+//                                     return {
+//                                         value: list.id,
+//                                         label:
+//                                             list.full_name !== ""
+//                                                 ? list.full_name
+//                                                 : list.username,
+//                                     };
+//                                 })}
+//                                 onChange={this.handleInput}
+//                                 required
+//                             />
+//                         </div>
+//                     </Modal.Body>
+//                     <Modal.Footer>
+//                         <button
+//                             type="submit"
+//                             className="btn btn-primary btn-block"
+//                         >
+//                             {this.state.showLoader ? (
+//                                 <Spinner
+//                                     as="span"
+//                                     animation="border"
+//                                     size="sm"
+//                                     role="status"
+//                                     aria-hidden="true"
+//                                     className="mr-2"
+//                                 />
+//                             ) : (
+//                                 ""
+//                             )}
+//                             Save
+//                         </button>
+//                     </Modal.Footer>
+//                 </form>
+//             </Modal>
+//         );
+//     }
+// }
 
 class GroupSubject extends Component {
     constructor(props) {
@@ -189,7 +189,7 @@ class GroupSubject extends Component {
         this.state = {
             showSideNav: false,
             showModal: false,
-            showReassignModal: false,
+            // showReassignModal: false,
             groupItem: [],
             subjectItems: [],
             chapterData: [],
@@ -212,11 +212,11 @@ class GroupSubject extends Component {
         });
     };
 
-    toggleReassignModal = () => {
-        this.setState({
-            showReassignModal: !this.state.showReassignModal,
-        });
-    };
+    // toggleReassignModal = () => {
+    //     this.setState({
+    //         showReassignModal: !this.state.showReassignModal,
+    //     });
+    // };
 
     loadSubjectData = () => {
         fetch(`${this.url}/hod/subjects/${this.subjectId}/chapters/`, {
@@ -276,7 +276,7 @@ class GroupSubject extends Component {
             setTimeout(() => {
                 this.setState({
                     showModal: false,
-                    showReassignModal: false,
+                    // showReassignModal: false,
                 });
             }, 1000);
         }
@@ -300,14 +300,14 @@ class GroupSubject extends Component {
                 />
 
                 {/* Subject reassign Modal */}
-                {this.state.showReassignModal ? (
+                {/* {this.state.showReassignModal ? (
                     <SubjectReassignModal
                         show={this.state.showReassignModal}
                         onHide={this.toggleReassignModal}
                         formSubmission={this.formSubmission}
                         subjectId={this.subjectId}
                     />
-                ) : null}
+                ) : null} */}
 
                 <div
                     className={`section content ${
@@ -352,12 +352,12 @@ class GroupSubject extends Component {
                                 </nav>
                             </div>
                             <div className="col-md-6 text-center text-md-right">
-                                <button
+                                {/* <button
                                     className="btn btn-primary btn-sm mr-2"
                                     onClick={this.toggleReassignModal}
                                 >
                                     Re assign
-                                </button>
+                                </button> */}
                                 <Link to={`${this.props.match.url}/configure`}>
                                     <button className="btn btn-primary btn-sm">
                                         Configure Course

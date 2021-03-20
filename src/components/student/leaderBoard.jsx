@@ -7,6 +7,7 @@ import Loading from "../sharedComponents/loader";
 import LeaderboardTable from "../table/leaderboardTable";
 import Paginations from "../sharedComponents/pagination";
 import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
+import { paginationCount } from "../../shared/globalValues.js";
 
 class Leaderboard extends Component {
     constructor() {
@@ -108,7 +109,7 @@ class Leaderboard extends Component {
                                         leaderBoard={this.state.leaderBoard}
                                     />
                                     <div className="card-body p-3">
-                                        {this.state.totalCount >= 10 ? (
+                                        {this.state.totalCount > paginationCount ? (
                                             <Paginations
                                                 activePage={
                                                     this.state.activePage
@@ -132,7 +133,7 @@ class Leaderboard extends Component {
                                         leaderBoard={this.state.leaderBoard}
                                     />
                                     <div className="card-body p-3">
-                                        {this.state.totalCount >= 10 ? (
+                                        {this.state.totalCount > paginationCount ? (
                                             <Paginations
                                                 activePage={
                                                     this.state.activePage

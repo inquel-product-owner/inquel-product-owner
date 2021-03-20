@@ -59,9 +59,7 @@ function ForgotPasswordModal(props) {
             aria-labelledby="contained-modal-title-vcenter"
             centered
         >
-            <Modal.Header closeButton>
-                Forgot password
-            </Modal.Header>
+            <Modal.Header closeButton>Forgot password</Modal.Header>
             <Modal.Body>
                 <Alert
                     variant="danger"
@@ -205,10 +203,6 @@ class TeacherLogin extends Component {
                                         "is_teacher",
                                         result.is_teacher
                                     );
-                                    localStorage.setItem(
-                                        "Username",
-                                        result.username
-                                    );
                                     this.setState({
                                         showLoader: false,
                                     });
@@ -217,6 +211,7 @@ class TeacherLogin extends Component {
                             .catch((err) => {
                                 console.log(err);
                             });
+                        // Logout the admin if he is logged in
                     } else if (localStorage.getItem("Inquel-Auth")) {
                         var url = baseUrl + adminPathUrl;
                         var authToken = localStorage.getItem("Inquel-Auth");
@@ -245,10 +240,6 @@ class TeacherLogin extends Component {
                                         "is_teacher",
                                         result.is_teacher
                                     );
-                                    localStorage.setItem(
-                                        "Username",
-                                        result.username
-                                    );
                                     this.setState({
                                         showLoader: false,
                                     });
@@ -263,7 +254,6 @@ class TeacherLogin extends Component {
                             `Token ${result.token}`
                         );
                         localStorage.setItem("is_teacher", result.is_teacher);
-                        localStorage.setItem("Username", result.username);
                         this.setState({
                             showLoader: false,
                         });

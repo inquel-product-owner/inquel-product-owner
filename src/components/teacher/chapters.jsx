@@ -666,14 +666,6 @@ class Chapters extends Component {
 
         return (
             <div key={index}>
-                {/* <button
-                        className="btn btn-primary-invert shadow-sm ml-2"
-                        onClick={() =>
-                            this.toggleModal(data.topic_num, data.ancestor)
-                        }
-                    >
-                        <i className="fas fa-plus-circle"></i>
-                    </button> */}
                 <Card.Header
                     className="small light-bg shadow-sm mb-2"
                     style={{
@@ -879,34 +871,6 @@ class Chapters extends Component {
 
     dispatchCycle = (data) => {
         store.dispatch({ type: "CYCLE", payload: data });
-    };
-
-    directExamButton = (data) => {
-        return (
-            <Link
-                to={`${this.props.match.url}/cycle/${data.cycle_test_id}/direct`}
-            >
-                <button
-                    className="btn btn-primary btn-sm ml-2"
-                    onClick={() => this.dispatchCycle(data.cycle_test_name)}
-                >
-                    Direct Test
-                </button>
-            </Link>
-        );
-    };
-
-    autoExamButton = (data) => {
-        return (
-            <Link to={`${this.props.match.url}/cycle/${data.cycle_test_id}`}>
-                <button
-                    className="btn btn-primary btn-sm"
-                    onClick={() => this.dispatchCycle(data.cycle_test_name)}
-                >
-                    Auto
-                </button>
-            </Link>
-        );
     };
 
     render() {

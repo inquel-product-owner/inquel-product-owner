@@ -82,25 +82,6 @@ class FlashCard extends Component {
         };
     }
 
-    // ---------- Alert messages ----------
-    toggleSuccessAlert = () => {
-        this.setState({
-            showSuccessAlert: false,
-        });
-    };
-    toggleErrorAlert = () => {
-        this.setState({
-            showErrorAlert: false,
-        });
-    };
-
-    // ---------- flip card ----------
-    toggleFlip = () => {
-        this.setState({
-            isFlipped: !this.state.isFlipped,
-        });
-    };
-
     // ---------- loads concepts data ----------
     loadConceptData = (path) => {
         var apiURL =
@@ -281,7 +262,10 @@ class FlashCard extends Component {
                     } else {
                         this.setState({
                             page_loading: false,
+                            activeTab: "practice",
                         });
+                        this.loadPracticeData();
+                        this.props.history.push({ hash: "practice" });
                     }
                 } else {
                     this.setState({
@@ -317,7 +301,11 @@ class FlashCard extends Component {
                                     : "80vh"
                             }`,
                         }}
-                        onClick={this.toggleFlip}
+                        onClick={() => {
+                            this.setState({
+                                isFlipped: !this.state.isFlipped,
+                            });
+                        }}
                     >
                         <div
                             className="h4 font-weight-bold-600"
@@ -357,7 +345,11 @@ class FlashCard extends Component {
                                     : "80vh"
                             }`,
                         }}
-                        onClick={this.toggleFlip}
+                        onClick={() => {
+                            this.setState({
+                                isFlipped: !this.state.isFlipped,
+                            });
+                        }}
                     >
                         <div className="row w-100">
                             {/* ---------- Content ---------- */}
@@ -759,7 +751,7 @@ class FlashCard extends Component {
                                                 }}
                                             >
                                                 <p className="font-weight-bold-600 mb-2">
-                                                    Correct answer:
+                                                    Correct answer(s):
                                                 </p>
                                                 {explanation.answer === false
                                                     ? explanation.answers !==
@@ -811,7 +803,7 @@ class FlashCard extends Component {
                                                     }}
                                                 >
                                                     <p className="font-weight-bold-600 mb-2">
-                                                        Your answer:
+                                                        Your answer(s):
                                                     </p>
                                                     {question.length !== 0
                                                         ? question.answers
@@ -1088,6 +1080,7 @@ class FlashCard extends Component {
             }
         );
     };
+
     handlePrevPage = () => {
         this.setState(
             {
@@ -1124,6 +1117,7 @@ class FlashCard extends Component {
             },
         });
     };
+
     handlePrev = () => {
         this.setState({
             activeData: this.state.activeData - 1,
@@ -1433,8 +1427,16 @@ class FlashCard extends Component {
                     successMsg={this.state.successMsg}
                     showErrorAlert={this.state.showErrorAlert}
                     showSuccessAlert={this.state.showSuccessAlert}
-                    toggleSuccessAlert={this.toggleSuccessAlert}
-                    toggleErrorAlert={this.toggleErrorAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
                 />
 
                 {/* Video modal */}

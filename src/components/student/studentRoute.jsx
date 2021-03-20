@@ -7,6 +7,7 @@ import Leaderboard from "./leaderBoard";
 import Group from "./group";
 import Subject from "./subject";
 import TestResult from "./testResult";
+import TestPreview from "./testPreview";
 import Summary from "./summary";
 import Notes from "./notes";
 import FlashCard from "./learnFlashCard";
@@ -83,6 +84,18 @@ const studentRoutes = (
                     <Redirect to="/student/login" />
                 ) : (
                     <TestResult {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/student/subject/:subjectId/results/preview"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/student/login" />
+                ) : (
+                    <TestPreview {...props} />
                 )
             }
         />

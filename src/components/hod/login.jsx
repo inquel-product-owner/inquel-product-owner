@@ -203,10 +203,6 @@ class HODLogin extends Component {
                                         "is_hod",
                                         result.is_hod
                                     );
-                                    localStorage.setItem(
-                                        "Username",
-                                        result.username
-                                    );
                                     this.setState({
                                         showLoader: false,
                                     });
@@ -215,6 +211,7 @@ class HODLogin extends Component {
                             .catch((err) => {
                                 console.log(err);
                             });
+                        // Logout the admin if he is logged in
                     } else if (localStorage.getItem("Inquel-Auth")) {
                         var url = baseUrl + adminPathUrl;
                         var authToken = localStorage.getItem("Inquel-Auth");
@@ -243,10 +240,6 @@ class HODLogin extends Component {
                                         "is_hod",
                                         result.is_hod
                                     );
-                                    localStorage.setItem(
-                                        "Username",
-                                        result.username
-                                    );
                                     this.setState({
                                         showLoader: false,
                                     });
@@ -261,7 +254,6 @@ class HODLogin extends Component {
                             `Token ${result.token}`
                         );
                         localStorage.setItem("is_hod", result.is_hod);
-                        localStorage.setItem("Username", result.username);
                         this.setState({
                             showLoader: false,
                         });

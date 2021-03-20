@@ -2,15 +2,40 @@ import React, { Component } from "react";
 import { Navbar, Nav, Dropdown } from "react-bootstrap";
 import { Link, Redirect } from "react-router-dom";
 import logo from "../../assets/IQ_Labs_V5.png";
-import userpic from "../../assets/user.png";
-import { baseUrl, accountsUrl } from "../../shared/baseUrl";
-import Logout from "../sharedComponents/handleLogout";
+import userpic from "../../assets/user-v1.png";
+import { baseUrl, accountsUrl, teacherUrl } from "../../shared/baseUrl";
+import { Logout } from "../sharedComponents/handleLogout";
 
 class Header extends Component {
     constructor(props) {
         super(props);
-        this.state = { isLoggedOut: false };
+        this.state = { data: [], isLoggedOut: false };
+        this.url = baseUrl + teacherUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
     }
+
+    componentDidMount = () => {
+        fetch(`${this.url}/teacher/profile/`, {
+            method: "GET",
+            headers: this.headers,
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    this.setState({
+                        data: result.data,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
 
     handleLogout = () => {
         var url = baseUrl + accountsUrl;
@@ -83,16 +108,29 @@ class Header extends Component {
                                     id="dropdown-basic"
                                 >
                                     <img
-                                        src={userpic}
+                                        src={
+                                            this.state.data.length !== 0
+                                                ? this.state.data
+                                                      .profile_link !== null
+                                                    ? this.state.data
+                                                          .profile_link
+                                                    : userpic
+                                                : userpic
+                                        }
                                         alt="User pic"
                                         width="25"
                                         className="profile-pic mr-1 mb-1"
                                     />{" "}
-                                    {localStorage.getItem("Username")}
+                                    {this.state.data.length !== 0
+                                        ? this.state.data.username
+                                        : ""}
                                 </Dropdown.Toggle>
 
                                 <Dropdown.Menu>
-                                    <Dropdown.Item as={Link} to="/teacher/profile">
+                                    <Dropdown.Item
+                                        as={Link}
+                                        to="/teacher/profile"
+                                    >
                                         <i className="fas fa-user mr-2"></i> My
                                         Profile
                                     </Dropdown.Item>

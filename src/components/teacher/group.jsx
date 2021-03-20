@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
+import { paginationCount } from "../../shared/globalValues.js";
 import Loading from "../sharedComponents/loader";
 import Paginations from "../sharedComponents/pagination";
 import SubjectTable from "../table/subjectTable";
@@ -151,7 +152,7 @@ class Group extends Component {
                                 check={false}
                             />
                             <div className="card-body p-3">
-                                {this.state.totalSubjectCount >= 10 ? (
+                                {this.state.totalSubjectCount > paginationCount ? (
                                     <Paginations
                                         activePage={
                                             this.state.activeSubjectPage

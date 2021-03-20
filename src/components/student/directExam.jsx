@@ -47,17 +47,6 @@ class DirectExam extends Component {
         pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
     }
 
-    toggleSuccessAlert = () => {
-        this.setState({
-            showSuccessAlert: false,
-        });
-    };
-    toggleErrorAlert = () => {
-        this.setState({
-            showErrorAlert: false,
-        });
-    };
-
     loadExamData = () => {
         fetch(
             `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/cycletest/direct/?cycle_test_id=${this.cycleTestId}`,
@@ -327,8 +316,8 @@ class DirectExam extends Component {
 
     render() {
         document.title = `${this.state.chapter_name} Direct Exam - Teacher | IQLabs`;
-        var ends_at = new Date(this.state.cycleTestItem.ends_at);
-        var starts_at = new Date(this.state.cycleTestItem.starts_at);
+        // var ends_at = new Date(this.state.cycleTestItem.ends_at);
+        // var starts_at = new Date(this.state.cycleTestItem.starts_at);
         return (
             <>
                 {/* Navbar */}
@@ -344,8 +333,16 @@ class DirectExam extends Component {
                     successMsg={this.state.successMsg}
                     showErrorAlert={this.state.showErrorAlert}
                     showSuccessAlert={this.state.showSuccessAlert}
-                    toggleSuccessAlert={this.toggleSuccessAlert}
-                    toggleErrorAlert={this.toggleErrorAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
                 />
 
                 <div className="exam-section">
@@ -402,7 +399,7 @@ class DirectExam extends Component {
                         </div>
 
                         <div className="card light-bg shadow-sm">
-                            <div className="row justify-content-center">
+                            {/* <div className="row justify-content-center">
                                 <div className="col-md-5">
                                     <div className="card secondary-bg">
                                         <div className="card-body small font-weight-bold-600 text-center p-3">
@@ -428,7 +425,7 @@ class DirectExam extends Component {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> */}
 
                             {/* File uploading */}
                             <div className="card-body">

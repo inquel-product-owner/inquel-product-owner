@@ -1,10 +1,11 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { Badge, Alert, Spinner } from "react-bootstrap";
-import profilepic from "../../assets/user.png";
+import profilepic from "../../assets/user-v1.png";
 import watermark from "../../assets/code.jpg";
 import Select from "react-select";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
+import { paginationCount } from "../../shared/globalValues.js";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import Loading from "../sharedComponents/loader";
@@ -773,7 +774,7 @@ class HodProfile extends Component {
                                         check={false}
                                     />
                                     <div className="card-body p-3">
-                                        {this.state.totalGroupCount >= 10 ? (
+                                        {this.state.totalGroupCount > paginationCount ? (
                                             <Paginations
                                                 activePage={
                                                     this.state.activeGroupPage

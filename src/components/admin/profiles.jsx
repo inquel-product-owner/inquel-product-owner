@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Tabs, Tab, Modal, Alert, Spinner } from "react-bootstrap";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl.js";
+import { paginationCount } from "../../shared/globalValues.js";
 import Select from "react-select";
 import Header from "./navbar";
 import SideNav from "./sidenav";
@@ -802,13 +803,13 @@ class Profiles extends Component {
             page_loading: true,
             is_formSubmited: false,
         };
+        this.url = baseUrl + adminPathUrl;
         this.authToken = localStorage.getItem("Inquel-Auth");
         this.headers = {
             Accept: "application/json",
             "Content-Type": "application/json",
             "Inquel-Auth": this.authToken,
         };
-        this.url = baseUrl + adminPathUrl;
         this.gridRef = React.createRef();
     }
 
@@ -1040,7 +1041,7 @@ class Profiles extends Component {
                                         ref={this.gridRef}
                                     />
                                     <div className="card-body p-3">
-                                        {this.state.totalHODCount >= 10 ? (
+                                        {this.state.totalHODCount > paginationCount ? (
                                             <Paginations
                                                 activePage={
                                                     this.state.activeHODPage
@@ -1066,7 +1067,7 @@ class Profiles extends Component {
                                         ref={this.gridRef}
                                     />
                                     <div className="card-body p-3">
-                                        {this.state.totalStudentCount >= 10 ? (
+                                        {this.state.totalStudentCount > paginationCount ? (
                                             <Paginations
                                                 activePage={
                                                     this.state.activeStudentPage

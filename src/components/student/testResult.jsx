@@ -30,17 +30,6 @@ class TestResult extends Component {
         };
     }
 
-    toggleSuccessAlert = () => {
-        this.setState({
-            showSuccessAlert: false,
-        });
-    };
-    toggleErrorAlert = () => {
-        this.setState({
-            showErrorAlert: false,
-        });
-    };
-
     loadTestResultData = () => {
         fetch(`${this.url}/student/subject/${this.subjectId}/testanalysis/`, {
             method: "GET",
@@ -112,8 +101,16 @@ class TestResult extends Component {
                     successMsg={this.state.successMsg}
                     showErrorAlert={this.state.showErrorAlert}
                     showSuccessAlert={this.state.showSuccessAlert}
-                    toggleSuccessAlert={this.toggleSuccessAlert}
-                    toggleErrorAlert={this.toggleErrorAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
                 />
 
                 <div className="exam-section">
@@ -172,7 +169,41 @@ class TestResult extends Component {
                                                                                         </Tooltip>
                                                                                     }
                                                                                 >
-                                                                                    <Link to="#">
+                                                                                    <Link
+                                                                                        to={`${this.props.match.url}/preview`}
+                                                                                        onClick={() => {
+                                                                                            attempt
+                                                                                                .auto_section
+                                                                                                .length !==
+                                                                                            0
+                                                                                                ? sessionStorage.setItem(
+                                                                                                      "data",
+                                                                                                      JSON.stringify(
+                                                                                                          {
+                                                                                                              auto: true,
+                                                                                                              direct: false,
+                                                                                                              cycle_test_name:
+                                                                                                                  data.cycle_test_name,
+                                                                                                              data:
+                                                                                                                  attempt.auto_section,
+                                                                                                          }
+                                                                                                      )
+                                                                                                  )
+                                                                                                : sessionStorage.setItem(
+                                                                                                      "data",
+                                                                                                      JSON.stringify(
+                                                                                                          {
+                                                                                                              auto: false,
+                                                                                                              direct: true,
+                                                                                                              cycle_test_name:
+                                                                                                                  data.cycle_test_name,
+                                                                                                              data:
+                                                                                                                  attempt.direct_question,
+                                                                                                          }
+                                                                                                      )
+                                                                                                  );
+                                                                                        }}
+                                                                                    >
                                                                                         <i className="fas fa-circle text-success fa-lg mx-2"></i>
                                                                                     </Link>
                                                                                 </OverlayTrigger>
