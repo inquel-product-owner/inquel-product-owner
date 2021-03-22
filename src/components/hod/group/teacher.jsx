@@ -42,7 +42,7 @@ class GroupTeachers extends Component {
         };
 
         Promise.all([
-            fetch(`${url}/hod/group/${this.groupId}`, {
+            fetch(`${url}/hod/group/${this.groupId}/`, {
                 headers: headers,
                 method: "GET",
             }).then((res) => res.json()),
