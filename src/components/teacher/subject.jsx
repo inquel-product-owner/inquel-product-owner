@@ -830,12 +830,12 @@ class SubjectChapters extends Component {
 
                         {/* Header area */}
                         <div className="row align-items-center">
-                            <div className="col-md-2">
+                            <div className="col-md-6">
                                 <h5 className="primary-text">
                                     {this.props.subject_name}
                                 </h5>
                             </div>
-                            <div className="col-md-10">
+                            <div className="col-md-6">
                                 <div className="d-flex flex-wrap justify-content-end mb-4">
                                     <button className="btn btn-primary btn-sm">
                                         Publish

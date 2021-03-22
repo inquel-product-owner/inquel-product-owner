@@ -101,7 +101,7 @@ export class DeleteContentModal extends Component {
                     </Alert>
                     <p className="mb-0">
                         Are you sure that you want to delete{" "}
-                        <span className="font-weight-bold">
+                        <span className="font-weight-bold-600">
                             {this.props.name}
                         </span>
                         ?
