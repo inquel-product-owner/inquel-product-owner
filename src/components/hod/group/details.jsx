@@ -31,7 +31,7 @@ class GroupDetails extends Component {
             Authorization: authToken,
         };
 
-        fetch(`${url}/hod/group/${this.groupId}`, {
+        fetch(`${url}/hod/group/${this.groupId}/`, {
             headers: headers,
             method: "GET",
         })

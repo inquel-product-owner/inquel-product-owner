@@ -288,7 +288,7 @@ class GroupStudents extends Component {
     };
 
     componentDidMount = () => {
-        fetch(`${this.url}/hod/group/${this.groupId}`, {
+        fetch(`${this.url}/hod/group/${this.groupId}/`, {
             headers: this.headers,
             method: "GET",
         })

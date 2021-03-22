@@ -903,14 +903,18 @@ class Subject extends Component {
                                                                                                                           fontSize:
                                                                                                                               "18px",
                                                                                                                       }}
-                                                                                                                      onClick={() =>
+                                                                                                                      onClick={(
+                                                                                                                          event
+                                                                                                                      ) => {
                                                                                                                           this.handleTopicCompletion(
                                                                                                                               topics.topic_num,
                                                                                                                               topics.topic_name,
                                                                                                                               index,
                                                                                                                               data.chapter_id
-                                                                                                                          )
-                                                                                                                      }
+                                                                                                                          );
+
+                                                                                                                          event.stopPropagation();
+                                                                                                                      }}
                                                                                                                   >
                                                                                                                       <i className="fas fa-check-circle"></i>
                                                                                                                   </button>

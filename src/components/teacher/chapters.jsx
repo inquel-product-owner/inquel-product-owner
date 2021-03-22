@@ -1103,8 +1103,8 @@ class Chapters extends Component {
                                         <Accordion.Toggle
                                             as={Card.Header}
                                             eventKey="0"
-                                            className="secondary-bg mb-2"
-                                            style={{ cursor: "pointer" }}
+                                            className="secondary-bg shadow-sm mb-2 py-3"
+                                            style={{ borderRadius:'8px' }}
                                             onClick={() => {
                                                 this.setState({
                                                     collapsed: !this.state
