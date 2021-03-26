@@ -1,8 +1,8 @@
 import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 import axios from "axios";
-import Header from "./navbar";
-import SideNav from "./sidenav";
+import Header from "./shared/navbar";
+import SideNav from "./shared/sidenav";
 import CKeditor from "../sharedComponents/CKeditor";
 import ReactSwitch from "../sharedComponents/switchComponent";
 import {
@@ -24,7 +24,7 @@ const mapStateToProps = (state) => ({
     topic_name: state.topic_name,
 });
 
-class SubjectType1 extends Component {
+class Type1 extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -66,7 +66,7 @@ class SubjectType1 extends Component {
             questions: [
                 {
                     chapter_id: this.props.match.params.chapterId,
-                    topic_name: this.props.match.params.topicName,
+                    topic_num: this.props.match.params.topicNum,
                     question: "<p>Question goes here</p>",
                     question_random_id: "",
                     is_image_uploaded: false,
@@ -122,8 +122,7 @@ class SubjectType1 extends Component {
         this.audio_limit = 2;
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
-        this.topicName = this.props.match.params.topicName;
-        this.ancestor = this.props.match.params.ancestor;
+        this.topicNum = this.props.match.params.topicNum;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
@@ -152,7 +151,7 @@ class SubjectType1 extends Component {
 
     loadMCQData = () => {
         fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/?chapter_id=${this.chapterId}&topic_name=${this.topicName}`,
+            `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/?chapter_id=${this.chapterId}&topic_num=${this.topicNum}`,
             {
                 headers: this.headers,
                 method: "GET",
@@ -166,7 +165,7 @@ class SubjectType1 extends Component {
                     let keyboards = [];
                     let images = [];
                     let audio = [];
-                    let response = result.data.results[0].mcq;
+                    let response = result.data.results;
                     if (response.length !== 0) {
                         for (let i = 0; i < response.length; i++) {
                             images = [];
@@ -256,7 +255,7 @@ class SubjectType1 extends Component {
 
                             data.push({
                                 chapter_id: this.props.match.params.chapterId,
-                                topic_name: this.props.match.params.topicName,
+                                topic_num: this.props.match.params.topicNum,
                                 question: response[i].question,
                                 question_random_id:
                                     response[i].question_random_id,
@@ -614,8 +613,7 @@ class SubjectType1 extends Component {
             method: "POST",
             body: JSON.stringify({
                 chapter_id: this.chapterId,
-                topic_name: this.topicName,
-                ancestor: this.ancestor,
+                topic_num: this.topicNum,
                 question: data[this.state.activeQuestion].question,
                 content: {
                     mcq: data[this.state.activeQuestion].content.mcq,
@@ -680,8 +678,7 @@ class SubjectType1 extends Component {
             method: "PUT",
             body: JSON.stringify({
                 chapter_id: this.chapterId,
-                topic_name: this.topicName,
-                ancestor: this.ancestor,
+                topic_num: this.topicNum,
                 question: data[this.state.activeQuestion].question,
                 question_random_id:
                     data[this.state.activeQuestion].question_random_id,
@@ -760,7 +757,7 @@ class SubjectType1 extends Component {
             let form_data = new FormData();
 
             form_data.append("chapter_id", this.chapterId);
-            form_data.append("topic_name", this.topicName);
+            form_data.append("topic_num", this.topicNum);
             form_data.append(
                 "question_random_id",
                 questionData[this.state.activeQuestion].question_random_id
@@ -1212,7 +1209,7 @@ class SubjectType1 extends Component {
         ) {
             let body = {
                 chapter_id: this.chapterId,
-                topic_name: this.topicName,
+                topic_num: this.topicNum,
                 question_random_id:
                     values[this.state.activeQuestion].question_random_id,
             };
@@ -1411,7 +1408,7 @@ class SubjectType1 extends Component {
                     headers: this.headers,
                     body: JSON.stringify({
                         chapter_id: this.chapterId,
-                        topic_name: this.topicName,
+                        topic_num: this.topicNum,
                         question_random_id:
                             values[this.state.activeQuestion]
                                 .question_random_id,
@@ -1506,7 +1503,7 @@ class SubjectType1 extends Component {
         ) {
             let body = {
                 chapter_id: this.chapterId,
-                topic_name: this.topicName,
+                topic_num: this.topicNum,
                 question_random_id:
                     values[this.state.activeQuestion].question_random_id,
             };
@@ -1813,7 +1810,7 @@ class SubjectType1 extends Component {
         });
         values.push({
             chapter_id: this.chapterId,
-            topic_name: this.topicName,
+            topic_num: this.topicNum,
             question: "<p>Question goes here</p>",
             question_random_id: "",
             is_image_uploaded: false,
@@ -1900,7 +1897,7 @@ class SubjectType1 extends Component {
                         });
                         values.push({
                             chapter_id: this.chapterId,
-                            topic_name: this.topicName,
+                            topic_num: this.topicNum,
                             question: "<p>Question goes here</p>",
                             question_random_id: "",
                             is_image_uploaded: false,
@@ -2021,7 +2018,7 @@ class SubjectType1 extends Component {
         }
         values.splice(index + 1, 0, {
             chapter_id: this.chapterId,
-            topic_name: this.topicName,
+            topic_num: this.topicNum,
             question: values[index].question,
             question_random_id: "",
             is_image_uploaded: false,
@@ -2097,7 +2094,7 @@ class SubjectType1 extends Component {
                     });
                     values.push({
                         chapter_id: this.chapterId,
-                        topic_name: this.topicName,
+                        topic_num: this.topicNum,
                         question: "<p>Question goes here</p>",
                         question_random_id: "",
                         is_image_uploaded: false,
@@ -2210,7 +2207,7 @@ class SubjectType1 extends Component {
                     body: JSON.stringify({
                         question_ids: id,
                         chapter_id: this.chapterId,
-                        topic_name: this.topicName,
+                        topic_num: this.topicNum,
                     }),
                 }
             )
@@ -2321,7 +2318,7 @@ class SubjectType1 extends Component {
                         name=""
                         data={{
                             chapter_id: this.chapterId,
-                            topic_name: this.topicName,
+                            topic_num: this.topicNum,
                             question_random_id: this.state.selectedQuestion,
                         }}
                         toggleModal={this.closeMCQ_DeleteModal}
@@ -4114,4 +4111,4 @@ class SubjectType1 extends Component {
     }
 }
 
-export default connect(mapStateToProps)(SubjectType1);
+export default connect(mapStateToProps)(Type1);

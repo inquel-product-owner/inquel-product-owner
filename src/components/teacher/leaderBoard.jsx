@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import SideNav from "./sidenav";
-import Header from "./navbar";
+import SideNav from "./shared/sidenav";
+import Header from "./shared/navbar";
 import { Tabs, Tab } from "react-bootstrap";
 import Loading from "../sharedComponents/loader";
 import LeaderboardTable from "../table/leaderboardTable";
