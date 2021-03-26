@@ -510,7 +510,7 @@ input[type="search"]:focus {
 
 .fp-container .fp-loader {
     top: 40%;
-    left: 40%;
+    left: 45%;
     z-index: 2000;
     position: absolute;
 }
@@ -524,11 +524,15 @@ input[type="search"]:focus {
 }
 
 .alert-top {
-    padding: 0.8rem 1rem;
+    padding: 0.7rem 1rem;
     width: 50%;
     top: 0;
     margin: 0 auto;
     transition: all 0.5s ease-in-out;
+}
+
+.alert-top .d-flex p:nth-child(2)::first-letter {
+    text-transform: uppercase;
 }
 
 @media screen and (max-width: 768px) {
@@ -555,7 +559,7 @@ input[type="search"]:focus {
 }
 
 .alert-top .close {
-    padding: 0.8rem 1rem;
+    padding: 0.7rem 1rem;
     outline: none;
 }
 

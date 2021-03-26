@@ -7,8 +7,11 @@ import { Link } from "react-router-dom";
 import { Modal, Alert, Spinner, Dropdown } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import Loading from "../sharedComponents/loader";
-import { UpdateContentModal } from "../sharedComponents/updateModal";
-import { DeleteContentModal } from "../sharedComponents/deleteModal";
+import AlertBox from "../sharedComponents/alert";
+import {
+    ContentDeleteModal,
+    ContentUpdateModal,
+} from "../sharedComponents/contentManagementModal";
 
 class ChapterModal extends Component {
     constructor() {
@@ -542,9 +545,11 @@ class SubjectChapters extends Component {
             selectedSemester: "",
             is_independent: false,
 
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
             page_loading: true,
-            is_chapterSubmitted: false,
-            is_semesterSubmitted: false,
         };
         this.subjectId = this.props.match.params.subjectId;
         this.url = baseUrl + teacherUrl;
@@ -615,12 +620,20 @@ class SubjectChapters extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                this.setState({
-                    subjectItems: result.data.results,
-                    is_independent: result.data.is_independent,
-                    page_loading: false,
-                });
                 console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        subjectItems: result.data.results,
+                        is_independent: result.data.is_independent,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -634,19 +647,31 @@ class SubjectChapters extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                const chapters = [];
-                for (let i = 0; i < result.data.length; i++) {
-                    for (let j = 0; j < result.data[i].chapters.length; j++) {
-                        chapters.push(result.data[i].chapters[j]);
-                    }
-                }
-                this.setState({
-                    semesterItems: result.data,
-                    semester_chapters: chapters,
-                    chapter_id: [],
-                    page_loading: false,
-                });
                 console.log(result);
+                if (result.sts === true) {
+                    const chapters = [];
+                    for (let i = 0; i < result.data.length; i++) {
+                        for (
+                            let j = 0;
+                            j < result.data[i].chapters.length;
+                            j++
+                        ) {
+                            chapters.push(result.data[i].chapters[j]);
+                        }
+                    }
+                    this.setState({
+                        semesterItems: result.data,
+                        semester_chapters: chapters,
+                        chapter_id: [],
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -660,58 +685,26 @@ class SubjectChapters extends Component {
         this.loadSemesterData();
     };
 
-    componentDidUpdate = (prevProps, prevState) => {
-        if (
-            prevState.is_chapterSubmitted !== this.state.is_chapterSubmitted &&
-            this.state.is_chapterSubmitted === true
-        ) {
-            this.loadChapterData();
+    chapterFormSubmission = () => {
+        setTimeout(() => {
             this.setState({
-                is_chapterSubmitted: false,
+                showModal: false,
+                showChapter_EditModal: false,
+                showChapter_DeleteModal: false,
             });
-        }
+            this.loadChapterData();
+        }, 1000);
+    };
 
-        if (
-            prevState.is_semesterSubmitted !==
-                this.state.is_semesterSubmitted &&
-            this.state.is_semesterSubmitted === true
-        ) {
+    semesterFormSubmission = () => {
+        setTimeout(() => {
+            this.setState({
+                showSemesterModal: false,
+                showSemester_EditModal: false,
+                showSemester_DeleteModal: false,
+            });
             this.loadSemesterData();
-            this.loadChapterData();
-            this.setState({
-                is_semesterSubmitted: false,
-            });
-        }
-    };
-
-    chapterFormSubmission = (is_chapterSubmitted) => {
-        if (is_chapterSubmitted) {
-            this.setState({
-                is_chapterSubmitted: true,
-            });
-            setTimeout(() => {
-                this.setState({
-                    showModal: false,
-                    showChapter_EditModal: false,
-                    showChapter_DeleteModal: false,
-                });
-            }, 1500);
-        }
-    };
-
-    semesterFormSubmission = (is_semesterSubmitted) => {
-        if (is_semesterSubmitted) {
-            this.setState({
-                is_semesterSubmitted: true,
-            });
-            setTimeout(() => {
-                this.setState({
-                    showSemesterModal: false,
-                    showSemester_EditModal: false,
-                    showSemester_DeleteModal: false,
-                });
-            }, 1500);
-        }
+        }, 1000);
     };
 
     dispatchChapter = (data) => {
@@ -729,6 +722,24 @@ class SubjectChapters extends Component {
                 <Header
                     name={this.props.subject_name}
                     togglenav={this.toggleSideNav}
+                />
+
+                {/* ALert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
                 />
 
                 {/* Sidebar */}
@@ -777,7 +788,7 @@ class SubjectChapters extends Component {
 
                 {/* Semester Edit modal */}
                 {this.state.showSemester_EditModal ? (
-                    <UpdateContentModal
+                    <ContentUpdateModal
                         show={this.state.showSemester_EditModal}
                         onHide={this.toggleSemester_EditModal}
                         formSubmission={this.semesterFormSubmission}
@@ -797,7 +808,7 @@ class SubjectChapters extends Component {
 
                 {/* Semester Delete modal */}
                 {this.state.showSemester_DeleteModal ? (
-                    <DeleteContentModal
+                    <ContentDeleteModal
                         show={this.state.showSemester_DeleteModal}
                         onHide={this.toggleSemester_DeleteModal}
                         formSubmission={this.semesterFormSubmission}
@@ -837,7 +848,7 @@ class SubjectChapters extends Component {
                             </div>
                             <div className="col-md-6">
                                 <div className="d-flex flex-wrap justify-content-end mb-4">
-                                    <button className="btn btn-primary btn-sm">
+                                    <button className="btn btn-primary btn-sm shadow-none">
                                         Publish
                                     </button>
                                 </div>
@@ -941,7 +952,7 @@ class SubjectChapters extends Component {
                                                                                       className="primary-text"
                                                                                   >
                                                                                       <button
-                                                                                          className="btn btn-primary btn-sm mr-2"
+                                                                                          className="btn btn-primary btn-sm shadow-none mr-2"
                                                                                           onClick={() =>
                                                                                               this.dispatchChapter(
                                                                                                   chapter.chapter_name
@@ -956,7 +967,7 @@ class SubjectChapters extends Component {
                                                                                       className="primary-text"
                                                                                   >
                                                                                       <button
-                                                                                          className="btn btn-primary btn-sm"
+                                                                                          className="btn btn-primary btn-sm shadow-none"
                                                                                           onClick={() =>
                                                                                               this.dispatchChapter(
                                                                                                   chapter.chapter_name
@@ -972,7 +983,7 @@ class SubjectChapters extends Component {
                                                                                       to={`${this.props.match.url}/chapter/${chapter.chapter_id}`}
                                                                                   >
                                                                                       <button
-                                                                                          className="btn btn-primary btn-sm"
+                                                                                          className="btn btn-primary btn-sm shadow-none"
                                                                                           onClick={() =>
                                                                                               this.dispatchChapter(
                                                                                                   chapter.chapter_name
@@ -1032,7 +1043,7 @@ class SubjectChapters extends Component {
                                                                                   to={`${this.props.match.url}/semester/${data.semester_id}`}
                                                                               >
                                                                                   <button
-                                                                                      className="btn btn-primary btn-sm"
+                                                                                      className="btn btn-primary btn-sm shadow-none"
                                                                                       onClick={() =>
                                                                                           this.dispatchSemester(
                                                                                               data.semester_name
@@ -1054,7 +1065,7 @@ class SubjectChapters extends Component {
                                                                                       to={`${this.props.match.url}/semester/${data.semester_id}/direct`}
                                                                                   >
                                                                                       <button
-                                                                                          className="btn btn-primary btn-sm ml-2"
+                                                                                          className="btn btn-primary btn-sm shadow-none ml-2"
                                                                                           onClick={() =>
                                                                                               this.dispatchSemester(
                                                                                                   data.semester_name
@@ -1075,7 +1086,7 @@ class SubjectChapters extends Component {
                                                                                       to={`${this.props.match.url}/semester/${data.semester_id}`}
                                                                                   >
                                                                                       <button
-                                                                                          className="btn btn-primary btn-sm"
+                                                                                          className="btn btn-primary btn-sm shadow-none"
                                                                                           onClick={() =>
                                                                                               this.dispatchSemester(
                                                                                                   data.semester_name
@@ -1094,7 +1105,7 @@ class SubjectChapters extends Component {
                                                                                           to={`${this.props.match.url}/semester/${data.semester_id}/direct`}
                                                                                       >
                                                                                           <button
-                                                                                              className="btn btn-primary btn-sm ml-2"
+                                                                                              className="btn btn-primary btn-sm shadow-none ml-2"
                                                                                               onClick={() =>
                                                                                                   this.dispatchSemester(
                                                                                                       data.semester_name
@@ -1117,7 +1128,7 @@ class SubjectChapters extends Component {
                                                                               to={`${this.props.match.url}/semester/${data.semester_id}`}
                                                                           >
                                                                               <button
-                                                                                  className="btn btn-primary btn-sm"
+                                                                                  className="btn btn-primary btn-sm shadow-none"
                                                                                   onClick={() =>
                                                                                       this.dispatchSemester(
                                                                                           data.semester_name
@@ -1139,7 +1150,7 @@ class SubjectChapters extends Component {
                                                                                   to={`${this.props.match.url}/semester/${data.semester_id}/direct`}
                                                                               >
                                                                                   <button
-                                                                                      className="btn btn-primary btn-sm ml-2"
+                                                                                      className="btn btn-primary btn-sm shadow-none ml-2"
                                                                                       onClick={() =>
                                                                                           this.dispatchSemester(
                                                                                               data.semester_name
@@ -1259,7 +1270,7 @@ class SubjectChapters extends Component {
                                                                       className="primary-text"
                                                                   >
                                                                       <button
-                                                                          className="btn btn-primary btn-sm mr-2"
+                                                                          className="btn btn-primary btn-sm shadow-none mr-2"
                                                                           onClick={() =>
                                                                               this.dispatchChapter(
                                                                                   chapter.chapter_name
@@ -1274,7 +1285,7 @@ class SubjectChapters extends Component {
                                                                       className="primary-text"
                                                                   >
                                                                       <button
-                                                                          className="btn btn-primary btn-sm"
+                                                                          className="btn btn-primary btn-sm shadow-none"
                                                                           onClick={() =>
                                                                               this.dispatchChapter(
                                                                                   chapter.chapter_name
@@ -1290,7 +1301,7 @@ class SubjectChapters extends Component {
                                                                       to={`${this.props.match.url}/chapter/${chapter.chapter_id}`}
                                                                   >
                                                                       <button
-                                                                          className="btn btn-primary btn-sm"
+                                                                          className="btn btn-primary btn-sm shadow-none"
                                                                           onClick={() =>
                                                                               this.dispatchChapter(
                                                                                   chapter.chapter_name

@@ -12,6 +12,12 @@ import Paginations from "../sharedComponents/pagination";
 import ReactSwitch from "../sharedComponents/switchComponent";
 import dateFormat from "dateformat";
 import { Link } from "react-router-dom";
+import AlertBox from "../sharedComponents/alert";
+import {
+    UserDeleteModal,
+    UserDisableModal,
+    UserEnableModal,
+} from "../sharedComponents/userManagementModal";
 
 class HODModal extends Component {
     constructor(props) {
@@ -140,7 +146,7 @@ class HODModal extends Component {
                             showSuccessAlert: true,
                             showLoader: false,
                         });
-                        this.props.formSubmission(true);
+                        this.props.formSubmission();
                     } else {
                         this.setState({
                             errorMsg: result.msg,
@@ -343,6 +349,7 @@ class HODModal extends Component {
                 show={this.props.show}
                 onHide={this.props.onHide}
                 size="lg"
+                backdrop="static"
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
@@ -762,7 +769,7 @@ class HODModal extends Component {
                         </div>
                         <div className="form-group">
                             <button
-                                className="btn btn-primary btn-block"
+                                className="btn btn-primary btn-block shadow-none"
                                 type="submit"
                             >
                                 {this.state.showLoader ? (
@@ -795,13 +802,27 @@ class Profiles extends Component {
             totalHODCount: 0,
             activeStudentPage: 1,
             totalStudentCount: 0,
-            modalShow: false,
+
+            showModal: false,
+            showHOD_DeleteModal: false,
+            showStudent_DeleteModal: false,
+            showHOD_DisableModal: false,
+            showStudent_DisableModal: false,
+            showHOD_EnableModal: false,
+            showStudent_EnableModal: false,
             showSideNav: false,
+
             activeTab: "hod",
             hodItems: [],
             studentItems: [],
+            selectedHOD: [],
+            selectedStudent: [],
+
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
             page_loading: true,
-            is_formSubmited: false,
         };
         this.url = baseUrl + adminPathUrl;
         this.authToken = localStorage.getItem("Inquel-Auth");
@@ -821,7 +842,7 @@ class Profiles extends Component {
 
     toggleModal = () => {
         this.setState({
-            modalShow: !this.state.modalShow,
+            showModal: !this.state.showModal,
         });
     };
 
@@ -838,12 +859,20 @@ class Profiles extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                this.setState({
-                    hodItems: result.data.results,
-                    totalHODCount: result.data.count,
-                    page_loading: false,
-                });
                 console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        hodItems: result.data.results,
+                        totalHODCount: result.data.count,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -858,12 +887,20 @@ class Profiles extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                this.setState({
-                    studentItems: result.data.results,
-                    totalStudentCount: result.data.count,
-                    page_loading: false,
-                });
                 console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        studentItems: result.data.results,
+                        totalStudentCount: result.data.count,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -881,55 +918,116 @@ class Profiles extends Component {
         this.loadStudentData();
     };
 
-    componentDidUpdate = (prevProps, prevState) => {
-        if (
-            prevState.is_formSubmited !== this.state.is_formSubmited &&
-            this.state.is_formSubmited === true
-        ) {
-            this.loadHodData();
+    handleDelete = () => {
+        if (this.state.activeTab === "hod") {
             this.setState({
-                is_formSubmited: false,
+                showHOD_DeleteModal: !this.state.showHOD_DeleteModal,
+            });
+        } else if (this.state.activeTab === "student") {
+            this.setState({
+                showStudent_DeleteModal: !this.state.showStudent_DeleteModal,
             });
         }
+    };
 
-        if (prevState.activeHODPage !== this.state.activeHODPage) {
-            this.loadHodData();
+    handleDisable = () => {
+        if (this.state.activeTab === "hod") {
             this.setState({
-                page_loading: true,
+                showHOD_DisableModal: !this.state.showHOD_DisableModal,
+            });
+        } else if (this.state.activeTab === "student") {
+            this.setState({
+                showStudent_DisableModal: !this.state.showStudent_DisableModal,
             });
         }
+    };
 
-        if (prevState.activeStudentPage !== this.state.activeStudentPage) {
+    handleEnable = () => {
+        if (this.state.activeTab === "hod") {
+            this.setState({
+                showHOD_EnableModal: !this.state.showHOD_EnableModal,
+            });
+        } else if (this.state.activeTab === "student") {
+            this.setState({
+                showStudent_EnableModal: !this.state.showStudent_EnableModal,
+            });
+        }
+    };
+
+    // Gets HOD ID from the HOD table
+    handleHODId = (data) => {
+        let value = [];
+        const hodItems = this.state.hodItems;
+        for (let i = 0; i < hodItems.length; i++) {
+            if (data.includes(hodItems[i].id.toString())) {
+                value.push({
+                    id: hodItems[i].id.toString(),
+                    username: hodItems[i].username,
+                });
+            } else {
+                continue;
+            }
+        }
+        this.setState({
+            selectedHOD: value,
+        });
+    };
+
+    // Gets Student ID from the Student table
+    handleStudentId = (data) => {
+        let value = [];
+        const studentItems = this.state.studentItems;
+        for (let i = 0; i < studentItems.length; i++) {
+            if (data.includes(studentItems[i].id.toString())) {
+                value.push({
+                    id: studentItems[i].id.toString(),
+                    username: studentItems[i].username,
+                });
+            } else {
+                continue;
+            }
+        }
+        this.setState({
+            selectedStudent: value,
+        });
+    };
+
+    formSubmission = () => {
+        setTimeout(() => {
+            this.loadHodData();
+            this.setState({
+                showModal: false,
+                showHOD_DeleteModal: false,
+                showHOD_DisableModal: false,
+                showHOD_EnableModal: false,
+            });
+        }, 1000);
+    };
+
+    studentFormSubmission = () => {
+        setTimeout(() => {
             this.loadStudentData();
             this.setState({
-                page_loading: true,
+                showStudent_DeleteModal: false,
+                showStudent_DisableModal: false,
+                showStudent_EnableModal: false,
             });
-        }
-    };
-
-    triggerDelete = () => {
-        this.gridRef.current.showConsole();
-    };
-
-    formSubmission = (is_formSubmited) => {
-        if (is_formSubmited) {
-            this.setState({
-                is_formSubmited: true,
-            });
-            setTimeout(() => {
-                this.setState({
-                    modalShow: false,
-                });
-            }, 1000);
-        }
+        }, 1000);
     };
 
     handleHODPageChange(pageNumber) {
-        this.setState({ activeHODPage: pageNumber });
+        this.setState({ activeHODPage: pageNumber, page_loading: true }, () => {
+            this.loadHodData();
+        });
     }
 
     handleStudentPageChange(pageNumber) {
-        this.setState({ activeStudentPage: pageNumber });
+        this.setState(
+            { activeStudentPage: pageNumber, page_loading: true },
+            () => {
+                this.loadStudentData();
+            }
+        );
     }
 
     render() {
@@ -955,12 +1053,132 @@ class Profiles extends Component {
                     activeLink="profiles"
                 />
 
-                {/* HOD Modal */}
-                {this.state.modalShow ? (
+                {/* ALert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
+                />
+
+                {/* HOD create Modal */}
+                {this.state.showModal ? (
                     <HODModal
-                        show={this.state.modalShow}
+                        show={this.state.showModal}
                         onHide={this.toggleModal}
                         formSubmission={this.formSubmission}
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* HOD Delete Modal */}
+                {this.state.showHOD_DeleteModal ? (
+                    <UserDeleteModal
+                        show={this.state.showHOD_DeleteModal}
+                        onHide={this.handleDelete}
+                        toggleModal={this.handleDelete}
+                        formSubmission={this.formSubmission}
+                        url={`${this.url}/hod/`}
+                        data={this.state.selectedHOD}
+                        field="hod_ids"
+                        type="HOD"
+                        token="Inquel-Auth"
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* HOD Disable Modal */}
+                {this.state.showHOD_DisableModal ? (
+                    <UserDisableModal
+                        show={this.state.showHOD_DisableModal}
+                        onHide={this.handleDisable}
+                        toggleModal={this.handleDisable}
+                        formSubmission={this.formSubmission}
+                        url={`${this.url}/hod/`}
+                        data={this.state.selectedHOD}
+                        field="hod_ids"
+                        type="HOD"
+                        token="Inquel-Auth"
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* HOD Enable Modal */}
+                {this.state.showHOD_EnableModal ? (
+                    <UserEnableModal
+                        show={this.state.showHOD_EnableModal}
+                        onHide={this.handleEnable}
+                        toggleModal={this.handleEnable}
+                        formSubmission={this.formSubmission}
+                        url={`${this.url}/hod/`}
+                        data={this.state.selectedHOD}
+                        field="hod_ids"
+                        type="HOD"
+                        token="Inquel-Auth"
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Student Delete Modal */}
+                {this.state.showStudent_DeleteModal ? (
+                    <UserDeleteModal
+                        show={this.state.showStudent_DeleteModal}
+                        onHide={this.handleDelete}
+                        toggleModal={this.handleDelete}
+                        formSubmission={this.studentFormSubmission}
+                        url={`${this.url}/student/`}
+                        data={this.state.selectedStudent}
+                        field="student_ids"
+                        type="Student"
+                        token="Inquel-Auth"
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Student Disable Modal */}
+                {this.state.showStudent_DisableModal ? (
+                    <UserDisableModal
+                        show={this.state.showStudent_DisableModal}
+                        onHide={this.handleDisable}
+                        toggleModal={this.handleDisable}
+                        formSubmission={this.studentFormSubmission}
+                        url={`${this.url}/student/`}
+                        data={this.state.selectedStudent}
+                        field="student_ids"
+                        type="Student"
+                        token="Inquel-Auth"
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Student Enable Modal */}
+                {this.state.showStudent_EnableModal ? (
+                    <UserEnableModal
+                        show={this.state.showStudent_EnableModal}
+                        onHide={this.handleEnable}
+                        toggleModal={this.handleEnable}
+                        formSubmission={this.studentFormSubmission}
+                        url={`${this.url}/student/`}
+                        data={this.state.selectedStudent}
+                        field="student_ids"
+                        type="Student"
+                        token="Inquel-Auth"
                     />
                 ) : (
                     ""
@@ -1001,7 +1219,7 @@ class Profiles extends Component {
                             <div className="col-md-6 d-flex justify-content-end">
                                 {this.state.activeTab === "hod" ? (
                                     <button
-                                        className="btn btn-primary btn-sm mr-1"
+                                        className="btn btn-primary btn-sm shadow-none mr-1"
                                         onClick={this.toggleModal}
                                     >
                                         Add New
@@ -1010,15 +1228,21 @@ class Profiles extends Component {
                                     ""
                                 )}
                                 <button
-                                    className="btn btn-primary btn-sm mr-1"
-                                    onClick={this.triggerDelete}
+                                    className="btn btn-primary btn-sm shadow-none mr-1"
+                                    onClick={this.handleDelete}
                                 >
                                     Delete
                                 </button>
-                                <button className="btn btn-primary btn-sm mr-1">
+                                <button
+                                    className="btn btn-primary btn-sm shadow-none mr-1"
+                                    onClick={this.handleEnable}
+                                >
                                     Enable
                                 </button>
-                                <button className="btn btn-primary btn-sm">
+                                <button
+                                    className="btn btn-primary btn-sm shadow-none"
+                                    onClick={this.handleDisable}
+                                >
                                     Disable
                                 </button>
                             </div>
@@ -1038,10 +1262,11 @@ class Profiles extends Component {
                                 <div className="card shadow-sm">
                                     <HODTable
                                         hodItems={this.state.hodItems}
-                                        ref={this.gridRef}
+                                        handleHODId={this.handleHODId}
                                     />
                                     <div className="card-body p-3">
-                                        {this.state.totalHODCount > paginationCount ? (
+                                        {this.state.totalHODCount >
+                                        paginationCount ? (
                                             <Paginations
                                                 activePage={
                                                     this.state.activeHODPage
@@ -1064,10 +1289,11 @@ class Profiles extends Component {
                                     <StudentTable
                                         studentItems={this.state.studentItems}
                                         path="admin"
-                                        ref={this.gridRef}
+                                        handleStudentId={this.handleStudentId}
                                     />
                                     <div className="card-body p-3">
-                                        {this.state.totalStudentCount > paginationCount ? (
+                                        {this.state.totalStudentCount >
+                                        paginationCount ? (
                                             <Paginations
                                                 activePage={
                                                     this.state.activeStudentPage

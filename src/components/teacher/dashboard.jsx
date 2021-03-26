@@ -7,6 +7,7 @@ import Loading from "../sharedComponents/loader";
 import GroupTable from "../table/groupTable";
 import SubjectTable from "../table/subjectTable";
 import Paginations from "../sharedComponents/pagination";
+import AlertBox from "../sharedComponents/alert";
 
 class Dashboard extends Component {
     constructor(props) {
@@ -19,6 +20,11 @@ class Dashboard extends Component {
             totalGroupCount: 0,
             activeSubjectPage: 1,
             totalSubjectCount: 0,
+
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
             page_loading: true,
         };
         this.url = baseUrl + teacherUrl;
@@ -43,12 +49,20 @@ class Dashboard extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                this.setState({
-                    groupItem: result.data.results,
-                    totalGroupCount: result.data.count,
-                    page_loading: false,
-                });
                 console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        groupItem: result.data.results,
+                        totalGroupCount: result.data.count,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -66,11 +80,19 @@ class Dashboard extends Component {
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
-                this.setState({
-                    subjectItem: result.data.results,
-                    totalSubjectCount: result.data.count,
-                    page_loading: false,
-                });
+                if (result.sts === true) {
+                    this.setState({
+                        subjectItem: result.data.results,
+                        totalSubjectCount: result.data.count,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -83,28 +105,22 @@ class Dashboard extends Component {
         this.loadSubjectData();
     };
 
-    componentDidUpdate = (prevProps, prevState) => {
-        if (prevState.activeGroupPage !== this.state.activeGroupPage) {
-            this.loadGroupData();
-            this.setState({
-                page_loading: true,
-            });
-        }
-
-        if (prevState.activeSubjectPage !== this.state.activeSubjectPage) {
-            this.loadSubjectData();
-            this.setState({
-                page_loading: true,
-            });
-        }
-    };
-
     handleGroupPageChange(pageNumber) {
-        this.setState({ activeGroupPage: pageNumber });
+        this.setState(
+            { activeGroupPage: pageNumber, page_loading: true },
+            () => {
+                this.loadGroupData();
+            }
+        );
     }
 
     handleSubjectPageChange(pageNumber) {
-        this.setState({ activeSubjectPage: pageNumber });
+        this.setState(
+            { activeSubjectPage: pageNumber, page_loading: true },
+            () => {
+                this.loadSubjectData();
+            }
+        );
     }
 
     render() {
@@ -112,6 +128,24 @@ class Dashboard extends Component {
             <div className="wrapper">
                 {/* Navbar */}
                 <Header name="Dashboard" togglenav={this.toggleSideNav} />
+
+                {/* ALert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
+                />
 
                 {/* Sidebar */}
                 <SideNav
@@ -145,7 +179,8 @@ class Dashboard extends Component {
                                 view={true}
                             />
                             <div className="card-body p-3">
-                                {this.state.totalGroupCount > paginationCount ? (
+                                {this.state.totalGroupCount >
+                                paginationCount ? (
                                     <Paginations
                                         activePage={this.state.activeGroupPage}
                                         totalItemsCount={
@@ -170,7 +205,8 @@ class Dashboard extends Component {
                                 check={false}
                             />
                             <div className="card-body p-3">
-                                {this.state.totalSubjectCount > paginationCount ? (
+                                {this.state.totalSubjectCount >
+                                paginationCount ? (
                                     <Paginations
                                         activePage={
                                             this.state.activeSubjectPage

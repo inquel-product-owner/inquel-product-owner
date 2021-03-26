@@ -9,6 +9,12 @@ import { paginationCount } from "../../../shared/globalValues.js";
 import Loading from "../../sharedComponents/loader";
 import SubjectTable from "../../table/subjectTable";
 import Paginations from "../../sharedComponents/pagination";
+import AlertBox from "../../sharedComponents/alert";
+import {
+    ContentDisableModal,
+    ContentEnableModal,
+    MultiContentDeleteModal,
+} from "../../sharedComponents/contentManagementModal";
 
 class SubjectModal extends Component {
     constructor() {
@@ -45,16 +51,8 @@ class SubjectModal extends Component {
                         teacherData: result.data,
                     });
                 } else {
-                    if (result.detail) {
-                        this.setState({
-                            errorMsg: result.detail,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.msg,
-                        });
-                    }
                     this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
                         showErrorAlert: true,
                     });
                 }
@@ -91,7 +89,7 @@ class SubjectModal extends Component {
                         showSuccessAlert: true,
                         showLoader: false,
                     });
-                    this.props.formSubmission(true);
+                    this.props.formSubmission();
                 } else {
                     this.setState({
                         errorMsg: result.msg,
@@ -127,32 +125,33 @@ class SubjectModal extends Component {
                 centered
             >
                 <Modal.Header closeButton>Create Subject</Modal.Header>
-                <Modal.Body>
-                    <Alert
-                        variant="danger"
-                        show={this.state.showErrorAlert}
-                        onClose={() => {
-                            this.setState({
-                                showErrorAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.errorMsg}
-                    </Alert>
-                    <Alert
-                        variant="success"
-                        show={this.state.showSuccessAlert}
-                        onClose={() => {
-                            this.setState({
-                                showSuccessAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.successMsg}
-                    </Alert>
-                    <form onSubmit={this.handleSubmit} autoComplete="off">
+                <form onSubmit={this.handleSubmit} autoComplete="off">
+                    <Modal.Body>
+                        <Alert
+                            variant="danger"
+                            show={this.state.showErrorAlert}
+                            onClose={() => {
+                                this.setState({
+                                    showErrorAlert: false,
+                                });
+                            }}
+                            dismissible
+                        >
+                            {this.state.errorMsg}
+                        </Alert>
+                        <Alert
+                            variant="success"
+                            show={this.state.showSuccessAlert}
+                            onClose={() => {
+                                this.setState({
+                                    showSuccessAlert: false,
+                                });
+                            }}
+                            dismissible
+                        >
+                            {this.state.successMsg}
+                        </Alert>
+
                         <div className="form-group">
                             <label htmlFor="subject">Subject name</label>
                             <input
@@ -186,25 +185,25 @@ class SubjectModal extends Component {
                                 required
                             />
                         </div>
-                        <div className="form-group">
-                            <button className="btn btn-primary btn-sm btn-block">
-                                {this.state.showLoader ? (
-                                    <Spinner
-                                        as="span"
-                                        animation="border"
-                                        size="sm"
-                                        role="status"
-                                        aria-hidden="true"
-                                        className="mr-2"
-                                    />
-                                ) : (
-                                    ""
-                                )}
-                                Create Subject
-                            </button>
-                        </div>
-                    </form>
-                </Modal.Body>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <button className="btn btn-primary btn-block shadow-none">
+                            {this.state.showLoader ? (
+                                <Spinner
+                                    as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    aria-hidden="true"
+                                    className="mr-2"
+                                />
+                            ) : (
+                                ""
+                            )}
+                            Create Subject
+                        </button>
+                    </Modal.Footer>
+                </form>
             </Modal>
         );
     }
@@ -216,12 +215,21 @@ class Group extends Component {
         this.state = {
             showSideNav: false,
             showModal: false,
+            showSubject_DeleteModal: false,
+            showSubject_DisableModal: false,
+            showSubject_EnableModal: false,
+
             groupItems: [],
             subjectItems: [],
+            selectedSubject: [],
             activeSubjectPage: 1,
             totalSubjectCount: 0,
+
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
             page_loading: true,
-            is_formSubmited: false,
         };
         this.groupId = this.props.match.params.groupId;
         this.url = baseUrl + hodUrl;
@@ -252,13 +260,21 @@ class Group extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                this.setState({
-                    groupItems: result.data,
-                    subjectItems: result.data.subjects,
-                    totalSubjectCount: result.data.subjects.length,
-                    page_loading: false,
-                });
                 console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        groupItems: result.data,
+                        subjectItems: result.data.subjects,
+                        totalSubjectCount: result.data.subjects.length,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -269,40 +285,62 @@ class Group extends Component {
         this.loadSubjectData();
     };
 
-    componentDidUpdate = (prevProps, prevState) => {
-        if (
-            prevState.is_formSubmited !== this.state.is_formSubmited &&
-            this.state.is_formSubmited === true
-        ) {
-            this.loadSubjectData();
-            this.setState({
-                is_formSubmited: false,
-            });
-        }
-
-        if (prevState.activeSubjectPage !== this.state.activeSubjectPage) {
-            this.loadSubjectData();
-            this.setState({
-                page_loading: true,
-            });
-        }
+    handleDelete = () => {
+        this.setState({
+            showSubject_DeleteModal: !this.state.showSubject_DeleteModal,
+        });
     };
 
-    formSubmission = (is_formSubmited) => {
-        if (is_formSubmited) {
-            this.setState({
-                is_formSubmited: true,
-            });
-            setTimeout(() => {
-                this.setState({
-                    showModal: false,
+    handleDisable = () => {
+        this.setState({
+            showSubject_DisableModal: !this.state.showSubject_DisableModal,
+        });
+    };
+
+    handleEnable = () => {
+        this.setState({
+            showSubject_EnableModal: !this.state.showSubject_EnableModal,
+        });
+    };
+
+    // Gets Subject ID from the Subject table
+    handleSubjectId = (data) => {
+        let value = [];
+        const subjectItems = this.state.subjectItems;
+        for (let i = 0; i < subjectItems.length; i++) {
+            if (data.includes(subjectItems[i].id.toString())) {
+                value.push({
+                    id: subjectItems[i].id.toString(),
+                    name: subjectItems[i].subject_name,
                 });
-            }, 1000);
+            } else {
+                continue;
+            }
         }
+        this.setState({
+            selectedSubject: value,
+        });
+    };
+
+    formSubmission = () => {
+        setTimeout(() => {
+            this.setState({
+                showModal: false,
+                showSubject_DeleteModal: false,
+                showSubject_DisableModal: false,
+                showSubject_EnableModal: false,
+            });
+            this.loadSubjectData();
+        }, 1000);
     };
 
     handleSubjectPageChange(pageNumber) {
-        this.setState({ activeSubjectPage: pageNumber });
+        this.setState(
+            { activeSubjectPage: pageNumber, page_loading: true },
+            () => {
+                this.loadSubjectData();
+            }
+        );
     }
 
     render() {
@@ -318,19 +356,85 @@ class Group extends Component {
                     togglenav={this.toggleSideNav}
                 />
 
+                {/* ALert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
+                />
+
                 {/* Sidebar */}
                 <SideNav
                     shownav={this.state.showSideNav}
                     activeLink="dashboard"
                 />
 
-                {/* Add Subject modal */}
+                {/* Subject create modal */}
                 {this.state.showModal ? (
                     <SubjectModal
                         show={this.state.showModal}
                         onHide={this.toggleModal}
                         groupId={this.groupId}
                         formSubmission={this.formSubmission}
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Subject Delete Modal */}
+                {this.state.showSubject_DeleteModal ? (
+                    <MultiContentDeleteModal
+                        show={this.state.showSubject_DeleteModal}
+                        onHide={this.handleDelete}
+                        toggleModal={this.handleDelete}
+                        formSubmission={this.formSubmission}
+                        url={`${this.url}/hod/create/subject/`}
+                        data={this.state.selectedSubject}
+                        field="subject_ids"
+                        type="Subject"
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Subject Disable Modal */}
+                {this.state.showSubject_DisableModal ? (
+                    <ContentDisableModal
+                        show={this.state.showSubject_DisableModal}
+                        onHide={this.handleDisable}
+                        toggleModal={this.handleDisable}
+                        formSubmission={this.formSubmission}
+                        url={`${this.url}/hod/create/subject/`}
+                        data={this.state.selectedSubject}
+                        field="subject_ids"
+                        type="Subject"
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Subject Enable Modal */}
+                {this.state.showSubject_EnableModal ? (
+                    <ContentEnableModal
+                        show={this.state.showSubject_EnableModal}
+                        onHide={this.handleEnable}
+                        toggleModal={this.handleEnable}
+                        formSubmission={this.formSubmission}
+                        url={`${this.url}/hod/create/subject/`}
+                        data={this.state.selectedSubject}
+                        field="subject_ids"
+                        type="Subject"
                     />
                 ) : (
                     ""
@@ -370,17 +474,17 @@ class Group extends Component {
                             </div>
                             <div className="col-6 text-right">
                                 <Link to={`${this.props.match.url}/student`}>
-                                    <button className="btn btn-primary btn-sm mr-2">
+                                    <button className="btn btn-primary btn-sm shadow-none mr-1">
                                         Student
                                     </button>
                                 </Link>
                                 <Link to={`${this.props.match.url}/teacher`}>
-                                    <button className="btn btn-primary btn-sm mr-2">
+                                    <button className="btn btn-primary btn-sm shadow-none mr-1">
                                         Teacher
                                     </button>
                                 </Link>
                                 <Link to={`${this.props.match.url}/details`}>
-                                    <button className="btn btn-primary btn-sm">
+                                    <button className="btn btn-primary btn-sm shadow-none">
                                         Configuration
                                     </button>
                                 </Link>
@@ -390,22 +494,31 @@ class Group extends Component {
                             <div className="card-header">
                                 <div className="row align-items-center">
                                     <div className="col-md-3">
-                                        <h5>Subjects</h5>
+                                        <h5 className="mb-0">Subjects</h5>
                                     </div>
                                     <div className="col-md-9 text-right">
                                         <button
-                                            className="btn btn-primary btn-sm mr-2"
+                                            className="btn btn-primary btn-sm shadow-none mr-1"
                                             onClick={this.toggleModal}
                                         >
                                             Add new
                                         </button>
-                                        <button className="btn btn-primary btn-sm mr-2">
+                                        <button
+                                            className="btn btn-primary btn-sm shadow-none mr-1"
+                                            onClick={this.handleDelete}
+                                        >
                                             Delete
                                         </button>
-                                        <button className="btn btn-primary btn-sm mr-2">
+                                        <button
+                                            className="btn btn-primary btn-sm shadow-none mr-1"
+                                            onClick={this.handleEnable}
+                                        >
                                             Enable
                                         </button>
-                                        <button className="btn btn-primary btn-sm">
+                                        <button
+                                            className="btn btn-primary btn-sm shadow-none"
+                                            onClick={this.handleDisable}
+                                        >
                                             Disable
                                         </button>
                                     </div>
@@ -414,9 +527,11 @@ class Group extends Component {
                             <SubjectTable
                                 subjectItems={this.state.subjectItems}
                                 path={`hod/group/${this.groupId}`}
+                                handleSubjectId={this.handleSubjectId}
                             />
                             <div className="card-body p-3">
-                                {this.state.totalSubjectCount > paginationCount ? (
+                                {this.state.totalSubjectCount >
+                                paginationCount ? (
                                     <Paginations
                                         activePage={
                                             this.state.activeSubjectPage

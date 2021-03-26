@@ -6,6 +6,7 @@ import { Tab, Row, Col, Nav, Badge } from "react-bootstrap";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
 import Loading from "../sharedComponents/loader";
 import { Link } from "react-router-dom";
+import AlertBox from "../sharedComponents/alert";
 
 function EmptyData() {
     return (
@@ -22,6 +23,10 @@ class HodTeacherList extends Component {
             showSideNav: false,
             teacherItems: [],
             hodItems: [],
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
             page_loading: true,
         };
         this.hodId = this.props.match.params.hodId;
@@ -55,11 +60,21 @@ class HodTeacherList extends Component {
             }).then((res) => res.json()),
         ])
             .then((result) => {
-                this.setState({
-                    hodItems: result[0].data,
-                    teacherItems: result[1].data.results,
-                    page_loading: false,
-                });
+                if (result[1].sts === true) {
+                    this.setState({
+                        hodItems: result[0].data,
+                        teacherItems: result[1].data.results,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result[1].detail
+                            ? result[1].detail
+                            : result[1].msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
                 console.log(result);
             })
             .catch((err) => {
@@ -77,6 +92,24 @@ class HodTeacherList extends Component {
                 <SideNav
                     shownav={this.state.showSideNav}
                     activeLink="profiles"
+                />
+
+                {/* ALert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
                 />
 
                 <div
@@ -150,17 +183,11 @@ class HodTeacherList extends Component {
                                             0 ? (
                                                 this.state.hodItems
                                                     .is_active ? (
-                                                    <Badge
-                                                        variant="success"
-                                                        className="ml-1"
-                                                    >
+                                                    <Badge variant="success">
                                                         Active
                                                     </Badge>
                                                 ) : (
-                                                    <Badge
-                                                        variant="danger"
-                                                        className="ml-1"
-                                                    >
+                                                    <Badge variant="danger">
                                                         Not active
                                                     </Badge>
                                                 )
@@ -174,24 +201,6 @@ class HodTeacherList extends Component {
                         </div>
 
                         {/* Teachers list */}
-                        <div className="row justify-content-center justify-content-between mb-4">
-                            <div className="col-md-3 mb-2 mb-md-0">
-                                <h5 className="primary-text font-weight-bold">
-                                    Teacher profiles
-                                </h5>
-                            </div>
-                            <div className="col-md-3">
-                                <form action="">
-                                    <input
-                                        type="search"
-                                        name="search"
-                                        id="search"
-                                        placeholder="Search Teacher"
-                                        className="form-control"
-                                    />
-                                </form>
-                            </div>
-                        </div>
                         <div className="card shadow-sm">
                             <div className="card-body">
                                 <Tab.Container

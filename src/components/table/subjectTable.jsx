@@ -33,9 +33,6 @@ class SubjectTable extends Component {
             checkboxOnly: true,
         };
         this.toolbarOptions = ["Search"];
-        this.state = {
-            subjectId: [],
-        };
     }
 
     rowSelected() {
@@ -45,10 +42,7 @@ class SubjectTable extends Component {
             for (let index = 0; index < selectedrecords.length; index++) {
                 element.push(selectedrecords[index].id.toString());
             }
-            console.log(element);
-            this.setState({
-                subjectId: element,
-            });
+            this.props.handleSubjectId(element);
         }
     }
 
@@ -59,10 +53,7 @@ class SubjectTable extends Component {
             for (let index = 0; index < selectedrecords.length; index++) {
                 element.push(selectedrecords[index].id.toString());
             }
-            console.log(element);
-            this.setState({
-                subjectId: element,
-            });
+            this.props.handleSubjectId(element);
         }
     }
 

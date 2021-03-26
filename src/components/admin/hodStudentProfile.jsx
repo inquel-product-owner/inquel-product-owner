@@ -6,6 +6,7 @@ import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
 import Loading from "../sharedComponents/loader";
 import { Badge } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import AlertBox from "../sharedComponents/alert";
 
 class HodStudentProfile extends Component {
     constructor(props) {
@@ -13,6 +14,10 @@ class HodStudentProfile extends Component {
         this.state = {
             showSideNav: false,
             studentItems: [],
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
             page_loading: true,
         };
         this.hodId = this.props.match.params.hodId;
@@ -42,10 +47,18 @@ class HodStudentProfile extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                this.setState({
-                    studentItems: result.data,
-                    page_loading: false,
-                });
+                if (result.sts === true) {
+                    this.setState({
+                        studentItems: result.data,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
                 console.log(result);
             })
             .catch((err) => {
@@ -63,6 +76,24 @@ class HodStudentProfile extends Component {
                 <SideNav
                     shownav={this.state.showSideNav}
                     activeLink="profiles"
+                />
+
+                {/* ALert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
                 />
 
                 <div
@@ -147,17 +178,11 @@ class HodStudentProfile extends Component {
                                             0 ? (
                                                 this.state.studentItems
                                                     .is_active ? (
-                                                    <Badge
-                                                        variant="success"
-                                                        className="ml-1"
-                                                    >
+                                                    <Badge variant="success">
                                                         Active
                                                     </Badge>
                                                 ) : (
-                                                    <Badge
-                                                        variant="danger"
-                                                        className="ml-1"
-                                                    >
+                                                    <Badge variant="danger">
                                                         Not active
                                                     </Badge>
                                                 )
@@ -171,71 +196,95 @@ class HodStudentProfile extends Component {
                         </div>
                         <div className="row mb-4">
                             <div className="col-md-2 col-sm-4 col-6 mb-3">
-                                <p className="mb-1 font-weight-bold">
+                                <p className="mb-1 font-weight-bold-600">
                                     First Name
                                 </p>
-                                <p className="mb-0">
+                                <p className="text-break mb-0">
                                     {this.state.studentItems.first_name}
                                 </p>
                             </div>
                             <div className="col-md-2 col-sm-4 col-6 mb-3">
-                                <p className="mb-1 font-weight-bold">
+                                <p className="mb-1 font-weight-bold-600">
                                     Last Name
                                 </p>
-                                <p className="mb-0">
+                                <p className="text-break mb-0">
                                     {this.state.studentItems.last_name}
                                 </p>
                             </div>
                             <div className="col-md-2 col-sm-4 col-6 mb-3">
-                                <p className="mb-1 font-weight-bold">
+                                <p className="mb-1 font-weight-bold-600">
                                     Email ID
                                 </p>
-                                <p className="mb-0">
+                                <p className="text-break mb-0">
                                     {this.state.studentItems.email}
                                 </p>
                             </div>
                             <div className="col-md-2 col-sm-4 col-6 mb-3">
-                                <p className="mb-1 font-weight-bold">Mobile</p>
-                                <p className="mb-0">
+                                <p className="mb-1 font-weight-bold-600">
+                                    Mobile
+                                </p>
+                                <p className="text-break mb-0">
+                                    {this.state.studentItems.country_code}
                                     {this.state.studentItems.phone_num}
                                 </p>
                             </div>
                             <div className="col-md-2 col-sm-4 col-6 mb-3">
-                                <p className="mb-1 font-weight-bold">
+                                <p className="mb-1 font-weight-bold-600">
                                     Institution
                                 </p>
-                                <p className="mb-0">XYZ</p>
+                                <p className="text-break mb-0">XYZ</p>
                             </div>
                             <div className="col-md-2 col-sm-4 col-6">
-                                <p className="mb-1 font-weight-bold">
+                                <p className="mb-1 font-weight-bold-600">
                                     Standard
                                 </p>
-                                <p className="mb-0">XYZ</p>
+                                <p className="text-break mb-0">XYZ</p>
                             </div>
                             <div className="col-md-2 col-sm-4 col-6 mb-3">
-                                <p className="mb-1 font-weight-bold">
+                                <p className="mb-1 font-weight-bold-600">
                                     Referral
                                 </p>
-                                <p className="mb-0">XYZ</p>
+                                <p className="text-break mb-0">XYZ</p>
                             </div>
                             <div className="col-md-2 col-sm-4 col-6 mb-3">
-                                <p className="mb-1 font-weight-bold">Address</p>
-                                <p className="mb-1 font-weight-bold">City</p>
-                                <p className="mb-0">Bangalore</p>
+                                <p className="mb-1 font-weight-bold-600">
+                                    Address
+                                </p>
+                                <p className="text-break mb-0">
+                                    {this.state.studentItems.address}
+                                </p>
                             </div>
                             <div className="col-md-2 col-sm-4 col-6 mb-3">
-                                <p className="mb-1 font-weight-bold">
+                                <p className="mb-1 font-weight-bold-600">
+                                    City
+                                </p>
+                                <p className="text-break mb-0">
+                                    {this.state.studentItems.city}
+                                </p>
+                            </div>
+                            <div className="col-md-2 col-sm-4 col-6 mb-3">
+                                <p className="mb-1 font-weight-bold-600">
                                     District
                                 </p>
-                                <p className="mb-0">Bangalore</p>
+                                <p className="text-break mb-0">
+                                    {this.state.studentItems.district}
+                                </p>
                             </div>
                             <div className="col-md-2 col-sm-4 col-6 mb-3">
-                                <p className="mb-1 font-weight-bold">State</p>
-                                <p className="mb-0">Karnataka</p>
+                                <p className="mb-1 font-weight-bold-600">
+                                    State
+                                </p>
+                                <p className="text-break mb-0">
+                                    {this.state.studentItems.state}
+                                </p>
                             </div>
                             <div className="col-md-2 col-sm-4 col-6">
-                                <p className="mb-1 font-weight-bold">Country</p>
-                                <p className="mb-0">India</p>
+                                <p className="mb-1 font-weight-bold-600">
+                                    Country
+                                </p>
+                                <p className="text-break mb-0">
+                                    {this.state.studentItems.country}
+                                </p>
                             </div>
                         </div>
                         {/* Loading component */}

@@ -6,6 +6,7 @@ import Select from "react-select";
 import { Modal, Alert, Spinner } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
 import Loading from "../sharedComponents/loader";
+import AlertBox from "../sharedComponents/alert";
 
 class ChapterModal extends Component {
     constructor(props) {
@@ -15,10 +16,11 @@ class ChapterModal extends Component {
             chapter: "",
             teacher: "",
             weightage: "",
-            successMsg: "",
+
             errorMsg: "",
-            showSuccessAlert: false,
+            successMsg: "",
             showErrorAlert: false,
+            showSuccessAlert: false,
             showLoader: false,
         };
     }
@@ -94,7 +96,7 @@ class ChapterModal extends Component {
                         showSuccessAlert: true,
                         showLoader: false,
                     });
-                    this.props.formSubmission(true);
+                    this.props.formSubmission();
                 } else {
                     this.setState({
                         errorMsg: result.msg,
@@ -192,7 +194,7 @@ class ChapterModal extends Component {
                     <Modal.Footer>
                         <button
                             type="submit"
-                            className="btn btn-primary btn-block"
+                            className="btn btn-primary btn-block shadow-none"
                         >
                             {this.state.showLoader ? (
                                 <Spinner
@@ -221,10 +223,11 @@ class ChapterReassignModal extends Component {
         this.state = {
             teacherData: [],
             teacher: "",
-            successMsg: "",
+
             errorMsg: "",
-            showSuccessAlert: false,
+            successMsg: "",
             showErrorAlert: false,
+            showSuccessAlert: false,
             showLoader: false,
         };
         this.url = baseUrl + hodUrl;
@@ -295,7 +298,7 @@ class ChapterReassignModal extends Component {
                             showSuccessAlert: true,
                             showLoader: false,
                         });
-                        this.props.formSubmission(true);
+                        this.props.formSubmission();
                     } else {
                         this.setState({
                             errorMsg: result.msg,
@@ -346,32 +349,30 @@ class ChapterReassignModal extends Component {
                         >
                             {this.state.successMsg}
                         </Alert>
-                        <div className="form-group">
-                            <label htmlFor="teacher">Teacher</label>
-                            <Select
-                                className="basic-single borders"
-                                placeholder="Select teacher"
-                                isSearchable={true}
-                                name="teacher_id"
-                                id="teacher_id"
-                                options={this.state.teacherData.map((list) => {
-                                    return {
-                                        value: list.id,
-                                        label:
-                                            list.full_name !== ""
-                                                ? list.full_name
-                                                : list.username,
-                                    };
-                                })}
-                                onChange={this.handleInput}
-                                required
-                            />
-                        </div>
+                        <label htmlFor="teacher">Teacher</label>
+                        <Select
+                            className="basic-single borders"
+                            placeholder="Select teacher"
+                            isSearchable={true}
+                            name="teacher_id"
+                            id="teacher_id"
+                            options={this.state.teacherData.map((list) => {
+                                return {
+                                    value: list.id,
+                                    label:
+                                        list.full_name !== ""
+                                            ? list.full_name
+                                            : list.username,
+                                };
+                            })}
+                            onChange={this.handleInput}
+                            required
+                        />
                     </Modal.Body>
                     <Modal.Footer>
                         <button
                             type="submit"
-                            className="btn btn-primary btn-block"
+                            className="btn btn-primary btn-block shadow-none"
                         >
                             {this.state.showLoader ? (
                                 <Spinner
@@ -404,6 +405,11 @@ class Subject extends Component {
             subjectItems: [],
             chapterData: [],
             chapter_id: "",
+
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
             page_loading: true,
         };
         this.subjectId = this.props.match.params.subjectId;
@@ -440,12 +446,20 @@ class Subject extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                this.setState({
-                    subjectItems: result.data,
-                    chapterData: result.data.chapters,
-                    page_loading: false,
-                });
                 console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        subjectItems: result.data,
+                        chapterData: result.data.chapters,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -456,30 +470,14 @@ class Subject extends Component {
         this.loadSubjectData();
     };
 
-    componentDidUpdate = (prevProps, prevState) => {
-        if (
-            prevState.is_formSubmited !== this.state.is_formSubmited &&
-            this.state.is_formSubmited === true
-        ) {
+    formSubmission = () => {
+        setTimeout(() => {
+            this.setState({
+                showModal: false,
+                showReassignModal: false,
+            });
             this.loadSubjectData();
-            this.setState({
-                is_formSubmited: false,
-            });
-        }
-    };
-
-    formSubmission = (is_formSubmited) => {
-        if (is_formSubmited) {
-            this.setState({
-                is_formSubmited: true,
-            });
-            setTimeout(() => {
-                this.setState({
-                    showModal: false,
-                    showReassignModal: false,
-                });
-            }, 1000);
-        }
+        }, 1000);
     };
 
     render() {
@@ -494,6 +492,24 @@ class Subject extends Component {
                 <Header
                     name={this.state.subjectItems.subject_name}
                     togglenav={this.toggleSideNav}
+                />
+
+                {/* ALert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
                 />
 
                 {/* Sidebar */}
@@ -559,13 +575,13 @@ class Subject extends Component {
                             </div>
                             <div className="col-md-6 text-center text-md-right">
                                 <button
-                                    className="btn btn-primary btn-sm mr-2"
+                                    className="btn btn-primary btn-sm shadow-none mr-2"
                                     onClick={this.toggleModal}
                                 >
                                     Add New
                                 </button>
                                 <Link to={`${this.props.match.url}/configure`}>
-                                    <button className="btn btn-primary btn-sm">
+                                    <button className="btn btn-primary btn-sm shadow-none">
                                         Configure Course
                                     </button>
                                 </Link>

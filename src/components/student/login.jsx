@@ -436,7 +436,7 @@ class StudentLogin extends Component {
                                             <div className="form-group">
                                                 <button
                                                     type="submit"
-                                                    className="btn btn-primary btn-block"
+                                                    className="btn btn-primary btn-block shadow-none"
                                                 >
                                                     {this.state.showLoader ? (
                                                         <Spinner

@@ -152,7 +152,7 @@ const teacherRoutes = (
         />
         <Route
             exact
-            path="/teacher/subject/:subjectId/chapter/:chapterId/:topicName/notes"
+            path="/teacher/subject/:subjectId/chapter/:chapterId/:topicId/notes"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
@@ -164,7 +164,7 @@ const teacherRoutes = (
         />
         <Route
             exact
-            path="/teacher/subject/:subjectId/chapter/:chapterId/:topicName/notes/upload"
+            path="/teacher/subject/:subjectId/chapter/:chapterId/:topicId/notes/upload"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (

@@ -9,6 +9,7 @@ import Loading from "../../sharedComponents/loader";
 import GroupTable from "../../table/groupTable";
 import Paginations from "../../sharedComponents/pagination";
 import dateFormat from "dateformat";
+import AlertBox from "../../sharedComponents/alert";
 
 class GroupModal extends Component {
     constructor() {
@@ -21,6 +22,7 @@ class GroupModal extends Component {
             valid_from: "",
             valid_to: "",
             levelItems: [],
+
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
@@ -52,16 +54,8 @@ class GroupModal extends Component {
                         levelItems: result.data.LEVELS,
                     });
                 } else {
-                    if (result.detail) {
-                        this.setState({
-                            errorMsg: result.detail,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.msg,
-                        });
-                    }
                     this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
                         showErrorAlert: true,
                     });
                 }
@@ -147,7 +141,7 @@ class GroupModal extends Component {
                             showSuccessAlert: false,
                         });
                     }, 3000);
-                    this.props.formSubmission(true);
+                    this.props.formSubmission();
                 } else {
                     this.setState({
                         errorMsg: result.msg,
@@ -352,8 +346,12 @@ class GroupConfiguration extends Component {
             discipline: "",
             valid_from: "",
             valid_to: "",
+
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
             page_loading: true,
-            is_formSubmited: false,
         };
         this.url = baseUrl + hodUrl;
         this.authToken = localStorage.getItem("Authorization");
@@ -383,23 +381,31 @@ class GroupConfiguration extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                this.setState({
-                    groupItem: result.data.results,
-                    totalGroupCount: result.data.count,
-                    category: result.data.category,
-                    sub_category: result.data.sub_category,
-                    discipline: result.data.discipline,
-                    valid_from: dateFormat(
-                        result.data.hod_valid_from,
-                        "yyyy-mm-dd"
-                    ),
-                    valid_to: dateFormat(
-                        result.data.hod_valid_to,
-                        "yyyy-mm-dd"
-                    ),
-                    page_loading: false,
-                });
                 console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        groupItem: result.data.results,
+                        totalGroupCount: result.data.count,
+                        category: result.data.category,
+                        sub_category: result.data.sub_category,
+                        discipline: result.data.discipline,
+                        valid_from: dateFormat(
+                            result.data.hod_valid_from,
+                            "yyyy-mm-dd"
+                        ),
+                        valid_to: dateFormat(
+                            result.data.hod_valid_to,
+                            "yyyy-mm-dd"
+                        ),
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -412,40 +418,22 @@ class GroupConfiguration extends Component {
         this.loadGroupData();
     };
 
-    componentDidUpdate = (prevProps, prevState) => {
-        if (
-            prevState.is_formSubmited !== this.state.is_formSubmited &&
-            this.state.is_formSubmited === true
-        ) {
+    formSubmission = () => {
+        setTimeout(() => {
+            this.setState({
+                showModal: false,
+            });
             this.loadGroupData();
-            this.setState({
-                is_formSubmited: false,
-            });
-        }
-
-        if (prevState.activeGroupPage !== this.state.activeGroupPage) {
-            this.loadGroupData();
-            this.setState({
-                page_loading: true,
-            });
-        }
-    };
-
-    formSubmission = (is_formSubmited) => {
-        if (is_formSubmited) {
-            this.setState({
-                is_formSubmited: true,
-            });
-            setTimeout(() => {
-                this.setState({
-                    showModal: false,
-                });
-            }, 1000);
-        }
+        }, 1000);
     };
 
     handleGroupPageChange(pageNumber) {
-        this.setState({ activeGroupPage: pageNumber });
+        this.setState(
+            { activeGroupPage: pageNumber, page_loading: true },
+            () => {
+                this.loadGroupData();
+            }
+        );
     }
 
     render() {
@@ -453,6 +441,24 @@ class GroupConfiguration extends Component {
             <div className="wrapper">
                 {/* Navbar */}
                 <Header name="Groups" togglenav={this.toggleSideNav} />
+
+                {/* ALert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
+                />
 
                 {/* Sidebar */}
                 <SideNav
@@ -527,7 +533,8 @@ class GroupConfiguration extends Component {
                                 details={true}
                             />
                             <div className="card-body p-3">
-                                {this.state.totalGroupCount > paginationCount ? (
+                                {this.state.totalGroupCount >
+                                paginationCount ? (
                                     <Paginations
                                         activePage={this.state.activeGroupPage}
                                         totalItemsCount={

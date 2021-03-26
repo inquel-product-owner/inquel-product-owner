@@ -11,14 +11,6 @@ class AlertBox extends React.Component {
                 this.props.toggleSuccessAlert();
             }, 3000);
         }
-        // if (
-        //     prevProps.showErrorAlert !== this.props.showErrorAlert &&
-        //     this.props.showErrorAlert === true
-        // ) {
-        //     setTimeout(() => {
-        //         this.props.toggleAlert();
-        //     }, 10000);
-        // }
     };
 
     render() {
@@ -34,7 +26,9 @@ class AlertBox extends React.Component {
                     dismissible
                 >
                     <div className="d-flex justify-content-center align-items-center">
-                        <i className="far fa-times-circle mr-2"></i>
+                        <p className="mb-0">
+                            <i className="far fa-times-circle mr-2"></i>
+                        </p>
                         <p className="mb-0">{this.props.errorMsg}</p>
                     </div>
                 </Alert>
@@ -48,7 +42,9 @@ class AlertBox extends React.Component {
                     dismissible
                 >
                     <div className="d-flex justify-content-center align-items-center">
-                        <i className="far fa-check-circle mr-2"></i>
+                        <p className="mb-0">
+                            <i className="far fa-check-circle mr-2"></i>
+                        </p>
                         <p className="mb-0">{this.props.successMsg}</p>
                     </div>
                 </Alert>

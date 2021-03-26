@@ -10,6 +10,7 @@ import Loading from "../sharedComponents/loader";
 import GroupTable from "../table/groupTable";
 import SubjectTable from "../table/subjectTable";
 import Paginations from "../sharedComponents/pagination";
+import AlertBox from "../sharedComponents/alert";
 
 class TeacherProfile extends Component {
     constructor(props) {
@@ -23,6 +24,11 @@ class TeacherProfile extends Component {
             totalGroupCount: 0,
             activeSubjectPage: 1,
             totalSubjectCount: 0,
+
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
             page_loading: true,
         };
         this.teacherId = this.props.match.params.teacherId;
@@ -48,12 +54,20 @@ class TeacherProfile extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                this.setState({
-                    groupItems: result.data.group_data,
-                    totalGroupCount: result.data.group_data.length,
-                    page_loading: false,
-                });
                 console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        groupItems: result.data.group_data,
+                        totalGroupCount: result.data.group_data.length,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -67,13 +81,21 @@ class TeacherProfile extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                this.setState({
-                    subjectItems: result.data.independent_subject_data,
-                    totalSubjectCount:
-                        result.data.independent_subject_data.length,
-                    page_loading: false,
-                });
                 console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        subjectItems: result.data.independent_subject_data,
+                        totalSubjectCount:
+                            result.data.independent_subject_data.length,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -89,11 +111,19 @@ class TeacherProfile extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                this.setState({
-                    teacherItems: result.data.teacher_profile,
-                    page_loading: false,
-                });
                 console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        teacherItems: result.data.teacher_profile,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -103,28 +133,22 @@ class TeacherProfile extends Component {
         this.loadSubjectData();
     };
 
-    componentDidUpdate = (prevProps, prevState) => {
-        if (prevState.activeGroupPage !== this.state.activeGroupPage) {
-            this.loadGroupData();
-            this.setState({
-                page_loading: true,
-            });
-        }
-
-        if (prevState.activeSubjectPage !== this.state.activeSubjectPage) {
-            this.loadSubjectData();
-            this.setState({
-                page_loading: true,
-            });
-        }
-    };
-
     handleGroupPageChange(pageNumber) {
-        this.setState({ activeGroupPage: pageNumber });
+        this.setState(
+            { activeGroupPage: pageNumber, page_loading: true },
+            () => {
+                this.loadGroupData();
+            }
+        );
     }
 
     handleSubjectPageChange(pageNumber) {
-        this.setState({ activeSubjectPage: pageNumber });
+        this.setState(
+            { activeSubjectPage: pageNumber, page_loading: true },
+            () => {
+                this.loadSubjectData();
+            }
+        );
     }
 
     render() {
@@ -132,6 +156,24 @@ class TeacherProfile extends Component {
             <div className="wrapper">
                 {/* Navbar */}
                 <Header name="Teacher Profile" togglenav={this.toggleSideNav} />
+
+                {/* ALert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
+                />
 
                 {/* Sidebar */}
                 <SideNav
@@ -209,17 +251,11 @@ class TeacherProfile extends Component {
                                             0 ? (
                                                 this.state.teacherItems
                                                     .is_active ? (
-                                                    <Badge
-                                                        variant="success"
-                                                        className="ml-1"
-                                                    >
+                                                    <Badge variant="success">
                                                         Active
                                                     </Badge>
                                                 ) : (
-                                                    <Badge
-                                                        variant="danger"
-                                                        className="ml-1"
-                                                    >
+                                                    <Badge variant="danger">
                                                         Inactive
                                                     </Badge>
                                                 )
@@ -233,31 +269,85 @@ class TeacherProfile extends Component {
                         </div>
                         <div className="row mb-4">
                             <div className="col-md-2 col-6 mb-3 mb-md-0">
-                                <p className="font-weight-bold">Full Name</p>
-                                <p className="mb-0">
-                                    {this.state.teacherItems.full_name}
+                                <p className="font-weight-bold-600 mb-2">
+                                    First Name
+                                </p>
+                                <p className="text-break mb-0">
+                                    {this.state.teacherItems.first_name}
                                 </p>
                             </div>
                             <div className="col-md-2 col-6 mb-3 mb-md-0">
-                                <p className="font-weight-bold">Designation</p>
-                                <p className="mb-0">Science Teacher</p>
+                                <p className="font-weight-bold-600 mb-2">
+                                    Last Name
+                                </p>
+                                <p className="text-break mb-0">
+                                    {this.state.teacherItems.last_name}
+                                </p>
                             </div>
                             <div className="col-md-2 col-6 mb-3 mb-md-0">
-                                <p className="font-weight-bold">Email ID</p>
-                                <p className="mb-0">
+                                <p className="font-weight-bold-600 mb-2">
+                                    Designation
+                                </p>
+                                <p className="text-break mb-0">Science Teacher</p>
+                            </div>
+                            <div className="col-md-2 col-6 mb-3 mb-md-0">
+                                <p className="font-weight-bold-600 mb-2">
+                                    Email ID
+                                </p>
+                                <p className="text-break mb-0">
                                     {this.state.teacherItems.email}
                                 </p>
                             </div>
                             <div className="col-md-2 col-6 mb-3 mb-md-0">
-                                <p className="font-weight-bold">Mobile</p>
-                                <p className="mb-0">
+                                <p className="font-weight-bold-600 mb-2">
+                                    Mobile
+                                </p>
+                                <p className="text-break mb-0">
+                                    {this.state.teacherItems.country_code}
                                     {this.state.teacherItems.phone_num}
                                 </p>
                             </div>
-                            <div className="col-md-2 col-6 mb-3 mb-md-0">
-                                <p className="font-weight-bold">Mobile</p>
-                                <p className="mb-0">
-                                    {this.state.teacherItems.phone_num}
+                        </div>
+
+                        <div className="row mb-5">
+                            <div className="col-md-2 col-sm-4 col-6 mb-3">
+                                <p className="mb-1 font-weight-bold-600 mb-2">
+                                    Address
+                                </p>
+                                <p className="text-break mb-0">
+                                    {this.state.teacherItems.address}
+                                </p>
+                            </div>
+                            <div className="col-md-2 col-sm-4 col-6 mb-3">
+                                <p className="mb-1 font-weight-bold-600 mb-2">
+                                    City
+                                </p>
+                                <p className="text-break mb-0">
+                                    {this.state.teacherItems.city}
+                                </p>
+                            </div>
+                            <div className="col-md-2 col-sm-4 col-6 mb-3">
+                                <p className="mb-1 font-weight-bold-600 mb-2">
+                                    District
+                                </p>
+                                <p className="text-break mb-0">
+                                    {this.state.teacherItems.district}
+                                </p>
+                            </div>
+                            <div className="col-md-2 col-sm-4 col-6 mb-3">
+                                <p className="mb-1 font-weight-bold-600 mb-2">
+                                    State
+                                </p>
+                                <p className="text-break mb-0">
+                                    {this.state.teacherItems.state}
+                                </p>
+                            </div>
+                            <div className="col-md-2 col-sm-4 col-6">
+                                <p className="mb-1 font-weight-bold-600 mb-2">
+                                    Country
+                                </p>
+                                <p className="text-break mb-0">
+                                    {this.state.teacherItems.country}
                                 </p>
                             </div>
                         </div>
@@ -273,7 +363,8 @@ class TeacherProfile extends Component {
                                 view={true}
                             />
                             <div className="card-body p-3">
-                                {this.state.totalGroupCount > paginationCount ? (
+                                {this.state.totalGroupCount >
+                                paginationCount ? (
                                     <Paginations
                                         activePage={this.state.activeGroupPage}
                                         totalItemsCount={
@@ -298,7 +389,8 @@ class TeacherProfile extends Component {
                                 check={false}
                             />
                             <div className="card-body p-3">
-                                {this.state.totalSubjectCount > paginationCount ? (
+                                {this.state.totalSubjectCount >
+                                paginationCount ? (
                                     <Paginations
                                         activePage={
                                             this.state.activeSubjectPage

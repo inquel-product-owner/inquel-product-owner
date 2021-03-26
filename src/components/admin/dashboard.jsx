@@ -1030,36 +1030,34 @@ class Dashboard extends Component {
                                 {/* Filter area */}
                                 <div className="row justify-content-center justify-content-md-end mb-4">
                                     <div className="col-md-4 pr-md-0">
-                                        <form>
-                                            <div className="form-group">
-                                                <input
-                                                    type="search"
-                                                    name="search"
-                                                    id="search"
-                                                    className="form-control mb-md-0 mb-2"
-                                                    placeholder="Search"
-                                                />
-                                            </div>
-                                        </form>
+                                        <div className="form-group">
+                                            <input
+                                                type="search"
+                                                name="search"
+                                                id="search"
+                                                className="form-control mb-md-0 mb-2"
+                                                placeholder="Search"
+                                            />
+                                        </div>
                                     </div>
-                                    <div className="col-md-6 text-md-right text-center">
-                                        <button className="btn btn-primary-invert mr-md-3 mr-1">
+                                    <div className="col-md-5 text-md-right text-center">
+                                        <button className="btn btn-primary-invert btn-sm shadow-none mr-1">
                                             Filter{" "}
                                             <i className="fas fa-filter ml-1"></i>
                                         </button>
                                         <button
-                                            className="btn btn-primary mr-md-3 mr-1"
+                                            className="btn btn-primary btn-sm shadow-none mr-1"
                                             onClick={this.toggleCourseModal}
                                         >
                                             Add
                                         </button>
-                                        <button className="btn btn-primary mr-md-3 mr-1">
+                                        <button className="btn btn-primary btn-sm shadow-none mr-1">
                                             Delete
                                         </button>
-                                        <button className="btn btn-primary mr-md-3 mr-1">
+                                        <button className="btn btn-primary btn-sm shadow-none mr-1">
                                             Enable
                                         </button>
-                                        <button className="btn btn-primary">
+                                        <button className="btn btn-primary btn-sm shadow-none">
                                             Disable
                                         </button>
                                     </div>
@@ -1083,25 +1081,25 @@ class Dashboard extends Component {
                                                 </Tooltip>
                                             }
                                         >
-                                        <label
-                                            className={`btn btn-light ${
-                                                this.state.tableView
-                                                    ? "active"
-                                                    : ""
-                                            }`}
-                                        >
-                                            <input
-                                                type="radio"
-                                                name="options"
-                                                id="tableview"
-                                                onChange={() => {
-                                                    this.setState({
-                                                        tableView: true,
-                                                    });
-                                                }}
-                                            />{" "}
-                                            <i className="fas fa-th-list"></i>
-                                        </label>
+                                            <label
+                                                className={`btn btn-light ${
+                                                    this.state.tableView
+                                                        ? "active"
+                                                        : ""
+                                                }`}
+                                            >
+                                                <input
+                                                    type="radio"
+                                                    name="options"
+                                                    id="tableview"
+                                                    onChange={() => {
+                                                        this.setState({
+                                                            tableView: true,
+                                                        });
+                                                    }}
+                                                />{" "}
+                                                <i className="fas fa-th-list"></i>
+                                            </label>
                                         </OverlayTrigger>
                                         <OverlayTrigger
                                             key="top"
@@ -1115,25 +1113,25 @@ class Dashboard extends Component {
                                                 </Tooltip>
                                             }
                                         >
-                                        <label
-                                            className={`btn btn-light ${
-                                                this.state.tableView
-                                                    ? ""
-                                                    : "active"
-                                            }`}
-                                        >
-                                            <input
-                                                type="radio"
-                                                name="options"
-                                                id="cardview"
-                                                onChange={() => {
-                                                    this.setState({
-                                                        tableView: false,
-                                                    });
-                                                }}
-                                            />{" "}
-                                            <i className="fas fa-th-large"></i>
-                                        </label>
+                                            <label
+                                                className={`btn btn-light ${
+                                                    this.state.tableView
+                                                        ? ""
+                                                        : "active"
+                                                }`}
+                                            >
+                                                <input
+                                                    type="radio"
+                                                    name="options"
+                                                    id="cardview"
+                                                    onChange={() => {
+                                                        this.setState({
+                                                            tableView: false,
+                                                        });
+                                                    }}
+                                                />{" "}
+                                                <i className="fas fa-th-large"></i>
+                                            </label>
                                         </OverlayTrigger>
                                     </div>
                                 </div>

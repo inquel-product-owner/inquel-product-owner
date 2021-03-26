@@ -86,9 +86,6 @@ class GroupTable extends Component {
             itemTemplate: valid_toDate,
         };
         this.toolbarOptions = ["Search"];
-        this.state = {
-            groupId: [],
-        };
     }
 
     rowSelected() {
@@ -98,10 +95,7 @@ class GroupTable extends Component {
             for (let index = 0; index < selectedrecords.length; index++) {
                 element.push(selectedrecords[index].id.toString());
             }
-            console.log(element);
-            this.setState({
-                groupId: element,
-            });
+            this.props.handleGroupId(element);
         }
     }
 
@@ -112,10 +106,7 @@ class GroupTable extends Component {
             for (let index = 0; index < selectedrecords.length; index++) {
                 element.push(selectedrecords[index].id.toString());
             }
-            console.log(element);
-            this.setState({
-                groupId: element,
-            });
+            this.props.handleGroupId(element);
         }
     }
 
