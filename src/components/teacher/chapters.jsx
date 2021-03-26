@@ -16,8 +16,10 @@ import { Link } from "react-router-dom";
 import Loading from "../sharedComponents/loader";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import AlertBox from "../sharedComponents/alert";
-import { DeleteContentModal } from "../sharedComponents/deleteModal";
-import { UpdateContentModal } from "../sharedComponents/updateModal";
+import {
+    ContentDeleteModal,
+    ContentUpdateModal,
+} from "../sharedComponents/contentManagementModal";
 
 class TopicModal extends Component {
     constructor(props) {
@@ -111,7 +113,7 @@ class TopicModal extends Component {
                         showSuccessAlert: true,
                         showLoader: false,
                     });
-                    this.props.formSubmission(true);
+                    this.props.formSubmission();
                 } else {
                     this.setState({
                         errorMsg: result.msg,
@@ -249,7 +251,7 @@ class CycleTestModal extends Component {
                         showSuccessAlert: true,
                         showLoader: false,
                     });
-                    this.props.formSubmission(true);
+                    this.props.formSubmission();
                 } else {
                     this.setState({
                         errorMsg: result.msg,
@@ -379,8 +381,6 @@ class Chapters extends Component {
             showErrorAlert: false,
             showSuccessAlert: false,
             page_loading: true,
-            is_topicFormSubmitted: false,
-            is_cycleTestFormSubmitted: false,
         };
         this.subjectId = this.props.match.params.subjectId;
         this.url = baseUrl + teacherUrl;
@@ -453,6 +453,13 @@ class Chapters extends Component {
                     chapters.topic_id = result.data.topic_id
                         ? result.data.topic_id
                         : "";
+                    store.dispatch({
+                        type: "CHAPTER",
+                        payload:
+                            result.data.chapter_name !== undefined
+                                ? result.data.chapter_name
+                                : "Chapter name",
+                    });
                     this.setState({
                         chapters: chapters,
                         chapterName:
@@ -463,6 +470,12 @@ class Chapters extends Component {
                             result.data.topics_list !== undefined
                                 ? result.data.topics_list
                                 : [],
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
                         page_loading: false,
                     });
                 }
@@ -486,6 +499,12 @@ class Chapters extends Component {
                 if (result.sts === true) {
                     this.setState({
                         cycle_test: result.data,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
                         page_loading: false,
                     });
                 }
@@ -512,11 +531,19 @@ class Chapters extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                this.setState({
-                    chapterList: result.data.results,
-                    is_independent: result.data.is_independent,
-                });
                 console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        chapterList: result.data.results,
+                        is_independent: result.data.is_independent,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -539,58 +566,30 @@ class Chapters extends Component {
                 }
             );
         }
+    };
 
-        if (
-            prevState.is_topicFormSubmitted !==
-                this.state.is_topicFormSubmitted &&
-            this.state.is_topicFormSubmitted === true
-        ) {
+    topic_formSubmission = () => {
+        setTimeout(() => {
+            this.setState({
+                showTopicModal: false,
+                showTopic_EditModal: false,
+                showTopic_DeleteModal: false,
+                page_loading: true,
+            });
             this.loadChapterData();
-            this.setState({
-                is_topicFormSubmitted: false,
-            });
-        }
+        }, 1000);
+    };
 
-        if (
-            prevState.is_cycleTestFormSubmitted !==
-                this.state.is_cycleTestFormSubmitted &&
-            this.state.is_cycleTestFormSubmitted === true
-        ) {
+    cycleTest_formSubmission = () => {
+        setTimeout(() => {
+            this.setState({
+                showCycle_TestModal: false,
+                showCycle_EditModal: false,
+                showCycle_DeleteModal: false,
+                page_loading: true,
+            });
             this.loadCycleTestData();
-            this.setState({
-                is_cycleTestFormSubmitted: false,
-            });
-        }
-    };
-
-    topic_formSubmission = (is_formSubmitted) => {
-        if (is_formSubmitted) {
-            this.setState({
-                is_topicFormSubmitted: true,
-            });
-            setTimeout(() => {
-                this.setState({
-                    showTopicModal: false,
-                    showTopic_EditModal: false,
-                    showTopic_DeleteModal: false,
-                });
-            }, 1000);
-        }
-    };
-
-    cycleTest_formSubmission = (is_formSubmitted) => {
-        if (is_formSubmitted) {
-            this.setState({
-                is_cycleTestFormSubmitted: true,
-            });
-            setTimeout(() => {
-                this.setState({
-                    showCycle_TestModal: false,
-                    showCycle_EditModal: false,
-                    showCycle_DeleteModal: false,
-                });
-            }, 1000);
-        }
+        }, 1000);
     };
 
     handleSelect = (event) => {
@@ -692,7 +691,7 @@ class Chapters extends Component {
                                         to={`${this.props.match.url}/${data.topic_name}/notes/upload`}
                                     >
                                         <button
-                                            className="btn btn-sm btn-primary mr-2"
+                                            className="btn btn-sm btn-primary shadow-none mr-2"
                                             onClick={() =>
                                                 this.dispatchTopic(
                                                     data.topic_name
@@ -703,10 +702,10 @@ class Chapters extends Component {
                                         </button>
                                     </Link>
                                     <Link
-                                        to={`${this.props.match.url}/${data.topic_name}/notes`}
+                                        to={`${this.props.match.url}/${data.topic_num}/notes`}
                                     >
                                         <button
-                                            className="btn btn-sm btn-primary"
+                                            className="btn btn-sm btn-primary shadow-none"
                                             onClick={() =>
                                                 this.dispatchTopic(
                                                     data.topic_name
@@ -722,7 +721,7 @@ class Chapters extends Component {
                                         to={`${this.props.match.url}/${data.topic_name}/match`}
                                     >
                                         <button
-                                            className="btn btn-primary btn-sm"
+                                            className="btn btn-primary btn-sm shadow-none"
                                             onClick={() =>
                                                 this.dispatchTopic(
                                                     data.topic_name
@@ -738,7 +737,7 @@ class Chapters extends Component {
                                         to={`${this.props.match.url}/${data.topic_name}/${data.ancestor}/concepts`}
                                     >
                                         <button
-                                            className="btn btn-primary btn-sm"
+                                            className="btn btn-primary btn-sm shadow-none"
                                             onClick={() =>
                                                 this.dispatchTopic(
                                                     data.topic_name
@@ -754,7 +753,7 @@ class Chapters extends Component {
                                         to={`${this.props.match.url}/${data.topic_name}/${data.ancestor}/type1`}
                                     >
                                         <button
-                                            className="btn btn-primary btn-sm"
+                                            className="btn btn-primary btn-sm shadow-none"
                                             onClick={() =>
                                                 this.dispatchTopic(
                                                     data.topic_name
@@ -770,7 +769,7 @@ class Chapters extends Component {
                                         to={`${this.props.match.url}/${data.topic_name}/type2`}
                                     >
                                         <button
-                                            className="btn btn-primary btn-sm"
+                                            className="btn btn-primary btn-sm shadow-none"
                                             onClick={() =>
                                                 this.dispatchTopic(
                                                     data.topic_name
@@ -928,7 +927,7 @@ class Chapters extends Component {
 
                 {/* Topic edit modal */}
                 {this.state.showTopic_EditModal ? (
-                    <UpdateContentModal
+                    <ContentUpdateModal
                         show={this.state.showTopic_EditModal}
                         onHide={this.toggleTopic_EditModal}
                         formSubmission={this.topic_formSubmission}
@@ -949,7 +948,7 @@ class Chapters extends Component {
 
                 {/* Topic Delete modal */}
                 {this.state.showTopic_DeleteModal ? (
-                    <DeleteContentModal
+                    <ContentDeleteModal
                         show={this.state.showTopic_DeleteModal}
                         onHide={this.toggleTopic_DeleteModal}
                         formSubmission={this.topic_formSubmission}
@@ -983,7 +982,7 @@ class Chapters extends Component {
 
                 {/* Cycle test edit modal */}
                 {this.state.showCycle_EditModal ? (
-                    <UpdateContentModal
+                    <ContentUpdateModal
                         show={this.state.showCycle_EditModal}
                         onHide={this.toggleCycle_EditModal}
                         formSubmission={this.cycleTest_formSubmission}
@@ -1005,7 +1004,7 @@ class Chapters extends Component {
 
                 {/* Cycle test Delete modal */}
                 {this.state.showCycle_DeleteModal ? (
-                    <DeleteContentModal
+                    <ContentDeleteModal
                         show={this.state.showCycle_DeleteModal}
                         onHide={this.toggleCycle_DeleteModal}
                         formSubmission={this.cycleTest_formSubmission}
@@ -1104,7 +1103,7 @@ class Chapters extends Component {
                                             as={Card.Header}
                                             eventKey="0"
                                             className="secondary-bg shadow-sm mb-2 py-3"
-                                            style={{ borderRadius:'8px' }}
+                                            style={{ borderRadius: "8px" }}
                                             onClick={() => {
                                                 this.setState({
                                                     collapsed: !this.state
@@ -1194,7 +1193,7 @@ class Chapters extends Component {
                                                                                           to={`${this.props.match.url}/cycle/${data.cycle_test_id}`}
                                                                                       >
                                                                                           <button
-                                                                                              className="btn btn-primary btn-sm"
+                                                                                              className="btn btn-primary btn-sm shadow-none"
                                                                                               onClick={() =>
                                                                                                   this.dispatchCycle(
                                                                                                       data.cycle_test_name
@@ -1216,7 +1215,7 @@ class Chapters extends Component {
                                                                                               to={`${this.props.match.url}/cycle/${data.cycle_test_id}/direct`}
                                                                                           >
                                                                                               <button
-                                                                                                  className="btn btn-primary btn-sm ml-2"
+                                                                                                  className="btn btn-primary btn-sm shadow-none ml-2"
                                                                                                   onClick={() =>
                                                                                                       this.dispatchCycle(
                                                                                                           data.cycle_test_name
@@ -1237,7 +1236,7 @@ class Chapters extends Component {
                                                                                               to={`${this.props.match.url}/cycle/${data.cycle_test_id}`}
                                                                                           >
                                                                                               <button
-                                                                                                  className="btn btn-primary btn-sm"
+                                                                                                  className="btn btn-primary btn-sm shadow-none"
                                                                                                   onClick={() =>
                                                                                                       this.dispatchCycle(
                                                                                                           data.cycle_test_name
@@ -1256,7 +1255,7 @@ class Chapters extends Component {
                                                                                                   to={`${this.props.match.url}/cycle/${data.cycle_test_id}/direct`}
                                                                                               >
                                                                                                   <button
-                                                                                                      className="btn btn-primary btn-sm ml-2"
+                                                                                                      className="btn btn-primary btn-sm shadow-none ml-2"
                                                                                                       onClick={() =>
                                                                                                           this.dispatchCycle(
                                                                                                               data.cycle_test_name
@@ -1279,7 +1278,7 @@ class Chapters extends Component {
                                                                                       to={`${this.props.match.url}/cycle/${data.cycle_test_id}`}
                                                                                   >
                                                                                       <button
-                                                                                          className="btn btn-primary btn-sm"
+                                                                                          className="btn btn-primary btn-sm shadow-none"
                                                                                           onClick={() =>
                                                                                               this.dispatchCycle(
                                                                                                   data.cycle_test_name
@@ -1301,7 +1300,7 @@ class Chapters extends Component {
                                                                                           to={`${this.props.match.url}/cycle/${data.cycle_test_id}/direct`}
                                                                                       >
                                                                                           <button
-                                                                                              className="btn btn-primary btn-sm ml-2"
+                                                                                              className="btn btn-primary btn-sm shadow-none ml-2"
                                                                                               onClick={() =>
                                                                                                   this.dispatchCycle(
                                                                                                       data.cycle_test_name

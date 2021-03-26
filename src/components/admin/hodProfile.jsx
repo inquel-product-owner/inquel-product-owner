@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import { Badge, Alert, Spinner } from "react-bootstrap";
+import { Badge, Spinner } from "react-bootstrap";
 import profilepic from "../../assets/user-v1.png";
-import watermark from "../../assets/code.jpg";
 import Select from "react-select";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
 import { paginationCount } from "../../shared/globalValues.js";
@@ -13,6 +12,7 @@ import GroupTable from "../table/groupTable";
 import Paginations from "../sharedComponents/pagination";
 import ReactSwitch from "../sharedComponents/switchComponent";
 import dateFormat from "dateformat";
+import AlertBox from "../sharedComponents/alert";
 
 class HodProfile extends Component {
     constructor(props) {
@@ -28,12 +28,14 @@ class HodProfile extends Component {
             subcategory: [],
             discipline: [],
             board: [],
+
             selectedCategory: "",
             selectedSubcategory: "",
             selectedDiscipline: "",
             selectedBoard: "",
             selectedValid_from: "",
             selectedValid_to: "",
+
             progressivescore: false,
             type1: false,
             type2: false,
@@ -46,18 +48,15 @@ class HodProfile extends Component {
             simulationexam: false,
             lockingoftest: false,
             mobileapp: false,
+
             showSideNav: false,
             subcategory_loading: false,
             discipline_loading: false,
-            showDetailsErrorAlert: false,
-            showDetailsSuccessAlert: false,
-            showDetailsLoader: false,
-            errorMsgDetails: "",
-            showConfigErrorAlert: false,
-            showConfigSuccessAlert: false,
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
             showConfigLoader: false,
-            errorMsgConfig: "",
-            is_formSubmited: false,
         };
         this.authToken = localStorage.getItem("Inquel-Auth");
         this.headers = {
@@ -71,8 +70,8 @@ class HodProfile extends Component {
 
     handleConfiguration = () => {
         this.setState({
-            showConfigErrorAlert: false,
-            showConfigSuccessAlert: false,
+            showSuccessAlert: false,
+            showErrorAlert: false,
             showConfigLoader: true,
         });
 
@@ -99,15 +98,23 @@ class HodProfile extends Component {
                 .then((result) => {
                     console.log(result);
                     if (result.sts === true) {
-                        this.setState({
-                            successMsgConfig: result.msg,
-                            showConfigSuccessAlert: true,
-                            showConfigLoader: false,
-                        });
+                        this.setState(
+                            {
+                                successMsg: result.msg,
+                                showSuccessAlert: true,
+                                showConfigLoader: false,
+                                page_loading: true,
+                            },
+                            () => {
+                                this.loadHodData();
+                            }
+                        );
                     } else {
                         this.setState({
-                            errorMsgConfig: result.msg,
-                            showConfigErrorAlert: true,
+                            errorMsg: result.detail
+                                ? result.detail
+                                : result.msg,
+                            showErrorAlert: true,
                             showConfigLoader: false,
                         });
                     }
@@ -117,8 +124,8 @@ class HodProfile extends Component {
                 });
         } else {
             this.setState({
-                errorMsgConfig: "Can't update inactive HOD!",
-                showConfigErrorAlert: true,
+                errorMsg: "Can't update inactive HOD!",
+                showErrorAlert: true,
                 showConfigLoader: false,
             });
         }
@@ -126,9 +133,9 @@ class HodProfile extends Component {
 
     handleDetails = () => {
         this.setState({
-            showDetailsErrorAlert: false,
-            showDetailsSuccessAlert: false,
-            showDetailsLoader: true,
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            page_loading: true,
         });
 
         if (this.state.hodItems.is_active) {
@@ -148,18 +155,23 @@ class HodProfile extends Component {
                 .then((result) => {
                     console.log(result);
                     if (result.sts === true) {
-                        this.setState({
-                            successMsgDetails: result.msg,
-                            showDetailsSuccessAlert: true,
-                            showDetailsLoader: false,
-                            is_formSubmited: true,
-                            page_loading: true,
-                        });
+                        this.setState(
+                            {
+                                successMsg: result.msg,
+                                showSuccessAlert: true,
+                                page_loading: true,
+                            },
+                            () => {
+                                this.loadHodData();
+                            }
+                        );
                     } else {
                         this.setState({
-                            errorMsgDetails: result.msg,
-                            showDetailsErrorAlert: true,
-                            showDetailsLoader: false,
+                            errorMsg: result.detail
+                                ? result.detail
+                                : result.msg,
+                            showErrorAlert: true,
+                            page_loading: false,
                         });
                     }
                 })
@@ -168,9 +180,9 @@ class HodProfile extends Component {
                 });
         } else {
             this.setState({
-                errorMsgDetails: "Can't update inactive HOD!",
-                showDetailsErrorAlert: true,
-                showDetailsLoader: false,
+                errorMsg: "Can't update inactive HOD!",
+                showErrorAlert: true,
+                page_loading: false,
             });
         }
     };
@@ -183,36 +195,46 @@ class HodProfile extends Component {
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
-                this.setState({
-                    hodItems: result.data,
-                    permissions: result.data.permissions[0],
-                    selectedCategory: result.data.permissions[0].category,
-                    selectedSubcategory:
-                        result.data.permissions[0].sub_category,
-                    selectedDiscipline: result.data.permissions[0].discipline,
-                    selectedBoard: result.data.permissions[0].board,
-                    selectedValid_from: dateFormat(
-                        result.data.permissions[0].valid_from,
-                        "yyyy-mm-dd '00:00:00'"
-                    ),
-                    selectedValid_to: dateFormat(
-                        result.data.permissions[0].valid_to,
-                        "yyyy-mm-dd '00:00:00'"
-                    ),
-                    progressivescore: result.data.permissions[0].prog_sco_card,
-                    type1: result.data.permissions[0].type_1_q,
-                    type2: result.data.permissions[0].type_2_q,
-                    directquestion: result.data.permissions[0].direct_q,
-                    quiz: result.data.permissions[0].quiz,
-                    match: result.data.permissions[0].match,
-                    configure: result.data.permissions[0].config_course,
-                    summary: result.data.permissions[0].summary,
-                    simulationexam: result.data.permissions[0].sim_exam,
-                    lockingoftest: result.data.permissions[0].lock_test,
-                    notesdownload: result.data.permissions[0].copy_download,
-                    mobileapp: result.data.permissions[0].android_app,
-                    page_loading: false,
-                });
+                if (result.sts === true) {
+                    this.setState({
+                        hodItems: result.data,
+                        permissions: result.data.permissions[0],
+                        selectedCategory: result.data.permissions[0].category,
+                        selectedSubcategory:
+                            result.data.permissions[0].sub_category,
+                        selectedDiscipline:
+                            result.data.permissions[0].discipline,
+                        selectedBoard: result.data.permissions[0].board,
+                        selectedValid_from: dateFormat(
+                            result.data.permissions[0].valid_from,
+                            "yyyy-mm-dd '00:00:00'"
+                        ),
+                        selectedValid_to: dateFormat(
+                            result.data.permissions[0].valid_to,
+                            "yyyy-mm-dd '00:00:00'"
+                        ),
+                        progressivescore:
+                            result.data.permissions[0].prog_sco_card,
+                        type1: result.data.permissions[0].type_1_q,
+                        type2: result.data.permissions[0].type_2_q,
+                        directquestion: result.data.permissions[0].direct_q,
+                        quiz: result.data.permissions[0].quiz,
+                        match: result.data.permissions[0].match,
+                        configure: result.data.permissions[0].config_course,
+                        summary: result.data.permissions[0].summary,
+                        simulationexam: result.data.permissions[0].sim_exam,
+                        lockingoftest: result.data.permissions[0].lock_test,
+                        notesdownload: result.data.permissions[0].copy_download,
+                        mobileapp: result.data.permissions[0].android_app,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -230,11 +252,19 @@ class HodProfile extends Component {
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
-                this.setState({
-                    group: result.data.results,
-                    totalGroupCount: result.data.count,
-                    page_loading: false,
-                });
+                if (result.sts === true) {
+                    this.setState({
+                        group: result.data.results,
+                        totalGroupCount: result.data.count,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -254,33 +284,22 @@ class HodProfile extends Component {
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
-                this.setState({
-                    category: result.data.CATEGORY,
-                    board: result.data.BOARD,
-                });
+                if (result.sts === true) {
+                    this.setState({
+                        category: result.data.CATEGORY,
+                        board: result.data.BOARD,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
             });
-    };
-
-    componentDidUpdate = (prevProps, prevState) => {
-        if (
-            prevState.is_formSubmited !== this.state.is_formSubmited &&
-            this.state.is_formSubmited === true
-        ) {
-            this.loadHodData();
-            this.setState({
-                is_formSubmited: false,
-            });
-        }
-
-        if (prevState.activeGroupPage !== this.state.activeGroupPage) {
-            this.loadGroupData();
-            this.setState({
-                page_loading: true,
-            });
-        }
     };
 
     handleCategory = (event) => {
@@ -302,10 +321,19 @@ class HodProfile extends Component {
             })
                 .then((res) => res.json())
                 .then((result) => {
-                    this.setState({
-                        subcategory: result.data.sub_category,
-                        subcategory_loading: false,
-                    });
+                    if (result.sts === true) {
+                        this.setState({
+                            subcategory: result.data.sub_category,
+                            subcategory_loading: false,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.detail
+                                ? result.detail
+                                : result.msg,
+                            showErrorAlert: true,
+                        });
+                    }
                     console.log(result);
                 })
                 .catch((err) => {
@@ -335,11 +363,19 @@ class HodProfile extends Component {
                 .then((res) => res.json())
                 .then((result) => {
                     console.log(result);
-                    this.setState({
-                        discipline: result.data.DISCIPLINE,
-                        discipline_loading: false,
-                    });
-                    console.log(result);
+                    if (result.sts === true) {
+                        this.setState({
+                            discipline: result.data.DISCIPLINE,
+                            discipline_loading: false,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.detail
+                                ? result.detail
+                                : result.msg,
+                            showErrorAlert: true,
+                        });
+                    }
                 })
                 .catch((err) => {
                     console.log(err);
@@ -445,7 +481,12 @@ class HodProfile extends Component {
     };
 
     handleGroupPageChange(pageNumber) {
-        this.setState({ activeGroupPage: pageNumber });
+        this.setState(
+            { activeGroupPage: pageNumber, page_loading: true },
+            () => {
+                this.loadGroupData();
+            }
+        );
     }
 
     render() {
@@ -458,6 +499,24 @@ class HodProfile extends Component {
                 <SideNav
                     shownav={this.state.showSideNav}
                     activeLink="profiles"
+                />
+
+                {/* ALert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
                 />
 
                 <div
@@ -543,17 +602,11 @@ class HodProfile extends Component {
                                                         .length !== 0 ? (
                                                         this.state.hodItems
                                                             .is_active ? (
-                                                            <Badge
-                                                                variant="success"
-                                                                className="ml-1"
-                                                            >
+                                                            <Badge variant="success">
                                                                 Active
                                                             </Badge>
                                                         ) : (
-                                                            <Badge
-                                                                variant="danger"
-                                                                className="ml-1"
-                                                            >
+                                                            <Badge variant="danger">
                                                                 Not active
                                                             </Badge>
                                                         )
@@ -573,7 +626,7 @@ class HodProfile extends Component {
                                                         textDecoration: "none",
                                                     }}
                                                 >
-                                                    <button className="btn btn-primary btn-sm btn-block">
+                                                    <button className="btn btn-primary btn-sm btn-block shadow-none">
                                                         My Student Profiles
                                                     </button>
                                                 </Link>
@@ -585,7 +638,7 @@ class HodProfile extends Component {
                                                         textDecoration: "none",
                                                     }}
                                                 >
-                                                    <button className="btn btn-primary btn-sm btn-block">
+                                                    <button className="btn btn-primary btn-sm btn-block shadow-none">
                                                         My Teacher Profiles
                                                     </button>
                                                 </Link>
@@ -595,42 +648,43 @@ class HodProfile extends Component {
                                 </div>
                                 <div className="row mb-4">
                                     <div className="col-md-2 col-sm-4 col-6 mb-4">
-                                        <p className="mb-1 font-weight-bold">
+                                        <p className="mb-1 font-weight-bold-600">
                                             First Name
                                         </p>
-                                        <p className="mb-0">
+                                        <p className="text-break mb-0">
                                             {this.state.hodItems.first_name}
                                         </p>
                                     </div>
                                     <div className="col-md-2 col-sm-4 col-6 mb-4">
-                                        <p className="mb-1 font-weight-bold">
+                                        <p className="mb-1 font-weight-bold-600">
                                             Last Name
                                         </p>
-                                        <p className="mb-0">
+                                        <p className="text-break mb-0">
                                             {this.state.hodItems.last_name}
                                         </p>
                                     </div>
                                     <div className="col-md-2 col-sm-4 col-6 mb-4">
-                                        <p className="mb-1 font-weight-bold">
+                                        <p className="mb-1 font-weight-bold-600">
                                             Email ID
                                         </p>
-                                        <p className="mb-0">
+                                        <p className="text-break mb-0">
                                             {this.state.hodItems.email}
                                         </p>
                                     </div>
                                     <div className="col-md-2 col-sm-4 col-6 mb-4">
-                                        <p className="mb-1 font-weight-bold">
+                                        <p className="mb-1 font-weight-bold-600">
                                             Mobile
                                         </p>
-                                        <p className="mb-0">
+                                        <p className="text-break mb-0">
+                                            {this.state.hodItems.country_code}
                                             {this.state.hodItems.phone_num}
                                         </p>
                                     </div>
                                     <div className="col-md-2 col-sm-4 col-6 mb-4">
-                                        <p className="mb-1 font-weight-bold">
+                                        <p className="mb-1 font-weight-bold-600">
                                             Office Number
                                         </p>
-                                        <p className="mb-0">
+                                        <p className="text-break mb-0">
                                             {
                                                 this.state.hodItems
                                                     .secondary_phone_num
@@ -638,10 +692,10 @@ class HodProfile extends Component {
                                         </p>
                                     </div>
                                     <div className="col-md-2 col-sm-4 col-6 mb-4">
-                                        <p className="mb-1 font-weight-bold">
+                                        <p className="mb-1 font-weight-bold-600">
                                             Institution
                                         </p>
-                                        <p className="mb-0">
+                                        <p className="text-break mb-0">
                                             {
                                                 this.state.permissions
                                                     .institution_name
@@ -650,18 +704,18 @@ class HodProfile extends Component {
                                     </div>
 
                                     <div className="col-md-2 col-sm-4 col-6 mb-4">
-                                        <p className="mb-1 font-weight-bold">
+                                        <p className="mb-1 font-weight-bold-600">
                                             Category
                                         </p>
-                                        <p className="mb-0">
+                                        <p className="text-break mb-0">
                                             {this.state.permissions.category}
                                         </p>
                                     </div>
                                     <div className="col-md-2 col-sm-4 col-6 mb-4">
-                                        <p className="mb-1 font-weight-bold">
+                                        <p className="mb-1 font-weight-bold-600">
                                             Sub category
                                         </p>
-                                        <p className="mb-0">
+                                        <p className="text-break mb-0">
                                             {
                                                 this.state.permissions
                                                     .sub_category
@@ -669,26 +723,26 @@ class HodProfile extends Component {
                                         </p>
                                     </div>
                                     <div className="col-md-2 col-sm-4 col-6 mb-4">
-                                        <p className="mb-1 font-weight-bold">
+                                        <p className="mb-1 font-weight-bold-600">
                                             Discipline
                                         </p>
-                                        <p className="mb-0">
+                                        <p className="text-break mb-0">
                                             {this.state.permissions.discipline}
                                         </p>
                                     </div>
                                     <div className="col-md-2 col-sm-4 col-6 mb-4">
-                                        <p className="mb-1 font-weight-bold">
+                                        <p className="mb-1 font-weight-bold-600">
                                             Board / University
                                         </p>
-                                        <p className="mb-0">
+                                        <p className="text-break mb-0">
                                             {this.state.permissions.board}
                                         </p>
                                     </div>
                                     <div className="col-md-2 col-sm-4 col-6 mb-4">
-                                        <p className="mb-1 font-weight-bold">
+                                        <p className="mb-1 font-weight-bold-600">
                                             Valid From
                                         </p>
-                                        <p className="mb-0">
+                                        <p className="text-break mb-0">
                                             {dateFormat(
                                                 this.state.permissions
                                                     .valid_from,
@@ -697,10 +751,10 @@ class HodProfile extends Component {
                                         </p>
                                     </div>
                                     <div className="col-md-2 col-sm-4 col-6 mb-4">
-                                        <p className="mb-1 font-weight-bold">
+                                        <p className="mb-1 font-weight-bold-600">
                                             Valid To
                                         </p>
-                                        <p className="mb-0">
+                                        <p className="text-break mb-0">
                                             {dateFormat(
                                                 this.state.permissions.valid_to,
                                                 "dd/mm/yyyy"
@@ -709,54 +763,63 @@ class HodProfile extends Component {
                                     </div>
 
                                     <div className="col-md-2 col-sm-4 col-6 mb-4">
-                                        <p className="mb-1 font-weight-bold">
+                                        <p className="mb-1 font-weight-bold-600">
                                             Address
                                         </p>
-                                        <p className="mb-0">XYZ</p>
+                                        <p className="text-break mb-0">{this.state.hodItems.address}</p>
                                     </div>
                                     <div className="col-md-2 col-sm-4 col-6 mb-4">
-                                        <p className="mb-1 font-weight-bold">
+                                        <p className="mb-1 font-weight-bold-600">
                                             City
                                         </p>
-                                        <p className="mb-0">Bangalore</p>
+                                        <p className="text-break mb-0">{this.state.hodItems.city}</p>
                                     </div>
                                     <div className="col-md-2 col-sm-4 col-6 mb-4">
-                                        <p className="mb-1 font-weight-bold">
+                                        <p className="mb-1 font-weight-bold-600">
                                             District
                                         </p>
-                                        <p className="mb-0">Bangalore</p>
+                                        <p className="text-break mb-0">{this.state.hodItems.district}</p>
                                     </div>
                                     <div className="col-md-2 col-sm-4 col-6 mb-4">
-                                        <p className="mb-1 font-weight-bold">
+                                        <p className="mb-1 font-weight-bold-600">
                                             State
                                         </p>
-                                        <p className="mb-0">Karnataka</p>
+                                        <p className="text-break mb-0">{this.state.hodItems.state}</p>
                                     </div>
                                     <div className="col-md-2 col-sm-4 col-6 mb-4">
-                                        <p className="mb-1 font-weight-bold">
+                                        <p className="mb-1 font-weight-bold-600">
                                             Country
                                         </p>
-                                        <p className="mb-0">Karnataka</p>
+                                        <p className="text-break mb-0">{this.state.hodItems.country}</p>
                                     </div>
                                     <div className="col-md-3 col-sm-4 col-6 mb-4">
-                                        <p className="mb-1 font-weight-bold">
+                                        <p className="mb-1 font-weight-bold-600">
                                             Additional Details 1
                                         </p>
-                                        <p className="mb-0">XYZ</p>
+                                        <p className="text-break mb-0">
+                                            {this.state.hodItems
+                                                .additional_details_1}
+                                        </p>
                                     </div>
                                     <div className="col-md-3 col-sm-4 col-6 mb-4">
-                                        <p className="mb-1 font-weight-bold">
+                                        <p className="mb-1 font-weight-bold-600">
                                             Additional Details 2
                                         </p>
-                                        <p className="mb-0">XYZ</p>
+                                        <p className="text-break mb-0">
+                                            {this.state.hodItems
+                                                .additional_details_2}
+                                        </p>
                                     </div>
                                     <div className="col-md-3 col-sm-6 col-6">
-                                        <p className="mb-1 font-weight-bold">
+                                        <p className="mb-1 font-weight-bold-600">
                                             Watermark Image
                                         </p>
                                         <img
-                                            src={watermark}
-                                            alt="Laptop"
+                                            src={
+                                                this.state.hodItems
+                                                    .watermark_image
+                                            }
+                                            alt={this.state.hodItems.full_name}
                                             className="img-fluid"
                                         />
                                     </div>
@@ -774,7 +837,8 @@ class HodProfile extends Component {
                                         check={false}
                                     />
                                     <div className="card-body p-3">
-                                        {this.state.totalGroupCount > paginationCount ? (
+                                        {this.state.totalGroupCount >
+                                        paginationCount ? (
                                             <Paginations
                                                 activePage={
                                                     this.state.activeGroupPage
@@ -856,63 +920,21 @@ class HodProfile extends Component {
                                     <div className="card-header pb-0">
                                         <div className="row align-items-center">
                                             <div className="col-6">
-                                                <h6 className="font-weight-bold">
+                                                <h6 className="font-weight-bold mb-0">
                                                     Details
                                                 </h6>
                                             </div>
                                             <div className="col-6 text-right">
                                                 <button
-                                                    className="btn btn-primary btn-sm"
+                                                    className="btn btn-primary btn-sm shadow-none"
                                                     onClick={this.handleDetails}
                                                 >
-                                                    {this.state
-                                                        .showDetailsLoader ? (
-                                                        <Spinner
-                                                            as="span"
-                                                            animation="border"
-                                                            size="sm"
-                                                            role="status"
-                                                            aria-hidden="true"
-                                                            className="mr-2"
-                                                        />
-                                                    ) : (
-                                                        ""
-                                                    )}
                                                     Save
                                                 </button>
                                             </div>
                                         </div>
                                     </div>
                                     <div className="card-body">
-                                        <Alert
-                                            variant="danger"
-                                            show={
-                                                this.state.showDetailsErrorAlert
-                                            }
-                                            onClose={() => {
-                                                this.setState({
-                                                    showDetailsErrorAlert: false,
-                                                });
-                                            }}
-                                            dismissible
-                                        >
-                                            {this.state.errorMsgDetails}
-                                        </Alert>
-                                        <Alert
-                                            variant="success"
-                                            show={
-                                                this.state
-                                                    .showDetailsSuccessAlert
-                                            }
-                                            onClose={() => {
-                                                this.setState({
-                                                    showDetailsSuccessAlert: false,
-                                                });
-                                            }}
-                                            dismissible
-                                        >
-                                            {this.state.successMsgDetails}
-                                        </Alert>
                                         <div className="form-group">
                                             <label
                                                 htmlFor="category"
@@ -1075,13 +1097,13 @@ class HodProfile extends Component {
                                     <div className="card-header pb-0">
                                         <div className="row align-items-center">
                                             <div className="col-6">
-                                                <h6 className="font-weight-bold">
+                                                <h6 className="font-weight-bold mb-0">
                                                     Configuration
                                                 </h6>
                                             </div>
                                             <div className="col-6 text-right">
                                                 <button
-                                                    className="btn btn-primary btn-sm"
+                                                    className="btn btn-primary btn-sm shadow-none"
                                                     onClick={
                                                         this.handleConfiguration
                                                     }
@@ -1105,37 +1127,6 @@ class HodProfile extends Component {
                                         </div>
                                     </div>
                                     <div className="card-body">
-                                        <Alert
-                                            variant="danger"
-                                            show={
-                                                this.state.showConfigErrorAlert
-                                            }
-                                            className="mb-3"
-                                            onClose={() => {
-                                                this.setState({
-                                                    showConfigErrorAlert: false,
-                                                });
-                                            }}
-                                            dismissible
-                                        >
-                                            {this.state.errorMsgConfig}
-                                        </Alert>
-                                        <Alert
-                                            variant="success"
-                                            show={
-                                                this.state
-                                                    .showConfigSuccessAlert
-                                            }
-                                            className="mb-3"
-                                            onClose={() => {
-                                                this.setState({
-                                                    showConfigSuccessAlert: false,
-                                                });
-                                            }}
-                                            dismissible
-                                        >
-                                            {this.state.successMsgConfig}
-                                        </Alert>
                                         <div className="row mb-2">
                                             <div className="col-9">
                                                 <p className="primary-text small mb-0 font-weight-bold">

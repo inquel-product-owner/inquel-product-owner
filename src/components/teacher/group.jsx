@@ -9,6 +9,7 @@ import Loading from "../sharedComponents/loader";
 import Paginations from "../sharedComponents/pagination";
 import SubjectTable from "../table/subjectTable";
 import CarouselCard from "../sharedComponents/owlCarousel";
+import AlertBox from "../sharedComponents/alert";
 
 const mapStateToProps = (state) => ({
     group_name: state.group_name,
@@ -19,10 +20,14 @@ class Group extends Component {
         super(props);
         this.state = {
             showSideNav: false,
-            subjectModalShow: false,
             groupItem: [],
             activeSubjectPage: 1,
             totalSubjectCount: 0,
+
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
             page_loading: true,
         };
         this.url = baseUrl + teacherUrl;
@@ -40,12 +45,6 @@ class Group extends Component {
         });
     };
 
-    addSubjectModal = () => {
-        this.setState({
-            subjectModalShow: !this.state.subjectModalShow,
-        });
-    };
-
     loadSubjectData = () => {
         fetch(
             `${this.url}/teacher/group/${this.props.match.params.groupId}/?page=${this.state.activeSubjectPage}`,
@@ -57,11 +56,19 @@ class Group extends Component {
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
-                this.setState({
-                    groupItem: result.data.results,
-                    totalSubjectCount: result.data.count,
-                    page_loading: false,
-                });
+                if (result.sts === true) {
+                    this.setState({
+                        groupItem: result.data.results,
+                        totalSubjectCount: result.data.count,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -72,17 +79,13 @@ class Group extends Component {
         this.loadSubjectData();
     };
 
-    componentDidUpdate = (prevProps, prevState) => {
-        if (prevState.activeSubjectPage !== this.state.activeSubjectPage) {
-            this.loadSubjectData();
-            this.setState({
-                page_loading: true,
-            });
-        }
-    };
-
     handleSubjectPageChange(pageNumber) {
-        this.setState({ activeSubjectPage: pageNumber });
+        this.setState(
+            { activeSubjectPage: pageNumber, page_loading: true },
+            () => {
+                this.loadSubjectData();
+            }
+        );
     }
 
     render() {
@@ -93,6 +96,24 @@ class Group extends Component {
                 <Header
                     name={this.props.group_name}
                     togglenav={this.toggleSideNav}
+                />
+
+                {/* ALert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
                 />
 
                 {/* Sidebar */}
@@ -123,7 +144,7 @@ class Group extends Component {
                                 <Link
                                     to={`/teacher/group/${this.props.match.params.groupId}/student`}
                                 >
-                                    <button className="btn btn-primary btn-sm">
+                                    <button className="btn btn-primary btn-sm shadow-none">
                                         Students
                                     </button>
                                 </Link>
@@ -133,18 +154,7 @@ class Group extends Component {
                         {/* Subject list */}
                         <div className="card shadow-sm mb-4">
                             <div className="card-header">
-                                <div className="row align-items-center">
-                                    <div className="col-md-3">
-                                        <h5>Subjects</h5>
-                                    </div>
-                                    <div className="col-md-9 text-right">
-                                        <Link to="">
-                                            <button className="btn btn-primary btn-sm">
-                                                View all
-                                            </button>
-                                        </Link>
-                                    </div>
-                                </div>
+                                <h5 className="mb-0">Subjects</h5>
                             </div>
                             <SubjectTable
                                 subjectItems={this.state.groupItem}
@@ -152,7 +162,8 @@ class Group extends Component {
                                 check={false}
                             />
                             <div className="card-body p-3">
-                                {this.state.totalSubjectCount > paginationCount ? (
+                                {this.state.totalSubjectCount >
+                                paginationCount ? (
                                     <Paginations
                                         activePage={
                                             this.state.activeSubjectPage

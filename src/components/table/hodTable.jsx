@@ -43,7 +43,7 @@ function statusdetails(props) {
 
 function nameTemplate(props) {
     return (
-        <div>
+        <div className="d-flex align-items-center">
             <div className="empimg">
                 <img
                     src={
@@ -62,10 +62,7 @@ function nameTemplate(props) {
 }
 
 function dateTemplate(props) {
-    return dateFormat(
-        props.date_joined,
-        "dd/mm/yyyy"
-    );
+    return dateFormat(props.date_joined, "dd/mm/yyyy");
 }
 
 function viewTemplate(props) {
@@ -105,7 +102,6 @@ class HODTable extends Component {
             itemTemplate: dateTemplate,
         };
         this.toolbarOptions = ["Search"];
-        this.state = { hodId: [] };
     }
 
     showConsole = () => {
@@ -145,10 +141,7 @@ class HODTable extends Component {
             for (let index = 0; index < selectedrecords.length; index++) {
                 element.push(selectedrecords[index].id.toString());
             }
-            console.log(element);
-            this.setState({
-                hodId: element,
-            });
+            this.props.handleHODId(element);
         }
     }
 
@@ -159,10 +152,7 @@ class HODTable extends Component {
             for (let index = 0; index < selectedrecords.length; index++) {
                 element.push(selectedrecords[index].id.toString());
             }
-            console.log(element);
-            this.setState({
-                hodId: element,
-            });
+            this.props.handleHODId(element);
         }
     }
 
@@ -261,9 +251,7 @@ class HODTable extends Component {
                                 width="130"
                             />
                         </ColumnsDirective>
-                        <Inject
-                            services={[Filter, Sort, Toolbar, Resize]}
-                        />
+                        <Inject services={[Filter, Sort, Toolbar, Resize]} />
                     </GridComponent>
                 </div>
                 <style>@import 'src/grid/Grid/style.css';</style>

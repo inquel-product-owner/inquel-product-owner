@@ -5,158 +5,20 @@ import Header from "./navbar";
 import SideNav from "./sidenav";
 import CKeditor from "../sharedComponents/CKeditor";
 import ReactSwitch from "../sharedComponents/switchComponent";
-import { Accordion, Card, Alert, Spinner, Modal } from "react-bootstrap";
+import { Accordion, Card, Spinner } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import ReactCardFlip from "react-card-flip";
 import Loading from "../sharedComponents/loader";
-import AlertModal from "../sharedComponents/alertModal";
+import AlertBox from "../sharedComponents/alert";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import FileModal from "./shared/fileExplorer";
+import { ContentDeleteModal } from "../sharedComponents/contentManagementModal";
 
 const mapStateToProps = (state) => ({
     subject_name: state.subject_name,
     chapter_name: state.chapter_name,
     topic_name: state.topic_name,
 });
-
-class ConceptsDeleteModal extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            errorMsg: "",
-            successMsg: "",
-            showErrorAlert: false,
-            showSuccessAlert: false,
-            showLoader: false,
-        };
-        this.url = baseUrl + teacherUrl;
-        this.authToken = localStorage.getItem("Authorization");
-        this.headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: this.authToken,
-        };
-    }
-
-    handleDelete = () => {
-        this.setState({
-            showSuccessAlert: false,
-            showErrorAlert: false,
-            showLoader: true,
-        });
-
-        fetch(
-            `${this.url}/teacher/subject/${this.props.subjectId}/chapter/concepts/`,
-            {
-                method: "DELETE",
-                headers: this.headers,
-                body: JSON.stringify({
-                    chapter_id: this.props.chapter_id,
-                    topic_name: this.props.topic_name,
-                    concepts_random_id: this.props.values,
-                }),
-            }
-        )
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    this.setState({
-                        successMsg: result.msg,
-                        showSuccessAlert: true,
-                        showLoader: false,
-                    });
-                    this.props.formSubmission(true);
-                } else {
-                    if (result.detail) {
-                        this.setState({
-                            errorMsg: result.detail,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.msg,
-                        });
-                    }
-                    this.setState({
-                        showErrorAlert: true,
-                        showLoader: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    render() {
-        return (
-            <Modal
-                show={this.props.show}
-                onHide={this.props.onHide}
-                size="md"
-                aria-labelledby="contained-modal-title-vcenter"
-                centered
-            >
-                <Modal.Header closeButton>Delete Concept</Modal.Header>
-                <Modal.Body>
-                    <Alert
-                        variant="danger"
-                        show={this.state.showErrorAlert}
-                        onClose={() => {
-                            this.setState({
-                                showErrorAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.errorMsg}
-                    </Alert>
-                    <Alert
-                        variant="success"
-                        show={this.state.showSuccessAlert}
-                        onClose={() => {
-                            this.setState({
-                                showSuccessAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.successMsg}
-                    </Alert>
-                    <p className="mb-0">
-                        Are you sure that you want to delete this concept?
-                    </p>
-                </Modal.Body>
-                <Modal.Footer>
-                    <button
-                        className="btn btn-secondary btn-sm mr-2"
-                        onClick={this.props.toggleModal}
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        className="btn btn-primary btn-sm"
-                        onClick={this.handleDelete}
-                    >
-                        {this.state.showLoader ? (
-                            <Spinner
-                                as="span"
-                                animation="border"
-                                size="sm"
-                                role="status"
-                                aria-hidden="true"
-                                className="mr-2"
-                            />
-                        ) : (
-                            ""
-                        )}
-                        Delete
-                    </button>
-                </Modal.Footer>
-            </Modal>
-        );
-    }
-}
 
 class SubjectConcepts extends Component {
     constructor(props) {
@@ -170,17 +32,7 @@ class SubjectConcepts extends Component {
             showErrorAlert: false,
             showSuccessAlert: false,
             showLoader: false,
-
-            showPublishErrorAlert: false,
-            showPublishSuccessAlert: false,
             showPublishLoader: false,
-
-            showImageErrorAlert: false,
-            showVideoErrorAlert: false,
-            showAudioErrorAlert: false,
-            showImageSuccessAlert: false,
-            showVideoSuccessAlert: false,
-            showAudioSuccessAlert: false,
 
             page_loading: true,
             btnDisabled: false,
@@ -469,17 +321,9 @@ class SubjectConcepts extends Component {
                         });
                     }
                 } else {
-                    if (result.detail) {
-                        this.setState({
-                            alertMsg: result.detail,
-                        });
-                    } else {
-                        this.setState({
-                            alertMsg: result.msg,
-                        });
-                    }
                     this.setState({
-                        showAlertModal: true,
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
                         page_loading: false,
                     });
                 }
@@ -561,16 +405,8 @@ class SubjectConcepts extends Component {
                         isForm_submitted: true,
                     });
                 } else {
-                    if (result.detail) {
-                        this.setState({
-                            errorMsg: result.detail,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.msg,
-                        });
-                    }
                     this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
                         showErrorAlert: true,
                         showLoader: false,
                     });
@@ -619,16 +455,8 @@ class SubjectConcepts extends Component {
                         isForm_submitted: true,
                     });
                 } else {
-                    if (result.detail) {
-                        this.setState({
-                            errorMsg: result.detail,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.msg,
-                        });
-                    }
                     this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
                         showErrorAlert: true,
                         showLoader: false,
                     });
@@ -820,16 +648,10 @@ class SubjectConcepts extends Component {
                         }
                     );
                 } else {
-                    if (result.data.detail) {
-                        this.setState({
-                            errorMsg: result.data.detail,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.data.msg,
-                        });
-                    }
                     this.setState({
+                        errorMsg: result.data.detail
+                            ? result.data.detail
+                            : result.data.msg,
                         showErrorAlert: true,
                         showLoader: false,
                     });
@@ -873,16 +695,10 @@ class SubjectConcepts extends Component {
                         }
                     );
                 } else {
-                    if (result.data.detail) {
-                        this.setState({
-                            errorMsg: result.data.detail,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.data.msg,
-                        });
-                    }
                     this.setState({
+                        errorMsg: result.data.detail
+                            ? result.data.detail
+                            : result.data.msg,
                         showErrorAlert: true,
                         showLoader: false,
                     });
@@ -941,8 +757,8 @@ class SubjectConcepts extends Component {
         const values = [...this.state.concepts];
 
         this.setState({
-            showImageSuccessAlert: false,
-            showImageErrorAlert: false,
+            showSuccessAlert: false,
+            showErrorAlert: false,
         });
 
         if (
@@ -972,7 +788,7 @@ class SubjectConcepts extends Component {
                     if (result.sts === true) {
                         this.setState({
                             successMsg: result.msg,
-                            showImageSuccessAlert: true,
+                            showSuccessAlert: true,
                         });
                         values[this.state.activeConcept].content.images.splice(
                             index,
@@ -1006,7 +822,7 @@ class SubjectConcepts extends Component {
                             errorMsg: result.detail
                                 ? result.detail
                                 : result.msg,
-                            showImageErrorAlert: true,
+                            showErrorAlert: true,
                         });
                     }
                 })
@@ -1041,7 +857,7 @@ class SubjectConcepts extends Component {
 
     handleImageFile = (index, event) => {
         this.setState({
-            showImageErrorAlert: false,
+            showErrorAlert: false,
         });
 
         let values = [...this.state.concepts];
@@ -1049,7 +865,7 @@ class SubjectConcepts extends Component {
         if (!file.match(/\.(jpg|jpeg|png|webp)$/)) {
             this.setState({
                 errorMsg: "Please select valid image file",
-                showImageErrorAlert: true,
+                showErrorAlert: true,
                 btnDisabled: true,
             });
         } else {
@@ -1063,7 +879,7 @@ class SubjectConcepts extends Component {
             this.setState({
                 concepts: values,
                 btnDisabled: false,
-                showImageErrorAlert: false,
+                showErrorAlert: false,
             });
         }
     };
@@ -1096,7 +912,7 @@ class SubjectConcepts extends Component {
 
     handleVideoFile = (event) => {
         this.setState({
-            showVideoErrorAlert: false,
+            showErrorAlert: false,
         });
 
         let values = [...this.state.concepts];
@@ -1104,7 +920,7 @@ class SubjectConcepts extends Component {
         if (!file.match(/\.(mpeg|flv|avi|mov|mp4|mkv)$/)) {
             this.setState({
                 errorMsg: "Please select valid video file",
-                showVideoErrorAlert: true,
+                showErrorAlert: true,
                 btnDisabled: true,
             });
         } else {
@@ -1119,7 +935,7 @@ class SubjectConcepts extends Component {
             this.setState({
                 concepts: values,
                 btnDisabled: false,
-                showVideoErrorAlert: false,
+                showErrorAlert: false,
             });
         }
     };
@@ -1165,7 +981,7 @@ class SubjectConcepts extends Component {
                     if (result.sts === true) {
                         this.setState({
                             successMsg: result.msg,
-                            showVideoSuccessAlert: true,
+                            showSuccessAlert: true,
                         });
                         values[this.state.activeConcept].content.video.title =
                             "";
@@ -1186,7 +1002,7 @@ class SubjectConcepts extends Component {
                             errorMsg: result.detail
                                 ? result.detail
                                 : result.msg,
-                            showVideoErrorAlert: true,
+                            showErrorAlert: true,
                         });
                     }
                 })
@@ -1233,8 +1049,8 @@ class SubjectConcepts extends Component {
         const values = [...this.state.concepts];
 
         this.setState({
-            showAudioSuccessAlert: false,
-            showAudioErrorAlert: false,
+            showSuccessAlert: false,
+            showErrorAlert: false,
         });
 
         if (
@@ -1264,7 +1080,7 @@ class SubjectConcepts extends Component {
                     if (result.sts === true) {
                         this.setState({
                             successMsg: result.msg,
-                            showAudioSuccessAlert: true,
+                            showSuccessAlert: true,
                         });
                         values[this.state.activeConcept].content.audio.splice(
                             index,
@@ -1298,7 +1114,7 @@ class SubjectConcepts extends Component {
                             errorMsg: result.detail
                                 ? result.detail
                                 : result.msg,
-                            showAudioErrorAlert: true,
+                            showErrorAlert: true,
                         });
                     }
                 })
@@ -1333,7 +1149,7 @@ class SubjectConcepts extends Component {
 
     handleAudioFile = (index, event) => {
         this.setState({
-            showAudioErrorAlert: false,
+            showErrorAlert: false,
         });
 
         const values = [...this.state.concepts];
@@ -1341,7 +1157,7 @@ class SubjectConcepts extends Component {
         if (!file.match(/\.(wav|mp3)$/)) {
             this.setState({
                 errorMsg: "Please select valid audio file",
-                showAudioErrorAlert: true,
+                showErrorAlert: true,
                 btnDisabled: true,
             });
         } else {
@@ -1355,7 +1171,7 @@ class SubjectConcepts extends Component {
             this.setState({
                 concepts: values,
                 btnDisabled: false,
-                showAudioErrorAlert: false,
+                showErrorAlert: false,
             });
         }
     };
@@ -1679,97 +1495,95 @@ class SubjectConcepts extends Component {
         });
     };
 
-    handleConcept_Deletion = (isMCQ_Deleted) => {
-        if (isMCQ_Deleted === true) {
-            const values = [...this.state.concepts];
-            const keyboards = [...this.state.keyboards];
-            const flips = [...this.state.flipState];
+    handleConcept_Deletion = () => {
+        const values = [...this.state.concepts];
+        const keyboards = [...this.state.keyboards];
+        const flips = [...this.state.flipState];
 
-            flips.splice(this.state.activeConcept, 1);
-            keyboards.splice(this.state.activeConcept, 1);
-            values.splice(this.state.activeConcept, 1);
+        flips.splice(this.state.activeConcept, 1);
+        keyboards.splice(this.state.activeConcept, 1);
+        values.splice(this.state.activeConcept, 1);
 
-            this.setState(
-                {
-                    concepts: values,
-                    keyboards: keyboards,
-                    flipState: flips,
-                    activeConcept: "",
-                },
-                () => {
-                    if (values.length === 0) {
-                        flips.push(false);
-                        keyboards.push({
-                            all: false,
-                            chemistry: false,
-                            physics: false,
-                            maths: false,
-                        });
-                        values.push({
-                            chapter_id: this.props.match.params.chapterId,
-                            topic_name: this.props.match.params.topicName,
-                            concepts_random_id: "",
-                            is_image_uploaded: false,
-                            content: {
-                                terms: "<p>Terms goes here</p>",
-                                definition: "<p>Definition goes here</p>",
-                                images: [
-                                    {
-                                        title: "",
-                                        file_name: "",
-                                        image: null,
-                                        path: "",
-                                    },
-                                ],
-                                video: {
+        this.setState(
+            {
+                concepts: values,
+                keyboards: keyboards,
+                flipState: flips,
+                activeConcept: "",
+            },
+            () => {
+                if (values.length === 0) {
+                    flips.push(false);
+                    keyboards.push({
+                        all: false,
+                        chemistry: false,
+                        physics: false,
+                        maths: false,
+                    });
+                    values.push({
+                        chapter_id: this.props.match.params.chapterId,
+                        topic_name: this.props.match.params.topicName,
+                        concepts_random_id: "",
+                        is_image_uploaded: false,
+                        content: {
+                            terms: "<p>Terms goes here</p>",
+                            definition: "<p>Definition goes here</p>",
+                            images: [
+                                {
                                     title: "",
                                     file_name: "",
-                                    video: null,
+                                    image: null,
                                     path: "",
-                                    url: "",
                                 },
-                                audio: [
-                                    {
-                                        title: "",
-                                        file_name: "",
-                                        audio: null,
-                                        path: "",
-                                    },
-                                ],
+                            ],
+                            video: {
+                                title: "",
+                                file_name: "",
+                                video: null,
+                                path: "",
+                                url: "",
                             },
-                            settings: {
-                                virtual_keyboard: [],
-                                limited: false,
-                            },
-                        });
-                        this.setState({
-                            concepts: values,
-                            keyboards: keyboards,
-                            flipState: flips,
-                        });
-                    }
+                            audio: [
+                                {
+                                    title: "",
+                                    file_name: "",
+                                    audio: null,
+                                    path: "",
+                                },
+                            ],
+                        },
+                        settings: {
+                            virtual_keyboard: [],
+                            limited: false,
+                        },
+                    });
+                    this.setState({
+                        concepts: values,
+                        keyboards: keyboards,
+                        flipState: flips,
+                    });
+                }
+            }
+        );
+        setTimeout(() => {
+            this.setState(
+                {
+                    showConceptDelete_Modal: false,
+                    page_loading: true,
+                },
+                () => {
+                    this.loadConceptData();
                 }
             );
-            setTimeout(() => {
-                this.setState(
-                    {
-                        showConceptDelete_Modal: false,
-                        page_loading: true,
-                    },
-                    () => {
-                        this.loadConceptData();
-                    }
-                );
-            }, 1000);
-        }
+        }, 1000);
     };
 
     // -------------------------- Publishing the concept --------------------------
 
     handlePublish = () => {
         this.setState({
-            showPublishSuccessAlert: false,
-            showPublishErrorAlert: false,
+            showSuccessAlert: false,
+            showErrorAlert: false,
             showPublishLoader: true,
         });
 
@@ -1802,21 +1616,15 @@ class SubjectConcepts extends Component {
                     if (result.sts === true) {
                         this.setState({
                             successMsg: result.msg,
-                            showPublishSuccessAlert: true,
+                            showSuccessAlert: true,
                             showPublishLoader: false,
                         });
                     } else {
-                        if (result.detail) {
-                            this.setState({
-                                errorMsg: result.detail,
-                            });
-                        } else {
-                            this.setState({
-                                errorMsg: result.msg,
-                            });
-                        }
                         this.setState({
-                            showPublishErrorAlert: true,
+                            errorMsg: result.detail
+                                ? result.detail
+                                : result.msg,
+                            showErrorAlert: true,
                             showPublishLoader: false,
                         });
                     }
@@ -1882,33 +1690,23 @@ class SubjectConcepts extends Component {
                     togglenav={this.toggleSideNav}
                 />
 
-                {/* Alert message */}
-                <Alert
-                    variant="danger"
-                    className="fixed-top"
-                    show={this.state.showPublishErrorAlert}
-                    onClose={() => {
+                {/* ALert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
                         this.setState({
-                            showPublishErrorAlert: false,
+                            showSuccessAlert: false,
                         });
                     }}
-                    dismissible
-                >
-                    {this.state.errorMsg}
-                </Alert>
-                <Alert
-                    variant="success"
-                    className="fixed-top"
-                    show={this.state.showPublishSuccessAlert}
-                    onClose={() => {
+                    toggleErrorAlert={() => {
                         this.setState({
-                            showPublishSuccessAlert: false,
+                            showErrorAlert: false,
                         });
                     }}
-                    dismissible
-                >
-                    {this.state.successMsg}
-                </Alert>
+                />
 
                 {/* Sidebar */}
                 <SideNav
@@ -1918,15 +1716,19 @@ class SubjectConcepts extends Component {
 
                 {/* Concept Deletion Modal */}
                 {this.state.showConceptDelete_Modal ? (
-                    <ConceptsDeleteModal
+                    <ContentDeleteModal
                         show={this.state.showConceptDelete_Modal}
                         onHide={this.closeConcept_DeleteModal}
-                        toggleModal={this.closeConcept_DeleteModal}
                         formSubmission={this.handleConcept_Deletion}
-                        subjectId={this.subjectId}
-                        chapter_id={this.chapterId}
-                        topic_name={this.topicName}
-                        values={this.state.selectedConcept}
+                        url={`${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/`}
+                        type="concept"
+                        name=""
+                        data={{
+                            chapter_id: this.chapterId,
+                            topic_name: this.topicName,
+                            concepts_random_id: this.state.selectedConcept,
+                        }}
+                        toggleModal={this.closeConcept_DeleteModal}
                     />
                 ) : null}
 
@@ -1938,15 +1740,6 @@ class SubjectConcepts extends Component {
                         image={this.state.selectedImage}
                         video={this.state.selectedVideo}
                         audio={this.state.selectedAudio}
-                    />
-                ) : null}
-
-                {/* ALert modal */}
-                {this.state.showAlertModal ? (
-                    <AlertModal
-                        show={this.state.showAlertModal}
-                        msg={this.state.alertMsg}
-                        goBack={this.props.history.goBack}
                     />
                 ) : null}
 
@@ -1984,7 +1777,7 @@ class SubjectConcepts extends Component {
                                     <div className="col-md-6">
                                         <div className="d-flex flex-wrap justify-content-end mb-4">
                                             <button
-                                                className="btn btn-primary btn-sm mr-1"
+                                                className="btn btn-primary btn-sm shadow-none mr-1"
                                                 onClick={this.handlePublish}
                                             >
                                                 {this.state
@@ -2002,10 +1795,10 @@ class SubjectConcepts extends Component {
                                                 )}
                                                 Publish
                                             </button>
-                                            <button className="btn btn-primary btn-sm mr-1">
+                                            <button className="btn btn-primary btn-sm shadow-none mr-1">
                                                 Download template
                                             </button>
-                                            <button className="btn btn-primary btn-sm mr-1">
+                                            <button className="btn btn-primary btn-sm shadow-none">
                                                 Upload template
                                             </button>
                                         </div>
@@ -2202,7 +1995,7 @@ class SubjectConcepts extends Component {
                                 })}
 
                                 <button
-                                    className="btn btn-primary btn-block"
+                                    className="btn btn-primary btn-block shadow-none"
                                     onClick={this.addNewConcept}
                                 >
                                     Add +
@@ -2214,7 +2007,7 @@ class SubjectConcepts extends Component {
                                 <div className="col-md-3 content-edit">
                                     <div className="d-flex justify-content-between align-items-center mb-2">
                                         <button
-                                            className="btn btn-primary btn-sm"
+                                            className="btn btn-primary btn-sm shadow-none"
                                             onClick={this.handleSubmit}
                                             disabled={this.state.btnDisabled}
                                         >
@@ -2233,7 +2026,7 @@ class SubjectConcepts extends Component {
                                             Save
                                         </button>
                                         <button
-                                            className="btn btn-link btn-sm"
+                                            className="btn btn-link btn-sm shadow-none"
                                             onClick={() => {
                                                 this.setState({
                                                     showEdit_option: false,
@@ -2248,33 +2041,6 @@ class SubjectConcepts extends Component {
                                             Close
                                         </button>
                                     </div>
-
-                                    <Alert
-                                        variant="danger"
-                                        show={this.state.showErrorAlert}
-                                        onClose={() => {
-                                            this.setState({
-                                                showErrorAlert: false,
-                                            });
-                                        }}
-                                        className="mb-2"
-                                        dismissible
-                                    >
-                                        {this.state.errorMsg}
-                                    </Alert>
-                                    <Alert
-                                        variant="success"
-                                        show={this.state.showSuccessAlert}
-                                        onClose={() => {
-                                            this.setState({
-                                                showSuccessAlert: false,
-                                            });
-                                        }}
-                                        className="mb-2"
-                                        dismissible
-                                    >
-                                        {this.state.successMsg}
-                                    </Alert>
 
                                     <Accordion defaultActiveKey="">
                                         {/* ---------- Content ---------- */}
@@ -2370,39 +2136,6 @@ class SubjectConcepts extends Component {
                                             <Accordion.Collapse eventKey="1">
                                                 <Card.Body className="p-3">
                                                     {/* ---------- Image ---------- */}
-
-                                                    <Alert
-                                                        variant="danger"
-                                                        show={
-                                                            this.state
-                                                                .showImageErrorAlert
-                                                        }
-                                                        onClose={() => {
-                                                            this.setState({
-                                                                showImageErrorAlert: false,
-                                                            });
-                                                        }}
-                                                        className="mb-2"
-                                                        dismissible
-                                                    >
-                                                        {this.state.errorMsg}
-                                                    </Alert>
-                                                    <Alert
-                                                        variant="success"
-                                                        show={
-                                                            this.state
-                                                                .showImageSuccessAlert
-                                                        }
-                                                        onClose={() => {
-                                                            this.setState({
-                                                                showImageSuccessAlert: false,
-                                                            });
-                                                        }}
-                                                        className="mb-2"
-                                                        dismissible
-                                                    >
-                                                        {this.state.successMsg}
-                                                    </Alert>
 
                                                     <div className="form-group">
                                                         <div className="row align-items-center mb-2">
@@ -2570,39 +2303,6 @@ class SubjectConcepts extends Component {
 
                                                     {/* ---------- Video ---------- */}
 
-                                                    <Alert
-                                                        variant="danger"
-                                                        show={
-                                                            this.state
-                                                                .showVideoErrorAlert
-                                                        }
-                                                        onClose={() => {
-                                                            this.setState({
-                                                                showVideoErrorAlert: false,
-                                                            });
-                                                        }}
-                                                        className="mb-2"
-                                                        dismissible
-                                                    >
-                                                        {this.state.errorMsg}
-                                                    </Alert>
-                                                    <Alert
-                                                        variant="success"
-                                                        show={
-                                                            this.state
-                                                                .showVideoSuccessAlert
-                                                        }
-                                                        onClose={() => {
-                                                            this.setState({
-                                                                showVideoSuccessAlert: false,
-                                                            });
-                                                        }}
-                                                        className="mb-2"
-                                                        dismissible
-                                                    >
-                                                        {this.state.successMsg}
-                                                    </Alert>
-
                                                     <div className="form-group">
                                                         <div className="row align-items-center mb-2">
                                                             <div className="col-md-6">
@@ -2744,39 +2444,6 @@ class SubjectConcepts extends Component {
                                             <Accordion.Collapse eventKey="2">
                                                 <Card.Body className="p-3">
                                                     {/* ---------- Audio ---------- */}
-
-                                                    <Alert
-                                                        variant="danger"
-                                                        show={
-                                                            this.state
-                                                                .showAudioErrorAlert
-                                                        }
-                                                        onClose={() => {
-                                                            this.setState({
-                                                                showAudioErrorAlert: false,
-                                                            });
-                                                        }}
-                                                        className="mb-2"
-                                                        dismissible
-                                                    >
-                                                        {this.state.errorMsg}
-                                                    </Alert>
-                                                    <Alert
-                                                        variant="success"
-                                                        show={
-                                                            this.state
-                                                                .showAudioSuccessAlert
-                                                        }
-                                                        onClose={() => {
-                                                            this.setState({
-                                                                showAudioSuccessAlert: false,
-                                                            });
-                                                        }}
-                                                        className="mb-2"
-                                                        dismissible
-                                                    >
-                                                        {this.state.successMsg}
-                                                    </Alert>
 
                                                     <div className="form-group">
                                                         <div className="text-right mb-2">

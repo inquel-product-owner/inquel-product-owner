@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import Select from "react-select";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
 import Loading from "../sharedComponents/loader";
+import AlertBox from "../sharedComponents/alert";
 
 class MasterData extends Component {
     constructor(props) {
@@ -14,6 +15,7 @@ class MasterData extends Component {
             activeType: "category",
             activeCategory: "",
             activeSubcategory: "",
+
             category: [],
             subcategory: [],
             discipline: [],
@@ -22,6 +24,11 @@ class MasterData extends Component {
             board: [],
             type: [],
             subcategory_loading: false,
+
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
             page_loading: false,
         };
         this.url = baseUrl + adminPathUrl;
@@ -56,13 +63,20 @@ class MasterData extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                this.setState({
-                    category: result.data.CATEGORY,
-                    board: result.data.BOARD,
-                    type: result.data.TYPE,
-                    activeCategory: "",
-                    activeSubcategory: "",
-                });
+                if (result.sts === true) {
+                    this.setState({
+                        category: result.data.CATEGORY,
+                        board: result.data.BOARD,
+                        type: result.data.TYPE,
+                        activeCategory: "",
+                        activeSubcategory: "",
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                    });
+                }
                 console.log(result);
             })
             .catch((err) => {
@@ -86,10 +100,19 @@ class MasterData extends Component {
             })
                 .then((res) => res.json())
                 .then((result) => {
-                    this.setState({
-                        subcategory: result.data.sub_category,
-                        subcategory_loading: false,
-                    });
+                    if (result.sts === true) {
+                        this.setState({
+                            subcategory: result.data.sub_category,
+                            subcategory_loading: false,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.detail
+                                ? result.detail
+                                : result.msg,
+                            showErrorAlert: true,
+                        });
+                    }
                     console.log(result);
                 })
                 .catch((err) => {
@@ -122,12 +145,22 @@ class MasterData extends Component {
             )
                 .then((res) => res.json())
                 .then((result) => {
-                    this.setState({
-                        discipline: result.data.DISCIPLINE,
-                        levels: result.data.LEVELS,
-                        subjects: result.data.SUBJECTS,
-                        page_loading: false,
-                    });
+                    if (result.sts === true) {
+                        this.setState({
+                            discipline: result.data.DISCIPLINE,
+                            levels: result.data.LEVELS,
+                            subjects: result.data.SUBJECTS,
+                            page_loading: false,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.detail
+                                ? result.detail
+                                : result.msg,
+                            showErrorAlert: true,
+                            page_loading: false,
+                        });
+                    }
                     console.log(result);
                 })
                 .catch((err) => {
@@ -147,6 +180,24 @@ class MasterData extends Component {
 
                 {/* Sidebar */}
                 <SideNav shownav={this.state.showSideNav} activeLink="course" />
+
+                {/* ALert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
+                />
 
                 <div
                     className={`section content ${
@@ -180,7 +231,7 @@ class MasterData extends Component {
                             </div>
                             <div className="col-md-6 text-right">
                                 <Link to={`${this.props.match.url}/discounts`}>
-                                    <button className="btn btn-outline-secondary btn-sm">
+                                    <button className="btn btn-outline-secondary btn-sm shadow-none">
                                         Discounts Configuration{" "}
                                         <i className="fas fa-chevron-right fa-sm ml-2"></i>
                                     </button>
@@ -248,7 +299,7 @@ class MasterData extends Component {
                                             />
                                         </div>
 
-                                        <button className="btn btn-light btn-sm btn-block border-secondary mb-2">
+                                        <button className="btn btn-light btn-sm btn-block border-secondary shadow-none mb-2">
                                             Add +
                                         </button>
 
@@ -288,7 +339,7 @@ class MasterData extends Component {
                                             />
                                         </div>
 
-                                        <button className="btn btn-light btn-sm btn-block border-secondary">
+                                        <button className="btn btn-light btn-sm btn-block border-secondary shadow-none">
                                             Add +
                                         </button>
                                     </div>
@@ -329,7 +380,7 @@ class MasterData extends Component {
                                                             Data not available
                                                         </p>
                                                     )}
-                                                    <button className="btn btn-light btn-sm btn-block border-secondary">
+                                                    <button className="btn btn-light btn-sm btn-block border-secondary shadow-none">
                                                         Add +
                                                     </button>
                                                 </div>
@@ -362,7 +413,7 @@ class MasterData extends Component {
                                                             Data not available
                                                         </p>
                                                     )}
-                                                    <button className="btn btn-light btn-sm btn-block border-secondary">
+                                                    <button className="btn btn-light btn-sm btn-block border-secondary shadow-none">
                                                         Add +
                                                     </button>
                                                 </div>
@@ -395,7 +446,7 @@ class MasterData extends Component {
                                                             Data not available
                                                         </p>
                                                     )}
-                                                    <button className="btn btn-light btn-sm btn-block border-secondary">
+                                                    <button className="btn btn-light btn-sm btn-block border-secondary shadow-none">
                                                         Add +
                                                     </button>
                                                 </div>
@@ -440,7 +491,7 @@ class MasterData extends Component {
                                                             Data not available
                                                         </p>
                                                     )}
-                                                    <button className="btn btn-light btn-sm btn-block border-secondary">
+                                                    <button className="btn btn-light btn-sm btn-block border-secondary shadow-none">
                                                         Add +
                                                     </button>
                                                 </div>
@@ -485,7 +536,7 @@ class MasterData extends Component {
                                                             Data not available
                                                         </p>
                                                     )}
-                                                    <button className="btn btn-light btn-sm btn-block border-secondary">
+                                                    <button className="btn btn-light btn-sm btn-block border-secondary shadow-none">
                                                         Add +
                                                     </button>
                                                 </div>

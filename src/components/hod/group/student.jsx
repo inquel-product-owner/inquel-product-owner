@@ -8,6 +8,8 @@ import { paginationCount } from "../../../shared/globalValues.js";
 import Loading from "../../sharedComponents/loader";
 import Paginations from "../../sharedComponents/pagination";
 import StudentTable from "../../table/studentTable";
+import AlertBox from "../../sharedComponents/alert";
+import { UserRemoveModal } from "../../sharedComponents/userManagementModal";
 
 class StudentAssignModal extends Component {
     constructor(props) {
@@ -56,7 +58,7 @@ class StudentAssignModal extends Component {
                         showSuccessAlert: true,
                         showLoader: false,
                     });
-                    this.props.formSubmission(true);
+                    this.props.formSubmission();
                 } else {
                     this.setState({
                         errorMsg: result.msg,
@@ -237,10 +239,17 @@ class GroupStudents extends Component {
         this.state = {
             showSideNav: false,
             showStudentModal: false,
+            showStudent_RemoveModal: false,
             groupItem: [],
             studentItem: [],
+            selectedStudent: [],
             activeStudentPage: 1,
             totalStudentCount: 0,
+
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
             page_loading: true,
         };
         this.groupId = this.props.match.params.groupId;
@@ -275,12 +284,20 @@ class GroupStudents extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                this.setState({
-                    studentItem: result.data.results,
-                    totalStudentCount: result.data.count,
-                    page_loading: false,
-                });
                 console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        studentItem: result.data.results,
+                        totalStudentCount: result.data.count,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -294,10 +311,18 @@ class GroupStudents extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                this.setState({
-                    groupItem: result.data,
-                });
                 console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        groupItem: result.data,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -306,40 +331,48 @@ class GroupStudents extends Component {
         this.loadStudentData();
     };
 
-    componentDidUpdate = (prevProps, prevState) => {
-        if (
-            prevState.is_formSubmited !== this.state.is_formSubmited &&
-            this.state.is_formSubmited === true
-        ) {
-            this.loadStudentData();
-            this.setState({
-                is_formSubmited: false,
-            });
-        }
-
-        if (prevState.activeStudentPage !== this.state.activeStudentPage) {
-            this.loadStudentData();
-            this.setState({
-                page_loading: true,
-            });
-        }
+    handleRemove = () => {
+        this.setState({
+            showStudent_RemoveModal: !this.state.showStudent_RemoveModal,
+        });
     };
 
-    formSubmission = (is_formSubmited) => {
-        if (is_formSubmited) {
-            this.setState({
-                is_formSubmited: true,
-            });
-            setTimeout(() => {
-                this.setState({
-                    showStudentModal: false,
+    // Gets Student ID from the Student table
+    handleStudentId = (data) => {
+        let value = [];
+        const studentItems = this.state.studentItem;
+        for (let i = 0; i < studentItems.length; i++) {
+            if (data.includes(studentItems[i].id.toString())) {
+                value.push({
+                    id: studentItems[i].id.toString(),
+                    username: studentItems[i].username,
                 });
-            }, 1000);
+            } else {
+                continue;
+            }
         }
+        this.setState({
+            selectedStudent: value,
+        });
+    };
+
+    formSubmission = () => {
+        setTimeout(() => {
+            this.setState({
+                showStudentModal: false,
+                showStudent_RemoveModal: false,
+            });
+            this.loadStudentData();
+        }, 1000);
     };
 
     handleStudentPageChange(pageNumber) {
-        this.setState({ activeStudentPage: pageNumber });
+        this.setState(
+            { activeStudentPage: pageNumber, page_loading: true },
+            () => {
+                this.loadStudentData();
+            }
+        );
     }
 
     render() {
@@ -352,19 +385,54 @@ class GroupStudents extends Component {
                     togglenav={this.toggleSideNav}
                 />
 
+                {/* ALert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
+                />
+
                 {/* Sidebar */}
                 <SideNav
                     shownav={this.state.showSideNav}
                     activeLink="dashboard"
                 />
 
-                {/* Add student modal */}
+                {/* Student assign modal */}
                 {this.state.showStudentModal ? (
                     <StudentAssignModal
                         show={this.state.showStudentModal}
                         onHide={this.toggleStudentModal}
                         groupId={this.groupId}
                         formSubmission={this.formSubmission}
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Student Remoing Modal */}
+                {this.state.showStudent_RemoveModal ? (
+                    <UserRemoveModal
+                        show={this.state.showStudent_RemoveModal}
+                        onHide={this.handleRemove}
+                        toggleModal={this.handleRemove}
+                        formSubmission={this.formSubmission}
+                        url={`${this.url}/hod/group/${this.groupId}/student/`}
+                        data={this.state.selectedStudent}
+                        field="student_ids"
+                        type="Student"
+                        token="Authorization"
                     />
                 ) : (
                     ""
@@ -397,7 +465,9 @@ class GroupStudents extends Component {
                                         <li className="breadcrumb-item">
                                             <Link
                                                 to="#"
-                                                onClick={this.props.history.goBack}
+                                                onClick={
+                                                    this.props.history.goBack
+                                                }
                                             >
                                                 Group
                                             </Link>
@@ -411,19 +481,22 @@ class GroupStudents extends Component {
                             <div className="col-md-6">
                                 <div className="d-flex flex-wrap justify-content-end mb-4">
                                     <button
-                                        className="btn btn-primary btn-sm mr-1"
+                                        className="btn btn-primary btn-sm shadow-none mr-1"
                                         onClick={this.toggleStudentModal}
                                     >
                                         Add New
                                     </button>
-                                    <button className="btn btn-primary btn-sm mr-1">
+                                    <button
+                                        className="btn btn-primary btn-sm shadow-none mr-1"
+                                        onClick={this.handleRemove}
+                                    >
                                         Remove
                                     </button>
                                     <Dropdown>
                                         <Dropdown.Toggle
                                             variant="primary"
                                             id="dropdown-basic"
-                                            className="btn-sm"
+                                            className="btn-sm shadow-none"
                                         >
                                             Notify
                                         </Dropdown.Toggle>
@@ -448,9 +521,11 @@ class GroupStudents extends Component {
                                 studentItems={this.state.studentItem}
                                 path={`hod/group/${this.groupId}`}
                                 category={true}
+                                handleStudentId={this.handleStudentId}
                             />
                             <div className="card-body p-3">
-                                {this.state.totalStudentCount > paginationCount ? (
+                                {this.state.totalStudentCount >
+                                paginationCount ? (
                                     <Paginations
                                         activePage={
                                             this.state.activeStudentPage

@@ -10,6 +10,12 @@ import Loading from "../sharedComponents/loader";
 import GroupTable from "../table/groupTable";
 import SubjectTable from "../table/subjectTable";
 import Paginations from "../sharedComponents/pagination";
+import AlertBox from "../sharedComponents/alert";
+import {
+    ContentDisableModal,
+    ContentEnableModal,
+    MultiContentDeleteModal,
+} from "../sharedComponents/contentManagementModal";
 
 class SubjectModal extends Component {
     constructor() {
@@ -54,10 +60,10 @@ class SubjectModal extends Component {
                         showSuccessAlert: true,
                         showLoader: false,
                     });
-                    this.props.formSubmission(true);
+                    this.props.formSubmission();
                 } else {
                     this.setState({
-                        errorMsg: result.msg,
+                        errorMsg: result.detail ? result.detail : result.msg,
                         showErrorAlert: true,
                         showLoader: false,
                     });
@@ -84,62 +90,61 @@ class SubjectModal extends Component {
                 centered
             >
                 <Modal.Header closeButton>Create Subject</Modal.Header>
-                <Modal.Body>
-                    <Alert
-                        variant="danger"
-                        show={this.state.showErrorAlert}
-                        onClose={() => {
-                            this.setState({
-                                showErrorAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.errorMsg}
-                    </Alert>
-                    <Alert
-                        variant="success"
-                        show={this.state.showSuccessAlert}
-                        onClose={() => {
-                            this.setState({
-                                showSuccessAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.successMsg}
-                    </Alert>
-                    <form onSubmit={this.handleSubmit} autoComplete="off">
-                        <div className="form-group">
-                            <label htmlFor="subject">Subject name</label>
-                            <input
-                                type="text"
-                                name="subject"
-                                id="subject"
-                                className="form-control borders"
-                                onChange={this.handleSubject}
-                                required
-                            />
-                        </div>
-                        <div className="form-group">
-                            <button className="btn btn-primary btn-sm btn-block">
-                                {this.state.showLoader ? (
-                                    <Spinner
-                                        as="span"
-                                        animation="border"
-                                        size="sm"
-                                        role="status"
-                                        aria-hidden="true"
-                                        className="mr-2"
-                                    />
-                                ) : (
-                                    ""
-                                )}
-                                Create Subject
-                            </button>
-                        </div>
-                    </form>
-                </Modal.Body>
+                <form onSubmit={this.handleSubmit} autoComplete="off">
+                    <Modal.Body>
+                        <Alert
+                            variant="danger"
+                            show={this.state.showErrorAlert}
+                            onClose={() => {
+                                this.setState({
+                                    showErrorAlert: false,
+                                });
+                            }}
+                            dismissible
+                        >
+                            {this.state.errorMsg}
+                        </Alert>
+                        <Alert
+                            variant="success"
+                            show={this.state.showSuccessAlert}
+                            onClose={() => {
+                                this.setState({
+                                    showSuccessAlert: false,
+                                });
+                            }}
+                            dismissible
+                        >
+                            {this.state.successMsg}
+                        </Alert>
+
+                        <label htmlFor="subject">Subject name</label>
+                        <input
+                            type="text"
+                            name="subject"
+                            id="subject"
+                            className="form-control borders"
+                            onChange={this.handleSubject}
+                            required
+                        />
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <button className="btn btn-primary btn-block shadow-none">
+                            {this.state.showLoader ? (
+                                <Spinner
+                                    as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    aria-hidden="true"
+                                    className="mr-2"
+                                />
+                            ) : (
+                                ""
+                            )}
+                            Create Subject
+                        </button>
+                    </Modal.Footer>
+                </form>
             </Modal>
         );
     }
@@ -151,14 +156,26 @@ class Dashboard extends Component {
         this.state = {
             showSideNav: false,
             subjectModalShow: false,
+            showGroup_DeleteModal: false,
+            showSubject_DeleteModal: false,
+            showSubject_DisableModal: false,
+            showSubject_EnableModal: false,
+
             groupItems: [],
             subjectItems: [],
+            selectedSubject: [],
+            selectedGroup: [],
+
             activeGroupPage: 1,
             totalGroupCount: 0,
             activeSubjectPage: 1,
             totalSubjectCount: 0,
+
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
             page_loading: true,
-            is_formSubmited: false,
         };
         this.url = baseUrl + hodUrl;
         this.authToken = localStorage.getItem("Authorization");
@@ -175,7 +192,7 @@ class Dashboard extends Component {
         });
     };
 
-    addSubjectModal = () => {
+    handleSubjectAdd = () => {
         this.setState({
             subjectModalShow: !this.state.subjectModalShow,
         });
@@ -188,12 +205,20 @@ class Dashboard extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                this.setState({
-                    groupItems: result.data.results,
-                    totalGroupCount: result.data.count,
-                    page_loading: false,
-                });
                 console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        groupItems: result.data.results,
+                        totalGroupCount: result.data.count,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -210,12 +235,20 @@ class Dashboard extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                this.setState({
-                    subjectItems: result.data.results,
-                    totalSubjectCount: result.data.count,
-                    page_loading: false,
-                });
                 console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        subjectItems: result.data.results,
+                        totalSubjectCount: result.data.count,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -229,51 +262,105 @@ class Dashboard extends Component {
         this.loadSubjectData();
     };
 
-    componentDidUpdate = (prevProps, prevState) => {
-        if (
-            prevState.is_formSubmited !== this.state.is_formSubmited &&
-            this.state.is_formSubmited === true
-        ) {
-            this.loadSubjectData();
+    handleDelete = (type) => {
+        if (type === "group") {
             this.setState({
-                is_formSubmited: false,
+                showGroup_DeleteModal: !this.state.showGroup_DeleteModal,
             });
-        }
-
-        if (prevState.activeGroupPage !== this.state.activeGroupPage) {
-            this.loadGroupData();
+        } else if (type === "subject") {
             this.setState({
-                page_loading: true,
-            });
-        }
-
-        if (prevState.activeSubjectPage !== this.state.activeSubjectPage) {
-            this.loadSubjectData();
-            this.setState({
-                page_loading: true,
+                showSubject_DeleteModal: !this.state.showSubject_DeleteModal,
             });
         }
     };
 
-    formSubmission = (is_formSubmited) => {
-        if (is_formSubmited) {
+    handleDisable = () => {
+        this.setState({
+            showSubject_DisableModal: !this.state.showSubject_DisableModal,
+        });
+    };
+
+    handleEnable = () => {
+        this.setState({
+            showSubject_EnableModal: !this.state.showSubject_EnableModal,
+        });
+    };
+
+    groupFormSubmission = () => {
+        setTimeout(() => {
             this.setState({
-                is_formSubmited: true,
+                showGroup_DeleteModal: false,
             });
-            setTimeout(() => {
-                this.setState({
-                    subjectModalShow: false,
+            this.loadGroupData();
+        }, 1000);
+    };
+
+    subjectFormSubmission = () => {
+        setTimeout(() => {
+            this.setState({
+                subjectModalShow: false,
+                showSubject_DeleteModal: false,
+                showSubject_DisableModal: false,
+                showSubject_EnableModal: false,
+            });
+            this.loadSubjectData();
+        }, 1000);
+    };
+
+    // Gets group ID from the group table
+    handleGroupId = (data) => {
+        let value = [];
+        const groupItems = this.state.groupItems;
+        for (let i = 0; i < groupItems.length; i++) {
+            if (data.includes(groupItems[i].id.toString())) {
+                value.push({
+                    id: groupItems[i].id.toString(),
+                    name: groupItems[i].group_name,
                 });
-            }, 1000);
+            } else {
+                continue;
+            }
         }
+        this.setState({
+            selectedGroup: value,
+        });
+    };
+
+    // Gets Subject ID from the Subject table
+    handleSubjectId = (data) => {
+        let value = [];
+        const subjectItems = this.state.subjectItems;
+        for (let i = 0; i < subjectItems.length; i++) {
+            if (data.includes(subjectItems[i].id.toString())) {
+                value.push({
+                    id: subjectItems[i].id.toString(),
+                    name: subjectItems[i].subject_name,
+                });
+            } else {
+                continue;
+            }
+        }
+        this.setState({
+            selectedSubject: value,
+        });
     };
 
     handleGroupPageChange(pageNumber) {
-        this.setState({ activeGroupPage: pageNumber });
+        this.setState(
+            { activeGroupPage: pageNumber, page_loading: true },
+            () => {
+                this.loadGroupData();
+            }
+        );
     }
 
     handleSubjectPageChange(pageNumber) {
-        this.setState({ activeSubjectPage: pageNumber });
+        this.setState(
+            { activeSubjectPage: pageNumber, page_loading: true },
+            () => {
+                this.loadSubjectData();
+            }
+        );
     }
 
     render() {
@@ -282,18 +369,100 @@ class Dashboard extends Component {
                 {/* Navbar */}
                 <Header name="Dashboard" togglenav={this.toggleSideNav} />
 
+                {/* ALert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
+                />
+
                 {/* Sidebar */}
                 <SideNav
                     shownav={this.state.showSideNav}
                     activeLink="dashboard"
                 />
 
-                {/* Add Subject modal */}
+                {/* Group Delete Modal */}
+                {this.state.showGroup_DeleteModal ? (
+                    <MultiContentDeleteModal
+                        show={this.state.showGroup_DeleteModal}
+                        onHide={() => this.handleDelete("group")}
+                        toggleModal={() => this.handleDelete("group")}
+                        formSubmission={this.groupFormSubmission}
+                        url={`${this.url}/hod/groups/`}
+                        data={this.state.selectedGroup}
+                        field="group_ids"
+                        type="Group"
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Subject create modal */}
                 <SubjectModal
                     show={this.state.subjectModalShow}
-                    onHide={this.addSubjectModal}
+                    onHide={this.handleSubjectAdd}
                     formSubmission={this.formSubmission}
                 />
+
+                {/* Subject Delete Modal */}
+                {this.state.showSubject_DeleteModal ? (
+                    <MultiContentDeleteModal
+                        show={this.state.showSubject_DeleteModal}
+                        onHide={() => this.handleDelete("subject")}
+                        toggleModal={() => this.handleDelete("subject")}
+                        formSubmission={this.subjectFormSubmission}
+                        url={`${this.url}/hod/create/subject/`}
+                        data={this.state.selectedSubject}
+                        field="subject_ids"
+                        type="Subject"
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Subject Disable Modal */}
+                {this.state.showSubject_DisableModal ? (
+                    <ContentDisableModal
+                        show={this.state.showSubject_DisableModal}
+                        onHide={this.handleDisable}
+                        toggleModal={this.handleDisable}
+                        formSubmission={this.subjectFormSubmission}
+                        url={`${this.url}/hod/create/subject/`}
+                        data={this.state.selectedSubject}
+                        field="subject_ids"
+                        type="Subject"
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Subject Enable Modal */}
+                {this.state.showSubject_EnableModal ? (
+                    <ContentEnableModal
+                        show={this.state.showSubject_EnableModal}
+                        onHide={this.handleEnable}
+                        toggleModal={this.handleEnable}
+                        formSubmission={this.subjectFormSubmission}
+                        url={`${this.url}/hod/create/subject/`}
+                        data={this.state.selectedSubject}
+                        field="subject_ids"
+                        type="Subject"
+                    />
+                ) : (
+                    ""
+                )}
 
                 <div
                     className={`section content ${
@@ -315,15 +484,20 @@ class Dashboard extends Component {
                             <div className="card-header">
                                 <div className="row align-items-center">
                                     <div className="col-6">
-                                        <h4>Groups</h4>
+                                        <h5>Groups</h5>
                                     </div>
                                     <div className="col-6 text-right">
                                         <Link to="/hod/group">
-                                            <button className="btn btn-primary btn-sm mr-2">
+                                            <button className="btn btn-primary btn-sm shadow-none mr-1">
                                                 Group Configuration
                                             </button>
                                         </Link>
-                                        <button className="btn btn-primary btn-sm">
+                                        <button
+                                            className="btn btn-primary btn-sm shadow-none"
+                                            onClick={() =>
+                                                this.handleDelete("group")
+                                            }
+                                        >
                                             Delete
                                         </button>
                                     </div>
@@ -334,9 +508,11 @@ class Dashboard extends Component {
                                 path="hod"
                                 view={true}
                                 check={true}
+                                handleGroupId={this.handleGroupId}
                             />
                             <div className="card-body p-3">
-                                {this.state.totalGroupCount > paginationCount ? (
+                                {this.state.totalGroupCount >
+                                paginationCount ? (
                                     <Paginations
                                         activePage={this.state.activeGroupPage}
                                         totalItemsCount={
@@ -355,22 +531,33 @@ class Dashboard extends Component {
                             <div className="card-header">
                                 <div className="row align-items-center">
                                     <div className="col-md-3">
-                                        <h4>Subjects</h4>
+                                        <h5>Subjects</h5>
                                     </div>
                                     <div className="col-md-9 text-right">
                                         <button
-                                            className="btn btn-primary btn-sm mr-2"
-                                            onClick={this.addSubjectModal}
+                                            className="btn btn-primary btn-sm shadow-none mr-1"
+                                            onClick={this.handleSubjectAdd}
                                         >
                                             Add new
                                         </button>
-                                        <button className="btn btn-primary btn-sm mr-2">
+                                        <button
+                                            className="btn btn-primary btn-sm shadow-none mr-1"
+                                            onClick={() =>
+                                                this.handleDelete("subject")
+                                            }
+                                        >
                                             Delete
                                         </button>
-                                        <button className="btn btn-primary btn-sm mr-2">
+                                        <button
+                                            className="btn btn-primary btn-sm shadow-none mr-1"
+                                            onClick={this.handleEnable}
+                                        >
                                             Enable
                                         </button>
-                                        <button className="btn btn-primary btn-sm">
+                                        <button
+                                            className="btn btn-primary btn-sm shadow-none"
+                                            onClick={this.handleDisable}
+                                        >
                                             Disable
                                         </button>
                                     </div>
@@ -379,9 +566,11 @@ class Dashboard extends Component {
                             <SubjectTable
                                 subjectItems={this.state.subjectItems}
                                 path="hod"
+                                handleSubjectId={this.handleSubjectId}
                             />
                             <div className="card-body p-3">
-                                {this.state.totalSubjectCount > paginationCount ? (
+                                {this.state.totalSubjectCount >
+                                paginationCount ? (
                                     <Paginations
                                         activePage={
                                             this.state.activeSubjectPage
@@ -402,19 +591,19 @@ class Dashboard extends Component {
                             <div className="card-header">
                                 <div className="row align-items-center">
                                     <div className="col-md-3">
-                                        <h4>Course</h4>
+                                        <h5>Course</h5>
                                     </div>
                                     <div className="col-md-9 text-right">
-                                        <button className="btn btn-primary btn-sm mr-2">
+                                        <button className="btn btn-primary btn-sm shadow-none mr-1">
                                             Add new
                                         </button>
-                                        <button className="btn btn-primary btn-sm mr-2">
+                                        <button className="btn btn-primary btn-sm shadow-none mr-1">
                                             Delete
                                         </button>
-                                        <button className="btn btn-primary btn-sm mr-2">
+                                        <button className="btn btn-primary btn-sm shadow-none mr-1">
                                             Enable
                                         </button>
-                                        <button className="btn btn-primary btn-sm">
+                                        <button className="btn btn-primary btn-sm shadow-none">
                                             Disable
                                         </button>
                                     </div>
