@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import store from "../../redux/store";
 import { connect } from "react-redux";
-import Header from "./navbar";
-import SideNav from "./sidenav";
+import Header from "./shared/navbar";
+import SideNav from "./shared/sidenav";
 import {
     Card,
     Accordion,
@@ -688,7 +688,7 @@ class Chapters extends Component {
                             <div className="row align-items-center">
                                 <div className="col-md-2 mb-2 mb-md-0">
                                     <Link
-                                        to={`${this.props.match.url}/${data.topic_name}/notes/upload`}
+                                        to={`${this.props.match.url}/${data.topic_num}/notes/upload`}
                                     >
                                         <button
                                             className="btn btn-sm btn-primary shadow-none mr-2"
@@ -734,7 +734,7 @@ class Chapters extends Component {
                                 </div>
                                 <div className="col-md-2 mb-2 mb-md-0">
                                     <Link
-                                        to={`${this.props.match.url}/${data.topic_name}/${data.ancestor}/concepts`}
+                                        to={`${this.props.match.url}/${data.topic_num}/concepts`}
                                     >
                                         <button
                                             className="btn btn-primary btn-sm shadow-none"
@@ -750,7 +750,7 @@ class Chapters extends Component {
                                 </div>
                                 <div className="col-md-2 mb-2 mb-md-0">
                                     <Link
-                                        to={`${this.props.match.url}/${data.topic_name}/${data.ancestor}/type1`}
+                                        to={`${this.props.match.url}/${data.topic_num}/type1`}
                                     >
                                         <button
                                             className="btn btn-primary btn-sm shadow-none"

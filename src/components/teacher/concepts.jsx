@@ -1,8 +1,8 @@
 import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 import axios from "axios";
-import Header from "./navbar";
-import SideNav from "./sidenav";
+import Header from "./shared/navbar";
+import SideNav from "./shared/sidenav";
 import CKeditor from "../sharedComponents/CKeditor";
 import ReactSwitch from "../sharedComponents/switchComponent";
 import { Accordion, Card, Spinner } from "react-bootstrap";
@@ -20,7 +20,7 @@ const mapStateToProps = (state) => ({
     topic_name: state.topic_name,
 });
 
-class SubjectConcepts extends Component {
+class Concepts extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -60,7 +60,7 @@ class SubjectConcepts extends Component {
             concepts: [
                 {
                     chapter_id: this.props.match.params.chapterId,
-                    topic_name: this.props.match.params.topicName,
+                    topic_num: this.props.match.params.topicNum,
                     concepts_random_id: "",
                     is_image_uploaded: false,
                     content: {
@@ -91,8 +91,7 @@ class SubjectConcepts extends Component {
         this.audio_limit = 2;
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
-        this.topicName = this.props.match.params.topicName;
-        this.ancestor = this.props.match.params.ancestor;
+        this.topicNum = this.props.match.params.topicNum;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
@@ -119,7 +118,7 @@ class SubjectConcepts extends Component {
 
     loadConceptData = () => {
         fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/?chapter_id=${this.chapterId}&topic_name=${this.topicName}`,
+            `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/?chapter_id=${this.chapterId}&topic_num=${this.topicNum}`,
             {
                 method: "GET",
                 headers: this.headers,
@@ -230,7 +229,7 @@ class SubjectConcepts extends Component {
 
                             data.push({
                                 chapter_id: this.props.match.params.chapterId,
-                                topic_name: this.props.match.params.topicName,
+                                topic_num: this.props.match.params.topicNum,
                                 concepts_random_id:
                                     response[i].concepts_random_id,
                                 is_image_uploaded:
@@ -377,8 +376,7 @@ class SubjectConcepts extends Component {
                 method: "POST",
                 body: JSON.stringify({
                     chapter_id: this.chapterId,
-                    topic_name: this.topicName,
-                    ancestor: this.ancestor,
+                    topic_num: this.topicNum,
                     content: {
                         terms: data[this.state.activeConcept].content.terms,
                         definition:
@@ -425,8 +423,7 @@ class SubjectConcepts extends Component {
                 method: "PUT",
                 body: JSON.stringify({
                     chapter_id: this.chapterId,
-                    topic_name: this.topicName,
-                    ancestor: this.ancestor,
+                    topic_num: this.topicNum,
                     concepts_random_id:
                         data[this.state.activeConcept].concepts_random_id,
                     content: {
@@ -485,7 +482,7 @@ class SubjectConcepts extends Component {
             let form_data = new FormData();
 
             form_data.append("chapter_id", this.chapterId);
-            form_data.append("topic_name", this.topicName);
+            form_data.append("topic_num", this.topicNum);
             form_data.append(
                 "concepts_random_id",
                 conceptValues[this.state.activeConcept].concepts_random_id
@@ -767,7 +764,7 @@ class SubjectConcepts extends Component {
         ) {
             let body = {
                 chapter_id: this.chapterId,
-                topic_name: this.topicName,
+                topic_num: this.topicNum,
                 concepts_random_id:
                     values[this.state.activeConcept].concepts_random_id,
             };
@@ -966,7 +963,7 @@ class SubjectConcepts extends Component {
                     headers: this.headers,
                     body: JSON.stringify({
                         chapter_id: this.chapterId,
-                        topic_name: this.topicName,
+                        topic_num: this.topicNum,
                         concepts_random_id:
                             values[this.state.activeConcept].concepts_random_id,
                         concepts_video_1_title:
@@ -1059,7 +1056,7 @@ class SubjectConcepts extends Component {
         ) {
             let body = {
                 chapter_id: this.chapterId,
-                topic_name: this.topicName,
+                topic_num: this.topicNum,
                 concepts_random_id:
                     values[this.state.activeConcept].concepts_random_id,
             };
@@ -1321,7 +1318,7 @@ class SubjectConcepts extends Component {
         });
         values.push({
             chapter_id: this.props.match.params.chapterId,
-            topic_name: this.props.match.params.topicName,
+            topic_num: this.props.match.params.topicNum,
             concepts_random_id: "",
             is_image_uploaded: false,
             content: {
@@ -1391,7 +1388,7 @@ class SubjectConcepts extends Component {
                         });
                         values.push({
                             chapter_id: this.props.match.params.chapterId,
-                            topic_name: this.props.match.params.topicName,
+                            topic_num: this.props.match.params.topicNum,
                             concepts_random_id: "",
                             is_image_uploaded: false,
                             content: {
@@ -1457,7 +1454,7 @@ class SubjectConcepts extends Component {
         });
         values.splice(index + 1, 0, {
             chapter_id: this.chapterId,
-            topic_name: this.topicName,
+            topic_num: this.topicNum,
             concepts_random_id: "",
             is_image_uploaded: false,
             content: {
@@ -1522,7 +1519,7 @@ class SubjectConcepts extends Component {
                     });
                     values.push({
                         chapter_id: this.props.match.params.chapterId,
-                        topic_name: this.props.match.params.topicName,
+                        topic_num: this.props.match.params.topicNum,
                         concepts_random_id: "",
                         is_image_uploaded: false,
                         content: {
@@ -1606,7 +1603,7 @@ class SubjectConcepts extends Component {
                     body: JSON.stringify({
                         concept_ids: id,
                         chapter_id: this.chapterId,
-                        topic_name: this.topicName,
+                        topic_num: this.topicNum,
                     }),
                 }
             )
@@ -1725,7 +1722,7 @@ class SubjectConcepts extends Component {
                         name=""
                         data={{
                             chapter_id: this.chapterId,
-                            topic_name: this.topicName,
+                            topic_num: this.topicNum,
                             concepts_random_id: this.state.selectedConcept,
                         }}
                         toggleModal={this.closeConcept_DeleteModal}
@@ -2788,4 +2785,4 @@ class SubjectConcepts extends Component {
     }
 }
 
-export default connect(mapStateToProps)(SubjectConcepts);
+export default connect(mapStateToProps)(Concepts);

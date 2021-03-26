@@ -400,7 +400,7 @@ class Dashboard extends Component {
                         onHide={() => this.handleDelete("group")}
                         toggleModal={() => this.handleDelete("group")}
                         formSubmission={this.groupFormSubmission}
-                        url={`${this.url}/hod/groups/`}
+                        url={`${this.url}/hod/create/group/`}
                         data={this.state.selectedGroup}
                         field="group_ids"
                         type="Group"

@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import axios from "axios";
-import Header from "./navbar";
-import SideNav from "./sidenav";
+import Header from "./shared/navbar";
+import SideNav from "./shared/sidenav";
 import Switch from "react-switch";
 import { Spinner } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
@@ -45,7 +45,7 @@ class NotesUpload extends Component {
         };
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
-        this.topicName = this.props.match.params.topicName;
+        this.topicNum = this.props.match.params.topicNum;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
@@ -107,7 +107,7 @@ class NotesUpload extends Component {
         });
 
         fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/notes/?chapter_id=${this.chapterId}&topic_name=${this.topicName}`,
+            `${this.url}/teacher/subject/${this.subjectId}/notes/?chapter_id=${this.chapterId}&topic_num=${this.topicNum}`,
             {
                 method: "GET",
                 headers: this.headers,
@@ -167,7 +167,7 @@ class NotesUpload extends Component {
         let form_data = new FormData();
 
         form_data.append("chapter_id", this.chapterId);
-        form_data.append("topic_name", this.topicName);
+        form_data.append("topic_num", this.topicNum);
         form_data.append("notes_file_1", files.file);
         form_data.append("limited", this.state.limited);
 
@@ -305,7 +305,7 @@ class NotesUpload extends Component {
                         name=""
                         data={{
                             chapter_id: this.chapterId,
-                            topic_name: this.topicName,
+                            topic_num: this.topicNum,
                             notes_id: this.state.notes_id,
                         }}
                         toggleModal={this.toggleModal}

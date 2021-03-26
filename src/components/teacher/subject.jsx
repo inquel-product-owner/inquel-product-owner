@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import store from "../../redux/store";
 import { connect } from "react-redux";
-import Header from "./navbar";
-import SideNav from "./sidenav";
+import Header from "./shared/navbar";
+import SideNav from "./shared/sidenav";
 import { Link } from "react-router-dom";
 import { Modal, Alert, Spinner, Dropdown } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
@@ -525,7 +525,7 @@ const mapStateToProps = (state) => ({
     subject_name: state.subject_name,
 });
 
-class SubjectChapters extends Component {
+class Subject extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -680,7 +680,7 @@ class SubjectChapters extends Component {
 
     componentDidMount = () => {
         document.title = `${this.props.subject_name} - Teacher | IQLabs`;
-
+console.log(store.getState());
         this.loadChapterData();
         this.loadSemesterData();
     };
@@ -1370,4 +1370,4 @@ class SubjectChapters extends Component {
     }
 }
 
-export default connect(mapStateToProps)(SubjectChapters);
+export default connect(mapStateToProps)(Subject);
