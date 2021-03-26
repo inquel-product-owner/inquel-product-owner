@@ -4,11 +4,12 @@ import axios from "axios";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { Link } from "react-router-dom";
-import { Spinner, Alert } from "react-bootstrap";
+import { Spinner } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import { Document, Page, pdfjs } from "react-pdf";
 import Loading from "../sharedComponents/loader";
 import dateFormat from "dateformat";
+import AlertBox from "../sharedComponents/alert";
 
 const mapStateToProps = (state) => ({
     subject_name: state.subject_name,
@@ -107,16 +108,8 @@ class SemesterDirect extends Component {
                         ),
                     });
                 } else {
-                    if (result.detail) {
-                        this.setState({
-                            errorMsg: result.detail,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.msg,
-                        });
-                    }
                     this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
                         showErrorAlert: true,
                         showLoader: false,
                     });
@@ -238,7 +231,7 @@ class SemesterDirect extends Component {
     };
 
     handlePOST = (form_data, options) => {
-        const pdf = this.state.pdf;
+        let pdf = this.state.pdf;
         let extension = "";
 
         if (pdf.file_name !== null) {
@@ -286,32 +279,20 @@ class SemesterDirect extends Component {
                             }
                         );
                     } else if (result.data.sts === false) {
-                        if (result.data.detail) {
-                            this.setState({
-                                errorMsg: result.data.detail,
-                            });
-                        } else {
-                            this.setState({
-                                errorMsg: result.data.msg,
-                            });
-                        }
                         this.setState({
+                            errorMsg: result.data.detail
+                                ? result.data.detail
+                                : result.data.msg,
                             showErrorAlert: true,
                             showLoader: false,
                         });
                     }
                 })
                 .catch((err) => {
-                    if (err.response.data.detail) {
-                        this.setState({
-                            errorMsg: err.response.data.detail,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: err.response.data.msg,
-                        });
-                    }
                     this.setState({
+                        errorMsg: err.response.data.detail
+                            ? err.response.data.detail
+                            : err.response.data.msg,
                         showErrorAlert: true,
                         showLoader: false,
                     });
@@ -363,32 +344,20 @@ class SemesterDirect extends Component {
                                 }
                             );
                         } else if (result.data.sts === false) {
-                            if (result.data.detail) {
-                                this.setState({
-                                    errorMsg: result.data.detail,
-                                });
-                            } else {
-                                this.setState({
-                                    errorMsg: result.data.msg,
-                                });
-                            }
                             this.setState({
+                                errorMsg: result.data.detail
+                                    ? result.data.detail
+                                    : result.data.msg,
                                 showErrorAlert: true,
                                 showLoader: false,
                             });
                         }
                     })
                     .catch((err) => {
-                        if (err.response.data.detail) {
-                            this.setState({
-                                errorMsg: err.response.data.detail,
-                            });
-                        } else {
-                            this.setState({
-                                errorMsg: err.response.data.msg,
-                            });
-                        }
                         this.setState({
+                            errorMsg: err.response.data.detail
+                                ? err.response.data.detail
+                                : err.response.data.msg,
                             showErrorAlert: true,
                             showLoader: false,
                         });
@@ -468,6 +437,24 @@ class SemesterDirect extends Component {
                 <Header
                     name={this.props.subject_name}
                     togglenav={this.toggleSideNav}
+                />
+
+                {/* ALert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
                 />
 
                 {/* Sidebar */}
@@ -559,31 +546,6 @@ class SemesterDirect extends Component {
                             <div className="card-body">
                                 <div className="row justify-content-center">
                                     <div className="col-md-4">
-                                        <Alert
-                                            variant="danger"
-                                            show={this.state.showErrorAlert}
-                                            onClose={() => {
-                                                this.setState({
-                                                    showErrorAlert: false,
-                                                });
-                                            }}
-                                            dismissible
-                                        >
-                                            {this.state.errorMsg}
-                                        </Alert>
-                                        <Alert
-                                            variant="success"
-                                            show={this.state.showSuccessAlert}
-                                            onClose={() => {
-                                                this.setState({
-                                                    showSuccessAlert: false,
-                                                });
-                                            }}
-                                            dismissible
-                                        >
-                                            {this.state.successMsg}
-                                        </Alert>
-
                                         <div className="custom-file">
                                             <input
                                                 type="file"
@@ -614,7 +576,7 @@ class SemesterDirect extends Component {
                                         </small>
 
                                         <button
-                                            className="btn btn-primary btn-block btn-sm"
+                                            className="btn btn-primary btn-block btn-sm shadow-none"
                                             onClick={this.handleSubmit}
                                             disabled={this.state.btnDisabled}
                                         >
@@ -666,7 +628,7 @@ class SemesterDirect extends Component {
                                             {this.state.numPages > 1 ? (
                                                 <>
                                                     <button
-                                                        className="btn btn-primary btn-sm mr-2"
+                                                        className="btn btn-primary btn-sm shadow-none mr-2"
                                                         onClick={
                                                             this.goToPrevPage
                                                         }
@@ -681,7 +643,7 @@ class SemesterDirect extends Component {
                                                         Prev
                                                     </button>
                                                     <button
-                                                        className="btn btn-primary btn-sm"
+                                                        className="btn btn-primary btn-sm shadow-none"
                                                         onClick={
                                                             this.goToNextPage
                                                         }

@@ -6,16 +6,29 @@ import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, hodUrl } from "../../shared/baseUrl";
 import Loading from "../sharedComponents/loader";
+import AlertBox from "../sharedComponents/alert";
 
-class GroupStudentProfile extends Component {
+class StudentProfile extends Component {
     constructor(props) {
         super(props);
         this.state = {
             showSideNav: false,
             studentItems: [],
+
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
             page_loading: true,
         };
         this.studentId = this.props.match.params.studentId;
+        this.url = baseUrl + hodUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
     }
 
     toggleSideNav = () => {
@@ -27,25 +40,25 @@ class GroupStudentProfile extends Component {
     componentDidMount = () => {
         document.title = "Student Profile - HOD | IQLabs";
 
-        var url = baseUrl + hodUrl;
-        var authToken = localStorage.getItem("Authorization");
-        var headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: authToken,
-        };
-
-        fetch(`${url}/hod/student/${this.studentId}/`, {
-            headers: headers,
+        fetch(`${this.url}/hod/student/${this.studentId}/`, {
+            headers: this.headers,
             method: "GET",
         })
             .then((res) => res.json())
             .then((result) => {
-                this.setState({
-                    studentItems: result.data,
-                    page_loading: false,
-                });
                 console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        studentItems: result.data,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -57,6 +70,24 @@ class GroupStudentProfile extends Component {
             <div className="wrapper">
                 {/* Navbar */}
                 <Header name="Student Profile" togglenav={this.toggleSideNav} />
+
+                {/* ALert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
+                />
 
                 {/* Sidebar */}
                 <SideNav
@@ -134,17 +165,11 @@ class GroupStudentProfile extends Component {
                                             0 ? (
                                                 this.state.studentItems
                                                     .is_active ? (
-                                                    <Badge
-                                                        variant="success"
-                                                        className="ml-1"
-                                                    >
+                                                    <Badge variant="success">
                                                         Active
                                                     </Badge>
                                                 ) : (
-                                                    <Badge
-                                                        variant="danger"
-                                                        className="ml-1"
-                                                    >
+                                                    <Badge variant="danger">
                                                         Inactive
                                                     </Badge>
                                                 )
@@ -158,71 +183,95 @@ class GroupStudentProfile extends Component {
                         </div>
                         <div className="row mb-4">
                             <div className="col-md-2 col-sm-4 col-6 mb-3">
-                                <p className="mb-1 font-weight-bold">
+                                <p className="mb-1 font-weight-bold-600">
                                     First Name
                                 </p>
-                                <p className="mb-0">
+                                <p className="text-break mb-0">
                                     {this.state.studentItems.first_name}
                                 </p>
                             </div>
                             <div className="col-md-2 col-sm-4 col-6 mb-3">
-                                <p className="mb-1 font-weight-bold">
+                                <p className="mb-1 font-weight-bold-600">
                                     Last Name
                                 </p>
-                                <p className="mb-0">
+                                <p className="text-break mb-0">
                                     {this.state.studentItems.last_name}
                                 </p>
                             </div>
                             <div className="col-md-2 col-sm-4 col-6 mb-3">
-                                <p className="mb-1 font-weight-bold">
+                                <p className="mb-1 font-weight-bold-600">
                                     Email ID
                                 </p>
-                                <p className="mb-0">
+                                <p className="text-break mb-0">
                                     {this.state.studentItems.email}
                                 </p>
                             </div>
                             <div className="col-md-2 col-sm-4 col-6 mb-3">
-                                <p className="mb-1 font-weight-bold">Mobile</p>
-                                <p className="mb-0">
+                                <p className="mb-1 font-weight-bold-600">
+                                    Mobile
+                                </p>
+                                <p className="text-break mb-0">
+                                    {this.state.studentItems.country_code}
                                     {this.state.studentItems.phone_num}
                                 </p>
                             </div>
                             <div className="col-md-2 col-sm-4 col-6 mb-3">
-                                <p className="mb-1 font-weight-bold">
+                                <p className="mb-1 font-weight-bold-600">
                                     Institution
                                 </p>
-                                <p className="mb-0">XYZ</p>
+                                <p className="text-break mb-0">XYZ</p>
                             </div>
                             <div className="col-md-2 col-sm-4 col-6">
-                                <p className="mb-1 font-weight-bold">
+                                <p className="mb-1 font-weight-bold-600">
                                     Standard
                                 </p>
-                                <p className="mb-0">XYZ</p>
+                                <p className="text-break mb-0">XYZ</p>
                             </div>
                             <div className="col-md-2 col-sm-4 col-6 mb-3">
-                                <p className="mb-1 font-weight-bold">
+                                <p className="mb-1 font-weight-bold-600">
                                     Referral
                                 </p>
-                                <p className="mb-0">XYZ</p>
+                                <p className="text-break mb-0">XYZ</p>
                             </div>
                             <div className="col-md-2 col-sm-4 col-6 mb-3">
-                                <p className="mb-1 font-weight-bold">Address</p>
-                                <p className="mb-1 font-weight-bold">City</p>
-                                <p className="mb-0">Bangalore</p>
+                                <p className="mb-1 font-weight-bold-600">
+                                    Address
+                                </p>
+                                <p className="text-break mb-0">
+                                    {this.state.studentItems.address}
+                                </p>
                             </div>
                             <div className="col-md-2 col-sm-4 col-6 mb-3">
-                                <p className="mb-1 font-weight-bold">
+                                <p className="mb-1 font-weight-bold-600">
+                                    City
+                                </p>
+                                <p className="text-break mb-0">
+                                    {this.state.studentItems.city}
+                                </p>
+                            </div>
+                            <div className="col-md-2 col-sm-4 col-6 mb-3">
+                                <p className="mb-1 font-weight-bold-600">
                                     District
                                 </p>
-                                <p className="mb-0">Bangalore</p>
+                                <p className="text-break mb-0">
+                                    {this.state.studentItems.district}
+                                </p>
                             </div>
                             <div className="col-md-2 col-sm-4 col-6 mb-3">
-                                <p className="mb-1 font-weight-bold">State</p>
-                                <p className="mb-0">Karnataka</p>
+                                <p className="mb-1 font-weight-bold-600">
+                                    State
+                                </p>
+                                <p className="text-break mb-0">
+                                    {this.state.studentItems.state}
+                                </p>
                             </div>
                             <div className="col-md-2 col-sm-4 col-6">
-                                <p className="mb-1 font-weight-bold">Country</p>
-                                <p className="mb-0">India</p>
+                                <p className="mb-1 font-weight-bold-600">
+                                    Country
+                                </p>
+                                <p className="text-break mb-0">
+                                    {this.state.studentItems.country}
+                                </p>
                             </div>
                         </div>
 
@@ -320,4 +369,4 @@ class GroupStudentProfile extends Component {
     }
 }
 
-export default GroupStudentProfile;
+export default StudentProfile;

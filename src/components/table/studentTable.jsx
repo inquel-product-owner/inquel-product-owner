@@ -43,7 +43,7 @@ function statusdetails(props) {
 
 function nameTemplate(props) {
     return (
-        <div>
+        <div className="d-flex align-items-center">
             <div className="empimg">
                 <img
                     src={
@@ -95,9 +95,6 @@ class StudentTable extends Component {
             itemTemplate: dateTemplate,
         };
         this.toolbarOptions = ["Search"];
-        this.state = {
-            studentId: [],
-        };
     }
 
     showConsole = () => {
@@ -131,16 +128,12 @@ class StudentTable extends Component {
 
     rowSelected() {
         if (this.gridInstance) {
-            // const selectedrowindex = this.gridInstance.getSelectedRowIndexes();
             const selectedrecords = this.gridInstance.getSelectedRecords();
             let element = [];
             for (let index = 0; index < selectedrecords.length; index++) {
                 element.push(selectedrecords[index].id.toString());
             }
-            console.log(element);
-            this.setState({
-                studentId: element,
-            });
+            this.props.handleStudentId(element);
         }
     }
 
@@ -151,10 +144,7 @@ class StudentTable extends Component {
             for (let index = 0; index < selectedrecords.length; index++) {
                 element.push(selectedrecords[index].id.toString());
             }
-            console.log(element);
-            this.setState({
-                studentId: element,
-            });
+            this.props.handleStudentId(element);
         }
     }
 
@@ -223,12 +213,6 @@ class StudentTable extends Component {
                                 filter={this.excel}
                                 clipMode="EllipsisWithTooltip"
                             />
-                            <ColumnDirective
-                                field="contact"
-                                headerText="Contact"
-                                filter={this.excel}
-                                clipMode="EllipsisWithTooltip"
-                            ></ColumnDirective>
                             {this.props.category ? (
                                 <ColumnDirective
                                     field="category"

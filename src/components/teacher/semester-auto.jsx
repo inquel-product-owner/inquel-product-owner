@@ -6,6 +6,7 @@ import Select from "react-select";
 import { Modal, Alert, Spinner, Dropdown } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import Loading from "../sharedComponents/loader";
+import AlertBox from "../sharedComponents/alert";
 
 class Scorecard extends Component {
     constructor(props) {
@@ -46,18 +47,9 @@ class Scorecard extends Component {
                         scorecard: result.data,
                     });
                 } else {
-                    if (result.detail) {
-                        this.setState({
-                            errorMsg: result.detail,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.msg,
-                        });
-                    }
                     this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
                         showErrorAlert: true,
-                        showLoader: false,
                     });
                 }
                 this.setState({
@@ -92,18 +84,10 @@ class Scorecard extends Component {
                         this.loadDefault_ScoreCard();
                     }
                 } else {
-                    if (result.detail) {
-                        this.setState({
-                            errorMsg: result.detail,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.msg,
-                        });
-                    }
                     this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
                         showErrorAlert: true,
-                        showLoader: false,
+                        page_loading: false,
                     });
                 }
             })
@@ -167,18 +151,10 @@ class Scorecard extends Component {
                         showSuccessAlert: true,
                         showLoader: false,
                     });
-                    this.props.formSubmission(true);
+                    this.props.formSubmission();
                 } else {
-                    if (result.detail) {
-                        this.setState({
-                            errorMsg: result.detail,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.msg,
-                        });
-                    }
                     this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
                         showErrorAlert: true,
                         showLoader: false,
                     });
@@ -386,7 +362,7 @@ class Scorecard extends Component {
                 </Modal.Body>
                 <Modal.Footer className="text-right">
                     <button
-                        className="btn btn-primary btn-sm"
+                        className="btn btn-primary btn-sm shadow-none"
                         onClick={this.handleSubmit}
                     >
                         {this.state.showLoader ? (
@@ -424,6 +400,7 @@ class SemesterAuto extends Component {
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
+            page_loading: true,
 
             sections: [
                 {
@@ -444,9 +421,6 @@ class SemesterAuto extends Component {
             attempts: [],
             selectedAttempt: "",
             question_type: [],
-
-            page_loading: true,
-            is_formSubmitted: false,
         };
         this.subjectId = this.props.match.params.subjectId;
         this.semesterId = this.props.match.params.semesterId;
@@ -472,14 +446,12 @@ class SemesterAuto extends Component {
         });
     };
 
-    formSubmission = (is_formSubmitted) => {
-        if (is_formSubmitted) {
-            setTimeout(() => {
-                this.setState({
-                    showModal: !this.state.showModal,
-                });
-            }, 1500);
-        }
+    formSubmission = () => {
+        setTimeout(() => {
+            this.setState({
+                showModal: !this.state.showModal,
+            });
+        }, 1000);
     };
 
     // loads attempt and question type data
@@ -526,6 +498,7 @@ class SemesterAuto extends Component {
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
+                if (result.sts === true) {
                 if (
                     result.data.auto_test !== undefined &&
                     result.data.auto_test.length !== 0
@@ -601,6 +574,13 @@ class SemesterAuto extends Component {
                         page_loading: false,
                     });
                 }
+            } else {
+                this.setState({
+                    errorMsg: result.detail ? result.detail : result.msg,
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
+            }
             })
             .catch((err) => {
                 console.log(err);
@@ -668,11 +648,20 @@ class SemesterAuto extends Component {
                 .then((res) => res.json())
                 .then((result) => {
                     console.log(result);
+                    if (result.sts === true) {
                     const filterData = [...this.state.filterData];
                     filterData[index].category = result.data.category;
                     this.setState({
                         filterData: filterData,
                     });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail
+                            ? result.detail
+                            : result.msg,
+                        showErrorAlert: true,
+                    });
+                }
                 })
                 .catch((err) => {
                     console.log(err);
@@ -713,10 +702,19 @@ class SemesterAuto extends Component {
                 .then((res) => res.json())
                 .then((result) => {
                     console.log(result);
+                    if (result.sts === true) {
                     filterData[index].marks = result.data.marks;
                     this.setState({
                         filterData: filterData,
                     });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail
+                            ? result.detail
+                            : result.msg,
+                        showErrorAlert: true,
+                    });
+                }
                 })
                 .catch((err) => {
                     console.log(err);
@@ -741,11 +739,20 @@ class SemesterAuto extends Component {
                 .then((res) => res.json())
                 .then((result) => {
                     console.log(result);
+                    if (result.sts === true) {
                     section[index].total_questions =
                         result.data.total_questions;
                     this.setState({
                         sections: section,
                     });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail
+                            ? result.detail
+                            : result.msg,
+                        showErrorAlert: true,
+                    });
+                }
                 })
                 .catch((err) => {
                     console.log(err);
@@ -876,16 +883,8 @@ class SemesterAuto extends Component {
                         }
                     );
                 } else {
-                    if (result.detail) {
-                        this.setState({
-                            errorMsg: result.detail,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.msg,
-                        });
-                    }
                     this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -922,16 +921,8 @@ class SemesterAuto extends Component {
                         showSuccessAlert: true,
                     });
                 } else {
-                    if (result.detail) {
-                        this.setState({
-                            errorMsg: result.detail,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.msg,
-                        });
-                    }
                     this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -969,16 +960,8 @@ class SemesterAuto extends Component {
                         }
                     );
                 } else {
-                    if (result.detail) {
-                        this.setState({
-                            errorMsg: result.detail,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.msg,
-                        });
-                    }
                     this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -1143,6 +1126,24 @@ class SemesterAuto extends Component {
                     togglenav={this.toggleSideNav}
                 />
 
+                {/* ALert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
+                />
+
                 {/* Sidebar */}
                 <SideNav
                     shownav={this.state.showSideNav}
@@ -1195,7 +1196,7 @@ class SemesterAuto extends Component {
                                             className="form-control form-shadow"
                                             placeholder="Enter duration (In minutes)"
                                             onChange={this.handleDuration}
-                                            value={this.state.duration}
+                                            value={this.state.duration ||''}
                                             autoComplete="off"
                                             min="1"
                                             max="360"
@@ -1233,38 +1234,13 @@ class SemesterAuto extends Component {
                             </div>
                             <div className="col-md-4 text-right">
                                 <button
-                                    className="btn btn-primary btn-sm"
+                                    className="btn btn-primary btn-sm shadow-none"
                                     onClick={this.toggleModal}
                                 >
                                     Score Configuration
                                 </button>
                             </div>
                         </div>
-
-                        <Alert
-                            variant="danger"
-                            show={this.state.showErrorAlert}
-                            onClose={() => {
-                                this.setState({
-                                    showErrorAlert: false,
-                                });
-                            }}
-                            dismissible
-                        >
-                            {this.state.errorMsg}
-                        </Alert>
-                        <Alert
-                            variant="success"
-                            show={this.state.showSuccessAlert}
-                            onClose={() => {
-                                this.setState({
-                                    showSuccessAlert: false,
-                                });
-                            }}
-                            dismissible
-                        >
-                            {this.state.successMsg}
-                        </Alert>
 
                         <div className="card shadow-sm">
                             <div className="table-responsive">
@@ -1652,7 +1628,7 @@ class SemesterAuto extends Component {
 
                             <div className="card-body">
                                 <button
-                                    className="btn btn-light btn-block shadow-sm"
+                                    className="btn btn-light btn-block shadow-sm shadow-none"
                                     onClick={this.addSection}
                                 >
                                     Add Section +

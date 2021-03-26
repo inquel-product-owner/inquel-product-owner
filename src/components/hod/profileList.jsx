@@ -9,6 +9,12 @@ import Loading from "../sharedComponents/loader";
 import TeacherTable from "../table/teacherTable";
 import StudentTable from "../table/studentTable";
 import Paginations from "../sharedComponents/pagination";
+import AlertBox from "../sharedComponents/alert";
+import {
+    UserDeleteModal,
+    UserDisableModal,
+    UserEnableModal,
+} from "../sharedComponents/userManagementModal";
 
 // Student add modal
 class AddStudentModal extends Component {
@@ -214,7 +220,7 @@ class AddStudentModal extends Component {
                     <Modal.Footer>
                         <button
                             type="submit"
-                            className="btn btn-primary btn-block"
+                            className="btn btn-primary btn-block shadow-none"
                         >
                             {this.state.showLoader ? (
                                 <Spinner
@@ -437,7 +443,7 @@ class AddTeacherModal extends Component {
                     <Modal.Footer>
                         <button
                             type="submit"
-                            className="btn btn-primary btn-block"
+                            className="btn btn-primary btn-block shadow-none"
                         >
                             {this.state.showLoader ? (
                                 <Spinner
@@ -599,13 +605,13 @@ class TeacherDeleteModal extends Component {
                 </Modal.Body>
                 <Modal.Footer>
                     <button
-                        className="btn btn-secondary btn-sm mr-2"
+                        className="btn btn-link btn-sm shadow-none mr-2"
                         onClick={this.props.toggleModal}
                     >
                         Cancel
                     </button>
                     <button
-                        className="btn btn-primary btn-sm"
+                        className="btn btn-primary btn-sm shadow-none"
                         onClick={this.handleDelete}
                     >
                         {this.state.showLoader ? (
@@ -637,25 +643,27 @@ class ProfileList extends Component {
             activeStudentPage: 1,
             totalStudentCount: 0,
             showSideNav: false,
-            errorMsg: "",
-            successMsg: "",
-            showErrorAlert: false,
-            showSuccessAlert: false,
 
             activeTab: "teacher",
-            showStudentModal: false,
             showTeacherModal: false,
-            showStudent_DeleteModal: false,
+            showStudentModal: false,
             showTeacher_DeleteModal: false,
+            showStudent_DeleteModal: false,
+            showTeacher_DisableModal: false,
+            showStudent_DisableModal: false,
+            showTeacher_EnableModal: false,
+            showStudent_EnableModal: false,
 
             teacherItems: [],
             studentItems: [],
             selectedTeacher: [],
             selectedStudent: [],
 
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
             page_loading: true,
-            is_teacherFormSubmited: false,
-            is_studentFormSubmited: false,
         };
         this.url = baseUrl + hodUrl;
         this.authToken = localStorage.getItem("Authorization");
@@ -687,12 +695,20 @@ class ProfileList extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                this.setState({
-                    teacherItems: result.data.results,
-                    totalTeacherCount: result.data.count,
-                    page_loading: false,
-                });
                 console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        teacherItems: result.data.results,
+                        totalTeacherCount: result.data.count,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -709,12 +725,20 @@ class ProfileList extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                this.setState({
-                    studentItems: result.data.results,
-                    totalStudentCount: result.data.count,
-                    page_loading: false,
-                });
                 console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        studentItems: result.data.results,
+                        totalStudentCount: result.data.count,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -732,45 +756,7 @@ class ProfileList extends Component {
         this.loadStudentData();
     };
 
-    componentDidUpdate = (prevProps, prevState) => {
-        if (
-            prevState.is_teacherFormSubmited !==
-                this.state.is_teacherFormSubmited &&
-            this.state.is_teacherFormSubmited === true
-        ) {
-            this.loadTeacherData();
-            this.setState({
-                is_teacherFormSubmited: false,
-            });
-        }
-
-        if (
-            prevState.is_studentFormSubmited !==
-                this.state.is_studentFormSubmited &&
-            this.state.is_studentFormSubmited === true
-        ) {
-            this.loadStudentData();
-            this.setState({
-                is_studentFormSubmited: false,
-            });
-        }
-
-        if (prevState.activeTeacherPage !== this.state.activeTeacherPage) {
-            this.loadTeacherData();
-            this.setState({
-                page_loading: true,
-            });
-        }
-
-        if (prevState.activeStudentPage !== this.state.activeStudentPage) {
-            this.loadStudentData();
-            this.setState({
-                page_loading: true,
-            });
-        }
-    };
-
-    handleProfileAdding = () => {
+    handleAdd = () => {
         if (this.state.activeTab === "teacher") {
             this.setState({
                 showTeacherModal: !this.state.showTeacherModal,
@@ -782,32 +768,64 @@ class ProfileList extends Component {
         }
     };
 
-    teacherFormSubmission = (is_teacherFormSubmited) => {
-        if (is_teacherFormSubmited) {
+    handleDelete = () => {
+        if (this.state.activeTab === "teacher") {
             this.setState({
-                is_teacherFormSubmited: true,
+                showTeacher_DeleteModal: !this.state.showTeacher_DeleteModal,
             });
-            setTimeout(() => {
-                this.setState({
-                    showTeacherModal: false,
-                    showTeacher_DeleteModal: false,
-                });
-            }, 2000);
+        } else if (this.state.activeTab === "student") {
+            this.setState({
+                showStudent_DeleteModal: !this.state.showStudent_DeleteModal,
+            });
         }
     };
 
-    studentFormSubmission = (is_studentFormSubmited) => {
-        if (is_studentFormSubmited) {
+    handleDisable = () => {
+        if (this.state.activeTab === "teacher") {
             this.setState({
-                is_studentFormSubmited: true,
+                showTeacher_DisableModal: !this.state.showTeacher_DisableModal,
             });
-            setTimeout(() => {
-                this.setState({
-                    showStudentModal: false,
-                    showStudent_DeleteModal: false,
-                });
-            }, 1000);
+        } else if (this.state.activeTab === "student") {
+            this.setState({
+                showStudent_DisableModal: !this.state.showStudent_DisableModal,
+            });
         }
+    };
+
+    handleEnable = () => {
+        if (this.state.activeTab === "teacher") {
+            this.setState({
+                showTeacher_EnableModal: !this.state.showTeacher_EnableModal,
+            });
+        } else if (this.state.activeTab === "student") {
+            this.setState({
+                showStudent_EnableModal: !this.state.showStudent_EnableModal,
+            });
+        }
+    };
+
+    teacherFormSubmission = () => {
+        setTimeout(() => {
+            this.setState({
+                showTeacherModal: false,
+                showTeacher_DeleteModal: false,
+                showTeacher_DisableModal: false,
+                showTeacher_EnableModal: false,
+            });
+            this.loadTeacherData();
+        }, 1000);
+    };
+
+    studentFormSubmission = () => {
+        setTimeout(() => {
+            this.setState({
+                showStudentModal: false,
+                showStudent_DeleteModal: false,
+                showStudent_DisableModal: false,
+                showStudent_EnableModal: false,
+            });
+            this.loadStudentData();
+        }, 1000);
     };
 
     // Gets teacher ID from the teacher table
@@ -829,24 +847,41 @@ class ProfileList extends Component {
         });
     };
 
-    handleDelete = () => {
-        if (this.state.activeTab === "teacher") {
-            this.setState({
-                showTeacher_DeleteModal: !this.state.showTeacher_DeleteModal,
-            });
-        } else if (this.state.activeTab === "student") {
-            this.setState({
-                showStudent_DeleteModal: !this.state.showStudent_DeleteModal,
-            });
+    // Gets Student ID from the Student table
+    handleStudentId = (data) => {
+        let value = [];
+        const studentItems = this.state.studentItems;
+        for (let i = 0; i < studentItems.length; i++) {
+            if (data.includes(studentItems[i].id.toString())) {
+                value.push({
+                    id: studentItems[i].id.toString(),
+                    username: studentItems[i].username,
+                });
+            } else {
+                continue;
+            }
         }
+        this.setState({
+            selectedStudent: value,
+        });
     };
 
     handleTeacherPageChange(pageNumber) {
-        this.setState({ activeTeacherPage: pageNumber });
+        this.setState(
+            { activeTeacherPage: pageNumber, page_loading: true },
+            () => {
+                this.loadTeacherData();
+            }
+        );
     }
 
     handleStudentPageChange(pageNumber) {
-        this.setState({ activeStudentPage: pageNumber });
+        this.setState(
+            { activeStudentPage: pageNumber, page_loading: true },
+            () => {
+                this.loadStudentData();
+            }
+        );
     }
 
     render() {
@@ -866,31 +901,40 @@ class ProfileList extends Component {
                     togglenav={this.toggleSideNav}
                 />
 
+                {/* ALert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
+                />
+
                 {/* Sidebar */}
                 <SideNav
                     shownav={this.state.showSideNav}
                     activeLink="profiles"
                 />
 
-                {/* Add Student modal */}
-                {this.state.showStudentModal ? (
-                    <AddStudentModal
-                        show={this.state.showStudentModal}
-                        onHide={this.handleProfileAdding}
-                        studentFormSubmission={this.studentFormSubmission}
-                    />
-                ) : null}
-
-                {/* Add Teacher modal */}
+                {/* Teacher create modal */}
                 {this.state.showTeacherModal ? (
                     <AddTeacherModal
                         show={this.state.showTeacherModal}
-                        onHide={this.handleProfileAdding}
+                        onHide={this.handleAdd}
                         teacherFormSubmission={this.teacherFormSubmission}
                     />
                 ) : null}
 
-                {/* Delete Teacher modal */}
+                {/* Teacher delete modal */}
                 {this.state.showTeacher_DeleteModal ? (
                     <TeacherDeleteModal
                         show={this.state.showTeacher_DeleteModal}
@@ -900,6 +944,100 @@ class ProfileList extends Component {
                         toggleModal={this.handleDelete}
                     />
                 ) : null}
+
+                {/* Teacher Disable Modal */}
+                {this.state.showTeacher_DisableModal ? (
+                    <UserDisableModal
+                        show={this.state.showTeacher_DisableModal}
+                        onHide={this.handleDisable}
+                        toggleModal={this.handleDisable}
+                        formSubmission={this.teacherFormSubmission}
+                        url={`${this.url}/hod/teacher/`}
+                        data={this.state.selectedTeacher}
+                        field="teacher_ids"
+                        type="Teacher"
+                        token="Authorization"
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Teacher Enable Modal */}
+                {this.state.showTeacher_EnableModal ? (
+                    <UserEnableModal
+                        show={this.state.showTeacher_EnableModal}
+                        onHide={this.handleEnable}
+                        toggleModal={this.handleEnable}
+                        formSubmission={this.teacherFormSubmission}
+                        url={`${this.url}/hod/teacher/`}
+                        data={this.state.selectedTeacher}
+                        field="teacher_ids"
+                        type="Teacher"
+                        token="Authorization"
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Student create modal */}
+                {this.state.showStudentModal ? (
+                    <AddStudentModal
+                        show={this.state.showStudentModal}
+                        onHide={this.handleAdd}
+                        studentFormSubmission={this.studentFormSubmission}
+                    />
+                ) : null}
+
+                {/* Student Delete Modal */}
+                {this.state.showStudent_DeleteModal ? (
+                    <UserDeleteModal
+                        show={this.state.showStudent_DeleteModal}
+                        onHide={this.handleDelete}
+                        toggleModal={this.handleDelete}
+                        formSubmission={this.studentFormSubmission}
+                        url={`${this.url}/hod/create/student/`}
+                        data={this.state.selectedStudent}
+                        field="student_ids"
+                        type="Student"
+                        token="Authorization"
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Student Disable Modal */}
+                {this.state.showStudent_DisableModal ? (
+                    <UserDisableModal
+                        show={this.state.showStudent_DisableModal}
+                        onHide={this.handleDisable}
+                        toggleModal={this.handleDisable}
+                        formSubmission={this.studentFormSubmission}
+                        url={`${this.url}/hod/create/student/`}
+                        data={this.state.selectedStudent}
+                        field="student_ids"
+                        type="Student"
+                        token="Authorization"
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Student Enable Modal */}
+                {this.state.showStudent_EnableModal ? (
+                    <UserEnableModal
+                        show={this.state.showStudent_EnableModal}
+                        onHide={this.handleEnable}
+                        toggleModal={this.handleEnable}
+                        formSubmission={this.studentFormSubmission}
+                        url={`${this.url}/hod/create/student/`}
+                        data={this.state.selectedStudent}
+                        field="student_ids"
+                        type="Student"
+                        token="Authorization"
+                    />
+                ) : (
+                    ""
+                )}
 
                 <div
                     className={`section content ${
@@ -935,28 +1073,34 @@ class ProfileList extends Component {
                             </div>
                             <div className="col-md-6 d-flex justify-content-end">
                                 <button
-                                    className="btn btn-primary btn-sm mr-1"
-                                    onClick={this.handleProfileAdding}
+                                    className="btn btn-primary btn-sm shadow-none mr-1"
+                                    onClick={this.handleAdd}
                                 >
                                     Add New
                                 </button>
                                 <button
-                                    className="btn btn-primary btn-sm mr-1"
+                                    className="btn btn-primary btn-sm shadow-none mr-1"
                                     onClick={this.handleDelete}
                                 >
                                     Delete
                                 </button>
-                                <button className="btn btn-primary btn-sm mr-1">
+                                <button
+                                    className="btn btn-primary btn-sm shadow-none mr-1"
+                                    onClick={this.handleEnable}
+                                >
                                     Enable
                                 </button>
-                                <button className="btn btn-primary btn-sm mr-1">
+                                <button
+                                    className="btn btn-primary btn-sm shadow-none mr-1"
+                                    onClick={this.handleDisable}
+                                >
                                     Disable
                                 </button>
                                 <Dropdown>
                                     <Dropdown.Toggle
                                         variant="primary"
                                         id="dropdown-basic"
-                                        className="btn-sm"
+                                        className="btn-sm shadow-none"
                                     >
                                         Notify
                                     </Dropdown.Toggle>
@@ -991,7 +1135,8 @@ class ProfileList extends Component {
                                         handleTeacherId={this.handleTeacherId}
                                     />
                                     <div className="card-body p-3">
-                                        {this.state.totalTeacherCount > paginationCount ? (
+                                        {this.state.totalTeacherCount >
+                                        paginationCount ? (
                                             <Paginations
                                                 activePage={
                                                     this.state.activeTeacherPage
@@ -1014,9 +1159,11 @@ class ProfileList extends Component {
                                         studentItems={this.state.studentItems}
                                         path="hod"
                                         group={true}
+                                        handleStudentId={this.handleStudentId}
                                     />
                                     <div className="card-body p-3">
-                                        {this.state.totalStudentCount > paginationCount ? (
+                                        {this.state.totalStudentCount >
+                                        paginationCount ? (
                                             <Paginations
                                                 activePage={
                                                     this.state.activeStudentPage

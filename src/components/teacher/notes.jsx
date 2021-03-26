@@ -9,6 +9,8 @@ import { Modal, Alert, Spinner } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import CKeditor from "../sharedComponents/CKeditor";
 import Loading from "../sharedComponents/loader";
+import AlertBox from "../sharedComponents/alert";
+import { ContentDeleteModal } from "../sharedComponents/contentManagementModal";
 
 const mapStateToProps = (state) => ({
     subject_name: state.subject_name,
@@ -30,7 +32,7 @@ class ImageUploadModal extends Component {
         };
         this.subjectId = this.props.subjectId;
         this.chapterId = this.props.chapterId;
-        this.topicName = this.props.topicName;
+        this.topicId = this.props.topicId;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
     }
@@ -44,7 +46,7 @@ class ImageUploadModal extends Component {
 
         let form_data = new FormData();
         form_data.append("chapter_id", this.chapterId);
-        form_data.append("topic_name", this.topicName);
+        form_data.append("topic_num", this.topicId);
         form_data.append("notes_image_1", event.target.files[0]);
 
         const options = {
@@ -92,16 +94,10 @@ class ImageUploadModal extends Component {
                             image: image,
                         });
                     } else {
-                        if (result.data.detail) {
-                            this.setState({
-                                errorMsg: result.data.detail,
-                            });
-                        } else {
-                            this.setState({
-                                errorMsg: result.data.msg,
-                            });
-                        }
                         this.setState({
+                            errorMsg: result.data.detail
+                                ? result.data.detail
+                                : result.data.msg,
                             showErrorAlert: true,
                             showLoader: false,
                         });
@@ -237,142 +233,6 @@ class ImageUploadModal extends Component {
     }
 }
 
-class DeleteModal extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            errorMsg: "",
-            successMsg: "",
-            showErrorAlert: false,
-            showSuccessAlert: false,
-            showLoader: false,
-        };
-        this.subjectId = this.props.subjectId;
-        this.url = baseUrl + teacherUrl;
-        this.authToken = localStorage.getItem("Authorization");
-        this.headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: this.authToken,
-        };
-    }
-
-    handleDelete = () => {
-        this.setState({
-            showSuccessAlert: false,
-            showErrorAlert: false,
-            showLoader: true,
-        });
-
-        fetch(`${this.url}/teacher/subject/${this.subjectId}/notes/`, {
-            method: "DELETE",
-            headers: this.headers,
-            body: JSON.stringify({
-                chapter_id: this.props.chapterId,
-                topic_name: this.props.topicName,
-                notes_id: this.props.notes_id,
-            }),
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    this.setState({
-                        successMsg: result.msg,
-                        showSuccessAlert: true,
-                        showLoader: false,
-                    });
-                    this.props.formSubmission(true);
-                } else {
-                    if (result.detail) {
-                        this.setState({
-                            errorMsg: result.detail,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.msg,
-                        });
-                    }
-                    this.setState({
-                        showErrorAlert: true,
-                        showLoader: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-    render() {
-        return (
-            <Modal
-                show={this.props.show}
-                onHide={this.props.onHide}
-                size="md"
-                aria-labelledby="contained-modal-title-vcenter"
-                centered
-            >
-                <Modal.Header closeButton>Delete Notes</Modal.Header>
-                <Modal.Body>
-                    <Alert
-                        variant="danger"
-                        show={this.state.showErrorAlert}
-                        onClose={() => {
-                            this.setState({
-                                showErrorAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.errorMsg}
-                    </Alert>
-                    <Alert
-                        variant="success"
-                        show={this.state.showSuccessAlert}
-                        onClose={() => {
-                            this.setState({
-                                showSuccessAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.successMsg}
-                    </Alert>
-                    <p className="mb-0">
-                        Are you sure that you want to delete this notes?
-                    </p>
-                </Modal.Body>
-                <Modal.Footer>
-                    <button
-                        className="btn btn-secondary btn-sm mr-2"
-                        onClick={this.props.toggleModal}
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        className="btn btn-primary btn-sm"
-                        onClick={this.handleDelete}
-                    >
-                        {this.state.showLoader ? (
-                            <Spinner
-                                as="span"
-                                animation="border"
-                                size="sm"
-                                role="status"
-                                aria-hidden="true"
-                                className="mr-2"
-                            />
-                        ) : (
-                            ""
-                        )}
-                        Delete
-                    </button>
-                </Modal.Footer>
-            </Modal>
-        );
-    }
-}
-
 class SubjectNotes extends Component {
     constructor(props) {
         super(props);
@@ -380,10 +240,6 @@ class SubjectNotes extends Component {
             showSideNav: false,
             showModal: false,
             showDeleteModal: false,
-            errorMsg: "",
-            successMsg: "",
-            showErrorAlert: false,
-            showSuccessAlert: false,
             showLoader: false,
 
             limited: false,
@@ -394,12 +250,16 @@ class SubjectNotes extends Component {
             image: [],
             url: "",
 
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
             page_loading: true,
-            is_formSubmited: false,
         };
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
-        this.topicName = this.props.match.params.topicName;
+        this.chapterId = this.props.match.params.chapterId;
+        this.topicId = this.props.match.params.topicId;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
@@ -421,7 +281,7 @@ class SubjectNotes extends Component {
         });
     };
 
-    toggleModal = () => {
+    toggleImageModal = () => {
         this.setState({
             showModal: !this.state.showModal,
         });
@@ -443,7 +303,7 @@ class SubjectNotes extends Component {
         });
 
         fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/notes/?chapter_id=${this.chapterId}&topic_name=${this.topicName}`,
+            `${this.url}/teacher/subject/${this.subjectId}/notes/?chapter_id=${this.chapterId}&topic_num=${this.topicId}`,
             {
                 method: "GET",
                 headers: this.headers,
@@ -469,6 +329,12 @@ class SubjectNotes extends Component {
                         notes_id: result.data[0].notes_id,
                         notes_name: result.data[0].notes_name,
                         url: result.data[0].direct_question_urls,
+                        page_loading: false,
+                    });
+                } else if (result.sts === false) {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
                     });
                 }
                 this.setState({
@@ -546,11 +412,12 @@ class SubjectNotes extends Component {
                 notes_name: this.state.title,
                 notes_content: this.state.content,
                 chapter_id: this.chapterId,
-                topic_name: this.topicName,
+                topic_num: this.topicId,
             }),
         })
             .then((res) => res.json())
             .then((result) => {
+                console.log(result);
                 if (result.sts === true) {
                     this.setState(
                         {
@@ -571,7 +438,6 @@ class SubjectNotes extends Component {
                         showLoader: false,
                     });
                 }
-                console.log(result);
             })
             .catch((err) => {
                 this.setState({
@@ -590,12 +456,13 @@ class SubjectNotes extends Component {
                 notes_name: this.state.title,
                 notes_content: this.state.content,
                 chapter_id: this.chapterId,
-                topic_name: this.topicName,
+                topic_num: this.topicId,
                 notes_id: this.state.notes_id,
             }),
         })
             .then((res) => res.json())
             .then((result) => {
+                console.log(result);
                 if (result.sts === true) {
                     this.setState(
                         {
@@ -616,7 +483,6 @@ class SubjectNotes extends Component {
                         showLoader: false,
                     });
                 }
-                console.log(result);
             })
             .catch((err) => {
                 this.setState({
@@ -626,29 +492,13 @@ class SubjectNotes extends Component {
             });
     };
 
-    componentDidUpdate = (prevProps, prevState) => {
-        if (
-            prevState.is_formSubmited !== this.state.is_formSubmited &&
-            this.state.is_formSubmited === true
-        ) {
+    formSubmission = () => {
+        setTimeout(() => {
+            this.setState({
+                showDeleteModal: false,
+            });
             this.loadNotesData();
-            this.setState({
-                is_formSubmited: false,
-            });
-        }
-    };
-
-    formSubmission = (is_formSubmited) => {
-        if (is_formSubmited) {
-            this.setState({
-                is_formSubmited: true,
-            });
-            setTimeout(() => {
-                this.setState({
-                    showDeleteModal: false,
-                });
-            }, 1000);
-        }
+        }, 1000);
     };
 
     render() {
@@ -658,6 +508,24 @@ class SubjectNotes extends Component {
                 <Header
                     name={this.props.subject_name}
                     togglenav={this.toggleSideNav}
+                />
+
+                {/* ALert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
                 />
 
                 {/* Sidebar */}
@@ -670,11 +538,11 @@ class SubjectNotes extends Component {
                 {this.state.showModal ? (
                     <ImageUploadModal
                         show={this.state.showModal}
-                        onHide={this.toggleModal}
+                        onHide={this.toggleImageModal}
                         image={this.state.image}
                         subjectId={this.subjectId}
                         chapterId={this.chapterId}
-                        topicName={this.topicName}
+                        topicId={this.topicId}
                     />
                 ) : (
                     ""
@@ -682,14 +550,18 @@ class SubjectNotes extends Component {
 
                 {/* Delete Modal */}
                 {this.state.showDeleteModal ? (
-                    <DeleteModal
+                    <ContentDeleteModal
                         show={this.state.showDeleteModal}
                         onHide={this.toggleDeleteModal}
-                        subjectId={this.subjectId}
-                        chapterId={this.chapterId}
-                        topicName={this.topicName}
-                        notes_id={this.state.notes_id}
                         formSubmission={this.formSubmission}
+                        url={`${this.url}/teacher/subject/${this.subjectId}/notes/`}
+                        type="notes"
+                        name=""
+                        data={{
+                            chapter_id: this.chapterId,
+                            topic_num: this.topicId,
+                            notes_id: this.state.notes_id,
+                        }}
                         toggleModal={this.toggleDeleteModal}
                     />
                 ) : null}
@@ -724,14 +596,14 @@ class SubjectNotes extends Component {
                                         {this.state.notes_id !== "" &&
                                         this.state.notes_name !== undefined ? (
                                             <button
-                                                className="btn btn-primary btn-sm mr-2"
+                                                className="btn btn-primary btn-sm shadow-none mr-2"
                                                 onClick={this.toggleDeleteModal}
                                             >
                                                 Delete
                                             </button>
                                         ) : null}
                                         <button
-                                            className="btn btn-primary btn-sm mr-2"
+                                            className="btn btn-primary btn-sm shadow-none mr-2"
                                             onClick={this.handleSubmit}
                                         >
                                             {this.state.showLoader ? (
@@ -749,8 +621,8 @@ class SubjectNotes extends Component {
                                             Save
                                         </button>
                                         <button
-                                            className="btn btn-primary btn-sm mr-3"
-                                            onClick={this.toggleModal}
+                                            className="btn btn-primary btn-sm shadow-none mr-3"
+                                            onClick={this.toggleImageModal}
                                         >
                                             Upload Image
                                         </button>
@@ -778,33 +650,6 @@ class SubjectNotes extends Component {
                                 </div>
                             </div>
                         </div>
-
-                        <Alert
-                            variant="danger"
-                            show={this.state.showErrorAlert}
-                            onClose={() => {
-                                this.setState({
-                                    showErrorAlert: false,
-                                });
-                            }}
-                            className="my-2"
-                            dismissible
-                        >
-                            {this.state.errorMsg}
-                        </Alert>
-                        <Alert
-                            variant="success"
-                            show={this.state.showSuccessAlert}
-                            onClose={() => {
-                                this.setState({
-                                    showSuccessAlert: false,
-                                });
-                            }}
-                            className="my-2"
-                            dismissible
-                        >
-                            {this.state.successMsg}
-                        </Alert>
 
                         <div className="card shadow-sm mb-3">
                             <div className="card-body">

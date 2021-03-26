@@ -25,16 +25,23 @@ _:-ms-fullscreen,
     background-color: #0078d6;
 }
 
-#Emptext {
+/* #Emptext {
     top: -12px;
     left: 41px;
     position: relative;
-}
+} */
 .empimg {
-    height: 27px;
-    width: 29px;
-    border-radius: 14px;
+    height: auto;
+    width: 30px;
+    border-radius: 50%;
+    margin-right: 5px;
 }
+
+.empimg .profile-pic {
+    height: auto;
+    width: 26px;
+}
+
 #overviewgrid.e-rtl #Emptext {
     top: -12px;
     left: -41px;
@@ -227,6 +234,7 @@ td.e-rowcell .statustxt.e-inactivecolor {
     background-color: transparent;
     border-color: transparent;
     color: #621012;
+    border-radius: 4px;
 }
 
 .e-grid .e-filtered::before {

@@ -43,7 +43,7 @@ function statusdetails(props) {
 
 function nameTemplate(props) {
     return (
-        <div>
+        <div className="d-flex align-items-center">
             <div className="empimg">
                 <img
                     src={

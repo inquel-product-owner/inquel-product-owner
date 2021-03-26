@@ -9,6 +9,7 @@ import Paginations from "../sharedComponents/pagination";
 import StudentTable from "../table/studentTable";
 import { Badge } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import AlertBox from "../sharedComponents/alert";
 
 class HodStudentList extends Component {
     constructor(props) {
@@ -20,6 +21,10 @@ class HodStudentList extends Component {
             page_loading: true,
             activeStudentPage: 1,
             totalStudentCount: 0,
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
         };
         this.hodId = this.props.match.params.hodId;
         this.url = baseUrl + adminPathUrl;
@@ -47,11 +52,21 @@ class HodStudentList extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
+                if (result.sts === true) {
                 this.setState({
                     studentItems: result.data.results,
                     totalStudentCount: result.data.count,
                     page_loading: false,
                 });
+            } else {
+                this.setState({
+                    errorMsg: result.detail
+                        ? result.detail
+                        : result.msg,
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
+            }
                 console.log(result);
             })
             .catch((err) => {
@@ -68,10 +83,20 @@ class HodStudentList extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
+                if (result.sts === true) {
                 this.setState({
                     hodItems: result.data,
                     page_loading: false,
                 });
+            } else {
+                this.setState({
+                    errorMsg: result.detail
+                        ? result.detail
+                        : result.msg,
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
+            }
                 console.log(result);
             })
             .catch((err) => {
@@ -81,17 +106,12 @@ class HodStudentList extends Component {
         this.loadStudentData();
     };
 
-    componentDidUpdate = (prevProps, prevState) => {
-        if (prevState.activeStudentPage !== this.state.activeStudentPage) {
-            this.loadStudentData();
-            this.setState({
-                page_loading: true,
-            });
-        }
-    };
-
     handleStudentPageChange(pageNumber) {
-        this.setState({ activeStudentPage: pageNumber });
+        this.setState({ activeStudentPage: pageNumber, page_loading: true },
+            () => {
+                this.loadStudentData();
+            }
+        );
     }
 
     render() {
@@ -104,6 +124,24 @@ class HodStudentList extends Component {
                 <SideNav
                     shownav={this.state.showSideNav}
                     activeLink="profiles"
+                />
+
+                {/* ALert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
                 />
 
                 <div
@@ -178,14 +216,12 @@ class HodStudentList extends Component {
                                                     .is_active ? (
                                                     <Badge
                                                         variant="success"
-                                                        className="ml-1"
                                                     >
                                                         Active
                                                     </Badge>
                                                 ) : (
                                                     <Badge
                                                         variant="danger"
-                                                        className="ml-1"
                                                     >
                                                         Not active
                                                     </Badge>

@@ -5,6 +5,7 @@ import Header from "../navbar";
 import SideNav from "../sidenav";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import Loading from "../../sharedComponents/loader";
+import AlertBox from "../../sharedComponents/alert";
 
 function EmptyData() {
     return (
@@ -21,9 +22,21 @@ class GroupTeachers extends Component {
             showSideNav: false,
             groupItem: [],
             teacherItems: [],
+
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
             page_loading: true,
         };
         this.groupId = this.props.match.params.groupId;
+        this.url = baseUrl + hodUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
     }
 
     toggleSideNav = () => {
@@ -33,31 +46,33 @@ class GroupTeachers extends Component {
     };
 
     componentDidMount = () => {
-        var url = baseUrl + hodUrl;
-        var authToken = localStorage.getItem("Authorization");
-        var headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: authToken,
-        };
-
         Promise.all([
-            fetch(`${url}/hod/group/${this.groupId}/`, {
-                headers: headers,
+            fetch(`${this.url}/hod/group/${this.groupId}/`, {
+                headers: this.headers,
                 method: "GET",
             }).then((res) => res.json()),
-            fetch(`${url}/hod/group/${this.groupId}/teacher/`, {
-                headers: headers,
+            fetch(`${this.url}/hod/group/${this.groupId}/teacher/`, {
+                headers: this.headers,
                 method: "GET",
             }).then((res) => res.json()),
         ])
             .then((result) => {
-                this.setState({
-                    groupItem: result[0].data,
-                    teacherItems: result[1].data.results,
-                    page_loading: false,
-                });
                 console.log(result);
+                if (result[1].sts === true) {
+                    this.setState({
+                        groupItem: result[0].data,
+                        teacherItems: result[1].data.results,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result[1].detail
+                            ? result[1].detail
+                            : result[1].msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -74,6 +89,24 @@ class GroupTeachers extends Component {
                     togglenav={this.toggleSideNav}
                 />
 
+                {/* ALert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
+                />
+
                 {/* Sidebar */}
                 <SideNav
                     shownav={this.state.showSideNav}
@@ -88,65 +121,33 @@ class GroupTeachers extends Component {
                     <div className="container-fluid">
                         {/* Back button */}
                         <button
-                            className="btn btn-primary-invert btn-sm mb-2"
+                            className="btn btn-primary-invert btn-sm mb-3"
                             onClick={this.props.history.goBack}
                         >
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
 
                         {/* Filter area */}
-                        <div className="row align-items-center mb-3">
-                            <div className="col-md-4">
-                                <nav aria-label="breadcrumb">
-                                    <ol className="breadcrumb">
-                                        <li className="breadcrumb-item">
-                                            <Link to="/hod">
-                                                <i className="fas fa-home fa-sm"></i>
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item">
-                                            <Link
-                                                to="#"
-                                                onClick={this.props.history.goBack}
-                                            >
-                                                Group
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item active">
-                                            Teacher
-                                        </li>
-                                    </ol>
-                                </nav>
-                            </div>
-                            <div className="col-md-8 text-right">
-                                <div className="row justify-content-end">
-                                    <div className="col-md-3 pr-md-0">
-                                        <form>
-                                            <div className="form-group">
-                                                <input
-                                                    type="search"
-                                                    name="search"
-                                                    id="search"
-                                                    className="form-control"
-                                                    placeholder="Search"
-                                                />
-                                            </div>
-                                        </form>
-                                    </div>
-                                    <div className="col-md-3 justify-content-between">
-                                        <button className="btn btn-primary btn-sm mr-1">
-                                            Delete
-                                        </button>
-                                        <button className="btn btn-primary btn-sm mr-1">
-                                            Enable
-                                        </button>
-                                        <button className="btn btn-primary btn-sm">
-                                            Disable
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb mb-3">
+                                <li className="breadcrumb-item">
+                                    <Link to="/hod">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item">
+                                    <Link
+                                        to="#"
+                                        onClick={this.props.history.goBack}
+                                    >
+                                        Group
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    Teacher
+                                </li>
+                            </ol>
+                        </nav>
 
                         {/* Teacher list */}
                         <div className="card shadow-sm">

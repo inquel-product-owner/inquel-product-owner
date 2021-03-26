@@ -6,6 +6,7 @@ import Select from "react-select";
 import { Modal, Alert, Spinner, Dropdown } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import Loading from "../sharedComponents/loader";
+import AlertBox from "../sharedComponents/alert";
 
 const mapStateToProps = (state) => ({
     subject_name: state.subject_name,
@@ -53,18 +54,9 @@ class Scorecard extends Component {
                         scorecard: result.data,
                     });
                 } else {
-                    if (result.detail) {
-                        this.setState({
-                            errorMsg: result.detail,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.msg,
-                        });
-                    }
                     this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
                         showErrorAlert: true,
-                        showLoader: false,
                     });
                 }
                 this.setState({
@@ -99,18 +91,10 @@ class Scorecard extends Component {
                         this.loadDefault_ScoreCard();
                     }
                 } else {
-                    if (result.detail) {
-                        this.setState({
-                            errorMsg: result.detail,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.msg,
-                        });
-                    }
                     this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
                         showErrorAlert: true,
-                        showLoader: false,
+                        page_loading: false,
                     });
                 }
             })
@@ -174,18 +158,10 @@ class Scorecard extends Component {
                         showSuccessAlert: true,
                         showLoader: false,
                     });
-                    this.props.formSubmission(true);
+                    this.props.formSubmission();
                 } else {
-                    if (result.detail) {
-                        this.setState({
-                            errorMsg: result.detail,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.msg,
-                        });
-                    }
                     this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
                         showErrorAlert: true,
                         showLoader: false,
                     });
@@ -393,7 +369,7 @@ class Scorecard extends Component {
                 </Modal.Body>
                 <Modal.Footer className="text-right">
                     <button
-                        className="btn btn-primary btn-sm"
+                        className="btn btn-primary btn-sm shadow-none"
                         onClick={this.handleSubmit}
                     >
                         {this.state.showLoader ? (
@@ -426,6 +402,7 @@ class CycleTestAuto extends Component {
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
+            page_loading: true,
 
             sections: [
                 {
@@ -446,9 +423,6 @@ class CycleTestAuto extends Component {
             attempts: [],
             selectedAttempt: "",
             question_type: [],
-
-            page_loading: true,
-            is_formSubmitted: false,
         };
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
@@ -475,14 +449,12 @@ class CycleTestAuto extends Component {
         });
     };
 
-    formSubmission = (is_formSubmitted) => {
-        if (is_formSubmitted) {
-            setTimeout(() => {
-                this.setState({
-                    showModal: !this.state.showModal,
-                });
-            }, 1500);
-        }
+    formSubmission = () => {
+        setTimeout(() => {
+            this.setState({
+                showModal: !this.state.showModal,
+            });
+        }, 1000);
     };
 
     // loads attempt and question type data
@@ -529,78 +501,88 @@ class CycleTestAuto extends Component {
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
-                if (
-                    result.data.auto_test !== undefined &&
-                    result.data.auto_test.length !== 0
-                ) {
-                    const section = [];
-                    let duration = "";
-                    const filterData = [];
-                    for (let i = 0; i < result.data.auto_test.length; i++) {
-                        section.push({
-                            section_id: result.data.auto_test[i].section_id,
-                            section_description:
-                                result.data.auto_test[i].section_description,
-                            question_type:
-                                result.data.auto_test[i].question_type,
-                            category: result.data.auto_test[i].category,
-                            any_questions:
-                                result.data.auto_test[i].any_questions,
-                            no_questions:
-                                result.data.auto_test[i].total_questions,
-                            marks: result.data.auto_test[i].mark,
-                            total_marks: result.data.auto_test[i].total_marks,
-                        });
-                        duration =
-                            result.duration !== null ? result.duration : "";
-
-                        // loads question category data
-                        Promise.all([
-                            fetch(
-                                `${this.filterURL}?chapter_id=${this.chapterId}&question_type=${result.data.auto_test[i].question_type}`,
-                                {
-                                    method: "GET",
-                                    headers: this.headers,
-                                }
-                            ).then((res) => res.json()),
-                            fetch(
-                                `${this.filterURL}?chapter_id=${this.chapterId}&question_type=${result.data.auto_test[i].question_type}&category=${result.data.auto_test[i].category}`,
-                                {
-                                    method: "GET",
-                                    headers: this.headers,
-                                }
-                            ).then((res) => res.json()),
-                            fetch(
-                                `${this.filterURL}?chapter_id=${this.chapterId}&question_type=${result.data.auto_test[i].question_type}&category=${result.data.auto_test[i].category}&marks=${result.data.auto_test[i].mark}`,
-                                {
-                                    method: "GET",
-                                    headers: this.headers,
-                                }
-                            ).then((res) => res.json()),
-                        ])
-                            .then((result) => {
-                                console.log(result);
-                                filterData.push({
-                                    category: result[0].data.category,
-                                    marks: result[1].data.marks,
-                                });
-                                section[i].total_questions =
-                                    result[2].data.total_questions;
-                                this.setState({
-                                    filterData: filterData,
-                                });
-                            })
-                            .catch((err) => {
-                                console.log(err);
+                if (result.sts === true) {
+                    if (
+                        result.data.auto_test !== undefined &&
+                        result.data.auto_test.length !== 0
+                    ) {
+                        const section = [];
+                        let duration = "";
+                        const filterData = [];
+                        for (let i = 0; i < result.data.auto_test.length; i++) {
+                            section.push({
+                                section_id: result.data.auto_test[i].section_id,
+                                section_description:
+                                    result.data.auto_test[i]
+                                        .section_description,
+                                question_type:
+                                    result.data.auto_test[i].question_type,
+                                category: result.data.auto_test[i].category,
+                                any_questions:
+                                    result.data.auto_test[i].any_questions,
+                                no_questions:
+                                    result.data.auto_test[i].total_questions,
+                                marks: result.data.auto_test[i].mark,
+                                total_marks:
+                                    result.data.auto_test[i].total_marks,
                             });
+                            duration =
+                                result.duration !== null ? result.duration : "";
+
+                            // loads question category data
+                            Promise.all([
+                                fetch(
+                                    `${this.filterURL}?chapter_id=${this.chapterId}&question_type=${result.data.auto_test[i].question_type}`,
+                                    {
+                                        method: "GET",
+                                        headers: this.headers,
+                                    }
+                                ).then((res) => res.json()),
+                                fetch(
+                                    `${this.filterURL}?chapter_id=${this.chapterId}&question_type=${result.data.auto_test[i].question_type}&category=${result.data.auto_test[i].category}`,
+                                    {
+                                        method: "GET",
+                                        headers: this.headers,
+                                    }
+                                ).then((res) => res.json()),
+                                fetch(
+                                    `${this.filterURL}?chapter_id=${this.chapterId}&question_type=${result.data.auto_test[i].question_type}&category=${result.data.auto_test[i].category}&marks=${result.data.auto_test[i].mark}`,
+                                    {
+                                        method: "GET",
+                                        headers: this.headers,
+                                    }
+                                ).then((res) => res.json()),
+                            ])
+                                .then((result) => {
+                                    console.log(result);
+                                    filterData.push({
+                                        category: result[0].data.category,
+                                        marks: result[1].data.marks,
+                                    });
+                                    section[i].total_questions =
+                                        result[2].data.total_questions;
+                                    this.setState({
+                                        filterData: filterData,
+                                    });
+                                })
+                                .catch((err) => {
+                                    console.log(err);
+                                });
+                        }
+                        this.setState({
+                            sections: section,
+                            duration: duration,
+                            page_loading: false,
+                        });
+                    } else {
+                        this.setState({
+                            page_loading: false,
+                        });
                     }
-                    this.setState({
-                        sections: section,
-                        duration: duration,
-                        page_loading: false,
-                    });
                 } else {
                     this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
                         page_loading: false,
                     });
                 }
@@ -674,11 +656,20 @@ class CycleTestAuto extends Component {
                 .then((res) => res.json())
                 .then((result) => {
                     console.log(result);
-                    const filterData = [...this.state.filterData];
-                    filterData[index].category = result.data.category;
-                    this.setState({
-                        filterData: filterData,
-                    });
+                    if (result.sts === true) {
+                        const filterData = [...this.state.filterData];
+                        filterData[index].category = result.data.category;
+                        this.setState({
+                            filterData: filterData,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.detail
+                                ? result.detail
+                                : result.msg,
+                            showErrorAlert: true,
+                        });
+                    }
                 })
                 .catch((err) => {
                     console.log(err);
@@ -719,10 +710,19 @@ class CycleTestAuto extends Component {
                 .then((res) => res.json())
                 .then((result) => {
                     console.log(result);
-                    filterData[index].marks = result.data.marks;
-                    this.setState({
-                        filterData: filterData,
-                    });
+                    if (result.sts === true) {
+                        filterData[index].marks = result.data.marks;
+                        this.setState({
+                            filterData: filterData,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.detail
+                                ? result.detail
+                                : result.msg,
+                            showErrorAlert: true,
+                        });
+                    }
                 })
                 .catch((err) => {
                     console.log(err);
@@ -747,11 +747,20 @@ class CycleTestAuto extends Component {
                 .then((res) => res.json())
                 .then((result) => {
                     console.log(result);
-                    section[index].total_questions =
-                        result.data.total_questions;
-                    this.setState({
-                        sections: section,
-                    });
+                    if (result.sts === true) {
+                        section[index].total_questions =
+                            result.data.total_questions;
+                        this.setState({
+                            sections: section,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.detail
+                                ? result.detail
+                                : result.msg,
+                            showErrorAlert: true,
+                        });
+                    }
                 })
                 .catch((err) => {
                     console.log(err);
@@ -883,16 +892,8 @@ class CycleTestAuto extends Component {
                         }
                     );
                 } else {
-                    if (result.detail) {
-                        this.setState({
-                            errorMsg: result.detail,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.msg,
-                        });
-                    }
                     this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -930,16 +931,8 @@ class CycleTestAuto extends Component {
                         showSuccessAlert: true,
                     });
                 } else {
-                    if (result.detail) {
-                        this.setState({
-                            errorMsg: result.detail,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.msg,
-                        });
-                    }
                     this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -978,16 +971,8 @@ class CycleTestAuto extends Component {
                         }
                     );
                 } else {
-                    if (result.detail) {
-                        this.setState({
-                            errorMsg: result.detail,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.msg,
-                        });
-                    }
                     this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -1153,6 +1138,24 @@ class CycleTestAuto extends Component {
                     togglenav={this.toggleSideNav}
                 />
 
+                {/* ALert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
+                />
+
                 {/* Sidebar */}
                 <SideNav
                     shownav={this.state.showSideNav}
@@ -1206,7 +1209,7 @@ class CycleTestAuto extends Component {
                                             className="form-control form-shadow"
                                             placeholder="Enter duration (In minutes)"
                                             onChange={this.handleDuration}
-                                            value={this.state.duration || ''}
+                                            value={this.state.duration || ""}
                                             autoComplete="off"
                                             min="1"
                                             max="360"
@@ -1244,38 +1247,13 @@ class CycleTestAuto extends Component {
                             </div>
                             <div className="col-md-4 text-right">
                                 <button
-                                    className="btn btn-primary btn-sm"
+                                    className="btn btn-primary btn-sm shadow-none"
                                     onClick={this.toggleModal}
                                 >
                                     Score Configuration
                                 </button>
                             </div>
                         </div>
-
-                        <Alert
-                            variant="danger"
-                            show={this.state.showErrorAlert}
-                            onClose={() => {
-                                this.setState({
-                                    showErrorAlert: false,
-                                });
-                            }}
-                            dismissible
-                        >
-                            {this.state.errorMsg}
-                        </Alert>
-                        <Alert
-                            variant="success"
-                            show={this.state.showSuccessAlert}
-                            onClose={() => {
-                                this.setState({
-                                    showSuccessAlert: false,
-                                });
-                            }}
-                            dismissible
-                        >
-                            {this.state.successMsg}
-                        </Alert>
 
                         <div className="card shadow-sm">
                             <div className="table-responsive">
@@ -1312,7 +1290,8 @@ class CycleTestAuto extends Component {
                                                                           1
                                                                       }`}
                                                                       value={
-                                                                          section.section_description || ''
+                                                                          section.section_description ||
+                                                                          ""
                                                                       }
                                                                       onChange={(
                                                                           event
@@ -1340,7 +1319,8 @@ class CycleTestAuto extends Component {
                                                                           )
                                                                       }
                                                                       value={
-                                                                          section.question_type || ''
+                                                                          section.question_type ||
+                                                                          ""
                                                                       }
                                                                       required
                                                                   >
@@ -1361,7 +1341,8 @@ class CycleTestAuto extends Component {
                                                                                     return (
                                                                                         <option
                                                                                             value={
-                                                                                                data || ''
+                                                                                                data ||
+                                                                                                ""
                                                                                             }
                                                                                             key={
                                                                                                 index
@@ -1393,7 +1374,8 @@ class CycleTestAuto extends Component {
                                                                           )
                                                                       }
                                                                       value={
-                                                                          section.category || ''
+                                                                          section.category ||
+                                                                          ""
                                                                       }
                                                                       disabled={
                                                                           section.question_type ===
@@ -1431,7 +1413,8 @@ class CycleTestAuto extends Component {
                                                                                         return (
                                                                                             <option
                                                                                                 value={
-                                                                                                    data || ''
+                                                                                                    data ||
+                                                                                                    ""
                                                                                                 }
                                                                                                 key={
                                                                                                     c_index
@@ -1454,7 +1437,8 @@ class CycleTestAuto extends Component {
                                                                       id="marks"
                                                                       className="form-control form-control-sm border-secondary"
                                                                       value={
-                                                                          section.marks || ''
+                                                                          section.marks ||
+                                                                          ""
                                                                       }
                                                                       onChange={(
                                                                           event
@@ -1500,7 +1484,8 @@ class CycleTestAuto extends Component {
                                                                                         return (
                                                                                             <option
                                                                                                 value={
-                                                                                                    data || ''
+                                                                                                    data ||
+                                                                                                    ""
                                                                                                 }
                                                                                                 key={
                                                                                                     c_index
@@ -1522,7 +1507,8 @@ class CycleTestAuto extends Component {
                                                                       className="form-control form-control-sm border-secondary"
                                                                       type="text"
                                                                       value={
-                                                                          section.total_questions || ''
+                                                                          section.total_questions ||
+                                                                          ""
                                                                       }
                                                                       placeholder="Total question"
                                                                       disabled
@@ -1533,7 +1519,8 @@ class CycleTestAuto extends Component {
                                                                       className="form-control form-control-sm border-secondary"
                                                                       type="text"
                                                                       value={
-                                                                          section.no_questions || ''
+                                                                          section.no_questions ||
+                                                                          ""
                                                                       }
                                                                       placeholder="No. of questions"
                                                                       onChange={(
@@ -1559,7 +1546,8 @@ class CycleTestAuto extends Component {
                                                                       className="form-control form-control-sm border-secondary"
                                                                       type="text"
                                                                       value={
-                                                                          section.any_questions || ''
+                                                                          section.any_questions ||
+                                                                          ""
                                                                       }
                                                                       placeholder="Any questions"
                                                                       onChange={(
@@ -1586,7 +1574,8 @@ class CycleTestAuto extends Component {
                                                                       type="text"
                                                                       placeholder="Total marks"
                                                                       value={
-                                                                          section.total_marks || ''
+                                                                          section.total_marks ||
+                                                                          ""
                                                                       }
                                                                       disabled
                                                                   />
@@ -1663,7 +1652,7 @@ class CycleTestAuto extends Component {
 
                             <div className="card-body">
                                 <button
-                                    className="btn btn-light btn-block shadow-sm"
+                                    className="btn btn-light btn-block shadow-sm shadow-none"
                                     onClick={this.addSection}
                                 >
                                     Add Section +
