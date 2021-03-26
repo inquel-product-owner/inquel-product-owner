@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import axios from "axios";
-import Header from "./navbar";
-import SideNav from "./sidenav";
+import Header from "./shared/navbar";
+import SideNav from "./shared/sidenav";
 import Switch from "react-switch";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { Modal, Alert, Spinner } from "react-bootstrap";
@@ -32,7 +32,7 @@ class ImageUploadModal extends Component {
         };
         this.subjectId = this.props.subjectId;
         this.chapterId = this.props.chapterId;
-        this.topicId = this.props.topicId;
+        this.topicNum = this.props.topicNum;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
     }
@@ -46,7 +46,7 @@ class ImageUploadModal extends Component {
 
         let form_data = new FormData();
         form_data.append("chapter_id", this.chapterId);
-        form_data.append("topic_num", this.topicId);
+        form_data.append("topic_num", this.topicNum);
         form_data.append("notes_image_1", event.target.files[0]);
 
         const options = {
@@ -233,7 +233,7 @@ class ImageUploadModal extends Component {
     }
 }
 
-class SubjectNotes extends Component {
+class Notes extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -259,7 +259,7 @@ class SubjectNotes extends Component {
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
         this.chapterId = this.props.match.params.chapterId;
-        this.topicId = this.props.match.params.topicId;
+        this.topicNum = this.props.match.params.topicNum;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
@@ -303,7 +303,7 @@ class SubjectNotes extends Component {
         });
 
         fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/notes/?chapter_id=${this.chapterId}&topic_num=${this.topicId}`,
+            `${this.url}/teacher/subject/${this.subjectId}/notes/?chapter_id=${this.chapterId}&topic_num=${this.topicNum}`,
             {
                 method: "GET",
                 headers: this.headers,
@@ -412,7 +412,7 @@ class SubjectNotes extends Component {
                 notes_name: this.state.title,
                 notes_content: this.state.content,
                 chapter_id: this.chapterId,
-                topic_num: this.topicId,
+                topic_num: this.topicNum,
             }),
         })
             .then((res) => res.json())
@@ -456,7 +456,7 @@ class SubjectNotes extends Component {
                 notes_name: this.state.title,
                 notes_content: this.state.content,
                 chapter_id: this.chapterId,
-                topic_num: this.topicId,
+                topic_num: this.topicNum,
                 notes_id: this.state.notes_id,
             }),
         })
@@ -542,7 +542,7 @@ class SubjectNotes extends Component {
                         image={this.state.image}
                         subjectId={this.subjectId}
                         chapterId={this.chapterId}
-                        topicId={this.topicId}
+                        topicNum={this.topicNum}
                     />
                 ) : (
                     ""
@@ -559,7 +559,7 @@ class SubjectNotes extends Component {
                         name=""
                         data={{
                             chapter_id: this.chapterId,
-                            topic_num: this.topicId,
+                            topic_num: this.topicNum,
                             notes_id: this.state.notes_id,
                         }}
                         toggleModal={this.toggleDeleteModal}
@@ -683,4 +683,4 @@ class SubjectNotes extends Component {
     }
 }
 
-export default connect(mapStateToProps)(SubjectNotes);
+export default connect(mapStateToProps)(Notes);

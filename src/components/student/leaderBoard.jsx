@@ -103,7 +103,7 @@ class Leaderboard extends Component {
                             onSelect={this.handleSelect}
                         >
                             {/* Quiz Table */}
-                            <Tab eventKey="quiz" title="Quiz">
+                            <Tab eventKey="quiz" title="Quiz Masters">
                                 <div className="card shadow-sm">
                                     <LeaderboardTable
                                         leaderBoard={this.state.leaderBoard}

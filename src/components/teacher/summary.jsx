@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import axios from "axios";
-import Header from "./navbar";
-import SideNav from "./sidenav";
+import Header from "./shared/navbar";
+import SideNav from "./shared/sidenav";
 import Switch from "react-switch";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { Modal, Alert, Spinner } from "react-bootstrap";
@@ -230,7 +230,7 @@ class ImageUploadModal extends Component {
     }
 }
 
-class SubjectSummary extends Component {
+class Summary extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -663,4 +663,4 @@ class SubjectSummary extends Component {
     }
 }
 
-export default connect(mapStateToProps)(SubjectSummary);
+export default connect(mapStateToProps)(Summary);

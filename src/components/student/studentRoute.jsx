@@ -49,7 +49,7 @@ const studentRoutes = (
             }
         />
 
-        {/* ---------- Subject ---------- */}
+        {/* --------------- Subject --------------- */}
 
         <Route
             exact
@@ -136,7 +136,7 @@ const studentRoutes = (
             }
         />
 
-        {/* ---------- Cycle test ---------- */}
+        {/* --------------- Cycle test --------------- */}
 
         <Route
             exact
@@ -175,7 +175,7 @@ const studentRoutes = (
             }
         />
 
-        {/* ---------- Leaderboard ---------- */}
+        {/* --------------- Leaderboard --------------- */}
 
         <Route
             exact
@@ -190,7 +190,7 @@ const studentRoutes = (
             }
         />
 
-        {/* ---------- Login, Registration, Verification and error page routings ---------- */}
+        {/* --------------- Login, Registration, Verification and error page routings --------------- */}
 
         <Route
             exact
