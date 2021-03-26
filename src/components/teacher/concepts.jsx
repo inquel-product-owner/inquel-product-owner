@@ -132,7 +132,7 @@ class Concepts extends Component {
                     let keyboards = [];
                     let images = [];
                     let audio = [];
-                    let response = result.data.results[0].concepts;
+                    let response = result.data.results;
                     if (response.length !== 0) {
                         for (let i = 0; i < response.length; i++) {
                             images = [];
