@@ -72,7 +72,7 @@ class FlashCard extends Component {
         };
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
-        this.topicName = this.props.match.params.topicName;
+        this.topicNum = this.props.match.params.topicNum;
         this.url = baseUrl + studentUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
@@ -86,7 +86,7 @@ class FlashCard extends Component {
     loadConceptData = (path) => {
         var apiURL =
             path === undefined || path === null
-                ? `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/concepts/?topic_name=${this.topicName}`
+                ? `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/concepts/?topic_num=${this.topicNum}`
                 : path;
         fetch(apiURL, {
             method: "GET",
@@ -196,7 +196,7 @@ class FlashCard extends Component {
 
                             data.push({
                                 chapter_id: this.props.match.params.chapterId,
-                                topic_name: this.props.match.params.topicName,
+                                topic_num: this.props.match.params.topicNum,
                                 concepts_random_id:
                                     response[i].concepts_random_id,
                                 content: {
@@ -262,10 +262,10 @@ class FlashCard extends Component {
                     } else {
                         this.setState({
                             page_loading: false,
-                            activeTab: "practice",
+                            // activeTab: "practice",
                         });
-                        this.loadPracticeData();
-                        this.props.history.push({ hash: "practice" });
+                        // this.loadPracticeData();
+                        // this.props.history.push({ hash: "practice" });
                     }
                 } else {
                     this.setState({
@@ -417,7 +417,7 @@ class FlashCard extends Component {
     loadPracticeData = (path) => {
         var apiURL =
             path === undefined || path === null
-                ? `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/typeone/learn/?topic_name=${this.topicName}`
+                ? `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/typeone/learn/?topic_num=${this.topicNum}`
                 : path;
         fetch(apiURL, {
             method: "GET",

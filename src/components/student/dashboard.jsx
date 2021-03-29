@@ -14,7 +14,6 @@ class Dashboard extends Component {
         super(props);
         this.state = {
             showSideNav: false,
-            subjectItems: [],
             groupData: "",
             page_loading: true,
             errorMsg: "",
@@ -39,30 +38,6 @@ class Dashboard extends Component {
 
     componentDidMount = () => {
         document.title = "Dashboard - Student | IQLabs";
-
-        fetch(`${this.url}/student/subject/`, {
-            method: "GET",
-            headers: this.headers,
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    this.setState({
-                        subjectItems: result.data,
-                        page_loading: false,
-                    });
-                } else {
-                    this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
 
         fetch(`${this.url}/student/group/`, {
             method: "GET",
@@ -253,48 +228,50 @@ class Dashboard extends Component {
                             </div>
                         </div>
 
-                        {/* Assigned subjects */}
+                        {/* Group section */}
                         <div className="card shadow-sm mb-4">
                             <div className="card-header">
                                 <h5>Group</h5>
                             </div>
                             <div className="card-body">
-                                <div className="table-responsive">
-                                    <table className="table">
-                                        <thead>
-                                            <tr>
-                                                <th>Group name</th>
-                                                <th>Group description</th>
-                                                <th>View</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    {
-                                                        this.state.groupData
-                                                            .group_name
-                                                    }
-                                                </td>
-                                                <td>
-                                                    {
-                                                        this.state.groupData
-                                                            .group_description
-                                                    }
-                                                </td>
-                                                <td>
-                                                    <Link
-                                                        to={`/student/group/${this.state.groupData.id}`}
-                                                    >
-                                                        <button className="btn btn-primary btn-sm shadow-none">
-                                                            <i className="fas fa-eye"></i>
-                                                        </button>
-                                                    </Link>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+                                {this.state.groupData !== "" ? (
+                                    <div className="table-responsive">
+                                        <table className="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Group name</th>
+                                                    <th>Group description</th>
+                                                    <th>View</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        {
+                                                            this.state.groupData
+                                                                .group_name
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        {
+                                                            this.state.groupData
+                                                                .group_description
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        <Link
+                                                            to={`/student/group/${this.state.groupData.id}`}
+                                                        >
+                                                            <button className="btn btn-primary btn-sm shadow-none">
+                                                                <i className="fas fa-eye"></i>
+                                                            </button>
+                                                        </Link>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                ) : "No data to display..."}
                             </div>
                         </div>
 

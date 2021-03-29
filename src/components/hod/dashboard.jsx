@@ -413,7 +413,7 @@ class Dashboard extends Component {
                 <SubjectModal
                     show={this.state.subjectModalShow}
                     onHide={this.handleSubjectAdd}
-                    formSubmission={this.formSubmission}
+                    formSubmission={this.subjectFormSubmission}
                 />
 
                 {/* Subject Delete Modal */}
@@ -566,6 +566,7 @@ class Dashboard extends Component {
                             <SubjectTable
                                 subjectItems={this.state.subjectItems}
                                 path="hod"
+                                status={true}
                                 handleSubjectId={this.handleSubjectId}
                             />
                             <div className="card-body p-3">

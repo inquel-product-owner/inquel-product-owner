@@ -325,7 +325,7 @@ class Subject extends Component {
                                 </div>
                                 <div className="col-md-10 col-9">
                                     <Link
-                                        to={`${this.props.match.url}/chapter/${chapter_id}/${data.topic_name}/learn`}
+                                        to={`${this.props.match.url}/chapter/${chapter_id}/${data.topic_num}/learn`}
                                         className="primary-text"
                                     >
                                         {data.topic_name}
