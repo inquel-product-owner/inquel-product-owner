@@ -14,6 +14,32 @@ import "./grid-overview.css";
 import { Link } from "react-router-dom";
 import store from "../../redux/store";
 
+function statusTemplate(props) {
+    return (
+        <div id="status" className="statustemp">
+            <span className="statustxt">
+                {props.status ? "Active" : "Inactive"}
+            </span>
+        </div>
+    );
+}
+
+function statusdetails(props) {
+    if (props.status) {
+        return (
+            <div className="statustemp e-activecolor">
+                <span className="statustxt e-activecolor">Active</span>
+            </div>
+        );
+    } else {
+        return (
+            <div className="statustemp e-inactivecolor">
+                <span className="statustxt e-inactivecolor">Inactive</span>
+            </div>
+        );
+    }
+}
+
 class SubjectTable extends Component {
     constructor() {
         super(...arguments);
@@ -27,12 +53,41 @@ class SubjectTable extends Component {
         this.Filter = {
             type: "Menu",
         };
+        this.status = {
+            type: "CheckBox",
+            itemTemplate: statusdetails,
+        };
         this.select = {
             persistSelection: true,
             type: "Multiple",
             checkboxOnly: true,
         };
         this.toolbarOptions = ["Search"];
+    }
+
+    onQueryCellInfo(args) {
+        if (args.column.field === "status") {
+            if (args.cell.textContent === "Active") {
+                args.cell
+                    .querySelector(".statustxt")
+                    .classList.add("e-activecolor");
+                args.cell
+                    .querySelector(".statustemp")
+                    .classList.add("e-activecolor");
+            }
+            if (args.cell.textContent === "Inactive") {
+                args.cell
+                    .querySelector(".statustxt")
+                    .classList.add("e-inactivecolor");
+                args.cell
+                    .querySelector(".statustemp")
+                    .classList.add("e-inactivecolor");
+            }
+        }
+    }
+
+    dataBound() {
+        this.gridInstance.autoFitColumns();
     }
 
     rowSelected() {
@@ -64,16 +119,15 @@ class SubjectTable extends Component {
     viewTemplate = (props) => {
         return (
             <Link to={`/${this.props.path}/subject/${props.id}`}>
-                <button className="btn btn-link btn-sm" onClick={() => this.dispatch(props.subject_name)}>
+                <button
+                    className="btn btn-link btn-sm"
+                    onClick={() => this.dispatch(props.subject_name)}
+                >
                     <i className="fas fa-eye"></i>
                 </button>
             </Link>
         );
     };
-
-    dataBound() {
-        this.gridInstance.autoFitColumns();
-    }
 
     render() {
         return (
@@ -88,12 +142,13 @@ class SubjectTable extends Component {
                         ref={(g) => {
                             this.gridInstance = g;
                         }}
+                        queryCellInfo={this.onQueryCellInfo.bind(this)}
                         dataBound={this.dataBound.bind(this)}
                         filterSettings={this.Filter}
                         allowFiltering={true}
                         allowSorting={true}
                         allowSelection={true}
-                        allowTextWrap={true}
+                        // allowTextWrap={true}
                         // allowResizing={true}
                         selectionSettings={this.select}
                         toolbar={this.toolbarOptions}
@@ -120,6 +175,15 @@ class SubjectTable extends Component {
                                 clipMode="EllipsisWithTooltip"
                                 filter={this.excel}
                             />
+                            {this.props.status === true ? (
+                                <ColumnDirective
+                                    field="status"
+                                    headerText="Status"
+                                    filter={this.status}
+                                    clipMode="EllipsisWithTooltip"
+                                    template={statusTemplate}
+                                />
+                            ) : null}
                             <ColumnDirective
                                 headerText="Action"
                                 allowSorting={false}

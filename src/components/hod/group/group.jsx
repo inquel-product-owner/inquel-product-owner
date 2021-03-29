@@ -527,6 +527,7 @@ class Group extends Component {
                             <SubjectTable
                                 subjectItems={this.state.subjectItems}
                                 path={`hod/group/${this.groupId}`}
+                                status={true}
                                 handleSubjectId={this.handleSubjectId}
                             />
                             <div className="card-body p-3">

@@ -96,101 +96,104 @@ class FileModal extends Component {
                             </div>
                             <div className="col-md-9 py-3">
                                 {this.state.activeTab === "image" ? (
-                                    this.state.selectedImageData.path !== "" ? (
-                                        <div className="row justify-content-center">
-                                            <div className="col-md-10">
-                                                <div className="card">
-                                                    {/* Single image view */}
-                                                    <div className="card-body text-center p-0">
-                                                        {this.state
-                                                            .selectedImageData
-                                                            .length !== 0 ? (
-                                                            <>
-                                                                <img
-                                                                    src={
-                                                                        this
-                                                                            .state
-                                                                            .selectedImageData
-                                                                            .path
-                                                                    }
-                                                                    alt={
-                                                                        this
-                                                                            .state
-                                                                            .selectedImageData
-                                                                            .file_name
-                                                                    }
-                                                                    className="img-fluid rounded-lg"
-                                                                />
-                                                                <div className="card-body primary-text font-weight-bold-600 text-center small p-2">
-                                                                    {
-                                                                        this
-                                                                            .state
-                                                                            .selectedImageData
-                                                                            .title
-                                                                    }
-                                                                </div>
-                                                            </>
-                                                        ) : (
-                                                            ""
-                                                        )}
+                                    <div className="row justify-content-center">
+                                        <div className="col-md-10">
+                                            <div className="card">
+                                                {/* Single image view */}
+                                                <div className="card-body text-center p-0">
+                                                    <img
+                                                        src={
+                                                            this.state
+                                                                .selectedImageData
+                                                                .path
+                                                        }
+                                                        alt={
+                                                            this.state
+                                                                .selectedImageData
+                                                                .file_name
+                                                        }
+                                                        className="img-fluid rounded-lg"
+                                                    />
+                                                    <div className="card-body primary-text font-weight-bold-600 text-center small p-2">
+                                                        {
+                                                            this.state
+                                                                .selectedImageData
+                                                                .title
+                                                        }
                                                     </div>
-                                                    {/* Thumbnails */}
-                                                    <div className="card-footer px-0">
-                                                        <div className="row justify-content-center">
-                                                            {this.state.image.map(
-                                                                (
-                                                                    images,
-                                                                    index
-                                                                ) => {
-                                                                    return images.path !==
-                                                                        "" ? (
+                                                </div>
+                                                {/* Thumbnails */}
+                                                <div className="card-footer px-0">
+                                                    <div className="row justify-content-center">
+                                                        {this.state.image.map(
+                                                            (images, index) => {
+                                                                return images.path !==
+                                                                    "" ? (
+                                                                    <div
+                                                                        key={
+                                                                            index
+                                                                        }
+                                                                        className="col-md-3"
+                                                                    >
                                                                         <div
-                                                                            key={
+                                                                            className={`card preview-img-sm shadow-sm ${
+                                                                                this
+                                                                                    .state
+                                                                                    .selectedImage ===
                                                                                 index
-                                                                            }
-                                                                            className="col-md-3"
-                                                                        >
-                                                                            <div
-                                                                                className={`card preview-img-sm shadow-sm ${
-                                                                                    this
-                                                                                        .state
-                                                                                        .selectedImage ===
+                                                                                    ? "border-primary"
+                                                                                    : ""
+                                                                            }`}
+                                                                            style={{
+                                                                                backgroundImage: `url(${images.path})`,
+                                                                            }}
+                                                                            onClick={() =>
+                                                                                this.changeImage(
                                                                                     index
-                                                                                        ? "border-primary"
-                                                                                        : ""
-                                                                                }`}
-                                                                                style={{
-                                                                                    backgroundImage: `url(${images.path})`,
-                                                                                }}
-                                                                                onClick={() =>
-                                                                                    this.changeImage(
-                                                                                        index
-                                                                                    )
-                                                                                }
-                                                                            ></div>
-                                                                        </div>
-                                                                    ) : null;
-                                                                }
-                                                            )}
-                                                        </div>
+                                                                                )
+                                                                            }
+                                                                        ></div>
+                                                                    </div>
+                                                                ) : null;
+                                                            }
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    ) : (
-                                        "Images not uploaded..."
-                                    )
+                                    </div>
                                 ) : null}
 
                                 {/* Video tab */}
                                 {this.state.activeTab === "video" ? (
                                     <div className="card">
                                         {this.state.video.path !== "" ? (
-                                            <Player>
-                                                <source
-                                                    src={this.state.video.path}
-                                                />
-                                            </Player>
+                                            <>
+                                                <Player>
+                                                    <source
+                                                        src={
+                                                            this.state.video
+                                                                .path
+                                                        }
+                                                    />
+                                                </Player>
+                                                <p className="mt-3">
+                                                    If video doesn't start
+                                                    playing,{" "}
+                                                    <a
+                                                        href={
+                                                            this.state.video
+                                                                .path
+                                                        }
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                    >
+                                                        Click here
+                                                    </a>{" "}
+                                                    to view the video in a
+                                                    seperate tab
+                                                </p>
+                                            </>
                                         ) : (
                                             "Video not uploaded..."
                                         )}
