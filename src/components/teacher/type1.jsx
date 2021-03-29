@@ -172,49 +172,80 @@ class Type1 extends Component {
                             audio = [];
                             if (response[i].files.length !== 0) {
                                 // image
-                                if (response[i].files[0].type1_image_1) {
+                                if (
+                                    response[i].files[0].type1_image_1 !==
+                                        undefined ||
+                                    response[i].files[0].type1_image_2 !==
+                                        undefined ||
+                                    response[i].files[0].type1_image_3 !==
+                                        undefined ||
+                                    response[i].files[0].type1_image_4 !==
+                                        undefined
+                                ) {
                                     images.push({
                                         title:
                                             response[i].files[0]
-                                                .type1_image_1_title,
+                                                .type1_image_1_title || "",
                                         file_name: "",
                                         image: null,
                                         path:
-                                            response[i].files[0].type1_image_1,
-                                    });
-                                }
-                                if (response[i].files[0].type1_image_2) {
-                                    images.push({
-                                        title:
                                             response[i].files[0]
-                                                .type1_image_2_title,
-                                        file_name: "",
-                                        image: null,
-                                        path:
-                                            response[i].files[0].type1_image_2,
+                                                .type1_image_1 || "",
                                     });
-                                }
-                                if (response[i].files[0].type1_image_3) {
-                                    images.push({
-                                        title:
+                                    if (
+                                        response[i].files[0].type1_image_2 !==
+                                            undefined ||
+                                        response[i].files[0].type1_image_3 !==
+                                            undefined ||
+                                        response[i].files[0].type1_image_4 !==
+                                            undefined
+                                    ) {
+                                        images.push({
+                                            title:
+                                                response[i].files[0]
+                                                    .type1_image_2_title || "",
+                                            file_name: "",
+                                            image: null,
+                                            path:
+                                                response[i].files[0]
+                                                    .type1_image_2 || "",
+                                        });
+                                        if (
                                             response[i].files[0]
-                                                .type1_image_3_title,
-                                        file_name: "",
-                                        image: null,
-                                        path:
-                                            response[i].files[0].type1_image_3,
-                                    });
-                                }
-                                if (response[i].files[0].type1_image_4) {
-                                    images.push({
-                                        title:
+                                                .type1_image_3 !== undefined ||
                                             response[i].files[0]
-                                                .type1_image_4_title,
-                                        file_name: "",
-                                        image: null,
-                                        path:
-                                            response[i].files[0].type1_image_4,
-                                    });
+                                                .type1_image_4 !== undefined
+                                        ) {
+                                            images.push({
+                                                title:
+                                                    response[i].files[0]
+                                                        .type1_image_3_title ||
+                                                    "",
+                                                file_name: "",
+                                                image: null,
+                                                path:
+                                                    response[i].files[0]
+                                                        .type1_image_3 || "",
+                                            });
+                                            if (
+                                                response[i].files[0]
+                                                    .type1_image_4 !== undefined
+                                            ) {
+                                                images.push({
+                                                    title:
+                                                        response[i].files[0]
+                                                            .type1_image_4_title ||
+                                                        "",
+                                                    file_name: "",
+                                                    image: null,
+                                                    path:
+                                                        response[i].files[0]
+                                                            .type1_image_4 ||
+                                                        "",
+                                                });
+                                            }
+                                        }
+                                    }
                                 }
 
                                 // audio

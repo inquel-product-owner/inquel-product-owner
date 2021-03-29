@@ -143,62 +143,62 @@ class TopicModal extends Component {
                 centered
             >
                 <Modal.Header closeButton>Create Topic</Modal.Header>
-                <Modal.Body>
-                    <Alert
-                        variant="danger"
-                        show={this.state.showErrorAlert}
-                        onClose={() => {
-                            this.setState({
-                                showErrorAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.errorMsg}
-                    </Alert>
-                    <Alert
-                        variant="success"
-                        show={this.state.showSuccessAlert}
-                        onClose={() => {
-                            this.setState({
-                                showSuccessAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.successMsg}
-                    </Alert>
+                <form onSubmit={this.handleSubmit} autoComplete="off">
+                    <Modal.Body>
+                        <Alert
+                            variant="danger"
+                            show={this.state.showErrorAlert}
+                            onClose={() => {
+                                this.setState({
+                                    showErrorAlert: false,
+                                });
+                            }}
+                            dismissible
+                        >
+                            {this.state.errorMsg}
+                        </Alert>
+                        <Alert
+                            variant="success"
+                            show={this.state.showSuccessAlert}
+                            onClose={() => {
+                                this.setState({
+                                    showSuccessAlert: false,
+                                });
+                            }}
+                            dismissible
+                        >
+                            {this.state.successMsg}
+                        </Alert>
 
-                    <form onSubmit={this.handleSubmit} autoComplete="off">
-                        <div className="form-group">
-                            <input
-                                type="text"
-                                name="topic"
-                                className="form-control borders"
-                                onChange={this.handleTopic}
-                                placeholder="Topic name"
-                                required
-                            />
-                        </div>
-                        <div className="form-group">
-                            <button className="btn btn-primary btn-sm btn-block">
-                                {this.state.showLoader ? (
-                                    <Spinner
-                                        as="span"
-                                        animation="border"
-                                        size="sm"
-                                        role="status"
-                                        aria-hidden="true"
-                                        className="mr-2"
-                                    />
-                                ) : (
-                                    ""
-                                )}
-                                Add
-                            </button>
-                        </div>
-                    </form>
-                </Modal.Body>
+                        <label htmlFor="topic">Topic name</label>
+                        <input
+                            type="text"
+                            name="topic"
+                            id="topic"
+                            className="form-control borders"
+                            onChange={this.handleTopic}
+                            placeholder="Topic name"
+                            required
+                        />
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <button className="btn btn-primary btn-block shadow-none">
+                            {this.state.showLoader ? (
+                                <Spinner
+                                    as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    aria-hidden="true"
+                                    className="mr-2"
+                                />
+                            ) : (
+                                ""
+                            )}
+                            Add
+                        </button>
+                    </Modal.Footer>
+                </form>
             </Modal>
         );
     }
@@ -281,62 +281,62 @@ class CycleTestModal extends Component {
                 centered
             >
                 <Modal.Header closeButton>Create Cycle test</Modal.Header>
-                <Modal.Body>
-                    <Alert
-                        variant="danger"
-                        show={this.state.showErrorAlert}
-                        onClose={() => {
-                            this.setState({
-                                showErrorAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.errorMsg}
-                    </Alert>
-                    <Alert
-                        variant="success"
-                        show={this.state.showSuccessAlert}
-                        onClose={() => {
-                            this.setState({
-                                showSuccessAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.successMsg}
-                    </Alert>
+                <form onSubmit={this.handleSubmit} autoComplete="off">
+                    <Modal.Body>
+                        <Alert
+                            variant="danger"
+                            show={this.state.showErrorAlert}
+                            onClose={() => {
+                                this.setState({
+                                    showErrorAlert: false,
+                                });
+                            }}
+                            dismissible
+                        >
+                            {this.state.errorMsg}
+                        </Alert>
+                        <Alert
+                            variant="success"
+                            show={this.state.showSuccessAlert}
+                            onClose={() => {
+                                this.setState({
+                                    showSuccessAlert: false,
+                                });
+                            }}
+                            dismissible
+                        >
+                            {this.state.successMsg}
+                        </Alert>
 
-                    <form onSubmit={this.handleSubmit} autoComplete="off">
-                        <div className="form-group">
-                            <input
-                                type="text"
-                                name="cycle_test"
-                                className="form-control borders"
-                                onChange={this.handleCycleTest}
-                                placeholder="Cycle test name"
-                                required
-                            />
-                        </div>
-                        <div className="form-group">
-                            <button className="btn btn-primary btn-sm btn-block">
-                                {this.state.showLoader ? (
-                                    <Spinner
-                                        as="span"
-                                        animation="border"
-                                        size="sm"
-                                        role="status"
-                                        aria-hidden="true"
-                                        className="mr-2"
-                                    />
-                                ) : (
-                                    ""
-                                )}
-                                Add
-                            </button>
-                        </div>
-                    </form>
-                </Modal.Body>
+                        <label htmlFor="cycle_test">Cycle test name</label>
+                        <input
+                            type="text"
+                            name="cycle_test"
+                            id="cycle_test"
+                            className="form-control borders"
+                            onChange={this.handleCycleTest}
+                            placeholder="Cycle test name"
+                            required
+                        />
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <button className="btn btn-primary btn-block shadow-none">
+                            {this.state.showLoader ? (
+                                <Spinner
+                                    as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    aria-hidden="true"
+                                    className="mr-2"
+                                />
+                            ) : (
+                                ""
+                            )}
+                            Add
+                        </button>
+                    </Modal.Footer>
+                </form>
             </Modal>
         );
     }
@@ -458,14 +458,14 @@ class Chapters extends Component {
                         payload:
                             result.data.chapter_name !== undefined
                                 ? result.data.chapter_name
-                                : "Chapter name",
+                                : this.props.chapter_name,
                     });
                     this.setState({
                         chapters: chapters,
                         chapterName:
                             result.data.chapter_name !== undefined
                                 ? result.data.chapter_name
-                                : "Chapter name",
+                                : this.props.chapter_name,
                         next_topic:
                             result.data.topics_list !== undefined
                                 ? result.data.topics_list
@@ -597,6 +597,10 @@ class Chapters extends Component {
         chapters.chapter_id = event.value;
         this.props.history.push({
             pathname: `/teacher/subject/${this.subjectId}/chapter/${event.value}`,
+        });
+        store.dispatch({
+            type: "CHAPTER",
+            payload: event.label,
         });
         this.setState(
             {
@@ -873,7 +877,7 @@ class Chapters extends Component {
     };
 
     render() {
-        document.title = `${this.state.chapterName} - Teacher | IQLabs`;
+        document.title = `${this.props.chapter_name} - Teacher | IQLabs`;
         return (
             <div className="wrapper">
                 {/* Navbar */}
@@ -1040,7 +1044,7 @@ class Chapters extends Component {
                             <div className="col-md-4">
                                 <Select
                                     className="basic-single form-shadow"
-                                    placeholder={this.state.chapterName}
+                                    placeholder={this.props.chapter_name}
                                     value={[]}
                                     isSearchable={true}
                                     name="chapter"
@@ -1132,8 +1136,8 @@ class Chapters extends Component {
                                                         </div>
                                                         <div className="col-8 small font-weight-bold">
                                                             {
-                                                                this.state
-                                                                    .chapterName
+                                                                this.props
+                                                                    .chapter_name
                                                             }
                                                         </div>
                                                     </div>
