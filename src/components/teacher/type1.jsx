@@ -5,13 +5,7 @@ import Header from "./shared/navbar";
 import SideNav from "./shared/sidenav";
 import CKeditor from "../sharedComponents/CKeditor";
 import ReactSwitch from "../sharedComponents/switchComponent";
-import {
-    Accordion,
-    Card,
-    Spinner,
-    OverlayTrigger,
-    Tooltip,
-} from "react-bootstrap";
+import { Accordion, Card, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import Loading from "../sharedComponents/loader";
 import AlertBox from "../sharedComponents/alert";
@@ -37,8 +31,6 @@ class Type1 extends Component {
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
-            showLoader: false,
-            showPublishLoader: false,
 
             page_loading: true,
             btnDisabled: false,
@@ -85,7 +77,7 @@ class Type1 extends Component {
                             { correct: false, content: "" },
                             { correct: false, content: "" },
                         ],
-                        explanation: "",
+                        explanation: "<p>Explanation goes here</p>",
                         images: [
                             { title: "", file_name: "", image: null, path: "" },
                         ],
@@ -474,7 +466,7 @@ class Type1 extends Component {
 
     handleSubmit = () => {
         this.setState({
-            showLoader: true,
+            page_loading: true,
             showErrorAlert: false,
             showSuccessAlert: false,
         });
@@ -567,7 +559,7 @@ class Type1 extends Component {
             this.setState({
                 errorMsg: "Question is required",
                 showErrorAlert: true,
-                showLoader: false,
+                page_loading: false,
             });
         } else if (
             data[this.state.activeQuestion].content.mcq === false &&
@@ -577,37 +569,37 @@ class Type1 extends Component {
             this.setState({
                 errorMsg: "Select any one answer type",
                 showErrorAlert: true,
-                showLoader: false,
+                page_loading: false,
             });
         } else if (option_content === false) {
             this.setState({
                 errorMsg: "Enter the options value",
                 showErrorAlert: true,
-                showLoader: false,
+                page_loading: false,
             });
         } else if (option_correct === false) {
             this.setState({
                 errorMsg: "Select a correct option in the MCQ",
                 showErrorAlert: true,
-                showLoader: false,
+                page_loading: false,
             });
         } else if (fill_in === false) {
             this.setState({
                 errorMsg: "Enter the fill in answers",
                 showErrorAlert: true,
-                showLoader: false,
+                page_loading: false,
             });
         } else if (boolean_correct === false) {
             this.setState({
                 errorMsg: "Select either True or False",
                 showErrorAlert: true,
-                showLoader: false,
+                page_loading: false,
             });
         } else if (data[this.state.activeQuestion].properties.marks === "") {
             this.setState({
                 errorMsg: "Marks is required",
                 showErrorAlert: true,
-                showLoader: false,
+                page_loading: false,
             });
         } else if (
             data[this.state.activeQuestion].properties.complexity === ""
@@ -615,19 +607,19 @@ class Type1 extends Component {
             this.setState({
                 errorMsg: "Complexity is required",
                 showErrorAlert: true,
-                showLoader: false,
+                page_loading: false,
             });
         } else if (data[this.state.activeQuestion].properties.priority === "") {
             this.setState({
                 errorMsg: "Priority is required",
                 showErrorAlert: true,
-                showLoader: false,
+                page_loading: false,
             });
         } else if (data[this.state.activeQuestion].properties.theme === "") {
             this.setState({
-                errorMsg: "Theme is reuired",
+                errorMsg: "Theme is required",
                 showErrorAlert: true,
-                showLoader: false,
+                page_loading: false,
             });
         } else {
             if (data[this.state.activeQuestion].question_random_id === "") {
@@ -694,7 +686,7 @@ class Type1 extends Component {
                     this.setState({
                         errorMsg: result.detail ? result.detail : result.msg,
                         showErrorAlert: true,
-                        showLoader: false,
+                        page_loading: false,
                     });
                 }
             })
@@ -761,7 +753,7 @@ class Type1 extends Component {
                     this.setState({
                         errorMsg: result.detail ? result.detail : result.msg,
                         showErrorAlert: true,
-                        showLoader: false,
+                        page_loading: false,
                     });
                 }
             })
@@ -777,7 +769,7 @@ class Type1 extends Component {
             this.state.isForm_submitted === true
         ) {
             this.setState({
-                showLoader: true,
+                page_loading: true,
                 showErrorAlert: false,
                 showSuccessAlert: false,
                 isForm_submitted: false,
@@ -900,20 +892,17 @@ class Type1 extends Component {
                         questions: questionData,
                         successMsg: "Question added",
                         showSuccessAlert: true,
-                        showLoader: false,
                     },
                     () => {
-                        setTimeout(() => {
-                            this.setState({
-                                showEdit_option: false,
-                                contentCollapsed: true,
-                                propertiesCollapsed: true,
-                                settingsCollapsed: true,
-                                page_loading: true,
-                                activeQuestion: "",
-                            });
-                            this.loadMCQData();
-                        }, 1000);
+                        this.setState({
+                            showEdit_option: false,
+                            contentCollapsed: true,
+                            propertiesCollapsed: true,
+                            settingsCollapsed: true,
+                            page_loading: true,
+                            activeQuestion: "",
+                        });
+                        this.loadMCQData();
                     }
                 );
             }
@@ -935,20 +924,18 @@ class Type1 extends Component {
                             questions: questionData,
                             successMsg: result.data.msg,
                             showSuccessAlert: true,
-                            showLoader: false,
+                            page_loading: false,
                         },
                         () => {
-                            setTimeout(() => {
-                                this.setState({
-                                    showEdit_option: false,
-                                    contentCollapsed: true,
-                                    propertiesCollapsed: true,
-                                    settingsCollapsed: true,
-                                    page_loading: true,
-                                    activeQuestion: "",
-                                });
-                                this.loadMCQData();
-                            }, 1000);
+                            this.setState({
+                                showEdit_option: false,
+                                contentCollapsed: true,
+                                propertiesCollapsed: true,
+                                settingsCollapsed: true,
+                                page_loading: true,
+                                activeQuestion: "",
+                            });
+                            this.loadMCQData();
                         }
                     );
                 } else {
@@ -957,7 +944,7 @@ class Type1 extends Component {
                             ? result.data.detail
                             : result.data.msg,
                         showErrorAlert: true,
-                        showLoader: false,
+                        page_loading: false,
                     });
                 }
             })
@@ -981,20 +968,18 @@ class Type1 extends Component {
                             questions: questionData,
                             successMsg: result.data.msg,
                             showSuccessAlert: true,
-                            showLoader: false,
+                            page_loading: false,
                         },
                         () => {
-                            setTimeout(() => {
-                                this.setState({
-                                    showEdit_option: false,
-                                    contentCollapsed: true,
-                                    propertiesCollapsed: true,
-                                    settingsCollapsed: true,
-                                    page_loading: true,
-                                    activeQuestion: "",
-                                });
-                                this.loadMCQData();
-                            }, 1000);
+                            this.setState({
+                                showEdit_option: false,
+                                contentCollapsed: true,
+                                propertiesCollapsed: true,
+                                settingsCollapsed: true,
+                                page_loading: true,
+                                activeQuestion: "",
+                            });
+                            this.loadMCQData();
                         }
                     );
                 } else {
@@ -1003,7 +988,7 @@ class Type1 extends Component {
                             ? result.data.detail
                             : result.data.msg,
                         showErrorAlert: true,
-                        showLoader: false,
+                        page_loading: false,
                     });
                 }
             })
@@ -1860,7 +1845,7 @@ class Type1 extends Component {
                     { correct: false, content: "" },
                     { correct: false, content: "" },
                 ],
-                explanation: "",
+                explanation: "<p>Explanation goes here</p>",
                 images: [{ title: "", file_name: "", image: null, path: "" }],
                 video: {
                     title: "",
@@ -1947,7 +1932,7 @@ class Type1 extends Component {
                                     { correct: false, content: "" },
                                     { correct: false, content: "" },
                                 ],
-                                explanation: "",
+                                explanation: "<p>Explanation goes here</p>",
                                 images: [
                                     {
                                         title: "",
@@ -2150,7 +2135,7 @@ class Type1 extends Component {
                                 { correct: false, content: "" },
                                 { correct: false, content: "" },
                             ],
-                            explanation: "",
+                            explanation: "<p>Explanation goes here</p>",
                             images: [
                                 {
                                     title: "",
@@ -2216,7 +2201,7 @@ class Type1 extends Component {
         this.setState({
             showSuccessAlert: false,
             showErrorAlert: false,
-            showPublishLoader: true,
+            page_loading: true,
         });
 
         const questions = [...this.state.questions];
@@ -2249,7 +2234,7 @@ class Type1 extends Component {
                         this.setState({
                             successMsg: result.msg,
                             showSuccessAlert: true,
-                            showPublishLoader: false,
+                            page_loading: false,
                         });
                     } else {
                         this.setState({
@@ -2257,7 +2242,7 @@ class Type1 extends Component {
                                 ? result.detail
                                 : result.msg,
                             showErrorAlert: true,
-                            showPublishLoader: false,
+                            page_loading: false,
                         });
                     }
                 })
@@ -2266,7 +2251,7 @@ class Type1 extends Component {
                 });
         } else {
             this.setState({
-                showPublishLoader: false,
+                page_loading: false,
             });
         }
     };
@@ -2404,19 +2389,6 @@ class Type1 extends Component {
                                                 className="btn btn-primary btn-sm shadow-none mr-1"
                                                 onClick={this.handlePublish}
                                             >
-                                                {this.state
-                                                    .showPublishLoader ? (
-                                                    <Spinner
-                                                        as="span"
-                                                        animation="border"
-                                                        size="sm"
-                                                        role="status"
-                                                        aria-hidden="true"
-                                                        className="mr-2"
-                                                    />
-                                                ) : (
-                                                    ""
-                                                )}
                                                 Publish
                                             </button>
                                             <button className="btn btn-primary btn-sm shadow-none mr-1">
@@ -2542,7 +2514,7 @@ class Type1 extends Component {
                                                                                                 <div
                                                                                                     className={`card form-shadow ${
                                                                                                         options.correct
-                                                                                                            ? "border border-success"
+                                                                                                            ? "success-bg"
                                                                                                             : ""
                                                                                                     }`}
                                                                                                 >
@@ -2626,7 +2598,7 @@ class Type1 extends Component {
                                                                                                 <div
                                                                                                     className={`card form-shadow ${
                                                                                                         boolean.correct
-                                                                                                            ? "border border-success"
+                                                                                                            ? "success-bg"
                                                                                                             : ""
                                                                                                     }`}
                                                                                                 >
@@ -2693,18 +2665,6 @@ class Type1 extends Component {
                                             onClick={this.handleSubmit}
                                             disabled={this.state.btnDisabled}
                                         >
-                                            {this.state.showLoader ? (
-                                                <Spinner
-                                                    as="span"
-                                                    animation="border"
-                                                    size="sm"
-                                                    role="status"
-                                                    aria-hidden="true"
-                                                    className="mr-2"
-                                                />
-                                            ) : (
-                                                ""
-                                            )}
                                             Save
                                         </button>
                                         <button
