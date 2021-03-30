@@ -1137,7 +1137,7 @@ class FlashCard extends Component {
             activeTab: type,
             page_loading: true,
         });
-        this.props.history.push({ hash: type });
+        // this.props.history.push({ hash: type });
         if (type === "concept") {
             this.loadConceptData();
         } else if (type === "practice") {
@@ -1250,7 +1250,7 @@ class FlashCard extends Component {
         });
     };
 
-    // ---------- creates section structure ----------
+    // ---------- creates section structure and explanation structure ----------
 
     loopSectionStructure = () => {
         const sections =
