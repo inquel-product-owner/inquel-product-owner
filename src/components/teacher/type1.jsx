@@ -435,7 +435,7 @@ class Type1 extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.props.topic_name} MCQ - Teacher | IQLabs`;
+        document.title = `${this.props.topic_name} Type 1 - Teacher | IQLabs`;
 
         fetch(`${this.url}/teacher/status/data/?theme=1&complexity=1`, {
             headers: this.headers,
@@ -2380,7 +2380,7 @@ class Type1 extends Component {
                                 <div className="row align-items-center">
                                     <div className="col-md-6">
                                         <h5 className="primary-text">
-                                            {`${this.props.chapter_name} | ${this.props.topic_name} - MCQ`}
+                                            {`${this.props.topic_name} - Type 1`}
                                         </h5>
                                     </div>
                                     <div className="col-md-6">
@@ -2641,6 +2641,52 @@ class Type1 extends Component {
                                                                 </div>
                                                             </div>
                                                         </div>
+                                                        {/* ----- Answer type tag ----- */}
+                                                        {question.content
+                                                            .mcq ? (
+                                                            <div
+                                                                className="secondary-bg primary-text font-weight-bold px-2 py-1  position-absolute rounded-lg shadow-sm"
+                                                                style={{
+                                                                    bottom:
+                                                                        "5px",
+                                                                    right:
+                                                                        "5px",
+                                                                    fontSize:
+                                                                        "10px",
+                                                                }}
+                                                            >
+                                                                MCQ
+                                                            </div>
+                                                        ) : question.content
+                                                              .fill_in ? (
+                                                            <div
+                                                                className="secondary-bg primary-text font-weight-bold px-2 py-1  position-absolute rounded-lg shadow-sm"
+                                                                style={{
+                                                                    bottom:
+                                                                        "5px",
+                                                                    right:
+                                                                        "5px",
+                                                                    fontSize:
+                                                                        "10px",
+                                                                }}
+                                                            >
+                                                                Fill in
+                                                            </div>
+                                                        ) : (
+                                                            <div
+                                                                className="secondary-bg primary-text font-weight-bold px-2 py-1  position-absolute rounded-lg shadow-sm"
+                                                                style={{
+                                                                    bottom:
+                                                                        "5px",
+                                                                    right:
+                                                                        "5px",
+                                                                    fontSize:
+                                                                        "10px",
+                                                                }}
+                                                            >
+                                                                True / False
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
@@ -2649,7 +2695,7 @@ class Type1 extends Component {
                                 )}
 
                                 <button
-                                    className="btn btn-primary btn-block"
+                                    className="btn btn-primary btn-block shadow-none"
                                     onClick={this.addNewQuestion}
                                 >
                                     Add +

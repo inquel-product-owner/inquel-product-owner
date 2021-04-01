@@ -1,180 +1,61 @@
 import React, { Component, Fragment } from "react";
+import { connect } from "react-redux";
 import axios from "axios";
-import Header from "./navbar";
-import SideNav from "./sidenav";
+import Header from "./shared/navbar";
+import SideNav from "./shared/sidenav";
 import CKeditor from "../sharedComponents/CKeditor";
 import ReactSwitch from "../sharedComponents/switchComponent";
-import { Accordion, Card, Alert, Spinner, Modal } from "react-bootstrap";
+import { Accordion, Card, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import Loading from "../sharedComponents/loader";
+import AlertBox from "../sharedComponents/alert";
+import FileModal from "./shared/fileExplorer";
+import { ContentDeleteModal } from "../sharedComponents/contentManagementModal";
 
-class MCQDeleteModal extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            errorMsg: "",
-            successMsg: "",
-            showErrorAlert: false,
-            showSuccessAlert: false,
-            showLoader: false,
-        };
-        this.url = baseUrl + teacherUrl;
-        this.authToken = localStorage.getItem("Authorization");
-        this.headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: this.authToken,
-        };
-    }
+const mapStateToProps = (state) => ({
+    subject_name: state.subject_name,
+    chapter_name: state.chapter_name,
+    topic_name: state.topic_name,
+});
 
-    handleDelete = () => {
-        this.setState({
-            showSuccessAlert: false,
-            showErrorAlert: false,
-            showLoader: true,
-        });
-
-        fetch(
-            `${this.url}/teacher/subject/${this.props.subjectId}/chapter/mcq/`,
-            {
-                method: "DELETE",
-                headers: this.headers,
-                body: JSON.stringify({
-                    chapter_name: this.props.chapter_name,
-                    topic_name: this.props.topic_name,
-                    question_random_id: this.props.values,
-                }),
-            }
-        )
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    this.setState({
-                        successMsg: result.msg,
-                        showSuccessAlert: true,
-                        showLoader: false,
-                    });
-                    this.props.formSubmission(true);
-                } else {
-                    if (result.detail) {
-                        this.setState({
-                            errorMsg: result.detail,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.msg,
-                        });
-                    }
-                    this.setState({
-                        showErrorAlert: true,
-                        showLoader: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    render() {
-        return (
-            <Modal
-                show={this.props.show}
-                onHide={this.props.onHide}
-                size="md"
-                aria-labelledby="contained-modal-title-vcenter"
-                centered
-            >
-                <Modal.Header closeButton>Delete MCQ</Modal.Header>
-                <Modal.Body>
-                    <Alert
-                        variant="danger"
-                        show={this.state.showErrorAlert}
-                        onClose={() => {
-                            this.setState({
-                                showErrorAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.errorMsg}
-                    </Alert>
-                    <Alert
-                        variant="success"
-                        show={this.state.showSuccessAlert}
-                        onClose={() => {
-                            this.setState({
-                                showSuccessAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.successMsg}
-                    </Alert>
-                    <p className="mb-0">
-                        Are you sure that you want to delete this question?
-                    </p>
-                </Modal.Body>
-                <Modal.Footer>
-                    <button
-                        className="btn btn-secondary btn-sm mr-2"
-                        onClick={this.props.toggleModal}
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        className="btn btn-primary btn-sm"
-                        onClick={this.handleDelete}
-                    >
-                        {this.state.showLoader ? (
-                            <Spinner
-                                as="span"
-                                animation="border"
-                                size="sm"
-                                role="status"
-                                aria-hidden="true"
-                                className="mr-2"
-                            />
-                        ) : (
-                            ""
-                        )}
-                        Delete
-                    </button>
-                </Modal.Footer>
-            </Modal>
-        );
-    }
-}
-
-class SubjectType1 extends Component {
+class Type2 extends Component {
     constructor(props) {
         super(props);
         this.state = {
             showSideNav: false,
+            showModal: false,
+
+            alertMsg: "",
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
-            showLoader: false,
+
             page_loading: true,
             btnDisabled: false,
             showMCQDelete_Modal: false,
+            showSubMCQDelete_Modal: false,
 
+            showMainEdit_option: false,
             contentCollapsed: true,
             propertiesCollapsed: true,
             settingsCollapsed: true,
-            showEdit_option: false,
+
+            showSubEdit_option: false,
+            subContentCollapsed: true,
             showVirtual_keyboard: true,
+
             themeData: [],
             complexityData: [],
             isForm_submitted: false,
 
             activeQuestion: "",
-            selectedImageQuestion: "",
-            selectedImageData: [],
+            activeSubQuestion: "",
             selectedImage: "",
-            selectedQuestion: [],
+            selectedVideo: "",
+            selectedAudio: "",
+            selectedQuestion: "",
+            selectedSubQuestion: "",
 
             keyboards: [
                 { all: false, chemistry: false, physics: false, maths: false },
@@ -182,28 +63,32 @@ class SubjectType1 extends Component {
 
             questions: [
                 {
-                    chapter_name: this.props.match.params.chapterName,
-                    topic_name: this.props.match.params.topicName,
-                    question: "<p>Question goes here</p>",
+                    question: "<p>Main Question goes here</p>",
                     question_random_id: "",
                     is_image_uploaded: false,
+                    sub_question: [
+                        {
+                            sub_question_id: "",
+                            question: "<p>Sub question goes here</p>",
+                            explanation: "<p>Explanation goes here</p>",
+                            mcq: true,
+                            fill_in: false,
+                            fillin_answer: [""],
+                            options: [
+                                { correct: false, content: "" },
+                                { correct: false, content: "" },
+                                { correct: false, content: "" },
+                                { correct: false, content: "" },
+                            ],
+                            marks: "",
+                            negative_marks: "0",
+                        },
+                    ],
                     content: {
-                        mcq: true,
-                        fill_in: false,
-                        boolean: false,
-                        fillin_answer: [""],
-                        boolean_question: [
-                            { correct: false, content: "True" },
-                            { correct: false, content: "False" },
-                        ],
-                        options: [
-                            { correct: false, content: "" },
-                            { correct: false, content: "" },
-                            { correct: false, content: "" },
-                            { correct: false, content: "" },
-                        ],
-                        explanation: "",
                         images: [
+                            { title: "", file_name: "", image: null, path: "" },
+                            { title: "", file_name: "", image: null, path: "" },
+                            { title: "", file_name: "", image: null, path: "" },
                             { title: "", file_name: "", image: null, path: "" },
                         ],
                         video: {
@@ -211,6 +96,7 @@ class SubjectType1 extends Component {
                             file_name: "",
                             video: null,
                             path: "",
+                            url: "",
                         },
                         audio: [
                             { title: "", file_name: "", audio: null, path: "" },
@@ -218,7 +104,6 @@ class SubjectType1 extends Component {
                         ],
                     },
                     properties: {
-                        marks: "",
                         complexity: "",
                         priority: "",
                         theme: "",
@@ -235,10 +120,10 @@ class SubjectType1 extends Component {
             ],
         };
         this.option_limit = 6;
-        this.image_limit = 4;
+        this.sub_question_limit = 10;
         this.subjectId = this.props.match.params.subjectId;
-        this.chapterName = this.props.match.params.chapterName;
-        this.topicName = this.props.match.params.topicName;
+        this.chapterId = this.props.match.params.chapterId;
+        this.topicNum = this.props.match.params.topicNum;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
@@ -254,11 +139,20 @@ class SubjectType1 extends Component {
         });
     };
 
+    toggleModal = (image, video, audio) => {
+        this.setState({
+            showModal: !this.state.showModal,
+            selectedImage: image,
+            selectedVideo: video,
+            selectedAudio: audio,
+        });
+    };
+
     // -------------------------- Form submission --------------------------
 
     loadMCQData = () => {
         fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/?chapter_name=${this.chapterName}&topic_name=${this.topicName}`,
+            `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/?chapter_id=${this.chapterId}&topic_num=${this.topicNum}`,
             {
                 headers: this.headers,
                 method: "GET",
@@ -266,217 +160,283 @@ class SubjectType1 extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                let data = [];
-                let keyboards = [];
-                let images = [];
-                let audio = [];
-                let response = result.data.results[0].mcq;
-                if (response.length !== 0) {
-                    for (let i = 0; i < response.length; i++) {
-                        images = [];
-                        audio = [];
-                        if (response[i].files.length !== 0) {
-                            // image
-                            if (response[i].files[0].type1_image_1) {
-                                images.push({
-                                    title:
-                                        response[i].files[0]
-                                            .type1_image_1_title,
-                                    file_name: "",
-                                    image: null,
-                                    path: response[i].files[0].type1_image_1,
-                                });
-                            }
-                            if (response[i].files[0].type1_image_2) {
-                                images.push({
-                                    title:
-                                        response[i].files[0]
-                                            .type1_image_2_title,
-                                    file_name: "",
-                                    image: null,
-                                    path: response[i].files[0].type1_image_2,
-                                });
-                            }
-                            if (response[i].files[0].type1_image_3) {
-                                images.push({
-                                    title:
-                                        response[i].files[0]
-                                            .type1_image_3_title,
-                                    file_name: "",
-                                    image: null,
-                                    path: response[i].files[0].type1_image_3,
-                                });
-                            }
-                            if (response[i].files[0].type1_image_4) {
-                                images.push({
-                                    title:
-                                        response[i].files[0]
-                                            .type1_image_4_title,
-                                    file_name: "",
-                                    image: null,
-                                    path: response[i].files[0].type1_image_4,
-                                });
+                console.log(result);
+                if (result.sts === true) {
+                    let data = [];
+                    let keyboards = [];
+                    let images = [];
+                    let audio = [];
+                    let response = result.data.results;
+                    if (response.length !== 0) {
+                        for (let i = 0; i < response.length; i++) {
+                            images = [];
+                            audio = [];
+                            if (response[i].files.length !== 0) {
+                                // image
+                                if (
+                                    response[i].files[0].type1_image_1 !==
+                                        undefined ||
+                                    response[i].files[0].type1_image_2 !==
+                                        undefined ||
+                                    response[i].files[0].type1_image_3 !==
+                                        undefined ||
+                                    response[i].files[0].type1_image_4 !==
+                                        undefined
+                                ) {
+                                    images.push({
+                                        title:
+                                            response[i].files[0]
+                                                .type1_image_1_title || "",
+                                        file_name: "",
+                                        image: null,
+                                        path:
+                                            response[i].files[0]
+                                                .type1_image_1 || "",
+                                    });
+                                    if (
+                                        response[i].files[0].type1_image_2 !==
+                                            undefined ||
+                                        response[i].files[0].type1_image_3 !==
+                                            undefined ||
+                                        response[i].files[0].type1_image_4 !==
+                                            undefined
+                                    ) {
+                                        images.push({
+                                            title:
+                                                response[i].files[0]
+                                                    .type1_image_2_title || "",
+                                            file_name: "",
+                                            image: null,
+                                            path:
+                                                response[i].files[0]
+                                                    .type1_image_2 || "",
+                                        });
+                                        if (
+                                            response[i].files[0]
+                                                .type1_image_3 !== undefined ||
+                                            response[i].files[0]
+                                                .type1_image_4 !== undefined
+                                        ) {
+                                            images.push({
+                                                title:
+                                                    response[i].files[0]
+                                                        .type1_image_3_title ||
+                                                    "",
+                                                file_name: "",
+                                                image: null,
+                                                path:
+                                                    response[i].files[0]
+                                                        .type1_image_3 || "",
+                                            });
+                                            if (
+                                                response[i].files[0]
+                                                    .type1_image_4 !== undefined
+                                            ) {
+                                                images.push({
+                                                    title:
+                                                        response[i].files[0]
+                                                            .type1_image_4_title ||
+                                                        "",
+                                                    file_name: "",
+                                                    image: null,
+                                                    path:
+                                                        response[i].files[0]
+                                                            .type1_image_4 ||
+                                                        "",
+                                                });
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // audio
+                                if (response[i].files[0].type1_audio_1) {
+                                    audio.push({
+                                        title:
+                                            response[i].files[0]
+                                                .type1_audio_1_title,
+                                        file_name: "",
+                                        audio: null,
+                                        path:
+                                            response[i].files[0].type1_audio_1,
+                                    });
+                                }
+                                if (response[i].files[0].type1_audio_2) {
+                                    audio.push({
+                                        title:
+                                            response[i].files[0]
+                                                .type1_audio_2_title,
+                                        file_name: "",
+                                        audio: null,
+                                        path:
+                                            response[i].files[0].type1_audio_2,
+                                    });
+                                }
                             }
 
-                            // audio
-                            if (response[i].files[0].type1_audio_1) {
-                                audio.push({
-                                    title:
-                                        response[i].files[0]
-                                            .type1_audio_1_title,
-                                    file_name: "",
-                                    audio: null,
-                                    path: response[i].files[0].type1_audio_1,
-                                });
+                            // video
+                            var path = "";
+                            if (response[i].files.length !== 0) {
+                                if (response[i].files[0].paste_video_url) {
+                                    path = response[i].files[0].paste_video_url;
+                                }
+                                if (response[i].files[0].type1_video_1) {
+                                    path = response[i].files[0].type1_video_1;
+                                }
                             }
-                            if (response[i].files[0].type1_audio_2) {
-                                audio.push({
-                                    title:
-                                        response[i].files[0]
-                                            .type1_audio_2_title,
-                                    file_name: "",
-                                    audio: null,
-                                    path: response[i].files[0].type1_audio_2,
-                                });
-                            }
-                        }
 
-                        data.push({
-                            chapter_name: this.props.match.params.chapterName,
-                            topic_name: this.props.match.params.topicName,
-                            question: response[i].question,
-                            question_random_id: response[i].question_random_id,
-                            is_image_uploaded:
-                                response[i].files.length !== 0 ? true : false,
-                            content: {
-                                mcq: response[i].mcq,
-                                fill_in: response[i].fill_in,
-                                boolean: response[i].boolean,
-                                fillin_answer:
-                                    response[i].fillin_answer.length !== 0
-                                        ? response[i].fillin_answer
-                                        : [""],
-                                boolean_question:
-                                    response[i].boolean_question.length !== 0
-                                        ? response[i].boolean_question
-                                        : [
-                                              {
-                                                  correct: false,
-                                                  content: "True",
-                                              },
-                                              {
-                                                  correct: false,
-                                                  content: "False",
-                                              },
-                                          ],
-                                options:
-                                    response[i].options.length !== 0
-                                        ? response[i].options
-                                        : [
-                                              { correct: false, content: "" },
-                                              { correct: false, content: "" },
-                                              { correct: false, content: "" },
-                                              { correct: false, content: "" },
-                                          ],
-                                explanation: response[i].explanation,
-                                images:
-                                    images.length === 0
-                                        ? [
-                                              {
-                                                  title: "",
-                                                  file_name: "",
-                                                  image: null,
-                                                  path: "",
-                                              },
-                                          ]
-                                        : images,
-                                video: {
-                                    title:
-                                        response[i].files.length !== 0 &&
-                                        response[i].files[0].type1_video_1_title
-                                            ? response[i].files[0]
-                                                  .type1_video_1_title
-                                            : "",
-                                    file_name: "",
-                                    video: null,
-                                    path:
-                                        response[i].files.length !== 0 &&
-                                        response[i].files[0].paste_video_url
-                                            ? response[i].files[0]
-                                                  .paste_video_url
-                                            : "",
+                            data.push({
+                                chapter_id: this.props.match.params.chapterId,
+                                topic_num: this.props.match.params.topicNum,
+                                question: response[i].question,
+                                question_random_id:
+                                    response[i].question_random_id,
+                                is_image_uploaded:
+                                    response[i].files.length !== 0
+                                        ? true
+                                        : false,
+                                content: {
+                                    mcq: response[i].mcq,
+                                    fill_in: response[i].fill_in,
+                                    boolean: response[i].boolean,
+                                    fillin_answer:
+                                        response[i].fillin_answer.length !== 0
+                                            ? response[i].fillin_answer
+                                            : [""],
+                                    boolean_question:
+                                        response[i].boolean_question.length !==
+                                        0
+                                            ? response[i].boolean_question
+                                            : [
+                                                  {
+                                                      correct: false,
+                                                      content: "True",
+                                                  },
+                                                  {
+                                                      correct: false,
+                                                      content: "False",
+                                                  },
+                                              ],
+                                    options:
+                                        response[i].options.length !== 0
+                                            ? response[i].options
+                                            : [
+                                                  {
+                                                      correct: false,
+                                                      content: "",
+                                                  },
+                                                  {
+                                                      correct: false,
+                                                      content: "",
+                                                  },
+                                                  {
+                                                      correct: false,
+                                                      content: "",
+                                                  },
+                                                  {
+                                                      correct: false,
+                                                      content: "",
+                                                  },
+                                              ],
+                                    explanation: response[i].explanation,
+                                    images:
+                                        images.length === 0
+                                            ? [
+                                                  {
+                                                      title: "",
+                                                      file_name: "",
+                                                      image: null,
+                                                      path: "",
+                                                  },
+                                              ]
+                                            : images,
+                                    video: {
+                                        title:
+                                            response[i].files.length !== 0 &&
+                                            response[i].files[0]
+                                                .type1_video_1_title
+                                                ? response[i].files[0]
+                                                      .type1_video_1_title
+                                                : "",
+                                        file_name: "",
+                                        video: null,
+                                        path: path,
+                                        url: "",
+                                    },
+                                    audio:
+                                        audio.length === 0
+                                            ? [
+                                                  {
+                                                      title: "",
+                                                      file_name: "",
+                                                      audio: null,
+                                                      path: "",
+                                                  },
+                                              ]
+                                            : audio,
                                 },
-                                audio:
-                                    audio.length === 0
-                                        ? [
-                                              {
-                                                  title: "",
-                                                  file_name: "",
-                                                  audio: null,
-                                                  path: "",
-                                              },
-                                              {
-                                                  title: "",
-                                                  file_name: "",
-                                                  audio: null,
-                                                  path: "",
-                                              },
-                                          ]
-                                        : audio,
-                            },
-                            properties: {
-                                marks: response[i].properties.marks,
-                                complexity: response[i].properties.complexity,
-                                priority: response[i].properties.priority,
-                                theme: response[i].properties.theme,
-                                test: response[i].properties.test,
-                                semester: response[i].properties.semester,
-                                quiz: response[i].properties.quiz,
-                                learn: response[i].properties.learn,
-                            },
-                            settings: {
-                                virtual_keyboard:
-                                    response[i].settings.virtual_keyboard,
-                                limited: response[i].settings.limited,
-                            },
-                        });
+                                properties: {
+                                    marks: response[i].properties.marks,
+                                    complexity:
+                                        response[i].properties.complexity,
+                                    priority: response[i].properties.priority,
+                                    theme: response[i].properties.theme,
+                                    test: response[i].properties.test,
+                                    semester: response[i].properties.semester,
+                                    quiz: response[i].properties.quiz,
+                                    learn: response[i].properties.learn,
+                                },
+                                settings: {
+                                    virtual_keyboard:
+                                        response[i].settings.virtual_keyboard,
+                                    limited: response[i].settings.limited,
+                                },
+                            });
 
-                        // Keyboards
-                        let boards = {
-                            all: false,
-                            chemistry: false,
-                            physics: false,
-                            maths: false,
-                        };
-                        let virtual_keyboard =
-                            response[i].settings.virtual_keyboard;
-                        for (let j = 0; j < virtual_keyboard.length; j++) {
-                            if (virtual_keyboard[j] === "All") {
-                                boards.all = true;
-                                boards.chemistry = true;
-                                boards.maths = true;
-                                boards.physics = true;
-                            } else if (virtual_keyboard[j] === "Chemistry") {
-                                boards.chemistry = true;
-                            } else if (virtual_keyboard[j] === "Physics") {
-                                boards.physics = true;
-                            } else if (virtual_keyboard[j] === "Maths") {
-                                boards.maths = true;
+                            // Keyboards
+                            let boards = {
+                                all: false,
+                                chemistry: false,
+                                physics: false,
+                                maths: false,
+                            };
+                            let virtual_keyboard =
+                                response[i].settings.virtual_keyboard;
+                            for (let j = 0; j < virtual_keyboard.length; j++) {
+                                if (virtual_keyboard[j] === "All") {
+                                    boards.all = true;
+                                    boards.chemistry = true;
+                                    boards.maths = true;
+                                    boards.physics = true;
+                                } else if (
+                                    virtual_keyboard[j] === "Chemistry"
+                                ) {
+                                    boards.chemistry = true;
+                                } else if (virtual_keyboard[j] === "Physics") {
+                                    boards.physics = true;
+                                } else if (virtual_keyboard[j] === "Maths") {
+                                    boards.maths = true;
+                                }
                             }
+                            keyboards.push(boards);
                         }
-                        keyboards.push(boards);
+                        this.setState({
+                            questions: data,
+                            keyboards: keyboards,
+                            page_loading: false,
+                        });
+                    } else {
+                        this.setState({
+                            page_loading: false,
+                        });
                     }
-                    this.setState({
-                        questions: data,
-                        keyboards: keyboards,
-                        page_loading: false,
-                    });
                 } else {
                     this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
                         page_loading: false,
                     });
                 }
-                console.log(result);
             })
             .catch((err) => {
                 console.log(err);
@@ -484,7 +444,7 @@ class SubjectType1 extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.chapterName} Type 1 MCQ - Teacher | IQLabs`;
+        document.title = `${this.props.topic_name} Type 2 - Teacher | IQLabs`;
 
         fetch(`${this.url}/teacher/status/data/?theme=1&complexity=1`, {
             headers: this.headers,
@@ -492,264 +452,215 @@ class SubjectType1 extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                this.setState({
-                    themeData: result.data.theme,
-                    complexityData: result.data.complexity,
-                });
                 console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        themeData: result.data.theme,
+                        complexityData: result.data.complexity,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
             });
 
-        this.loadMCQData();
+        // this.loadMCQData();
+        this.setState({
+            page_loading: false,
+        });
     };
 
     handleSubmit = () => {
         this.setState({
-            showLoader: true,
+            page_loading: true,
             showErrorAlert: false,
             showSuccessAlert: false,
         });
 
         const data = [...this.state.questions];
-        let option_correct = data[this.state.activeQuestion].content.mcq
-            ? false
-            : true;
-        let option_content = data[this.state.activeQuestion].content.mcq
-            ? false
-            : true;
-        let fill_in = data[this.state.activeQuestion].content.fill_in
-            ? false
-            : true;
-        let boolean_correct = data[this.state.activeQuestion].content.boolean
-            ? false
-            : true;
+        let form_data = new FormData();
 
-        // Options validation
-        if (data[this.state.activeQuestion].content.mcq === true) {
-            for (
-                let i = 0;
-                i < data[this.state.activeQuestion].content.options.length;
-                i++
-            ) {
-                if (
-                    data[this.state.activeQuestion].content.options[i]
-                        .correct === true
-                ) {
-                    option_correct = true;
-                } else {
-                    continue;
-                }
-            }
-            for (
-                let i = 0;
-                i < data[this.state.activeQuestion].content.options.length;
-                i++
-            ) {
-                if (
-                    data[this.state.activeQuestion].content.options[i]
-                        .content !== ""
-                ) {
-                    option_content = true;
-                } else {
-                    option_content = false;
-                }
-            }
+        form_data.append(
+            "main_question",
+            JSON.stringify({
+                main_question: {
+                    question: data[this.state.activeQuestion].question,
+                    properties: {
+                        complexity:
+                            data[this.state.activeQuestion].properties
+                                .complexity,
+                        priority:
+                            data[this.state.activeQuestion].properties.priority,
+                        theme: data[this.state.activeQuestion].properties.theme,
+                        test: data[this.state.activeQuestion].properties.test,
+                        semester:
+                            data[this.state.activeQuestion].properties.semester,
+                        quiz: data[this.state.activeQuestion].properties.quiz,
+                        learn: data[this.state.activeQuestion].properties.learn,
+                    },
+                    settings: {
+                        virtual_keyboard:
+                            data[this.state.activeQuestion].settings
+                                .virtual_keyboard,
+                        limited:
+                            data[this.state.activeQuestion].settings.limited,
+                    },
+                },
+            })
+        );
+        form_data.append(
+            "sub_question",
+            JSON.stringify({
+                sub_question: data[this.state.activeQuestion].sub_question,
+            })
+        );
+        form_data.append("topic_num", this.topicNum);
+
+        // Video
+        if (data[this.state.activeQuestion].content.video.url !== "") {
+            form_data.append(
+                "video_url",
+                data[this.state.activeQuestion].content.video.url
+            );
         }
 
-        // fill in validation
-        if (data[this.state.activeQuestion].content.fill_in === true) {
-            for (
-                let i = 0;
-                i <
-                data[this.state.activeQuestion].content.fillin_answer.length;
-                i++
-            ) {
-                if (
-                    data[this.state.activeQuestion].content.fillin_answer[i] !==
-                    ""
-                ) {
-                    fill_in = true;
-                } else {
-                    fill_in = false;
-                }
-            }
+        if (data[this.state.activeQuestion].content.video.video !== null) {
+            form_data.append(
+                "type2_video_1_title",
+                data[this.state.activeQuestion].content.video.title
+            );
+            form_data.append(
+                "type2_video_1",
+                data[this.state.activeQuestion].content.video.video
+            );
         }
 
-        // Boolean validation
-        if (data[this.state.activeQuestion].content.boolean === true) {
-            for (
-                let i = 0;
-                i <
-                data[this.state.activeQuestion].content.boolean_question.length;
-                i++
+        // Image
+        for (
+            let i = 0;
+            i < data[this.state.activeQuestion].content.images.length;
+            i++
+        ) {
+            if (
+                data[this.state.activeQuestion].content.images[i].image !== null
             ) {
-                if (
-                    data[this.state.activeQuestion].content.boolean_question[i]
-                        .correct === true
-                ) {
-                    boolean_correct = true;
-                } else {
-                    continue;
-                }
-            }
-        }
-
-        if (data[this.state.activeQuestion].question === "") {
-            this.setState({
-                errorMsg: "Question is required",
-                showErrorAlert: true,
-                showLoader: false,
-            });
-        } else if (
-            data[this.state.activeQuestion].content.mcq === false &&
-            data[this.state.activeQuestion].content.fill_in === false &&
-            data[this.state.activeQuestion].content.boolean === false
-        ) {
-            this.setState({
-                errorMsg: "Select any one answer type",
-                showErrorAlert: true,
-                showLoader: false,
-            });
-        } else if (option_content === false) {
-            this.setState({
-                errorMsg: "Enter the options value",
-                showErrorAlert: true,
-                showLoader: false,
-            });
-        } else if (option_correct === false) {
-            this.setState({
-                errorMsg: "Select a correct option in the MCQ",
-                showErrorAlert: true,
-                showLoader: false,
-            });
-        } else if (fill_in === false) {
-            this.setState({
-                errorMsg: "Enter the fill in answers",
-                showErrorAlert: true,
-                showLoader: false,
-            });
-        } else if (boolean_correct === false) {
-            this.setState({
-                errorMsg: "Select either True or False",
-                showErrorAlert: true,
-                showLoader: false,
-            });
-        } else if (
-            data[this.state.activeQuestion].properties.complexity === ""
-        ) {
-            this.setState({
-                errorMsg: "Complexity is required",
-                showErrorAlert: true,
-                showLoader: false,
-            });
-        } else if (data[this.state.activeQuestion].properties.theme === "") {
-            this.setState({
-                errorMsg: "Theme is reuired",
-                showErrorAlert: true,
-                showLoader: false,
-            });
-        } else if (data[this.state.activeQuestion].properties.marks === "") {
-            this.setState({
-                errorMsg: "Marks is required",
-                showErrorAlert: true,
-                showLoader: false,
-            });
-        } else if (data[this.state.activeQuestion].properties.priority === "") {
-            this.setState({
-                errorMsg: "Priority is required",
-                showErrorAlert: true,
-                showLoader: false,
-            });
-        } else if (
-            data[this.state.activeQuestion].settings.virtual_keyboard.length ===
-            0
-        ) {
-            this.setState({
-                errorMsg: "Please select a Virtual keyboard",
-                showErrorAlert: true,
-                showLoader: false,
-            });
-        } else {
-            if (data[this.state.activeQuestion].question_random_id === "") {
-                this.handlePOST(data);
+                form_data.append(
+                    `type2_image_${i + 1}_title`,
+                    data[this.state.activeQuestion].content.images[i].title
+                );
+                form_data.append(
+                    `type2_image_${i + 1}`,
+                    data[this.state.activeQuestion].content.images[i].image
+                );
             } else {
-                this.handlePUT(data);
+                continue;
             }
+        }
+
+        // Audio
+        for (
+            let i = 0;
+            i < data[this.state.activeQuestion].content.audio.length;
+            i++
+        ) {
+            if (
+                data[this.state.activeQuestion].content.audio[i].audio !== null
+            ) {
+                form_data.append(
+                    `type2_audio_${i + 1}_title`,
+                    data[this.state.activeQuestion].content.audio[i].title
+                );
+                form_data.append(
+                    `type2_audio_${i + 1}`,
+                    data[this.state.activeQuestion].content.audio[i].audio
+                );
+            } else {
+                continue;
+            }
+        }
+
+        if (data[this.state.activeQuestion].question_random_id === "") {
+            this.handlePOST(form_data);
+        } else {
+            this.handlePUT(form_data);
         }
     };
 
     handlePOST = (data) => {
-        fetch(`${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/`, {
-            headers: this.headers,
-            method: "POST",
-            body: JSON.stringify({
-                chapter_name: this.props.match.params.chapterName,
-                topic_name: this.props.match.params.topicName,
-                question: data[this.state.activeQuestion].question,
-                content: {
-                    mcq: data[this.state.activeQuestion].content.mcq,
-                    fill_in: data[this.state.activeQuestion].content.fill_in,
-                    boolean: data[this.state.activeQuestion].content.boolean,
-                    fillin_answer:
-                        data[this.state.activeQuestion].content.fillin_answer,
-                    boolean_question:
-                        data[this.state.activeQuestion].content
-                            .boolean_question,
-                    options: data[this.state.activeQuestion].content.options,
-                    explanation:
-                        data[this.state.activeQuestion].content.explanation,
-                },
-                properties: {
-                    marks: data[this.state.activeQuestion].properties.marks,
-                    complexity:
-                        data[this.state.activeQuestion].properties.complexity,
-                    priority:
-                        data[this.state.activeQuestion].properties.priority,
-                    theme: data[this.state.activeQuestion].properties.theme,
-                    test: data[this.state.activeQuestion].properties.test,
-                    semester:
-                        data[this.state.activeQuestion].properties.semester,
-                    quiz: data[this.state.activeQuestion].properties.quiz,
-                    learn: data[this.state.activeQuestion].properties.learn,
-                },
-                settings: {
-                    virtual_keyboard:
-                        data[this.state.activeQuestion].settings
-                            .virtual_keyboard,
-                    limited: data[this.state.activeQuestion].settings.limited,
-                },
-            }),
-        })
-            .then((res) => res.json())
+        const options = {
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "multipart/form-data",
+                Authorization: this.authToken,
+            },
+        };
+
+        axios
+            .post(
+                `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/`,
+                data,
+                options
+            )
             .then((result) => {
                 console.log(result);
-                if (result.sts === true) {
-                    data[this.state.activeQuestion].question_random_id =
-                        result.question_random_id;
-                    this.setState({
-                        questions: data,
-                        isForm_submitted: true,
-                    });
+                if (result.data.sts === true) {
+                    this.setState(
+                        {
+                            successMsg: result.data.msg,
+                            showSuccessAlert: true,
+                            page_loading: false,
+                        },
+                        () => {
+                            this.setState({
+                                showMainEdit_option: false,
+                                showSubEdit_option: false,
+                                contentCollapsed: true,
+                                subContentCollapsed: true,
+                                propertiesCollapsed: true,
+                                settingsCollapsed: true,
+                                activeQuestion: "",
+                                activeSubQuestion: "",
+                            });
+                            this.loadMCQData();
+                        }
+                    );
                 } else {
-                    if (result.detail) {
-                        this.setState({
-                            errorMsg: result.detail,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.msg,
-                        });
-                    }
                     this.setState({
+                        errorMsg: result.data.detail
+                            ? result.data.detail
+                            : result.data.msg,
                         showErrorAlert: true,
-                        showLoader: false,
+                        page_loading: false,
                     });
                 }
             })
             .catch((err) => {
-                console.log(err);
+                console.warn(err);
+                if (err.response) {
+                    this.setState({
+                        errorMsg: err.response.data.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                } else if (err.request) {
+                    this.setState({
+                        errorMsg: err.rerequestsponse.data.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                } else if (err.message) {
+                    this.setState({
+                        errorMsg: err.message.data.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             });
     };
 
@@ -758,8 +669,8 @@ class SubjectType1 extends Component {
             headers: this.headers,
             method: "PUT",
             body: JSON.stringify({
-                chapter_name: this.props.match.params.chapterName,
-                topic_name: this.props.match.params.topicName,
+                chapter_id: this.chapterId,
+                topic_num: this.topicNum,
                 question: data[this.state.activeQuestion].question,
                 question_random_id:
                     data[this.state.activeQuestion].question_random_id,
@@ -803,25 +714,15 @@ class SubjectType1 extends Component {
                 if (result.sts === true) {
                     data[this.state.activeQuestion].question_random_id =
                         result.question_random_id;
-                    // data[this.state.activeQuestion].is_image_uploaded =
-                    //     result.file_exists === true ? true : false;
                     this.setState({
                         questions: data,
                         isForm_submitted: true,
                     });
                 } else {
-                    if (result.detail) {
-                        this.setState({
-                            errorMsg: result.detail,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.msg,
-                        });
-                    }
                     this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
                         showErrorAlert: true,
-                        showLoader: false,
+                        page_loading: false,
                     });
                 }
             })
@@ -837,7 +738,7 @@ class SubjectType1 extends Component {
             this.state.isForm_submitted === true
         ) {
             this.setState({
-                showLoader: true,
+                page_loading: true,
                 showErrorAlert: false,
                 showSuccessAlert: false,
                 isForm_submitted: false,
@@ -847,20 +748,20 @@ class SubjectType1 extends Component {
 
             let form_data = new FormData();
 
-            form_data.append("chapter_name", this.chapterName);
-            form_data.append("topic_name", this.topicName);
+            form_data.append("chapter_id", this.chapterId);
+            form_data.append("topic_num", this.topicNum);
             form_data.append(
                 "question_random_id",
                 questionData[this.state.activeQuestion].question_random_id
             );
 
+            // Video
             if (
-                questionData[this.state.activeQuestion].content.video.path !==
-                ""
+                questionData[this.state.activeQuestion].content.video.url !== ""
             ) {
                 form_data.append(
                     "video_url",
-                    questionData[this.state.activeQuestion].content.video.path
+                    questionData[this.state.activeQuestion].content.video.url
                 );
             }
 
@@ -869,15 +770,16 @@ class SubjectType1 extends Component {
                 null
             ) {
                 form_data.append(
-                    "type1_video_1_title",
+                    "type2_video_1_title",
                     questionData[this.state.activeQuestion].content.video.title
                 );
                 form_data.append(
-                    "type1_video_1",
+                    "type2_video_1",
                     questionData[this.state.activeQuestion].content.video.video
                 );
             }
 
+            // Image
             for (
                 let i = 0;
                 i <
@@ -889,13 +791,13 @@ class SubjectType1 extends Component {
                         .image !== null
                 ) {
                     form_data.append(
-                        `type1_image_${i + 1}_title`,
+                        `type2_image_${i + 1}_title`,
                         questionData[this.state.activeQuestion].content.images[
                             i
                         ].title
                     );
                     form_data.append(
-                        `type1_image_${i + 1}`,
+                        `type2_image_${i + 1}`,
                         questionData[this.state.activeQuestion].content.images[
                             i
                         ].image
@@ -905,6 +807,7 @@ class SubjectType1 extends Component {
                 }
             }
 
+            // Audio
             for (
                 let i = 0;
                 i <
@@ -916,12 +819,12 @@ class SubjectType1 extends Component {
                         .audio !== null
                 ) {
                     form_data.append(
-                        `type1_audio_${i + 1}_title`,
+                        `type2_audio_${i + 1}_title`,
                         questionData[this.state.activeQuestion].content.audio[i]
                             .title
                     );
                     form_data.append(
-                        `type1_audio_${i + 1}`,
+                        `type2_audio_${i + 1}`,
                         questionData[this.state.activeQuestion].content.audio[i]
                             .audio
                     );
@@ -958,13 +861,17 @@ class SubjectType1 extends Component {
                         questions: questionData,
                         successMsg: "Question added",
                         showSuccessAlert: true,
-                        showLoader: false,
-                        page_loading: true,
                     },
                     () => {
-                        setTimeout(() => {
-                            this.loadMCQData();
-                        }, 2000);
+                        this.setState({
+                            showMainEdit_option: false,
+                            contentCollapsed: true,
+                            propertiesCollapsed: true,
+                            settingsCollapsed: true,
+                            page_loading: true,
+                            activeQuestion: "",
+                        });
+                        this.loadMCQData();
                     }
                 );
             }
@@ -986,28 +893,27 @@ class SubjectType1 extends Component {
                             questions: questionData,
                             successMsg: result.data.msg,
                             showSuccessAlert: true,
-                            showLoader: false,
-                            page_loading: true,
+                            page_loading: false,
                         },
                         () => {
-                            setTimeout(() => {
-                                this.loadMCQData();
-                            }, 2000);
+                            this.setState({
+                                showMainEdit_option: false,
+                                contentCollapsed: true,
+                                propertiesCollapsed: true,
+                                settingsCollapsed: true,
+                                page_loading: true,
+                                activeQuestion: "",
+                            });
+                            this.loadMCQData();
                         }
                     );
                 } else {
-                    if (result.data.detail) {
-                        this.setState({
-                            errorMsg: result.data.detail,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.data.msg,
-                        });
-                    }
                     this.setState({
+                        errorMsg: result.data.detail
+                            ? result.data.detail
+                            : result.data.msg,
                         showErrorAlert: true,
-                        showLoader: false,
+                        page_loading: false,
                     });
                 }
             })
@@ -1031,28 +937,27 @@ class SubjectType1 extends Component {
                             questions: questionData,
                             successMsg: result.data.msg,
                             showSuccessAlert: true,
-                            showLoader: false,
-                            page_loading: true,
+                            page_loading: false,
                         },
                         () => {
-                            setTimeout(() => {
-                                this.loadMCQData();
-                            }, 2000);
+                            this.setState({
+                                showMainEdit_option: false,
+                                contentCollapsed: true,
+                                propertiesCollapsed: true,
+                                settingsCollapsed: true,
+                                page_loading: true,
+                                activeQuestion: "",
+                            });
+                            this.loadMCQData();
                         }
                     );
                 } else {
-                    if (result.data.detail) {
-                        this.setState({
-                            errorMsg: result.data.detail,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.data.msg,
-                        });
-                    }
                     this.setState({
+                        errorMsg: result.data.detail
+                            ? result.data.detail
+                            : result.data.msg,
                         showErrorAlert: true,
-                        showLoader: false,
+                        page_loading: false,
                     });
                 }
             })
@@ -1071,11 +976,21 @@ class SubjectType1 extends Component {
         });
     };
 
+    onSubEditorChange = (evt) => {
+        const values = [...this.state.questions];
+        values[this.state.activeQuestion].sub_question[
+            this.state.activeSubQuestion
+        ].question = evt.editor.getData();
+        this.setState({
+            questions: values,
+        });
+    };
+
     handleExplanation = (evt) => {
         const values = [...this.state.questions];
-        values[
-            this.state.activeQuestion
-        ].content.explanation = evt.editor.getData();
+        values[this.state.activeQuestion].sub_question[
+            this.state.activeSubQuestion
+        ].explanation = evt.editor.getData();
         this.setState({
             questions: values,
         });
@@ -1085,11 +1000,14 @@ class SubjectType1 extends Component {
 
     handleOptions_mcq = () => {
         const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.mcq = !values[
-            this.state.activeQuestion
-        ].content.mcq;
-        values[this.state.activeQuestion].content.fill_in = false;
-        values[this.state.activeQuestion].content.boolean = false;
+        values[this.state.activeQuestion].sub_question[
+            this.state.activeSubQuestion
+        ].mcq = !values[this.state.activeQuestion].sub_question[
+            this.state.activeSubQuestion
+        ].mcq;
+        values[this.state.activeQuestion].sub_question[
+            this.state.activeSubQuestion
+        ].fill_in = false;
         this.setState({
             questions: values,
         });
@@ -1097,33 +1015,14 @@ class SubjectType1 extends Component {
 
     handleOptions_fillin = () => {
         const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.fill_in = !values[
-            this.state.activeQuestion
-        ].content.fill_in;
-        values[this.state.activeQuestion].content.mcq = false;
-        values[this.state.activeQuestion].content.boolean = false;
-        this.setState({
-            questions: values,
-        });
-    };
-
-    handleOptions_boolean = () => {
-        const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.boolean = !values[
-            this.state.activeQuestion
-        ].content.boolean;
-        values[this.state.activeQuestion].content.mcq = false;
-        values[this.state.activeQuestion].content.fill_in = false;
-        this.setState({
-            questions: values,
-        });
-    };
-
-    handleBoolean = () => {
-        const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.boolean = !values[
-            this.state.activeQuestion
-        ].content.boolean;
+        values[this.state.activeQuestion].sub_question[
+            this.state.activeSubQuestion
+        ].fill_in = !values[this.state.activeQuestion].sub_question[
+            this.state.activeSubQuestion
+        ].fill_in;
+        values[this.state.activeQuestion].sub_question[
+            this.state.activeSubQuestion
+        ].mcq = false;
         this.setState({
             questions: values,
         });
@@ -1132,42 +1031,26 @@ class SubjectType1 extends Component {
     correctOption = (index) => {
         const values = [...this.state.questions];
         if (
-            values[this.state.activeQuestion].content.options[index].content !==
-            ""
+            values[this.state.activeQuestion].sub_question[
+                this.state.activeSubQuestion
+            ].options[index].content !== ""
         ) {
-            values[this.state.activeQuestion].content.options[
-                index
-            ].correct = !values[this.state.activeQuestion].content.options[
-                index
-            ].correct;
+            values[this.state.activeQuestion].sub_question[
+                this.state.activeSubQuestion
+            ].options[index].correct = !values[this.state.activeQuestion]
+                .sub_question[this.state.activeSubQuestion].options[index]
+                .correct;
             this.setState({
                 questions: values,
             });
         }
     };
 
-    correctBoolean = (index) => {
-        const values = [...this.state.questions];
-        values[
-            this.state.activeQuestion
-        ].content.boolean_question[0].correct = false;
-        values[
-            this.state.activeQuestion
-        ].content.boolean_question[1].correct = false;
-        values[this.state.activeQuestion].content.boolean_question[
-            index
-        ].correct = !values[this.state.activeQuestion].content.boolean_question[
-            index
-        ].correct;
-        this.setState({
-            questions: values,
-        });
-    };
-
     handleOptionChange = (index, event) => {
         const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.options[index].content =
-            event.target.value;
+        values[this.state.activeQuestion].sub_question[
+            this.state.activeSubQuestion
+        ].options[index].content = event.target.value;
         this.setState({
             questions: values,
         });
@@ -1175,7 +1058,9 @@ class SubjectType1 extends Component {
 
     handleAddOptionFields = () => {
         const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.options.push({
+        values[this.state.activeQuestion].sub_question[
+            this.state.activeSubQuestion
+        ].options.push({
             correct: false,
             content: "",
         });
@@ -1186,17 +1071,22 @@ class SubjectType1 extends Component {
 
     handleRemoveOptionFields = (index) => {
         const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.options.splice(index, 1);
+        values[this.state.activeQuestion].sub_question[
+            this.state.activeSubQuestion
+        ].options.splice(index, 1);
         this.setState(
             {
                 questions: values,
             },
             () => {
                 if (
-                    values[this.state.activeQuestion].content.options.length ===
-                    0
+                    values[this.state.activeQuestion].sub_question[
+                        this.state.activeSubQuestion
+                    ].options.length === 0
                 ) {
-                    values[this.state.activeQuestion].content.options.push({
+                    values[this.state.activeQuestion].sub_question[
+                        this.state.activeSubQuestion
+                    ].options.push({
                         correct: false,
                         content: "",
                     });
@@ -1210,8 +1100,9 @@ class SubjectType1 extends Component {
 
     handleAnswerChange = (index, event) => {
         const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.fillin_answer[index] =
-            event.target.value;
+        values[this.state.activeQuestion].sub_question[
+            this.state.activeSubQuestion
+        ].fillin_answer[index] = event.target.value;
         this.setState({
             questions: values,
         });
@@ -1219,7 +1110,9 @@ class SubjectType1 extends Component {
 
     handleAddAnswerFields = () => {
         const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.fillin_answer.push("");
+        values[this.state.activeQuestion].sub_question[
+            this.state.activeSubQuestion
+        ].fillin_answer.push("");
         this.setState({
             questions: values,
         });
@@ -1227,22 +1120,22 @@ class SubjectType1 extends Component {
 
     handleRemoveAnswerFields = (index) => {
         const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.fillin_answer.splice(
-            index,
-            1
-        );
+        values[this.state.activeQuestion].sub_question[
+            this.state.activeSubQuestion
+        ].fillin_answer.splice(index, 1);
         this.setState(
             {
                 questions: values,
             },
             () => {
                 if (
-                    values[this.state.activeQuestion].content.fillin_answer
-                        .length === 0
+                    values[this.state.activeQuestion].sub_question[
+                        this.state.activeSubQuestion
+                    ].fillin_answer.length === 0
                 ) {
-                    values[
-                        this.state.activeQuestion
-                    ].content.fillin_answer.push("");
+                    values[this.state.activeQuestion].sub_question[
+                        this.state.activeSubQuestion
+                    ].fillin_answer.push("");
                 }
                 this.setState({
                     questions: values,
@@ -1262,46 +1155,79 @@ class SubjectType1 extends Component {
         });
     };
 
-    handleAddImageFields = () => {
-        const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.images.push({
-            title: "",
-            file_name: "",
-            image: null,
-            path: "",
-        });
-        this.setState({
-            questions: values,
-        });
-    };
-
     handleRemoveImageFields = (index) => {
         const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.images.splice(index, 1);
-        this.setState(
-            {
-                questions: values,
-            },
-            () => {
-                if (
-                    values[this.state.activeQuestion].content.images.length ===
-                    0
-                ) {
-                    values[this.state.activeQuestion].content.images.push({
-                        title: "",
-                        file_name: "",
-                        image: null,
-                        path: "",
-                    });
+
+        this.setState({
+            showSuccessAlert: false,
+            showErrorAlert: false,
+        });
+
+        if (
+            values[this.state.activeQuestion].question_random_id !== "" &&
+            values[this.state.activeQuestion].is_image_uploaded === true
+        ) {
+            let body = {
+                chapter_id: this.chapterId,
+                topic_num: this.topicNum,
+                question_random_id:
+                    values[this.state.activeQuestion].question_random_id,
+            };
+            body[`type2_image_${index + 1}_title`] =
+                values[this.state.activeQuestion].content.images[index].title;
+
+            fetch(
+                `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/files/`,
+                {
+                    method: "DELETE",
+                    headers: this.headers,
+                    body: JSON.stringify(body),
                 }
-                this.setState({
-                    questions: values,
+            )
+                .then((res) => res.json())
+                .then((result) => {
+                    console.log(result);
+                    if (result.sts === true) {
+                        this.setState({
+                            successMsg: result.msg,
+                            showSuccessAlert: true,
+                        });
+                        values[this.state.activeQuestion].content.images[
+                            index
+                        ] = { title: "", file_name: "", image: null, path: "" };
+                        this.setState({
+                            questions: values,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.detail
+                                ? result.detail
+                                : result.msg,
+                            showErrorAlert: true,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
                 });
-            }
-        );
+        } else {
+            values[this.state.activeQuestion].content.images[index] = {
+                title: "",
+                file_name: "",
+                image: null,
+                path: "",
+            };
+            this.setState({
+                questions: values,
+            });
+        }
     };
 
     handleImageFile = (index, event) => {
+        this.setState({
+            showErrorAlert: false,
+        });
+
         const values = [...this.state.questions];
         const file = event.target.files[0].name.toLowerCase();
         if (!file.match(/\.(jpg|jpeg|png|webp)$/)) {
@@ -1326,29 +1252,27 @@ class SubjectType1 extends Component {
         }
     };
 
-    changeImage = (image_index, q_index) => {
-        const images = [...this.state.questions];
-        if (
-            this.state.selectedImage === image_index &&
-            this.state.selectedImageQuestion === q_index
-        ) {
-            this.setState({
-                selectedImage: "",
-                selectedImageQuestion: "",
-                selectedImageData: [],
-            });
-        } else {
-            this.setState({
-                selectedImage: image_index,
-                selectedImageQuestion: q_index,
-                selectedImageData: images[q_index].content.images[image_index],
-            });
-        }
-    };
-
     clearImages = () => {
         const values = [...this.state.questions];
         values[this.state.activeQuestion].content.images = [
+            {
+                title: "",
+                file_name: "",
+                image: null,
+                path: "",
+            },
+            {
+                title: "",
+                file_name: "",
+                image: null,
+                path: "",
+            },
+            {
+                title: "",
+                file_name: "",
+                image: null,
+                path: "",
+            },
             {
                 title: "",
                 file_name: "",
@@ -1373,6 +1297,10 @@ class SubjectType1 extends Component {
     };
 
     handleVideoFile = (event) => {
+        this.setState({
+            showErrorAlert: false,
+        });
+
         let values = [...this.state.questions];
         const file = event.target.files[0].name.toLowerCase();
         if (!file.match(/\.(mpeg|flv|avi|mov|mp4|mkv)$/)) {
@@ -1389,6 +1317,7 @@ class SubjectType1 extends Component {
             ].content.video.path = URL.createObjectURL(event.target.files[0]);
             values[this.state.activeQuestion].content.video.video =
                 event.target.files[0];
+            values[this.state.activeQuestion].content.video.url = "";
             this.setState({
                 questions: values,
                 btnDisabled: false,
@@ -1399,10 +1328,11 @@ class SubjectType1 extends Component {
 
     handleVideoUrl = (event) => {
         const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.video.path =
+        values[this.state.activeQuestion].content.video.url =
             event.target.value;
         values[this.state.activeQuestion].content.video.file_name = "";
         values[this.state.activeQuestion].content.video.video = null;
+        values[this.state.activeQuestion].content.video.path = "";
         this.setState({
             questions: values,
         });
@@ -1410,13 +1340,73 @@ class SubjectType1 extends Component {
 
     clearVideo = () => {
         const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.video.title = "";
-        values[this.state.activeQuestion].content.video.file_name = "";
-        values[this.state.activeQuestion].content.video.video = null;
-        values[this.state.activeQuestion].content.video.path = "";
-        this.setState({
-            questions: values,
-        });
+
+        if (
+            values[this.state.activeQuestion].question_random_id !== "" &&
+            values[this.state.activeQuestion].is_image_uploaded === true
+        ) {
+            fetch(
+                `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/files/`,
+                {
+                    method: "DELETE",
+                    headers: this.headers,
+                    body: JSON.stringify({
+                        chapter_id: this.chapterId,
+                        topic_num: this.topicNum,
+                        question_random_id:
+                            values[this.state.activeQuestion]
+                                .question_random_id,
+                        type2_video_1_title:
+                            values[this.state.activeQuestion].content.video
+                                .title,
+                    }),
+                }
+            )
+                .then((res) => res.json())
+                .then((result) => {
+                    console.log(result);
+                    if (result.sts === true) {
+                        this.setState({
+                            successMsg: result.msg,
+                            showSuccessAlert: true,
+                        });
+                        values[this.state.activeQuestion].content.video.title =
+                            "";
+                        values[
+                            this.state.activeQuestion
+                        ].content.video.file_name = "";
+                        values[
+                            this.state.activeQuestion
+                        ].content.video.video = null;
+                        values[this.state.activeQuestion].content.video.path =
+                            "";
+                        values[this.state.activeQuestion].content.video.url =
+                            "";
+                        this.setState({
+                            questions: values,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.detail
+                                ? result.detail
+                                : result.msg,
+                            showErrorAlert: true,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        } else {
+            values[this.state.activeQuestion].content.video.title = "";
+            values[this.state.activeQuestion].content.video.file_name = "";
+            values[this.state.activeQuestion].content.video.video = null;
+            values[this.state.activeQuestion].content.video.path = "";
+            values[this.state.activeQuestion].content.video.url = "";
+            this.setState({
+                questions: values,
+            });
+        }
     };
 
     // -------------------------- Audio --------------------------
@@ -1430,7 +1420,84 @@ class SubjectType1 extends Component {
         });
     };
 
+    handleRemoveAudioFields = (index) => {
+        const values = [...this.state.questions];
+
+        this.setState({
+            showSuccessAlert: false,
+            showErrorAlert: false,
+        });
+
+        if (
+            values[this.state.activeQuestion].question_random_id !== "" &&
+            values[this.state.activeQuestion].is_image_uploaded === true
+        ) {
+            let body = {
+                chapter_id: this.chapterId,
+                topic_num: this.topicNum,
+                question_random_id:
+                    values[this.state.activeQuestion].question_random_id,
+            };
+            body[`type2_audio_${index + 1}_title`] =
+                values[this.state.activeQuestion].content.audio[index].title;
+
+            fetch(
+                `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/files/`,
+                {
+                    method: "DELETE",
+                    headers: this.headers,
+                    body: JSON.stringify(body),
+                }
+            )
+                .then((res) => res.json())
+                .then((result) => {
+                    console.log(result);
+                    if (result.sts === true) {
+                        this.setState({
+                            successMsg: result.msg,
+                            showSuccessAlert: true,
+                        });
+                        values[this.state.activeQuestion].content.audio[
+                            index
+                        ] = {
+                            title: "",
+                            file_name: "",
+                            audio: null,
+                            path: "",
+                        };
+                        this.setState({
+                            questions: values,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.detail
+                                ? result.detail
+                                : result.msg,
+                            showErrorAlert: true,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        } else {
+            values[this.state.activeQuestion].content.audio[index] = {
+                title: "",
+                file_name: "",
+                audio: null,
+                path: "",
+            };
+            this.setState({
+                questions: values,
+            });
+        }
+    };
+
     handleAudioFile = (index, event) => {
+        this.setState({
+            showErrorAlert: false,
+        });
+
         const values = [...this.state.questions];
         const file = event.target.files[0].name.toLowerCase();
         if (!file.match(/\.(wav|mp3)$/)) {
@@ -1471,8 +1538,13 @@ class SubjectType1 extends Component {
     handleProperties = (event, type) => {
         const values = [...this.state.questions];
         if (type === "marks") {
-            values[this.state.activeQuestion].properties.marks =
-                event.target.value;
+            values[this.state.activeQuestion].sub_question[
+                this.state.activeSubQuestion
+            ].marks = event.target.value;
+        } else if (type === "negative_marks") {
+            values[this.state.activeQuestion].sub_question[
+                this.state.activeSubQuestion
+            ].negative_marks = event.target.value;
         } else if (type === "complexity") {
             values[this.state.activeQuestion].properties.complexity =
                 event.target.value;
@@ -1633,7 +1705,7 @@ class SubjectType1 extends Component {
         }
     };
 
-    // -------------------------- Adding new question --------------------------
+    // -------------------------- Adding, Removing, Deleting question --------------------------
 
     addNewQuestion = () => {
         const values = [...this.state.questions];
@@ -1645,33 +1717,40 @@ class SubjectType1 extends Component {
             maths: false,
         });
         values.push({
-            chapter_name: this.chapterName,
-            topic_name: this.topicName,
-            question: "<p>Question goes here</p>",
+            question: "<p>Main Question goes here</p>",
             question_random_id: "",
             is_image_uploaded: false,
+            sub_question: [
+                {
+                    sub_question_id: "",
+                    question: "<p>Sub question goes here</p>",
+                    explanation: "<p>Explanation goes here</p>",
+                    mcq: true,
+                    fill_in: false,
+                    fillin_answer: [""],
+                    options: [
+                        { correct: false, content: "" },
+                        { correct: false, content: "" },
+                        { correct: false, content: "" },
+                        { correct: false, content: "" },
+                    ],
+                    marks: "",
+                    negative_marks: 0,
+                },
+            ],
             content: {
-                mcq: true,
-                fill_in: false,
-                boolean: false,
-                fillin_answer: [""],
-                boolean_question: [
-                    { correct: false, content: "True" },
-                    { correct: false, content: "False" },
+                images: [
+                    { title: "", file_name: "", image: null, path: "" },
+                    { title: "", file_name: "", image: null, path: "" },
+                    { title: "", file_name: "", image: null, path: "" },
+                    { title: "", file_name: "", image: null, path: "" },
                 ],
-                options: [
-                    { correct: false, content: "" },
-                    { correct: false, content: "" },
-                    { correct: false, content: "" },
-                    { correct: false, content: "" },
-                ],
-                explanation: "",
-                images: [{ title: "", file_name: "", image: null, path: "" }],
                 video: {
                     title: "",
                     file_name: "",
                     video: null,
                     path: "",
+                    url: "",
                 },
                 audio: [
                     { title: "", file_name: "", audio: null, path: "" },
@@ -1679,7 +1758,6 @@ class SubjectType1 extends Component {
                 ],
             },
             properties: {
-                marks: "",
                 complexity: "",
                 priority: "",
                 theme: "",
@@ -1700,11 +1778,180 @@ class SubjectType1 extends Component {
         });
     };
 
-    removingQuestions = (index) => {
+    addNewSubQuestion = (index) => {
+        const values = [...this.state.questions];
+        values[index].sub_question.push({
+            sub_question_id: "",
+            question: "<p>Sub question goes here</p>",
+            explanation: "<p>Explanation goes here</p>",
+            mcq: true,
+            fill_in: false,
+            fillin_answer: [""],
+            options: [
+                { correct: false, content: "" },
+                { correct: false, content: "" },
+                { correct: false, content: "" },
+                { correct: false, content: "" },
+            ],
+            marks: "",
+            negative_marks: 0,
+        });
+        this.setState({
+            questions: values,
+            activeQuestion: index,
+            activeSubQuestion: values[index].sub_question.length - 1,
+        });
+    };
+
+    // --------------- Copy question ---------------
+
+    copyQuestions = (index) => {
+        const values = [...this.state.questions];
+        const keyboards = [...this.state.keyboards];
+
+        keyboards.splice(index + 1, 0, {
+            all: keyboards[index].all,
+            chemistry: keyboards[index].chemistry,
+            physics: keyboards[index].physics,
+            maths: keyboards[index].maths,
+        });
+        const test = [];
+        for (let i = 0; i < values[index].properties.test.length; i++) {
+            test[i] = values[index].properties.test[i];
+        }
+        const semester = [];
+        for (let i = 0; i < values[index].properties.semester.length; i++) {
+            semester[i] = values[index].properties.semester[i];
+        }
+        const quiz = [];
+        for (let i = 0; i < values[index].properties.quiz.length; i++) {
+            quiz[i] = values[index].properties.quiz[i];
+        }
+        const sub_question = [];
+        for (let i = 0; i < values[index].sub_question.length; i++) {
+            sub_question[i] = values[index].sub_question[i];
+        }
+        values.splice(index + 1, 0, {
+            question_random_id: "",
+            question: values[index].question,
+            is_image_uploaded: false,
+            sub_question: sub_question,
+            content: {
+                images: [
+                    { title: "", file_name: "", image: null, path: "" },
+                    { title: "", file_name: "", image: null, path: "" },
+                    { title: "", file_name: "", image: null, path: "" },
+                    { title: "", file_name: "", image: null, path: "" },
+                ],
+                video: {
+                    title: "",
+                    file_name: "",
+                    video: null,
+                    path: "",
+                    url: "",
+                },
+                audio: [
+                    { title: "", file_name: "", audio: null, path: "" },
+                    { title: "", file_name: "", audio: null, path: "" },
+                ],
+            },
+            properties: {
+                complexity: values[index].properties.complexity,
+                priority: values[index].properties.priority,
+                theme: values[index].properties.theme,
+                test: test,
+                semester: semester,
+                quiz: quiz,
+                learn: values[index].properties.learn,
+            },
+            settings: {
+                virtual_keyboard: values[index].settings.virtual_keyboard,
+                limited: values[index].settings.limited,
+            },
+        });
+        this.setState({
+            questions: values,
+            keyboards: keyboards,
+            activeQuestion: index + 1,
+        });
+    };
+
+    copySubQuestions = (main_index, sub_index) => {
+        const values = [...this.state.questions];
+
+        const options = [];
+        for (
+            let i = 0;
+            i < values[main_index].sub_question[sub_index].options.length;
+            i++
+        ) {
+            options[i] = {
+                content:
+                    values[main_index].sub_question[sub_index].options[i]
+                        .content,
+                correct:
+                    values[main_index].sub_question[sub_index].options[i]
+                        .correct,
+            };
+        }
+        const fillin = [];
+        for (
+            let i = 0;
+            i < values[main_index].sub_question[sub_index].fillin_answer.length;
+            i++
+        ) {
+            fillin[i] =
+                values[main_index].sub_question[sub_index].fillin_answer[i];
+        }
+        values[main_index].sub_question.splice(sub_index + 1, 0, {
+            sub_question_id: "",
+            question: values[main_index].sub_question[sub_index].question,
+            explanation: values[main_index].sub_question[sub_index].explanation,
+            mcq: values[main_index].sub_question[sub_index].mcq,
+            fill_in: values[main_index].sub_question[sub_index].fill_in,
+            fillin_answer: fillin,
+            options: options,
+            marks: values[main_index].sub_question[sub_index].marks,
+            negative_marks:
+                values[main_index].sub_question[sub_index].negative_marks,
+        });
+        this.setState({
+            questions: values,
+            activeQuestion: main_index,
+            activeSubQuestion: sub_index + 1,
+        });
+    };
+
+    // --------------- Edit question ---------------
+
+    editQuestion = (index) => {
+        this.setState({
+            showMainEdit_option: true,
+            showSubEdit_option: false,
+            activeQuestion: index,
+            showErrorAlert: false,
+            showSuccessAlert: false,
+        });
+    };
+
+    editSubQuestion = (main_index, sub_index) => {
+        this.setState({
+            showMainEdit_option: false,
+            showSubEdit_option: true,
+            activeQuestion: main_index,
+            activeSubQuestion: sub_index,
+            showErrorAlert: false,
+            showSuccessAlert: false,
+        });
+    };
+
+    // --------------- Delete question ---------------
+
+    deleteQuestion = (index) => {
         const values = [...this.state.questions];
         const keyboards = [...this.state.keyboards];
         this.setState({
-            showEdit_option: false,
+            showMainEdit_option: false,
             contentCollapsed: true,
             propertiesCollapsed: true,
             settingsCollapsed: true,
@@ -1717,20 +1964,13 @@ class SubjectType1 extends Component {
                 showMCQDelete_Modal: !this.state.showMCQDelete_Modal,
             });
         } else {
-            if (this.state.selectedImageQuestion === index) {
-                this.setState({
-                    selectedImageQuestion: "",
-                    selectedImageData: [],
-                    selectedImage: "",
-                });
-            }
-
             keyboards.splice(index, 1);
             values.splice(index, 1);
             this.setState(
                 {
                     questions: values,
                     keyboards: keyboards,
+                    activeQuestion: "",
                 },
                 () => {
                     if (values.length === 0) {
@@ -1741,28 +1981,47 @@ class SubjectType1 extends Component {
                             maths: false,
                         });
                         values.push({
-                            chapter_name: this.chapterName,
-                            topic_name: this.topicName,
-                            question: "<p>Question goes here</p>",
+                            question: "<p>Main Question goes here</p>",
                             question_random_id: "",
                             is_image_uploaded: false,
+                            sub_question: [
+                                {
+                                    sub_question_id: "",
+                                    question: "<p>Sub question goes here</p>",
+                                    explanation: "<p>Explanation goes here</p>",
+                                    mcq: true,
+                                    fill_in: false,
+                                    fillin_answer: [""],
+                                    options: [
+                                        { correct: false, content: "" },
+                                        { correct: false, content: "" },
+                                        { correct: false, content: "" },
+                                        { correct: false, content: "" },
+                                    ],
+                                    marks: "",
+                                    negative_marks: 0,
+                                },
+                            ],
                             content: {
-                                mcq: true,
-                                fill_in: false,
-                                boolean: false,
-                                fillin_answer: [""],
-                                boolean_question: [
-                                    { correct: false, content: "True" },
-                                    { correct: false, content: "False" },
-                                ],
-                                options: [
-                                    { correct: false, content: "" },
-                                    { correct: false, content: "" },
-                                    { correct: false, content: "" },
-                                    { correct: false, content: "" },
-                                ],
-                                explanation: "",
                                 images: [
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        image: null,
+                                        path: "",
+                                    },
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        image: null,
+                                        path: "",
+                                    },
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        image: null,
+                                        path: "",
+                                    },
                                     {
                                         title: "",
                                         file_name: "",
@@ -1775,6 +2034,7 @@ class SubjectType1 extends Component {
                                     file_name: "",
                                     video: null,
                                     path: "",
+                                    url: "",
                                 },
                                 audio: [
                                     {
@@ -1792,7 +2052,6 @@ class SubjectType1 extends Component {
                                 ],
                             },
                             properties: {
-                                marks: "",
                                 complexity: "",
                                 priority: "",
                                 theme: "",
@@ -1822,228 +2081,292 @@ class SubjectType1 extends Component {
         });
     };
 
-    copyQuestions = (index) => {
+    handleMCQ_Deletion = () => {
         const values = [...this.state.questions];
         const keyboards = [...this.state.keyboards];
 
-        keyboards[values.length] = {
-            all: keyboards[index].all,
-            chemistry: keyboards[index].chemistry,
-            physics: keyboards[index].physics,
-            maths: keyboards[index].maths,
-        };
-        const options = [];
-        for (let i = 0; i < values[index].content.options.length; i++) {
-            options[i] = {
-                content: values[index].content.options[i].content,
-                correct: values[index].content.options[i].correct,
-            };
-        }
-        const fillin = [];
-        for (let i = 0; i < values[index].content.fillin_answer.length; i++) {
-            fillin[i] = values[index].content.fillin_answer[i];
-        }
-        const boolean = [];
-        for (
-            let i = 0;
-            i < values[index].content.boolean_question.length;
-            i++
-        ) {
-            boolean[i] = {
-                content: values[index].content.boolean_question[i].content,
-                correct: values[index].content.boolean_question[i].correct,
-            };
-        }
-        const test = [];
-        for (let i = 0; i < values[index].properties.test.length; i++) {
-            test[i] = values[index].properties.test[i];
-        }
-        const semester = [];
-        for (let i = 0; i < values[index].properties.semester.length; i++) {
-            semester[i] = values[index].properties.semester[i];
-        }
-        const quiz = [];
-        for (let i = 0; i < values[index].properties.quiz.length; i++) {
-            quiz[i] = values[index].properties.quiz[i];
-        }
-        values[values.length] = {
-            chapter_name: this.chapterName,
-            topic_name: this.topicName,
-            question: values[index].question,
-            question_random_id: "",
-            is_image_uploaded: false,
-            content: {
-                mcq: values[index].content.mcq,
-                fill_in: values[index].content.fill_in,
-                boolean: values[index].content.boolean,
-                fillin_answer: fillin,
-                boolean_question: boolean,
-                options: options,
-                explanation: values[index].content.explanation,
-                images: [{ title: "", file_name: "", image: null, path: "" }],
-                video: {
-                    title: "",
-                    file_name: "",
-                    video: null,
-                    path: "",
-                },
-                audio: [
-                    { title: "", file_name: "", audio: null, path: "" },
-                    { title: "", file_name: "", audio: null, path: "" },
-                ],
+        keyboards.splice(this.state.activeQuestion, 1);
+        values.splice(this.state.activeQuestion, 1);
+
+        this.setState(
+            {
+                questions: values,
+                keyboards: keyboards,
+                activeQuestion: "",
             },
-            properties: {
-                marks: values[index].properties.marks,
-                complexity: values[index].properties.complexity,
-                priority: values[index].properties.priority,
-                theme: values[index].properties.theme,
-                test: test,
-                semester: semester,
-                quiz: quiz,
-                learn: values[index].properties.learn,
-            },
-            settings: {
-                virtual_keyboard: values[index].settings.virtual_keyboard,
-                limited: values[index].settings.limited,
-            },
-        };
-        this.setState({
-            questions: values,
-            keyboards: keyboards,
-            activeQuestion: values.length - 1,
-        });
-    };
-
-    editQuestion = (index) => {
-        this.setState({
-            showEdit_option: true,
-            activeQuestion: index,
-            showErrorAlert: false,
-            showSuccessAlert: false,
-        });
-    };
-
-    handleMCQ_Deletion = (isMCQ_Deleted) => {
-        if (isMCQ_Deleted === true) {
-            const values = [...this.state.questions];
-            const keyboards = [...this.state.keyboards];
-
-            keyboards.splice(this.state.activeQuestion, 1);
-            values.splice(this.state.activeQuestion, 1);
-
-            if (
-                this.state.selectedImageQuestion === this.state.activeQuestion
-            ) {
-                this.setState({
-                    selectedImageQuestion: "",
-                    selectedImageData: [],
-                    selectedImage: "",
-                });
-            }
-
-            this.setState(
-                {
-                    questions: values,
-                    keyboards: keyboards,
-                },
-                () => {
-                    if (values.length === 0) {
-                        keyboards.push({
-                            all: false,
-                            chemistry: false,
-                            physics: false,
-                            maths: false,
-                        });
-                        values.push({
-                            chapter_name: this.chapterName,
-                            topic_name: this.topicName,
-                            question: "<p>Question goes here</p>",
-                            question_random_id: "",
-                            is_image_uploaded: false,
-                            content: {
+            () => {
+                if (values.length === 0) {
+                    keyboards.push({
+                        all: false,
+                        chemistry: false,
+                        physics: false,
+                        maths: false,
+                    });
+                    values.push({
+                        question: "<p>Main Question goes here</p>",
+                        question_random_id: "",
+                        is_image_uploaded: false,
+                        sub_question: [
+                            {
+                                sub_question_id: "",
+                                question: "<p>Sub question goes here</p>",
+                                explanation: "<p>Explanation goes here</p>",
                                 mcq: true,
                                 fill_in: false,
-                                boolean: false,
                                 fillin_answer: [""],
-                                boolean_question: [
-                                    {
-                                        correct: false,
-                                        content: "True",
-                                    },
-                                    {
-                                        correct: false,
-                                        content: "False",
-                                    },
-                                ],
                                 options: [
                                     { correct: false, content: "" },
                                     { correct: false, content: "" },
                                     { correct: false, content: "" },
                                     { correct: false, content: "" },
                                 ],
-                                explanation: "",
-                                images: [
-                                    {
-                                        title: "",
-                                        file_name: "",
-                                        image: null,
-                                        path: "",
-                                    },
-                                ],
-                                video: {
+                                marks: "",
+                                negative_marks: 0,
+                            },
+                        ],
+                        content: {
+                            images: [
+                                {
                                     title: "",
                                     file_name: "",
-                                    video: null,
+                                    image: null,
                                     path: "",
                                 },
-                                audio: [
-                                    {
-                                        title: "",
-                                        file_name: "",
-                                        audio: null,
-                                        path: "",
-                                    },
-                                    {
-                                        title: "",
-                                        file_name: "",
-                                        audio: null,
-                                        path: "",
-                                    },
-                                ],
+                                {
+                                    title: "",
+                                    file_name: "",
+                                    image: null,
+                                    path: "",
+                                },
+                                {
+                                    title: "",
+                                    file_name: "",
+                                    image: null,
+                                    path: "",
+                                },
+                                {
+                                    title: "",
+                                    file_name: "",
+                                    image: null,
+                                    path: "",
+                                },
+                            ],
+                            video: {
+                                title: "",
+                                file_name: "",
+                                video: null,
+                                path: "",
+                                url: "",
                             },
-                            properties: {
-                                marks: "",
-                                complexity: "",
-                                priority: "",
-                                theme: "",
-                                test: [false, false, false, false, false],
-                                semester: [false, false, false, false, false],
-                                quiz: [false, false, false, false, false],
-                                learn: false,
-                            },
-                            settings: {
-                                virtual_keyboard: [],
-                                limited: false,
-                            },
+                            audio: [
+                                {
+                                    title: "",
+                                    file_name: "",
+                                    audio: null,
+                                    path: "",
+                                },
+                                {
+                                    title: "",
+                                    file_name: "",
+                                    audio: null,
+                                    path: "",
+                                },
+                            ],
+                        },
+                        properties: {
+                            complexity: "",
+                            priority: "",
+                            theme: "",
+                            test: [false, false, false, false, false],
+                            semester: [false, false, false, false, false],
+                            quiz: [false, false, false, false, false],
+                            learn: false,
+                        },
+                        settings: {
+                            virtual_keyboard: [],
+                            limited: false,
+                        },
+                    });
+                    this.setState({
+                        questions: values,
+                        keyboards: keyboards,
+                    });
+                }
+            }
+        );
+        this.setState(
+            {
+                showMCQDelete_Modal: false,
+                page_loading: true,
+            },
+            () => {
+                this.loadMCQData();
+            }
+        );
+    };
+
+    deleteSubQuestion = (main_index, sub_index) => {
+        const values = [...this.state.questions];
+        this.setState({
+            showMainEdit_option: false,
+            showSubEdit_option: false,
+            contentCollapsed: true,
+            subContentCollapsed: true,
+            propertiesCollapsed: true,
+            settingsCollapsed: true,
+            activeQuestion: main_index,
+            activeSubQuestion: sub_index,
+        });
+
+        if (values[main_index].sub_question[sub_index].sub_question_id !== "") {
+            this.setState({
+                selectedQuestion: values[main_index].question_random_id,
+                selectedSubQuestion:
+                    values[main_index].sub_question[sub_index].sub_question_id,
+                showSubMCQDelete_Modal: !this.state.showSubMCQDelete_Modal,
+            });
+        } else {
+            values[main_index].sub_question.splice(sub_index, 1);
+            this.setState(
+                {
+                    questions: values,
+                    activeSubQuestion: "",
+                },
+                () => {
+                    if (values[main_index].sub_question.length === 0) {
+                        values[main_index].sub_question.push({
+                            sub_question_id: "",
+                            question: "<p>Sub question goes here</p>",
+                            explanation: "<p>Explanation goes here</p>",
+                            mcq: true,
+                            fill_in: false,
+                            fillin_answer: [""],
+                            options: [
+                                { correct: false, content: "" },
+                                { correct: false, content: "" },
+                                { correct: false, content: "" },
+                                { correct: false, content: "" },
+                            ],
+                            marks: "",
+                            negative_marks: 0,
                         });
                         this.setState({
                             questions: values,
-                            keyboards: keyboards,
                         });
                     }
                 }
             );
-            setTimeout(() => {
-                this.setState(
-                    {
-                        showMCQDelete_Modal: false,
-                        page_loading: true,
-                    },
-                    () => {
-                        this.loadMCQData();
+        }
+    };
+
+    handleSubMCQ_Deletion = () => {
+        const values = [...this.state.questions];
+
+        values[this.state.activeQuestion].sub_question.splice(
+            this.state.activeSubQuestion,
+            1
+        );
+
+        this.setState(
+            {
+                questions: values,
+                activeSubQuestion: "",
+            },
+            () => {
+                if (
+                    values[this.state.activeQuestion].sub_question.length === 0
+                ) {
+                    values[this.state.activeQuestion].sub_question.push({
+                        sub_question_id: "",
+                        question: "<p>Sub question goes here</p>",
+                        explanation: "<p>Explanation goes here</p>",
+                        mcq: true,
+                        fill_in: false,
+                        fillin_answer: [""],
+                        options: [
+                            { correct: false, content: "" },
+                            { correct: false, content: "" },
+                            { correct: false, content: "" },
+                            { correct: false, content: "" },
+                        ],
+                        marks: "",
+                        negative_marks: 0,
+                    });
+                    this.setState({
+                        questions: values,
+                    });
+                }
+            }
+        );
+        this.setState(
+            {
+                showSubMCQDelete_Modal: false,
+                page_loading: true,
+            },
+            () => {
+                this.loadMCQData();
+            }
+        );
+    };
+
+    // -------------------------- Publishing the question --------------------------
+
+    handlePublish = () => {
+        this.setState({
+            showSuccessAlert: false,
+            showErrorAlert: false,
+            page_loading: true,
+        });
+
+        const questions = [...this.state.questions];
+        let id = [];
+        for (let i = 0; i < questions.length; i++) {
+            if (questions[i].question_random_id !== "") {
+                id.push(questions[i].question_random_id);
+            } else {
+                continue;
+            }
+        }
+
+        if (id.length !== 0) {
+            fetch(
+                `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/publish/`,
+                {
+                    headers: this.headers,
+                    method: "POST",
+                    body: JSON.stringify({
+                        question_ids: id,
+                        chapter_id: this.chapterId,
+                        topic_num: this.topicNum,
+                    }),
+                }
+            )
+                .then((res) => res.json())
+                .then((result) => {
+                    console.log(result);
+                    if (result.sts === true) {
+                        this.setState({
+                            successMsg: result.msg,
+                            showSuccessAlert: true,
+                            page_loading: false,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.detail
+                                ? result.detail
+                                : result.msg,
+                            showErrorAlert: true,
+                            page_loading: false,
+                        });
                     }
-                );
-            }, 1000);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        } else {
+            this.setState({
+                page_loading: false,
+            });
         }
     };
 
@@ -2053,7 +2376,28 @@ class SubjectType1 extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="Subject name" togglenav={this.toggleSideNav} />
+                <Header
+                    name={this.props.subject_name}
+                    togglenav={this.toggleSideNav}
+                />
+
+                {/* ALert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
+                />
 
                 {/* Sidebar */}
                 <SideNav
@@ -2063,15 +2407,48 @@ class SubjectType1 extends Component {
 
                 {/* MCQ Deletion Modal */}
                 {this.state.showMCQDelete_Modal ? (
-                    <MCQDeleteModal
+                    <ContentDeleteModal
                         show={this.state.showMCQDelete_Modal}
                         onHide={this.closeMCQ_DeleteModal}
-                        toggleModal={this.closeMCQ_DeleteModal}
                         formSubmission={this.handleMCQ_Deletion}
-                        subjectId={this.subjectId}
-                        chapter_name={this.chapterName}
-                        topic_name={this.topicName}
-                        values={this.state.selectedQuestion}
+                        url={`${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/`}
+                        type="question"
+                        name=""
+                        data={{
+                            chapter_id: this.chapterId,
+                            topic_num: this.topicNum,
+                            question_random_id: this.state.selectedQuestion,
+                        }}
+                        toggleModal={this.closeMCQ_DeleteModal}
+                    />
+                ) : null}
+
+                {/* Sub MCQ Deletion Modal */}
+                {this.state.showSubMCQDelete_Modal ? (
+                    <ContentDeleteModal
+                        show={this.state.showSubMCQDelete_Modal}
+                        onHide={this.closeMCQ_DeleteModal}
+                        formSubmission={this.handleSubMCQ_Deletion}
+                        url={`${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/`}
+                        type="question"
+                        name=""
+                        data={{
+                            chapter_id: this.chapterId,
+                            topic_num: this.topicNum,
+                            question_random_id: this.state.selectedQuestion,
+                        }}
+                        toggleModal={this.closeMCQ_DeleteModal}
+                    />
+                ) : null}
+
+                {/* File viewing Modal */}
+                {this.state.showModal ? (
+                    <FileModal
+                        show={this.state.showModal}
+                        onHide={this.toggleModal}
+                        image={this.state.selectedImage}
+                        video={this.state.selectedVideo}
+                        audio={this.state.selectedAudio}
                     />
                 ) : null}
 
@@ -2085,7 +2462,8 @@ class SubjectType1 extends Component {
                             {/* ------------------------------ MCQ Column ------------------------------ */}
                             <div
                                 className={`${
-                                    this.state.showEdit_option
+                                    this.state.showMainEdit_option ||
+                                    this.state.showSubEdit_option
                                         ? "col-md-9"
                                         : "col-12"
                                 } mb-4 mb-md-0`}
@@ -2103,314 +2481,381 @@ class SubjectType1 extends Component {
                                 <div className="row align-items-center">
                                     <div className="col-md-6">
                                         <h5 className="primary-text">
-                                            {`${this.chapterName} - MCQ`}
+                                            {`${this.props.topic_name} - Type 2`}
                                         </h5>
                                     </div>
                                     <div className="col-md-6">
                                         <div className="d-flex flex-wrap justify-content-end mb-4">
-                                            <button className="btn btn-primary btn-sm mr-1">
+                                            <button
+                                                className="btn btn-primary btn-sm shadow-none mr-1"
+                                                onClick={this.handlePublish}
+                                            >
                                                 Publish
                                             </button>
-                                            <button className="btn btn-primary btn-sm mr-1">
+                                            <button className="btn btn-primary btn-sm shadow-none mr-1">
                                                 Download template
                                             </button>
-                                            <button className="btn btn-primary btn-sm mr-1">
+                                            <button className="btn btn-primary btn-sm shadow-none">
                                                 Upload template
                                             </button>
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* -------------------- MCQ -------------------- */}
+                                {/* -------------------- Main question -------------------- */}
                                 {this.state.questions.map(
                                     (question, q_index) => {
                                         return (
-                                            <div
-                                                className="row mb-3"
-                                                key={q_index}
-                                            >
-                                                {/* ---------- Side buttons ---------- */}
-                                                <div className="col-md-1 mb-1 mb-md-0">
-                                                    <div className="row">
-                                                        <div className="col-md-12 col-3 mb-1">
-                                                            <button
-                                                                type="button"
-                                                                className="btn btn-light bg-white btn-block shadow-sm mr-2"
-                                                            >
-                                                                {q_index <= 8
-                                                                    ? `0${
-                                                                          q_index +
-                                                                          1
-                                                                      }`
-                                                                    : q_index +
-                                                                      1}
-                                                            </button>
-                                                        </div>
-                                                        <div className="col-md-12 col-3 mb-1">
-                                                            <button
-                                                                type="button"
-                                                                className="btn btn-light bg-white btn-block shadow-sm mr-2"
-                                                                onClick={() =>
-                                                                    this.editQuestion(
-                                                                        q_index
-                                                                    )
-                                                                }
-                                                            >
-                                                                <i className="far fa-edit fa-sm"></i>
-                                                            </button>
-                                                        </div>
-                                                        <div className="col-md-12 col-3 mb-1">
-                                                            <button
-                                                                type="button"
-                                                                className="btn btn-light bg-white btn-block shadow-sm mr-1"
-                                                                onClick={() =>
-                                                                    this.copyQuestions(
-                                                                        q_index
-                                                                    )
-                                                                }
-                                                            >
-                                                                <i className="far fa-copy fa-sm"></i>
-                                                            </button>
-                                                        </div>
-                                                        <div className="col-md-12 col-3">
-                                                            <button
-                                                                type="button"
-                                                                className="btn btn-light bg-white btn-block shadow-sm"
-                                                                onClick={() =>
-                                                                    this.removingQuestions(
-                                                                        q_index
-                                                                    )
-                                                                }
-                                                            >
-                                                                <i className="far fa-trash-alt fa-sm"></i>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                {/* ---------- Question preview ---------- */}
-                                                <div className="col-md-11 pl-md-0">
-                                                    <div className="card shadow-sm">
-                                                        <div className="card-body">
-                                                            <div className="row">
-                                                                {/* Questions & options */}
-                                                                <div
-                                                                    className={`${
-                                                                        this
-                                                                            .state
-                                                                            .selectedImageData
-                                                                            .length !==
-                                                                            0 &&
-                                                                        this
-                                                                            .state
-                                                                            .selectedImageQuestion ===
-                                                                            q_index
-                                                                            ? "col-md-9"
-                                                                            : "col-md-11 pr-md-0"
-                                                                    }`}
+                                            <div key={q_index}>
+                                                <div className="row mb-3">
+                                                    {/* ---------- Side buttons ---------- */}
+                                                    <div className="col-md-1 mb-1 mb-md-0">
+                                                        <div className="row">
+                                                            <div className="col-md-12 col-3 mb-1">
+                                                                <button
+                                                                    type="button"
+                                                                    className="btn btn-light bg-white btn-block shadow-sm mr-2"
                                                                 >
-                                                                    <div className="form-group">
-                                                                        <div className="card form-shadow">
-                                                                            <div
-                                                                                className="card-body py-2"
-                                                                                dangerouslySetInnerHTML={{
-                                                                                    __html:
-                                                                                        question.question,
-                                                                                }}
-                                                                            ></div>
-                                                                        </div>
-                                                                    </div>
-                                                                    {question
-                                                                        .content
-                                                                        .mcq ? (
-                                                                        <div className="row">
-                                                                            {question.content.options.map(
-                                                                                (
-                                                                                    options,
-                                                                                    index
-                                                                                ) => {
-                                                                                    return (
-                                                                                        <div
-                                                                                            className="col-md-6"
-                                                                                            key={
-                                                                                                index
-                                                                                            }
-                                                                                        >
-                                                                                            <div className="form-group">
-                                                                                                <div
-                                                                                                    className={`card form-shadow ${
-                                                                                                        options.correct
-                                                                                                            ? "border border-success"
-                                                                                                            : ""
-                                                                                                    }`}
-                                                                                                >
-                                                                                                    <div className="card-body small py-2">
-                                                                                                        {options.content !==
-                                                                                                        "" ? (
-                                                                                                            options.content
-                                                                                                        ) : (
-                                                                                                            <span className="text-muted">{`Option 0${
-                                                                                                                index +
-                                                                                                                1
-                                                                                                            }`}</span>
-                                                                                                        )}
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    );
-                                                                                }
-                                                                            )}
-                                                                        </div>
-                                                                    ) : (
-                                                                        ""
-                                                                    )}
-                                                                    {question
-                                                                        .content
-                                                                        .fill_in ? (
-                                                                        <div className="row">
-                                                                            {question.content.fillin_answer.map(
-                                                                                (
-                                                                                    fill_in,
-                                                                                    index
-                                                                                ) => {
-                                                                                    return (
-                                                                                        <div
-                                                                                            className="col-md-6"
-                                                                                            key={
-                                                                                                index
-                                                                                            }
-                                                                                        >
-                                                                                            <div className="form-group">
-                                                                                                <div className="card form-shadow">
-                                                                                                    <div className="card-body small py-2">
-                                                                                                        {fill_in !==
-                                                                                                        "" ? (
-                                                                                                            fill_in
-                                                                                                        ) : (
-                                                                                                            <span className="text-muted">{`Answer 0${
-                                                                                                                index +
-                                                                                                                1
-                                                                                                            }`}</span>
-                                                                                                        )}
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    );
-                                                                                }
-                                                                            )}
-                                                                        </div>
-                                                                    ) : (
-                                                                        ""
-                                                                    )}
-                                                                    {question
-                                                                        .content
-                                                                        .boolean ? (
-                                                                        <div className="row">
-                                                                            {question.content.boolean_question.map(
-                                                                                (
-                                                                                    boolean,
-                                                                                    index
-                                                                                ) => {
-                                                                                    return (
-                                                                                        <div
-                                                                                            className="col-md-6"
-                                                                                            key={
-                                                                                                index
-                                                                                            }
-                                                                                        >
-                                                                                            <div className="form-group">
-                                                                                                <div
-                                                                                                    className={`card form-shadow ${
-                                                                                                        boolean.correct
-                                                                                                            ? "border border-success"
-                                                                                                            : ""
-                                                                                                    }`}
-                                                                                                >
-                                                                                                    <div className="card-body small py-2">
-                                                                                                        {
-                                                                                                            boolean.content
-                                                                                                        }
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    );
-                                                                                }
-                                                                            )}
-                                                                        </div>
-                                                                    ) : (
-                                                                        ""
-                                                                    )}
-                                                                </div>
-                                                                {/* image preview */}
-                                                                {this.state
-                                                                    .selectedImageData
-                                                                    .length !==
-                                                                    0 &&
-                                                                this.state
-                                                                    .selectedImageQuestion ===
-                                                                    q_index ? (
-                                                                    <div className="col-md-2 mb-2 mb-md-0 pr-md-0">
-                                                                        <div className="card shadow-sm">
-                                                                            <img
-                                                                                src={
-                                                                                    this
-                                                                                        .state
-                                                                                        .selectedImageData
-                                                                                        .path
-                                                                                }
-                                                                                alt={
-                                                                                    this
-                                                                                        .state
-                                                                                        .selectedImageData
-                                                                                        .file_name
-                                                                                }
-                                                                                className="img-fluid rounded-lg"
-                                                                            />
-                                                                        </div>
-                                                                    </div>
-                                                                ) : (
-                                                                    ""
-                                                                )}
-                                                                <div className="col-md-1 d-flex justify-content-md-center justify-content-around flex-wrap">
-                                                                    {question.content.images.map(
-                                                                        (
-                                                                            images,
-                                                                            index
-                                                                        ) => {
-                                                                            return images.path !==
-                                                                                "" ? (
-                                                                                <div
-                                                                                    key={
-                                                                                        index
-                                                                                    }
-                                                                                    className="card preview-img-sm bg-light shadow-sm"
-                                                                                    style={{
-                                                                                        backgroundImage: `url(${images.path})`,
-                                                                                    }}
-                                                                                    onClick={() =>
-                                                                                        this.changeImage(
-                                                                                            index,
-                                                                                            q_index
-                                                                                        )
-                                                                                    }
-                                                                                ></div>
-                                                                            ) : (
-                                                                                <div
-                                                                                    key={
-                                                                                        index
-                                                                                    }
-                                                                                    className="card preview-img-sm bg-light shadow-sm"
-                                                                                ></div>
-                                                                            );
-                                                                        }
-                                                                    )}
-                                                                </div>
+                                                                    {q_index <=
+                                                                    8
+                                                                        ? `0${
+                                                                              q_index +
+                                                                              1
+                                                                          }`
+                                                                        : q_index +
+                                                                          1}
+                                                                </button>
+                                                            </div>
+                                                            <div className="col-md-12 col-3 mb-1">
+                                                                <button
+                                                                    type="button"
+                                                                    className="btn btn-light bg-white btn-block shadow-sm mr-2"
+                                                                    onClick={() =>
+                                                                        this.editQuestion(
+                                                                            q_index
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <i className="far fa-edit fa-sm"></i>
+                                                                </button>
+                                                            </div>
+                                                            <div className="col-md-12 col-3 mb-1">
+                                                                <button
+                                                                    type="button"
+                                                                    className="btn btn-light bg-white btn-block shadow-sm mr-1"
+                                                                    onClick={() =>
+                                                                        this.copyQuestions(
+                                                                            q_index
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <i className="far fa-copy fa-sm"></i>
+                                                                </button>
+                                                            </div>
+                                                            <div className="col-md-12 col-3">
+                                                                <button
+                                                                    type="button"
+                                                                    className="btn btn-light bg-white btn-block shadow-sm"
+                                                                    onClick={() =>
+                                                                        this.deleteQuestion(
+                                                                            q_index
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <i className="far fa-trash-alt fa-sm"></i>
+                                                                </button>
                                                             </div>
                                                         </div>
                                                     </div>
+
+                                                    {/* ---------- Question preview ---------- */}
+                                                    <div className="col-md-11 pl-md-0">
+                                                        <div
+                                                            className={`card mb-2 shadow-sm ${
+                                                                this.state
+                                                                    .activeQuestion ===
+                                                                q_index
+                                                                    ? "border-primary"
+                                                                    : ""
+                                                            }`}
+                                                        >
+                                                            <div className="card-body">
+                                                                <div className="row">
+                                                                    {/* Questions */}
+                                                                    <div className="col-11 pr-md-0">
+                                                                        <div className="form-group">
+                                                                            <div className="card">
+                                                                                <div
+                                                                                    className="card-body py-2"
+                                                                                    dangerouslySetInnerHTML={{
+                                                                                        __html:
+                                                                                            question.question,
+                                                                                    }}
+                                                                                ></div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    {/* File modal button */}
+                                                                    <div className="col-1 pl-0 text-right">
+                                                                        <button
+                                                                            className="btn btn-light bg-white shadow-sm"
+                                                                            onClick={() =>
+                                                                                this.toggleModal(
+                                                                                    question
+                                                                                        .content
+                                                                                        .images,
+                                                                                    question
+                                                                                        .content
+                                                                                        .video,
+                                                                                    question
+                                                                                        .content
+                                                                                        .audio
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            <i className="far fa-folder-open"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <button
+                                                            className="btn btn-light bg-white btn-block shadow-sm"
+                                                            onClick={() =>
+                                                                this.addNewSubQuestion(
+                                                                    q_index
+                                                                )
+                                                            }
+                                                        >
+                                                            Add Sub question +
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                {/* ---------- Sub question ---------- */}
+                                                <div className="ml-md-5 ml-3">
+                                                    {question.sub_question.map(
+                                                        (
+                                                            sub_question,
+                                                            sub_index
+                                                        ) => {
+                                                            return (
+                                                                <div
+                                                                    className="row mb-3"
+                                                                    key={
+                                                                        sub_index
+                                                                    }
+                                                                >
+                                                                    {/* ---------- Side buttons ---------- */}
+                                                                    <div className="col-md-1 mb-1 mb-md-0">
+                                                                        <div className="row">
+                                                                            <div className="col-md-12 col-3 mb-1">
+                                                                                <button
+                                                                                    type="button"
+                                                                                    className="btn btn-light bg-white btn-block shadow-sm mr-2"
+                                                                                >
+                                                                                    {`${
+                                                                                        q_index +
+                                                                                        1
+                                                                                    }.${
+                                                                                        sub_index +
+                                                                                        1
+                                                                                    }`}
+                                                                                </button>
+                                                                            </div>
+                                                                            <div className="col-md-12 col-3 mb-1">
+                                                                                <button
+                                                                                    type="button"
+                                                                                    className="btn btn-light bg-white btn-block shadow-sm mr-2"
+                                                                                    onClick={() =>
+                                                                                        this.editSubQuestion(
+                                                                                            q_index,
+                                                                                            sub_index
+                                                                                        )
+                                                                                    }
+                                                                                >
+                                                                                    <i className="far fa-edit fa-sm"></i>
+                                                                                </button>
+                                                                            </div>
+                                                                            <div className="col-md-12 col-3 mb-1">
+                                                                                <button
+                                                                                    type="button"
+                                                                                    className="btn btn-light bg-white btn-block shadow-sm mr-1"
+                                                                                    onClick={() =>
+                                                                                        this.copySubQuestions(
+                                                                                            q_index,
+                                                                                            sub_index
+                                                                                        )
+                                                                                    }
+                                                                                >
+                                                                                    <i className="far fa-copy fa-sm"></i>
+                                                                                </button>
+                                                                            </div>
+                                                                            <div className="col-md-12 col-3">
+                                                                                <button
+                                                                                    type="button"
+                                                                                    className="btn btn-light bg-white btn-block shadow-sm"
+                                                                                    onClick={() =>
+                                                                                        this.deleteSubQuestion(
+                                                                                            q_index,
+                                                                                            sub_index
+                                                                                        )
+                                                                                    }
+                                                                                >
+                                                                                    <i className="far fa-trash-alt fa-sm"></i>
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    {/* ---------- Sub Question preview ---------- */}
+                                                                    <div className="col-md-11 pl-md-0">
+                                                                        <div
+                                                                            className={`card shadow-sm ${
+                                                                                this
+                                                                                    .state
+                                                                                    .activeSubQuestion ===
+                                                                                    sub_index &&
+                                                                                this
+                                                                                    .state
+                                                                                    .activeQuestion ===
+                                                                                    q_index
+                                                                                    ? "border-primary"
+                                                                                    : ""
+                                                                            }`}
+                                                                        >
+                                                                            <div className="card-body">
+                                                                                <div className="form-group">
+                                                                                    <div className="card form-shadow">
+                                                                                        <div
+                                                                                            className="card-body py-2"
+                                                                                            dangerouslySetInnerHTML={{
+                                                                                                __html:
+                                                                                                    sub_question.question,
+                                                                                            }}
+                                                                                        ></div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                {sub_question.mcq ? (
+                                                                                    <div className="row">
+                                                                                        {sub_question.options.map(
+                                                                                            (
+                                                                                                options,
+                                                                                                index
+                                                                                            ) => {
+                                                                                                return (
+                                                                                                    <div
+                                                                                                        className="col-md-6"
+                                                                                                        key={
+                                                                                                            index
+                                                                                                        }
+                                                                                                    >
+                                                                                                        <div className="form-group">
+                                                                                                            <div
+                                                                                                                className={`card form-shadow ${
+                                                                                                                    options.correct
+                                                                                                                        ? "success-bg"
+                                                                                                                        : ""
+                                                                                                                }`}
+                                                                                                            >
+                                                                                                                <div className="card-body small py-2">
+                                                                                                                    {options.content !==
+                                                                                                                    "" ? (
+                                                                                                                        options.content
+                                                                                                                    ) : (
+                                                                                                                        <span className="text-muted">{`Option 0${
+                                                                                                                            index +
+                                                                                                                            1
+                                                                                                                        }`}</span>
+                                                                                                                    )}
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                );
+                                                                                            }
+                                                                                        )}
+                                                                                    </div>
+                                                                                ) : (
+                                                                                    ""
+                                                                                )}
+                                                                                {sub_question.fill_in ? (
+                                                                                    <div className="row">
+                                                                                        {sub_question.fillin_answer.map(
+                                                                                            (
+                                                                                                fill_in,
+                                                                                                index
+                                                                                            ) => {
+                                                                                                return (
+                                                                                                    <div
+                                                                                                        className="col-md-6"
+                                                                                                        key={
+                                                                                                            index
+                                                                                                        }
+                                                                                                    >
+                                                                                                        <div className="form-group">
+                                                                                                            <div className="card form-shadow">
+                                                                                                                <div className="card-body small py-2">
+                                                                                                                    {fill_in !==
+                                                                                                                    "" ? (
+                                                                                                                        fill_in
+                                                                                                                    ) : (
+                                                                                                                        <span className="text-muted">{`Answer 0${
+                                                                                                                            index +
+                                                                                                                            1
+                                                                                                                        }`}</span>
+                                                                                                                    )}
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                );
+                                                                                            }
+                                                                                        )}
+                                                                                    </div>
+                                                                                ) : (
+                                                                                    ""
+                                                                                )}
+                                                                            </div>
+                                                                            {/* ----- Answer type tag ----- */}
+                                                                            {sub_question.mcq ? (
+                                                                                <div
+                                                                                    className="secondary-bg primary-text font-weight-bold px-2 py-1  position-absolute rounded-lg shadow-sm"
+                                                                                    style={{
+                                                                                        bottom:
+                                                                                            "5px",
+                                                                                        right:
+                                                                                            "5px",
+                                                                                        fontSize:
+                                                                                            "10px",
+                                                                                    }}
+                                                                                >
+                                                                                    MCQ
+                                                                                </div>
+                                                                            ) : sub_question.fill_in ? (
+                                                                                <div
+                                                                                    className="secondary-bg primary-text font-weight-bold px-2 py-1  position-absolute rounded-lg shadow-sm"
+                                                                                    style={{
+                                                                                        bottom:
+                                                                                            "5px",
+                                                                                        right:
+                                                                                            "5px",
+                                                                                        fontSize:
+                                                                                            "10px",
+                                                                                    }}
+                                                                                >
+                                                                                    Fill
+                                                                                    in
+                                                                                </div>
+                                                                            ) : (
+                                                                                ""
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        }
+                                                    )}
                                                 </div>
                                             </div>
                                         );
@@ -2418,77 +2863,42 @@ class SubjectType1 extends Component {
                                 )}
 
                                 <button
-                                    className="btn btn-primary btn-block"
+                                    className="btn btn-primary btn-block shadow-none"
                                     onClick={this.addNewQuestion}
                                 >
                                     Add +
                                 </button>
                             </div>
 
-                            {/* ---------- Settings column ---------- */}
-                            {this.state.showEdit_option ? (
+                            {/* ---------- Main Settings column ---------- */}
+                            {this.state.showMainEdit_option ? (
                                 <div className="col-md-3 content-edit">
                                     <div className="d-flex justify-content-between align-items-center mb-2">
                                         <button
-                                            className="btn btn-primary btn-sm"
+                                            className="btn btn-primary btn-sm shadow-none"
                                             onClick={this.handleSubmit}
                                             disabled={this.state.btnDisabled}
                                         >
-                                            {this.state.showLoader ? (
-                                                <Spinner
-                                                    as="span"
-                                                    animation="border"
-                                                    size="sm"
-                                                    role="status"
-                                                    aria-hidden="true"
-                                                    className="mr-2"
-                                                />
-                                            ) : (
-                                                ""
-                                            )}
                                             Save
                                         </button>
                                         <button
-                                            className="btn btn-link btn-sm"
+                                            className="btn btn-link btn-sm shadow-none"
                                             onClick={() => {
                                                 this.setState({
-                                                    showEdit_option: false,
+                                                    showMainEdit_option: false,
+                                                    showSubEdit_option: false,
                                                     contentCollapsed: true,
+                                                    subContentCollapsed: true,
                                                     propertiesCollapsed: true,
                                                     settingsCollapsed: true,
+                                                    activeQuestion: "",
+                                                    activeSubQuestion: "",
                                                 });
                                             }}
                                         >
                                             Close
                                         </button>
                                     </div>
-
-                                    <Alert
-                                        variant="danger"
-                                        show={this.state.showErrorAlert}
-                                        onClose={() => {
-                                            this.setState({
-                                                showErrorAlert: false,
-                                            });
-                                        }}
-                                        className="mb-2"
-                                        dismissible
-                                    >
-                                        {this.state.errorMsg}
-                                    </Alert>
-                                    <Alert
-                                        variant="success"
-                                        show={this.state.showSuccessAlert}
-                                        onClose={() => {
-                                            this.setState({
-                                                showSuccessAlert: false,
-                                            });
-                                        }}
-                                        className="mb-2"
-                                        dismissible
-                                    >
-                                        {this.state.successMsg}
-                                    </Alert>
 
                                     <Accordion defaultActiveKey="">
                                         {/* Content | image / video */}
@@ -2537,383 +2947,30 @@ class SubjectType1 extends Component {
                                                         />
                                                     </div>
 
-                                                    {/* ---------- Options ---------- */}
-                                                    <div className="form-group">
-                                                        <div className="row mb-3">
-                                                            <div className="col-md-6">
-                                                                <div className="d-flex align-items-center">
-                                                                    <span className="mr-4">
-                                                                        MCQ
-                                                                    </span>
-                                                                    <ReactSwitch
-                                                                        checked={
-                                                                            data[
-                                                                                this
-                                                                                    .state
-                                                                                    .activeQuestion
-                                                                            ]
-                                                                                .content
-                                                                                .mcq
-                                                                        }
-                                                                        onChange={() =>
-                                                                            this.handleOptions_mcq(
-                                                                                this
-                                                                                    .state
-                                                                                    .activeQuestion
-                                                                            )
-                                                                        }
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="row mb-3">
-                                                            <div className="col-md-6">
-                                                                <div className="d-flex align-items-center">
-                                                                    <span className="mr-4">
-                                                                        Fill in
-                                                                    </span>
-                                                                    <ReactSwitch
-                                                                        checked={
-                                                                            data[
-                                                                                this
-                                                                                    .state
-                                                                                    .activeQuestion
-                                                                            ]
-                                                                                .content
-                                                                                .fill_in
-                                                                        }
-                                                                        onChange={() =>
-                                                                            this.handleOptions_fillin(
-                                                                                this
-                                                                                    .state
-                                                                                    .activeQuestion
-                                                                            )
-                                                                        }
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="row mb-3">
-                                                            <div className="col-md-8">
-                                                                <div className="d-flex align-items-center">
-                                                                    <span className="mr-4">
-                                                                        True /
-                                                                        False
-                                                                    </span>
-                                                                    <ReactSwitch
-                                                                        checked={
-                                                                            data[
-                                                                                this
-                                                                                    .state
-                                                                                    .activeQuestion
-                                                                            ]
-                                                                                .content
-                                                                                .boolean
-                                                                        }
-                                                                        onChange={() =>
-                                                                            this.handleOptions_boolean(
-                                                                                this
-                                                                                    .state
-                                                                                    .activeQuestion
-                                                                            )
-                                                                        }
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    {data[
-                                                        this.state
-                                                            .activeQuestion
-                                                    ].content.mcq ? (
-                                                        <div className="form-group row align-items-center">
-                                                            {data[
-                                                                this.state
-                                                                    .activeQuestion
-                                                            ].content.options.map(
-                                                                (
-                                                                    options,
-                                                                    index
-                                                                ) => (
-                                                                    <Fragment
-                                                                        key={
-                                                                            index
-                                                                        }
-                                                                    >
-                                                                        <div className="col-10 mb-2 pr-0">
-                                                                            <div
-                                                                                className="input-group border-secondary"
-                                                                                style={{
-                                                                                    borderRadius:
-                                                                                        "6px",
-                                                                                }}
-                                                                            >
-                                                                                <input
-                                                                                    type="text"
-                                                                                    className="form-control form-control-sm"
-                                                                                    id={`option${index}`}
-                                                                                    name="option"
-                                                                                    placeholder={`Option 0${
-                                                                                        index +
-                                                                                        1
-                                                                                    }`}
-                                                                                    value={
-                                                                                        options.content
-                                                                                    }
-                                                                                    onChange={(
-                                                                                        event
-                                                                                    ) =>
-                                                                                        this.handleOptionChange(
-                                                                                            index,
-                                                                                            event
-                                                                                        )
-                                                                                    }
-                                                                                    autoComplete="off"
-                                                                                    required
-                                                                                />
-                                                                                <div className="input-group-append">
-                                                                                    <div
-                                                                                        className="btn-group"
-                                                                                        role="group"
-                                                                                        aria-label="Basic example"
-                                                                                    >
-                                                                                        <button
-                                                                                            type="button"
-                                                                                            className="btn btn-light btn-sm shadow-none font-weight-bold"
-                                                                                            onClick={() =>
-                                                                                                this.handleRemoveOptionFields(
-                                                                                                    index
-                                                                                                )
-                                                                                            }
-                                                                                        >
-                                                                                            -
-                                                                                        </button>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="col-2 mb-2">
-                                                                            <p
-                                                                                className={`mb-0 text-right ${
-                                                                                    options.correct
-                                                                                        ? "text-success"
-                                                                                        : "text-muted"
-                                                                                }`}
-                                                                                onClick={() =>
-                                                                                    this.correctOption(
-                                                                                        index
-                                                                                    )
-                                                                                }
-                                                                                style={{
-                                                                                    cursor:
-                                                                                        "pointer",
-                                                                                }}
-                                                                            >
-                                                                                <i className="fas fa-check-circle"></i>
-                                                                            </p>
-                                                                        </div>
-                                                                    </Fragment>
-                                                                )
-                                                            )}
-                                                            {data[
-                                                                this.state
-                                                                    .activeQuestion
-                                                            ].content.options
-                                                                .length <
-                                                            this
-                                                                .option_limit ? (
-                                                                <div className="form-group col-12 mb-0">
-                                                                    <button
-                                                                        className="btn btn-light btn-block border-secondary bg-white btn-sm"
-                                                                        onClick={
-                                                                            this
-                                                                                .handleAddOptionFields
-                                                                        }
-                                                                    >
-                                                                        Add +
-                                                                    </button>
-                                                                </div>
-                                                            ) : (
-                                                                ""
-                                                            )}
-                                                        </div>
-                                                    ) : data[
-                                                          this.state
-                                                              .activeQuestion
-                                                      ].content.fill_in ? (
-                                                        // Fill in answers
-                                                        <div className="form-group row">
-                                                            {data[
-                                                                this.state
-                                                                    .activeQuestion
-                                                            ].content.fillin_answer.map(
-                                                                (
-                                                                    answer,
-                                                                    index
-                                                                ) => (
-                                                                    <Fragment
-                                                                        key={
-                                                                            index
-                                                                        }
-                                                                    >
-                                                                        <div className="col-12 mb-2">
-                                                                            <div
-                                                                                className="input-group border-secondary"
-                                                                                style={{
-                                                                                    borderRadius:
-                                                                                        "6px",
-                                                                                }}
-                                                                            >
-                                                                                <input
-                                                                                    type="text"
-                                                                                    className="form-control form-control-sm"
-                                                                                    id={`answer${index}`}
-                                                                                    name="answer"
-                                                                                    placeholder={`Answer 0${
-                                                                                        index +
-                                                                                        1
-                                                                                    }`}
-                                                                                    value={
-                                                                                        answer
-                                                                                    }
-                                                                                    onChange={(
-                                                                                        event
-                                                                                    ) =>
-                                                                                        this.handleAnswerChange(
-                                                                                            index,
-                                                                                            event
-                                                                                        )
-                                                                                    }
-                                                                                    autoComplete="off"
-                                                                                    required
-                                                                                />
-                                                                                <div className="input-group-append">
-                                                                                    <div
-                                                                                        className="btn-group"
-                                                                                        role="group"
-                                                                                        aria-label="Basic example"
-                                                                                    >
-                                                                                        <button
-                                                                                            type="button"
-                                                                                            className="btn btn-light btn-sm shadow-none font-weight-bold"
-                                                                                            onClick={() =>
-                                                                                                this.handleRemoveAnswerFields(
-                                                                                                    index
-                                                                                                )
-                                                                                            }
-                                                                                        >
-                                                                                            -
-                                                                                        </button>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </Fragment>
-                                                                )
-                                                            )}
-                                                            <div className="form-group col-12 mb-0">
-                                                                <button
-                                                                    className="btn btn-light btn-block border-secondary bg-white btn-sm"
-                                                                    onClick={
-                                                                        this
-                                                                            .handleAddAnswerFields
-                                                                    }
-                                                                >
-                                                                    Add +
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    ) : data[
-                                                          this.state
-                                                              .activeQuestion
-                                                      ].content.boolean ? (
-                                                        // true or false
-                                                        <div className="form-group row align-items-center">
-                                                            {data[
-                                                                this.state
-                                                                    .activeQuestion
-                                                            ].content.boolean_question.map(
-                                                                (
-                                                                    boolean,
-                                                                    index
-                                                                ) => (
-                                                                    <Fragment
-                                                                        key={
-                                                                            index
-                                                                        }
-                                                                    >
-                                                                        <div className="col-10 mb-2 pr-0">
-                                                                            <input
-                                                                                type="text"
-                                                                                className="form-control form-control-sm border-secondary"
-                                                                                id={`option${index}`}
-                                                                                name="option"
-                                                                                placeholder={`Option 0${
-                                                                                    index +
-                                                                                    1
-                                                                                }`}
-                                                                                value={
-                                                                                    boolean.content
-                                                                                }
-                                                                                disabled
-                                                                                autoComplete="off"
-                                                                                required
-                                                                            />
-                                                                        </div>
-                                                                        <div className="col-2 mb-2">
-                                                                            <p
-                                                                                className={`mb-0 text-right ${
-                                                                                    boolean.correct
-                                                                                        ? "text-success"
-                                                                                        : "text-muted"
-                                                                                }`}
-                                                                                onClick={() =>
-                                                                                    this.correctBoolean(
-                                                                                        index
-                                                                                    )
-                                                                                }
-                                                                                style={{
-                                                                                    cursor:
-                                                                                        "pointer",
-                                                                                }}
-                                                                            >
-                                                                                <i className="fas fa-check-circle"></i>
-                                                                            </p>
-                                                                        </div>
-                                                                    </Fragment>
-                                                                )
-                                                            )}
-                                                        </div>
-                                                    ) : (
-                                                        ""
-                                                    )}
-
-                                                    {/* ---------- Explanation ---------- */}
-                                                    <div className="form-group">
-                                                        <label>
-                                                            Explanation
-                                                        </label>
-                                                        <CKeditor
-                                                            data={
-                                                                data[
-                                                                    this.state
-                                                                        .activeQuestion
-                                                                ].content
-                                                                    .explanation
-                                                            }
-                                                            onChange={
-                                                                this
-                                                                    .handleExplanation
-                                                            }
-                                                        />
-                                                    </div>
-
                                                     {/* ---------- Image ---------- */}
+
                                                     <div className="form-group">
                                                         <div className="row align-items-center mb-2">
                                                             <div className="col-md-6">
                                                                 <p className="mb-0">
                                                                     Image
+                                                                    <OverlayTrigger
+                                                                        key="right"
+                                                                        placement="right"
+                                                                        overlay={
+                                                                            <Tooltip id="tooltip">
+                                                                                You
+                                                                                can
+                                                                                upload
+                                                                                Max
+                                                                                of
+                                                                                04
+                                                                                Images
+                                                                            </Tooltip>
+                                                                        }
+                                                                    >
+                                                                        <i className="fas fa-info-circle fa-xs ml-2"></i>
+                                                                    </OverlayTrigger>
                                                                 </p>
                                                             </div>
                                                             <div className="col-md-6 text-right">
@@ -2934,10 +2991,12 @@ class SubjectType1 extends Component {
                                                         ].content.images.map(
                                                             (
                                                                 options,
-                                                                index
+                                                                image_index
                                                             ) => (
                                                                 <Fragment
-                                                                    key={index}
+                                                                    key={
+                                                                        image_index
+                                                                    }
                                                                 >
                                                                     <div
                                                                         className="input-group border-secondary mb-1"
@@ -2949,10 +3008,10 @@ class SubjectType1 extends Component {
                                                                         <input
                                                                             type="text"
                                                                             className="form-control form-control-sm"
-                                                                            id={`image${index}`}
+                                                                            id={`image${image_index}`}
                                                                             name="image"
                                                                             placeholder={`Image title 0${
-                                                                                index +
+                                                                                image_index +
                                                                                 1
                                                                             }`}
                                                                             value={
@@ -2962,7 +3021,7 @@ class SubjectType1 extends Component {
                                                                                 event
                                                                             ) =>
                                                                                 this.handleImageTitle(
-                                                                                    index,
+                                                                                    image_index,
                                                                                     event
                                                                                 )
                                                                             }
@@ -2976,14 +3035,14 @@ class SubjectType1 extends Component {
                                                                             >
                                                                                 <button
                                                                                     type="button"
-                                                                                    className="btn btn-light btn-sm shadow-none font-weight-bold"
+                                                                                    className="btn btn-light btn-sm shadow-none"
                                                                                     onClick={() =>
                                                                                         this.handleRemoveImageFields(
-                                                                                            index
+                                                                                            image_index
                                                                                         )
                                                                                     }
                                                                                 >
-                                                                                    -
+                                                                                    <i className="fas fa-times fa-sm"></i>
                                                                                 </button>
                                                                             </div>
                                                                         </div>
@@ -2992,21 +3051,21 @@ class SubjectType1 extends Component {
                                                                         <input
                                                                             type="file"
                                                                             className="custom-file-input"
-                                                                            id={`file${index}`}
+                                                                            id={`file${image_index}`}
                                                                             accept="image/*"
                                                                             aria-describedby="inputGroupFileAddon01"
                                                                             onChange={(
                                                                                 event
                                                                             ) =>
                                                                                 this.handleImageFile(
-                                                                                    index,
+                                                                                    image_index,
                                                                                     event
                                                                                 )
                                                                             }
                                                                         />
                                                                         <label
                                                                             className="custom-file-label"
-                                                                            htmlFor={`file${index}`}
+                                                                            htmlFor={`file${image_index}`}
                                                                         >
                                                                             {options.file_name ===
                                                                             ""
@@ -3027,30 +3086,10 @@ class SubjectType1 extends Component {
                                                             Select only .png
                                                             .jpg .jpeg .webp
                                                         </small>
-
-                                                        {data[
-                                                            this.state
-                                                                .activeQuestion
-                                                        ].content.images
-                                                            .length <
-                                                        this.image_limit ? (
-                                                            <div className="form-group mb-0">
-                                                                <button
-                                                                    className="btn btn-light btn-block border-secondary bg-white btn-sm"
-                                                                    onClick={
-                                                                        this
-                                                                            .handleAddImageFields
-                                                                    }
-                                                                >
-                                                                    Add +
-                                                                </button>
-                                                            </div>
-                                                        ) : (
-                                                            ""
-                                                        )}
                                                     </div>
 
                                                     {/* ---------- Video ---------- */}
+
                                                     <div className="form-group">
                                                         <div className="row align-items-center mb-2">
                                                             <div className="col-md-6">
@@ -3155,7 +3194,7 @@ class SubjectType1 extends Component {
                                                                     this.state
                                                                         .activeQuestion
                                                                 ].content.video
-                                                                    .path
+                                                                    .url
                                                             }
                                                         />
                                                         <small className="form-text text-muted mb-2">
@@ -3165,11 +3204,29 @@ class SubjectType1 extends Component {
                                                     </div>
 
                                                     {/* ---------- Audio ---------- */}
+
                                                     <div className="form-group">
                                                         <div className="row align-items-center mb-2">
                                                             <div className="col-md-6">
                                                                 <p className="mb-0">
                                                                     Audio
+                                                                    <OverlayTrigger
+                                                                        key="right"
+                                                                        placement="right"
+                                                                        overlay={
+                                                                            <Tooltip id="tooltip">
+                                                                                You
+                                                                                can
+                                                                                upload
+                                                                                Max
+                                                                                of
+                                                                                02
+                                                                                Audio
+                                                                            </Tooltip>
+                                                                        }
+                                                                    >
+                                                                        <i className="fas fa-info-circle fa-xs ml-2"></i>
+                                                                    </OverlayTrigger>
                                                                 </p>
                                                             </div>
                                                             <div className="col-md-6 text-right">
@@ -3190,52 +3247,81 @@ class SubjectType1 extends Component {
                                                         ].content.audio.map(
                                                             (
                                                                 options,
-                                                                index
+                                                                audio_index
                                                             ) => (
                                                                 <Fragment
-                                                                    key={index}
+                                                                    key={
+                                                                        audio_index
+                                                                    }
                                                                 >
-                                                                    <input
-                                                                        type="text"
-                                                                        className="form-control form-control-sm border-secondary mb-1"
-                                                                        id={`audio${index}`}
-                                                                        name="audio"
-                                                                        placeholder={`Audio title 0${
-                                                                            index +
-                                                                            1
-                                                                        }`}
-                                                                        value={
-                                                                            options.title
-                                                                        }
-                                                                        onChange={(
-                                                                            event
-                                                                        ) =>
-                                                                            this.handleAudioTitle(
-                                                                                index,
+                                                                    <div
+                                                                        className="input-group border-secondary mb-1"
+                                                                        style={{
+                                                                            borderRadius:
+                                                                                "6px",
+                                                                        }}
+                                                                    >
+                                                                        <input
+                                                                            type="text"
+                                                                            className="form-control form-control-sm"
+                                                                            id={`audio${audio_index}`}
+                                                                            name="audio"
+                                                                            placeholder={`Audio title 0${
+                                                                                audio_index +
+                                                                                1
+                                                                            }`}
+                                                                            value={
+                                                                                options.title
+                                                                            }
+                                                                            onChange={(
                                                                                 event
-                                                                            )
-                                                                        }
-                                                                        autoComplete="off"
-                                                                    />
+                                                                            ) =>
+                                                                                this.handleAudioTitle(
+                                                                                    audio_index,
+                                                                                    event
+                                                                                )
+                                                                            }
+                                                                            autoComplete="off"
+                                                                        />
+                                                                        <div className="input-group-append">
+                                                                            <div
+                                                                                className="btn-group"
+                                                                                role="group"
+                                                                                aria-label="Basic example"
+                                                                            >
+                                                                                <button
+                                                                                    type="button"
+                                                                                    className="btn btn-light btn-sm shadow-none"
+                                                                                    onClick={() =>
+                                                                                        this.handleRemoveAudioFields(
+                                                                                            audio_index
+                                                                                        )
+                                                                                    }
+                                                                                >
+                                                                                    <i className="fas fa-times fa-sm"></i>
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
                                                                     <div className="custom-file mb-2">
                                                                         <input
                                                                             type="file"
                                                                             className="custom-file-input"
-                                                                            id={`audio${index}`}
+                                                                            id={`audio${audio_index}`}
                                                                             accept="audio/*"
                                                                             aria-describedby="inputGroupFileAddon01"
                                                                             onChange={(
                                                                                 event
                                                                             ) =>
                                                                                 this.handleAudioFile(
-                                                                                    index,
+                                                                                    audio_index,
                                                                                     event
                                                                                 )
                                                                             }
                                                                         />
                                                                         <label
                                                                             className="custom-file-label"
-                                                                            htmlFor={`audio${index}`}
+                                                                            htmlFor={`audio${audio_index}`}
                                                                         >
                                                                             {options.file_name ===
                                                                             ""
@@ -3288,36 +3374,6 @@ class SubjectType1 extends Component {
 
                                             <Accordion.Collapse eventKey="1">
                                                 <Card.Body className="p-3">
-                                                    {/* ---------- Marks ---------- */}
-                                                    <div className="form-group row align-items-center">
-                                                        <div className="col-4 small">
-                                                            Marks
-                                                        </div>
-                                                        <div className="col-8">
-                                                            <input
-                                                                type="text"
-                                                                className="form-control form-control-sm border-secondary"
-                                                                value={
-                                                                    data[
-                                                                        this
-                                                                            .state
-                                                                            .activeQuestion
-                                                                    ].properties
-                                                                        .marks
-                                                                }
-                                                                onChange={(
-                                                                    event
-                                                                ) =>
-                                                                    this.handleProperties(
-                                                                        event,
-                                                                        "marks"
-                                                                    )
-                                                                }
-                                                                autoComplete="off"
-                                                            />
-                                                        </div>
-                                                    </div>
-
                                                     {/* ---------- Complexity ---------- */}
                                                     <div className="form-group row align-items-center">
                                                         <div className="col-4 small">
@@ -3803,6 +3859,469 @@ class SubjectType1 extends Component {
                             ) : (
                                 ""
                             )}
+
+                            {/* ---------- Sub Settings column ---------- */}
+                            {this.state.showSubEdit_option ? (
+                                <div className="col-md-3 content-edit">
+                                    <div className="d-flex justify-content-between align-items-center mb-2">
+                                        <button
+                                            className="btn btn-primary btn-sm shadow-none"
+                                            onClick={this.handleSubmit}
+                                            disabled={this.state.btnDisabled}
+                                        >
+                                            Save
+                                        </button>
+                                        <button
+                                            className="btn btn-link btn-sm shadow-none"
+                                            onClick={() => {
+                                                this.setState({
+                                                    showMainEdit_option: false,
+                                                    showSubEdit_option: false,
+                                                    contentCollapsed: true,
+                                                    subContentCollapsed: true,
+                                                    propertiesCollapsed: true,
+                                                    settingsCollapsed: true,
+                                                    activeQuestion: "",
+                                                    activeSubQuestion: "",
+                                                });
+                                            }}
+                                        >
+                                            Close
+                                        </button>
+                                    </div>
+
+                                    <Accordion defaultActiveKey="">
+                                        {/* Content */}
+                                        <Card className="shadow-sm mb-2">
+                                            <Accordion.Toggle
+                                                as={Card.Body}
+                                                variant="link"
+                                                eventKey="0"
+                                                className="text-dark"
+                                                style={{ cursor: "pointer" }}
+                                                onClick={() =>
+                                                    this.toggleCollapse(
+                                                        "content"
+                                                    )
+                                                }
+                                            >
+                                                <div className="d-flex justify-content-between align-items-center">
+                                                    Content
+                                                    {this.state
+                                                        .contentCollapsed ? (
+                                                        <i className="fas fa-angle-right "></i>
+                                                    ) : (
+                                                        <i className="fas fa-angle-down "></i>
+                                                    )}
+                                                </div>
+                                            </Accordion.Toggle>
+
+                                            <Accordion.Collapse eventKey="0">
+                                                <Card.Body className="p-3">
+                                                    {/* ---------- Questions ---------- */}
+                                                    <div className="form-group">
+                                                        <label>
+                                                            Add Questions
+                                                        </label>
+                                                        <CKeditor
+                                                            data={
+                                                                data[
+                                                                    this.state
+                                                                        .activeQuestion
+                                                                ].sub_question[
+                                                                    this.state
+                                                                        .activeSubQuestion
+                                                                ].question
+                                                            }
+                                                            onChange={
+                                                                this
+                                                                    .onSubEditorChange
+                                                            }
+                                                        />
+                                                    </div>
+
+                                                    {/* ---------- Options ---------- */}
+                                                    <div className="form-group">
+                                                        <div className="row mb-3">
+                                                            <div className="col-md-6">
+                                                                <div className="d-flex align-items-center">
+                                                                    <span className="mr-4">
+                                                                        MCQ
+                                                                    </span>
+                                                                    <ReactSwitch
+                                                                        checked={
+                                                                            data[
+                                                                                this
+                                                                                    .state
+                                                                                    .activeQuestion
+                                                                            ]
+                                                                                .sub_question[
+                                                                                this
+                                                                                    .state
+                                                                                    .activeSubQuestion
+                                                                            ]
+                                                                                .mcq
+                                                                        }
+                                                                        onChange={() =>
+                                                                            this.handleOptions_mcq(
+                                                                                this
+                                                                                    .state
+                                                                                    .activeQuestion
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="row mb-3">
+                                                            <div className="col-md-6">
+                                                                <div className="d-flex align-items-center">
+                                                                    <span className="mr-4">
+                                                                        Fill in
+                                                                    </span>
+                                                                    <ReactSwitch
+                                                                        checked={
+                                                                            data[
+                                                                                this
+                                                                                    .state
+                                                                                    .activeQuestion
+                                                                            ]
+                                                                                .sub_question[
+                                                                                this
+                                                                                    .state
+                                                                                    .activeSubQuestion
+                                                                            ]
+                                                                                .fill_in
+                                                                        }
+                                                                        onChange={() =>
+                                                                            this.handleOptions_fillin(
+                                                                                this
+                                                                                    .state
+                                                                                    .activeQuestion
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {data[
+                                                        this.state
+                                                            .activeQuestion
+                                                    ].sub_question[
+                                                        this.state
+                                                            .activeSubQuestion
+                                                    ].mcq ? (
+                                                        <div className="form-group row align-items-center">
+                                                            {data[
+                                                                this.state
+                                                                    .activeQuestion
+                                                            ].sub_question[
+                                                                this.state
+                                                                    .activeSubQuestion
+                                                            ].options.map(
+                                                                (
+                                                                    options,
+                                                                    index
+                                                                ) => (
+                                                                    <Fragment
+                                                                        key={
+                                                                            index
+                                                                        }
+                                                                    >
+                                                                        <div className="col-10 mb-2 pr-0">
+                                                                            <div
+                                                                                className="input-group border-secondary"
+                                                                                style={{
+                                                                                    borderRadius:
+                                                                                        "6px",
+                                                                                }}
+                                                                            >
+                                                                                <input
+                                                                                    type="text"
+                                                                                    className="form-control form-control-sm"
+                                                                                    id={`option${index}`}
+                                                                                    name="option"
+                                                                                    placeholder={`Option 0${
+                                                                                        index +
+                                                                                        1
+                                                                                    }`}
+                                                                                    value={
+                                                                                        options.content
+                                                                                    }
+                                                                                    onChange={(
+                                                                                        event
+                                                                                    ) =>
+                                                                                        this.handleOptionChange(
+                                                                                            index,
+                                                                                            event
+                                                                                        )
+                                                                                    }
+                                                                                    autoComplete="off"
+                                                                                    required
+                                                                                />
+                                                                                <div className="input-group-append">
+                                                                                    <div
+                                                                                        className="btn-group"
+                                                                                        role="group"
+                                                                                        aria-label="Basic example"
+                                                                                    >
+                                                                                        <button
+                                                                                            type="button"
+                                                                                            className="btn btn-light btn-sm shadow-none font-weight-bold"
+                                                                                            onClick={() =>
+                                                                                                this.handleRemoveOptionFields(
+                                                                                                    index
+                                                                                                )
+                                                                                            }
+                                                                                        >
+                                                                                            -
+                                                                                        </button>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="col-2 mb-2">
+                                                                            <p
+                                                                                className={`mb-0 text-right ${
+                                                                                    options.correct
+                                                                                        ? "text-success"
+                                                                                        : "text-muted"
+                                                                                }`}
+                                                                                onClick={() =>
+                                                                                    this.correctOption(
+                                                                                        index
+                                                                                    )
+                                                                                }
+                                                                                style={{
+                                                                                    cursor:
+                                                                                        "pointer",
+                                                                                }}
+                                                                            >
+                                                                                <i className="fas fa-check-circle"></i>
+                                                                            </p>
+                                                                        </div>
+                                                                    </Fragment>
+                                                                )
+                                                            )}
+                                                            {data[
+                                                                this.state
+                                                                    .activeQuestion
+                                                            ].sub_question[
+                                                                this.state
+                                                                    .activeSubQuestion
+                                                            ].options.length <
+                                                            this
+                                                                .option_limit ? (
+                                                                <div className="form-group col-12 mb-0">
+                                                                    <button
+                                                                        className="btn btn-light btn-block border-secondary btn-sm"
+                                                                        onClick={
+                                                                            this
+                                                                                .handleAddOptionFields
+                                                                        }
+                                                                    >
+                                                                        Add +
+                                                                    </button>
+                                                                </div>
+                                                            ) : (
+                                                                ""
+                                                            )}
+                                                        </div>
+                                                    ) : data[
+                                                          this.state
+                                                              .activeQuestion
+                                                      ].sub_question[
+                                                          this.state
+                                                              .activeSubQuestion
+                                                      ].fill_in ? (
+                                                        // Fill in answers
+                                                        <div className="form-group row">
+                                                            {data[
+                                                                this.state
+                                                                    .activeQuestion
+                                                            ].sub_question[
+                                                                this.state
+                                                                    .activeSubQuestion
+                                                            ].fillin_answer.map(
+                                                                (
+                                                                    answer,
+                                                                    index
+                                                                ) => (
+                                                                    <Fragment
+                                                                        key={
+                                                                            index
+                                                                        }
+                                                                    >
+                                                                        <div className="col-12 mb-2">
+                                                                            <div
+                                                                                className="input-group border-secondary"
+                                                                                style={{
+                                                                                    borderRadius:
+                                                                                        "6px",
+                                                                                }}
+                                                                            >
+                                                                                <input
+                                                                                    type="text"
+                                                                                    className="form-control form-control-sm"
+                                                                                    id={`answer${index}`}
+                                                                                    name="answer"
+                                                                                    placeholder={`Answer 0${
+                                                                                        index +
+                                                                                        1
+                                                                                    }`}
+                                                                                    value={
+                                                                                        answer
+                                                                                    }
+                                                                                    onChange={(
+                                                                                        event
+                                                                                    ) =>
+                                                                                        this.handleAnswerChange(
+                                                                                            index,
+                                                                                            event
+                                                                                        )
+                                                                                    }
+                                                                                    autoComplete="off"
+                                                                                    required
+                                                                                />
+                                                                                <div className="input-group-append">
+                                                                                    <div
+                                                                                        className="btn-group"
+                                                                                        role="group"
+                                                                                        aria-label="Basic example"
+                                                                                    >
+                                                                                        <button
+                                                                                            type="button"
+                                                                                            className="btn btn-light btn-sm shadow-none font-weight-bold"
+                                                                                            onClick={() =>
+                                                                                                this.handleRemoveAnswerFields(
+                                                                                                    index
+                                                                                                )
+                                                                                            }
+                                                                                        >
+                                                                                            -
+                                                                                        </button>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </Fragment>
+                                                                )
+                                                            )}
+                                                            <div className="form-group col-12 mb-0">
+                                                                <button
+                                                                    className="btn btn-light btn-block border-secondary btn-sm"
+                                                                    onClick={
+                                                                        this
+                                                                            .handleAddAnswerFields
+                                                                    }
+                                                                >
+                                                                    Add +
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        ""
+                                                    )}
+
+                                                    {/* ---------- Explanation ---------- */}
+                                                    <div className="form-group">
+                                                        <label>
+                                                            Explanation
+                                                        </label>
+                                                        <CKeditor
+                                                            data={
+                                                                data[
+                                                                    this.state
+                                                                        .activeQuestion
+                                                                ].sub_question[
+                                                                    this.state
+                                                                        .activeSubQuestion
+                                                                ].explanation
+                                                            }
+                                                            onChange={
+                                                                this
+                                                                    .handleExplanation
+                                                            }
+                                                        />
+                                                    </div>
+
+                                                    {/* ---------- Marks ---------- */}
+                                                    <div className="form-group row align-items-center">
+                                                        <div className="col-4 small">
+                                                            Marks
+                                                        </div>
+                                                        <div className="col-8">
+                                                            <input
+                                                                type="text"
+                                                                className="form-control form-control-sm border-secondary"
+                                                                value={
+                                                                    data[
+                                                                        this
+                                                                            .state
+                                                                            .activeQuestion
+                                                                    ]
+                                                                        .sub_question[
+                                                                        this
+                                                                            .state
+                                                                            .activeSubQuestion
+                                                                    ].marks
+                                                                }
+                                                                onChange={(
+                                                                    event
+                                                                ) =>
+                                                                    this.handleProperties(
+                                                                        event,
+                                                                        "marks"
+                                                                    )
+                                                                }
+                                                                autoComplete="off"
+                                                            />
+                                                        </div>
+                                                    </div>
+
+                                                    {/* ---------- Negative Marks ---------- */}
+                                                    <div className="form-group row align-items-center">
+                                                        <div className="col-4 small">
+                                                            Negative Marks
+                                                        </div>
+                                                        <div className="col-8">
+                                                            <input
+                                                                type="text"
+                                                                className="form-control form-control-sm border-secondary"
+                                                                value={
+                                                                    data[
+                                                                        this
+                                                                            .state
+                                                                            .activeQuestion
+                                                                    ]
+                                                                        .sub_question[
+                                                                        this
+                                                                            .state
+                                                                            .activeSubQuestion
+                                                                    ]
+                                                                        .negative_marks
+                                                                }
+                                                                onChange={(
+                                                                    event
+                                                                ) =>
+                                                                    this.handleProperties(
+                                                                        event,
+                                                                        "negative_marks"
+                                                                    )
+                                                                }
+                                                                autoComplete="off"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </Card.Body>
+                                            </Accordion.Collapse>
+                                        </Card>
+                                    </Accordion>
+                                </div>
+                            ) : (
+                                ""
+                            )}
                         </div>
                         {/* Loading component */}
                         {this.state.page_loading ? <Loading /> : ""}
@@ -3813,4 +4332,4 @@ class SubjectType1 extends Component {
     }
 }
 
-export default SubjectType1;
+export default connect(mapStateToProps)(Type2);
