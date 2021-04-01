@@ -17,6 +17,7 @@ import SummaryUpload from "./summaryUpload";
 import Notes from "./notes";
 import NotesUpload from "./notesUpload";
 import Type1 from "./type1";
+import Type2 from "./type2";
 import Concepts from "./concepts";
 
 import CycleTestAuto from "./cycleTest-auto";
@@ -180,7 +181,7 @@ const teacherRoutes = (
             }
         />
 
-        {/* --------------- Type1, Concepts --------------- */}
+        {/* --------------- Type1, Type2 and Concepts --------------- */}
 
         <Route
             exact
@@ -191,6 +192,18 @@ const teacherRoutes = (
                     <Redirect to="/teacher/login" />
                 ) : (
                     <Type1 {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/teacher/subject/:subjectId/chapter/:chapterId/:topicNum/type2"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <Type2 {...props} />
                 )
             }
         />

@@ -722,7 +722,7 @@ class Chapters extends Component {
                                 </div>
                                 <div className="col-md-2 mb-2 mb-md-0">
                                     <Link
-                                        to={`${this.props.match.url}/${data.topic_name}/match`}
+                                        to={`${this.props.match.url}/${data.topic_num}/match`}
                                     >
                                         <button
                                             className="btn btn-primary btn-sm shadow-none"
@@ -770,7 +770,7 @@ class Chapters extends Component {
                                 </div>
                                 <div className="col-md-2 mb-2 mb-md-0">
                                     <Link
-                                        to={`${this.props.match.url}/${data.topic_name}/type2`}
+                                        to={`${this.props.match.url}/${data.topic_num}/type2`}
                                     >
                                         <button
                                             className="btn btn-primary btn-sm shadow-none"
