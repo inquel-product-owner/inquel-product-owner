@@ -39,8 +39,7 @@ class Concepts extends Component {
             showConceptDelete_Modal: false,
 
             contentCollapsed: true,
-            imageCollapsed: true,
-            audioCollapsed: true,
+            filesCollapsed: true,
             settingsCollapsed: true,
             showEdit_option: false,
             showVirtual_keyboard: true,
@@ -598,8 +597,7 @@ class Concepts extends Component {
                             this.setState({
                                 showEdit_option: false,
                                 contentCollapsed: true,
-                                imageCollapsed: true,
-                                audioCollapsed: true,
+                                filesCollapsed: true,
                                 settingsCollapsed: true,
                                 page_loading: true,
                                 activeConcept: "",
@@ -634,8 +632,7 @@ class Concepts extends Component {
                                 this.setState({
                                     showEdit_option: false,
                                     contentCollapsed: true,
-                                    imageCollapsed: true,
-                                    audioCollapsed: true,
+                                    filesCollapsed: true,
                                     settingsCollapsed: true,
                                     page_loading: true,
                                     activeConcept: "",
@@ -681,8 +678,7 @@ class Concepts extends Component {
                                 this.setState({
                                     showEdit_option: false,
                                     contentCollapsed: true,
-                                    imageCollapsed: true,
-                                    audioCollapsed: true,
+                                    filesCollapsed: true,
                                     settingsCollapsed: true,
                                     page_loading: true,
                                     activeConcept: "",
@@ -761,8 +757,9 @@ class Concepts extends Component {
         if (
             values[this.state.activeConcept].concepts_random_id !== "" &&
             values[this.state.activeConcept].is_image_uploaded === true &&
-            values[this.state.activeConcept].content.images[index].file_name === '' &&
-            values[this.state.activeConcept].content.images[index].path !== ''
+            values[this.state.activeConcept].content.images[index].file_name ===
+                "" &&
+            values[this.state.activeConcept].content.images[index].path !== ""
         ) {
             let body = {
                 chapter_id: this.chapterId,
@@ -957,8 +954,8 @@ class Concepts extends Component {
         if (
             values[this.state.activeConcept].concepts_random_id !== "" &&
             values[this.state.activeConcept].is_image_uploaded === true &&
-            values[this.state.activeConcept].content.video.file_name === '' &&
-            values[this.state.activeConcept].content.video.path !== ''
+            values[this.state.activeConcept].content.video.file_name === "" &&
+            values[this.state.activeConcept].content.video.path !== ""
         ) {
             fetch(
                 `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/files/`,
@@ -1057,8 +1054,9 @@ class Concepts extends Component {
         if (
             values[this.state.activeConcept].concepts_random_id !== "" &&
             values[this.state.activeConcept].is_image_uploaded === true &&
-            values[this.state.activeConcept].content.audio[index].file_name === '' &&
-            values[this.state.activeConcept].content.audio[index].path !== ''
+            values[this.state.activeConcept].content.audio[index].file_name ===
+                "" &&
+            values[this.state.activeConcept].content.audio[index].path !== ""
         ) {
             let body = {
                 chapter_id: this.chapterId,
@@ -1286,21 +1284,16 @@ class Concepts extends Component {
     toggleCollapse = (component) => {
         this.setState({
             contentCollapsed: true,
-            imageCollapsed: true,
-            audioCollapsed: true,
+            filesCollapsed: true,
             settingsCollapsed: true,
         });
         if (component === "content") {
             this.setState({
                 contentCollapsed: !this.state.contentCollapsed,
             });
-        } else if (component === "image") {
+        } else if (component === "files") {
             this.setState({
-                imageCollapsed: !this.state.imageCollapsed,
-            });
-        } else if (component === "audio") {
-            this.setState({
-                audioCollapsed: !this.state.audioCollapsed,
+                filesCollapsed: !this.state.filesCollapsed,
             });
         } else {
             this.setState({
@@ -1361,8 +1354,7 @@ class Concepts extends Component {
         this.setState({
             showEdit_option: false,
             contentCollapsed: true,
-            imageCollapsed: true,
-            audioCollapsed: true,
+            filesCollapsed: true,
             settingsCollapsed: true,
             activeConcept: index,
         });
@@ -2034,8 +2026,7 @@ class Concepts extends Component {
                                                 this.setState({
                                                     showEdit_option: false,
                                                     contentCollapsed: true,
-                                                    imageCollapsed: true,
-                                                    audioCollapsed: true,
+                                                    filesCollapsed: true,
                                                     settingsCollapsed: true,
                                                     activeConcept: "",
                                                 });
@@ -2122,13 +2113,13 @@ class Concepts extends Component {
                                                 className="text-dark"
                                                 style={{ cursor: "pointer" }}
                                                 onClick={() =>
-                                                    this.toggleCollapse("image")
+                                                    this.toggleCollapse("files")
                                                 }
                                             >
                                                 <div className="d-flex justify-content-between align-items-center">
-                                                    Image / Video
+                                                    Image | Video | Audio
                                                     {this.state
-                                                        .imageCollapsed ? (
+                                                        .filesCollapsed ? (
                                                         <i className="fas fa-angle-right "></i>
                                                     ) : (
                                                         <i className="fas fa-angle-down "></i>
@@ -2417,48 +2408,44 @@ class Concepts extends Component {
                                                             video
                                                         </small>
                                                     </div>
-                                                </Card.Body>
-                                            </Accordion.Collapse>
-                                        </Card>
 
-                                        {/* ---------- Audio ---------- */}
-                                        <Card className="shadow-sm mb-2">
-                                            <Accordion.Toggle
-                                                as={Card.Body}
-                                                variant="link"
-                                                eventKey="2"
-                                                className="text-dark"
-                                                style={{ cursor: "pointer" }}
-                                                onClick={() =>
-                                                    this.toggleCollapse("audio")
-                                                }
-                                            >
-                                                <div className="d-flex justify-content-between align-items-center">
-                                                    Audio
-                                                    {this.state
-                                                        .audioCollapsed ? (
-                                                        <i className="fas fa-angle-right "></i>
-                                                    ) : (
-                                                        <i className="fas fa-angle-down "></i>
-                                                    )}
-                                                </div>
-                                            </Accordion.Toggle>
-
-                                            <Accordion.Collapse eventKey="2">
-                                                <Card.Body className="p-3">
                                                     {/* ---------- Audio ---------- */}
 
                                                     <div className="form-group">
-                                                        <div className="text-right mb-2">
-                                                            <button
-                                                                className="btn btn-link btn-sm shadow-none"
-                                                                onClick={
-                                                                    this
-                                                                        .clearAudios
-                                                                }
-                                                            >
-                                                                Clear
-                                                            </button>
+                                                        <div className="row align-items-center mb-2">
+                                                            <div className="col-md-6">
+                                                                <p className="mb-0">
+                                                                    Audio
+                                                                    <OverlayTrigger
+                                                                        key="right"
+                                                                        placement="right"
+                                                                        overlay={
+                                                                            <Tooltip id="tooltip">
+                                                                                You
+                                                                                can
+                                                                                upload
+                                                                                Max
+                                                                                of
+                                                                                02
+                                                                                Audio
+                                                                            </Tooltip>
+                                                                        }
+                                                                    >
+                                                                        <i className="fas fa-info-circle fa-xs ml-2"></i>
+                                                                    </OverlayTrigger>
+                                                                </p>
+                                                            </div>
+                                                            <div className="col-md-6 text-right">
+                                                                <button
+                                                                    className="btn btn-link btn-sm shadow-none"
+                                                                    onClick={
+                                                                        this
+                                                                            .clearAudios
+                                                                    }
+                                                                >
+                                                                    Clear
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                         {data[
                                                             this.state
@@ -2595,7 +2582,7 @@ class Concepts extends Component {
                                             <Accordion.Toggle
                                                 as={Card.Body}
                                                 variant="link"
-                                                eventKey="3"
+                                                eventKey="2"
                                                 className="text-dark"
                                                 style={{ cursor: "pointer" }}
                                                 onClick={this.toggleCollapse}
@@ -2611,7 +2598,7 @@ class Concepts extends Component {
                                                 </div>
                                             </Accordion.Toggle>
 
-                                            <Accordion.Collapse eventKey="3">
+                                            <Accordion.Collapse eventKey="2">
                                                 <Card.Body className="p-3">
                                                     {/* ---------- Virtual keyboard ---------- */}
                                                     <div className="form-group">

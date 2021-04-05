@@ -5,7 +5,7 @@ import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import CKeditor from "../../sharedComponents/CKeditor";
 import ReactSwitch from "../../sharedComponents/switchComponent";
-import { Accordion, Card, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { Accordion, Card } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
 import Loading from "../../sharedComponents/loader";
 import AlertBox from "../../sharedComponents/alert";
@@ -38,6 +38,7 @@ class Type2 extends Component {
 
             showMainEdit_option: false,
             contentCollapsed: true,
+            filesCollapsed: true,
             propertiesCollapsed: true,
             settingsCollapsed: true,
 
@@ -63,14 +64,16 @@ class Type2 extends Component {
 
             questions: [
                 {
-                    question: "<p>Main Question goes here</p>",
                     question_random_id: "",
-                    is_image_uploaded: false,
+                    question: "<p>Main Question goes here</p>",
+                    explanation: "<p>Explanation goes here</p>",
+                    is_file_uploaded: false,
+                    mcq: true,
+                    fill_in: false,
                     sub_question: [
                         {
                             sub_question_id: "",
                             question: "<p>Sub question goes here</p>",
-                            explanation: "<p>Explanation goes here</p>",
                             mcq: true,
                             fill_in: false,
                             fillin_answer: [""],
@@ -254,8 +257,6 @@ class Type2 extends Component {
                                             .sub_question_id,
                                     question:
                                         response[i].sub_question[k].question,
-                                    explanation:
-                                        response[i].sub_question[k].explanation,
                                     mcq: response[i].sub_question[k].mcq,
                                     fill_in:
                                         response[i].sub_question[k].fill_in,
@@ -299,13 +300,24 @@ class Type2 extends Component {
 
                             // Main question
                             data.push({
-                                question: response[i].question,
                                 question_random_id:
                                     response[i].question_random_id,
-                                is_image_uploaded:
+                                question: response[i].question,
+                                explanation: response[i].explanation,
+                                is_file_uploaded:
                                     Object.entries(response[i].files).length !==
                                     0
                                         ? true
+                                        : false,
+                                mcq:
+                                    response[i].sub_question[0].mcq !==
+                                    undefined
+                                        ? response[i].sub_question[0].mcq
+                                        : false,
+                                fill_in:
+                                    response[i].sub_question[0].fill_in !==
+                                    undefined
+                                        ? response[i].sub_question[0].fill_in
                                         : false,
                                 sub_question: sub_question,
                                 content: {
@@ -632,6 +644,7 @@ class Type2 extends Component {
                                 showMainEdit_option: false,
                                 showSubEdit_option: false,
                                 contentCollapsed: true,
+                                filesCollapsed: true,
                                 subContentCollapsed: true,
                                 propertiesCollapsed: true,
                                 settingsCollapsed: true,
@@ -707,6 +720,7 @@ class Type2 extends Component {
                                 showMainEdit_option: false,
                                 showSubEdit_option: false,
                                 contentCollapsed: true,
+                                filesCollapsed: true,
                                 subContentCollapsed: true,
                                 propertiesCollapsed: true,
                                 settingsCollapsed: true,
@@ -770,9 +784,7 @@ class Type2 extends Component {
 
     handleExplanation = (evt) => {
         const values = [...this.state.questions];
-        values[this.state.activeQuestion].sub_question[
-            this.state.activeSubQuestion
-        ].explanation = evt.editor.getData();
+        values[this.state.activeQuestion].explanation = evt.editor.getData();
         this.setState({
             questions: values,
         });
@@ -782,14 +794,26 @@ class Type2 extends Component {
 
     handleOptions_mcq = () => {
         const values = [...this.state.questions];
-        values[this.state.activeQuestion].sub_question[
-            this.state.activeSubQuestion
-        ].mcq = !values[this.state.activeQuestion].sub_question[
-            this.state.activeSubQuestion
+        // main_question
+        values[this.state.activeQuestion].mcq = !values[
+            this.state.activeQuestion
         ].mcq;
-        values[this.state.activeQuestion].sub_question[
-            this.state.activeSubQuestion
-        ].fill_in = false;
+        values[this.state.activeQuestion].fill_in = !values[
+            this.state.activeQuestion
+        ].fill_in;
+        for (
+            let i = 0;
+            i < values[this.state.activeQuestion].sub_question.length;
+            i++
+        ) {
+            // sub_question
+            values[this.state.activeQuestion].sub_question[i].mcq = !values[
+                this.state.activeQuestion
+            ].sub_question[i].mcq;
+            values[this.state.activeQuestion].sub_question[i].fill_in = !values[
+                this.state.activeQuestion
+            ].sub_question[i].fill_in;
+        }
         this.setState({
             questions: values,
         });
@@ -797,14 +821,26 @@ class Type2 extends Component {
 
     handleOptions_fillin = () => {
         const values = [...this.state.questions];
-        values[this.state.activeQuestion].sub_question[
-            this.state.activeSubQuestion
-        ].fill_in = !values[this.state.activeQuestion].sub_question[
-            this.state.activeSubQuestion
+        // main_question
+        values[this.state.activeQuestion].fill_in = !values[
+            this.state.activeQuestion
         ].fill_in;
-        values[this.state.activeQuestion].sub_question[
-            this.state.activeSubQuestion
-        ].mcq = false;
+        values[this.state.activeQuestion].mcq = !values[
+            this.state.activeQuestion
+        ].mcq;
+        for (
+            let i = 0;
+            i < values[this.state.activeQuestion].sub_question.length;
+            i++
+        ) {
+            // sub_question
+            values[this.state.activeQuestion].sub_question[i].fill_in = !values[
+                this.state.activeQuestion
+            ].sub_question[i].fill_in;
+            values[this.state.activeQuestion].sub_question[i].mcq = !values[
+                this.state.activeQuestion
+            ].sub_question[i].mcq;
+        }
         this.setState({
             questions: values,
         });
@@ -817,6 +853,18 @@ class Type2 extends Component {
                 this.state.activeSubQuestion
             ].options[index].content !== ""
         ) {
+            for (
+                let i = 0;
+                i <
+                values[this.state.activeQuestion].sub_question[
+                    this.state.activeSubQuestion
+                ].options.length;
+                i++
+            ) {
+                values[this.state.activeQuestion].sub_question[
+                    this.state.activeSubQuestion
+                ].options[i].correct = false;
+            }
             values[this.state.activeQuestion].sub_question[
                 this.state.activeSubQuestion
             ].options[index].correct = !values[this.state.activeQuestion]
@@ -947,7 +995,7 @@ class Type2 extends Component {
 
         if (
             values[this.state.activeQuestion].question_random_id !== "" &&
-            values[this.state.activeQuestion].is_image_uploaded === true &&
+            values[this.state.activeQuestion].is_file_uploaded === true &&
             values[this.state.activeQuestion].content.images[index]
                 .file_name === "" &&
             values[this.state.activeQuestion].content.images[index].path !== ""
@@ -1042,35 +1090,80 @@ class Type2 extends Component {
 
     clearImages = () => {
         const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.images = [
-            {
-                title: "",
-                file_name: "",
-                image: null,
-                path: "",
-            },
-            {
-                title: "",
-                file_name: "",
-                image: null,
-                path: "",
-            },
-            {
-                title: "",
-                file_name: "",
-                image: null,
-                path: "",
-            },
-            {
-                title: "",
-                file_name: "",
-                image: null,
-                path: "",
-            },
-        ];
         this.setState({
-            questions: values,
+            showErrorAlert: false,
+            showSuccessAlert: false,
         });
+        for (
+            let i = 0;
+            i < values[this.state.activeQuestion].content.images.length;
+            i++
+        ) {
+            if (
+                values[this.state.activeQuestion].question_random_id !== "" &&
+                values[this.state.activeQuestion].is_file_uploaded === true &&
+                values[this.state.activeQuestion].content.images[i]
+                    .file_name === "" &&
+                values[this.state.activeQuestion].content.images[i].path !== ""
+            ) {
+                let body = {
+                    question_random_id:
+                        values[this.state.activeQuestion].question_random_id,
+                };
+                body[`type2_image_${i + 1}_title`] =
+                    values[this.state.activeQuestion].content.images[i].title;
+
+                fetch(
+                    `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/`,
+                    {
+                        method: "DELETE",
+                        headers: this.headers,
+                        body: JSON.stringify(body),
+                    }
+                )
+                    .then((res) => res.json())
+                    .then((result) => {
+                        console.log(result);
+                        if (result.sts === true) {
+                            this.setState({
+                                successMsg: result.msg,
+                                showSuccessAlert: true,
+                            });
+                            values[this.state.activeQuestion].content.images[
+                                i
+                            ] = {
+                                title: "",
+                                file_name: "",
+                                image: null,
+                                path: "",
+                            };
+                            this.setState({
+                                questions: values,
+                            });
+                        } else {
+                            this.setState({
+                                errorMsg: result.detail
+                                    ? result.detail
+                                    : result.msg,
+                                showErrorAlert: true,
+                            });
+                        }
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+            } else {
+                values[this.state.activeQuestion].content.images[i] = {
+                    title: "",
+                    file_name: "",
+                    image: null,
+                    path: "",
+                };
+                this.setState({
+                    questions: values,
+                });
+            }
+        }
     };
 
     // -------------------------- Video --------------------------
@@ -1131,7 +1224,7 @@ class Type2 extends Component {
 
         if (
             values[this.state.activeQuestion].question_random_id !== "" &&
-            values[this.state.activeQuestion].is_image_uploaded === true &&
+            values[this.state.activeQuestion].is_file_uploaded === true &&
             values[this.state.activeQuestion].content.video.file_name === "" &&
             values[this.state.activeQuestion].content.video.path !== ""
         ) {
@@ -1218,7 +1311,7 @@ class Type2 extends Component {
 
         if (
             values[this.state.activeQuestion].question_random_id !== "" &&
-            values[this.state.activeQuestion].is_image_uploaded === true &&
+            values[this.state.activeQuestion].is_file_uploaded === true &&
             values[this.state.activeQuestion].content.audio[index].file_name ===
                 "" &&
             values[this.state.activeQuestion].content.audio[index].path !== ""
@@ -1313,13 +1406,80 @@ class Type2 extends Component {
 
     clearAudios = () => {
         const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.audio = [
-            { title: "", file_name: "", audio: null, path: "" },
-            { title: "", file_name: "", audio: null, path: "" },
-        ];
         this.setState({
-            questions: values,
+            showErrorAlert: false,
+            showSuccessAlert: false,
         });
+        for (
+            let i = 0;
+            i < values[this.state.activeQuestion].content.audio.length;
+            i++
+        ) {
+            if (
+                values[this.state.activeQuestion].question_random_id !== "" &&
+                values[this.state.activeQuestion].is_file_uploaded === true &&
+                values[this.state.activeQuestion].content.audio[i].file_name ===
+                    "" &&
+                values[this.state.activeQuestion].content.audio[i].path !== ""
+            ) {
+                let body = {
+                    question_random_id:
+                        values[this.state.activeQuestion].question_random_id,
+                };
+                body[`type2_audio_${i + 1}_title`] =
+                    values[this.state.activeQuestion].content.audio[i].title;
+
+                fetch(
+                    `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/`,
+                    {
+                        method: "DELETE",
+                        headers: this.headers,
+                        body: JSON.stringify(body),
+                    }
+                )
+                    .then((res) => res.json())
+                    .then((result) => {
+                        console.log(result);
+                        if (result.sts === true) {
+                            this.setState({
+                                successMsg: result.msg,
+                                showSuccessAlert: true,
+                            });
+                            values[this.state.activeQuestion].content.audio[
+                                i
+                            ] = {
+                                title: "",
+                                file_name: "",
+                                audio: null,
+                                path: "",
+                            };
+                            this.setState({
+                                questions: values,
+                            });
+                        } else {
+                            this.setState({
+                                errorMsg: result.detail
+                                    ? result.detail
+                                    : result.msg,
+                                showErrorAlert: true,
+                            });
+                        }
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+            } else {
+                values[this.state.activeQuestion].content.audio[i] = {
+                    title: "",
+                    file_name: "",
+                    audio: null,
+                    path: "",
+                };
+                this.setState({
+                    questions: values,
+                });
+            }
+        }
     };
 
     // -------------------------- Properties --------------------------
@@ -1476,12 +1636,17 @@ class Type2 extends Component {
     toggleCollapse = (component) => {
         this.setState({
             contentCollapsed: true,
+            filesCollapsed: true,
             propertiesCollapsed: true,
             settingsCollapsed: true,
         });
         if (component === "content") {
             this.setState({
                 contentCollapsed: !this.state.contentCollapsed,
+            });
+        } else if (component === "files") {
+            this.setState({
+                filesCollapsed: !this.state.filesCollapsed,
             });
         } else if (component === "properties") {
             this.setState({
@@ -1506,14 +1671,16 @@ class Type2 extends Component {
             maths: false,
         });
         values.push({
-            question: "<p>Main Question goes here</p>",
             question_random_id: "",
-            is_image_uploaded: false,
+            question: "<p>Main Question goes here</p>",
+            explanation: "<p>Explanation goes here</p>",
+            is_file_uploaded: false,
+            mcq: true,
+            fill_in: false,
             sub_question: [
                 {
                     sub_question_id: "",
                     question: "<p>Sub question goes here</p>",
-                    explanation: "<p>Explanation goes here</p>",
                     mcq: true,
                     fill_in: false,
                     fillin_answer: [""],
@@ -1572,9 +1739,8 @@ class Type2 extends Component {
         values[index].sub_question.push({
             sub_question_id: "",
             question: "<p>Sub question goes here</p>",
-            explanation: "<p>Explanation goes here</p>",
-            mcq: true,
-            fill_in: false,
+            mcq: values[index].mcq,
+            fill_in: values[index].fill_in,
             fillin_answer: [""],
             options: [
                 { correct: false, content: "" },
@@ -1640,9 +1806,8 @@ class Type2 extends Component {
             sub_question[i] = {
                 sub_question_id: values[index].sub_question[i].sub_question_id,
                 question: values[index].sub_question[i].question,
-                explanation: values[index].sub_question[i].explanation,
-                mcq: values[index].sub_question[i].mcq,
-                fill_in: values[index].sub_question[i].fill_in,
+                mcq: values[index].mcq,
+                fill_in: values[index].fill_in,
                 fillin_answer: fillin,
                 options: options,
                 marks: values[index].sub_question[i].marks,
@@ -1652,7 +1817,10 @@ class Type2 extends Component {
         values.splice(index + 1, 0, {
             question_random_id: "",
             question: values[index].question,
-            is_image_uploaded: false,
+            explanation: values[index].explanation,
+            is_file_uploaded: false,
+            mcq: values[index].mcq,
+            fill_in: values[index].fill_in,
             sub_question: sub_question,
             content: {
                 images: [
@@ -1724,9 +1892,8 @@ class Type2 extends Component {
         values[main_index].sub_question.splice(sub_index + 1, 0, {
             sub_question_id: "",
             question: values[main_index].sub_question[sub_index].question,
-            explanation: values[main_index].sub_question[sub_index].explanation,
-            mcq: values[main_index].sub_question[sub_index].mcq,
-            fill_in: values[main_index].sub_question[sub_index].fill_in,
+            mcq: values[main_index].mcq,
+            fill_in: values[main_index].fill_in,
             fillin_answer: fillin,
             options: options,
             marks: values[main_index].sub_question[sub_index].marks,
@@ -1750,6 +1917,7 @@ class Type2 extends Component {
             showErrorAlert: false,
             showSuccessAlert: false,
             contentCollapsed: true,
+            filesCollapsed: true,
             subContentCollapsed: true,
             propertiesCollapsed: true,
             settingsCollapsed: true,
@@ -1765,6 +1933,7 @@ class Type2 extends Component {
             showErrorAlert: false,
             showSuccessAlert: false,
             contentCollapsed: true,
+            filesCollapsed: true,
             subContentCollapsed: true,
             propertiesCollapsed: true,
             settingsCollapsed: true,
@@ -1780,6 +1949,7 @@ class Type2 extends Component {
             showMainEdit_option: false,
             showSubEdit_option: false,
             contentCollapsed: true,
+            filesCollapsed: true,
             subContentCollapsed: true,
             propertiesCollapsed: true,
             settingsCollapsed: true,
@@ -1809,14 +1979,16 @@ class Type2 extends Component {
                             maths: false,
                         });
                         values.push({
-                            question: "<p>Main Question goes here</p>",
                             question_random_id: "",
-                            is_image_uploaded: false,
+                            question: "<p>Main Question goes here</p>",
+                            explanation: "<p>Explanation goes here</p>",
+                            is_file_uploaded: false,
+                            mcq: true,
+                            fill_in: false,
                             sub_question: [
                                 {
                                     sub_question_id: "",
                                     question: "<p>Sub question goes here</p>",
-                                    explanation: "<p>Explanation goes here</p>",
                                     mcq: true,
                                     fill_in: false,
                                     fillin_answer: [""],
@@ -1931,14 +2103,16 @@ class Type2 extends Component {
                         maths: false,
                     });
                     values.push({
-                        question: "<p>Main Question goes here</p>",
                         question_random_id: "",
-                        is_image_uploaded: false,
+                        question: "<p>Main Question goes here</p>",
+                        explanation: "<p>Explanation goes here</p>",
+                        is_file_uploaded: false,
+                        mcq: true,
+                        fill_in: false,
                         sub_question: [
                             {
                                 sub_question_id: "",
                                 question: "<p>Sub question goes here</p>",
-                                explanation: "<p>Explanation goes here</p>",
                                 mcq: true,
                                 fill_in: false,
                                 fillin_answer: [""],
@@ -2039,6 +2213,7 @@ class Type2 extends Component {
             showMainEdit_option: false,
             showSubEdit_option: false,
             contentCollapsed: true,
+            filesCollapsed: true,
             subContentCollapsed: true,
             propertiesCollapsed: true,
             settingsCollapsed: true,
@@ -2065,9 +2240,8 @@ class Type2 extends Component {
                         values[main_index].sub_question.push({
                             sub_question_id: "",
                             question: "<p>Sub question goes here</p>",
-                            explanation: "<p>Explanation goes here</p>",
-                            mcq: true,
-                            fill_in: false,
+                            mcq: values[main_index].mcq,
+                            fill_in: values[main_index].fill_in,
                             fillin_answer: [""],
                             options: [
                                 { correct: false, content: "" },
@@ -2113,9 +2287,8 @@ class Type2 extends Component {
                     values[this.state.activeQuestion].sub_question.push({
                         sub_question_id: "",
                         question: "<p>Sub question goes here</p>",
-                        explanation: "<p>Explanation goes here</p>",
-                        mcq: true,
-                        fill_in: false,
+                        mcq: values[this.state.activeQuestion].mcq,
+                        fill_in: values[this.state.activeQuestion].fill_in,
                         fillin_answer: [""],
                         options: [
                             { correct: false, content: "" },
@@ -2725,6 +2898,7 @@ class Type2 extends Component {
                                                     showMainEdit_option: false,
                                                     showSubEdit_option: false,
                                                     contentCollapsed: true,
+                                                    filesCollapsed: true,
                                                     subContentCollapsed: true,
                                                     propertiesCollapsed: true,
                                                     settingsCollapsed: true,
@@ -2738,14 +2912,13 @@ class Type2 extends Component {
                                     </div>
 
                                     <Accordion defaultActiveKey="">
-                                        {/* Content | image / video */}
+                                        {/* ----- Content ----- */}
                                         <Card className="shadow-sm mb-2">
                                             <Accordion.Toggle
                                                 as={Card.Body}
                                                 variant="link"
                                                 eventKey="0"
                                                 className="text-dark"
-                                                style={{ cursor: "pointer" }}
                                                 onClick={() =>
                                                     this.toggleCollapse(
                                                         "content"
@@ -2753,7 +2926,7 @@ class Type2 extends Component {
                                                 }
                                             >
                                                 <div className="d-flex justify-content-between align-items-center">
-                                                    Content | Image / Video
+                                                    Content
                                                     {this.state
                                                         .contentCollapsed ? (
                                                         <i className="fas fa-angle-right "></i>
@@ -2766,6 +2939,7 @@ class Type2 extends Component {
                                             <Accordion.Collapse eventKey="0">
                                                 <Card.Body className="p-3">
                                                     {/* ---------- Questions ---------- */}
+
                                                     <div className="form-group">
                                                         <label>
                                                             Add Questions
@@ -2784,8 +2958,105 @@ class Type2 extends Component {
                                                         />
                                                     </div>
 
-                                                    {/* ---------- Image ---------- */}
+                                                    {/* ---------- Explanation ---------- */}
 
+                                                    <div className="form-group">
+                                                        <label>
+                                                            Explanation
+                                                        </label>
+                                                        <CKeditor
+                                                            data={
+                                                                data[
+                                                                    this.state
+                                                                        .activeQuestion
+                                                                ].explanation
+                                                            }
+                                                            onChange={
+                                                                this
+                                                                    .handleExplanation
+                                                            }
+                                                        />
+                                                    </div>
+
+                                                    {/* ---------- Options ---------- */}
+
+                                                    <div className="form-group">
+                                                        <div className="row mb-3">
+                                                            <div className="col-md-6">
+                                                                <div className="d-flex align-items-center">
+                                                                    <span className="mr-4">
+                                                                        MCQ
+                                                                    </span>
+                                                                    <ReactSwitch
+                                                                        checked={
+                                                                            data[
+                                                                                this
+                                                                                    .state
+                                                                                    .activeQuestion
+                                                                            ]
+                                                                                .mcq
+                                                                        }
+                                                                        onChange={
+                                                                            this
+                                                                                .handleOptions_mcq
+                                                                        }
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="row mb-3">
+                                                            <div className="col-md-6">
+                                                                <div className="d-flex align-items-center">
+                                                                    <span className="mr-4">
+                                                                        Fill in
+                                                                    </span>
+                                                                    <ReactSwitch
+                                                                        checked={
+                                                                            data[
+                                                                                this
+                                                                                    .state
+                                                                                    .activeQuestion
+                                                                            ]
+                                                                                .fill_in
+                                                                        }
+                                                                        onChange={
+                                                                            this
+                                                                                .handleOptions_fillin
+                                                                        }
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </Card.Body>
+                                            </Accordion.Collapse>
+                                        </Card>
+
+                                        {/* ----- Files ----- */}
+                                        <Card className="shadow-sm mb-2">
+                                            <Accordion.Toggle
+                                                as={Card.Body}
+                                                variant="link"
+                                                eventKey="1"
+                                                className="text-dark"
+                                                onClick={() =>
+                                                    this.toggleCollapse("files")
+                                                }
+                                            >
+                                                <div className="d-flex justify-content-between align-items-center">
+                                                    Image | Video | Audio
+                                                    {this.state
+                                                        .filesCollapsed ? (
+                                                        <i className="fas fa-angle-right "></i>
+                                                    ) : (
+                                                        <i className="fas fa-angle-down "></i>
+                                                    )}
+                                                </div>
+                                            </Accordion.Toggle>
+
+                                            <Accordion.Collapse eventKey="1">
+                                                <Card.Body className="p-3">
+                                                    {/* ---------- Image ---------- */}
                                                     <div className="form-group">
                                                         <div className="row align-items-center mb-2">
                                                             <div className="col-md-6">
@@ -3081,23 +3352,6 @@ class Type2 extends Component {
                                                             <div className="col-md-6">
                                                                 <p className="mb-0">
                                                                     Audio
-                                                                    <OverlayTrigger
-                                                                        key="right"
-                                                                        placement="right"
-                                                                        overlay={
-                                                                            <Tooltip id="tooltip">
-                                                                                You
-                                                                                can
-                                                                                upload
-                                                                                Max
-                                                                                of
-                                                                                02
-                                                                                Audio
-                                                                            </Tooltip>
-                                                                        }
-                                                                    >
-                                                                        <i className="fas fa-info-circle fa-xs ml-2"></i>
-                                                                    </OverlayTrigger>
                                                                 </p>
                                                             </div>
                                                             <div className="col-md-6 text-right">
@@ -3231,9 +3485,8 @@ class Type2 extends Component {
                                             <Accordion.Toggle
                                                 as={Card.Body}
                                                 variant="link"
-                                                eventKey="1"
+                                                eventKey="2"
                                                 className="text-dark"
-                                                style={{ cursor: "pointer" }}
                                                 onClick={() =>
                                                     this.toggleCollapse(
                                                         "properties"
@@ -3251,7 +3504,7 @@ class Type2 extends Component {
                                                 </div>
                                             </Accordion.Toggle>
 
-                                            <Accordion.Collapse eventKey="1">
+                                            <Accordion.Collapse eventKey="2">
                                                 <Card.Body className="p-3">
                                                     {/* ---------- Complexity ---------- */}
                                                     <div className="form-group row align-items-center">
@@ -3552,9 +3805,8 @@ class Type2 extends Component {
                                             <Accordion.Toggle
                                                 as={Card.Body}
                                                 variant="link"
-                                                eventKey="2"
+                                                eventKey="3"
                                                 className="text-dark"
-                                                style={{ cursor: "pointer" }}
                                                 onClick={this.toggleCollapse}
                                             >
                                                 <div className="d-flex justify-content-between align-items-center">
@@ -3568,7 +3820,7 @@ class Type2 extends Component {
                                                 </div>
                                             </Accordion.Toggle>
 
-                                            <Accordion.Collapse eventKey="2">
+                                            <Accordion.Collapse eventKey="3">
                                                 <Card.Body className="p-3">
                                                     {/* ---------- Virtual keyboard ---------- */}
                                                     <div className="form-group">
@@ -3757,6 +4009,7 @@ class Type2 extends Component {
                                                     showMainEdit_option: false,
                                                     showSubEdit_option: false,
                                                     contentCollapsed: true,
+                                                    filesCollapsed: true,
                                                     subContentCollapsed: true,
                                                     propertiesCollapsed: true,
                                                     settingsCollapsed: true,
@@ -3777,7 +4030,6 @@ class Type2 extends Component {
                                                 variant="link"
                                                 eventKey="0"
                                                 className="text-dark"
-                                                style={{ cursor: "pointer" }}
                                                 onClick={() =>
                                                     this.toggleCollapse(
                                                         "content"
@@ -3787,7 +4039,7 @@ class Type2 extends Component {
                                                 <div className="d-flex justify-content-between align-items-center">
                                                     Content
                                                     {this.state
-                                                        .contentCollapsed ? (
+                                                        .subContentCollapsed ? (
                                                         <i className="fas fa-angle-right "></i>
                                                     ) : (
                                                         <i className="fas fa-angle-down "></i>
@@ -3820,70 +4072,7 @@ class Type2 extends Component {
                                                     </div>
 
                                                     {/* ---------- Options ---------- */}
-                                                    <div className="form-group">
-                                                        <div className="row mb-3">
-                                                            <div className="col-md-6">
-                                                                <div className="d-flex align-items-center">
-                                                                    <span className="mr-4">
-                                                                        MCQ
-                                                                    </span>
-                                                                    <ReactSwitch
-                                                                        checked={
-                                                                            data[
-                                                                                this
-                                                                                    .state
-                                                                                    .activeQuestion
-                                                                            ]
-                                                                                .sub_question[
-                                                                                this
-                                                                                    .state
-                                                                                    .activeSubQuestion
-                                                                            ]
-                                                                                .mcq
-                                                                        }
-                                                                        onChange={() =>
-                                                                            this.handleOptions_mcq(
-                                                                                this
-                                                                                    .state
-                                                                                    .activeQuestion
-                                                                            )
-                                                                        }
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="row mb-3">
-                                                            <div className="col-md-6">
-                                                                <div className="d-flex align-items-center">
-                                                                    <span className="mr-4">
-                                                                        Fill in
-                                                                    </span>
-                                                                    <ReactSwitch
-                                                                        checked={
-                                                                            data[
-                                                                                this
-                                                                                    .state
-                                                                                    .activeQuestion
-                                                                            ]
-                                                                                .sub_question[
-                                                                                this
-                                                                                    .state
-                                                                                    .activeSubQuestion
-                                                                            ]
-                                                                                .fill_in
-                                                                        }
-                                                                        onChange={() =>
-                                                                            this.handleOptions_fillin(
-                                                                                this
-                                                                                    .state
-                                                                                    .activeQuestion
-                                                                            )
-                                                                        }
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+
                                                     {data[
                                                         this.state
                                                             .activeQuestion
@@ -3891,122 +4080,129 @@ class Type2 extends Component {
                                                         this.state
                                                             .activeSubQuestion
                                                     ].mcq ? (
-                                                        <div className="form-group row align-items-center">
-                                                            {data[
-                                                                this.state
-                                                                    .activeQuestion
-                                                            ].sub_question[
-                                                                this.state
-                                                                    .activeSubQuestion
-                                                            ].options.map(
-                                                                (
-                                                                    options,
-                                                                    index
-                                                                ) => (
-                                                                    <Fragment
-                                                                        key={
-                                                                            index
-                                                                        }
-                                                                    >
-                                                                        <div className="col-10 mb-2 pr-0">
-                                                                            <div
-                                                                                className="input-group border-secondary"
-                                                                                style={{
-                                                                                    borderRadius:
-                                                                                        "6px",
-                                                                                }}
-                                                                            >
-                                                                                <input
-                                                                                    type="text"
-                                                                                    className="form-control form-control-sm"
-                                                                                    id={`option${index}`}
-                                                                                    name="option"
-                                                                                    placeholder={`Option 0${
-                                                                                        index +
-                                                                                        1
-                                                                                    }`}
-                                                                                    value={
-                                                                                        options.content
-                                                                                    }
-                                                                                    onChange={(
-                                                                                        event
-                                                                                    ) =>
-                                                                                        this.handleOptionChange(
-                                                                                            index,
+                                                        <>
+                                                            <label>
+                                                                Options
+                                                            </label>
+                                                            <div className="form-group row align-items-center">
+                                                                {data[
+                                                                    this.state
+                                                                        .activeQuestion
+                                                                ].sub_question[
+                                                                    this.state
+                                                                        .activeSubQuestion
+                                                                ].options.map(
+                                                                    (
+                                                                        options,
+                                                                        index
+                                                                    ) => (
+                                                                        <Fragment
+                                                                            key={
+                                                                                index
+                                                                            }
+                                                                        >
+                                                                            <div className="col-10 mb-2 pr-0">
+                                                                                <div
+                                                                                    className="input-group border-secondary"
+                                                                                    style={{
+                                                                                        borderRadius:
+                                                                                            "6px",
+                                                                                    }}
+                                                                                >
+                                                                                    <input
+                                                                                        type="text"
+                                                                                        className="form-control form-control-sm"
+                                                                                        id={`option${index}`}
+                                                                                        name="option"
+                                                                                        placeholder={`Option 0${
+                                                                                            index +
+                                                                                            1
+                                                                                        }`}
+                                                                                        value={
+                                                                                            options.content
+                                                                                        }
+                                                                                        onChange={(
                                                                                             event
-                                                                                        )
-                                                                                    }
-                                                                                    autoComplete="off"
-                                                                                    required
-                                                                                />
-                                                                                <div className="input-group-append">
-                                                                                    <div
-                                                                                        className="btn-group"
-                                                                                        role="group"
-                                                                                        aria-label="Basic example"
-                                                                                    >
-                                                                                        <button
-                                                                                            type="button"
-                                                                                            className="btn btn-light btn-sm shadow-none font-weight-bold"
-                                                                                            onClick={() =>
-                                                                                                this.handleRemoveOptionFields(
-                                                                                                    index
-                                                                                                )
-                                                                                            }
+                                                                                        ) =>
+                                                                                            this.handleOptionChange(
+                                                                                                index,
+                                                                                                event
+                                                                                            )
+                                                                                        }
+                                                                                        autoComplete="off"
+                                                                                        required
+                                                                                    />
+                                                                                    <div className="input-group-append">
+                                                                                        <div
+                                                                                            className="btn-group"
+                                                                                            role="group"
+                                                                                            aria-label="Basic example"
                                                                                         >
-                                                                                            -
-                                                                                        </button>
+                                                                                            <button
+                                                                                                type="button"
+                                                                                                className="btn btn-light btn-sm shadow-none font-weight-bold"
+                                                                                                onClick={() =>
+                                                                                                    this.handleRemoveOptionFields(
+                                                                                                        index
+                                                                                                    )
+                                                                                                }
+                                                                                            >
+                                                                                                -
+                                                                                            </button>
+                                                                                        </div>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
-                                                                        </div>
-                                                                        <div className="col-2 mb-2">
-                                                                            <p
-                                                                                className={`mb-0 text-right ${
-                                                                                    options.correct
-                                                                                        ? "text-success"
-                                                                                        : "text-muted"
-                                                                                }`}
-                                                                                onClick={() =>
-                                                                                    this.correctOption(
-                                                                                        index
-                                                                                    )
-                                                                                }
-                                                                                style={{
-                                                                                    cursor:
-                                                                                        "pointer",
-                                                                                }}
-                                                                            >
-                                                                                <i className="fas fa-check-circle"></i>
-                                                                            </p>
-                                                                        </div>
-                                                                    </Fragment>
-                                                                )
-                                                            )}
-                                                            {data[
-                                                                this.state
-                                                                    .activeQuestion
-                                                            ].sub_question[
-                                                                this.state
-                                                                    .activeSubQuestion
-                                                            ].options.length <
-                                                            this
-                                                                .option_limit ? (
-                                                                <div className="form-group col-12 mb-0">
-                                                                    <button
-                                                                        className="btn btn-light btn-block border-secondary btn-sm"
-                                                                        onClick={
-                                                                            this
-                                                                                .handleAddOptionFields
-                                                                        }
-                                                                    >
-                                                                        Add +
-                                                                    </button>
-                                                                </div>
-                                                            ) : (
-                                                                ""
-                                                            )}
-                                                        </div>
+                                                                            <div className="col-2 mb-2">
+                                                                                <p
+                                                                                    className={`mb-0 text-right ${
+                                                                                        options.correct
+                                                                                            ? "text-success"
+                                                                                            : "text-muted"
+                                                                                    }`}
+                                                                                    onClick={() =>
+                                                                                        this.correctOption(
+                                                                                            index
+                                                                                        )
+                                                                                    }
+                                                                                    style={{
+                                                                                        cursor:
+                                                                                            "pointer",
+                                                                                    }}
+                                                                                >
+                                                                                    <i className="fas fa-check-circle"></i>
+                                                                                </p>
+                                                                            </div>
+                                                                        </Fragment>
+                                                                    )
+                                                                )}
+                                                                {data[
+                                                                    this.state
+                                                                        .activeQuestion
+                                                                ].sub_question[
+                                                                    this.state
+                                                                        .activeSubQuestion
+                                                                ].options
+                                                                    .length <
+                                                                this
+                                                                    .option_limit ? (
+                                                                    <div className="form-group col-12 mb-0">
+                                                                        <button
+                                                                            className="btn btn-light btn-block border-secondary btn-sm"
+                                                                            onClick={
+                                                                                this
+                                                                                    .handleAddOptionFields
+                                                                            }
+                                                                        >
+                                                                            Add
+                                                                            +
+                                                                        </button>
+                                                                    </div>
+                                                                ) : (
+                                                                    ""
+                                                                )}
+                                                            </div>
+                                                        </>
                                                     ) : data[
                                                           this.state
                                                               .activeQuestion
@@ -4014,118 +4210,101 @@ class Type2 extends Component {
                                                           this.state
                                                               .activeSubQuestion
                                                       ].fill_in ? (
-                                                        // Fill in answers
-                                                        <div className="form-group row">
-                                                            {data[
-                                                                this.state
-                                                                    .activeQuestion
-                                                            ].sub_question[
-                                                                this.state
-                                                                    .activeSubQuestion
-                                                            ].fillin_answer.map(
-                                                                (
-                                                                    answer,
-                                                                    index
-                                                                ) => (
-                                                                    <Fragment
-                                                                        key={
-                                                                            index
-                                                                        }
-                                                                    >
-                                                                        <div className="col-12 mb-2">
-                                                                            <div
-                                                                                className="input-group border-secondary"
-                                                                                style={{
-                                                                                    borderRadius:
-                                                                                        "6px",
-                                                                                }}
-                                                                            >
-                                                                                <input
-                                                                                    type="text"
-                                                                                    className="form-control form-control-sm"
-                                                                                    id={`answer${index}`}
-                                                                                    name="answer"
-                                                                                    placeholder={`Answer 0${
-                                                                                        index +
-                                                                                        1
-                                                                                    }`}
-                                                                                    value={
-                                                                                        answer
-                                                                                    }
-                                                                                    onChange={(
-                                                                                        event
-                                                                                    ) =>
-                                                                                        this.handleAnswerChange(
-                                                                                            index,
-                                                                                            event
-                                                                                        )
-                                                                                    }
-                                                                                    autoComplete="off"
-                                                                                    required
-                                                                                />
-                                                                                <div className="input-group-append">
-                                                                                    <div
-                                                                                        className="btn-group"
-                                                                                        role="group"
-                                                                                        aria-label="Basic example"
-                                                                                    >
-                                                                                        <button
-                                                                                            type="button"
-                                                                                            className="btn btn-light btn-sm shadow-none font-weight-bold"
-                                                                                            onClick={() =>
-                                                                                                this.handleRemoveAnswerFields(
-                                                                                                    index
-                                                                                                )
-                                                                                            }
-                                                                                        >
-                                                                                            -
-                                                                                        </button>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </Fragment>
-                                                                )
-                                                            )}
-                                                            <div className="form-group col-12 mb-0">
-                                                                <button
-                                                                    className="btn btn-light btn-block border-secondary btn-sm"
-                                                                    onClick={
-                                                                        this
-                                                                            .handleAddAnswerFields
-                                                                    }
-                                                                >
-                                                                    Add +
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    ) : (
-                                                        ""
-                                                    )}
-
-                                                    {/* ---------- Explanation ---------- */}
-                                                    <div className="form-group">
-                                                        <label>
-                                                            Explanation
-                                                        </label>
-                                                        <CKeditor
-                                                            data={
-                                                                data[
+                                                        <>
+                                                            <label>
+                                                                Fill in
+                                                            </label>
+                                                            <div className="form-group row">
+                                                                {data[
                                                                     this.state
                                                                         .activeQuestion
                                                                 ].sub_question[
                                                                     this.state
                                                                         .activeSubQuestion
-                                                                ].explanation
-                                                            }
-                                                            onChange={
-                                                                this
-                                                                    .handleExplanation
-                                                            }
-                                                        />
-                                                    </div>
+                                                                ].fillin_answer.map(
+                                                                    (
+                                                                        answer,
+                                                                        index
+                                                                    ) => (
+                                                                        <Fragment
+                                                                            key={
+                                                                                index
+                                                                            }
+                                                                        >
+                                                                            <div className="col-12 mb-2">
+                                                                                <div
+                                                                                    className="input-group border-secondary"
+                                                                                    style={{
+                                                                                        borderRadius:
+                                                                                            "6px",
+                                                                                    }}
+                                                                                >
+                                                                                    <input
+                                                                                        type="text"
+                                                                                        className="form-control form-control-sm"
+                                                                                        id={`answer${index}`}
+                                                                                        name="answer"
+                                                                                        placeholder={`Answer 0${
+                                                                                            index +
+                                                                                            1
+                                                                                        }`}
+                                                                                        value={
+                                                                                            answer
+                                                                                        }
+                                                                                        onChange={(
+                                                                                            event
+                                                                                        ) =>
+                                                                                            this.handleAnswerChange(
+                                                                                                index,
+                                                                                                event
+                                                                                            )
+                                                                                        }
+                                                                                        autoComplete="off"
+                                                                                        required
+                                                                                    />
+                                                                                    <div className="input-group-append">
+                                                                                        <div
+                                                                                            className="btn-group"
+                                                                                            role="group"
+                                                                                            aria-label="Basic example"
+                                                                                        >
+                                                                                            <button
+                                                                                                type="button"
+                                                                                                className="btn btn-light btn-sm shadow-none font-weight-bold"
+                                                                                                onClick={() =>
+                                                                                                    this.handleRemoveAnswerFields(
+                                                                                                        index
+                                                                                                    )
+                                                                                                }
+                                                                                            >
+                                                                                                -
+                                                                                            </button>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </Fragment>
+                                                                    )
+                                                                )}
+                                                                <div className="form-group col-12 mb-0">
+                                                                    <button
+                                                                        className="btn btn-light btn-block border-secondary btn-sm"
+                                                                        onClick={
+                                                                            this
+                                                                                .handleAddAnswerFields
+                                                                        }
+                                                                    >
+                                                                        Add +
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </>
+                                                    ) : (
+                                                        ""
+                                                    )}
 
                                                     {/* ---------- Marks ---------- */}
+
                                                     <div className="form-group row align-items-center">
                                                         <div className="col-4 small">
                                                             Marks
