@@ -342,6 +342,143 @@ class CycleTestModal extends Component {
     }
 }
 
+class QuizModal extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            quiz_name: "",
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: false,
+        };
+        this.url = baseUrl + teacherUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
+    }
+
+    handleSubmit = (event) => {
+        event.preventDefault();
+
+        this.setState({
+            showLoader: true,
+            showErrorAlert: false,
+            showSuccessAlert: false,
+        });
+
+        fetch(`${this.url}/teacher/subject/${this.props.subjectId}/quiz/`, {
+            headers: this.headers,
+            method: "POST",
+            body: JSON.stringify({
+                chapter_id: this.props.chapter_id,
+                quiz_name: this.state.quiz_name,
+            }),
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        showLoader: false,
+                    });
+                    this.props.formSubmission();
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    handleQuizName = (event) => {
+        this.setState({
+            quiz_name: event.target.value,
+        });
+    };
+
+    render() {
+        return (
+            <Modal
+                show={this.props.show}
+                onHide={this.props.onHide}
+                size="md"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Header closeButton>Create Quiz</Modal.Header>
+                <form onSubmit={this.handleSubmit} autoComplete="off">
+                    <Modal.Body>
+                        <Alert
+                            variant="danger"
+                            show={this.state.showErrorAlert}
+                            onClose={() => {
+                                this.setState({
+                                    showErrorAlert: false,
+                                });
+                            }}
+                            dismissible
+                        >
+                            {this.state.errorMsg}
+                        </Alert>
+                        <Alert
+                            variant="success"
+                            show={this.state.showSuccessAlert}
+                            onClose={() => {
+                                this.setState({
+                                    showSuccessAlert: false,
+                                });
+                            }}
+                            dismissible
+                        >
+                            {this.state.successMsg}
+                        </Alert>
+
+                        <label htmlFor="quiz_name">Quiz name</label>
+                        <input
+                            type="text"
+                            name="quiz_name"
+                            id="quiz_name"
+                            className="form-control borders"
+                            onChange={this.handleQuizName}
+                            placeholder="Quiz name"
+                            required
+                        />
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <button className="btn btn-primary btn-block shadow-none">
+                            {this.state.showLoader ? (
+                                <Spinner
+                                    as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    aria-hidden="true"
+                                    className="mr-2"
+                                />
+                            ) : (
+                                ""
+                            )}
+                            Add
+                        </button>
+                    </Modal.Footer>
+                </form>
+            </Modal>
+        );
+    }
+}
+
 const mapStateToProps = (state) => ({
     subject_name: state.subject_name,
     chapter_name: state.chapter_name,
@@ -358,6 +495,9 @@ class Chapters extends Component {
             showCycle_TestModal: false,
             showCycle_EditModal: false,
             showCycle_DeleteModal: false,
+            showQuiz_CreateModal: false,
+            showQuiz_EditModal: false,
+            showQuiz_DeleteModal: false,
 
             collapsed: false,
             chapterList: [],
@@ -371,8 +511,10 @@ class Chapters extends Component {
                 chapter_structure: [],
             },
             cycle_test: [],
+            quiz: [],
             selectedCycleData: [],
             selectedTopicData: [],
+            selectedQuizData: [],
             next_topic: [],
             is_independent: false,
 
@@ -391,6 +533,8 @@ class Chapters extends Component {
             Authorization: this.authToken,
         };
     }
+
+    // ----- Topic Modals -----
 
     toggleModal = (index, ancestor) => {
         this.setState({
@@ -414,7 +558,9 @@ class Chapters extends Component {
         });
     };
 
-    toggleCycleTestModal = (index) => {
+    // ----- Cycle test Modals -----
+
+    toggleCycleTestModal = () => {
         this.setState({
             showCycle_TestModal: !this.state.showCycle_TestModal,
         });
@@ -434,7 +580,31 @@ class Chapters extends Component {
         });
     };
 
-    loadChapterData = () => {
+    // ----- Quiz Modals -----
+
+    toggleQuiz_CreateModal = () => {
+        this.setState({
+            showQuiz_CreateModal: !this.state.showQuiz_CreateModal,
+        });
+    };
+
+    toggleQuiz_EditModal = (data) => {
+        this.setState({
+            selectedQuizData: data,
+            showQuiz_EditModal: !this.state.showQuiz_EditModal,
+        });
+    };
+
+    toggleQuiz_DeleteModal = (data) => {
+        this.setState({
+            selectedQuizData: data,
+            showQuiz_DeleteModal: !this.state.showQuiz_DeleteModal,
+        });
+    };
+
+    // ----- Loads data -----
+
+    loadTopicData = () => {
         fetch(
             `${this.url}/teacher/subject/${this.subjectId}/chapter/topics/?chapter_id=${this.state.chapterId}`,
             {
@@ -514,14 +684,41 @@ class Chapters extends Component {
             });
     };
 
+    loadQuizData = () => {
+        fetch(`${this.url}/teacher/subject/${this.subjectId}/quiz/`, {
+            headers: this.headers,
+            method: "GET",
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        quiz: result.data,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     componentDidMount = () => {
         this.setState(
             {
                 chapterId: this.props.match.params.chapterId,
             },
             () => {
-                this.loadChapterData();
+                this.loadTopicData();
                 this.loadCycleTestData();
+                this.loadQuizData();
             }
         );
 
@@ -561,12 +758,15 @@ class Chapters extends Component {
                     page_loading: true,
                 },
                 () => {
-                    this.loadChapterData();
+                    this.loadTopicData();
                     this.loadCycleTestData();
+                    this.loadQuizData();
                 }
             );
         }
     };
+
+    // ----- Form submissions -----
 
     topic_formSubmission = () => {
         setTimeout(() => {
@@ -576,7 +776,7 @@ class Chapters extends Component {
                 showTopic_DeleteModal: false,
                 page_loading: true,
             });
-            this.loadChapterData();
+            this.loadTopicData();
         }, 1000);
     };
 
@@ -589,6 +789,18 @@ class Chapters extends Component {
                 page_loading: true,
             });
             this.loadCycleTestData();
+        }, 1000);
+    };
+
+    quiz_formSubmission = () => {
+        setTimeout(() => {
+            this.setState({
+                showQuiz_CreateModal: false,
+                showQuiz_EditModal: false,
+                showQuiz_DeleteModal: false,
+                page_loading: true,
+            });
+            this.loadQuizData();
         }, 1000);
     };
 
@@ -609,8 +821,9 @@ class Chapters extends Component {
                 page_loading: true,
             },
             () => {
-                this.loadChapterData();
+                this.loadTopicData();
                 this.loadCycleTestData();
+                this.loadQuizData();
             }
         );
     };
@@ -643,7 +856,7 @@ class Chapters extends Component {
                             successMsg: result.msg,
                             showSuccessAlert: true,
                         });
-                        this.loadChapterData();
+                        this.loadTopicData();
                     } else {
                         this.setState({
                             errorMsg: result.detail
@@ -876,6 +1089,10 @@ class Chapters extends Component {
         store.dispatch({ type: "CYCLE", payload: data });
     };
 
+    dispatchQuiz = (data) => {
+        store.dispatch({ type: "QUIZ", payload: data });
+    };
+
     render() {
         document.title = `${this.props.chapter_name} - Teacher | IQLabs`;
         return (
@@ -1021,6 +1238,55 @@ class Chapters extends Component {
                                 .cycle_test_id,
                         }}
                         toggleModal={this.toggleCycle_DeleteModal}
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Quiz creation modal */}
+                {this.state.showQuiz_CreateModal ? (
+                    <QuizModal
+                        show={this.state.showQuiz_CreateModal}
+                        onHide={this.toggleQuiz_CreateModal}
+                        formSubmission={this.quiz_formSubmission}
+                        subjectId={this.subjectId}
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Quiz edit modal */}
+                {this.state.showQuiz_EditModal ? (
+                    <ContentUpdateModal
+                        show={this.state.showQuiz_EditModal}
+                        onHide={this.toggleQuiz_EditModal}
+                        formSubmission={this.quiz_formSubmission}
+                        url={`${this.url}/teacher/subject/${this.subjectId}/quiz/`}
+                        type="Quiz"
+                        name={this.state.selectedQuizData.quiz_name}
+                        data={{
+                            quiz_id: this.state.selectedQuizData.quiz_id,
+                            quiz_name: this.state.selectedQuizData.quiz_name,
+                        }}
+                        toggleModal={this.toggleQuiz_EditModal}
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Quiz Delete modal */}
+                {this.state.showQuiz_DeleteModal ? (
+                    <ContentDeleteModal
+                        show={this.state.showQuiz_DeleteModal}
+                        onHide={this.toggleQuiz_DeleteModal}
+                        formSubmission={this.quiz_formSubmission}
+                        url={`${this.url}/teacher/subject/${this.subjectId}/quiz/`}
+                        type="Quiz"
+                        name={this.state.selectedQuizData.quiz_name}
+                        data={{
+                            quiz_id: this.state.selectedQuizData.quiz_id,
+                        }}
+                        toggleModal={this.toggleQuiz_DeleteModal}
                     />
                 ) : (
                     ""
@@ -1360,6 +1626,81 @@ class Chapters extends Component {
                                                           }
                                                       )
                                                     : null}
+
+                                                {/* Quiz list */}
+                                                {this.state.quiz.length !== 0
+                                                    ? this.state.quiz.map(
+                                                          (data, index) => {
+                                                              return (
+                                                                  <div
+                                                                      className="card card-header shadow-sm light-bg mb-2"
+                                                                      key={
+                                                                          index
+                                                                      }
+                                                                  >
+                                                                      <div className="row align-items-center">
+                                                                          <div className="col-md-6">
+                                                                              <p className="small primary-text font-weight-bold-600 mb-0">
+                                                                                  {
+                                                                                      data.quiz_name
+                                                                                  }
+                                                                              </p>
+                                                                          </div>
+                                                                          <div className="col-md-6 d-flex align-items-center justify-content-end">
+                                                                              <Link
+                                                                                  to={`${this.props.match.url}/quiz/${data.quiz_id}`}
+                                                                              >
+                                                                                  <button
+                                                                                      className="btn btn-primary btn-sm shadow-none"
+                                                                                      onClick={() =>
+                                                                                          this.dispatchQuiz(
+                                                                                              data.quiz_name
+                                                                                          )
+                                                                                      }
+                                                                                  >
+                                                                                      View
+                                                                                      /
+                                                                                      Edit
+                                                                                  </button>
+                                                                              </Link>
+                                                                              <Dropdown>
+                                                                                  <Dropdown.Toggle
+                                                                                      variant="white"
+                                                                                      className="btn btn-link btn-sm shadow-none caret-off ml-2"
+                                                                                  >
+                                                                                      <i className="fas fa-ellipsis-v"></i>
+                                                                                  </Dropdown.Toggle>
+
+                                                                                  <Dropdown.Menu>
+                                                                                      <Dropdown.Item
+                                                                                          onClick={() =>
+                                                                                              this.toggleQuiz_EditModal(
+                                                                                                  data
+                                                                                              )
+                                                                                          }
+                                                                                      >
+                                                                                          <i className="far fa-edit fa-sm mr-1"></i>{" "}
+                                                                                          Edit
+                                                                                      </Dropdown.Item>
+                                                                                      <Dropdown.Item
+                                                                                          onClick={() =>
+                                                                                              this.toggleQuiz_DeleteModal(
+                                                                                                  data
+                                                                                              )
+                                                                                          }
+                                                                                      >
+                                                                                          <i className="far fa-trash-alt fa-sm mr-1"></i>{" "}
+                                                                                          Delete
+                                                                                      </Dropdown.Item>
+                                                                                  </Dropdown.Menu>
+                                                                              </Dropdown>
+                                                                          </div>
+                                                                      </div>
+                                                                  </div>
+                                                              );
+                                                          }
+                                                      )
+                                                    : null}
                                             </Card>
                                         </Accordion.Collapse>
                                     </Card>
@@ -1379,7 +1720,10 @@ class Chapters extends Component {
                         >
                             Add Cycle test
                         </button>
-                        <button className="btn btn-tomato btn-block shadow-sm">
+                        <button
+                            className="btn btn-tomato btn-block shadow-sm"
+                            onClick={this.toggleQuiz_CreateModal}
+                        >
                             Add Quiz
                         </button>
                         {/* Loading component */}

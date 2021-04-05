@@ -1,15 +1,15 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import axios from "axios";
-import Header from "./shared/navbar";
-import SideNav from "./shared/sidenav";
+import Header from "../shared/navbar";
+import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { Spinner } from "react-bootstrap";
-import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
+import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
 import { Document, Page, pdfjs } from "react-pdf";
-import Loading from "../sharedComponents/loader";
+import Loading from "../../sharedComponents/loader";
 import dateFormat from "dateformat";
-import AlertBox from "../sharedComponents/alert";
+import AlertBox from "../../sharedComponents/alert";
 
 const mapStateToProps = (state) => ({
     subject_name: state.subject_name,

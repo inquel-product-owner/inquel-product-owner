@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import Header from "./shared/navbar";
-import SideNav from "./shared/sidenav";
+import Header from "../shared/navbar";
+import SideNav from "../shared/sidenav";
 import Select from "react-select";
 import { Modal, Alert, Spinner, Dropdown } from "react-bootstrap";
-import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
-import Loading from "../sharedComponents/loader";
-import AlertBox from "../sharedComponents/alert";
+import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
+import Loading from "../../sharedComponents/loader";
+import AlertBox from "../../sharedComponents/alert";
 
 class Scorecard extends Component {
     constructor(props) {
@@ -499,88 +499,100 @@ class SemesterAuto extends Component {
             .then((result) => {
                 console.log(result);
                 if (result.sts === true) {
-                if (
-                    result.data.auto_test !== undefined &&
-                    result.data.auto_test.length !== 0
-                ) {
-                    const section = [];
-                    let duration = "";
-                    const filterData = [];
-                    for (let i = 0; i < result.data.auto_test.length; i++) {
-                        section.push({
-                            section_id: result.data.auto_test[i].section_id,
-                            section_description:
-                                result.data.auto_test[i].section_description,
-                            question_type:
-                                result.data.auto_test[i].question_type,
-                            category: result.data.auto_test[i].category,
-                            any_questions:
-                                result.data.auto_test[i].any_questions,
-                            no_questions:
-                                result.data.auto_test[i].total_questions,
-                            marks: result.data.auto_test[i].mark,
-                            total_marks: result.data.auto_test[i].total_marks,
-                        });
-                        duration =
-                            result.duration !== null ? result.duration : "";
-
-                        // loads question category data
-                        Promise.all([
-                            fetch(
-                                `${this.filterURL}?question_type=${result.data.auto_test[i].question_type}`,
-                                {
-                                    method: "GET",
-                                    headers: this.headers,
-                                }
-                            ).then((res) => res.json()),
-                            fetch(
-                                `${this.filterURL}?question_type=${result.data.auto_test[i].question_type}&category=${result.data.auto_test[i].category}`,
-                                {
-                                    method: "GET",
-                                    headers: this.headers,
-                                }
-                            ).then((res) => res.json()),
-                            fetch(
-                                `${this.filterURL}?question_type=${result.data.auto_test[i].question_type}&category=${result.data.auto_test[i].category}&marks=${result.data.auto_test[i].mark}`,
-                                {
-                                    method: "GET",
-                                    headers: this.headers,
-                                }
-                            ).then((res) => res.json()),
-                        ])
-                            .then((result) => {
-                                console.log(result);
-                                filterData.push({
-                                    category: result[0].data.category,
-                                    marks: result[1].data.marks,
-                                });
-                                section[i].total_questions =
-                                    result[2].data.total_questions;
-                                this.setState({
-                                    filterData: filterData,
-                                });
-                            })
-                            .catch((err) => {
-                                console.log(err);
+                    if (
+                        result.data.auto_test !== undefined &&
+                        result.data.auto_test.length !== 0
+                    ) {
+                        const section = [];
+                        let duration = "";
+                        const filterData = [];
+                        for (let i = 0; i < result.data.auto_test.length; i++) {
+                            section.push({
+                                section_id: result.data.auto_test[i].section_id,
+                                section_description:
+                                    result.data.auto_test[i]
+                                        .section_description,
+                                question_type:
+                                    result.data.auto_test[i].question_type,
+                                category: result.data.auto_test[i].category,
+                                any_questions:
+                                    result.data.auto_test[i].any_questions,
+                                no_questions:
+                                    result.data.auto_test[i].total_questions,
+                                marks: result.data.auto_test[i].mark,
+                                total_marks:
+                                    result.data.auto_test[i].total_marks,
                             });
+                            duration =
+                                result.duration !== null ? result.duration : "";
+
+                            // loads question category data
+                            Promise.all([
+                                fetch(
+                                    `${this.filterURL}?question_type=${result.data.auto_test[i].question_type}`,
+                                    {
+                                        method: "GET",
+                                        headers: this.headers,
+                                    }
+                                ).then((res) => res.json()),
+                                fetch(
+                                    `${this.filterURL}?question_type=${
+                                        result.data.auto_test[i].question_type
+                                    }&category=${result.data.auto_test[
+                                        i
+                                    ].category.replace("&", "%26")}`,
+                                    {
+                                        method: "GET",
+                                        headers: this.headers,
+                                    }
+                                ).then((res) => res.json()),
+                                fetch(
+                                    `${this.filterURL}?question_type=${
+                                        result.data.auto_test[i].question_type
+                                    }&category=${result.data.auto_test[
+                                        i
+                                    ].category.replace("&", "%26")}&marks=${
+                                        result.data.auto_test[i].mark
+                                    }`,
+                                    {
+                                        method: "GET",
+                                        headers: this.headers,
+                                    }
+                                ).then((res) => res.json()),
+                            ])
+                                .then((result) => {
+                                    console.log(result);
+                                    filterData.push({
+                                        category: result[0].data.category,
+                                        marks: result[1].data.marks,
+                                    });
+                                    section[i].total_questions =
+                                        result[2].data.total_questions;
+                                    this.setState({
+                                        filterData: filterData,
+                                    });
+                                })
+                                .catch((err) => {
+                                    console.log(err);
+                                });
+                        }
+                        this.setState({
+                            sections: section,
+                            duration: duration,
+                            page_loading: false,
+                        });
+                    } else {
+                        this.setState({
+                            page_loading: false,
+                        });
                     }
-                    this.setState({
-                        sections: section,
-                        duration: duration,
-                        page_loading: false,
-                    });
                 } else {
                     this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
                         page_loading: false,
                     });
                 }
-            } else {
-                this.setState({
-                    errorMsg: result.detail ? result.detail : result.msg,
-                    showErrorAlert: true,
-                    page_loading: false,
-                });
-            }
             })
             .catch((err) => {
                 console.log(err);
@@ -624,10 +636,14 @@ class SemesterAuto extends Component {
 
     // loads category data on selecting question type
     handleType = (index, event) => {
-        const section = [...this.state.sections];
-        const filterData = [...this.state.filterData];
+        let section = [...this.state.sections];
+        let filterData = [...this.state.filterData];
         section[index].question_type = event.target.value;
-        filterData[index].category = [];
+        if (filterData[index] === undefined) {
+            filterData.push({ category: [], marks: [] });
+        } else {
+            filterData[index].category = [];
+        }
         section[index].category = "";
         section[index].marks = "";
         section[index].total_questions = "";
@@ -649,19 +665,19 @@ class SemesterAuto extends Component {
                 .then((result) => {
                     console.log(result);
                     if (result.sts === true) {
-                    const filterData = [...this.state.filterData];
-                    filterData[index].category = result.data.category;
-                    this.setState({
-                        filterData: filterData,
-                    });
-                } else {
-                    this.setState({
-                        errorMsg: result.detail
-                            ? result.detail
-                            : result.msg,
-                        showErrorAlert: true,
-                    });
-                }
+                        const filterData = [...this.state.filterData];
+                        filterData[index].category = result.data.category;
+                        this.setState({
+                            filterData: filterData,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.detail
+                                ? result.detail
+                                : result.msg,
+                            showErrorAlert: true,
+                        });
+                    }
                 })
                 .catch((err) => {
                     console.log(err);
@@ -693,7 +709,9 @@ class SemesterAuto extends Component {
 
         if (event.target.value !== "") {
             fetch(
-                `${this.filterURL}?question_type=${section[index].question_type}&category=${event.target.value}`,
+                `${this.filterURL}?question_type=${
+                    section[index].question_type
+                }&category=${event.target.value.replace("&", "%26")}`,
                 {
                     method: "GET",
                     headers: this.headers,
@@ -703,18 +721,18 @@ class SemesterAuto extends Component {
                 .then((result) => {
                     console.log(result);
                     if (result.sts === true) {
-                    filterData[index].marks = result.data.marks;
-                    this.setState({
-                        filterData: filterData,
-                    });
-                } else {
-                    this.setState({
-                        errorMsg: result.detail
-                            ? result.detail
-                            : result.msg,
-                        showErrorAlert: true,
-                    });
-                }
+                        filterData[index].marks = result.data.marks;
+                        this.setState({
+                            filterData: filterData,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.detail
+                                ? result.detail
+                                : result.msg,
+                            showErrorAlert: true,
+                        });
+                    }
                 })
                 .catch((err) => {
                     console.log(err);
@@ -727,10 +745,15 @@ class SemesterAuto extends Component {
         const section = [...this.state.sections];
 
         if (event.target.value !== "") {
-            section[index].marks = Number(event.target.value);
+            section[index].marks = parseFloat(event.target.value);
 
             fetch(
-                `${this.filterURL}?question_type=${section[index].question_type}&category=${section[index].category}&marks=${event.target.value}`,
+                `${this.filterURL}?question_type=${
+                    section[index].question_type
+                }&category=${section[index].category.replace(
+                    "&",
+                    "%26"
+                )}&marks=${event.target.value}`,
                 {
                     method: "GET",
                     headers: this.headers,
@@ -740,19 +763,19 @@ class SemesterAuto extends Component {
                 .then((result) => {
                     console.log(result);
                     if (result.sts === true) {
-                    section[index].total_questions =
-                        result.data.total_questions;
-                    this.setState({
-                        sections: section,
-                    });
-                } else {
-                    this.setState({
-                        errorMsg: result.detail
-                            ? result.detail
-                            : result.msg,
-                        showErrorAlert: true,
-                    });
-                }
+                        section[index].total_questions =
+                            result.data.total_questions;
+                        this.setState({
+                            sections: section,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.detail
+                                ? result.detail
+                                : result.msg,
+                            showErrorAlert: true,
+                        });
+                    }
                 })
                 .catch((err) => {
                     console.log(err);
@@ -973,8 +996,8 @@ class SemesterAuto extends Component {
     };
 
     addSection = () => {
-        const filterData = [...this.state.filterData];
-        const sections = [...this.state.sections];
+        let filterData = [...this.state.filterData];
+        let sections = [...this.state.sections];
         sections.push({
             section_id: "",
             section_description: "",
@@ -1196,7 +1219,7 @@ class SemesterAuto extends Component {
                                             className="form-control form-shadow"
                                             placeholder="Enter duration (In minutes)"
                                             onChange={this.handleDuration}
-                                            value={this.state.duration ||''}
+                                            value={this.state.duration || ""}
                                             autoComplete="off"
                                             min="1"
                                             max="360"
@@ -1277,7 +1300,8 @@ class SemesterAuto extends Component {
                                                                           1
                                                                       }`}
                                                                       value={
-                                                                          section.section_description || ''
+                                                                          section.section_description ||
+                                                                          ""
                                                                       }
                                                                       onChange={(
                                                                           event
@@ -1305,7 +1329,8 @@ class SemesterAuto extends Component {
                                                                           )
                                                                       }
                                                                       value={
-                                                                          section.question_type || ''
+                                                                          section.question_type ||
+                                                                          ""
                                                                       }
                                                                       required
                                                                   >
@@ -1326,7 +1351,8 @@ class SemesterAuto extends Component {
                                                                                     return (
                                                                                         <option
                                                                                             value={
-                                                                                                data || ''
+                                                                                                data ||
+                                                                                                ""
                                                                                             }
                                                                                             key={
                                                                                                 index
@@ -1358,7 +1384,8 @@ class SemesterAuto extends Component {
                                                                           )
                                                                       }
                                                                       value={
-                                                                          section.category || ''
+                                                                          section.category ||
+                                                                          ""
                                                                       }
                                                                       disabled={
                                                                           section.question_type ===
@@ -1396,7 +1423,8 @@ class SemesterAuto extends Component {
                                                                                         return (
                                                                                             <option
                                                                                                 value={
-                                                                                                    data || ''
+                                                                                                    data ||
+                                                                                                    ""
                                                                                                 }
                                                                                                 key={
                                                                                                     c_index
@@ -1419,7 +1447,8 @@ class SemesterAuto extends Component {
                                                                       id="marks"
                                                                       className="form-control form-control-sm border-secondary"
                                                                       value={
-                                                                          section.marks || ''
+                                                                          section.marks ||
+                                                                          ""
                                                                       }
                                                                       onChange={(
                                                                           event
@@ -1465,7 +1494,8 @@ class SemesterAuto extends Component {
                                                                                         return (
                                                                                             <option
                                                                                                 value={
-                                                                                                    data || ''
+                                                                                                    data ||
+                                                                                                    ""
                                                                                                 }
                                                                                                 key={
                                                                                                     c_index
@@ -1487,7 +1517,8 @@ class SemesterAuto extends Component {
                                                                       className="form-control form-control-sm border-secondary"
                                                                       type="text"
                                                                       value={
-                                                                          section.total_questions || ''
+                                                                          section.total_questions ||
+                                                                          ""
                                                                       }
                                                                       placeholder="Total question"
                                                                       disabled
@@ -1498,7 +1529,8 @@ class SemesterAuto extends Component {
                                                                       className="form-control form-control-sm border-secondary"
                                                                       type="text"
                                                                       value={
-                                                                          section.no_questions || ''
+                                                                          section.no_questions ||
+                                                                          ""
                                                                       }
                                                                       placeholder="No. of questions"
                                                                       onChange={(
@@ -1524,7 +1556,8 @@ class SemesterAuto extends Component {
                                                                       className="form-control form-control-sm border-secondary"
                                                                       type="text"
                                                                       value={
-                                                                          section.any_questions || ''
+                                                                          section.any_questions ||
+                                                                          ""
                                                                       }
                                                                       placeholder="Any questions"
                                                                       onChange={(
@@ -1551,7 +1584,8 @@ class SemesterAuto extends Component {
                                                                       type="text"
                                                                       placeholder="Total marks"
                                                                       value={
-                                                                          section.total_marks || ''
+                                                                          section.total_marks ||
+                                                                          ""
                                                                       }
                                                                       disabled
                                                                   />

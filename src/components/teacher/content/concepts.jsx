@@ -1,18 +1,18 @@
 import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 import axios from "axios";
-import Header from "./shared/navbar";
-import SideNav from "./shared/sidenav";
-import CKeditor from "../sharedComponents/CKeditor";
-import ReactSwitch from "../sharedComponents/switchComponent";
+import Header from "../shared/navbar";
+import SideNav from "../shared/sidenav";
+import CKeditor from "../../sharedComponents/CKeditor";
+import ReactSwitch from "../../sharedComponents/switchComponent";
 import { Accordion, Card, Spinner } from "react-bootstrap";
-import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
+import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
 import ReactCardFlip from "react-card-flip";
-import Loading from "../sharedComponents/loader";
-import AlertBox from "../sharedComponents/alert";
+import Loading from "../../sharedComponents/loader";
+import AlertBox from "../../sharedComponents/alert";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import FileModal from "./shared/fileExplorer";
-import { ContentDeleteModal } from "../sharedComponents/contentManagementModal";
+import FileModal from "../shared/fileExplorer";
+import { ContentDeleteModal } from "../../sharedComponents/contentManagementModal";
 
 const mapStateToProps = (state) => ({
     subject_name: state.subject_name,
@@ -760,7 +760,9 @@ class Concepts extends Component {
 
         if (
             values[this.state.activeConcept].concepts_random_id !== "" &&
-            values[this.state.activeConcept].is_image_uploaded === true
+            values[this.state.activeConcept].is_image_uploaded === true &&
+            values[this.state.activeConcept].content.images[index].file_name === '' &&
+            values[this.state.activeConcept].content.images[index].path !== ''
         ) {
             let body = {
                 chapter_id: this.chapterId,
@@ -954,7 +956,9 @@ class Concepts extends Component {
 
         if (
             values[this.state.activeConcept].concepts_random_id !== "" &&
-            values[this.state.activeConcept].is_image_uploaded === true
+            values[this.state.activeConcept].is_image_uploaded === true &&
+            values[this.state.activeConcept].content.video.file_name === '' &&
+            values[this.state.activeConcept].content.video.path !== ''
         ) {
             fetch(
                 `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/files/`,
@@ -1052,7 +1056,9 @@ class Concepts extends Component {
 
         if (
             values[this.state.activeConcept].concepts_random_id !== "" &&
-            values[this.state.activeConcept].is_image_uploaded === true
+            values[this.state.activeConcept].is_image_uploaded === true &&
+            values[this.state.activeConcept].content.audio[index].file_name === '' &&
+            values[this.state.activeConcept].content.audio[index].path !== ''
         ) {
             let body = {
                 chapter_id: this.chapterId,

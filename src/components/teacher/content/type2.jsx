@@ -1,16 +1,16 @@
 import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 import axios from "axios";
-import Header from "./shared/navbar";
-import SideNav from "./shared/sidenav";
-import CKeditor from "../sharedComponents/CKeditor";
-import ReactSwitch from "../sharedComponents/switchComponent";
+import Header from "../shared/navbar";
+import SideNav from "../shared/sidenav";
+import CKeditor from "../../sharedComponents/CKeditor";
+import ReactSwitch from "../../sharedComponents/switchComponent";
 import { Accordion, Card, OverlayTrigger, Tooltip } from "react-bootstrap";
-import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
-import Loading from "../sharedComponents/loader";
-import AlertBox from "../sharedComponents/alert";
-import FileModal from "./shared/fileExplorer";
-import { ContentDeleteModal } from "../sharedComponents/contentManagementModal";
+import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
+import Loading from "../../sharedComponents/loader";
+import AlertBox from "../../sharedComponents/alert";
+import FileModal from "../shared/fileExplorer";
+import { ContentDeleteModal } from "../../sharedComponents/contentManagementModal";
 
 const mapStateToProps = (state) => ({
     subject_name: state.subject_name,
@@ -152,7 +152,7 @@ class Type2 extends Component {
 
     loadMCQData = () => {
         fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/?chapter_id=${this.chapterId}&topic_num=${this.topicNum}`,
+            `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/?topic_num=${this.topicNum}`,
             {
                 headers: this.headers,
                 method: "GET",
@@ -163,6 +163,7 @@ class Type2 extends Component {
                 console.log(result);
                 if (result.sts === true) {
                     let data = [];
+                    let sub_question = [];
                     let keyboards = [];
                     let images = [];
                     let audio = [];
@@ -171,177 +172,164 @@ class Type2 extends Component {
                         for (let i = 0; i < response.length; i++) {
                             images = [];
                             audio = [];
-                            if (response[i].files.length !== 0) {
+                            sub_question = [];
+                            if (
+                                Object.entries(response[i].files).length !== 0
+                            ) {
                                 // image
-                                if (
-                                    response[i].files[0].type1_image_1 !==
-                                        undefined ||
-                                    response[i].files[0].type1_image_2 !==
-                                        undefined ||
-                                    response[i].files[0].type1_image_3 !==
-                                        undefined ||
-                                    response[i].files[0].type1_image_4 !==
-                                        undefined
-                                ) {
-                                    images.push({
-                                        title:
-                                            response[i].files[0]
-                                                .type1_image_1_title || "",
-                                        file_name: "",
-                                        image: null,
-                                        path:
-                                            response[i].files[0]
-                                                .type1_image_1 || "",
-                                    });
-                                    if (
-                                        response[i].files[0].type1_image_2 !==
-                                            undefined ||
-                                        response[i].files[0].type1_image_3 !==
-                                            undefined ||
-                                        response[i].files[0].type1_image_4 !==
-                                            undefined
-                                    ) {
-                                        images.push({
-                                            title:
-                                                response[i].files[0]
-                                                    .type1_image_2_title || "",
-                                            file_name: "",
-                                            image: null,
-                                            path:
-                                                response[i].files[0]
-                                                    .type1_image_2 || "",
-                                        });
-                                        if (
-                                            response[i].files[0]
-                                                .type1_image_3 !== undefined ||
-                                            response[i].files[0]
-                                                .type1_image_4 !== undefined
-                                        ) {
-                                            images.push({
-                                                title:
-                                                    response[i].files[0]
-                                                        .type1_image_3_title ||
-                                                    "",
-                                                file_name: "",
-                                                image: null,
-                                                path:
-                                                    response[i].files[0]
-                                                        .type1_image_3 || "",
-                                            });
-                                            if (
-                                                response[i].files[0]
-                                                    .type1_image_4 !== undefined
-                                            ) {
-                                                images.push({
-                                                    title:
-                                                        response[i].files[0]
-                                                            .type1_image_4_title ||
-                                                        "",
-                                                    file_name: "",
-                                                    image: null,
-                                                    path:
-                                                        response[i].files[0]
-                                                            .type1_image_4 ||
-                                                        "",
-                                                });
-                                            }
-                                        }
-                                    }
-                                }
+                                images.push({
+                                    title:
+                                        response[i].files.type2_image_1_title ||
+                                        "",
+                                    file_name: "",
+                                    image: null,
+                                    path: response[i].files.type2_image_1 || "",
+                                });
+                                images.push({
+                                    title:
+                                        response[i].files.type2_image_2_title ||
+                                        "",
+                                    file_name: "",
+                                    image: null,
+                                    path: response[i].files.type2_image_2 || "",
+                                });
+                                images.push({
+                                    title:
+                                        response[i].files.type2_image_3_title ||
+                                        "",
+                                    file_name: "",
+                                    image: null,
+                                    path: response[i].files.type2_image_3 || "",
+                                });
+                                images.push({
+                                    title:
+                                        response[i].files.type2_image_4_title ||
+                                        "",
+                                    file_name: "",
+                                    image: null,
+                                    path: response[i].files.type2_image_4 || "",
+                                });
 
                                 // audio
-                                if (response[i].files[0].type1_audio_1) {
-                                    audio.push({
-                                        title:
-                                            response[i].files[0]
-                                                .type1_audio_1_title,
-                                        file_name: "",
-                                        audio: null,
-                                        path:
-                                            response[i].files[0].type1_audio_1,
-                                    });
-                                }
-                                if (response[i].files[0].type1_audio_2) {
-                                    audio.push({
-                                        title:
-                                            response[i].files[0]
-                                                .type1_audio_2_title,
-                                        file_name: "",
-                                        audio: null,
-                                        path:
-                                            response[i].files[0].type1_audio_2,
-                                    });
-                                }
+                                audio.push({
+                                    title:
+                                        response[i].files.type2_audio_1_title ||
+                                        "",
+                                    file_name: "",
+                                    audio: null,
+                                    path: response[i].files.type2_audio_1 || "",
+                                });
+                                audio.push({
+                                    title:
+                                        response[i].files.type2_audio_2_title ||
+                                        "",
+                                    file_name: "",
+                                    audio: null,
+                                    path: response[i].files.type2_audio_2 || "",
+                                });
                             }
 
                             // video
                             var path = "";
-                            if (response[i].files.length !== 0) {
-                                if (response[i].files[0].paste_video_url) {
-                                    path = response[i].files[0].paste_video_url;
+                            if (
+                                Object.entries(response[i].files).length !== 0
+                            ) {
+                                if (response[i].files.paste_video_url) {
+                                    path = response[i].files.paste_video_url;
                                 }
-                                if (response[i].files[0].type1_video_1) {
-                                    path = response[i].files[0].type1_video_1;
+                                if (response[i].files.type2_video_1) {
+                                    path = response[i].files.type2_video_1;
                                 }
                             }
 
+                            // Sub question
+                            for (
+                                let k = 0;
+                                k < response[i].sub_question.length;
+                                k++
+                            ) {
+                                sub_question.push({
+                                    sub_question_id:
+                                        response[i].sub_question[k]
+                                            .sub_question_id,
+                                    question:
+                                        response[i].sub_question[k].question,
+                                    explanation:
+                                        response[i].sub_question[k].explanation,
+                                    mcq: response[i].sub_question[k].mcq,
+                                    fill_in:
+                                        response[i].sub_question[k].fill_in,
+                                    fillin_answer:
+                                        response[i].sub_question[k]
+                                            .fillin_answer.length !== 0
+                                            ? response[i].sub_question[k]
+                                                  .fillin_answer
+                                            : [""],
+                                    options:
+                                        response[i].sub_question[k].options
+                                            .length !== 0
+                                            ? response[i].sub_question[k]
+                                                  .options
+                                            : [
+                                                  {
+                                                      correct: false,
+                                                      content: "",
+                                                  },
+                                                  {
+                                                      correct: false,
+                                                      content: "",
+                                                  },
+                                                  {
+                                                      correct: false,
+                                                      content: "",
+                                                  },
+                                                  {
+                                                      correct: false,
+                                                      content: "",
+                                                  },
+                                              ],
+                                    marks: response[i].sub_question[
+                                        k
+                                    ].marks.toString(),
+                                    negative_marks: response[i].sub_question[
+                                        k
+                                    ].negative_marks.toString(),
+                                });
+                            }
+
+                            // Main question
                             data.push({
-                                chapter_id: this.props.match.params.chapterId,
-                                topic_num: this.props.match.params.topicNum,
                                 question: response[i].question,
                                 question_random_id:
                                     response[i].question_random_id,
                                 is_image_uploaded:
-                                    response[i].files.length !== 0
+                                    Object.entries(response[i].files).length !==
+                                    0
                                         ? true
                                         : false,
+                                sub_question: sub_question,
                                 content: {
-                                    mcq: response[i].mcq,
-                                    fill_in: response[i].fill_in,
-                                    boolean: response[i].boolean,
-                                    fillin_answer:
-                                        response[i].fillin_answer.length !== 0
-                                            ? response[i].fillin_answer
-                                            : [""],
-                                    boolean_question:
-                                        response[i].boolean_question.length !==
-                                        0
-                                            ? response[i].boolean_question
-                                            : [
-                                                  {
-                                                      correct: false,
-                                                      content: "True",
-                                                  },
-                                                  {
-                                                      correct: false,
-                                                      content: "False",
-                                                  },
-                                              ],
-                                    options:
-                                        response[i].options.length !== 0
-                                            ? response[i].options
-                                            : [
-                                                  {
-                                                      correct: false,
-                                                      content: "",
-                                                  },
-                                                  {
-                                                      correct: false,
-                                                      content: "",
-                                                  },
-                                                  {
-                                                      correct: false,
-                                                      content: "",
-                                                  },
-                                                  {
-                                                      correct: false,
-                                                      content: "",
-                                                  },
-                                              ],
-                                    explanation: response[i].explanation,
                                     images:
                                         images.length === 0
                                             ? [
+                                                  {
+                                                      title: "",
+                                                      file_name: "",
+                                                      image: null,
+                                                      path: "",
+                                                  },
+                                                  {
+                                                      title: "",
+                                                      file_name: "",
+                                                      image: null,
+                                                      path: "",
+                                                  },
+                                                  {
+                                                      title: "",
+                                                      file_name: "",
+                                                      image: null,
+                                                      path: "",
+                                                  },
                                                   {
                                                       title: "",
                                                       file_name: "",
@@ -352,11 +340,12 @@ class Type2 extends Component {
                                             : images,
                                     video: {
                                         title:
-                                            response[i].files.length !== 0 &&
-                                            response[i].files[0]
-                                                .type1_video_1_title
-                                                ? response[i].files[0]
-                                                      .type1_video_1_title
+                                            Object.entries(response[i].files)
+                                                .length !== 0 &&
+                                            response[i].files
+                                                .type2_video_1_title
+                                                ? response[i].files
+                                                      .type2_video_1_title
                                                 : "",
                                         file_name: "",
                                         video: null,
@@ -372,11 +361,16 @@ class Type2 extends Component {
                                                       audio: null,
                                                       path: "",
                                                   },
+                                                  {
+                                                      title: "",
+                                                      file_name: "",
+                                                      audio: null,
+                                                      path: "",
+                                                  },
                                               ]
                                             : audio,
                                 },
                                 properties: {
-                                    marks: response[i].properties.marks,
                                     complexity:
                                         response[i].properties.complexity,
                                     priority: response[i].properties.priority,
@@ -470,10 +464,7 @@ class Type2 extends Component {
                 console.log(err);
             });
 
-        // this.loadMCQData();
-        this.setState({
-            page_loading: false,
-        });
+        this.loadMCQData();
     };
 
     handleSubmit = () => {
@@ -520,7 +511,6 @@ class Type2 extends Component {
                 sub_question: data[this.state.activeQuestion].sub_question,
             })
         );
-        form_data.append("topic_num", this.topicNum);
 
         // Video
         if (data[this.state.activeQuestion].content.video.url !== "") {
@@ -585,10 +575,30 @@ class Type2 extends Component {
             }
         }
 
-        if (data[this.state.activeQuestion].question_random_id === "") {
-            this.handlePOST(form_data);
+        if (data[this.state.activeQuestion].properties.complexity === "") {
+            this.setState({
+                errorMsg: "Complexity is required",
+                showErrorAlert: true,
+                page_loading: false,
+            });
+        } else if (data[this.state.activeQuestion].properties.priority === "") {
+            this.setState({
+                errorMsg: "Priority is required",
+                showErrorAlert: true,
+                page_loading: false,
+            });
+        } else if (data[this.state.activeQuestion].properties.theme === "") {
+            this.setState({
+                errorMsg: "Theme is required",
+                showErrorAlert: true,
+                page_loading: false,
+            });
         } else {
-            this.handlePUT(form_data);
+            if (data[this.state.activeQuestion].question_random_id === "") {
+                this.handlePOST(form_data);
+            } else {
+                this.handlePUT(form_data);
+            }
         }
     };
 
@@ -600,6 +610,7 @@ class Type2 extends Component {
                 Authorization: this.authToken,
             },
         };
+        data.append("topic_num", this.topicNum);
 
         axios
             .post(
@@ -645,244 +656,41 @@ class Type2 extends Component {
                 if (err.response) {
                     this.setState({
                         errorMsg: err.response.data.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
                     });
                 } else if (err.request) {
                     this.setState({
-                        errorMsg: err.rerequestsponse.data.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
+                        errorMsg: err.request.data.msg,
                     });
                 } else if (err.message) {
                     this.setState({
                         errorMsg: err.message.data.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
                     });
                 }
+                this.setState({
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
     handlePUT = (data) => {
-        fetch(`${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/`, {
-            headers: this.headers,
-            method: "PUT",
-            body: JSON.stringify({
-                chapter_id: this.chapterId,
-                topic_num: this.topicNum,
-                question: data[this.state.activeQuestion].question,
-                question_random_id:
-                    data[this.state.activeQuestion].question_random_id,
-                content: {
-                    mcq: data[this.state.activeQuestion].content.mcq,
-                    fill_in: data[this.state.activeQuestion].content.fill_in,
-                    boolean: data[this.state.activeQuestion].content.boolean,
-                    fillin_answer:
-                        data[this.state.activeQuestion].content.fillin_answer,
-                    boolean_question:
-                        data[this.state.activeQuestion].content
-                            .boolean_question,
-                    options: data[this.state.activeQuestion].content.options,
-                    explanation:
-                        data[this.state.activeQuestion].content.explanation,
-                },
-                properties: {
-                    marks: data[this.state.activeQuestion].properties.marks,
-                    complexity:
-                        data[this.state.activeQuestion].properties.complexity,
-                    priority:
-                        data[this.state.activeQuestion].properties.priority,
-                    theme: data[this.state.activeQuestion].properties.theme,
-                    test: data[this.state.activeQuestion].properties.test,
-                    semester:
-                        data[this.state.activeQuestion].properties.semester,
-                    quiz: data[this.state.activeQuestion].properties.quiz,
-                    learn: data[this.state.activeQuestion].properties.learn,
-                },
-                settings: {
-                    virtual_keyboard:
-                        data[this.state.activeQuestion].settings
-                            .virtual_keyboard,
-                    limited: data[this.state.activeQuestion].settings.limited,
-                },
-            }),
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    data[this.state.activeQuestion].question_random_id =
-                        result.question_random_id;
-                    this.setState({
-                        questions: data,
-                        isForm_submitted: true,
-                    });
-                } else {
-                    this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
+        const options = {
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "multipart/form-data",
+                Authorization: this.authToken,
+            },
+        };
+        const question = [...this.state.questions];
+        data.append(
+            "question_random_id",
+            question[this.state.activeQuestion].question_random_id
+        );
 
-    // Run the image API once the question is added
-    componentDidUpdate = (prevProps, prevState) => {
-        if (
-            prevState.isForm_submitted !== this.state.isForm_submitted &&
-            this.state.isForm_submitted === true
-        ) {
-            this.setState({
-                page_loading: true,
-                showErrorAlert: false,
-                showSuccessAlert: false,
-                isForm_submitted: false,
-            });
-
-            const questionData = [...this.state.questions];
-
-            let form_data = new FormData();
-
-            form_data.append("chapter_id", this.chapterId);
-            form_data.append("topic_num", this.topicNum);
-            form_data.append(
-                "question_random_id",
-                questionData[this.state.activeQuestion].question_random_id
-            );
-
-            // Video
-            if (
-                questionData[this.state.activeQuestion].content.video.url !== ""
-            ) {
-                form_data.append(
-                    "video_url",
-                    questionData[this.state.activeQuestion].content.video.url
-                );
-            }
-
-            if (
-                questionData[this.state.activeQuestion].content.video.video !==
-                null
-            ) {
-                form_data.append(
-                    "type2_video_1_title",
-                    questionData[this.state.activeQuestion].content.video.title
-                );
-                form_data.append(
-                    "type2_video_1",
-                    questionData[this.state.activeQuestion].content.video.video
-                );
-            }
-
-            // Image
-            for (
-                let i = 0;
-                i <
-                questionData[this.state.activeQuestion].content.images.length;
-                i++
-            ) {
-                if (
-                    questionData[this.state.activeQuestion].content.images[i]
-                        .image !== null
-                ) {
-                    form_data.append(
-                        `type2_image_${i + 1}_title`,
-                        questionData[this.state.activeQuestion].content.images[
-                            i
-                        ].title
-                    );
-                    form_data.append(
-                        `type2_image_${i + 1}`,
-                        questionData[this.state.activeQuestion].content.images[
-                            i
-                        ].image
-                    );
-                } else {
-                    continue;
-                }
-            }
-
-            // Audio
-            for (
-                let i = 0;
-                i <
-                questionData[this.state.activeQuestion].content.audio.length;
-                i++
-            ) {
-                if (
-                    questionData[this.state.activeQuestion].content.audio[i]
-                        .audio !== null
-                ) {
-                    form_data.append(
-                        `type2_audio_${i + 1}_title`,
-                        questionData[this.state.activeQuestion].content.audio[i]
-                            .title
-                    );
-                    form_data.append(
-                        `type2_audio_${i + 1}`,
-                        questionData[this.state.activeQuestion].content.audio[i]
-                            .audio
-                    );
-                } else {
-                    continue;
-                }
-            }
-
-            const options = {
-                headers: {
-                    Accept: "application/json",
-                    "Content-Type": "multipart/form-data",
-                    Authorization: this.authToken,
-                },
-            };
-
-            let files_arr = [];
-            for (var p of form_data) {
-                files_arr.push(p);
-            }
-
-            if (files_arr.length !== 3) {
-                if (
-                    questionData[this.state.activeQuestion]
-                        .is_image_uploaded === false
-                ) {
-                    this.handleImgPOST(options, form_data, questionData);
-                } else {
-                    this.handleImgPATCH(options, form_data, questionData);
-                }
-            } else {
-                this.setState(
-                    {
-                        questions: questionData,
-                        successMsg: "Question added",
-                        showSuccessAlert: true,
-                    },
-                    () => {
-                        this.setState({
-                            showMainEdit_option: false,
-                            contentCollapsed: true,
-                            propertiesCollapsed: true,
-                            settingsCollapsed: true,
-                            page_loading: true,
-                            activeQuestion: "",
-                        });
-                        this.loadMCQData();
-                    }
-                );
-            }
-        }
-    };
-
-    handleImgPOST = (options, form_data, questionData) => {
         axios
-            .post(
-                `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/files/`,
-                form_data,
+            .put(
+                `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/`,
+                data,
                 options
             )
             .then((result) => {
@@ -890,7 +698,6 @@ class Type2 extends Component {
                 if (result.data.sts === true) {
                     this.setState(
                         {
-                            questions: questionData,
                             successMsg: result.data.msg,
                             showSuccessAlert: true,
                             page_loading: false,
@@ -898,11 +705,13 @@ class Type2 extends Component {
                         () => {
                             this.setState({
                                 showMainEdit_option: false,
+                                showSubEdit_option: false,
                                 contentCollapsed: true,
+                                subContentCollapsed: true,
                                 propertiesCollapsed: true,
                                 settingsCollapsed: true,
-                                page_loading: true,
                                 activeQuestion: "",
+                                activeSubQuestion: "",
                             });
                             this.loadMCQData();
                         }
@@ -918,51 +727,24 @@ class Type2 extends Component {
                 }
             })
             .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    handleImgPATCH = (options, form_data, questionData) => {
-        axios
-            .patch(
-                `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/files/`,
-                form_data,
-                options
-            )
-            .then((result) => {
-                console.log(result);
-                if (result.data.sts === true) {
-                    this.setState(
-                        {
-                            questions: questionData,
-                            successMsg: result.data.msg,
-                            showSuccessAlert: true,
-                            page_loading: false,
-                        },
-                        () => {
-                            this.setState({
-                                showMainEdit_option: false,
-                                contentCollapsed: true,
-                                propertiesCollapsed: true,
-                                settingsCollapsed: true,
-                                page_loading: true,
-                                activeQuestion: "",
-                            });
-                            this.loadMCQData();
-                        }
-                    );
-                } else {
+                console.warn(err);
+                if (err.response) {
                     this.setState({
-                        errorMsg: result.data.detail
-                            ? result.data.detail
-                            : result.data.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
+                        errorMsg: err.response.data.msg,
+                    });
+                } else if (err.request) {
+                    this.setState({
+                        errorMsg: err.request.data.msg,
+                    });
+                } else if (err.message) {
+                    this.setState({
+                        errorMsg: err.message.data.msg,
                     });
                 }
-            })
-            .catch((err) => {
-                console.log(err);
+                this.setState({
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -1165,11 +947,12 @@ class Type2 extends Component {
 
         if (
             values[this.state.activeQuestion].question_random_id !== "" &&
-            values[this.state.activeQuestion].is_image_uploaded === true
+            values[this.state.activeQuestion].is_image_uploaded === true &&
+            values[this.state.activeQuestion].content.images[index]
+                .file_name === "" &&
+            values[this.state.activeQuestion].content.images[index].path !== ""
         ) {
             let body = {
-                chapter_id: this.chapterId,
-                topic_num: this.topicNum,
                 question_random_id:
                     values[this.state.activeQuestion].question_random_id,
             };
@@ -1177,7 +960,7 @@ class Type2 extends Component {
                 values[this.state.activeQuestion].content.images[index].title;
 
             fetch(
-                `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/files/`,
+                `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/`,
                 {
                     method: "DELETE",
                     headers: this.headers,
@@ -1194,7 +977,12 @@ class Type2 extends Component {
                         });
                         values[this.state.activeQuestion].content.images[
                             index
-                        ] = { title: "", file_name: "", image: null, path: "" };
+                        ] = {
+                            title: "",
+                            file_name: "",
+                            image: null,
+                            path: "",
+                        };
                         this.setState({
                             questions: values,
                         });
@@ -1343,16 +1131,16 @@ class Type2 extends Component {
 
         if (
             values[this.state.activeQuestion].question_random_id !== "" &&
-            values[this.state.activeQuestion].is_image_uploaded === true
+            values[this.state.activeQuestion].is_image_uploaded === true &&
+            values[this.state.activeQuestion].content.video.file_name === "" &&
+            values[this.state.activeQuestion].content.video.path !== ""
         ) {
             fetch(
-                `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/files/`,
+                `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/`,
                 {
                     method: "DELETE",
                     headers: this.headers,
                     body: JSON.stringify({
-                        chapter_id: this.chapterId,
-                        topic_num: this.topicNum,
                         question_random_id:
                             values[this.state.activeQuestion]
                                 .question_random_id,
@@ -1430,11 +1218,12 @@ class Type2 extends Component {
 
         if (
             values[this.state.activeQuestion].question_random_id !== "" &&
-            values[this.state.activeQuestion].is_image_uploaded === true
+            values[this.state.activeQuestion].is_image_uploaded === true &&
+            values[this.state.activeQuestion].content.audio[index].file_name ===
+                "" &&
+            values[this.state.activeQuestion].content.audio[index].path !== ""
         ) {
             let body = {
-                chapter_id: this.chapterId,
-                topic_num: this.topicNum,
                 question_random_id:
                     values[this.state.activeQuestion].question_random_id,
             };
@@ -1442,7 +1231,7 @@ class Type2 extends Component {
                 values[this.state.activeQuestion].content.audio[index].title;
 
             fetch(
-                `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/files/`,
+                `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/`,
                 {
                     method: "DELETE",
                     headers: this.headers,
@@ -1540,11 +1329,11 @@ class Type2 extends Component {
         if (type === "marks") {
             values[this.state.activeQuestion].sub_question[
                 this.state.activeSubQuestion
-            ].marks = event.target.value;
+            ].marks = event.target.value.toString();
         } else if (type === "negative_marks") {
             values[this.state.activeQuestion].sub_question[
                 this.state.activeSubQuestion
-            ].negative_marks = event.target.value;
+            ].negative_marks = event.target.value.toString();
         } else if (type === "complexity") {
             values[this.state.activeQuestion].properties.complexity =
                 event.target.value;
@@ -1735,7 +1524,7 @@ class Type2 extends Component {
                         { correct: false, content: "" },
                     ],
                     marks: "",
-                    negative_marks: 0,
+                    negative_marks: "0",
                 },
             ],
             content: {
@@ -1794,7 +1583,7 @@ class Type2 extends Component {
                 { correct: false, content: "" },
             ],
             marks: "",
-            negative_marks: 0,
+            negative_marks: "0",
         });
         this.setState({
             questions: values,
@@ -1829,7 +1618,36 @@ class Type2 extends Component {
         }
         const sub_question = [];
         for (let i = 0; i < values[index].sub_question.length; i++) {
-            sub_question[i] = values[index].sub_question[i];
+            const options = [];
+            for (
+                let j = 0;
+                j < values[index].sub_question[i].options.length;
+                j++
+            ) {
+                options[j] = {
+                    content: values[index].sub_question[i].options[j].content,
+                    correct: values[index].sub_question[i].options[j].correct,
+                };
+            }
+            const fillin = [];
+            for (
+                let j = 0;
+                j < values[index].sub_question[i].fillin_answer.length;
+                j++
+            ) {
+                fillin[j] = values[index].sub_question[i].fillin_answer[j];
+            }
+            sub_question[i] = {
+                sub_question_id: values[index].sub_question[i].sub_question_id,
+                question: values[index].sub_question[i].question,
+                explanation: values[index].sub_question[i].explanation,
+                mcq: values[index].sub_question[i].mcq,
+                fill_in: values[index].sub_question[i].fill_in,
+                fillin_answer: fillin,
+                options: options,
+                marks: values[index].sub_question[i].marks,
+                negative_marks: values[index].sub_question[i].negative_marks,
+            };
         }
         values.splice(index + 1, 0, {
             question_random_id: "",
@@ -1931,6 +1749,10 @@ class Type2 extends Component {
             activeQuestion: index,
             showErrorAlert: false,
             showSuccessAlert: false,
+            contentCollapsed: true,
+            subContentCollapsed: true,
+            propertiesCollapsed: true,
+            settingsCollapsed: true,
         });
     };
 
@@ -1942,6 +1764,10 @@ class Type2 extends Component {
             activeSubQuestion: sub_index,
             showErrorAlert: false,
             showSuccessAlert: false,
+            contentCollapsed: true,
+            subContentCollapsed: true,
+            propertiesCollapsed: true,
+            settingsCollapsed: true,
         });
     };
 
@@ -1952,7 +1778,9 @@ class Type2 extends Component {
         const keyboards = [...this.state.keyboards];
         this.setState({
             showMainEdit_option: false,
+            showSubEdit_option: false,
             contentCollapsed: true,
+            subContentCollapsed: true,
             propertiesCollapsed: true,
             settingsCollapsed: true,
             activeQuestion: index,
@@ -1999,7 +1827,7 @@ class Type2 extends Component {
                                         { correct: false, content: "" },
                                     ],
                                     marks: "",
-                                    negative_marks: 0,
+                                    negative_marks: "0",
                                 },
                             ],
                             content: {
@@ -2121,7 +1949,7 @@ class Type2 extends Component {
                                     { correct: false, content: "" },
                                 ],
                                 marks: "",
-                                negative_marks: 0,
+                                negative_marks: "0",
                             },
                         ],
                         content: {
@@ -2248,7 +2076,7 @@ class Type2 extends Component {
                                 { correct: false, content: "" },
                             ],
                             marks: "",
-                            negative_marks: 0,
+                            negative_marks: "0",
                         });
                         this.setState({
                             questions: values,
@@ -2257,6 +2085,12 @@ class Type2 extends Component {
                 }
             );
         }
+    };
+
+    closeSubMCQ_DeleteModal = () => {
+        this.setState({
+            showSubMCQDelete_Modal: !this.state.showSubMCQDelete_Modal,
+        });
     };
 
     handleSubMCQ_Deletion = () => {
@@ -2290,7 +2124,7 @@ class Type2 extends Component {
                             { correct: false, content: "" },
                         ],
                         marks: "",
-                        negative_marks: 0,
+                        negative_marks: "0",
                     });
                     this.setState({
                         questions: values,
@@ -2330,14 +2164,12 @@ class Type2 extends Component {
 
         if (id.length !== 0) {
             fetch(
-                `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/publish/`,
+                `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/publish/`,
                 {
                     headers: this.headers,
                     method: "POST",
                     body: JSON.stringify({
-                        question_ids: id,
-                        chapter_id: this.chapterId,
-                        topic_num: this.topicNum,
+                        question_random_ids: id,
                     }),
                 }
             )
@@ -2411,12 +2243,10 @@ class Type2 extends Component {
                         show={this.state.showMCQDelete_Modal}
                         onHide={this.closeMCQ_DeleteModal}
                         formSubmission={this.handleMCQ_Deletion}
-                        url={`${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/`}
+                        url={`${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/`}
                         type="question"
                         name=""
                         data={{
-                            chapter_id: this.chapterId,
-                            topic_num: this.topicNum,
                             question_random_id: this.state.selectedQuestion,
                         }}
                         toggleModal={this.closeMCQ_DeleteModal}
@@ -2427,17 +2257,16 @@ class Type2 extends Component {
                 {this.state.showSubMCQDelete_Modal ? (
                     <ContentDeleteModal
                         show={this.state.showSubMCQDelete_Modal}
-                        onHide={this.closeMCQ_DeleteModal}
+                        onHide={this.closeSubMCQ_DeleteModal}
                         formSubmission={this.handleSubMCQ_Deletion}
-                        url={`${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/`}
-                        type="question"
+                        url={`${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/`}
+                        type="sub question"
                         name=""
                         data={{
-                            chapter_id: this.chapterId,
-                            topic_num: this.topicNum,
                             question_random_id: this.state.selectedQuestion,
+                            sub_question_id: this.state.selectedSubQuestion,
                         }}
-                        toggleModal={this.closeMCQ_DeleteModal}
+                        toggleModal={this.closeSubMCQ_DeleteModal}
                     />
                 ) : null}
 
@@ -2627,6 +2456,15 @@ class Type2 extends Component {
                                                                     q_index
                                                                 )
                                                             }
+                                                            disabled={
+                                                                this
+                                                                    .sub_question_limit ===
+                                                                question
+                                                                    .sub_question
+                                                                    .length
+                                                                    ? true
+                                                                    : false
+                                                            }
                                                         >
                                                             Add Sub question +
                                                         </button>
@@ -2726,9 +2564,8 @@ class Type2 extends Component {
                                                                         >
                                                                             <div className="card-body">
                                                                                 <div className="form-group">
-                                                                                    <div className="card form-shadow">
+                                                                                    <div className="card pl-3">
                                                                                         <div
-                                                                                            className="card-body py-2"
                                                                                             dangerouslySetInnerHTML={{
                                                                                                 __html:
                                                                                                     sub_question.question,
@@ -2752,10 +2589,10 @@ class Type2 extends Component {
                                                                                                     >
                                                                                                         <div className="form-group">
                                                                                                             <div
-                                                                                                                className={`card form-shadow ${
+                                                                                                                className={`card shadow-sm ${
                                                                                                                     options.correct
                                                                                                                         ? "success-bg"
-                                                                                                                        : ""
+                                                                                                                        : "bg-light"
                                                                                                                 }`}
                                                                                                             >
                                                                                                                 <div className="card-body small py-2">
@@ -2794,7 +2631,7 @@ class Type2 extends Component {
                                                                                                         }
                                                                                                     >
                                                                                                         <div className="form-group">
-                                                                                                            <div className="card form-shadow">
+                                                                                                            <div className="card shadow-sm bg-light">
                                                                                                                 <div className="card-body small py-2">
                                                                                                                     {fill_in !==
                                                                                                                     "" ? (
@@ -2820,7 +2657,7 @@ class Type2 extends Component {
                                                                             {/* ----- Answer type tag ----- */}
                                                                             {sub_question.mcq ? (
                                                                                 <div
-                                                                                    className="secondary-bg primary-text font-weight-bold px-2 py-1  position-absolute rounded-lg shadow-sm"
+                                                                                    className="secondary-bg primary-text font-weight-bold px-2 py-1 position-absolute rounded-lg shadow-sm"
                                                                                     style={{
                                                                                         bottom:
                                                                                             "5px",
@@ -2834,7 +2671,7 @@ class Type2 extends Component {
                                                                                 </div>
                                                                             ) : sub_question.fill_in ? (
                                                                                 <div
-                                                                                    className="secondary-bg primary-text font-weight-bold px-2 py-1  position-absolute rounded-lg shadow-sm"
+                                                                                    className="secondary-bg primary-text font-weight-bold px-2 py-1 position-absolute rounded-lg shadow-sm"
                                                                                     style={{
                                                                                         bottom:
                                                                                             "5px",
@@ -2954,23 +2791,6 @@ class Type2 extends Component {
                                                             <div className="col-md-6">
                                                                 <p className="mb-0">
                                                                     Image
-                                                                    <OverlayTrigger
-                                                                        key="right"
-                                                                        placement="right"
-                                                                        overlay={
-                                                                            <Tooltip id="tooltip">
-                                                                                You
-                                                                                can
-                                                                                upload
-                                                                                Max
-                                                                                of
-                                                                                04
-                                                                                Images
-                                                                            </Tooltip>
-                                                                        }
-                                                                    >
-                                                                        <i className="fas fa-info-circle fa-xs ml-2"></i>
-                                                                    </OverlayTrigger>
                                                                 </p>
                                                             </div>
                                                             <div className="col-md-6 text-right">
@@ -3062,6 +2882,14 @@ class Type2 extends Component {
                                                                                     event
                                                                                 )
                                                                             }
+                                                                            disabled={
+                                                                                options.file_name !==
+                                                                                    "" ||
+                                                                                options.path !==
+                                                                                    ""
+                                                                                    ? true
+                                                                                    : false
+                                                                            }
                                                                         />
                                                                         <label
                                                                             className="custom-file-label"
@@ -3142,6 +2970,34 @@ class Type2 extends Component {
                                                                         event
                                                                     )
                                                                 }
+                                                                disabled={
+                                                                    data[
+                                                                        this
+                                                                            .state
+                                                                            .activeQuestion
+                                                                    ].content
+                                                                        .video
+                                                                        .file_name !==
+                                                                        "" ||
+                                                                    data[
+                                                                        this
+                                                                            .state
+                                                                            .activeQuestion
+                                                                    ].content
+                                                                        .video
+                                                                        .path !==
+                                                                        "" ||
+                                                                    data[
+                                                                        this
+                                                                            .state
+                                                                            .activeQuestion
+                                                                    ].content
+                                                                        .video
+                                                                        .url !==
+                                                                        ""
+                                                                        ? true
+                                                                        : false
+                                                                }
                                                             />
                                                             <label
                                                                 className="custom-file-label"
@@ -3195,6 +3051,21 @@ class Type2 extends Component {
                                                                         .activeQuestion
                                                                 ].content.video
                                                                     .url
+                                                            }
+                                                            disabled={
+                                                                data[
+                                                                    this.state
+                                                                        .activeQuestion
+                                                                ].content.video
+                                                                    .file_name !==
+                                                                    "" ||
+                                                                data[
+                                                                    this.state
+                                                                        .activeQuestion
+                                                                ].content.video
+                                                                    .path !== ""
+                                                                    ? true
+                                                                    : false
                                                             }
                                                         />
                                                         <small className="form-text text-muted mb-2">
@@ -3317,6 +3188,14 @@ class Type2 extends Component {
                                                                                     audio_index,
                                                                                     event
                                                                                 )
+                                                                            }
+                                                                            disabled={
+                                                                                options.file_name !==
+                                                                                    "" ||
+                                                                                options.path !==
+                                                                                    ""
+                                                                                    ? true
+                                                                                    : false
                                                                             }
                                                                         />
                                                                         <label

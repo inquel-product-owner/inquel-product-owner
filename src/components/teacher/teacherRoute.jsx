@@ -12,21 +12,23 @@ import GroupStudents from "./groupStudents";
 
 import Subject from "./subject";
 import Chapters from "./chapters";
-import Summary from "./summary";
-import SummaryUpload from "./summaryUpload";
-import Notes from "./notes";
-import NotesUpload from "./notesUpload";
-import Type1 from "./type1";
-import Type2 from "./type2";
-import Concepts from "./concepts";
+import Summary from "./content/summary";
+import SummaryUpload from "./content/summaryUpload";
+import Notes from "./content/notes";
+import NotesUpload from "./content/notesUpload";
 
-import CycleTestAuto from "./cycleTest-auto";
-import CyleTestDirect from "./cycleTest-direct";
-import CycleTestAutoQA from "./cycleTest-autoQA";
+import Type1 from "./content/type1";
+import Type2 from "./content/type2";
+import Concepts from "./content/concepts";
+import Match from "./content/match";
 
-import SemesterAuto from "./semester-auto";
-import SemesterAutoQA from "./semester-autoQA";
-import SemesterDirect from "./semester-direct";
+import CycleTestAuto from "./cycle/auto";
+import CyleTestDirect from "./cycle/direct";
+import CycleTestAutoQA from "./cycle/sectionPreview";
+
+import SemesterAuto from "./semester/auto";
+import SemesterAutoQA from "./semester/sectionPreview";
+import SemesterDirect from "./semester/direct";
 import EvaluateStudents from "./evaluateStudents";
 
 import EmailVerify from "./emailVerification";
@@ -181,7 +183,7 @@ const teacherRoutes = (
             }
         />
 
-        {/* --------------- Type1, Type2 and Concepts --------------- */}
+        {/* --------------- Type1, Type2, Match and Concepts --------------- */}
 
         <Route
             exact
@@ -216,6 +218,18 @@ const teacherRoutes = (
                     <Redirect to="/teacher/login" />
                 ) : (
                     <Concepts {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/teacher/subject/:subjectId/chapter/:chapterId/:topicNum/match"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <Match {...props} />
                 )
             }
         />
