@@ -1,30 +1,29 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import axios from "axios";
-import Header from "./shared/navbar";
-import SideNav from "./shared/sidenav";
+import Header from "../shared/navbar";
+import SideNav from "../shared/sidenav";
 import Switch from "react-switch";
 import { Spinner } from "react-bootstrap";
-import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
+import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
 import { Document, Page, pdfjs } from "react-pdf";
-import Loading from "../sharedComponents/loader";
-import AlertBox from "../sharedComponents/alert";
-import { ContentDeleteModal } from "../sharedComponents/contentManagementModal";
+import Loading from "../../sharedComponents/loader";
+import AlertBox from "../../sharedComponents/alert";
+import { ContentDeleteModal } from "../../sharedComponents/contentManagementModal";
 
 const mapStateToProps = (state) => ({
     subject_name: state.subject_name,
     chapter_name: state.chapter_name,
-    topic_name: state.topic_name,
 });
 
-class NotesUpload extends Component {
+class SummaryUpload extends Component {
     constructor(props) {
         super(props);
         this.state = {
             showSideNav: false,
             showModal: false,
-            notes_id: "",
-            notes_name: "",
+            summary_id: "",
+            summary_name: "",
 
             pdf: {
                 file_name: null,
@@ -45,7 +44,6 @@ class NotesUpload extends Component {
         };
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
-        this.topicNum = this.props.match.params.topicNum;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
@@ -98,16 +96,16 @@ class NotesUpload extends Component {
         }
     };
 
-    loadNotesData = () => {
+    loadSummaryData = () => {
         this.setState({
-            notes_id: "",
+            summary_id: "",
             limited: false,
             path: null,
-            notes_name: "",
+            summary_name: "",
         });
 
         fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/notes/?chapter_id=${this.chapterId}&topic_num=${this.topicNum}`,
+            `${this.url}/teacher/subject/${this.subjectId}/summary/?chapter_id=${this.chapterId}`,
             {
                 method: "GET",
                 headers: this.headers,
@@ -118,10 +116,10 @@ class NotesUpload extends Component {
                 console.log(result);
                 if (result.sts === true && result.data.length !== 0) {
                     this.setState({
-                        notes_id: result.data[0].notes_id,
-                        notes_name: result.data[0].notes_name,
+                        summary_id: result.data[0].summary_id,
+                        summary_name: result.data[0].summary_name,
                         limited:
-                            result.data[0].notes_name === undefined
+                            result.data[0].summary_name === undefined
                                 ? result.data[0].limited
                                 : false,
                         path:
@@ -148,9 +146,9 @@ class NotesUpload extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.props.chapter_name} Notes - Teacher | IQLabs`;
+        document.title = `${this.props.chapter_name} Summary - Teacher | IQLabs`;
 
-        this.loadNotesData();
+        this.loadSummaryData();
     };
 
     handleSubmit = (event) => {
@@ -167,8 +165,7 @@ class NotesUpload extends Component {
         let form_data = new FormData();
 
         form_data.append("chapter_id", this.chapterId);
-        form_data.append("topic_num", this.topicNum);
-        form_data.append("notes_file_1", files.file);
+        form_data.append("summary_file_1", files.file);
         form_data.append("limited", this.state.limited);
 
         const options = {
@@ -202,7 +199,7 @@ class NotesUpload extends Component {
         } else {
             axios
                 .post(
-                    `${this.url}/teacher/subject/${this.subjectId}/notes/files/pdf/`,
+                    `${this.url}/teacher/subject/${this.subjectId}/summary/files/pdf/`,
                     form_data,
                     options
                 )
@@ -218,9 +215,9 @@ class NotesUpload extends Component {
                             path: result.data.url,
                             pdf: files,
                             btnDisabled: true,
-                            notes_id: result.data.notes_id,
+                            summary_id: result.data.summary_id,
                         });
-                        this.loadNotesData();
+                        this.loadSummaryData();
                     } else if (result.data.sts === false) {
                         this.setState({
                             errorMsg: result.data.detail
@@ -248,7 +245,7 @@ class NotesUpload extends Component {
             this.setState({
                 showModal: false,
             });
-            this.loadNotesData();
+            this.loadSummaryData();
         }, 1000);
     };
 
@@ -300,14 +297,10 @@ class NotesUpload extends Component {
                         show={this.state.showModal}
                         onHide={this.toggleModal}
                         formSubmission={this.formSubmission}
-                        url={`${this.url}/teacher/subject/${this.subjectId}/notes/`}
-                        type="notes"
+                        url={`${this.url}/teacher/subject/${this.subjectId}/summary/`}
+                        type="summary"
                         name=""
-                        data={{
-                            chapter_id: this.chapterId,
-                            topic_num: this.topicNum,
-                            notes_id: this.state.notes_id,
-                        }}
+                        data={{ summary_id: this.state.summary_id }}
                         toggleModal={this.toggleModal}
                     />
                 ) : null}
@@ -332,15 +325,15 @@ class NotesUpload extends Component {
                                     <div className="col-md-6">
                                         <p className="small mb-0">
                                             <span className="font-weight-bold">
-                                                Notes:
+                                                Summary:
                                             </span>{" "}
-                                            {this.props.chapter_name} |{" "}
-                                            {this.props.topic_name}
+                                            {this.props.chapter_name}
                                         </p>
                                     </div>
                                     <div className="col-md-6 d-flex align-items-center justify-content-end">
-                                        {this.state.notes_id !== "" &&
-                                        this.state.notes_name === undefined ? (
+                                        {this.state.summary_id !== "" &&
+                                        this.state.summary_name ===
+                                            undefined ? (
                                             <button
                                                 className="btn btn-primary btn-sm shadow-none mr-2"
                                                 onClick={this.toggleModal}
@@ -507,4 +500,4 @@ class NotesUpload extends Component {
     }
 }
 
-export default connect(mapStateToProps)(NotesUpload);
+export default connect(mapStateToProps)(SummaryUpload);

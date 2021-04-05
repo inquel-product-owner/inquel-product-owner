@@ -1,20 +1,21 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import axios from "axios";
-import Header from "./shared/navbar";
-import SideNav from "./shared/sidenav";
+import Header from "../shared/navbar";
+import SideNav from "../shared/sidenav";
 import Switch from "react-switch";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { Modal, Alert, Spinner } from "react-bootstrap";
-import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
-import CKeditor from "../sharedComponents/CKeditor";
-import Loading from "../sharedComponents/loader";
-import AlertBox from "../sharedComponents/alert";
-import { ContentDeleteModal } from "../sharedComponents/contentManagementModal";
+import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
+import CKeditor from "../../sharedComponents/CKeditor";
+import Loading from "../../sharedComponents/loader";
+import AlertBox from "../../sharedComponents/alert";
+import { ContentDeleteModal } from "../../sharedComponents/contentManagementModal";
 
 const mapStateToProps = (state) => ({
     subject_name: state.subject_name,
     chapter_name: state.chapter_name,
+    topic_name: state.topic_name,
 });
 
 class ImageUploadModal extends Component {
@@ -31,6 +32,7 @@ class ImageUploadModal extends Component {
         };
         this.subjectId = this.props.subjectId;
         this.chapterId = this.props.chapterId;
+        this.topicNum = this.props.topicNum;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
     }
@@ -44,7 +46,8 @@ class ImageUploadModal extends Component {
 
         let form_data = new FormData();
         form_data.append("chapter_id", this.chapterId);
-        form_data.append("summary_image_1", event.target.files[0]);
+        form_data.append("topic_num", this.topicNum);
+        form_data.append("notes_image_1", event.target.files[0]);
 
         const options = {
             headers: {
@@ -72,7 +75,7 @@ class ImageUploadModal extends Component {
         } else {
             axios
                 .post(
-                    `${this.url}/teacher/subject/${this.subjectId}/summary/files/`,
+                    `${this.url}/teacher/subject/${this.subjectId}/notes/files/`,
                     form_data,
                     options
                 )
@@ -230,7 +233,7 @@ class ImageUploadModal extends Component {
     }
 }
 
-class Summary extends Component {
+class Notes extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -242,9 +245,9 @@ class Summary extends Component {
             limited: false,
             title: "",
             content: "",
-            summary_id: "",
+            notes_id: "",
+            notes_name: "",
             image: [],
-            summary_name: "",
             url: "",
 
             errorMsg: "",
@@ -255,6 +258,8 @@ class Summary extends Component {
         };
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
+        this.chapterId = this.props.match.params.chapterId;
+        this.topicNum = this.props.match.params.topicNum;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
@@ -270,15 +275,15 @@ class Summary extends Component {
         });
     };
 
-    toggleImageModal = () => {
-        this.setState({
-            showModal: !this.state.showModal,
-        });
-    };
-
     toggleDeleteModal = () => {
         this.setState({
             showDeleteModal: !this.state.showDeleteModal,
+        });
+    };
+
+    toggleImageModal = () => {
+        this.setState({
+            showModal: !this.state.showModal,
         });
     };
 
@@ -288,17 +293,17 @@ class Summary extends Component {
         });
     };
 
-    loadSummaryData = () => {
+    loadNotesData = () => {
         this.setState({
             title: "",
             content: "",
             limited: false,
-            summary_id: "",
-            summary_name: "",
+            notes_id: "",
+            notes_name: "",
         });
 
         fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/summary/?chapter_id=${this.chapterId}`,
+            `${this.url}/teacher/subject/${this.subjectId}/notes/?chapter_id=${this.chapterId}&topic_num=${this.topicNum}`,
             {
                 method: "GET",
                 headers: this.headers,
@@ -310,20 +315,21 @@ class Summary extends Component {
                 if (result.sts === true && result.data.length !== 0) {
                     this.setState({
                         title:
-                            result.data[0].summary_name !== undefined
-                                ? result.data[0].summary_name
+                            result.data[0].notes_name !== undefined
+                                ? result.data[0].notes_name
                                 : "",
                         content:
-                            result.data[0].summary_content !== undefined
-                                ? result.data[0].summary_content
+                            result.data[0].notes_content !== undefined
+                                ? result.data[0].notes_content
                                 : "",
                         limited:
-                            result.data[0].summary_name !== undefined
+                            result.data[0].notes_name !== undefined
                                 ? result.data[0].limited
                                 : false,
-                        summary_id: result.data[0].summary_id,
-                        summary_name: result.data[0].summary_name,
+                        notes_id: result.data[0].notes_id,
+                        notes_name: result.data[0].notes_name,
                         url: result.data[0].direct_question_urls,
+                        page_loading: false,
                     });
                 } else if (result.sts === false) {
                     this.setState({
@@ -344,9 +350,9 @@ class Summary extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.props.chapter_name} Summary - Teacher | IQLabs`;
+        document.title = `${this.props.chapter_name} Notes - Teacher | IQLabs`;
 
-        this.loadSummaryData();
+        this.loadNotesData();
     };
 
     onEditorChange = (evt) => {
@@ -367,27 +373,28 @@ class Summary extends Component {
             showErrorAlert: false,
             showSuccessAlert: false,
         });
+
         if (this.state.title === "") {
             this.setState({
-                errorMsg: "Please add summary title",
+                errorMsg: "Please add notes title",
                 showErrorAlert: true,
                 showLoader: false,
             });
         } else if (this.state.content === "") {
             this.setState({
-                errorMsg: "Please add summary data",
+                errorMsg: "Please add notes data",
                 showErrorAlert: true,
                 showLoader: false,
             });
         } else {
             if (this.state.url.length !== 0) {
                 this.setState({
-                    errorMsg: "Summary already exists!",
+                    errorMsg: "Notes already exists!",
                     showErrorAlert: true,
                     showLoader: false,
                 });
             } else {
-                if (this.state.summary_id === "") {
+                if (this.state.notes_id === "") {
                     this.handlePOST();
                 } else {
                     this.handlePATCH();
@@ -397,14 +404,15 @@ class Summary extends Component {
     };
 
     handlePOST = () => {
-        fetch(`${this.url}/teacher/subject/${this.subjectId}/summary/`, {
+        fetch(`${this.url}/teacher/subject/${this.subjectId}/notes/`, {
             headers: this.headers,
             method: "POST",
             body: JSON.stringify({
                 limited: this.state.limited,
-                summary_name: this.state.title,
-                summary_content: this.state.content,
+                notes_name: this.state.title,
+                notes_content: this.state.content,
                 chapter_id: this.chapterId,
+                topic_num: this.topicNum,
             }),
         })
             .then((res) => res.json())
@@ -419,7 +427,7 @@ class Summary extends Component {
                         },
                         () => {
                             setTimeout(() => {
-                                this.loadSummaryData();
+                                this.loadNotesData();
                             }, 1000);
                         }
                     );
@@ -432,20 +440,24 @@ class Summary extends Component {
                 }
             })
             .catch((err) => {
+                this.setState({
+                    showLoader: false,
+                });
                 console.log(err);
             });
     };
 
     handlePATCH = () => {
-        fetch(`${this.url}/teacher/subject/${this.subjectId}/summary/`, {
+        fetch(`${this.url}/teacher/subject/${this.subjectId}/notes/`, {
             headers: this.headers,
             method: "PATCH",
             body: JSON.stringify({
                 limited: this.state.limited,
-                summary_name: this.state.title,
-                summary_content: this.state.content,
-                summary_id: this.state.summary_id,
+                notes_name: this.state.title,
+                notes_content: this.state.content,
                 chapter_id: this.chapterId,
+                topic_num: this.topicNum,
+                notes_id: this.state.notes_id,
             }),
         })
             .then((res) => res.json())
@@ -460,7 +472,7 @@ class Summary extends Component {
                         },
                         () => {
                             setTimeout(() => {
-                                this.loadSummaryData();
+                                this.loadNotesData();
                             }, 1000);
                         }
                     );
@@ -473,6 +485,9 @@ class Summary extends Component {
                 }
             })
             .catch((err) => {
+                this.setState({
+                    showLoader: false,
+                });
                 console.log(err);
             });
     };
@@ -482,7 +497,7 @@ class Summary extends Component {
             this.setState({
                 showDeleteModal: false,
             });
-            this.loadSummaryData()
+            this.loadNotesData();
         }, 1000);
     };
 
@@ -527,6 +542,7 @@ class Summary extends Component {
                         image={this.state.image}
                         subjectId={this.subjectId}
                         chapterId={this.chapterId}
+                        topicNum={this.topicNum}
                     />
                 ) : (
                     ""
@@ -538,10 +554,14 @@ class Summary extends Component {
                         show={this.state.showDeleteModal}
                         onHide={this.toggleDeleteModal}
                         formSubmission={this.formSubmission}
-                        url={`${this.url}/teacher/subject/${this.subjectId}/summary/`}
-                        type="summary"
+                        url={`${this.url}/teacher/subject/${this.subjectId}/notes/`}
+                        type="notes"
                         name=""
-                        data={{ summary_id: this.state.summary_id }}
+                        data={{
+                            chapter_id: this.chapterId,
+                            topic_num: this.topicNum,
+                            notes_id: this.state.notes_id,
+                        }}
                         toggleModal={this.toggleDeleteModal}
                     />
                 ) : null}
@@ -566,15 +586,15 @@ class Summary extends Component {
                                     <div className="col-md-6">
                                         <p className="small mb-0">
                                             <span className="font-weight-bold">
-                                                Summary:
+                                                Notes:
                                             </span>{" "}
-                                            {this.props.chapter_name}
+                                            {this.props.chapter_name} |{" "}
+                                            {this.props.topic_name}
                                         </p>
                                     </div>
                                     <div className="col-md-6 d-flex align-items-center justify-content-end">
-                                        {this.state.summary_id !== "" &&
-                                        this.state.summary_name !==
-                                            undefined ? (
+                                        {this.state.notes_id !== "" &&
+                                        this.state.notes_name !== undefined ? (
                                             <button
                                                 className="btn btn-primary btn-sm shadow-none mr-2"
                                                 onClick={this.toggleDeleteModal}
@@ -639,7 +659,7 @@ class Summary extends Component {
                                     id="title"
                                     value={this.state.title}
                                     className="form-control border-secondary"
-                                    placeholder="Add summary title"
+                                    placeholder="Notes title"
                                     onChange={this.handleTitle}
                                     autoComplete="off"
                                     required
@@ -663,4 +683,4 @@ class Summary extends Component {
     }
 }
 
-export default connect(mapStateToProps)(Summary);
+export default connect(mapStateToProps)(Notes);

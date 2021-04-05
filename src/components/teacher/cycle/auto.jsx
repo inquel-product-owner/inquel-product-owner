@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import Header from "./shared/navbar";
-import SideNav from "./shared/sidenav";
+import Header from "../shared/navbar";
+import SideNav from "../shared/sidenav";
 import Select from "react-select";
 import { Modal, Alert, Spinner, Dropdown } from "react-bootstrap";
-import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
-import Loading from "../sharedComponents/loader";
-import AlertBox from "../sharedComponents/alert";
+import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
+import Loading from "../../sharedComponents/loader";
+import AlertBox from "../../sharedComponents/alert";
 
 const mapStateToProps = (state) => ({
     subject_name: state.subject_name,
@@ -539,14 +539,14 @@ class CycleTestAuto extends Component {
                                     }
                                 ).then((res) => res.json()),
                                 fetch(
-                                    `${this.filterURL}?chapter_id=${this.chapterId}&question_type=${result.data.auto_test[i].question_type}&category=${result.data.auto_test[i].category}`,
+                                    `${this.filterURL}?chapter_id=${this.chapterId}&question_type=${result.data.auto_test[i].question_type}&category=${result.data.auto_test[i].category.replace('&','%26')}`,
                                     {
                                         method: "GET",
                                         headers: this.headers,
                                     }
                                 ).then((res) => res.json()),
                                 fetch(
-                                    `${this.filterURL}?chapter_id=${this.chapterId}&question_type=${result.data.auto_test[i].question_type}&category=${result.data.auto_test[i].category}&marks=${result.data.auto_test[i].mark}`,
+                                    `${this.filterURL}?chapter_id=${this.chapterId}&question_type=${result.data.auto_test[i].question_type}&category=${result.data.auto_test[i].category.replace('&','%26')}&marks=${result.data.auto_test[i].mark}`,
                                     {
                                         method: "GET",
                                         headers: this.headers,
@@ -629,10 +629,14 @@ class CycleTestAuto extends Component {
 
     // loads category data on selecting question type
     handleType = (index, event) => {
-        const section = [...this.state.sections];
-        const filterData = [...this.state.filterData];
+        let section = [...this.state.sections];
+        let filterData = [...this.state.filterData];
         section[index].question_type = event.target.value;
-        filterData[index].category = [];
+        if (filterData[index] === undefined) {
+            filterData.push({ category: [], marks: [] });
+        } else {
+            filterData[index].category = [];
+        }
         section[index].category = "";
         section[index].marks = "";
         section[index].total_questions = "";
@@ -701,7 +705,7 @@ class CycleTestAuto extends Component {
 
         if (event.target.value !== "") {
             fetch(
-                `${this.filterURL}?chapter_id=${this.chapterId}&question_type=${section[index].question_type}&category=${event.target.value}`,
+                `${this.filterURL}?chapter_id=${this.chapterId}&question_type=${section[index].question_type}&category=${event.target.value.replace('&','%26')}`,
                 {
                     method: "GET",
                     headers: this.headers,
@@ -735,10 +739,10 @@ class CycleTestAuto extends Component {
         const section = [...this.state.sections];
 
         if (event.target.value !== "") {
-            section[index].marks = Number(event.target.value);
+            section[index].marks = parseFloat(event.target.value);
 
             fetch(
-                `${this.filterURL}?chapter_id=${this.chapterId}&question_type=${section[index].question_type}&category=${section[index].category}&marks=${event.target.value}`,
+                `${this.filterURL}?chapter_id=${this.chapterId}&question_type=${section[index].question_type}&category=${section[index].category.replace('&','%26')}&marks=${event.target.value}`,
                 {
                     method: "GET",
                     headers: this.headers,
@@ -984,8 +988,8 @@ class CycleTestAuto extends Component {
     };
 
     addSection = () => {
-        const filterData = [...this.state.filterData];
-        const sections = [...this.state.sections];
+        let filterData = [...this.state.filterData];
+        let sections = [...this.state.sections];
         sections.push({
             section_id: "",
             section_description: "",

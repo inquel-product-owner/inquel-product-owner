@@ -1,16 +1,16 @@
 import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 import axios from "axios";
-import Header from "./shared/navbar";
-import SideNav from "./shared/sidenav";
-import CKeditor from "../sharedComponents/CKeditor";
-import ReactSwitch from "../sharedComponents/switchComponent";
+import Header from "../shared/navbar";
+import SideNav from "../shared/sidenav";
+import CKeditor from "../../sharedComponents/CKeditor";
+import ReactSwitch from "../../sharedComponents/switchComponent";
 import { Accordion, Card, OverlayTrigger, Tooltip } from "react-bootstrap";
-import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
-import Loading from "../sharedComponents/loader";
-import AlertBox from "../sharedComponents/alert";
-import FileModal from "./shared/fileExplorer";
-import { ContentDeleteModal } from "../sharedComponents/contentManagementModal";
+import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
+import Loading from "../../sharedComponents/loader";
+import AlertBox from "../../sharedComponents/alert";
+import FileModal from "../shared/fileExplorer";
+import { ContentDeleteModal } from "../../sharedComponents/contentManagementModal";
 
 const mapStateToProps = (state) => ({
     subject_name: state.subject_name,
@@ -1221,7 +1221,9 @@ class Type1 extends Component {
 
         if (
             values[this.state.activeQuestion].question_random_id !== "" &&
-            values[this.state.activeQuestion].is_image_uploaded === true
+            values[this.state.activeQuestion].is_image_uploaded === true &&
+            values[this.state.activeQuestion].content.images[index].file_name === '' &&
+            values[this.state.activeQuestion].content.images[index].path !== ''
         ) {
             let body = {
                 chapter_id: this.chapterId,
@@ -1415,7 +1417,9 @@ class Type1 extends Component {
 
         if (
             values[this.state.activeQuestion].question_random_id !== "" &&
-            values[this.state.activeQuestion].is_image_uploaded === true
+            values[this.state.activeQuestion].is_image_uploaded === true &&
+            values[this.state.activeQuestion].content.video.file_name === '' &&
+            values[this.state.activeQuestion].content.video.path !== ''
         ) {
             fetch(
                 `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/files/`,
@@ -1515,7 +1519,9 @@ class Type1 extends Component {
 
         if (
             values[this.state.activeQuestion].question_random_id !== "" &&
-            values[this.state.activeQuestion].is_image_uploaded === true
+            values[this.state.activeQuestion].is_image_uploaded === true &&
+            values[this.state.activeQuestion].content.audio[index].file_name === '' &&
+            values[this.state.activeQuestion].content.audio[index].path !== ''
         ) {
             let body = {
                 chapter_id: this.chapterId,
@@ -2512,10 +2518,10 @@ class Type1 extends Component {
                                                                                         >
                                                                                             <div className="form-group">
                                                                                                 <div
-                                                                                                    className={`card form-shadow ${
+                                                                                                    className={`card shadow-sm ${
                                                                                                         options.correct
                                                                                                             ? "success-bg"
-                                                                                                            : ""
+                                                                                                            : "bg-light"
                                                                                                     }`}
                                                                                                 >
                                                                                                     <div className="card-body small py-2">
@@ -2556,7 +2562,7 @@ class Type1 extends Component {
                                                                                             }
                                                                                         >
                                                                                             <div className="form-group">
-                                                                                                <div className="card form-shadow">
+                                                                                                <div className="card shadow-sm bg-light">
                                                                                                     <div className="card-body small py-2">
                                                                                                         {fill_in !==
                                                                                                         "" ? (
@@ -2596,10 +2602,10 @@ class Type1 extends Component {
                                                                                         >
                                                                                             <div className="form-group">
                                                                                                 <div
-                                                                                                    className={`card form-shadow ${
+                                                                                                    className={`card shadow-sm ${
                                                                                                         boolean.correct
                                                                                                             ? "success-bg"
-                                                                                                            : ""
+                                                                                                            : "bg-light"
                                                                                                     }`}
                                                                                                 >
                                                                                                     <div className="card-body small py-2">
@@ -2645,7 +2651,7 @@ class Type1 extends Component {
                                                         {question.content
                                                             .mcq ? (
                                                             <div
-                                                                className="secondary-bg primary-text font-weight-bold px-2 py-1  position-absolute rounded-lg shadow-sm"
+                                                                className="secondary-bg primary-text font-weight-bold px-2 py-1 position-absolute rounded-lg shadow-sm"
                                                                 style={{
                                                                     bottom:
                                                                         "5px",
@@ -2660,7 +2666,7 @@ class Type1 extends Component {
                                                         ) : question.content
                                                               .fill_in ? (
                                                             <div
-                                                                className="secondary-bg primary-text font-weight-bold px-2 py-1  position-absolute rounded-lg shadow-sm"
+                                                                className="secondary-bg primary-text font-weight-bold px-2 py-1 position-absolute rounded-lg shadow-sm"
                                                                 style={{
                                                                     bottom:
                                                                         "5px",
@@ -2674,7 +2680,7 @@ class Type1 extends Component {
                                                             </div>
                                                         ) : (
                                                             <div
-                                                                className="secondary-bg primary-text font-weight-bold px-2 py-1  position-absolute rounded-lg shadow-sm"
+                                                                className="secondary-bg primary-text font-weight-bold px-2 py-1 position-absolute rounded-lg shadow-sm"
                                                                 style={{
                                                                     bottom:
                                                                         "5px",
