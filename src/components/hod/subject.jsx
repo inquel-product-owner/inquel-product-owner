@@ -476,8 +476,8 @@ class Subject extends Component {
                 showModal: false,
                 showReassignModal: false,
             });
-            this.loadSubjectData();
         }, 1000);
+        this.loadSubjectData();
     };
 
     render() {

@@ -812,8 +812,8 @@ class ProfileList extends Component {
                 showTeacher_DisableModal: false,
                 showTeacher_EnableModal: false,
             });
-            this.loadTeacherData();
         }, 1000);
+        this.loadTeacherData();
     };
 
     studentFormSubmission = () => {
@@ -824,8 +824,8 @@ class ProfileList extends Component {
                 showStudent_DisableModal: false,
                 showStudent_EnableModal: false,
             });
-            this.loadStudentData();
         }, 1000);
+        this.loadStudentData();
     };
 
     // Gets teacher ID from the teacher table

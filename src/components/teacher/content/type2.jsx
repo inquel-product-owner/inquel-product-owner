@@ -494,6 +494,7 @@ class Type2 extends Component {
             JSON.stringify({
                 main_question: {
                     question: data[this.state.activeQuestion].question,
+                    explanation: data[this.state.activeQuestion].explanation,
                     properties: {
                         complexity:
                             data[this.state.activeQuestion].properties
@@ -587,7 +588,21 @@ class Type2 extends Component {
             }
         }
 
-        if (data[this.state.activeQuestion].properties.complexity === "") {
+        if (data[this.state.activeQuestion].question === "") {
+            this.setState({
+                errorMsg: "Main question is required",
+                showErrorAlert: true,
+                page_loading: false,
+            });
+        } else if (data[this.state.activeQuestion].explanation === "") {
+            this.setState({
+                errorMsg: "Explanation is required",
+                showErrorAlert: true,
+                page_loading: false,
+            });
+        } else if (
+            data[this.state.activeQuestion].properties.complexity === ""
+        ) {
             this.setState({
                 errorMsg: "Complexity is required",
                 showErrorAlert: true,
@@ -1804,7 +1819,7 @@ class Type2 extends Component {
                 fillin[j] = values[index].sub_question[i].fillin_answer[j];
             }
             sub_question[i] = {
-                sub_question_id: values[index].sub_question[i].sub_question_id,
+                sub_question_id: "",
                 question: values[index].sub_question[i].question,
                 mcq: values[index].mcq,
                 fill_in: values[index].fill_in,

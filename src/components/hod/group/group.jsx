@@ -330,8 +330,8 @@ class Group extends Component {
                 showSubject_DisableModal: false,
                 showSubject_EnableModal: false,
             });
-            this.loadSubjectData();
         }, 1000);
+        this.loadSubjectData();
     };
 
     handleSubjectPageChange(pageNumber) {

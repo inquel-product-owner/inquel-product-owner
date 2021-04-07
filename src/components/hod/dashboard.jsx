@@ -124,6 +124,7 @@ class SubjectModal extends Component {
                             id="subject"
                             className="form-control borders"
                             onChange={this.handleSubject}
+                            placeholder="Enter subject name"
                             required
                         />
                     </Modal.Body>
@@ -291,8 +292,8 @@ class Dashboard extends Component {
             this.setState({
                 showGroup_DeleteModal: false,
             });
-            this.loadGroupData();
         }, 1000);
+        this.loadGroupData();
     };
 
     subjectFormSubmission = () => {
@@ -303,8 +304,8 @@ class Dashboard extends Component {
                 showSubject_DisableModal: false,
                 showSubject_EnableModal: false,
             });
-            this.loadSubjectData();
         }, 1000);
+        this.loadSubjectData();
     };
 
     // Gets group ID from the group table
