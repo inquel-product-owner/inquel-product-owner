@@ -690,8 +690,8 @@ class Subject extends Component {
                 showChapter_EditModal: false,
                 showChapter_DeleteModal: false,
             });
-            this.loadChapterData();
         }, 1000);
+        this.loadChapterData();
     };
 
     semesterFormSubmission = () => {
@@ -701,8 +701,8 @@ class Subject extends Component {
                 showSemester_EditModal: false,
                 showSemester_DeleteModal: false,
             });
-            this.loadSemesterData();
         }, 1000);
+        this.loadSemesterData();
     };
 
     dispatchChapter = (data) => {

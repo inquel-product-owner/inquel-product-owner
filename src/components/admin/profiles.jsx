@@ -994,7 +994,6 @@ class Profiles extends Component {
 
     formSubmission = () => {
         setTimeout(() => {
-            this.loadHodData();
             this.setState({
                 showModal: false,
                 showHOD_DeleteModal: false,
@@ -1002,17 +1001,18 @@ class Profiles extends Component {
                 showHOD_EnableModal: false,
             });
         }, 1000);
+        this.loadHodData();
     };
 
     studentFormSubmission = () => {
         setTimeout(() => {
-            this.loadStudentData();
             this.setState({
                 showStudent_DeleteModal: false,
                 showStudent_DisableModal: false,
                 showStudent_EnableModal: false,
             });
         }, 1000);
+        this.loadStudentData();
     };
 
     handleHODPageChange(pageNumber) {

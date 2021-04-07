@@ -210,7 +210,7 @@ class StudentAssignModal extends Component {
                 </Modal.Body>
                 <Modal.Footer>
                     <button
-                        className="btn btn-primary btn-sm"
+                        className="btn btn-primary btn-sm shadow-none"
                         onClick={this.handleSubmit}
                     >
                         {this.state.showLoader ? (
@@ -362,8 +362,8 @@ class GroupStudents extends Component {
                 showStudentModal: false,
                 showStudent_RemoveModal: false,
             });
-            this.loadStudentData();
         }, 1000);
+        this.loadStudentData();
     };
 
     handleStudentPageChange(pageNumber) {

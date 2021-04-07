@@ -11,7 +11,6 @@ class GroupSubject extends Component {
         super(props);
         this.state = {
             showSideNav: false,
-            showModal: false,
             groupItem: [],
             subjectItems: [],
             chapterData: [],
@@ -91,15 +90,6 @@ class GroupSubject extends Component {
             });
 
         this.loadSubjectData();
-    };
-
-    formSubmission = () => {
-        setTimeout(() => {
-            this.setState({
-                showModal: false,
-            });
-            this.loadSubjectData();
-        }, 1000);
     };
 
     render() {

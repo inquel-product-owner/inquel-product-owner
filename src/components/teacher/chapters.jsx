@@ -371,14 +371,17 @@ class QuizModal extends Component {
             showSuccessAlert: false,
         });
 
-        fetch(`${this.url}/teacher/subject/${this.props.subjectId}/quiz/`, {
-            headers: this.headers,
-            method: "POST",
-            body: JSON.stringify({
-                chapter_id: this.props.chapter_id,
-                quiz_name: this.state.quiz_name,
-            }),
-        })
+        fetch(
+            `${this.url}/teacher/subject/${this.props.subjectId}/chapter/${this.props.chapterId}/quiz/`,
+            {
+                headers: this.headers,
+                method: "POST",
+                body: JSON.stringify({
+                    chapter_id: this.props.chapter_id,
+                    quiz_name: this.state.quiz_name,
+                }),
+            }
+        )
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
@@ -685,10 +688,13 @@ class Chapters extends Component {
     };
 
     loadQuizData = () => {
-        fetch(`${this.url}/teacher/subject/${this.subjectId}/quiz/`, {
-            headers: this.headers,
-            method: "GET",
-        })
+        fetch(
+            `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.state.chapterId}/quiz/`,
+            {
+                headers: this.headers,
+                method: "GET",
+            }
+        )
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
@@ -774,10 +780,9 @@ class Chapters extends Component {
                 showTopicModal: false,
                 showTopic_EditModal: false,
                 showTopic_DeleteModal: false,
-                page_loading: true,
             });
-            this.loadTopicData();
         }, 1000);
+        this.loadTopicData();
     };
 
     cycleTest_formSubmission = () => {
@@ -786,10 +791,9 @@ class Chapters extends Component {
                 showCycle_TestModal: false,
                 showCycle_EditModal: false,
                 showCycle_DeleteModal: false,
-                page_loading: true,
             });
-            this.loadCycleTestData();
         }, 1000);
+        this.loadCycleTestData();
     };
 
     quiz_formSubmission = () => {
@@ -798,10 +802,9 @@ class Chapters extends Component {
                 showQuiz_CreateModal: false,
                 showQuiz_EditModal: false,
                 showQuiz_DeleteModal: false,
-                page_loading: true,
             });
-            this.loadQuizData();
         }, 1000);
+        this.loadQuizData();
     };
 
     handleSelect = (event) => {
@@ -1250,6 +1253,7 @@ class Chapters extends Component {
                         onHide={this.toggleQuiz_CreateModal}
                         formSubmission={this.quiz_formSubmission}
                         subjectId={this.subjectId}
+                        chapterId={this.state.chapterId}
                     />
                 ) : (
                     ""
@@ -1261,7 +1265,7 @@ class Chapters extends Component {
                         show={this.state.showQuiz_EditModal}
                         onHide={this.toggleQuiz_EditModal}
                         formSubmission={this.quiz_formSubmission}
-                        url={`${this.url}/teacher/subject/${this.subjectId}/quiz/`}
+                        url={`${this.url}/teacher/subject/${this.subjectId}/chapter/${this.state.chapterId}/quiz/`}
                         type="Quiz"
                         name={this.state.selectedQuizData.quiz_name}
                         data={{
@@ -1280,7 +1284,7 @@ class Chapters extends Component {
                         show={this.state.showQuiz_DeleteModal}
                         onHide={this.toggleQuiz_DeleteModal}
                         formSubmission={this.quiz_formSubmission}
-                        url={`${this.url}/teacher/subject/${this.subjectId}/quiz/`}
+                        url={`${this.url}/teacher/subject/${this.subjectId}/chapter/${this.state.chapterId}/quiz/`}
                         type="Quiz"
                         name={this.state.selectedQuizData.quiz_name}
                         data={{
@@ -1628,7 +1632,7 @@ class Chapters extends Component {
                                                     : null}
 
                                                 {/* Quiz list */}
-                                                {this.state.quiz.length !== 0
+                                                {/* {this.state.quiz.length !== 0
                                                     ? this.state.quiz.map(
                                                           (data, index) => {
                                                               return (
@@ -1700,7 +1704,7 @@ class Chapters extends Component {
                                                               );
                                                           }
                                                       )
-                                                    : null}
+                                                    : null} */}
                                             </Card>
                                         </Accordion.Collapse>
                                     </Card>

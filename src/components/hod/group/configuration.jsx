@@ -423,8 +423,8 @@ class GroupConfiguration extends Component {
             this.setState({
                 showModal: false,
             });
-            this.loadGroupData();
         }, 1000);
+        this.loadGroupData();
     };
 
     handleGroupPageChange(pageNumber) {
