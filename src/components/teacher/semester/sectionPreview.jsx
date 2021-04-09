@@ -807,9 +807,8 @@ class SemesterAutoQA extends Component {
                                                   <div className="card-body d-flex">
                                                       <div className="row w-100">
                                                           {/* ----- Main Question ----- */}
-                                                          <div className="col-md-5">
+                                                          <div className="col-md-6">
                                                               <div
-                                                                  className="font-weight-bold-600 primary-text"
                                                                   dangerouslySetInnerHTML={{
                                                                       __html:
                                                                           data.question,
@@ -817,7 +816,7 @@ class SemesterAutoQA extends Component {
                                                               ></div>
                                                           </div>
                                                           {/* ----- Sub Question ----- */}
-                                                          <div className="col-md-7">
+                                                          <div className="col-md-6">
                                                               <div className="d-flex align-items-start justify-content">
                                                                   <button className="btn secondary-bg btn-sm shadow-sm mr-1 mt-1 px-3 font-weight-bold-600 rounded-lg">
                                                                       {`${
@@ -834,7 +833,7 @@ class SemesterAutoQA extends Component {
 
                                                                   {/* ---------- Sub Question preview ---------- */}
                                                                   <div className="card w-100">
-                                                                      <div className="card font-weight-bold-600 secondary-bg py-2 px-3 mb-2">
+                                                                      <div className="card secondary-bg py-2 px-3 mb-2">
                                                                           <div
                                                                               dangerouslySetInnerHTML={{
                                                                                   __html:

@@ -428,7 +428,7 @@ class CycleTestAuto extends Component {
         this.chapterId = this.props.match.params.chapterId;
         this.cycle_testId = this.props.match.params.cycle_testId;
         this.url = baseUrl + teacherUrl;
-        this.filterURL = `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/filter/`;
+        this.filterURL = `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/filter/?chapter_id=${this.chapterId}`;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
             Accept: "application/json",
@@ -508,7 +508,6 @@ class CycleTestAuto extends Component {
                     ) {
                         const section = [];
                         let duration = "";
-                        const filterData = [];
                         for (let i = 0; i < result.data.auto_test.length; i++) {
                             section.push({
                                 section_id: result.data.auto_test[i].section_id,
@@ -522,58 +521,23 @@ class CycleTestAuto extends Component {
                                     result.data.auto_test[i].any_questions,
                                 no_questions:
                                     result.data.auto_test[i].total_questions,
+                                total_questions: "",
                                 marks: result.data.auto_test[i].mark,
                                 total_marks:
                                     result.data.auto_test[i].total_marks,
                             });
                             duration =
                                 result.duration !== null ? result.duration : "";
-
-                            // loads question category data
-                            Promise.all([
-                                fetch(
-                                    `${this.filterURL}?chapter_id=${this.chapterId}&question_type=${result.data.auto_test[i].question_type}`,
-                                    {
-                                        method: "GET",
-                                        headers: this.headers,
-                                    }
-                                ).then((res) => res.json()),
-                                fetch(
-                                    `${this.filterURL}?chapter_id=${this.chapterId}&question_type=${result.data.auto_test[i].question_type}&category=${result.data.auto_test[i].category.replace('&','%26')}`,
-                                    {
-                                        method: "GET",
-                                        headers: this.headers,
-                                    }
-                                ).then((res) => res.json()),
-                                fetch(
-                                    `${this.filterURL}?chapter_id=${this.chapterId}&question_type=${result.data.auto_test[i].question_type}&category=${result.data.auto_test[i].category.replace('&','%26')}&marks=${result.data.auto_test[i].mark}`,
-                                    {
-                                        method: "GET",
-                                        headers: this.headers,
-                                    }
-                                ).then((res) => res.json()),
-                            ])
-                                .then((result) => {
-                                    console.log(result);
-                                    filterData.push({
-                                        category: result[0].data.category,
-                                        marks: result[1].data.marks,
-                                    });
-                                    section[i].total_questions =
-                                        result[2].data.total_questions;
-                                    this.setState({
-                                        filterData: filterData,
-                                    });
-                                })
-                                .catch((err) => {
-                                    console.log(err);
-                                });
                         }
-                        this.setState({
-                            sections: section,
-                            duration: duration,
-                            page_loading: false,
-                        });
+                        this.setState(
+                            {
+                                sections: section,
+                                duration: duration,
+                            },
+                            () => {
+                                this.loadsFilterData();
+                            }
+                        );
                     } else {
                         this.setState({
                             page_loading: false,
@@ -590,6 +554,57 @@ class CycleTestAuto extends Component {
             .catch((err) => {
                 console.log(err);
             });
+    };
+
+    loadsFilterData = () => {
+        const data = [...this.state.sections];
+        let filterData = [];
+        for (let i = 0; i < data.length; i++) {
+            Promise.all([
+                fetch(
+                    `${this.filterURL}&question_type=${data[i].question_type}`,
+                    {
+                        method: "GET",
+                        headers: this.headers,
+                    }
+                ).then((res) => res.json()),
+                fetch(
+                    `${this.filterURL}&question_type=${
+                        data[i].question_type
+                    }&category=${data[i].category.replace("&", "%26")}`,
+                    {
+                        method: "GET",
+                        headers: this.headers,
+                    }
+                ).then((res) => res.json()),
+                fetch(
+                    `${this.filterURL}&question_type=${
+                        data[i].question_type
+                    }&category=${data[i].category.replace("&", "%26")}&marks=${
+                        data[i].marks
+                    }`,
+                    {
+                        method: "GET",
+                        headers: this.headers,
+                    }
+                ).then((res) => res.json()),
+            ])
+                .then((result) => {
+                    filterData[i] = {
+                        category: result[0].data.category,
+                        marks: result[1].data.marks,
+                    };
+                    data[i].total_questions = result[2].data.total_questions;
+                    this.setState({
+                        sections: data,
+                        filterData: filterData,
+                        page_loading: false,
+                    });
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        }
     };
 
     componentDidMount = () => {
@@ -650,13 +665,10 @@ class CycleTestAuto extends Component {
         });
 
         if (event.target.value !== "") {
-            fetch(
-                `${this.filterURL}?chapter_id=${this.chapterId}&question_type=${event.target.value}`,
-                {
-                    method: "GET",
-                    headers: this.headers,
-                }
-            )
+            fetch(`${this.filterURL}&question_type=${event.target.value}`, {
+                method: "GET",
+                headers: this.headers,
+            })
                 .then((res) => res.json())
                 .then((result) => {
                     console.log(result);
@@ -705,7 +717,9 @@ class CycleTestAuto extends Component {
 
         if (event.target.value !== "") {
             fetch(
-                `${this.filterURL}?chapter_id=${this.chapterId}&question_type=${section[index].question_type}&category=${event.target.value.replace('&','%26')}`,
+                `${this.filterURL}&question_type=${
+                    section[index].question_type
+                }&category=${event.target.value.replace("&", "%26")}`,
                 {
                     method: "GET",
                     headers: this.headers,
@@ -742,7 +756,12 @@ class CycleTestAuto extends Component {
             section[index].marks = parseFloat(event.target.value);
 
             fetch(
-                `${this.filterURL}?chapter_id=${this.chapterId}&question_type=${section[index].question_type}&category=${section[index].category.replace('&','%26')}&marks=${event.target.value}`,
+                `${this.filterURL}&question_type=${
+                    section[index].question_type
+                }&category=${section[index].category.replace(
+                    "&",
+                    "%26"
+                )}&marks=${event.target.value}`,
                 {
                     method: "GET",
                     headers: this.headers,

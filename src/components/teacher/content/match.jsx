@@ -42,7 +42,6 @@ class Match extends Component {
                 },
             ],
         };
-        this.match_limit = 10;
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
         this.topicNum = this.props.match.params.topicNum;
@@ -170,7 +169,7 @@ class Match extends Component {
                         () => {
                             this.setState({
                                 showEdit_option: false,
-                            })
+                            });
                             this.loadMatchData();
                         }
                     );
@@ -214,7 +213,7 @@ class Match extends Component {
                         () => {
                             this.setState({
                                 showEdit_option: false,
-                            })
+                            });
                             this.loadMatchData();
                         }
                     );
@@ -264,17 +263,15 @@ class Match extends Component {
 
     handleAddNew = () => {
         const values = [...this.state.match];
-        if (values.length < this.match_limit) {
-            values.push({
-                match_id: "",
-                match_terms: "<p>Match terms goes here</p>",
-                match_definition: "<p>Match definition goes here</p>",
-            });
-            this.setState({
-                match: values,
-                activeMatch: values.length - 1,
-            });
-        }
+        values.push({
+            match_id: "",
+            match_terms: "<p>Match terms goes here</p>",
+            match_definition: "<p>Match definition goes here</p>",
+        });
+        this.setState({
+            match: values,
+            activeMatch: values.length - 1,
+        });
     };
 
     handleCopy = (index) => {
@@ -646,12 +643,6 @@ class Match extends Component {
                                 <button
                                     className="btn btn-primary btn-block shadow-none"
                                     onClick={this.handleAddNew}
-                                    disabled={
-                                        this.match_limit ===
-                                        this.state.match.length
-                                            ? true
-                                            : false
-                                    }
                                 >
                                     Add +
                                 </button>
