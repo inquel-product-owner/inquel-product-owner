@@ -56,6 +56,10 @@ class FlashCard extends Component {
 
             sections: [],
             explanation: [],
+            match_terms: { id: [], type: [] },
+            match_ids: [],
+            match_temp: [],
+            match_color: "primary-bg text-white",
 
             activeTab: "concept",
             activeData: 0,
@@ -289,7 +293,16 @@ class FlashCard extends Component {
     };
 
     conceptRender = (data, index) => {
-        return (
+        return data.length === 0 ? (
+            <div
+                className="card card-body shadow-sm align-items-center justify-content-center font-weight-bold-600"
+                style={{
+                    minHeight: "80vh",
+                }}
+            >
+                No content to display
+            </div>
+        ) : (
             <FullScreen
                 enabled={this.state.isFullscreenEnabled}
                 onChange={(isFullscreenEnabled) =>
@@ -318,12 +331,7 @@ class FlashCard extends Component {
                         <div
                             className="h4 font-weight-bold-600"
                             dangerouslySetInnerHTML={{
-                                __html:
-                                    data[index] !== undefined &&
-                                    data[index].content !== undefined &&
-                                    data[index].content.terms !== undefined
-                                        ? data[index].content.terms
-                                        : "",
+                                __html: data[index].content.terms,
                             }}
                         ></div>
                         <button
@@ -341,7 +349,11 @@ class FlashCard extends Component {
                                 });
                             }}
                         >
-                            <i className="fas fa-expand fa-lg"></i>
+                            {this.state.isFullscreenEnabled ? (
+                                <i className="fas fa-compress fa-lg"></i>
+                            ) : (
+                                <i className="fas fa-expand fa-lg"></i>
+                            )}
                         </button>
                     </div>
                     <div
@@ -413,7 +425,11 @@ class FlashCard extends Component {
                                 });
                             }}
                         >
-                            <i className="fas fa-expand fa-lg"></i>
+                            {this.state.isFullscreenEnabled ? (
+                                <i className="fas fa-compress fa-lg"></i>
+                            ) : (
+                                <i className="fas fa-expand fa-lg"></i>
+                            )}
                         </button>
                     </div>
                 </ReactCardFlip>
@@ -536,7 +552,16 @@ class FlashCard extends Component {
     };
 
     practiceRender = (data, index, section, explanation) => {
-        return (
+        return data.lenght === 0 ? (
+            <div
+                className="card card-body shadow-sm align-items-center justify-content-center font-weight-bold-600"
+                style={{
+                    minHeight: "80vh",
+                }}
+            >
+                No content to display
+            </div>
+        ) : (
             <div
                 className="card card-body shadow-sm"
                 style={{ minHeight: "80vh" }}
@@ -1409,16 +1434,61 @@ class FlashCard extends Component {
 
     // ---------- loads match data ----------
 
-    shuffleMatch(array) {
+    divideMatch = (array, allow) => {
+        let data = array[this.state.activeData];
+        let tempData = [];
+        let index = 0;
+        let ids = [];
+        if (array.length !== 0) {
+            while (index < 2) {
+                if (index === 0) {
+                    for (let i = 0; i < data.length; i++) {
+                        tempData.push({
+                            match_id: data[i].match_id,
+                            match_terms: data[i].match_terms,
+                        });
+                        ids.push(data[i].match_id);
+                    }
+                } else if (index === 1) {
+                    for (let i = 0; i < data.length; i++) {
+                        tempData.push({
+                            match_id: data[i].match_id,
+                            match_definition: data[i].match_definition,
+                        });
+                    }
+                }
+                index++;
+            }
+            if (allow === undefined) {
+                this.setState({
+                    match_ids: ids,
+                });
+            }
+        }
+        return this.shuffleMatch(tempData);
+    };
+
+    shuffleMatch = (array) => {
         for (var i = array.length - 1; i > 0; i--) {
             var j = Math.floor(Math.random() * (i + 1));
             var temp = array[i];
             array[i] = array[j];
             array[j] = temp;
         }
-
         return array;
-    }
+    };
+
+    chunk = (array, size) => {
+        const chunked_arr = [];
+        if (array.length !== 0) {
+            let copied = [...array];
+            const numOfChild = Math.ceil(copied.length / size);
+            for (let i = 0; i < numOfChild; i++) {
+                chunked_arr.push(copied.splice(0, size));
+            }
+        }
+        return chunked_arr;
+    };
 
     loadMatchData = (path) => {
         var apiURL =
@@ -1435,22 +1505,53 @@ class FlashCard extends Component {
                 if (result.sts === true) {
                     let response = result.data.results;
                     let data = [];
-                    if (response.match_terms.length !== 0) {
-                        response.match_terms.forEach((terms) => {
-                            data.push(terms);
-                        });
+                    // combines both terms and definition as a single object
+                    if (
+                        response.match_terms.length !== 0 &&
+                        response.match_definition.length !== 0
+                    ) {
+                        for (let i = 0; i < response.match_terms.length; i++) {
+                            for (
+                                let j = 0;
+                                j < response.match_definition.length;
+                                j++
+                            ) {
+                                if (
+                                    response.match_terms[i].match_id ===
+                                    response.match_definition[j].match_id
+                                ) {
+                                    data.push({
+                                        match_id:
+                                            response.match_terms[i].match_id,
+                                        match_terms:
+                                            response.match_terms[i].match_terms,
+                                        match_definition:
+                                            response.match_definition[j]
+                                                .match_definition,
+                                    });
+                                }
+                            }
+                        }
                     }
-                    if (response.match_definition.length !== 0) {
-                        response.match_definition.forEach((definition) => {
-                            data.push(definition);
-                        });
-                    }
-                    this.setState({
-                        match: this.shuffleMatch(data),
-                        previous: result.data.previous,
-                        next: result.data.next,
-                        page_loading: false,
-                    });
+
+                    this.setState(
+                        {
+                            match: this.chunk(this.shuffleMatch(data), 6),
+                            activeData: 0,
+                            totalItems: result.data.count,
+                            previous: result.data.previous,
+                            next: result.data.next,
+                            page_loading: false,
+                        },
+                        () => {
+                            this.setState({
+                                match_temp: this.chunk(
+                                    this.divideMatch(this.state.match),
+                                    3
+                                ),
+                            });
+                        }
+                    );
                 } else {
                     this.setState({
                         errorMsg: result.detail ? result.detail : result.msg,
@@ -1462,6 +1563,159 @@ class FlashCard extends Component {
             .catch((err) => {
                 console.log(err);
             });
+    };
+
+    handleMatch = (id, type) => {
+        let terms = this.state.match_terms;
+        let ids = [...this.state.match_ids];
+        let color = "primary-bg text-white";
+        if (terms.id.length < 2) {
+            if (terms.id.includes(id) && terms.type.includes(type)) {
+                terms.id = [];
+                terms.type = [];
+            } else {
+                terms.id.push(id);
+                terms.type.push(type);
+                if (terms.id.length === 2) {
+                    if (terms.id[0] === terms.id[1]) {
+                        ids.splice(ids.indexOf(terms.id[0]), 1);
+                        terms.id = [];
+                        terms.type = [];
+                    } else {
+                        color = "danger-bg";
+                        setTimeout(() => {
+                            this.setState({
+                                match_temp: this.chunk(
+                                    this.divideMatch(this.state.match, "false"),
+                                    3
+                                ),
+                            });
+                        }, 500);
+                    }
+                }
+            }
+        } else {
+            terms.id = [];
+            terms.type = [];
+            terms.id.push(id);
+            terms.type.push(type);
+        }
+        this.setState(
+            {
+                match_ids: ids,
+                match_terms: terms,
+                match_color: color,
+            },
+            () => {
+                if (ids.length === 0) {
+                    if (
+                        this.state.match[this.state.activeData + 1] !==
+                        undefined
+                    ) {
+                        this.setState(
+                            {
+                                activeData: this.state.activeData + 1,
+                            },
+                            () => {
+                                this.setState({
+                                    match_temp: this.chunk(
+                                        this.divideMatch(this.state.match),
+                                        3
+                                    ),
+                                });
+                            }
+                        );
+                    }
+                }
+            }
+        );
+    };
+
+    matchType = (data) => {
+        let type = data.match_terms !== undefined ? "terms" : "definition";
+        return type;
+    };
+
+    matchRender = () => {
+        let ids = [...this.state.match_ids];
+        let terms = this.state.match_terms;
+        return this.state.match_temp.length === 0 ? (
+            <div
+                className="card card-body shadow-sm align-items-center justify-content-center font-weight-bold-600"
+                style={{
+                    minHeight: "80vh",
+                }}
+            >
+                No content to display
+            </div>
+        ) : ids.length === 0 &&
+          this.state.match[this.state.activeData + 1] === undefined ? (
+            <div
+                className="card card-body shadow-sm align-items-center justify-content-center"
+                style={{
+                    minHeight: "80vh",
+                }}
+            >
+                <h3 className="primary-text mb-4">Congratulations!</h3>
+                <p className="mb-4">You just completed all the Match</p>
+                <button
+                    className="btn btn-primary btn-sm shadow-none"
+                    onClick={() => {
+                        this.setState(
+                            {
+                                page_loading: true,
+                            },
+                            () => {
+                                this.loadMatchData();
+                            }
+                        );
+                    }}
+                >
+                    <i className="fas fa-redo fa-sm mr-2"></i> Retry
+                </button>
+            </div>
+        ) : (
+            <div className="row">
+                {this.state.match_temp.map((data, index) => {
+                    return (
+                        <div className="col-lg-3 col-md-4 col-6" key={index}>
+                            {data.map((item, index) => {
+                                return (
+                                    <div
+                                        className={`card card-body match-card shadow-sm mb-3 ${
+                                            terms.id.includes(item.match_id) &&
+                                            terms.type[
+                                                terms.id.indexOf(item.match_id)
+                                            ] === this.matchType(item)
+                                                ? this.state.match_color
+                                                : "text-white"
+                                        } ${
+                                            ids.includes(item.match_id)
+                                                ? "visible"
+                                                : "invisible"
+                                        }`}
+                                        style={{ backgroundColor: "orangered" }}
+                                        key={index}
+                                        onClick={() =>
+                                            this.handleMatch(
+                                                item.match_id,
+                                                this.matchType(item)
+                                            )
+                                        }
+                                        dangerouslySetInnerHTML={{
+                                            __html:
+                                                item.match_terms !== undefined
+                                                    ? item.match_terms
+                                                    : item.match_definition,
+                                        }}
+                                    ></div>
+                                );
+                            })}
+                        </div>
+                    );
+                })}
+            </div>
+        );
     };
 
     // ---------- loads subject information ----------
@@ -2090,15 +2344,19 @@ class FlashCard extends Component {
                                     </button>
                                 </div>
                                 <div className="col-md-6 text-right">
-                                    <button className="btn btn-primary btn-sm rounded-circle mr-3 shadow-none">
-                                        <i
-                                            className="fas fa-bookmark fa-sm"
-                                            style={{
-                                                marginLeft: "1px",
-                                                marginRight: "1px",
-                                            }}
-                                        ></i>
-                                    </button>
+                                    {this.state.activeTab !== "match" ? (
+                                        <button className="btn btn-primary btn-sm rounded-circle mr-3 shadow-none">
+                                            <i
+                                                className="fas fa-bookmark fa-sm"
+                                                style={{
+                                                    marginLeft: "1px",
+                                                    marginRight: "1px",
+                                                }}
+                                            ></i>
+                                        </button>
+                                    ) : (
+                                        ""
+                                    )}
                                     {data[index] !== undefined &&
                                     data[index].content !== undefined &&
                                     data[index].content.audio !== undefined
@@ -2175,10 +2433,17 @@ class FlashCard extends Component {
                                         explanation
                                     )
                                 ) : (
-                                    ""
+                                    <div
+                                        className="card card-body shadow-sm align-items-center justify-content-center font-weight-bold-600"
+                                        style={{
+                                            minHeight: "80vh",
+                                        }}
+                                    >
+                                        No content to display
+                                    </div>
                                 )
                             ) : this.state.activeTab === "match" ? (
-                                <p>Match</p>
+                                this.matchRender()
                             ) : (
                                 ""
                             )}
@@ -2250,13 +2515,13 @@ class FlashCard extends Component {
 
                                         {/* ----- Pagination number ----- */}
                                         <span className="font-weight-bold-600 mr-2">
-                                            {index < 9
+                                            {index <= 9
                                                 ? `0${index + 1}`
                                                 : index + 1}
                                         </span>
                                         <span>/</span>
                                         <span className="font-weight-bold-600 ml-2">
-                                            {total < 9 ? `0${total}` : total}
+                                            {total <= 9 ? `0${total}` : total}
                                         </span>
 
                                         {/* ----- Next button ----- */}

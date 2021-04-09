@@ -505,7 +505,6 @@ class SemesterAuto extends Component {
                     ) {
                         const section = [];
                         let duration = "";
-                        const filterData = [];
                         for (let i = 0; i < result.data.auto_test.length; i++) {
                             section.push({
                                 section_id: result.data.auto_test[i].section_id,
@@ -519,68 +518,23 @@ class SemesterAuto extends Component {
                                     result.data.auto_test[i].any_questions,
                                 no_questions:
                                     result.data.auto_test[i].total_questions,
+                                total_questions: "",
                                 marks: result.data.auto_test[i].mark,
                                 total_marks:
                                     result.data.auto_test[i].total_marks,
                             });
                             duration =
                                 result.duration !== null ? result.duration : "";
-
-                            // loads question category data
-                            Promise.all([
-                                fetch(
-                                    `${this.filterURL}?question_type=${result.data.auto_test[i].question_type}`,
-                                    {
-                                        method: "GET",
-                                        headers: this.headers,
-                                    }
-                                ).then((res) => res.json()),
-                                fetch(
-                                    `${this.filterURL}?question_type=${
-                                        result.data.auto_test[i].question_type
-                                    }&category=${result.data.auto_test[
-                                        i
-                                    ].category.replace("&", "%26")}`,
-                                    {
-                                        method: "GET",
-                                        headers: this.headers,
-                                    }
-                                ).then((res) => res.json()),
-                                fetch(
-                                    `${this.filterURL}?question_type=${
-                                        result.data.auto_test[i].question_type
-                                    }&category=${result.data.auto_test[
-                                        i
-                                    ].category.replace("&", "%26")}&marks=${
-                                        result.data.auto_test[i].mark
-                                    }`,
-                                    {
-                                        method: "GET",
-                                        headers: this.headers,
-                                    }
-                                ).then((res) => res.json()),
-                            ])
-                                .then((result) => {
-                                    console.log(result);
-                                    filterData.push({
-                                        category: result[0].data.category,
-                                        marks: result[1].data.marks,
-                                    });
-                                    section[i].total_questions =
-                                        result[2].data.total_questions;
-                                    this.setState({
-                                        filterData: filterData,
-                                    });
-                                })
-                                .catch((err) => {
-                                    console.log(err);
-                                });
                         }
-                        this.setState({
-                            sections: section,
-                            duration: duration,
-                            page_loading: false,
-                        });
+                        this.setState(
+                            {
+                                sections: section,
+                                duration: duration,
+                            },
+                            () => {
+                                this.loadsFilterData();
+                            }
+                        );
                     } else {
                         this.setState({
                             page_loading: false,
@@ -597,6 +551,57 @@ class SemesterAuto extends Component {
             .catch((err) => {
                 console.log(err);
             });
+    };
+
+    loadsFilterData = () => {
+        const data = [...this.state.sections];
+        let filterData = [];
+        for (let i = 0; i < data.length; i++) {
+            Promise.all([
+                fetch(
+                    `${this.filterURL}?question_type=${data[i].question_type}`,
+                    {
+                        method: "GET",
+                        headers: this.headers,
+                    }
+                ).then((res) => res.json()),
+                fetch(
+                    `${this.filterURL}?question_type=${
+                        data[i].question_type
+                    }&category=${data[i].category.replace("&", "%26")}`,
+                    {
+                        method: "GET",
+                        headers: this.headers,
+                    }
+                ).then((res) => res.json()),
+                fetch(
+                    `${this.filterURL}?question_type=${
+                        data[i].question_type
+                    }&category=${data[i].category.replace("&", "%26")}&marks=${
+                        data[i].marks
+                    }`,
+                    {
+                        method: "GET",
+                        headers: this.headers,
+                    }
+                ).then((res) => res.json()),
+            ])
+                .then((result) => {
+                    filterData[i] = {
+                        category: result[0].data.category,
+                        marks: result[1].data.marks,
+                    };
+                    data[i].total_questions = result[2].data.total_questions;
+                    this.setState({
+                        sections: data,
+                        filterData: filterData,
+                        page_loading: false,
+                    });
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        }
     };
 
     componentDidMount = () => {
