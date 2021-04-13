@@ -280,9 +280,7 @@ class Subject extends Component {
                 if (result.sts === true) {
                     this.setState(
                         {
-                            successMsg: result.detail
-                                ? result.detail
-                                : result.msg,
+                            successMsg: "Topic completion updated",
                             showSuccessAlert: true,
                         },
                         () => {
@@ -744,7 +742,7 @@ class Subject extends Component {
                                                           >
                                                               <>
                                                                   <Accordion>
-                                                                      {/* Topic list */}
+                                                                      {/* ----- Topic list ----- */}
                                                                       {data.topics.map(
                                                                           (
                                                                               topic,
@@ -856,6 +854,8 @@ class Subject extends Component {
                                                                                                                                               .topic_num
                                                                                                                                       ]
                                                                                                                                           .color,
+                                                                                                                                      textTransform:
+                                                                                                                                          "capitalize",
                                                                                                                                   }}
                                                                                                                               >
                                                                                                                                   {

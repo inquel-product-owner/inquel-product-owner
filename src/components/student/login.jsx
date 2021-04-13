@@ -63,60 +63,60 @@ function ForgotPasswordModal(props) {
             centered
         >
             <Modal.Header closeButton>Forgot password</Modal.Header>
-            <Modal.Body>
-                <Alert
-                    variant="danger"
-                    show={showErrorAlert}
-                    onClose={() => {
-                        setErrorAlert(false);
-                    }}
-                    dismissible
-                >
-                    {errorMsg}
-                </Alert>
-                <Alert
-                    variant="success"
-                    show={showSuccessAlert}
-                    onClose={() => {
-                        setSuccessAlert(false);
-                    }}
-                    dismissible
-                >
-                    {successMsg}
-                </Alert>
-                <form onSubmit={handleSubmit} autoComplete="off">
-                    <div className="form-group">
-                        <label htmlFor="email">Email</label>
-                        <input
-                            type="email"
-                            name="email"
-                            id="email"
-                            className="form-control borders form-control-lg"
-                            onChange={(event) => {
-                                setEmail(event.target.value);
-                            }}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <button className="btn btn-primary btn-sm btn-block">
-                            {showLoader ? (
-                                <Spinner
-                                    as="span"
-                                    animation="border"
-                                    size="sm"
-                                    role="status"
-                                    aria-hidden="true"
-                                    className="mr-2"
-                                />
-                            ) : (
-                                ""
-                            )}
-                            Send Email
-                        </button>
-                    </div>
-                </form>
-            </Modal.Body>
+            <form onSubmit={handleSubmit} autoComplete="off">
+                <Modal.Body>
+                    <Alert
+                        variant="danger"
+                        show={showErrorAlert}
+                        onClose={() => {
+                            setErrorAlert(false);
+                        }}
+                        dismissible
+                    >
+                        {errorMsg}
+                    </Alert>
+                    <Alert
+                        variant="success"
+                        show={showSuccessAlert}
+                        onClose={() => {
+                            setSuccessAlert(false);
+                        }}
+                        dismissible
+                    >
+                        {successMsg}
+                    </Alert>
+
+                    <label htmlFor="email">Email</label>
+                    <input
+                        type="email"
+                        name="email"
+                        id="email"
+                        className="form-control borders"
+                        placeholder="Enter your email ID"
+                        onChange={(event) => {
+                            setEmail(event.target.value);
+                        }}
+                        required
+                    />
+                </Modal.Body>
+                <Modal.Footer>
+                    <button className="btn btn-primary btn-block shadow-none">
+                        {showLoader ? (
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                                className="mr-2"
+                            />
+                        ) : (
+                            ""
+                        )}
+                        Send Email
+                    </button>
+                </Modal.Footer>
+            </form>
         </Modal>
     );
 }

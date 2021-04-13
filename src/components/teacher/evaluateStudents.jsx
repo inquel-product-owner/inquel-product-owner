@@ -1,8 +1,18 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import Header from "./shared/navbar";
 import SideNav from "./shared/sidenav";
+import { Link } from "react-router-dom";
 import Select from "react-select";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
+
+const mapStateToProps = (state) => ({
+    group_name: state.group_name,
+    subject_name: state.subject_name,
+    chapter_name: state.chapter_name,
+    cycle_name: state.cycle_name,
+    semester_name: state.semester_name,
+});
 
 class EvaluateStudents extends Component {
     constructor(props) {
@@ -13,6 +23,11 @@ class EvaluateStudents extends Component {
             student_list: [],
             page_loading: true,
         };
+        this.groupId = this.props.match.params.groupId;
+        this.subjectId = this.props.match.params.subjectId;
+        this.semesterId = this.props.match.params.semesteId;
+        this.chapterId = this.props.match.params.chapterId;
+        this.cycle_testId = this.props.match.params.cycle_testId;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
@@ -110,6 +125,73 @@ class EvaluateStudents extends Component {
                         >
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
+
+                        {/* ----- Breadcrumb ----- */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb mb-4">
+                                <li className="breadcrumb-item">
+                                    <Link to="/teacher">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                {this.groupId !== undefined ? (
+                                    <li className="breadcrumb-item">
+                                        <Link
+                                            to={`/teacher/group/${this.groupId}`}
+                                        >
+                                            {this.props.group_name}
+                                        </Link>
+                                    </li>
+                                ) : (
+                                    ""
+                                )}
+                                <li className="breadcrumb-item">
+                                    <Link
+                                        to={`/teacher/group/${this.groupId}/subject/${this.subjectId}`}
+                                    >
+                                        {this.props.subject_name}
+                                    </Link>
+                                </li>
+                                {this.cycle_testId !== undefined ? (
+                                    <>
+                                        <li className="breadcrumb-item">
+                                            <Link
+                                                to={`/teacher/group/${this.groupId}/subject/${this.subjectId}/chapter/${this.chapterId}`}
+                                            >
+                                                {this.props.chapter_name}
+                                            </Link>
+                                        </li>
+                                        <li className="breadcrumb-item">
+                                            <Link
+                                                to="#"
+                                                onClick={
+                                                    this.props.history.goBack
+                                                }
+                                            >
+                                                {this.props.cycle_name}
+                                            </Link>
+                                        </li>
+                                    </>
+                                ) : (
+                                    ""
+                                )}
+                                {this.semesterId !== undefined ? (
+                                    <li className="breadcrumb-item">
+                                        <Link
+                                            to="#"
+                                            onClick={this.props.history.goBack}
+                                        >
+                                            {this.props.semester_name}
+                                        </Link>
+                                    </li>
+                                ) : (
+                                    ""
+                                )}
+                                <li className="breadcrumb-item active">
+                                    Student evaluation
+                                </li>
+                            </ol>
+                        </nav>
 
                         <div className="card shadow-sm mb-3">
                             <div className="card-header">
@@ -306,4 +388,4 @@ class EvaluateStudents extends Component {
     }
 }
 
-export default EvaluateStudents;
+export default connect(mapStateToProps)(EvaluateStudents);

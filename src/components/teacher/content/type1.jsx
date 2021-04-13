@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 import axios from "axios";
+import { Link } from "react-router-dom";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import CKeditor from "../../sharedComponents/CKeditor";
@@ -11,8 +12,10 @@ import Loading from "../../sharedComponents/loader";
 import AlertBox from "../../sharedComponents/alert";
 import FileModal from "../shared/fileExplorer";
 import { ContentDeleteModal } from "../../sharedComponents/contentManagementModal";
+import TemplateUpload from "../shared/templateUpload";
 
 const mapStateToProps = (state) => ({
+    group_name: state.group_name,
     subject_name: state.subject_name,
     chapter_name: state.chapter_name,
     topic_name: state.topic_name,
@@ -24,7 +27,7 @@ class Type1 extends Component {
         this.state = {
             showSideNav: false,
             showModal: false,
-            showAlertModal: false,
+            showTemplateUploadModal: false,
 
             alertMsg: "",
             errorMsg: "",
@@ -112,6 +115,7 @@ class Type1 extends Component {
         this.option_limit = 6;
         this.image_limit = 4;
         this.audio_limit = 2;
+        this.groupId = this.props.match.params.groupId;
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
         this.topicNum = this.props.match.params.topicNum;
@@ -137,6 +141,22 @@ class Type1 extends Component {
             selectedVideo: video,
             selectedAudio: audio,
         });
+    };
+
+    // -------------------------- Template uploading --------------------------
+
+    toggleTemplateModal = () => {
+        this.setState({
+            showTemplateUploadModal: !this.state.showTemplateUploadModal,
+        });
+    };
+
+    templateFormSubmission = (data) => {
+        this.setState({
+            showTemplateUploadModal: false,
+            page_loading: true,
+        });
+        this.loadMCQData();
     };
 
     // -------------------------- Form submission --------------------------
@@ -1222,8 +1242,9 @@ class Type1 extends Component {
         if (
             values[this.state.activeQuestion].question_random_id !== "" &&
             values[this.state.activeQuestion].is_image_uploaded === true &&
-            values[this.state.activeQuestion].content.images[index].file_name === '' &&
-            values[this.state.activeQuestion].content.images[index].path !== ''
+            values[this.state.activeQuestion].content.images[index]
+                .file_name === "" &&
+            values[this.state.activeQuestion].content.images[index].path !== ""
         ) {
             let body = {
                 chapter_id: this.chapterId,
@@ -1418,8 +1439,8 @@ class Type1 extends Component {
         if (
             values[this.state.activeQuestion].question_random_id !== "" &&
             values[this.state.activeQuestion].is_image_uploaded === true &&
-            values[this.state.activeQuestion].content.video.file_name === '' &&
-            values[this.state.activeQuestion].content.video.path !== ''
+            values[this.state.activeQuestion].content.video.file_name === "" &&
+            values[this.state.activeQuestion].content.video.path !== ""
         ) {
             fetch(
                 `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/files/`,
@@ -1520,8 +1541,9 @@ class Type1 extends Component {
         if (
             values[this.state.activeQuestion].question_random_id !== "" &&
             values[this.state.activeQuestion].is_image_uploaded === true &&
-            values[this.state.activeQuestion].content.audio[index].file_name === '' &&
-            values[this.state.activeQuestion].content.audio[index].path !== ''
+            values[this.state.activeQuestion].content.audio[index].file_name ===
+                "" &&
+            values[this.state.activeQuestion].content.audio[index].path !== ""
         ) {
             let body = {
                 chapter_id: this.chapterId,
@@ -2358,6 +2380,21 @@ class Type1 extends Component {
                     />
                 ) : null}
 
+                {/* Template uploading Modal */}
+                {this.state.showTemplateUploadModal ? (
+                    <TemplateUpload
+                        show={this.state.showTemplateUploadModal}
+                        onHide={this.toggleTemplateModal}
+                        formSubmission={this.templateFormSubmission}
+                        toggleModal={this.toggleTemplateModal}
+                        url={`${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/upload/`}
+                        type="type_1"
+                        subjectId={this.subjectId}
+                        chapterId={this.chapterId}
+                        topic_num={this.topicNum}
+                    />
+                ) : null}
+
                 <div
                     className={`section content ${
                         this.state.showSideNav ? "active" : ""
@@ -2382,25 +2419,87 @@ class Type1 extends Component {
                                     Back
                                 </button>
 
+                                {/* ----- Breadcrumb ----- */}
+                                <nav aria-label="breadcrumb">
+                                    <ol className="breadcrumb mb-3">
+                                        <li className="breadcrumb-item">
+                                            <Link to="/teacher">
+                                                <i className="fas fa-home fa-sm"></i>
+                                            </Link>
+                                        </li>
+                                        {this.groupId !== undefined ? (
+                                            <>
+                                                <li className="breadcrumb-item">
+                                                    <Link
+                                                        to={`/teacher/group/${this.groupId}`}
+                                                    >
+                                                        {this.props.group_name}
+                                                    </Link>
+                                                </li>
+                                                <li className="breadcrumb-item">
+                                                    <Link
+                                                        to={`/teacher/group/${this.groupId}/subject/${this.subjectId}`}
+                                                    >
+                                                        {
+                                                            this.props
+                                                                .subject_name
+                                                        }
+                                                    </Link>
+                                                </li>
+                                            </>
+                                        ) : (
+                                            <li className="breadcrumb-item">
+                                                <Link
+                                                    to={`/teacher/subject/${this.subjectId}`}
+                                                >
+                                                    {this.props.subject_name}
+                                                </Link>
+                                            </li>
+                                        )}
+                                        <li className="breadcrumb-item">
+                                            <Link
+                                                to="#"
+                                                onClick={
+                                                    this.props.history.goBack
+                                                }
+                                            >
+                                                {this.props.chapter_name}
+                                            </Link>
+                                        </li>
+                                        <li className="breadcrumb-item active">
+                                            Type 1
+                                        </li>
+                                    </ol>
+                                </nav>
+
                                 {/* Header area */}
-                                <div className="row align-items-center">
+                                <div className="row align-items-center mb-4">
                                     <div className="col-md-6">
-                                        <h5 className="primary-text">
-                                            {`${this.props.topic_name} - Type 1`}
+                                        <h5 className="primary-text mb-0">
+                                            {`Type 1 - ${this.props.topic_name}`}
                                         </h5>
                                     </div>
                                     <div className="col-md-6">
-                                        <div className="d-flex flex-wrap justify-content-end mb-4">
+                                        <div className="d-flex flex-wrap justify-content-end">
                                             <button
                                                 className="btn btn-primary btn-sm shadow-none mr-1"
                                                 onClick={this.handlePublish}
                                             >
                                                 Publish
                                             </button>
-                                            <button className="btn btn-primary btn-sm shadow-none mr-1">
+                                            <a
+                                                href="https://iqlabs-media-type1.s3.us-east-2.amazonaws.com/media/TypeOne/Templates/TeacherTypeOneTemplate.xlsx"
+                                                className="btn btn-primary btn-sm shadow-none mr-1"
+                                                download
+                                            >
                                                 Download template
-                                            </button>
-                                            <button className="btn btn-primary btn-sm shadow-none">
+                                            </a>
+                                            <button
+                                                className="btn btn-primary btn-sm shadow-none"
+                                                onClick={
+                                                    this.toggleTemplateModal
+                                                }
+                                            >
                                                 Upload template
                                             </button>
                                         </div>
@@ -2743,7 +2842,7 @@ class Type1 extends Component {
                                                 variant="link"
                                                 eventKey="0"
                                                 className="text-dark"
-                                                style={{ cursor: "pointer" }}
+                                                style={{ cursor: "default" }}
                                                 onClick={() =>
                                                     this.toggleCollapse(
                                                         "content"
@@ -3609,7 +3708,7 @@ class Type1 extends Component {
                                                 variant="link"
                                                 eventKey="1"
                                                 className="text-dark"
-                                                style={{ cursor: "pointer" }}
+                                                style={{ cursor: "default" }}
                                                 onClick={() =>
                                                     this.toggleCollapse(
                                                         "properties"
@@ -3960,7 +4059,7 @@ class Type1 extends Component {
                                                 variant="link"
                                                 eventKey="2"
                                                 className="text-dark"
-                                                style={{ cursor: "pointer" }}
+                                                style={{ cursor: "default" }}
                                                 onClick={this.toggleCollapse}
                                             >
                                                 <div className="d-flex justify-content-between align-items-center">

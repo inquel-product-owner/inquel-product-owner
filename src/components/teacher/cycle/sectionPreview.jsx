@@ -2,13 +2,16 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
+import { Link } from "react-router-dom";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
 import Loading from "../../sharedComponents/loader";
 import AlertBox from "../../sharedComponents/alert";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
+import { dataFormat } from "../../sharedComponents/dataFormating";
 
 const mapStateToProps = (state) => ({
+    group_name: state.group_name,
     subject_name: state.subject_name,
     chapter_name: state.chapter_name,
     cycle_name: state.cycle_name,
@@ -40,6 +43,7 @@ class CycleTestAutoQA extends Component {
             showSuccessAlert: false,
             page_loading: true,
         };
+        this.groupId = this.props.match.params.groupId;
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
         this.cycle_testId = this.props.match.params.cycle_testId;
@@ -74,270 +78,16 @@ class CycleTestAutoQA extends Component {
             .then((result) => {
                 console.log(result);
                 let data = [];
-                let images = [];
                 let type = "";
-                let sub_question = [];
                 let totalSubQuestion = [];
                 let currentSubQuestionIndex = [];
                 if (result.sts === true) {
-                    let response = result.data.results;
-                    if (response.length !== 0) {
-                        for (let i = 0; i < response.length; i++) {
-                            if (response[i].type_1 === true) {
-                                type = "type_1";
-                                images = [];
-                                if (response[i].files.length !== 0) {
-                                    // image
-                                    if (response[i].files[0].type1_image_1) {
-                                        images.push({
-                                            title:
-                                                response[i].files[0]
-                                                    .type1_image_1_title,
-                                            file_name: "",
-                                            image: null,
-                                            path:
-                                                response[i].files[0]
-                                                    .type1_image_1,
-                                        });
-                                    }
-                                    if (response[i].files[0].type1_image_2) {
-                                        images.push({
-                                            title:
-                                                response[i].files[0]
-                                                    .type1_image_2_title,
-                                            file_name: "",
-                                            image: null,
-                                            path:
-                                                response[i].files[0]
-                                                    .type1_image_2,
-                                        });
-                                    }
-                                    if (response[i].files[0].type1_image_3) {
-                                        images.push({
-                                            title:
-                                                response[i].files[0]
-                                                    .type1_image_3_title,
-                                            file_name: "",
-                                            image: null,
-                                            path:
-                                                response[i].files[0]
-                                                    .type1_image_3,
-                                        });
-                                    }
-                                    if (response[i].files[0].type1_image_4) {
-                                        images.push({
-                                            title:
-                                                response[i].files[0]
-                                                    .type1_image_4_title,
-                                            file_name: "",
-                                            image: null,
-                                            path:
-                                                response[i].files[0]
-                                                    .type1_image_4,
-                                        });
-                                    }
-                                }
-
-                                data.push({
-                                    question: response[i].question,
-                                    question_random_id:
-                                        response[i].question_random_id,
-                                    content: {
-                                        mcq: response[i].mcq,
-                                        fill_in: response[i].fill_in,
-                                        boolean: response[i].boolean,
-                                        fillin_answer:
-                                            response[i].fillin_answer.length !==
-                                            0
-                                                ? response[i].fillin_answer
-                                                : [""],
-                                        boolean_question:
-                                            response[i].boolean_question
-                                                .length !== 0
-                                                ? response[i].boolean_question
-                                                : [
-                                                      {
-                                                          correct: false,
-                                                          content: "True",
-                                                      },
-                                                      {
-                                                          correct: false,
-                                                          content: "False",
-                                                      },
-                                                  ],
-                                        options:
-                                            response[i].options.length !== 0
-                                                ? response[i].options
-                                                : [
-                                                      {
-                                                          correct: false,
-                                                          content: "",
-                                                      },
-                                                      {
-                                                          correct: false,
-                                                          content: "",
-                                                      },
-                                                      {
-                                                          correct: false,
-                                                          content: "",
-                                                      },
-                                                      {
-                                                          correct: false,
-                                                          content: "",
-                                                      },
-                                                  ],
-                                        explanation: response[i].explanation,
-                                        images:
-                                            images.length === 0
-                                                ? [
-                                                      {
-                                                          title: "",
-                                                          file_name: "",
-                                                          image: null,
-                                                          path: "",
-                                                      },
-                                                  ]
-                                                : images,
-                                    },
-                                });
-                            } else {
-                                type = "type_2";
-                                images = [];
-                                sub_question = [];
-                                totalSubQuestion.push(
-                                    response[i].sub_question.length
-                                );
-                                currentSubQuestionIndex.push(0);
-
-                                // Image
-                                if (
-                                    Object.entries(response[i].files).length !==
-                                    0
-                                ) {
-                                    if (response[i].files.type2_image_1) {
-                                        images.push({
-                                            title:
-                                                response[i].files
-                                                    .type2_image_1_title,
-                                            file_name: "",
-                                            image: null,
-                                            path:
-                                                response[i].files.type2_image_1,
-                                        });
-                                    }
-                                    if (response[i].files.type2_image_2) {
-                                        images.push({
-                                            title:
-                                                response[i].files
-                                                    .type2_image_2_title,
-                                            file_name: "",
-                                            image: null,
-                                            path:
-                                                response[i].files.type2_image_2,
-                                        });
-                                    }
-                                    if (response[i].files.type2_image_3) {
-                                        images.push({
-                                            title:
-                                                response[i].files
-                                                    .type2_image_3_title,
-                                            file_name: "",
-                                            image: null,
-                                            path:
-                                                response[i].files.type2_image_3,
-                                        });
-                                    }
-                                    if (response[i].files.type2_image_4) {
-                                        images.push({
-                                            title:
-                                                response[i].files
-                                                    .type2_image_4_title,
-                                            file_name: "",
-                                            image: null,
-                                            path:
-                                                response[i].files.type2_image_4,
-                                        });
-                                    }
-                                }
-
-                                // Sub question
-                                for (
-                                    let k = 0;
-                                    k < response[i].sub_question.length;
-                                    k++
-                                ) {
-                                    sub_question.push({
-                                        sub_question_id:
-                                            response[i].sub_question[k]
-                                                .sub_question_id,
-                                        question:
-                                            response[i].sub_question[k]
-                                                .question,
-                                        explanation:
-                                            response[i].sub_question[k]
-                                                .explanation,
-                                        mcq: response[i].sub_question[k].mcq,
-                                        fill_in:
-                                            response[i].sub_question[k].fill_in,
-                                        fillin_answer:
-                                            response[i].sub_question[k]
-                                                .fillin_answer.length !== 0
-                                                ? response[i].sub_question[k]
-                                                      .fillin_answer
-                                                : [""],
-                                        options:
-                                            response[i].sub_question[k].options
-                                                .length !== 0
-                                                ? response[i].sub_question[k]
-                                                      .options
-                                                : [
-                                                      {
-                                                          correct: false,
-                                                          content: "",
-                                                      },
-                                                      {
-                                                          correct: false,
-                                                          content: "",
-                                                      },
-                                                      {
-                                                          correct: false,
-                                                          content: "",
-                                                      },
-                                                      {
-                                                          correct: false,
-                                                          content: "",
-                                                      },
-                                                  ],
-                                        marks:
-                                            response[i].sub_question[k].marks,
-                                        negative_marks:
-                                            response[i].sub_question[k]
-                                                .negative_marks,
-                                    });
-                                }
-
-                                // Main question
-                                data.push({
-                                    question: response[i].question,
-                                    question_random_id:
-                                        response[i].question_random_id,
-                                    sub_question: sub_question,
-                                    content: {
-                                        images:
-                                            images.length === 0
-                                                ? [
-                                                      {
-                                                          title: "",
-                                                          file_name: "",
-                                                          image: null,
-                                                          path: "",
-                                                      },
-                                                  ]
-                                                : images,
-                                    },
-                                });
-                            }
-                        }
+                    if (result.data.results.length !== 0) {
+                        let values = dataFormat(result);
+                        data = values.result;
+                        type = values.type;
+                        totalSubQuestion = values.total;
+                        currentSubQuestionIndex = values.current;
                     }
                     this.setState({
                         data: data,
@@ -537,6 +287,61 @@ class CycleTestAutoQA extends Component {
                         >
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
+
+                        {/* ----- Breadcrumb ----- */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb mb-3">
+                                <li className="breadcrumb-item">
+                                    <Link to="/teacher">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                {this.groupId !== undefined ? (
+                                    <>
+                                        <li className="breadcrumb-item">
+                                            <Link
+                                                to={`/teacher/group/${this.groupId}`}
+                                            >
+                                                {this.props.group_name}
+                                            </Link>
+                                        </li>
+                                        <li className="breadcrumb-item">
+                                            <Link
+                                                to={`/teacher/group/${this.groupId}/subject/${this.subjectId}`}
+                                            >
+                                                {this.props.subject_name}
+                                            </Link>
+                                        </li>
+                                    </>
+                                ) : (
+                                    <li className="breadcrumb-item">
+                                        <Link
+                                            to={`/teacher/subject/${this.subjectId}`}
+                                        >
+                                            {this.props.subject_name}
+                                        </Link>
+                                    </li>
+                                )}
+                                <li className="breadcrumb-item">
+                                    <Link
+                                        to={`/teacher/group/${this.groupId}/subject/${this.subjectId}/chapter/${this.chapterId}`}
+                                    >
+                                        {this.props.chapter_name}
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item">
+                                    <Link
+                                        to="#"
+                                        onClick={this.props.history.goBack}
+                                    >
+                                        {this.props.cycle_name}
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    Section
+                                </li>
+                            </ol>
+                        </nav>
 
                         {/* Header */}
                         <div className="card primary-bg text-white small mb-4">

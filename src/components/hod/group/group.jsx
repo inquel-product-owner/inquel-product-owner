@@ -456,6 +456,7 @@ class Group extends Component {
 
                         <div className="row align-items-center mb-3 mt-2">
                             <div className="col-6">
+                                {/* ----- Breadcrumb ----- */}
                                 <nav aria-label="breadcrumb">
                                     <ol className="breadcrumb">
                                         <li className="breadcrumb-item">

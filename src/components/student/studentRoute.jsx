@@ -89,7 +89,7 @@ const studentRoutes = (
         />
         <Route
             exact
-            path="/student/subject/:subjectId/results/preview"
+            path="/student/subject/:subjectId/results/cycle/:cycleTestId/preview"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (

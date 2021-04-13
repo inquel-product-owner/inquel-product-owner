@@ -1,12 +1,17 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { Badge } from "react-bootstrap";
+import { connect } from "react-redux";
 import profilepic from "../../assets/user-v1.png";
 import Header from "./shared/navbar";
 import SideNav from "./shared/sidenav";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl";
 import Loading from "../sharedComponents/loader";
 import AlertBox from "../sharedComponents/alert";
+
+const mapStateToProps = (state) => ({
+    group_name: state.group_name,
+});
 
 class StudentProfile extends Component {
     constructor(props) {
@@ -21,6 +26,7 @@ class StudentProfile extends Component {
             showSuccessAlert: false,
             page_loading: true,
         };
+        this.groupId = this.props.match.params.groupId;
     }
 
     toggleSideNav = () => {
@@ -114,10 +120,21 @@ class StudentProfile extends Component {
                         <nav aria-label="breadcrumb">
                             <ol className="breadcrumb mb-3">
                                 <li className="breadcrumb-item">
-                                    <Link to="/hod">
+                                    <Link to="/teacher">
                                         <i className="fas fa-home fa-sm"></i>
                                     </Link>
                                 </li>
+                                {this.groupId !== undefined ? (
+                                    <li className="breadcrumb-item">
+                                        <Link
+                                            to={`/teacher/group/${this.groupId}`}
+                                        >
+                                            {this.props.group_name}
+                                        </Link>
+                                    </li>
+                                ) : (
+                                    ""
+                                )}
                                 <li className="breadcrumb-item">
                                     <Link
                                         to="#"
@@ -370,4 +387,4 @@ class StudentProfile extends Component {
     }
 }
 
-export default StudentProfile;
+export default connect(mapStateToProps)(StudentProfile);

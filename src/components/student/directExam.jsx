@@ -316,8 +316,6 @@ class DirectExam extends Component {
 
     render() {
         document.title = `${this.state.chapter_name} Direct Exam - Teacher | IQLabs`;
-        // var ends_at = new Date(this.state.cycleTestItem.ends_at);
-        // var starts_at = new Date(this.state.cycleTestItem.starts_at);
         return (
             <>
                 {/* Navbar */}
@@ -399,34 +397,6 @@ class DirectExam extends Component {
                         </div>
 
                         <div className="card light-bg shadow-sm">
-                            {/* <div className="row justify-content-center">
-                                <div className="col-md-5">
-                                    <div className="card secondary-bg">
-                                        <div className="card-body small font-weight-bold-600 text-center p-3">
-                                            <div className="row">
-                                                <div className="col-6">
-                                                    <p className="mb-0">
-                                                        Subject:{" "}
-                                                        {
-                                                            this.state
-                                                                .subject_name
-                                                        }
-                                                    </p>
-                                                </div>
-                                                <div className="col-6">
-                                                    <p className="mb-0">
-                                                        Duration:{" "}
-                                                        {(ends_at - starts_at) /
-                                                            60000}{" "}
-                                                        min.
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> */}
-
                             {/* File uploading */}
                             <div className="card-body">
                                 {this.state.isExamStarted ? (

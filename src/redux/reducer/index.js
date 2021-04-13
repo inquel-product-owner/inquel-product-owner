@@ -9,7 +9,7 @@ let data = {
     section_name: "Section",
 };
 
-const reducers = (state = data, action) => {
+const reducer = (state = data, action) => {
     switch (action.type) {
         case "GROUP":
             return { ...state, group_name: action.payload };
@@ -32,4 +32,4 @@ const reducers = (state = data, action) => {
     }
 };
 
-export default reducers;
+export default reducer;

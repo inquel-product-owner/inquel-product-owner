@@ -131,7 +131,7 @@ class TestResult extends Component {
                                     </div>
                                 </div>
 
-                                {/* Cycle test list */}
+                                {/* ----- Cycle test list ----- */}
                                 {this.state.cycle_test.length !== 0
                                     ? this.state.cycle_test.map(
                                           (data, index) => {
@@ -164,13 +164,18 @@ class TestResult extends Component {
                                                                                     }
                                                                                     placement="top"
                                                                                     overlay={
-                                                                                        <Tooltip id="tooltip4">
-                                                                                            Good
+                                                                                        <Tooltip id="tooltip4" style={{textTransform:'capitalize'}}>
+                                                                                            {attempt.auto_section !==
+                                                                                            undefined
+                                                                                                ? attempt
+                                                                                                      .auto_section[0]
+                                                                                                      .remarks
+                                                                                                : "Remarks"}
                                                                                         </Tooltip>
                                                                                     }
                                                                                 >
                                                                                     <Link
-                                                                                        to={`${this.props.match.url}/preview`}
+                                                                                        to={`${this.props.match.url}/cycle/${attempt.cycle_test_id}/preview`}
                                                                                         onClick={() => {
                                                                                             attempt
                                                                                                 .auto_section
@@ -204,7 +209,18 @@ class TestResult extends Component {
                                                                                                   );
                                                                                         }}
                                                                                     >
-                                                                                        <i className="fas fa-circle text-success fa-lg mx-2"></i>
+                                                                                        <i
+                                                                                            className="fas fa-circle fa-lg mx-2"
+                                                                                            style={{
+                                                                                                color:
+                                                                                                    attempt.auto_section !==
+                                                                                                    undefined
+                                                                                                        ? attempt
+                                                                                                              .auto_section[0]
+                                                                                                              .color
+                                                                                                        : "",
+                                                                                            }}
+                                                                                        ></i>
                                                                                     </Link>
                                                                                 </OverlayTrigger>
                                                                             );
@@ -219,7 +235,7 @@ class TestResult extends Component {
                                       )
                                     : ""}
 
-                                {/* Semester list */}
+                                {/* ----- Semester list ----- */}
                                 {this.state.semester.length !== 0
                                     ? this.state.semester.map((data, index) => {
                                           return (

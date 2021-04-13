@@ -75,7 +75,9 @@ const teacherRoutes = (
             }
         />
 
-        {/* --------------- Groups --------------- */}
+        {/* -----------------------------------------------------
+            -------------------- Group --------------------------
+            ----------------------------------------------------- */}
 
         <Route
             exact
@@ -91,6 +93,237 @@ const teacherRoutes = (
         />
         <Route
             exact
+            path="/teacher/group/:groupId/subject/:subjectId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <Subject {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/teacher/group/:groupId/subject/:subjectId/chapter/:chapterId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <Chapters {...props} />
+                )
+            }
+        />
+
+        {/* --------------- Summary --------------- */}
+
+        <Route
+            exact
+            path="/teacher/group/:groupId/subject/:subjectId/chapter/:chapterId/summary"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <Summary {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/teacher/group/:groupId/subject/:subjectId/chapter/:chapterId/summary/upload"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <SummaryUpload {...props} />
+                )
+            }
+        />
+
+        {/* --------------- Notes --------------- */}
+
+        <Route
+            exact
+            path="/teacher/group/:groupId/subject/:subjectId/chapter/:chapterId/:topicNum/notes"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <Notes {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/teacher/group/:groupId/subject/:subjectId/chapter/:chapterId/:topicNum/notes/upload"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <NotesUpload {...props} />
+                )
+            }
+        />
+
+        {/* --------------- Type1, Type2, Match and Concepts --------------- */}
+
+        <Route
+            exact
+            path="/teacher/group/:groupId/subject/:subjectId/chapter/:chapterId/:topicNum/type1"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <Type1 {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/teacher/group/:groupId/subject/:subjectId/chapter/:chapterId/:topicNum/type2"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <Type2 {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/teacher/group/:groupId/subject/:subjectId/chapter/:chapterId/:topicNum/concepts"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <Concepts {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/teacher/group/:groupId/subject/:subjectId/chapter/:chapterId/:topicNum/match"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <Match {...props} />
+                )
+            }
+        />
+
+        {/* --------------- Semester --------------- */}
+
+        <Route
+            exact
+            path="/teacher/group/:groupId/subject/:subjectId/semester/:semesterId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <SemesterAuto {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/teacher/group/:groupId/subject/:subjectId/semester/:semesterId/section/:sectionId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <SemesterAutoQA {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/teacher/group/:groupId/subject/:subjectId/semester/:semesterId/direct"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <SemesterDirect {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/teacher/group/:groupId/subject/:subjectId/semester/:semesterId/direct/student/:studentId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <EvaluateStudents {...props} />
+                )
+            }
+        />
+
+        {/* --------------- Cycle test --------------- */}
+
+        <Route
+            exact
+            path="/teacher/group/:groupId/subject/:subjectId/chapter/:chapterId/cycle/:cycle_testId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <CycleTestAuto {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/teacher/group/:groupId/subject/:subjectId/chapter/:chapterId/cycle/:cycle_testId/section/:sectionId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <CycleTestAutoQA {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/teacher/group/:groupId/subject/:subjectId/chapter/:chapterId/cycle/:cycle_testId/direct"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <CyleTestDirect {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/teacher/group/:groupId/subject/:subjectId/chapter/:chapterId/cycle/:cycle_testId/direct/student/:studentId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <EvaluateStudents {...props} />
+                )
+            }
+        />
+        <Route
+            exact
             path="/teacher/group/:groupId/student"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
@@ -101,8 +334,22 @@ const teacherRoutes = (
                 )
             }
         />
+        <Route
+            exact
+            path="/teacher/group/:groupId/student/:studentId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <StudentProfile {...props} />
+                )
+            }
+        />
 
-        {/* --------------- Subjects --------------- */}
+        {/* -----------------------------------------------------
+             -------------------- Independent --------------------
+             ----------------------------------------------------- */}
 
         <Route
             exact

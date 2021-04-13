@@ -2,14 +2,17 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
+import { Link } from "react-router-dom";
 import CKeditor from "../../sharedComponents/CKeditor";
 import { Accordion, Card } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
 import Loading from "../../sharedComponents/loader";
 import AlertBox from "../../sharedComponents/alert";
 import { ContentDeleteModal } from "../../sharedComponents/contentManagementModal";
+import TemplateUpload from "../shared/templateUpload";
 
 const mapStateToProps = (state) => ({
+    group_name: state.group_name,
     subject_name: state.subject_name,
     chapter_name: state.chapter_name,
     topic_name: state.topic_name,
@@ -21,6 +24,7 @@ class Match extends Component {
         this.state = {
             showSideNav: false,
             showDeleteModal: false,
+            showTemplateUploadModal: false,
 
             alertMsg: "",
             errorMsg: "",
@@ -42,6 +46,7 @@ class Match extends Component {
                 },
             ],
         };
+        this.groupId = this.props.match.params.groupId;
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
         this.topicNum = this.props.match.params.topicNum;
@@ -60,6 +65,22 @@ class Match extends Component {
         });
     };
 
+    // -------------------------- Template uploading --------------------------
+
+    toggleTemplateModal = () => {
+        this.setState({
+            showTemplateUploadModal: !this.state.showTemplateUploadModal,
+        });
+    };
+
+    templateFormSubmission = (data) => {
+        this.setState({
+            page_loading: true,
+            showTemplateUploadModal: false,
+        });
+        this.loadMatchData();
+    };
+
     // -------------------------- Form submission --------------------------
 
     loadMatchData = () => {
@@ -75,7 +96,7 @@ class Match extends Component {
                 console.log(result);
                 if (result.sts === true) {
                     let data = [];
-                    let response = result.data;
+                    let response = result.data.results;
                     if (response.length !== 0) {
                         for (let i = 0; i < response.length; i++) {
                             data.push({
@@ -340,7 +361,7 @@ class Match extends Component {
         });
     };
 
-    handleMCQ_Deletion = () => {
+    handleMatch_Deletion = () => {
         const values = [...this.state.match];
         values.splice(this.state.activeMatch, 1);
         this.setState(
@@ -465,12 +486,12 @@ class Match extends Component {
                     activeLink="dashboard"
                 />
 
-                {/* MCQ Deletion Modal */}
+                {/* Match Deletion Modal */}
                 {this.state.showDeleteModal ? (
                     <ContentDeleteModal
                         show={this.state.showDeleteModal}
                         onHide={this.toggleDeleteModal}
-                        formSubmission={this.handleMCQ_Deletion}
+                        formSubmission={this.handleMatch_Deletion}
                         url={`${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/match/`}
                         type="match"
                         name=""
@@ -481,6 +502,21 @@ class Match extends Component {
                     />
                 ) : null}
 
+                {/* Template uploading Modal */}
+                {this.state.showTemplateUploadModal ? (
+                    <TemplateUpload
+                        show={this.state.showTemplateUploadModal}
+                        onHide={this.toggleTemplateModal}
+                        formSubmission={this.templateFormSubmission}
+                        toggleModal={this.toggleTemplateModal}
+                        url={`${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/match/upload/`}
+                        type="match"
+                        subjectId={this.subjectId}
+                        chapterId={this.chapterId}
+                        topic_num={this.topicNum}
+                    />
+                ) : null}
+
                 <div
                     className={`section content ${
                         this.state.showSideNav ? "active" : ""
@@ -488,7 +524,7 @@ class Match extends Component {
                 >
                     <div className="container-fluid">
                         <div className="row">
-                            {/* ------------------------------ MCQ Column ------------------------------ */}
+                            {/* ------------------------------ Match column ------------------------------ */}
                             <div
                                 className={`${
                                     this.state.showEdit_option
@@ -505,25 +541,87 @@ class Match extends Component {
                                     Back
                                 </button>
 
+                                {/* ----- Breadcrumb ----- */}
+                                <nav aria-label="breadcrumb">
+                                    <ol className="breadcrumb mb-3">
+                                        <li className="breadcrumb-item">
+                                            <Link to="/teacher">
+                                                <i className="fas fa-home fa-sm"></i>
+                                            </Link>
+                                        </li>
+                                        {this.groupId !== undefined ? (
+                                            <>
+                                                <li className="breadcrumb-item">
+                                                    <Link
+                                                        to={`/teacher/group/${this.groupId}`}
+                                                    >
+                                                        {this.props.group_name}
+                                                    </Link>
+                                                </li>
+                                                <li className="breadcrumb-item">
+                                                    <Link
+                                                        to={`/teacher/group/${this.groupId}/subject/${this.subjectId}`}
+                                                    >
+                                                        {
+                                                            this.props
+                                                                .subject_name
+                                                        }
+                                                    </Link>
+                                                </li>
+                                            </>
+                                        ) : (
+                                            <li className="breadcrumb-item">
+                                                <Link
+                                                    to={`/teacher/subject/${this.subjectId}`}
+                                                >
+                                                    {this.props.subject_name}
+                                                </Link>
+                                            </li>
+                                        )}
+                                        <li className="breadcrumb-item">
+                                            <Link
+                                                to="#"
+                                                onClick={
+                                                    this.props.history.goBack
+                                                }
+                                            >
+                                                {this.props.chapter_name}
+                                            </Link>
+                                        </li>
+                                        <li className="breadcrumb-item active">
+                                            Match
+                                        </li>
+                                    </ol>
+                                </nav>
+
                                 {/* Header area */}
-                                <div className="row align-items-center">
+                                <div className="row align-items-center mb-4">
                                     <div className="col-md-6">
-                                        <h5 className="primary-text">
-                                            {`${this.props.topic_name} - Match`}
+                                        <h5 className="primary-text mb-0">
+                                            {`Match - ${this.props.topic_name}`}
                                         </h5>
                                     </div>
                                     <div className="col-md-6">
-                                        <div className="d-flex flex-wrap justify-content-end mb-4">
+                                        <div className="d-flex flex-wrap justify-content-end">
                                             <button
                                                 className="btn btn-primary btn-sm shadow-none mr-1"
                                                 onClick={this.handlePublish}
                                             >
                                                 Publish
                                             </button>
-                                            <button className="btn btn-primary btn-sm shadow-none mr-1">
+                                            <a
+                                                href="https://iqlabs-media-type1.s3.us-east-2.amazonaws.com/media/Match/Templates/TeacherMatchTemplate.xlsx"
+                                                className="btn btn-primary btn-sm shadow-none mr-1"
+                                                download
+                                            >
                                                 Download template
-                                            </button>
-                                            <button className="btn btn-primary btn-sm shadow-none">
+                                            </a>
+                                            <button
+                                                className="btn btn-primary btn-sm shadow-none"
+                                                onClick={
+                                                    this.toggleTemplateModal
+                                                }
+                                            >
                                                 Upload template
                                             </button>
                                         </div>
@@ -680,7 +778,7 @@ class Match extends Component {
                                                 variant="link"
                                                 eventKey="0"
                                                 className="text-dark"
-                                                style={{ cursor: "pointer" }}
+                                                style={{ cursor: "default" }}
                                                 onClick={this.toggleCollapse}
                                             >
                                                 <div className="d-flex justify-content-between align-items-center">
