@@ -74,13 +74,13 @@ class TopicModal extends Component {
             return arr;
         }
 
-        if (this.props.activeTopic === "1") {
+        if (Number.isInteger(this.props.activeTopic)) {
             chapters.chapter_structure.push({
                 topic_name: this.state.topic_name,
                 topic_num: `${this.props.activeTopic}.${
                     chapters.chapter_structure.length + 1
                 }`,
-                parent_id: this.props.activeTopic,
+                parent_id: this.props.activeTopic.toString(),
                 next_topic: "",
                 child: [],
                 ancestor: `${this.props.activeTopic}.${
@@ -483,6 +483,7 @@ class QuizModal extends Component {
 }
 
 const mapStateToProps = (state) => ({
+    group_name: state.group_name,
     subject_name: state.subject_name,
     chapter_name: state.chapter_name,
 });
@@ -501,18 +502,20 @@ class Chapters extends Component {
             showQuiz_CreateModal: false,
             showQuiz_EditModal: false,
             showQuiz_DeleteModal: false,
-
             collapsed: false,
+
             chapterList: [],
             chapterId: "",
             chapterName: "",
-            activeTopic: "",
-            ancestor: "",
             chapters: {
                 topic_id: "",
                 chapter_id: this.props.match.params.chapterId,
                 chapter_structure: [],
             },
+            chapterIndex: 1,
+            activeTopic: "",
+            ancestor: "",
+
             cycle_test: [],
             quiz: [],
             selectedCycleData: [],
@@ -527,6 +530,7 @@ class Chapters extends Component {
             showSuccessAlert: false,
             page_loading: true,
         };
+        this.groupId = this.props.match.params.groupId;
         this.subjectId = this.props.match.params.subjectId;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
@@ -539,7 +543,7 @@ class Chapters extends Component {
 
     // ----- Topic Modals -----
 
-    toggleModal = (index, ancestor) => {
+    toggleTopicModal = (index, ancestor) => {
         this.setState({
             showTopicModal: !this.state.showTopicModal,
             activeTopic: index,
@@ -716,6 +720,19 @@ class Chapters extends Component {
             });
     };
 
+    getChapterIndex = () => {
+        const chapters = [...this.state.chapterList];
+        let index = 0;
+        for (let i = 0; i < chapters.length; i++) {
+            if (chapters[i].chapter_id === this.state.chapterId) {
+                index = i + 1;
+            }
+        }
+        this.setState({
+            chapterIndex: index,
+        });
+    };
+
     componentDidMount = () => {
         this.setState(
             {
@@ -736,10 +753,15 @@ class Chapters extends Component {
             .then((result) => {
                 console.log(result);
                 if (result.sts === true) {
-                    this.setState({
-                        chapterList: result.data.results,
-                        is_independent: result.data.is_independent,
-                    });
+                    this.setState(
+                        {
+                            chapterList: result.data.results,
+                            is_independent: result.data.is_independent,
+                        },
+                        () => {
+                            this.getChapterIndex();
+                        }
+                    );
                 } else {
                     this.setState({
                         errorMsg: result.detail ? result.detail : result.msg,
@@ -767,6 +789,7 @@ class Chapters extends Component {
                     this.loadTopicData();
                     this.loadCycleTestData();
                     this.loadQuizData();
+                    this.getChapterIndex();
                 }
             );
         }
@@ -827,6 +850,7 @@ class Chapters extends Component {
                 this.loadTopicData();
                 this.loadCycleTestData();
                 this.loadQuizData();
+                this.getChapterIndex();
             }
         );
     };
@@ -878,9 +902,9 @@ class Chapters extends Component {
         }
     };
 
-    topic = (data, index, topic_id) => {
+    topicRender = (data, index, topic_id) => {
         const nestedTopics = (data.child || []).map((topic, index) => {
-            return this.topic(topic, index, topic_id);
+            return this.topicRender(topic, index, topic_id);
         });
 
         return (
@@ -893,14 +917,10 @@ class Chapters extends Component {
                     }}
                 >
                     <div className="row align-items-center">
-                        <div className="col-md-4 mb-2 mb-md-0">
-                            <div className="row align-items-center">
-                                <div className="col-md-2 col-3">
-                                    {data.topic_num}
-                                </div>
-                                <div className="col-md-10 col-9">
-                                    {data.topic_name}
-                                </div>
+                        <div className="col-md-4 mb-2 mb-md-0 font-weight-bold-600">
+                            <div className="d-flex">
+                                <div className="mr-3">{data.topic_num}</div>
+                                <div>{data.topic_name}</div>
                             </div>
                         </div>
 
@@ -1043,7 +1063,7 @@ class Chapters extends Component {
                                         <Dropdown.Menu>
                                             <Dropdown.Item
                                                 onClick={() =>
-                                                    this.toggleModal(
+                                                    this.toggleTopicModal(
                                                         data.topic_num,
                                                         data.ancestor
                                                     )
@@ -1138,7 +1158,7 @@ class Chapters extends Component {
                 {this.state.showTopicModal ? (
                     <TopicModal
                         show={this.state.showTopicModal}
-                        onHide={this.toggleModal}
+                        onHide={this.toggleTopicModal}
                         formSubmission={this.topic_formSubmission}
                         subjectId={this.subjectId}
                         chapters={this.state.chapters}
@@ -1310,6 +1330,40 @@ class Chapters extends Component {
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
 
+                        {/* ----- Breadcrumb ----- */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb mb-3">
+                                <li className="breadcrumb-item">
+                                    <Link to="/teacher">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                {this.groupId !== undefined ? (
+                                    <li className="breadcrumb-item">
+                                        <Link
+                                            to={`/teacher/group/${this.groupId}`}
+                                        >
+                                            {this.props.group_name}
+                                        </Link>
+                                    </li>
+                                ) : (
+                                    ""
+                                )}
+                                <li className="breadcrumb-item">
+                                    <Link
+                                        to="#"
+                                        onClick={this.props.history.goBack}
+                                    >
+                                        {this.props.subject_name}
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    <span>Chapter:</span>
+                                    {this.state.chapterName}
+                                </li>
+                            </ol>
+                        </nav>
+
                         <div className="row align-items-center mb-3">
                             <div className="col-md-4">
                                 <Select
@@ -1402,7 +1456,10 @@ class Chapters extends Component {
                                                             </span>
                                                         </div>
                                                         <div className="col-1 small font-weight-bold">
-                                                            1
+                                                            {
+                                                                this.state
+                                                                    .chapterIndex
+                                                            }
                                                         </div>
                                                         <div className="col-8 small font-weight-bold">
                                                             {
@@ -1423,7 +1480,7 @@ class Chapters extends Component {
                                                     .length !== 0
                                                     ? this.state.chapters.chapter_structure.map(
                                                           (data, index) => {
-                                                              return this.topic(
+                                                              return this.topicRender(
                                                                   data,
                                                                   index,
                                                                   this.state
@@ -1632,79 +1689,80 @@ class Chapters extends Component {
                                                     : null}
 
                                                 {/* Quiz list */}
-                                                {/* {this.state.quiz.length !== 0
-                                                    ? this.state.quiz.map(
-                                                          (data, index) => {
-                                                              return (
-                                                                  <div
-                                                                      className="card card-header shadow-sm light-bg mb-2"
-                                                                      key={
-                                                                          index
-                                                                      }
-                                                                  >
-                                                                      <div className="row align-items-center">
-                                                                          <div className="col-md-6">
-                                                                              <p className="small primary-text font-weight-bold-600 mb-0">
-                                                                                  {
-                                                                                      data.quiz_name
-                                                                                  }
-                                                                              </p>
-                                                                          </div>
-                                                                          <div className="col-md-6 d-flex align-items-center justify-content-end">
-                                                                              <Link
-                                                                                  to={`${this.props.match.url}/quiz/${data.quiz_id}`}
-                                                                              >
-                                                                                  <button
-                                                                                      className="btn btn-primary btn-sm shadow-none"
-                                                                                      onClick={() =>
-                                                                                          this.dispatchQuiz(
-                                                                                              data.quiz_name
-                                                                                          )
-                                                                                      }
-                                                                                  >
-                                                                                      View
-                                                                                      /
-                                                                                      Edit
-                                                                                  </button>
-                                                                              </Link>
-                                                                              <Dropdown>
-                                                                                  <Dropdown.Toggle
-                                                                                      variant="white"
-                                                                                      className="btn btn-link btn-sm shadow-none caret-off ml-2"
-                                                                                  >
-                                                                                      <i className="fas fa-ellipsis-v"></i>
-                                                                                  </Dropdown.Toggle>
+                                                {Object.entries(this.state.quiz)
+                                                    .length !== 0 ? (
+                                                    <div className="card card-header shadow-sm light-bg mb-2">
+                                                        <div className="row align-items-center">
+                                                            <div className="col-md-6">
+                                                                <p className="small primary-text font-weight-bold-600 mb-0">
+                                                                    {
+                                                                        this
+                                                                            .state
+                                                                            .quiz
+                                                                            .quiz_name
+                                                                    }
+                                                                </p>
+                                                            </div>
+                                                            <div className="col-md-6 d-flex align-items-center justify-content-end">
+                                                                <Link
+                                                                    to={`${this.props.match.url}/quiz/${this.state.quiz.quiz_id}`}
+                                                                >
+                                                                    <button
+                                                                        className="btn btn-primary btn-sm shadow-none"
+                                                                        onClick={() =>
+                                                                            this.dispatchQuiz(
+                                                                                this
+                                                                                    .state
+                                                                                    .quiz
+                                                                                    .quiz_name
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        View /
+                                                                        Edit
+                                                                    </button>
+                                                                </Link>
+                                                                <Dropdown>
+                                                                    <Dropdown.Toggle
+                                                                        variant="white"
+                                                                        className="btn btn-link btn-sm shadow-none caret-off ml-2"
+                                                                    >
+                                                                        <i className="fas fa-ellipsis-v"></i>
+                                                                    </Dropdown.Toggle>
 
-                                                                                  <Dropdown.Menu>
-                                                                                      <Dropdown.Item
-                                                                                          onClick={() =>
-                                                                                              this.toggleQuiz_EditModal(
-                                                                                                  data
-                                                                                              )
-                                                                                          }
-                                                                                      >
-                                                                                          <i className="far fa-edit fa-sm mr-1"></i>{" "}
-                                                                                          Edit
-                                                                                      </Dropdown.Item>
-                                                                                      <Dropdown.Item
-                                                                                          onClick={() =>
-                                                                                              this.toggleQuiz_DeleteModal(
-                                                                                                  data
-                                                                                              )
-                                                                                          }
-                                                                                      >
-                                                                                          <i className="far fa-trash-alt fa-sm mr-1"></i>{" "}
-                                                                                          Delete
-                                                                                      </Dropdown.Item>
-                                                                                  </Dropdown.Menu>
-                                                                              </Dropdown>
-                                                                          </div>
-                                                                      </div>
-                                                                  </div>
-                                                              );
-                                                          }
-                                                      )
-                                                    : null} */}
+                                                                    <Dropdown.Menu>
+                                                                        <Dropdown.Item
+                                                                            onClick={() =>
+                                                                                this.toggleQuiz_EditModal(
+                                                                                    this
+                                                                                        .state
+                                                                                        .quiz
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            <i className="far fa-edit fa-sm mr-1"></i>{" "}
+                                                                            Edit
+                                                                        </Dropdown.Item>
+                                                                        <Dropdown.Item
+                                                                            onClick={() =>
+                                                                                this.toggleQuiz_DeleteModal(
+                                                                                    this
+                                                                                        .state
+                                                                                        .quiz
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            <i className="far fa-trash-alt fa-sm mr-1"></i>{" "}
+                                                                            Delete
+                                                                        </Dropdown.Item>
+                                                                    </Dropdown.Menu>
+                                                                </Dropdown>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    ""
+                                                )}
                                             </Card>
                                         </Accordion.Collapse>
                                     </Card>
@@ -1714,7 +1772,12 @@ class Chapters extends Component {
 
                         <button
                             className="btn btn-tomato btn-block shadow-sm"
-                            onClick={() => this.toggleModal("1", "0")}
+                            onClick={() =>
+                                this.toggleTopicModal(
+                                    this.state.chapterIndex,
+                                    "0"
+                                )
+                            }
                         >
                             Add Topic
                         </button>
@@ -1727,6 +1790,11 @@ class Chapters extends Component {
                         <button
                             className="btn btn-tomato btn-block shadow-sm"
                             onClick={this.toggleQuiz_CreateModal}
+                            disabled={
+                                Object.entries(this.state.quiz).length !== 0
+                                    ? true
+                                    : false
+                            }
                         >
                             Add Quiz
                         </button>

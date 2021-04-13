@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import SideNav from "./shared/sidenav";
 import Header from "./shared/navbar";
+import { Link } from "react-router-dom";
 import { Tabs, Tab } from "react-bootstrap";
 import Loading from "../sharedComponents/loader";
 import LeaderboardTable from "../table/leaderboardTable";
@@ -77,6 +78,20 @@ class Leaderboard extends Component {
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
 
+                        {/* ----- Breadcrumb ----- */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb mb-3">
+                                <li className="breadcrumb-item">
+                                    <Link to="/teacher">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    Leaderboard
+                                </li>
+                            </ol>
+                        </nav>
+
                         {/* Leaderboard table */}
                         <Tabs
                             activeKey={
@@ -94,7 +109,8 @@ class Leaderboard extends Component {
                                         leaderBoard={this.state.leaderBoard}
                                     />
                                     <div className="card-body p-3">
-                                        {this.state.totalCount > paginationCount ? (
+                                        {this.state.totalCount >
+                                        paginationCount ? (
                                             <Paginations
                                                 activePage={
                                                     this.state.activePage
@@ -118,7 +134,8 @@ class Leaderboard extends Component {
                                         leaderBoard={this.state.leaderBoard}
                                     />
                                     <div className="card-body p-3">
-                                        {this.state.totalCount > paginationCount ? (
+                                        {this.state.totalCount >
+                                        paginationCount ? (
                                             <Paginations
                                                 activePage={
                                                     this.state.activePage

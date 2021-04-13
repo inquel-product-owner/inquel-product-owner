@@ -14,8 +14,6 @@ class FileModal extends Component {
             selectedImage: 0,
             selectedImageData: this.props.image[0],
             activeTab: "image",
-            // nav1: this.slider1,
-            // nav2: this.slider2,
         };
     }
 
@@ -27,13 +25,6 @@ class FileModal extends Component {
         });
     };
 
-    componentDidMount = () => {
-        // this.setState({
-        //     nav1: this.slider1,
-        //     nav2: this.slider2,
-        // });
-    };
-
     toggleNav = (type) => {
         this.setState({
             activeTab: type,
@@ -42,11 +33,6 @@ class FileModal extends Component {
 
     render() {
         let audio = "";
-        // const settingsMain = {
-        //     arrows: false,
-        //     fade: true,
-        //     adaptiveHeight: true,
-        // };
         return (
             <Modal
                 show={this.props.show}
@@ -232,115 +218,3 @@ class FileModal extends Component {
 }
 
 export default FileModal;
-
-// <div className="card shadow-sm">
-//     <div className="card-header text-center font-weight-bold tomato-bg">
-//         {this.state.selectedImageData
-//             .length !== 0
-//             ? this.state
-//                   .selectedImageData
-//                   .title
-//             : ""}
-//     </div>
-//     {/* Single image view */}
-//     <div className="card-body text-center p-0">
-//         {this.state.selectedImageData
-//             .length !== 0 ? (
-//             <img
-//                 src={
-//                     this.state
-//                         .selectedImageData
-//                         .path
-//                 }
-//                 alt={
-//                     this.state
-//                         .selectedImageData
-//                         .file_name
-//                 }
-//                 className="img-fluid"
-//             />
-//         ) : (
-//             ""
-//         )}
-//     </div>
-//     {/* Thumbnails */}
-//     <div className="card-footer tomato-bg">
-//         <div className="row justify-content-center">
-//             {this.state.image.map(
-//                 (images, index) => {
-//                     return images.path !==
-//                         "" ? (
-//                         <div
-//                             key={index}
-//                             className="col-md-3"
-//                         >
-//                             <div
-//                                 className={`card preview-img-sm ${
-//                                     this
-//                                         .state
-//                                         .selectedImage ===
-//                                     index
-//                                         ? "border-primary shadow"
-//                                         : ""
-//                                 }`}
-//                                 style={{
-//                                     backgroundImage: `url(${images.path})`,
-//                                 }}
-//                                 onClick={() =>
-//                                     this.changeImage(
-//                                         index
-//                                     )
-//                                 }
-//                             ></div>
-//                         </div>
-//                     ) : null;
-//                 }
-//             )}
-//         </div>
-//     </div>
-// </div>
-
-// {/* <>
-//     <Slider
-//         {...settingsMain}
-//         asNavFor={this.state.nav2}
-//         ref={(slider) => (this.slider1 = slider)}
-//     >
-//         {this.state.image.map((image, index) => {
-//             return image.path !== "" ? (
-//                 <div className="card mb-2" key={index}>
-//                     <img
-//                         src={image.path}
-//                         className="card-img-top rounded-lg shadow-sm"
-//                         alt={image.title}
-//                     />
-//                     <div className="card-body primary-text font-weight-bold-600 text-center small p-2">
-//                         {image.title}
-//                     </div>
-//                 </div>
-//             ) : null;
-//         })}
-//     </Slider>
-//     <Slider
-//         slidesToShow={this.props.image.length}
-//         swipeToSlide={true}
-//         focusOnSelect={true}
-//         centerMode={true}
-//         centerPadding="10px"
-//         asNavFor={this.state.nav1}
-//         ref={(slider) => (this.slider2 = slider)}
-//     >
-//         {this.state.image.map((image, index) => {
-//             return image.path !== "" ? (
-//                 <div className="col-12" key={index}>
-//                     <div
-//                         className="card shadow-sm preview-img-sm"
-//                         style={{
-//                             backgroundImage: `url(${image.path})`,
-//                         }}
-//                     ></div>
-//                 </div>
-//             ) : null;
-//         })}
-//     </Slider>
-// </>; */}

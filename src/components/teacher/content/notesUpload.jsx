@@ -4,6 +4,7 @@ import axios from "axios";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import Switch from "react-switch";
+import { Link } from "react-router-dom";
 import { Spinner } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
 import { Document, Page, pdfjs } from "react-pdf";
@@ -12,6 +13,7 @@ import AlertBox from "../../sharedComponents/alert";
 import { ContentDeleteModal } from "../../sharedComponents/contentManagementModal";
 
 const mapStateToProps = (state) => ({
+    group_name: state.group_name,
     subject_name: state.subject_name,
     chapter_name: state.chapter_name,
     topic_name: state.topic_name,
@@ -43,6 +45,7 @@ class NotesUpload extends Component {
             showLoader: false,
             page_loading: true,
         };
+        this.groupId = this.props.match.params.groupId;
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
         this.topicNum = this.props.match.params.topicNum;
@@ -118,15 +121,15 @@ class NotesUpload extends Component {
                 console.log(result);
                 if (result.sts === true && result.data.length !== 0) {
                     this.setState({
-                        notes_id: result.data[0].notes_id,
-                        notes_name: result.data[0].notes_name,
+                        notes_id: result.data.notes_id,
+                        notes_name: result.data.notes_name,
                         limited:
-                            result.data[0].notes_name === undefined
-                                ? result.data[0].limited
+                            result.data.notes_name === undefined
+                                ? result.data.limited
                                 : false,
                         path:
-                            result.data[0].direct_question_urls.length !== 0
-                                ? result.data[0].direct_question_urls[0]
+                            result.data.direct_question_urls.length !== 0
+                                ? result.data.direct_question_urls[0]
                                 : null,
                     });
                 } else if (result.sts === false) {
@@ -326,6 +329,54 @@ class NotesUpload extends Component {
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
 
+                        {/* ----- Breadcrumb ----- */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb mb-3">
+                                <li className="breadcrumb-item">
+                                    <Link to="/teacher">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                {this.groupId !== undefined ? (
+                                    <>
+                                        <li className="breadcrumb-item">
+                                            <Link
+                                                to={`/teacher/group/${this.groupId}`}
+                                            >
+                                                {this.props.group_name}
+                                            </Link>
+                                        </li>
+                                        <li className="breadcrumb-item">
+                                            <Link
+                                                to={`/teacher/group/${this.groupId}/subject/${this.subjectId}`}
+                                            >
+                                                {this.props.subject_name}
+                                            </Link>
+                                        </li>
+                                    </>
+                                ) : (
+                                    <li className="breadcrumb-item">
+                                        <Link
+                                            to={`/teacher/subject/${this.subjectId}`}
+                                        >
+                                            {this.props.subject_name}
+                                        </Link>
+                                    </li>
+                                )}
+                                <li className="breadcrumb-item">
+                                    <Link
+                                        to="#"
+                                        onClick={this.props.history.goBack}
+                                    >
+                                        {this.props.chapter_name}
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    Notes
+                                </li>
+                            </ol>
+                        </nav>
+
                         <div className="card secondary-bg mb-3">
                             <div className="card-body p-3">
                                 <div className="row align-items-center">
@@ -334,7 +385,6 @@ class NotesUpload extends Component {
                                             <span className="font-weight-bold">
                                                 Notes:
                                             </span>{" "}
-                                            {this.props.chapter_name} |{" "}
                                             {this.props.topic_name}
                                         </p>
                                     </div>

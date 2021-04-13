@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Header from "./shared/navbar";
 import SideNav from "./shared/sidenav";
 import { Dropdown } from "react-bootstrap";
+import { Link } from "react-router-dom";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import { paginationCount } from "../../shared/globalValues.js";
 import Loading from "../sharedComponents/loader";
@@ -241,21 +242,31 @@ class StudentList extends Component {
                     <div className="container-fluid">
                         {/* Back button */}
                         <button
-                            className="btn btn-primary-invert btn-sm mb-2"
+                            className="btn btn-primary-invert btn-sm mb-3"
                             onClick={this.props.history.goBack}
                         >
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
 
                         {/* Filter area */}
-                        <div className="row align-items-center">
-                            <div className="col-md-2">
-                                <h5 className="primary-text">
-                                    Students Profiles
-                                </h5>
+                        <div className="row align-items-center mb-3">
+                            <div className="col-md-6">
+                                {/* ----- Breadcrumb ----- */}
+                                <nav aria-label="breadcrumb">
+                                    <ol className="breadcrumb">
+                                        <li className="breadcrumb-item">
+                                            <Link to="/teacher">
+                                                <i className="fas fa-home fa-sm"></i>
+                                            </Link>
+                                        </li>
+                                        <li className="breadcrumb-item active">
+                                            Student Profiles
+                                        </li>
+                                    </ol>
+                                </nav>
                             </div>
-                            <div className="col-md-10">
-                                <div className="d-flex flex-wrap justify-content-end mb-4">
+                            <div className="col-md-6">
+                                <div className="d-flex flex-wrap justify-content-end">
                                     {/* <button
                                         className="btn btn-primary btn-sm shadow-none mr-1"
                                         onClick={this.handleDelete}

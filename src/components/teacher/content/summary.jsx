@@ -4,6 +4,7 @@ import axios from "axios";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import Switch from "react-switch";
+import { Link } from "react-router-dom";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { Modal, Alert, Spinner } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
@@ -13,6 +14,7 @@ import AlertBox from "../../sharedComponents/alert";
 import { ContentDeleteModal } from "../../sharedComponents/contentManagementModal";
 
 const mapStateToProps = (state) => ({
+    group_name: state.group_name,
     subject_name: state.subject_name,
     chapter_name: state.chapter_name,
 });
@@ -253,6 +255,7 @@ class Summary extends Component {
             showSuccessAlert: false,
             page_loading: true,
         };
+        this.groupId = this.props.match.params.groupId;
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
         this.url = baseUrl + teacherUrl;
@@ -482,7 +485,7 @@ class Summary extends Component {
             this.setState({
                 showDeleteModal: false,
             });
-            this.loadSummaryData()
+            this.loadSummaryData();
         }, 1000);
     };
 
@@ -559,6 +562,39 @@ class Summary extends Component {
                         >
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
+
+                        {/* ----- Breadcrumb ----- */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb mb-3">
+                                <li className="breadcrumb-item">
+                                    <Link to="/teacher">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                {this.groupId !== undefined ? (
+                                    <li className="breadcrumb-item">
+                                        <Link
+                                            to={`/teacher/group/${this.groupId}`}
+                                        >
+                                            {this.props.group_name}
+                                        </Link>
+                                    </li>
+                                ) : (
+                                    ""
+                                )}
+                                <li className="breadcrumb-item">
+                                    <Link
+                                        to="#"
+                                        onClick={this.props.history.goBack}
+                                    >
+                                        {this.props.subject_name}
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    Summary
+                                </li>
+                            </ol>
+                        </nav>
 
                         <div className="card secondary-bg mb-3">
                             <div className="card-body p-3">

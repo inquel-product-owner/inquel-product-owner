@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 import axios from "axios";
+import { Link } from "react-router-dom";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import CKeditor from "../../sharedComponents/CKeditor";
@@ -13,8 +14,10 @@ import AlertBox from "../../sharedComponents/alert";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import FileModal from "../shared/fileExplorer";
 import { ContentDeleteModal } from "../../sharedComponents/contentManagementModal";
+import TemplateUpload from "../shared/templateUpload";
 
 const mapStateToProps = (state) => ({
+    group_name: state.group_name,
     subject_name: state.subject_name,
     chapter_name: state.chapter_name,
     topic_name: state.topic_name,
@@ -26,6 +29,7 @@ class Concepts extends Component {
         this.state = {
             showSideNav: false,
             showModal: false,
+            showTemplateUploadModal: false,
 
             errorMsg: "",
             successMsg: "",
@@ -88,6 +92,7 @@ class Concepts extends Component {
         };
         this.image_limit = 4;
         this.audio_limit = 2;
+        this.groupId = this.props.match.params.groupId;
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
         this.topicNum = this.props.match.params.topicNum;
@@ -114,6 +119,24 @@ class Concepts extends Component {
             selectedAudio: audio,
         });
     };
+
+    // -------------------------- Template uploading --------------------------
+
+    toggleTemplateModal = () => {
+        this.setState({
+            showTemplateUploadModal: !this.state.showTemplateUploadModal,
+        });
+    };
+
+    templateFormSubmission = (data) => {
+        this.setState({
+            showTemplateUploadModal: false,
+            page_loading: true,
+        });
+        this.loadConceptData();
+    };
+
+    // -------------------------- Load concept data --------------------------
 
     loadConceptData = () => {
         fetch(
@@ -1738,6 +1761,21 @@ class Concepts extends Component {
                     />
                 ) : null}
 
+                {/* Template uploading Modal */}
+                {this.state.showTemplateUploadModal ? (
+                    <TemplateUpload
+                        show={this.state.showTemplateUploadModal}
+                        onHide={this.toggleTemplateModal}
+                        formSubmission={this.templateFormSubmission}
+                        toggleModal={this.toggleTemplateModal}
+                        url={`${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/upload/`}
+                        type="concept"
+                        subjectId={this.subjectId}
+                        chapterId={this.chapterId}
+                        topic_num={this.topicNum}
+                    />
+                ) : null}
+
                 <div
                     className={`section content ${
                         this.state.showSideNav ? "active" : ""
@@ -1762,15 +1800,68 @@ class Concepts extends Component {
                                     Back
                                 </button>
 
+                                {/* ----- Breadcrumb ----- */}
+                                <nav aria-label="breadcrumb">
+                                    <ol className="breadcrumb mb-3">
+                                        <li className="breadcrumb-item">
+                                            <Link to="/teacher">
+                                                <i className="fas fa-home fa-sm"></i>
+                                            </Link>
+                                        </li>
+                                        {this.groupId !== undefined ? (
+                                            <>
+                                                <li className="breadcrumb-item">
+                                                    <Link
+                                                        to={`/teacher/group/${this.groupId}`}
+                                                    >
+                                                        {this.props.group_name}
+                                                    </Link>
+                                                </li>
+                                                <li className="breadcrumb-item">
+                                                    <Link
+                                                        to={`/teacher/group/${this.groupId}/subject/${this.subjectId}`}
+                                                    >
+                                                        {
+                                                            this.props
+                                                                .subject_name
+                                                        }
+                                                    </Link>
+                                                </li>
+                                            </>
+                                        ) : (
+                                            <li className="breadcrumb-item">
+                                                <Link
+                                                    to={`/teacher/subject/${this.subjectId}`}
+                                                >
+                                                    {this.props.subject_name}
+                                                </Link>
+                                            </li>
+                                        )}
+                                        <li className="breadcrumb-item">
+                                            <Link
+                                                to="#"
+                                                onClick={
+                                                    this.props.history.goBack
+                                                }
+                                            >
+                                                {this.props.chapter_name}
+                                            </Link>
+                                        </li>
+                                        <li className="breadcrumb-item active">
+                                            Concepts
+                                        </li>
+                                    </ol>
+                                </nav>
+
                                 {/* Header area */}
-                                <div className="row align-items-center">
+                                <div className="row align-items-center mb-4">
                                     <div className="col-md-6">
-                                        <h5 className="primary-text">
-                                            {`${this.props.chapter_name} | ${this.props.topic_name} - Concepts`}
+                                        <h5 className="primary-text mb-0">
+                                            {`Concepts - ${this.props.topic_name}`}
                                         </h5>
                                     </div>
                                     <div className="col-md-6">
-                                        <div className="d-flex flex-wrap justify-content-end mb-4">
+                                        <div className="d-flex flex-wrap justify-content-end">
                                             <button
                                                 className="btn btn-primary btn-sm shadow-none mr-1"
                                                 onClick={this.handlePublish}
@@ -1790,10 +1881,19 @@ class Concepts extends Component {
                                                 )}
                                                 Publish
                                             </button>
-                                            <button className="btn btn-primary btn-sm shadow-none mr-1">
+                                            <a
+                                                href="https://iqlabs-media-type1.s3.us-east-2.amazonaws.com/media/TypeOne/Templates/TeacherConceptsTemplate.xlsx"
+                                                className="btn btn-primary btn-sm shadow-none mr-1"
+                                                download
+                                            >
                                                 Download template
-                                            </button>
-                                            <button className="btn btn-primary btn-sm shadow-none">
+                                            </a>
+                                            <button
+                                                className="btn btn-primary btn-sm shadow-none"
+                                                onClick={
+                                                    this.toggleTemplateModal
+                                                }
+                                            >
                                                 Upload template
                                             </button>
                                         </div>
@@ -2044,7 +2144,7 @@ class Concepts extends Component {
                                                 variant="link"
                                                 eventKey="0"
                                                 className="text-dark"
-                                                style={{ cursor: "pointer" }}
+                                                style={{ cursor: "default" }}
                                                 onClick={() =>
                                                     this.toggleCollapse(
                                                         "content"
@@ -2111,7 +2211,7 @@ class Concepts extends Component {
                                                 variant="link"
                                                 eventKey="1"
                                                 className="text-dark"
-                                                style={{ cursor: "pointer" }}
+                                                style={{ cursor: "default" }}
                                                 onClick={() =>
                                                     this.toggleCollapse("files")
                                                 }
@@ -2584,7 +2684,7 @@ class Concepts extends Component {
                                                 variant="link"
                                                 eventKey="2"
                                                 className="text-dark"
-                                                style={{ cursor: "pointer" }}
+                                                style={{ cursor: "default" }}
                                                 onClick={this.toggleCollapse}
                                             >
                                                 <div className="d-flex justify-content-between align-items-center">

@@ -8,6 +8,8 @@ import { OverlayTrigger, Tooltip, Popover, Modal } from "react-bootstrap";
 import FullScreen from "react-fullscreen-crossbrowser";
 import { Player } from "video-react";
 import "video-react/dist/video-react.css";
+import Lightbox from "react-awesome-lightbox";
+import "react-awesome-lightbox/build/style.css";
 import {
     Type1DataFormat,
     Type2DataFormat,
@@ -35,6 +37,17 @@ class VideoModal extends Component {
                         <Player>
                             <source src={this.state.video.path} />
                         </Player>
+                        <p className="mt-3 mb-0">
+                            If video doesn't start playing,{" "}
+                            <a
+                                href={this.state.video.path}
+                                target="_blank"
+                                rel="noreferrer"
+                            >
+                                Click here
+                            </a>{" "}
+                            to view the video in a seperate tab
+                        </p>
                     </div>
                 </Modal.Body>
             </Modal>
@@ -59,21 +72,25 @@ class FlashCard extends Component {
             match_terms: { id: [], type: [] },
             match_ids: [],
             match_temp: [],
-            match_color: "primary-bg text-white",
+            match_color: "match-active-bg",
 
             activeTab: "concept",
             activeData: 0,
             totalItems: "",
             totalSubQuestion: [],
             currentSubQuestionIndex: [],
+
             next: null,
             previous: null,
             type2_next: null,
             type2_previous: null,
             isFullscreenEnabled: false,
+            isLightBoxOpen: false,
 
             selectedImage: 0,
             selectedImageData: {},
+            selectedImageArray: [],
+            imageStartIndex: 0,
             selectedVideoData: "",
 
             errorMsg: "",
@@ -551,6 +568,123 @@ class FlashCard extends Component {
             });
     };
 
+    // ---------- creates section structure and explanation structure ----------
+
+    loopSectionStructure = () => {
+        const sections =
+            this.state.practice !== undefined ||
+            this.state.practice.length !== 0
+                ? this.state.practice
+                : [];
+        let questions = [];
+        let explanation = [];
+
+        if (sections.length !== 0) {
+            sections.forEach((data) => {
+                if (data.type === "type_1") {
+                    // section
+                    questions.push({
+                        question_random_id: data.question_random_id,
+                        answers: [],
+                    });
+                    // explanation
+                    explanation.push({
+                        isAnswered: false,
+                        answer: false,
+                        answers: [],
+                        explanation: "",
+                    });
+                } else if (data.type === "type_2") {
+                    let sub_question = [];
+                    let sub_explanation = [];
+                    data.sub_question.forEach((sub_data) => {
+                        // section
+                        sub_question.push({
+                            sub_question_id: sub_data.sub_question_id,
+                            answers: [],
+                        });
+                        // explanation
+                        sub_explanation.push({
+                            answer: false,
+                            answers: [],
+                        });
+                    });
+                    // section
+                    questions.push({
+                        question_random_id: data.question_random_id,
+                        answers: sub_question,
+                    });
+                    // explanation
+                    explanation.push({
+                        explanation: "",
+                        isAnswered: false,
+                        sub_question: sub_explanation,
+                    });
+                }
+            });
+        }
+
+        this.setState({
+            sections: questions,
+            explanation: explanation,
+        });
+    };
+
+    // ---------- handle option selection ----------
+
+    handleMCQ = (event, index) => {
+        let sections = [...this.state.sections];
+        if (event.target.checked) {
+            sections[index].answers.push(event.target.value);
+            this.setState({
+                sections: sections,
+            });
+        } else {
+            sections[index].answers.splice(
+                sections[index].answers.indexOf(event.target.value),
+                1
+            );
+            this.setState({
+                sections: sections,
+            });
+        }
+    };
+
+    handleFillin = (event, index, type) => {
+        let sections = [...this.state.sections];
+        if (event.target.value !== "") {
+            if (type === "type_1") {
+                sections[index].answers[0] = event.target.value;
+            } else if (type === "type_2") {
+                sections[index].answers[
+                    this.state.currentSubQuestionIndex[index]
+                ].answers[0] = event.target.value;
+            }
+            this.setState({
+                sections: sections,
+            });
+        } else {
+            if (type === "type_1") {
+                sections[index].answers = [];
+            } else if (type === "type_2") {
+                sections[index].answers[
+                    this.state.currentSubQuestionIndex[index]
+                ].answers = [];
+            }
+            this.setState({
+                sections: sections,
+            });
+        }
+    };
+
+    handleBoolean = (event, index) => {
+        let sections = [...this.state.sections];
+        sections[index].answers[0] = event.target.value;
+        this.setState({
+            sections: sections,
+        });
+    };
+
     practiceRender = (data, index, section, explanation) => {
         return data.lenght === 0 ? (
             <div
@@ -724,8 +858,7 @@ class FlashCard extends Component {
                                                             onChange={(event) =>
                                                                 this.handleMCQ(
                                                                     event,
-                                                                    index,
-                                                                    "type_1"
+                                                                    index
                                                                 )
                                                             }
                                                             checked={
@@ -860,23 +993,27 @@ class FlashCard extends Component {
                             )}
 
                             {/* ----- Check button ----- */}
-                            {explanation.length !== 0 ? (
+                            {Object.entries(explanation).length !== 0 ? (
                                 explanation.isAnswered === false ? (
-                                    <div className="row mt-4">
-                                        <div className="col-md-3">
-                                            <button
-                                                className="btn btn-primary btn-block btn-sm shadow-none"
-                                                onClick={() => {
-                                                    this.handleCheck(
-                                                        section,
-                                                        "type_1"
-                                                    );
-                                                }}
-                                            >
-                                                Check
-                                            </button>
+                                    section.answers.length !== 0 ? (
+                                        <div className="row mt-4">
+                                            <div className="col-md-3">
+                                                <button
+                                                    className="btn btn-primary btn-block btn-sm shadow-none"
+                                                    onClick={() => {
+                                                        this.handleCheck(
+                                                            section,
+                                                            "type_1"
+                                                        );
+                                                    }}
+                                                >
+                                                    Check
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
+                                    ) : (
+                                        ""
+                                    )
                                 ) : (
                                     ""
                                 )
@@ -895,122 +1032,259 @@ class FlashCard extends Component {
                         </div>
                     </div>
                 ) : (
-                    // --------------- Type 2 content ---------------
-                    <div className="row w-100">
-                        <div className="col-md-8">
-                            <div
-                                className="font-weight-bold-600 mb-4"
-                                dangerouslySetInnerHTML={{
-                                    __html: data[index].question,
-                                }}
-                            ></div>
-                            {/* ---------- Explanation ---------- */}
-                            {explanation.lenght !== 0 ? (
-                                explanation[
-                                    this.state.currentSubQuestionIndex[index]
-                                ].isAnswered === true ? (
-                                    <>
-                                        <div className="d-flex align-items-start justify-content">
-                                            <button className="btn secondary-bg btn-sm shadow-sm mr-1 mt-1 px-3 font-weight-bold-600 rounded-lg">
-                                                {this.state
-                                                    .currentSubQuestionIndex[
-                                                    index
-                                                ] + 1}
-                                            </button>
-                                            <div className="card font-weight-bold-600 secondary-bg py-2 px-3 mb-3 w-100">
-                                                <div
-                                                    dangerouslySetInnerHTML={{
-                                                        __html:
-                                                            data[index]
-                                                                .sub_question[
-                                                                this.state
-                                                                    .currentSubQuestionIndex[
-                                                                    index
-                                                                ]
-                                                            ].question,
-                                                    }}
-                                                ></div>
+                    // --------------- Type 2 render function ---------------
+                    this.typeTwoRender(data, index, section, explanation)
+                )}
+            </div>
+        );
+    };
+
+    handleDragStart = (event, data, index) => {
+        event.dataTransfer.setData("data", data);
+        event.dataTransfer.setData("index", index);
+        var node = document.getElementById(event.target.id);
+        var crt = node.cloneNode(true);
+        crt.id = event.target.id + "-copy";
+        crt.classList.remove("light-bg");
+        crt.classList.add("ghost-card");
+        document.getElementById("root").appendChild(crt);
+        event.dataTransfer.setDragImage(crt, 0, 0);
+    };
+
+    handleDragEnd = (event) => {
+        var id = event.target.id + "-copy";
+        var node = document.getElementById(id);
+        node.parentNode.removeChild(node);
+    };
+
+    handleDrop = (event) => {
+        const sections = [...this.state.sections];
+
+        var areaNode = document.getElementById("drop-area");
+        areaNode.classList.toggle("over");
+
+        let data = event.dataTransfer.getData("data") || null;
+        let index = event.dataTransfer.getData("index") || null;
+        if (data !== null && index !== null) {
+            sections[index].answers[
+                this.state.currentSubQuestionIndex[index]
+            ].answers[0] = data;
+        }
+
+        this.setState({
+            sections: sections,
+        });
+    };
+
+    handleDragEnter = (event) => {
+        var node = document.getElementById("drop-area");
+        node.classList.toggle("over");
+    };
+
+    handleDragLeave = (event) => {
+        var node = document.getElementById("drop-area");
+        node.classList.toggle("over");
+    };
+
+    typeTwoRender = (data, index, section, explanation) => {
+        let isAnswerAvailable = false;
+        let answerCount = 0;
+        if (Object.entries(section).length !== 0) {
+            if (section.answers.length !== 0) {
+                section.answers.forEach((data) => {
+                    if (data.answers.length !== 0) {
+                        isAnswerAvailable = true;
+                        answerCount++;
+                    }
+                });
+            }
+        }
+        return (
+            <>
+                {/* ---------- Main Question ---------- */}
+                <div
+                    className="mb-4"
+                    dangerouslySetInnerHTML={{
+                        __html: data[index].question,
+                    }}
+                ></div>
+                <div className="row w-100 mb-3">
+                    {/* ---------- Drop area ---------- */}
+                    <div className="col-md-6">
+                        <div
+                            id="drop-area"
+                            className="position-relative p-3"
+                            onDragOver={(e) => e.preventDefault()}
+                            onDrop={(e) => this.handleDrop(e)}
+                            onDragEnter={(e) => this.handleDragEnter(e)}
+                            onDragLeave={(e) => this.handleDragLeave(e)}
+                        >
+                            {isAnswerAvailable === false ? (
+                                <div id="drop-here" draggable={false}>
+                                    <i className="fas fa-arrows-alt mr-2"></i>{" "}
+                                    Drop answer here...
+                                </div>
+                            ) : (
+                                <>
+                                    {section.answers.map((data, index) => {
+                                        return data.answers.length !== 0 ? (
+                                            <div
+                                                className={`card shadow-sm mb-2 ${
+                                                    explanation.isAnswered ===
+                                                    true
+                                                        ? explanation
+                                                              .sub_question[
+                                                              index
+                                                          ].answer === false
+                                                            ? "danger-bg"
+                                                            : "success-bg"
+                                                        : "pinkrange-bg"
+                                                }`}
+                                                key={index}
+                                            >
+                                                <div className="card-body small font-weight-bold-600 primary-text py-3">
+                                                    {data.answers[0]}
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div
-                                            className="card card-body bg-light mb-3"
-                                            style={{
-                                                minHeight: "200px",
-                                            }}
-                                        >
-                                            <p className="font-weight-bold-600 mb-2">
-                                                Explanation:
-                                            </p>
-                                            <p
-                                                className="small"
+                                        ) : (
+                                            ""
+                                        );
+                                    })}
+                                    {/* ----- Check button ----- */}
+                                    {answerCount ===
+                                    this.state.totalSubQuestion[index] ? (
+                                        explanation.isAnswered === false ? (
+                                            <div className="row mt-3">
+                                                <div className="col-md-4">
+                                                    <button
+                                                        className="btn btn-primary btn-block btn-sm shadow-none"
+                                                        onClick={() => {
+                                                            this.handleCheck(
+                                                                section,
+                                                                "type_2"
+                                                            );
+                                                        }}
+                                                    >
+                                                        Check
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            ""
+                                        )
+                                    ) : (
+                                        ""
+                                    )}
+                                </>
+                            )}
+                        </div>
+                    </div>
+                    {/* ---------- Sub question ---------- */}
+                    <div className="col-md-6">
+                        {/* ----- Explanation ----- */}
+                        {Object.entries(explanation).lenght !== 0 ? (
+                            explanation.isAnswered === true ? (
+                                <div
+                                    className="card card-body bg-light"
+                                    style={{
+                                        minHeight: "250px",
+                                    }}
+                                >
+                                    <p className="font-weight-bold-600 mb-2">
+                                        Explanation:
+                                    </p>
+                                    <p
+                                        className="small"
+                                        dangerouslySetInnerHTML={{
+                                            __html: explanation.explanation,
+                                        }}
+                                    ></p>
+                                </div>
+                            ) : (
+                                /* ---------- Sub Question ---------- */
+                                <div className="d-flex align-items-start justify-content">
+                                    <button className="btn secondary-bg btn-sm shadow-sm mr-1 mt-1 px-3 font-weight-bold-600 rounded-lg">
+                                        {this.state.currentSubQuestionIndex[
+                                            index
+                                        ] + 1}
+                                    </button>
+
+                                    <div className="card w-100">
+                                        <div className="card secondary-bg py-2 px-3 mb-2">
+                                            <div
                                                 dangerouslySetInnerHTML={{
                                                     __html:
-                                                        explanation[
+                                                        data[index]
+                                                            .sub_question[
                                                             this.state
                                                                 .currentSubQuestionIndex[
                                                                 index
                                                             ]
-                                                        ].explanation,
+                                                        ].question,
                                                 }}
-                                            ></p>
+                                            ></div>
                                         </div>
-                                        {/* show answer */}
-                                        <div className="row">
-                                            <div className="col-md-6">
-                                                <div
-                                                    className="card card-body success-bg h-100"
-                                                    style={{
-                                                        minHeight: "100px",
-                                                    }}
-                                                >
-                                                    <p className="font-weight-bold-600 mb-2">
-                                                        Correct answer(s):
-                                                    </p>
-                                                    {explanation[
-                                                        this.state
-                                                            .currentSubQuestionIndex[
-                                                            index
-                                                        ]
-                                                    ].answer === false
-                                                        ? explanation[
-                                                              this.state
-                                                                  .currentSubQuestionIndex[
-                                                                  index
-                                                              ]
-                                                          ].answers !==
-                                                              undefined &&
-                                                          explanation[
-                                                              this.state
-                                                                  .currentSubQuestionIndex[
-                                                                  index
-                                                              ]
-                                                          ].answers.lenght !== 0
-                                                            ? explanation[
-                                                                  this.state
-                                                                      .currentSubQuestionIndex[
+                                        {/* Multiple choice question */}
+                                        {data[index].sub_question[
+                                            this.state.currentSubQuestionIndex[
+                                                index
+                                            ]
+                                        ].mcq
+                                            ? data[index].sub_question[
+                                                  this.state
+                                                      .currentSubQuestionIndex[
+                                                      index
+                                                  ]
+                                              ].options.map(
+                                                  (options, option_index) => {
+                                                      return (
+                                                          <div
+                                                              className="card shadow-sm mb-2 light-bg"
+                                                              key={option_index}
+                                                              id={`option-${option_index}`}
+                                                              style={{
+                                                                  cursor:
+                                                                      "move",
+                                                              }}
+                                                              onDragStart={(
+                                                                  e
+                                                              ) =>
+                                                                  this.handleDragStart(
+                                                                      e,
+                                                                      options.content,
                                                                       index
-                                                                  ]
-                                                              ].answers.map(
-                                                                  (
-                                                                      data,
-                                                                      index
-                                                                  ) => {
-                                                                      return (
-                                                                          <p
-                                                                              className="small mb-2"
-                                                                              key={
-                                                                                  index
-                                                                              }
-                                                                          >
-                                                                              {
-                                                                                  data
-                                                                              }
-                                                                          </p>
-                                                                      );
+                                                                  )
+                                                              }
+                                                              onDragEnd={(e) =>
+                                                                  this.handleDragEnd(
+                                                                      e
+                                                                  )
+                                                              }
+                                                              draggable
+                                                          >
+                                                              <div className="card-body small font-weight-bold-600 primary-text py-3">
+                                                                  {
+                                                                      options.content
                                                                   }
-                                                              )
-                                                            : ""
-                                                        : section.length !== 0
+                                                              </div>
+                                                          </div>
+                                                      );
+                                                  }
+                                              )
+                                            : ""}
+                                        {/* Fill in the blanks */}
+                                        {data[index].sub_question[
+                                            this.state.currentSubQuestionIndex[
+                                                index
+                                            ]
+                                        ].fill_in ? (
+                                            <input
+                                                type="text"
+                                                name="fill_in"
+                                                className="form-control borders"
+                                                placeholder="Type your answer here"
+                                                value={
+                                                    section.length !== 0
                                                         ? section.answers
                                                               .length !== 0
                                                             ? section.answers[
@@ -1018,84 +1292,22 @@ class FlashCard extends Component {
                                                                       .currentSubQuestionIndex[
                                                                       index
                                                                   ]
-                                                              ].answers.map(
-                                                                  (
-                                                                      data,
-                                                                      index
-                                                                  ) => {
-                                                                      return (
-                                                                          <p
-                                                                              className="small mb-2"
-                                                                              key={
-                                                                                  index
-                                                                              }
-                                                                          >
-                                                                              {
-                                                                                  data
-                                                                              }
-                                                                          </p>
-                                                                      );
-                                                                  }
-                                                              )
+                                                              ].answers[0] || ""
                                                             : ""
-                                                        : ""}
-                                                </div>
-                                            </div>
-                                            {explanation[
-                                                this.state
-                                                    .currentSubQuestionIndex[
-                                                    index
-                                                ]
-                                            ].answer === false ? (
-                                                <div className="col-md-6">
-                                                    <div
-                                                        className="card card-body danger-bg h-100"
-                                                        style={{
-                                                            minHeight: "100px",
-                                                        }}
-                                                    >
-                                                        <p className="font-weight-bold-600 mb-2">
-                                                            Your answer(s):
-                                                        </p>
-                                                        {section.length !== 0
-                                                            ? section.answers[
-                                                                  this.state
-                                                                      .currentSubQuestionIndex[
-                                                                      index
-                                                                  ]
-                                                              ].length !== 0
-                                                                ? section.answers[
-                                                                      this.state
-                                                                          .currentSubQuestionIndex[
-                                                                          index
-                                                                      ]
-                                                                  ].answers.map(
-                                                                      (
-                                                                          data,
-                                                                          index
-                                                                      ) => {
-                                                                          return (
-                                                                              <p
-                                                                                  className="small mb-2"
-                                                                                  key={
-                                                                                      index
-                                                                                  }
-                                                                              >
-                                                                                  {
-                                                                                      data
-                                                                                  }
-                                                                              </p>
-                                                                          );
-                                                                      }
-                                                                  )
-                                                                : ""
-                                                            : ""}
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                ""
-                                            )}
-                                        </div>
+                                                        : ""
+                                                }
+                                                onChange={(event) =>
+                                                    this.handleFillin(
+                                                        event,
+                                                        index,
+                                                        "type_2"
+                                                    )
+                                                }
+                                                autoComplete="off"
+                                            />
+                                        ) : (
+                                            ""
+                                        )}
                                         <div className="d-flex align-items-center justify-content-center mt-3">
                                             <button
                                                 className="btn btn-sm primary-text shadow-none"
@@ -1146,294 +1358,138 @@ class FlashCard extends Component {
                                                 <i className="fas fa-arrow-circle-right fa-lg"></i>
                                             </button>
                                         </div>
-                                    </>
-                                ) : (
-                                    <div className="d-flex align-items-start justify-content">
-                                        <button className="btn secondary-bg btn-sm shadow-sm mr-1 mt-1 px-3 font-weight-bold-600 rounded-lg">
-                                            {this.state.currentSubQuestionIndex[
-                                                index
-                                            ] + 1}
-                                        </button>
-
-                                        {/* ---------- Sub Question ---------- */}
-                                        <div className="card w-100">
-                                            <div className="card font-weight-bold-600 secondary-bg py-2 px-3 mb-2">
-                                                <div
-                                                    dangerouslySetInnerHTML={{
-                                                        __html:
-                                                            data[index]
-                                                                .sub_question[
-                                                                this.state
-                                                                    .currentSubQuestionIndex[
-                                                                    index
-                                                                ]
-                                                            ].question,
-                                                    }}
-                                                ></div>
-                                            </div>
-                                            {data[index].sub_question[
-                                                this.state
-                                                    .currentSubQuestionIndex[
-                                                    index
-                                                ]
-                                            ].mcq
-                                                ? data[index].sub_question[
-                                                      this.state
-                                                          .currentSubQuestionIndex[
-                                                          index
-                                                      ]
-                                                  ].options.map(
-                                                      (
-                                                          options,
-                                                          option_index
-                                                      ) => {
-                                                          return (
-                                                              <div
-                                                                  className="card shadow-sm mb-2 bg-light"
-                                                                  key={
-                                                                      option_index
-                                                                  }
-                                                              >
-                                                                  <div className="card-body small font-weight-bold-600 py-3">
-                                                                      <div
-                                                                          className="custom-control custom-checkbox"
-                                                                          key={
-                                                                              option_index
-                                                                          }
-                                                                      >
-                                                                          <input
-                                                                              type="checkbox"
-                                                                              className="custom-control-input"
-                                                                              id={`option_${option_index}`}
-                                                                              value={
-                                                                                  options.content
-                                                                              }
-                                                                              onChange={(
-                                                                                  event
-                                                                              ) =>
-                                                                                  this.handleMCQ(
-                                                                                      event,
-                                                                                      index,
-                                                                                      "type_2"
-                                                                                  )
-                                                                              }
-                                                                              checked={
-                                                                                  section.length !==
-                                                                                  0
-                                                                                      ? section
-                                                                                            .answers
-                                                                                            .length !==
-                                                                                        0
-                                                                                          ? section.answers[
-                                                                                                this
-                                                                                                    .state
-                                                                                                    .currentSubQuestionIndex[
-                                                                                                    index
-                                                                                                ]
-                                                                                            ].answers.includes(
-                                                                                                options.content
-                                                                                            )
-                                                                                              ? true
-                                                                                              : false
-                                                                                          : false
-                                                                                      : false
-                                                                              }
-                                                                          />
-                                                                          <label
-                                                                              className="custom-control-label"
-                                                                              htmlFor={`option_${option_index}`}
-                                                                          >
-                                                                              {
-                                                                                  options.content
-                                                                              }
-                                                                          </label>
-                                                                      </div>
-                                                                  </div>
-                                                              </div>
-                                                          );
-                                                      }
-                                                  )
-                                                : ""}
-                                            {data[index].sub_question[
-                                                this.state
-                                                    .currentSubQuestionIndex[
-                                                    index
-                                                ]
-                                            ].fill_in ? (
-                                                <input
-                                                    type="text"
-                                                    name="fill_in"
-                                                    className="form-control borders"
-                                                    placeholder="Type your answer here"
-                                                    value={
-                                                        section.length !== 0
-                                                            ? section.answers
-                                                                  .length !== 0
-                                                                ? section
-                                                                      .answers[
-                                                                      this.state
-                                                                          .currentSubQuestionIndex[
-                                                                          index
-                                                                      ]
-                                                                  ].answers[0]
-                                                                : ""
-                                                            : ""
-                                                    }
-                                                    onChange={(event) =>
-                                                        this.handleFillin(
-                                                            event,
-                                                            index,
-                                                            "type_2"
-                                                        )
-                                                    }
-                                                    autoComplete="off"
-                                                />
-                                            ) : (
-                                                ""
-                                            )}
-                                            <div className="d-flex align-items-center justify-content-center mt-3">
-                                                <button
-                                                    className="btn btn-sm primary-text shadow-none"
-                                                    onClick={() =>
-                                                        this.handleSubQPrev(
-                                                            index
-                                                        )
-                                                    }
-                                                    disabled={
-                                                        this.state
-                                                            .currentSubQuestionIndex[
-                                                            index
-                                                        ] === 0
-                                                            ? true
-                                                            : false
-                                                    }
-                                                >
-                                                    <i className="fas fa-arrow-circle-left fa-lg"></i>
-                                                </button>
-                                                <div className="border-primary small font-weight-bold-600 rounded-lg px-3 py-1 mx-3">
-                                                    {this.state
-                                                        .currentSubQuestionIndex[
-                                                        index
-                                                    ] + 1}{" "}
-                                                    /{" "}
-                                                    {
-                                                        this.state
-                                                            .totalSubQuestion[
-                                                            index
-                                                        ]
-                                                    }
-                                                </div>
-                                                <button
-                                                    className="btn btn-sm primary-text shadow-none"
-                                                    onClick={() =>
-                                                        this.handleSubQNext(
-                                                            index
-                                                        )
-                                                    }
-                                                    disabled={
-                                                        this.state
-                                                            .currentSubQuestionIndex[
-                                                            index
-                                                        ] +
-                                                            1 <
-                                                        this.state
-                                                            .totalSubQuestion[
-                                                            index
-                                                        ]
-                                                            ? false
-                                                            : true
-                                                    }
-                                                >
-                                                    <i className="fas fa-arrow-circle-right fa-lg"></i>
-                                                </button>
-                                            </div>
-                                        </div>
                                     </div>
-                                )
-                            ) : (
-                                ""
-                            )}
-
-                            {/* ----- Multiple choice notes ----- */}
-                            {explanation.length !== 0 ? (
-                                explanation[
-                                    this.state.currentSubQuestionIndex[index]
-                                ].isAnswered === false ? (
-                                    data[index].sub_question[
-                                        this.state.currentSubQuestionIndex[
-                                            index
-                                        ]
-                                    ].mcq_answers !== undefined ? (
-                                        data[index].sub_question[
-                                            this.state.currentSubQuestionIndex[
-                                                index
-                                            ]
-                                        ].mcq_answers > 1 ? (
-                                            <div className="small">
-                                                <b>Note:</b>{" "}
-                                                {
-                                                    data[index].sub_question[
-                                                        this.state
-                                                            .currentSubQuestionIndex[
-                                                            index
-                                                        ]
-                                                    ].mcq_answers
-                                                }{" "}
-                                                answers are correct
-                                            </div>
-                                        ) : null
-                                    ) : null
-                                ) : (
-                                    ""
-                                )
-                            ) : (
-                                ""
-                            )}
-
-                            {/* ----- Check button ----- */}
-                            {explanation.length !== 0 ? (
-                                explanation[
-                                    this.state.currentSubQuestionIndex[index]
-                                ].isAnswered === false ? (
-                                    <div className="row mt-4">
-                                        <div className="col-md-3">
-                                            <button
-                                                className="btn btn-primary btn-block btn-sm shadow-none"
-                                                onClick={() => {
-                                                    this.handleCheck(
-                                                        section,
-                                                        "type_2"
-                                                    );
-                                                }}
-                                            >
-                                                Check
-                                            </button>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    ""
-                                )
-                            ) : (
-                                ""
-                            )}
-                        </div>
-                        {/* ---------- Image ---------- */}
-                        <div className="col-md-4">
-                            {data[index].content.images !== undefined
-                                ? this.state.selectedImageData.path !== "" ||
-                                  data[index].content.images[0].path !== ""
-                                    ? this.imageRender(data, index)
-                                    : ""
-                                : ""}
-                        </div>
+                                </div>
+                            )
+                        ) : (
+                            ""
+                        )}
                     </div>
-                )}
-            </div>
+                </div>
+                {/* <!----- Image viewer -----> */}
+                <div className="d-flex justify-content-center">
+                    {data[index].content.images.map((images, image_index) => {
+                        return images.path !== "" ? (
+                            <div
+                                className="card preview-img-circle shadow-sm mx-2"
+                                key={image_index}
+                                style={{
+                                    backgroundImage: `url(${images.path})`,
+                                }}
+                                onClick={() =>
+                                    this.changeImageLightbox(
+                                        data[index].content.images,
+                                        image_index
+                                    )
+                                }
+                            ></div>
+                        ) : (
+                            ""
+                        );
+                    })}
+                </div>
+                {/* <!-- Image viewer ends here --> */}
+            </>
         );
+    };
+
+    // ---------- Post the options answers ----------
+
+    handleCheck = (data, type) => {
+        this.setState({
+            page_loading: true,
+        });
+
+        let explanation = [...this.state.explanation];
+
+        if (type === "type_1") {
+            fetch(
+                `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/typeone/learn/`,
+                {
+                    method: "POST",
+                    headers: this.headers,
+                    body: JSON.stringify(data),
+                }
+            )
+                .then((res) => res.json())
+                .then((result) => {
+                    console.log(result);
+                    if (result.sts === true) {
+                        explanation[this.state.activeData].answer =
+                            result.answer;
+                        explanation[this.state.activeData].answers =
+                            result.data.answers;
+                        explanation[this.state.activeData].explanation =
+                            result.data.explanation;
+                        explanation[this.state.activeData].isAnswered = true;
+                        this.setState({
+                            page_loading: false,
+                            explanation: explanation,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.detail
+                                ? result.detail
+                                : result.msg,
+                            showErrorAlert: true,
+                            page_loading: false,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        } else if (type === "type_2") {
+            fetch(
+                `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/learn/`,
+                {
+                    method: "POST",
+                    headers: this.headers,
+                    body: JSON.stringify(data),
+                }
+            )
+                .then((res) => res.json())
+                .then((result) => {
+                    console.log(result);
+                    if (result.sts === true) {
+                        explanation[this.state.activeData].explanation =
+                            result.data.explanation;
+                        explanation[this.state.activeData].isAnswered = true;
+                        for (
+                            let i = 0;
+                            i < result.data.sub_question.length;
+                            i++
+                        ) {
+                            explanation[this.state.activeData].sub_question[
+                                i
+                            ].answer = result.data.sub_question[i].answer;
+                            explanation[this.state.activeData].sub_question[
+                                i
+                            ].answers =
+                                result.data.sub_question[i].data.answers;
+                        }
+                        this.setState({
+                            page_loading: false,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.detail
+                                ? result.detail
+                                : result.msg,
+                            showErrorAlert: true,
+                            page_loading: false,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        }
     };
 
     // ---------- loads match data ----------
 
+    // seperate terms and definition from the single object
     divideMatch = (array, allow) => {
         let data = array[this.state.activeData];
         let tempData = [];
@@ -1536,6 +1592,7 @@ class FlashCard extends Component {
 
                     this.setState(
                         {
+                            // chunk the array and shuffling it
                             match: this.chunk(this.shuffleMatch(data), 6),
                             activeData: 0,
                             totalItems: result.data.count,
@@ -1544,6 +1601,7 @@ class FlashCard extends Component {
                             page_loading: false,
                         },
                         () => {
+                            // prepare first set of data in shuffle
                             this.setState({
                                 match_temp: this.chunk(
                                     this.divideMatch(this.state.match),
@@ -1565,10 +1623,11 @@ class FlashCard extends Component {
             });
     };
 
+    // handle match terms and definition matching
     handleMatch = (id, type) => {
         let terms = this.state.match_terms;
         let ids = [...this.state.match_ids];
-        let color = "primary-bg text-white";
+        let color = "match-active-bg";
         if (terms.id.length < 2) {
             if (terms.id.includes(id) && terms.type.includes(type)) {
                 terms.id = [];
@@ -1584,13 +1643,16 @@ class FlashCard extends Component {
                     } else {
                         color = "danger-bg";
                         setTimeout(() => {
+                            terms.id = [];
+                            terms.type = [];
                             this.setState({
+                                match_terms: terms,
                                 match_temp: this.chunk(
                                     this.divideMatch(this.state.match, "false"),
                                     3
                                 ),
                             });
-                        }, 500);
+                        }, 1000);
                     }
                 }
             }
@@ -1607,6 +1669,7 @@ class FlashCard extends Component {
                 match_color: color,
             },
             () => {
+                // loads next set of data
                 if (ids.length === 0) {
                     if (
                         this.state.match[this.state.activeData + 1] !==
@@ -1682,20 +1745,20 @@ class FlashCard extends Component {
                             {data.map((item, index) => {
                                 return (
                                     <div
-                                        className={`card card-body match-card shadow-sm mb-3 ${
+                                        className={`card card-body shadow-sm mb-3 ${
                                             terms.id.includes(item.match_id) &&
                                             terms.type[
                                                 terms.id.indexOf(item.match_id)
                                             ] === this.matchType(item)
                                                 ? this.state.match_color
-                                                : "text-white"
+                                                : "match-bg"
                                         } ${
                                             ids.includes(item.match_id)
                                                 ? "visible"
                                                 : "invisible"
                                         }`}
-                                        style={{ backgroundColor: "orangered" }}
                                         key={index}
+                                        style={{ cursor: "default" }}
                                         onClick={() =>
                                             this.handleMatch(
                                                 item.match_id,
@@ -1893,6 +1956,25 @@ class FlashCard extends Component {
         });
     };
 
+    changeImageLightbox = (images, index) => {
+        let imageArr = [];
+        this.setState({
+            selectedImageArray: [],
+            imageStartIndex: 0,
+        });
+        for (let i = 0; i < images.length; i++) {
+            imageArr.push({
+                url: images[i].path,
+                title: images[i].title,
+            });
+        }
+        this.setState({
+            selectedImageArray: imageArr,
+            imageStartIndex: index,
+            isLightBoxOpen: true,
+        });
+    };
+
     imageRender = (data, index) => {
         return (
             <div className="card">
@@ -1977,252 +2059,6 @@ class FlashCard extends Component {
         });
     };
 
-    // ---------- creates section structure and explanation structure ----------
-
-    loopSectionStructure = () => {
-        const sections =
-            this.state.practice !== undefined ||
-            this.state.practice.length !== 0
-                ? this.state.practice
-                : [];
-        let questions = [];
-        let explanation = [];
-
-        if (sections.length !== 0) {
-            sections.forEach((data) => {
-                if (data.type === "type_1") {
-                    questions.push({
-                        question_random_id: data.question_random_id,
-                        answers: [],
-                    });
-                    explanation.push({
-                        isAnswered: false,
-                        answer: false,
-                        answers: [],
-                        explanation: "",
-                    });
-                } else if (data.type === "type_2") {
-                    let sub_question = [];
-                    let sub_explanation = [];
-                    data.sub_question.forEach((sub_data) => {
-                        sub_question.push({
-                            sub_question_id: sub_data.sub_question_id,
-                            answers: [],
-                        });
-                        sub_explanation.push({
-                            isAnswered: false,
-                            answer: false,
-                            answers: [],
-                            explanation: "",
-                        });
-                    });
-                    questions.push({
-                        question_random_id: data.question_random_id,
-                        answers: sub_question,
-                    });
-                    explanation.push(sub_explanation);
-                }
-            });
-        }
-
-        this.setState({
-            sections: questions,
-            explanation: explanation,
-        });
-    };
-
-    // ---------- handle option selection ----------
-
-    handleMCQ = (event, index, type) => {
-        let sections = [...this.state.sections];
-        if (event.target.checked) {
-            if (type === "type_1") {
-                sections[index].answers.push(event.target.value);
-            } else if (type === "type_2") {
-                sections[index].answers[
-                    this.state.currentSubQuestionIndex[index]
-                ].answers.push(event.target.value);
-            }
-            this.setState({
-                sections: sections,
-            });
-        } else {
-            if (type === "type_1") {
-                sections[index].answers.splice(
-                    sections[index].answers.indexOf(event.target.value),
-                    1
-                );
-            } else if (type === "type_2") {
-                sections[index].answers[
-                    this.state.currentSubQuestionIndex[index]
-                ].answers.splice(
-                    sections[index].answers[
-                        this.state.currentSubQuestionIndex[index]
-                    ].answers.indexOf(event.target.value),
-                    1
-                );
-            }
-            this.setState({
-                sections: sections,
-            });
-        }
-    };
-
-    handleFillin = (event, index, type) => {
-        let sections = [...this.state.sections];
-        if (event.target.value !== "") {
-            if (type === "type_1") {
-                sections[index].answers[0] = event.target.value;
-            } else if (type === "type_2") {
-                sections[index].answers[
-                    this.state.currentSubQuestionIndex[index]
-                ].answers[0] = event.target.value;
-            }
-            this.setState({
-                sections: sections,
-            });
-        } else {
-            if (type === "type_1") {
-                sections[index].answers = [];
-            } else if (type === "type_2") {
-                sections[index].answers[
-                    this.state.currentSubQuestionIndex[index]
-                ].answers = [];
-            }
-            this.setState({
-                sections: sections,
-            });
-        }
-    };
-
-    handleBoolean = (event, index) => {
-        let sections = [...this.state.sections];
-        sections[index].answers[0] = event.target.value;
-        this.setState({
-            sections: sections,
-        });
-    };
-
-    // ---------- Post the options answers ----------
-
-    handleCheck = (data, type) => {
-        this.setState({
-            page_loading: true,
-        });
-
-        let explanation = [...this.state.explanation];
-
-        if (type === "type_1") {
-            if (data.answers.length !== 0) {
-                fetch(
-                    `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/typeone/learn/`,
-                    {
-                        method: "POST",
-                        headers: this.headers,
-                        body: JSON.stringify(data),
-                    }
-                )
-                    .then((res) => res.json())
-                    .then((result) => {
-                        console.log(result);
-                        if (result.sts === true) {
-                            explanation[this.state.activeData].answer =
-                                result.answer;
-                            explanation[this.state.activeData].answers =
-                                result.data.answers;
-                            explanation[this.state.activeData].explanation =
-                                result.data.explanation;
-                            explanation[
-                                this.state.activeData
-                            ].isAnswered = true;
-                            this.setState({
-                                page_loading: false,
-                                explanation: explanation,
-                            });
-                        } else {
-                            this.setState({
-                                errorMsg: result.detail
-                                    ? result.detail
-                                    : result.msg,
-                                showErrorAlert: true,
-                                page_loading: false,
-                            });
-                        }
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                    });
-            } else {
-                this.setState({
-                    page_loading: false,
-                    errorMsg: "Answer the question to view the result",
-                    showErrorAlert: true,
-                });
-            }
-        } else if (type === "type_2") {
-            let isAnswerAvailable = false;
-            for (let i = 0; i < data.answers.length; i++) {
-                isAnswerAvailable =
-                    data.answers[i].answers.length === 0 ? false : true;
-            }
-            if (isAnswerAvailable === true) {
-                fetch(
-                    `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/learn/`,
-                    {
-                        method: "POST",
-                        headers: this.headers,
-                        body: JSON.stringify(data),
-                    }
-                )
-                    .then((res) => res.json())
-                    .then((result) => {
-                        console.log(result);
-                        if (result.sts === true) {
-                            for (
-                                let i = 0;
-                                i < result.data.sub_question.length;
-                                i++
-                            ) {
-                                explanation[this.state.activeData][i].answer =
-                                    result.data.sub_question[i].answer;
-                                explanation[this.state.activeData][i].answers =
-                                    result.data.sub_question[i].data.answers;
-                                explanation[this.state.activeData][
-                                    i
-                                ].explanation =
-                                    result.data.sub_question[
-                                        i
-                                    ].data.explanation;
-                                explanation[this.state.activeData][
-                                    i
-                                ].isAnswered = true;
-                            }
-                            this.setState({
-                                page_loading: false,
-                            });
-                        } else {
-                            this.setState({
-                                errorMsg: result.detail
-                                    ? result.detail
-                                    : result.msg,
-                                showErrorAlert: true,
-                                page_loading: false,
-                            });
-                        }
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                    });
-            } else {
-                this.setState({
-                    page_loading: false,
-                    errorMsg: "Answer all the question to view the result",
-                    showErrorAlert: true,
-                });
-            }
-        }
-    };
-
     render() {
         document.title = `${this.state.chapter_name} learn - Teacher | IQLabs`;
         let data = [];
@@ -2291,6 +2127,21 @@ class FlashCard extends Component {
                         show={this.state.showVideoModal}
                         onHide={this.toggleVideoModal}
                         video={this.state.selectedVideoData}
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Image lightbox */}
+                {this.state.isLightBoxOpen ? (
+                    <Lightbox
+                        images={this.state.selectedImageArray}
+                        startIndex={this.state.imageStartIndex}
+                        onClose={() => {
+                            this.setState({
+                                isLightBoxOpen: false,
+                            });
+                        }}
                     />
                 ) : (
                     ""

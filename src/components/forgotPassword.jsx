@@ -12,15 +12,17 @@ export default class ForgotPassword extends Component {
         this.state = {
             password: "",
             confirmPassword: "",
+
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
             showLoader: false,
-            validToken: true,
             page_loading: true,
+
             showPassword: false,
             showConfirmPassword: false,
+            validToken: true,
             redirectLogin: false,
         };
         this.authToken = this.props.match.params.authToken;

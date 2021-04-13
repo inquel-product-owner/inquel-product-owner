@@ -520,6 +520,7 @@ class ChapterEditModal extends Component {
 }
 
 const mapStateToProps = (state) => ({
+    group_name: state.group_name,
     subject_name: state.subject_name,
 });
 
@@ -549,6 +550,7 @@ class Subject extends Component {
             showSuccessAlert: false,
             page_loading: true,
         };
+        this.groupId = this.props.match.params.groupId;
         this.subjectId = this.props.match.params.subjectId;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
@@ -831,25 +833,49 @@ class Subject extends Component {
                     <div className="container-fluid">
                         {/* Back button */}
                         <button
-                            className="btn btn-primary-invert btn-sm mb-2"
+                            className="btn btn-primary-invert btn-sm mb-3"
                             onClick={this.props.history.goBack}
                         >
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
 
                         {/* Header area */}
-                        <div className="row align-items-center">
+                        <div className="row align-items-center mb-3">
                             <div className="col-md-6">
-                                <h5 className="primary-text">
-                                    {this.props.subject_name}
-                                </h5>
+                                {/* ----- Breadcrumb ----- */}
+                                <nav aria-label="breadcrumb">
+                                    <ol className="breadcrumb">
+                                        <li className="breadcrumb-item">
+                                            <Link to="/teacher">
+                                                <i className="fas fa-home fa-sm"></i>
+                                            </Link>
+                                        </li>
+                                        {this.groupId !== undefined ? (
+                                            <li className="breadcrumb-item">
+                                                <Link
+                                                    to="#"
+                                                    onClick={
+                                                        this.props.history
+                                                            .goBack
+                                                    }
+                                                >
+                                                    {this.props.group_name}
+                                                </Link>
+                                            </li>
+                                        ) : (
+                                            ""
+                                        )}
+                                        <li className="breadcrumb-item active">
+                                            <span>Subject:</span>
+                                            {this.props.subject_name}
+                                        </li>
+                                    </ol>
+                                </nav>
                             </div>
-                            <div className="col-md-6">
-                                <div className="d-flex flex-wrap justify-content-end mb-4">
-                                    <button className="btn btn-primary btn-sm shadow-none">
-                                        Publish
-                                    </button>
-                                </div>
+                            <div className="col-md-6 text-right">
+                                <button className="btn btn-primary btn-sm shadow-none">
+                                    Publish
+                                </button>
                             </div>
                         </div>
 

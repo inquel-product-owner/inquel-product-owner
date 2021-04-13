@@ -30,6 +30,7 @@ class Group extends Component {
             showSuccessAlert: false,
             page_loading: true,
         };
+        this.groupId = this.props.match.params.groupId;
         this.url = baseUrl + teacherUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
@@ -47,7 +48,7 @@ class Group extends Component {
 
     loadSubjectData = () => {
         fetch(
-            `${this.url}/teacher/group/${this.props.match.params.groupId}/?page=${this.state.activeSubjectPage}`,
+            `${this.url}/teacher/group/${this.groupId}/?page=${this.state.activeSubjectPage}`,
             {
                 headers: this.headers,
                 method: "GET",
@@ -137,10 +138,23 @@ class Group extends Component {
                         </button>
 
                         <div className="row align-items-center mb-3">
-                            <div className="col-3">
-                                <h4>{this.props.group_name}</h4>
+                            <div className="col-6">
+                                {/* ----- Breadcrumb ----- */}
+                                <nav aria-label="breadcrumb">
+                                    <ol className="breadcrumb">
+                                        <li className="breadcrumb-item">
+                                            <Link to="/teacher">
+                                                <i className="fas fa-home fa-sm"></i>
+                                            </Link>
+                                        </li>
+                                        <li className="breadcrumb-item active">
+                                            <span>Group:</span>
+                                            {this.props.group_name}
+                                        </li>
+                                    </ol>
+                                </nav>
                             </div>
-                            <div className="col-9 text-right">
+                            <div className="col-6 text-right">
                                 <Link
                                     to={`/teacher/group/${this.props.match.params.groupId}/student`}
                                 >
@@ -151,14 +165,14 @@ class Group extends Component {
                             </div>
                         </div>
 
-                        {/* Subject list */}
+                        {/* ----- Subject list ----- */}
                         <div className="card shadow-sm mb-4">
                             <div className="card-header">
                                 <h5 className="mb-0">Subjects</h5>
                             </div>
                             <SubjectTable
                                 subjectItems={this.state.groupItem}
-                                path="teacher"
+                                path={`teacher/group/${this.groupId}`}
                                 check={false}
                             />
                             <div className="card-body p-3">
@@ -179,7 +193,7 @@ class Group extends Component {
                             </div>
                         </div>
 
-                        {/* Exams carousel */}
+                        {/* ----- Exams carousel ----- */}
                         <div className="card shadow-sm mb-4">
                             <div className="card-header">
                                 <div className="row align-items-center">
@@ -200,8 +214,8 @@ class Group extends Component {
                             </div>
                         </div>
 
-                        {/* Quiz carousel */}
-                        <div className="card shadow-sm mb-4">
+                        {/* ----- Quiz carousel ----- */}
+                        <div className="card shadow-sm">
                             <div className="card-header">
                                 <div className="row align-items-center">
                                     <div className="col-md-3">

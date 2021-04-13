@@ -12,6 +12,7 @@ import dateFormat from "dateformat";
 import AlertBox from "../../sharedComponents/alert";
 
 const mapStateToProps = (state) => ({
+    group_name: state.group_name,
     subject_name: state.subject_name,
     semester_name: state.semester_name,
 });
@@ -44,6 +45,7 @@ class SemesterDirect extends Component {
             btnDisabled: false,
             page_loading: true,
         };
+        this.groupId = this.props.match.params.groupId;
         this.subjectId = this.props.match.params.subjectId;
         this.semesterId = this.props.match.params.semesterId;
         this.url = baseUrl + teacherUrl;
@@ -479,9 +481,40 @@ class SemesterDirect extends Component {
 
                         <div className="row mb-4">
                             <div className="col-md-6">
-                                <h5 className="primary-text mb-0">
-                                    {this.props.semester_name}
-                                </h5>
+                                {/* ----- Breadcrumb ----- */}
+                                <nav aria-label="breadcrumb">
+                                    <ol className="breadcrumb mb-3">
+                                        <li className="breadcrumb-item">
+                                            <Link to="/teacher">
+                                                <i className="fas fa-home fa-sm"></i>
+                                            </Link>
+                                        </li>
+                                        {this.groupId !== undefined ? (
+                                            <li className="breadcrumb-item">
+                                                <Link
+                                                    to={`/teacher/group/${this.groupId}`}
+                                                >
+                                                    {this.props.group_name}
+                                                </Link>
+                                            </li>
+                                        ) : (
+                                            ""
+                                        )}
+                                        <li className="breadcrumb-item">
+                                            <Link
+                                                to="#"
+                                                onClick={
+                                                    this.props.history.goBack
+                                                }
+                                            >
+                                                {this.props.subject_name}
+                                            </Link>
+                                        </li>
+                                        <li className="breadcrumb-item active">
+                                            {this.props.semester_name}
+                                        </li>
+                                    </ol>
+                                </nav>
                             </div>
                             <div className="col-md-6 text-right">
                                 <Link to={`${this.props.match.url}/student/1`}>
