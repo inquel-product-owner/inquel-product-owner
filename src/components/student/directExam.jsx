@@ -347,15 +347,7 @@ class DirectExam extends Component {
                     <div className="container-fluid">
                         {/* Header configuration */}
                         <div className="row align-items-center justify-content-center mb-3">
-                            <div className="col-md-2">
-                                <div className="form-group">
-                                    <p className="mb-2 font-weight-bold-600">
-                                        Group:
-                                    </p>
-                                    <p className="small mb-0">A</p>
-                                </div>
-                            </div>
-                            <div className="col-md-2">
+                            <div className="col-md-2 text-center">
                                 <div className="form-group">
                                     <p className="mb-2 font-weight-bold-600">
                                         Date:
@@ -368,7 +360,7 @@ class DirectExam extends Component {
                                     </p>
                                 </div>
                             </div>
-                            <div className="col-md-2">
+                            <div className="col-md-2 text-center">
                                 <div className="form-group">
                                     <p className="mb-2 font-weight-bold-600">
                                         Starts at:
@@ -381,7 +373,7 @@ class DirectExam extends Component {
                                     </p>
                                 </div>
                             </div>
-                            <div className="col-md-2">
+                            <div className="col-md-2 text-center">
                                 <div className="form-group">
                                     <p className="mb-2 font-weight-bold-600">
                                         Ends at:
@@ -439,7 +431,7 @@ class DirectExam extends Component {
                                                             this.state
                                                                 .question_url
                                                         }
-                                                        className="btn btn-primary btn-block btn-sm"
+                                                        className="btn btn-primary btn-block btn-sm shadow-none"
                                                         download
                                                     >
                                                         Download Question
@@ -447,7 +439,7 @@ class DirectExam extends Component {
                                                 </div>
                                                 <div className="col-6">
                                                     <button
-                                                        className="btn btn-primary btn-block btn-sm"
+                                                        className="btn btn-primary btn-block btn-sm shadow-none"
                                                         onClick={
                                                             this.handleSubmit
                                                         }

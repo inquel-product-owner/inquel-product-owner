@@ -180,9 +180,9 @@ class TestPreview extends Component {
         });
     };
 
-    componentWillUnmount = () => {
-        sessionStorage.removeItem("data");
-    };
+    // componentWillUnmount = () => {
+    //     sessionStorage.removeItem("data");
+    // };
 
     onDocumentLoadSuccess = ({ numPages }) => {
         this.setState({ numPages });
@@ -326,6 +326,27 @@ class TestPreview extends Component {
                             </>
                         ) : (
                             <>
+                                {/* ----- Header Info ----- */}
+                                <div className="card card-body primary-bg text-white font-weight-bold-600 small shadow-sm mb-3">
+                                    <div className="row align-items-center">
+                                        <div className="col-md-6">
+                                            Section:{" "}
+                                            {this.state.currentSectionIndex + 1}
+                                        </div>
+                                        <div className="col-md-6">
+                                            <div className="row align-items-center justify-content-end">
+                                                <div className="col-md-3">
+                                                    Scored marks:{" "}
+                                                    {
+                                                        this.result.data[0]
+                                                            .student_scored_marks
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 {data.length !== 0
                                     ? data.map((question, q_index) => {
                                           return question.type === "type_1" ? (
@@ -344,7 +365,7 @@ class TestPreview extends Component {
                                                   >
                                                       <div className="card-body">
                                                           <div
-                                                              className="font-weight-bold-600 py-2"
+                                                              className="py-2"
                                                               dangerouslySetInnerHTML={{
                                                                   __html:
                                                                       question.question,
