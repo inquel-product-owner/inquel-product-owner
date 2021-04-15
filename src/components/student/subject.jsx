@@ -44,7 +44,6 @@ class Subject extends Component {
             showErrorAlert: false,
             showSuccessAlert: false,
             page_loading: true,
-            isDataLoaded: false,
         };
         this.url = baseUrl + studentUrl;
         this.authToken = localStorage.getItem("Authorization");
@@ -378,7 +377,7 @@ class Subject extends Component {
         );
     };
 
-    cycleTest = (data, index, chapter_index) => {
+    cycleTest = (data, index, chapter_index, chapter_id) => {
         return (
             <div
                 className="card card-header shadow-sm light-bg mb-2"
@@ -404,26 +403,8 @@ class Subject extends Component {
                                         chapter_index
                                     ] === true ? (
                                         // Check if cycle test is created or not
-                                        data.direct_question !== undefined ? (
-                                            // if exist, then redirect them to appropriate cycle test
-                                            data.direct_question === true ? (
-                                                <Link
-                                                    to={`${this.props.match.url}/chapter/${data.chapter_id}/cycle/${data.cycle_test_id}/direct`}
-                                                >
-                                                    <button className="btn btn-primary btn-sm shadow-none">
-                                                        Start
-                                                    </button>
-                                                </Link>
-                                            ) : (
-                                                <Link
-                                                    to={`${this.props.match.url}/chapter/${data.chapter_id}/cycle/${data.cycle_test_id}`}
-                                                >
-                                                    <button className="btn btn-primary btn-sm shadow-none">
-                                                        Start
-                                                    </button>
-                                                </Link>
-                                            )
-                                        ) : (
+                                        data.direct_question === false &&
+                                        data.auto_test_question === false ? (
                                             // if not then display the error message in tooltip
                                             <OverlayTrigger
                                                 key="top"
@@ -431,7 +412,7 @@ class Subject extends Component {
                                                 overlay={
                                                     <Tooltip id="tooltip">
                                                         Cycle test is not
-                                                        created yet...
+                                                        created yet
                                                     </Tooltip>
                                                 }
                                             >
@@ -439,6 +420,23 @@ class Subject extends Component {
                                                     <i className="fas fa-lock"></i>
                                                 </button>
                                             </OverlayTrigger>
+                                        ) : // if exist, then redirect them to appropriate cycle test
+                                        data.direct_question === true ? (
+                                            <Link
+                                                to={`${this.props.match.url}/chapter/${chapter_id}/cycle/${data.cycle_test_id}/direct`}
+                                            >
+                                                <button className="btn btn-primary btn-sm shadow-none">
+                                                    Start
+                                                </button>
+                                            </Link>
+                                        ) : (
+                                            <Link
+                                                to={`${this.props.match.url}/chapter/${chapter_id}/cycle/${data.cycle_test_id}`}
+                                            >
+                                                <button className="btn btn-primary btn-sm shadow-none">
+                                                    Start
+                                                </button>
+                                            </Link>
                                         )
                                     ) : (
                                         // if not then display the error message in tooltip
@@ -944,7 +942,7 @@ class Subject extends Component {
                                                                                                   //   }
                                                                                               >
                                                                                                   <Card>
-                                                                                                      {/* Topic list */}
+                                                                                                      {/* ----- Sub topic list ----- */}
                                                                                                       {(
                                                                                                           topics.child ||
                                                                                                           []
@@ -971,7 +969,7 @@ class Subject extends Component {
                                                                       )}
                                                                   </Accordion>
 
-                                                                  {/* Cycle test list */}
+                                                                  {/* ----- Cycle test list ----- */}
                                                                   {data.cycle_tests.map(
                                                                       (
                                                                           cycle,
@@ -980,7 +978,8 @@ class Subject extends Component {
                                                                           return this.cycleTest(
                                                                               cycle,
                                                                               cycle_index,
-                                                                              index
+                                                                              index,
+                                                                              data.chapter_id
                                                                           );
                                                                       }
                                                                   )}

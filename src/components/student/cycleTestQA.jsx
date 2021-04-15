@@ -546,12 +546,12 @@ class CycleTestQA extends Component {
                             showSuccessAlert: true,
                         },
                         () => {
+                            localStorage.removeItem("duration");
                             setTimeout(() => {
                                 this.setState({
                                     page_loading: false,
                                 });
                                 localStorage.removeItem("data");
-                                localStorage.removeItem("duration");
                                 this.props.history.goBack();
                             }, 1000);
                         }
@@ -826,7 +826,7 @@ class CycleTestQA extends Component {
                             {/* Questions & options */}
                             <div className="w-100">
                                 <div
-                                    className="font-weight-bold-600"
+                                    className="py-2"
                                     dangerouslySetInnerHTML={{
                                         __html: data.question,
                                     }}
@@ -1124,35 +1124,37 @@ class CycleTestQA extends Component {
                                                 </div>
                                             ) : (
                                                 <>
-                                                    {answerSection[
-                                                        index
-                                                    ].answer.map(
-                                                        (
-                                                            sub_answer,
-                                                            answer_index
-                                                        ) => {
-                                                            return sub_answer
-                                                                .answer
-                                                                .length !==
-                                                                0 ? (
-                                                                <div
-                                                                    className="card shadow-sm mb-2 pinkrange-bg"
-                                                                    key={
-                                                                        answer_index
-                                                                    }
-                                                                >
-                                                                    <div className="card-body small font-weight-bold-600 primary-text py-3">
-                                                                        {
-                                                                            sub_answer
-                                                                                .answer[0]
-                                                                        }
-                                                                    </div>
-                                                                </div>
-                                                            ) : (
-                                                                ""
-                                                            );
-                                                        }
-                                                    )}
+                                                    {answerSection.length !== 0
+                                                        ? answerSection[
+                                                              index
+                                                          ].answer.map(
+                                                              (
+                                                                  sub_answer,
+                                                                  answer_index
+                                                              ) => {
+                                                                  return sub_answer
+                                                                      .answer
+                                                                      .length !==
+                                                                      0 ? (
+                                                                      <div
+                                                                          className="card shadow-sm mb-2 pinkrange-bg"
+                                                                          key={
+                                                                              answer_index
+                                                                          }
+                                                                      >
+                                                                          <div className="card-body small font-weight-bold-600 primary-text py-3">
+                                                                              {
+                                                                                  sub_answer
+                                                                                      .answer[0]
+                                                                              }
+                                                                          </div>
+                                                                      </div>
+                                                                  ) : (
+                                                                      ""
+                                                                  );
+                                                              }
+                                                          )
+                                                        : ""}
                                                 </>
                                             )}
                                         </div>

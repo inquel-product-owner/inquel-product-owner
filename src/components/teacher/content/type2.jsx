@@ -2583,7 +2583,7 @@ class Type2 extends Component {
                                     </ol>
                                 </nav>
 
-                                {/* Header area */}
+                                {/* ----- Header area ----- */}
                                 <div className="row align-items-center mb-4">
                                     <div className="col-md-6">
                                         <h5 className="primary-text mb-0">

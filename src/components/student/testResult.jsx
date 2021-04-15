@@ -164,12 +164,33 @@ class TestResult extends Component {
                                                                                     }
                                                                                     placement="top"
                                                                                     overlay={
-                                                                                        <Tooltip id="tooltip4" style={{textTransform:'capitalize'}}>
-                                                                                            {attempt.auto_section !==
-                                                                                            undefined
+                                                                                        <Tooltip
+                                                                                            id="tooltip4"
+                                                                                            style={{
+                                                                                                textTransform:
+                                                                                                    "capitalize",
+                                                                                            }}
+                                                                                        >
+                                                                                            {attempt
+                                                                                                .auto_section
+                                                                                                .length !==
+                                                                                            0
                                                                                                 ? attempt
                                                                                                       .auto_section[0]
                                                                                                       .remarks
+                                                                                                : Object.entries(
+                                                                                                      attempt.direct_question
+                                                                                                  )
+                                                                                                      .length !==
+                                                                                                  0
+                                                                                                ? attempt
+                                                                                                      .direct_question
+                                                                                                      .remarks !==
+                                                                                                  undefined
+                                                                                                    ? attempt
+                                                                                                          .direct_question
+                                                                                                          .remarks
+                                                                                                    : "Not yet evaluated"
                                                                                                 : "Remarks"}
                                                                                         </Tooltip>
                                                                                     }
@@ -213,11 +234,26 @@ class TestResult extends Component {
                                                                                             className="fas fa-circle fa-lg mx-2"
                                                                                             style={{
                                                                                                 color:
-                                                                                                    attempt.auto_section !==
-                                                                                                    undefined
+                                                                                                    attempt
+                                                                                                        .auto_section
+                                                                                                        .length !==
+                                                                                                    0
                                                                                                         ? attempt
                                                                                                               .auto_section[0]
                                                                                                               .color
+                                                                                                        : Object.entries(
+                                                                                                              attempt.direct_question
+                                                                                                          )
+                                                                                                              .length !==
+                                                                                                          0
+                                                                                                        ? attempt
+                                                                                                              .direct_question
+                                                                                                              .color !==
+                                                                                                          undefined
+                                                                                                            ? attempt
+                                                                                                                  .direct_question
+                                                                                                                  .color
+                                                                                                            : "grey"
                                                                                                         : "",
                                                                                             }}
                                                                                         ></i>
