@@ -12,10 +12,13 @@ class TestPreview extends Component {
         this.state = {
             subject_name: "",
             section: [],
+
             totalSection: 0,
             currentSectionIndex: 0,
             totalSubQuestion: [],
             currentSubQuestionIndex: [],
+            totalQuestion: 0,
+
             numPages: null,
             pageNumber: 1,
 
@@ -44,6 +47,7 @@ class TestPreview extends Component {
         let questions = [];
         let totalSubQuestion = [];
         let currentSubQuestionIndex = [];
+        let totalQuestion = 0;
         this.result.data.forEach((data) => {
             if (data.cycle_test_id === this.cycleTestId) {
                 data.sections.forEach((section) => {
@@ -51,6 +55,7 @@ class TestPreview extends Component {
                     let total = [];
                     let current = [];
                     for (let i = 0; i < section.questions.length; i++) {
+                        totalQuestion++;
                         if (section.questions[i].sub_question === undefined) {
                             total.push(0);
                             current.push(0);
@@ -115,6 +120,7 @@ class TestPreview extends Component {
             totalSubQuestion: totalSubQuestion,
             currentSubQuestionIndex: currentSubQuestionIndex,
             totalSection: sections.length,
+            totalQuestion: totalQuestion,
         });
     };
 
@@ -180,9 +186,9 @@ class TestPreview extends Component {
         });
     };
 
-    // componentWillUnmount = () => {
-    //     sessionStorage.removeItem("data");
-    // };
+    componentWillUnmount = () => {
+        sessionStorage.removeItem("data");
+    };
 
     onDocumentLoadSuccess = ({ numPages }) => {
         this.setState({ numPages });
@@ -336,11 +342,21 @@ class TestPreview extends Component {
                                         <div className="col-md-6">
                                             <div className="row align-items-center justify-content-end">
                                                 <div className="col-md-3">
+                                                    Total questions:{" "}
+                                                    {this.state.totalQuestion <=
+                                                    8
+                                                        ? `0${this.state.totalQuestion}`
+                                                        : this.state
+                                                              .totalQuestion}
+                                                </div>
+                                                <div className="col-md-3">
                                                     Scored marks:{" "}
-                                                    {
-                                                        this.result.data[0]
-                                                            .student_scored_marks
-                                                    }
+                                                    {this.result.data[0]
+                                                        .student_scored_marks <=
+                                                    8
+                                                        ? `0${this.result.data[0].student_scored_marks}`
+                                                        : this.result.data[0]
+                                                              .student_scored_marks}
                                                 </div>
                                             </div>
                                         </div>
@@ -354,7 +370,12 @@ class TestPreview extends Component {
                                                   className="d-flex align-items-start justify-content mb-3"
                                                   key={q_index}
                                               >
-                                                  <button className="btn btn-light light-bg btn-sm border-0 shadow-sm mr-1 px-3 font-weight-bold-600 rounded-lg">
+                                                  <button
+                                                      className="btn btn-light light-bg btn-sm border-0 shadow-sm mr-1 px-3 font-weight-bold-600 rounded-lg"
+                                                      style={{
+                                                          cursor: "default",
+                                                      }}
+                                                  >
                                                       {q_index <= 8
                                                           ? `0${q_index + 1}`
                                                           : q_index + 1}
