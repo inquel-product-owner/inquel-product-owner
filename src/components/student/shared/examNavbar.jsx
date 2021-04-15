@@ -28,10 +28,7 @@ class Header extends Component {
                                 {this.props.name}
                             </h5>
                         </div>
-                        <div className="col-4 d-flex justify-content-end pr-0">
-                            <button className="btn btn-light bg-white border-0 btn-sm mr-3">
-                                <i className="fas fa-cog"></i>
-                            </button>
+                        <div className="col-4 text-right pr-0">
                             <button
                                 className="btn btn-light bg-white border-0 shadow-none btn-sm"
                                 onClick={this.props.goBack}
