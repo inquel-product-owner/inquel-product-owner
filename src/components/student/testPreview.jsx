@@ -67,7 +67,7 @@ class TestPreview extends Component {
                                 proper_answer:
                                     section.questions[i].proper_answer,
                                 answer: section.questions[i].answer,
-                                mark: section.questions[i].marks,
+                                marks: section.questions[i].marks,
                             });
                         } else if (
                             section.questions[i].sub_question !== undefined
@@ -86,7 +86,7 @@ class TestPreview extends Component {
                                 sub_question.push({
                                     question:
                                         section.questions[i].sub_question[j]
-                                            .question,
+                                            .question || "",
                                     sub_question_id:
                                         section.questions[i].sub_question[j]
                                             .sub_question_id,
@@ -96,7 +96,7 @@ class TestPreview extends Component {
                                     answer:
                                         section.questions[i].sub_question[j]
                                             .answer,
-                                    mark:
+                                    marks:
                                         section.questions[i].sub_question[j]
                                             .marks,
                                 });
@@ -106,6 +106,7 @@ class TestPreview extends Component {
                                 question: section.questions[i].question,
                                 question_random_id:
                                     section.questions[i].question_random_id,
+                                sub_question: sub_question,
                             });
                         }
                     }
@@ -125,6 +126,10 @@ class TestPreview extends Component {
     };
 
     componentDidMount = () => {
+        if (!sessionStorage.getItem("data")) {
+            this.props.history.goBack();
+        }
+
         fetch(`${this.url}/student/subject/${this.subjectId}/`, {
             method: "GET",
             headers: this.headers,
@@ -152,6 +157,10 @@ class TestPreview extends Component {
         if (this.result.auto === true) {
             this.loopAutoSection();
         }
+    };
+
+    componentWillUnmount = () => {
+        sessionStorage.removeItem("data");
     };
 
     // ---------- Navigation ----------
@@ -184,10 +193,6 @@ class TestPreview extends Component {
         this.setState({
             currentSubQuestionIndex: index,
         });
-    };
-
-    componentWillUnmount = () => {
-        sessionStorage.removeItem("data");
     };
 
     onDocumentLoadSuccess = ({ numPages }) => {
@@ -336,8 +341,12 @@ class TestPreview extends Component {
                                 <div className="card card-body primary-bg text-white font-weight-bold-600 small shadow-sm mb-3">
                                     <div className="row align-items-center">
                                         <div className="col-md-6">
-                                            Section:{" "}
-                                            {this.state.currentSectionIndex + 1}
+                                            {
+                                                this.result.data[0].sections[
+                                                    this.state
+                                                        .currentSectionIndex
+                                                ].section_description
+                                            }
                                         </div>
                                         <div className="col-md-6">
                                             <div className="row align-items-center justify-content-end">
@@ -380,13 +389,10 @@ class TestPreview extends Component {
                                                           ? `0${q_index + 1}`
                                                           : q_index + 1}
                                                   </button>
-                                                  <div
-                                                      className="card light-bg shadow-sm"
-                                                      style={{ width: "100%" }}
-                                                  >
+                                                  <div className="card light-bg shadow-sm w-100">
                                                       <div className="card-body">
                                                           <div
-                                                              className="py-2"
+                                                              className="mb-3"
                                                               dangerouslySetInnerHTML={{
                                                                   __html:
                                                                       question.question,
@@ -439,7 +445,7 @@ class TestPreview extends Component {
                                                               <div className="col-md-6">
                                                                   <div
                                                                       className={`card card-body ${
-                                                                          question.mark ===
+                                                                          question.marks ===
                                                                           0
                                                                               ? "danger-bg"
                                                                               : "success-bg"
@@ -483,26 +489,89 @@ class TestPreview extends Component {
                                                   className="d-flex align-items-start justify-content mb-3"
                                                   key={q_index}
                                               >
-                                                  <button className="btn btn-light bg-white btn-sm border-0 shadow-sm mr-1 px-3 font-weight-bold-600 rounded-lg">
+                                                  <button className="btn btn-light light-bg btn-sm border-0 shadow-sm mr-1 px-3 font-weight-bold-600 rounded-lg">
                                                       {q_index <= 8
                                                           ? `0${q_index + 1}`
                                                           : q_index + 1}
                                                   </button>
                                                   {/* ---------- Question preview ---------- */}
-                                                  <div className="card shadow-sm w-100">
-                                                      <div className="card-body d-flex">
+                                                  <div className="card shadow-sm light-bg w-100">
+                                                      <div className="card-body">
+                                                          {/* ----- Main Question ----- */}
+                                                          <div
+                                                              className="mb-3"
+                                                              dangerouslySetInnerHTML={{
+                                                                  __html:
+                                                                      question.question,
+                                                              }}
+                                                          ></div>
+
                                                           <div className="row w-100">
-                                                              {/* ----- Main Question ----- */}
-                                                              <div className="col-md-6">
+                                                              {/* ---------- Student answers ---------- */}
+                                                              <div className="col-md-5">
                                                                   <div
-                                                                      dangerouslySetInnerHTML={{
-                                                                          __html:
-                                                                              question.question,
+                                                                      className={`card card-body ${
+                                                                          question
+                                                                              .sub_question[
+                                                                              this
+                                                                                  .state
+                                                                                  .currentSubQuestionIndex[
+                                                                                  this
+                                                                                      .state
+                                                                                      .currentSectionIndex
+                                                                              ][
+                                                                                  q_index
+                                                                              ]
+                                                                          ]
+                                                                              .marks ===
+                                                                          0
+                                                                              ? "danger-bg"
+                                                                              : "success-bg"
+                                                                      } h-100`}
+                                                                      style={{
+                                                                          minHeight:
+                                                                              "100px",
                                                                       }}
-                                                                  ></div>
+                                                                  >
+                                                                      <p className="font-weight-bold-600 mb-2">
+                                                                          Your
+                                                                          answer(s):
+                                                                      </p>
+                                                                      {question.sub_question[
+                                                                          this
+                                                                              .state
+                                                                              .currentSubQuestionIndex[
+                                                                              this
+                                                                                  .state
+                                                                                  .currentSectionIndex
+                                                                          ][
+                                                                              q_index
+                                                                          ]
+                                                                      ].answer.map(
+                                                                          (
+                                                                              answer,
+                                                                              answer_index
+                                                                          ) => {
+                                                                              return (
+                                                                                  <p
+                                                                                      className="small mb-2"
+                                                                                      key={
+                                                                                          answer_index
+                                                                                      }
+                                                                                  >
+                                                                                      {
+                                                                                          answer
+                                                                                      }
+                                                                                  </p>
+                                                                              );
+                                                                          }
+                                                                      )}
+                                                                  </div>
                                                               </div>
+
                                                               {/* ----- Sub Question ----- */}
-                                                              <div className="col-md-6">
+
+                                                              <div className="col-md-7">
                                                                   <div className="d-flex align-items-start justify-content">
                                                                       <button className="btn secondary-bg btn-sm shadow-sm mr-1 mt-1 px-3 font-weight-bold-600 rounded-lg">
                                                                           {`${
@@ -523,7 +592,7 @@ class TestPreview extends Component {
                                                                       </button>
 
                                                                       {/* ---------- Sub Question preview ---------- */}
-                                                                      <div className="card w-100">
+                                                                      <div className="card light-bg w-100">
                                                                           <div className="card secondary-bg py-2 px-3 mb-2">
                                                                               <div
                                                                                   dangerouslySetInnerHTML={{
@@ -609,6 +678,10 @@ class TestPreview extends Component {
                                                                                       this
                                                                                           .state
                                                                                           .currentSubQuestionIndex[
+                                                                                          this
+                                                                                              .state
+                                                                                              .currentSectionIndex
+                                                                                      ][
                                                                                           q_index
                                                                                       ] ===
                                                                                       0
@@ -622,6 +695,10 @@ class TestPreview extends Component {
                                                                                   {this
                                                                                       .state
                                                                                       .currentSubQuestionIndex[
+                                                                                      this
+                                                                                          .state
+                                                                                          .currentSectionIndex
+                                                                                  ][
                                                                                       q_index
                                                                                   ] +
                                                                                       1}{" "}
@@ -630,6 +707,10 @@ class TestPreview extends Component {
                                                                                       this
                                                                                           .state
                                                                                           .totalSubQuestion[
+                                                                                          this
+                                                                                              .state
+                                                                                              .currentSectionIndex
+                                                                                      ][
                                                                                           q_index
                                                                                       ]
                                                                                   }
@@ -645,12 +726,20 @@ class TestPreview extends Component {
                                                                                       this
                                                                                           .state
                                                                                           .currentSubQuestionIndex[
+                                                                                          this
+                                                                                              .state
+                                                                                              .currentSectionIndex
+                                                                                      ][
                                                                                           q_index
                                                                                       ] +
                                                                                           1 <
                                                                                       this
                                                                                           .state
                                                                                           .totalSubQuestion[
+                                                                                          this
+                                                                                              .state
+                                                                                              .currentSectionIndex
+                                                                                      ][
                                                                                           q_index
                                                                                       ]
                                                                                           ? false
@@ -659,71 +748,6 @@ class TestPreview extends Component {
                                                                               >
                                                                                   <i className="fas fa-arrow-circle-right fa-lg"></i>
                                                                               </button>
-                                                                          </div>
-                                                                      </div>
-                                                                  </div>
-
-                                                                  {/* ---------- Student answers ---------- */}
-
-                                                                  <div className="row">
-                                                                      <div className="col-md-6">
-                                                                          <div
-                                                                              className={`card card-body ${
-                                                                                  question
-                                                                                      .sub_question[
-                                                                                      this
-                                                                                          .state
-                                                                                          .currentSubQuestionIndex[
-                                                                                          this
-                                                                                              .state
-                                                                                              .currentSectionIndex
-                                                                                      ][
-                                                                                          q_index
-                                                                                      ]
-                                                                                  ]
-                                                                                      .mark ===
-                                                                                  0
-                                                                                      ? "danger-bg"
-                                                                                      : "success-bg"
-                                                                              } h-100`}
-                                                                              style={{
-                                                                                  minHeight:
-                                                                                      "100px",
-                                                                              }}
-                                                                          >
-                                                                              <p className="font-weight-bold-600 mb-2">
-                                                                                  Your
-                                                                                  answer(s):
-                                                                              </p>
-                                                                              {question.sub_question[
-                                                                                  this
-                                                                                      .state
-                                                                                      .currentSubQuestionIndex[
-                                                                                      this
-                                                                                          .state
-                                                                                          .currentSectionIndex
-                                                                                  ][
-                                                                                      q_index
-                                                                                  ]
-                                                                              ].answer.map(
-                                                                                  (
-                                                                                      answer,
-                                                                                      answer_index
-                                                                                  ) => {
-                                                                                      return (
-                                                                                          <p
-                                                                                              className="small mb-2"
-                                                                                              key={
-                                                                                                  answer_index
-                                                                                              }
-                                                                                          >
-                                                                                              {
-                                                                                                  answer
-                                                                                              }
-                                                                                          </p>
-                                                                                      );
-                                                                                  }
-                                                                              )}
                                                                           </div>
                                                                       </div>
                                                                   </div>

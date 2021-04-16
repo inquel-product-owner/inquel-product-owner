@@ -25,6 +25,402 @@ function Lock() {
     );
 }
 
+const ChapterListRender = (props) => {
+    return (
+        <Card className="mb-1" key={props.chapter_index}>
+            <Accordion.Toggle
+                as={Card.Header}
+                eventKey={`chapter-${props.all_chapters.indexOf(
+                    props.chapter.chapter_id
+                )}`}
+                className="pinkrange-bg shadow-sm mb-2"
+                style={{
+                    borderRadius: "8px",
+                }}
+                onClick={() =>
+                    props.toggleCollapse(
+                        `chapter-${props.all_chapters.indexOf(
+                            props.chapter.chapter_id
+                        )}`
+                    )
+                }
+            >
+                <div className="row align-items-center">
+                    <div className="col-md-4 mb-2 mb-md-0">
+                        <div className="row align-items-center">
+                            <div className="col-1">
+                                <span>
+                                    <i
+                                        className={`fas fa-chevron-circle-down ${
+                                            props.chapterEventKey ===
+                                            `chapter-${props.all_chapters.indexOf(
+                                                props.chapter.chapter_id
+                                            )}`
+                                                ? ""
+                                                : "fa-rotate-270"
+                                        }`}
+                                    ></i>
+                                </span>
+                            </div>
+                            <div className="col-1 small font-weight-bold-600">
+                                {props.all_chapters.indexOf(
+                                    props.chapter.chapter_id
+                                ) + 1}
+                            </div>
+                            <div className="col-8 small font-weight-bold-600">
+                                {props.chapter.chapter_name}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-md-8 small primary-text font-weight-bold-600">
+                        <div className="row align-items-center justify-content-end">
+                            <div className="col-md-2 mb-2 mb-md-0">
+                                {props.chapter.weightage}
+                            </div>
+                            <div className="col-md-2 mb-2 mb-md-0">
+                                <Link
+                                    to={`${props.url}/chapter/${props.chapter.chapter_id}/summary`}
+                                >
+                                    <button className="btn btn-light btn-sm">
+                                        <i className="fas fa-eye fa-sm"></i>
+                                    </button>
+                                </Link>
+                            </div>
+                            <div className="col-md-2 mb-2 mb-md-0">
+                                <Link
+                                    to={`${props.url}/chapter/${props.chapter.chapter_id}/notes`}
+                                >
+                                    <button className="btn btn-light btn-sm">
+                                        <i className="fas fa-eye fa-sm"></i>
+                                    </button>
+                                </Link>
+                            </div>
+                            <div className="col-md-2 mb-2 mb-md-0">
+                                <div className="d-inline p-2 rounded">
+                                    Remarks
+                                </div>
+                            </div>
+                            <div className="col-md-2 mb-2 mb-md-0"></div>
+                            <div className="col-md-2 text-right mb-2 mb-md-0">
+                                <button
+                                    className={`btn btn-sm shadow-none ${
+                                        props.topics.length !== 0 &&
+                                        props.topics_completed.length !== 0
+                                            ? props.topics_completed.length ===
+                                              props.subjectItems.chapters.length
+                                                ? props.topics[
+                                                      props.all_chapters.indexOf(
+                                                          props.chapter
+                                                              .chapter_id
+                                                      )
+                                                  ] !== undefined &&
+                                                  props.topics_completed[
+                                                      props.all_chapters.indexOf(
+                                                          props.chapter
+                                                              .chapter_id
+                                                      )
+                                                  ] !== undefined
+                                                    ? props.topics[
+                                                          props.all_chapters.indexOf(
+                                                              props.chapter
+                                                                  .chapter_id
+                                                          )
+                                                      ].length ===
+                                                      props.topics_completed[
+                                                          props.all_chapters.indexOf(
+                                                              props.chapter
+                                                                  .chapter_id
+                                                          )
+                                                      ].length
+                                                        ? "text-success"
+                                                        : "text-muted"
+                                                    : "text-muted"
+                                                : "text-muted"
+                                            : "text-muted"
+                                    }`}
+                                    style={{
+                                        fontSize: "18px",
+                                    }}
+                                    onClick={(event) => {
+                                        props.handleAllTopicCompletion(
+                                            props.all_chapters.indexOf(
+                                                props.chapter.chapter_id
+                                            ),
+                                            props.chapter.chapter_id
+                                        );
+                                        event.stopPropagation();
+                                    }}
+                                >
+                                    <i className="fas fa-check-circle"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </Accordion.Toggle>
+
+            <Accordion.Collapse
+                eventKey={`chapter-${props.all_chapters.indexOf(
+                    props.chapter.chapter_id
+                )}`}
+            >
+                <>
+                    <Accordion>
+                        {/* ----- Topic list ----- */}
+                        {props.chapter.topics.map((topic, structure_index) => {
+                            return topic.chapter_structure.map(
+                                (topics, topic_index) => {
+                                    return (
+                                        <div key={topic_index}>
+                                            <Accordion.Toggle
+                                                as={Card.Header}
+                                                eventKey={`topic-${props.all_chapters.indexOf(
+                                                    props.chapter.chapter_id
+                                                )}-${topic_index}`}
+                                                className="light-bg shadow-sm py-2 mb-2"
+                                                style={{
+                                                    borderRadius: "8px",
+                                                }}
+                                                onClick={() =>
+                                                    props.toggleTopicCollapse(
+                                                        `topic-${props.all_chapters.indexOf(
+                                                            props.chapter
+                                                                .chapter_id
+                                                        )}-${topic_index}`
+                                                    )
+                                                }
+                                            >
+                                                <div className="row align-items-center">
+                                                    <div className="col-md-4 mb-2 mb-md-0">
+                                                        <div className="row">
+                                                            <div className="col-1">
+                                                                <span>
+                                                                    <i
+                                                                        className={`fas fa-chevron-circle-down ${
+                                                                            props.topicEventKey ===
+                                                                            `topic-${props.all_chapters.indexOf(
+                                                                                props
+                                                                                    .chapter
+                                                                                    .chapter_id
+                                                                            )}-${topic_index}`
+                                                                                ? ""
+                                                                                : "fa-rotate-270"
+                                                                        }`}
+                                                                    ></i>
+                                                                </span>
+                                                            </div>
+                                                            <div className="col-2 small font-weight-bold-600">
+                                                                {
+                                                                    topics.topic_num
+                                                                }
+                                                            </div>
+                                                            <div className="col-9 small font-weight-bold-600">
+                                                                <Link
+                                                                    to={`${props.url}/chapter/${props.chapter.chapter_id}/${topics.topic_num}/learn`}
+                                                                    className="primary-text"
+                                                                >
+                                                                    {
+                                                                        topics.topic_name
+                                                                    }
+                                                                    <i className="fas fa-external-link-alt fa-xs ml-2"></i>
+                                                                </Link>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="col-md-8 small primary-text font-weight-bold-600">
+                                                        <div className="row align-items-center">
+                                                            <div className="col-md-2 mb-2 mb-md-0"></div>
+                                                            <div className="col-md-2 mb-2 mb-md-0"></div>
+                                                            <div className="col-md-2 mb-2 mb-md-0"></div>
+                                                            <div className="col-md-2 mb-2 mb-md-0">
+                                                                {props
+                                                                    .topics_remarks[
+                                                                    props.all_chapters.indexOf(
+                                                                        props
+                                                                            .chapter
+                                                                            .chapter_id
+                                                                    )
+                                                                ] !==
+                                                                undefined ? (
+                                                                    props
+                                                                        .topics_remarks[
+                                                                        props.all_chapters.indexOf(
+                                                                            props
+                                                                                .chapter
+                                                                                .chapter_id
+                                                                        )
+                                                                    ][
+                                                                        topics
+                                                                            .topic_num
+                                                                    ] !==
+                                                                    undefined ? (
+                                                                        props
+                                                                            .topics_remarks[
+                                                                            props.all_chapters.indexOf(
+                                                                                props
+                                                                                    .chapter
+                                                                                    .chapter_id
+                                                                            )
+                                                                        ][
+                                                                            topics
+                                                                                .topic_num
+                                                                        ]
+                                                                            .remarks !==
+                                                                        undefined ? (
+                                                                            <div
+                                                                                className="text-white text-center p-2 rounded"
+                                                                                style={{
+                                                                                    backgroundColor:
+                                                                                        props
+                                                                                            .topics_remarks[
+                                                                                            props.all_chapters.indexOf(
+                                                                                                props
+                                                                                                    .chapter
+                                                                                                    .chapter_id
+                                                                                            )
+                                                                                        ][
+                                                                                            topics
+                                                                                                .topic_num
+                                                                                        ]
+                                                                                            .color,
+                                                                                    textTransform:
+                                                                                        "capitalize",
+                                                                                }}
+                                                                            >
+                                                                                {
+                                                                                    props
+                                                                                        .topics_remarks[
+                                                                                        props.all_chapters.indexOf(
+                                                                                            props
+                                                                                                .chapter
+                                                                                                .chapter_id
+                                                                                        )
+                                                                                    ][
+                                                                                        topics
+                                                                                            .topic_num
+                                                                                    ]
+                                                                                        .remarks
+                                                                                }
+                                                                            </div>
+                                                                        ) : (
+                                                                            ""
+                                                                        )
+                                                                    ) : null
+                                                                ) : null}
+                                                            </div>
+                                                            <div className="col-md-2 mb-2 mb-md-0">
+                                                                {
+                                                                    topics.next_topic
+                                                                }
+                                                            </div>
+                                                            <div className="col-md-2 mb-2 mb-md-0 text-right">
+                                                                <button
+                                                                    className={`btn btn-sm shadow-none ${
+                                                                        props
+                                                                            .topics_completed[
+                                                                            props.all_chapters.indexOf(
+                                                                                props
+                                                                                    .chapter
+                                                                                    .chapter_id
+                                                                            )
+                                                                        ] !==
+                                                                        undefined
+                                                                            ? props.topics_completed[
+                                                                                  props.all_chapters.indexOf(
+                                                                                      props
+                                                                                          .chapter
+                                                                                          .chapter_id
+                                                                                  )
+                                                                              ].includes(
+                                                                                  topics.topic_num
+                                                                              )
+                                                                                ? "text-success"
+                                                                                : "text-muted"
+                                                                            : "text-muted"
+                                                                    }`}
+                                                                    style={{
+                                                                        fontSize:
+                                                                            "18px",
+                                                                    }}
+                                                                    onClick={(
+                                                                        event
+                                                                    ) => {
+                                                                        props.handleTopicCompletion(
+                                                                            topics.topic_num,
+                                                                            topics.topic_name,
+                                                                            props.all_chapters.indexOf(
+                                                                                props
+                                                                                    .chapter
+                                                                                    .chapter_id
+                                                                            ),
+                                                                            props
+                                                                                .chapter
+                                                                                .chapter_id
+                                                                        );
+
+                                                                        event.stopPropagation();
+                                                                    }}
+                                                                >
+                                                                    <i className="fas fa-check-circle"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </Accordion.Toggle>
+
+                                            <Accordion.Collapse
+                                                eventKey={`topic-${props.all_chapters.indexOf(
+                                                    props.chapter.chapter_id
+                                                )}-${topic_index}`}
+                                            >
+                                                <Card>
+                                                    {/* ----- Sub topic list ----- */}
+                                                    {(topics.child || []).map(
+                                                        (
+                                                            child,
+                                                            child_index
+                                                        ) => {
+                                                            return props.topic(
+                                                                child,
+                                                                child_index,
+                                                                props.all_chapters.indexOf(
+                                                                    props
+                                                                        .chapter
+                                                                        .chapter_id
+                                                                ),
+                                                                props.chapter
+                                                                    .chapter_id
+                                                            );
+                                                        }
+                                                    )}
+                                                </Card>
+                                            </Accordion.Collapse>
+                                        </div>
+                                    );
+                                }
+                            );
+                        })}
+                    </Accordion>
+
+                    {/* ----- Cycle test list ----- */}
+                    {props.chapter.cycle_tests.map((cycle, cycle_index) => {
+                        return props.cycleTest(
+                            cycle,
+                            cycle_index,
+                            props.all_chapters.indexOf(
+                                props.chapter.chapter_id
+                            ),
+                            props.chapter.chapter_id
+                        );
+                    })}
+                </>
+            </Accordion.Collapse>
+        </Card>
+    );
+};
+
 class Subject extends Component {
     constructor(props) {
         super(props);
@@ -35,6 +431,10 @@ class Subject extends Component {
             topics_completed: [],
             topics_remarks: [],
             all_topics_completed: [],
+
+            all_chapters: [],
+            semester_chapters: [],
+            unassigned_chapters: [],
 
             chapterEventKey: "chapter-0",
             topicEventKey: "",
@@ -176,6 +576,8 @@ class Subject extends Component {
                         subjectItems: result.data,
                     });
                     let topics = [];
+                    let all_chapters = [];
+                    let semester_chapters = [];
                     for (let i = 0; i < result.data.chapters.length; i++) {
                         // Extracting topics from the chapter_structure
                         for (
@@ -195,9 +597,25 @@ class Subject extends Component {
                             result.data.chapters[i].chapter_id,
                             i
                         );
+                        // Gets all chapter id from the chapters list
+                        all_chapters.push(result.data.chapters[i].chapter_id);
+                    }
+                    for (let i = 0; i < result.data.semesters.length; i++) {
+                        // Gets all chapter id from the semester list
+                        for (
+                            let j = 0;
+                            j < result.data.semesters[i].chapters.length;
+                            j++
+                        ) {
+                            semester_chapters.push(
+                                result.data.semesters[i].chapters[j]
+                            );
+                        }
                     }
                     this.setState({
                         topics: topics,
+                        all_chapters: all_chapters,
+                        semester_chapters: semester_chapters,
                     });
                 } else {
                     this.setState({
@@ -390,67 +808,50 @@ class Subject extends Component {
                         </p>
                     </div>
                     <div className="col-md-4 d-flex align-items-center justify-content-end">
-                        {this.state.topics.length !== 0 &&
-                        this.state.topics_completed.length !== 0 ? (
-                            this.state.topics_completed.length ===
-                            this.state.subjectItems.chapters.length ? (
-                                this.state.topics[chapter_index] !==
-                                    undefined &&
-                                this.state.topics_completed[chapter_index] !==
-                                    undefined ? (
-                                    // Check if all the topics are completed
-                                    this.state.all_topics_completed[
-                                        chapter_index
-                                    ] === true ? (
-                                        // Check if cycle test is created or not
-                                        data.direct_question === false &&
-                                        data.auto_test_question === false ? (
-                                            // if not then display the error message in tooltip
-                                            <OverlayTrigger
-                                                key="top"
-                                                placement="top"
-                                                overlay={
-                                                    <Tooltip id="tooltip">
-                                                        Cycle test is not
-                                                        created yet
-                                                    </Tooltip>
-                                                }
-                                            >
-                                                <button className="btn btn-sm primary-text">
-                                                    <i className="fas fa-lock"></i>
-                                                </button>
-                                            </OverlayTrigger>
-                                        ) : // if exist, then redirect them to appropriate cycle test
-                                        data.direct_question === true ? (
-                                            <Link
-                                                to={`${this.props.match.url}/chapter/${chapter_id}/cycle/${data.cycle_test_id}/direct`}
-                                            >
-                                                <button className="btn btn-primary btn-sm shadow-none">
-                                                    Start
-                                                </button>
-                                            </Link>
-                                        ) : (
-                                            <Link
-                                                to={`${this.props.match.url}/chapter/${chapter_id}/cycle/${data.cycle_test_id}`}
-                                            >
-                                                <button className="btn btn-primary btn-sm shadow-none">
-                                                    Start
-                                                </button>
-                                            </Link>
-                                        )
-                                    ) : (
-                                        // if not then display the error message in tooltip
-                                        <Lock />
-                                    )
+                        {
+                            // Check if all the topics are completed
+                            this.state.all_topics_completed[chapter_index] ===
+                            true ? (
+                                // Check if cycle test is created or not
+                                data.direct_question === false &&
+                                data.auto_test_question === false ? (
+                                    // if not then display the error message in tooltip
+                                    <OverlayTrigger
+                                        key="top"
+                                        placement="top"
+                                        overlay={
+                                            <Tooltip id="tooltip">
+                                                Cycle test is not created yet
+                                            </Tooltip>
+                                        }
+                                    >
+                                        <button className="btn btn-sm primary-text">
+                                            <i className="fas fa-lock"></i>
+                                        </button>
+                                    </OverlayTrigger>
+                                ) : // if exist, then redirect them to appropriate cycle test
+                                data.direct_question === true ? (
+                                    <Link
+                                        to={`${this.props.match.url}/chapter/${chapter_id}/cycle/${data.cycle_test_id}/direct`}
+                                    >
+                                        <button className="btn btn-primary btn-sm shadow-none">
+                                            Start
+                                        </button>
+                                    </Link>
                                 ) : (
-                                    <Lock />
+                                    <Link
+                                        to={`${this.props.match.url}/chapter/${chapter_id}/cycle/${data.cycle_test_id}`}
+                                    >
+                                        <button className="btn btn-primary btn-sm shadow-none">
+                                            Start
+                                        </button>
+                                    </Link>
                                 )
                             ) : (
+                                // if not then display the error message in tooltip
                                 <Lock />
                             )
-                        ) : (
-                            <Lock />
-                        )}
+                        }
                     </div>
                 </div>
             </div>
@@ -463,6 +864,7 @@ class Subject extends Component {
                 ? this.state.subjectItems.subject_name
                 : ""
         } - Student | IQLabs`;
+        const all_chapters = this.state.all_chapters;
         return (
             <div className="wrapper">
                 {/* Navbar */}
@@ -552,7 +954,7 @@ class Subject extends Component {
                         {/* Course details */}
                         <div className="card shadow-sm">
                             <div className="card-header secondary-bg primary-text font-weight-bold">
-                                <div className="row">
+                                <div className="row align-items-center">
                                     <div className="col-md-4 mb-2 mb-md-0">
                                         Chapter
                                     </div>
@@ -581,431 +983,240 @@ class Subject extends Component {
                             <div className="card-body">
                                 <Accordion defaultActiveKey="chapter-0">
                                     {this.state.subjectItems.length !== 0
-                                        ? this.state.subjectItems.chapters.map(
-                                              (data, index) => {
+                                        ? this.state.subjectItems.semesters.map(
+                                              (semester, semester_index) => {
                                                   return (
-                                                      <Card
-                                                          className="mb-2"
-                                                          key={index}
+                                                      <React.Fragment
+                                                          key={semester_index}
                                                       >
-                                                          <Accordion.Toggle
-                                                              as={Card.Header}
-                                                              eventKey={`chapter-${index}`}
-                                                              className="pinkrange-bg shadow-sm mb-2"
-                                                              style={{
-                                                                  borderRadius:
-                                                                      "8px",
-                                                              }}
-                                                              onClick={() =>
-                                                                  this.toggleCollapse(
-                                                                      `chapter-${index}`
-                                                                  )
+                                                          {/* ----- Chapter list ----- */}
+                                                          {this.state.subjectItems.chapters.map(
+                                                              (
+                                                                  chapter,
+                                                                  chapter_index
+                                                              ) => {
+                                                                  return semester.chapters.includes(
+                                                                      chapter.chapter_id
+                                                                  ) ? (
+                                                                      <ChapterListRender
+                                                                          key={
+                                                                              chapter_index
+                                                                          }
+                                                                          chapter={
+                                                                              chapter
+                                                                          }
+                                                                          chapter_index={
+                                                                              chapter_index
+                                                                          }
+                                                                          all_chapters={
+                                                                              all_chapters
+                                                                          }
+                                                                          url={
+                                                                              this
+                                                                                  .props
+                                                                                  .match
+                                                                                  .url
+                                                                          }
+                                                                          subjectItems={
+                                                                              this
+                                                                                  .state
+                                                                                  .subjectItems
+                                                                          }
+                                                                          topics_completed={
+                                                                              this
+                                                                                  .state
+                                                                                  .topics_completed
+                                                                          }
+                                                                          topics_remarks={
+                                                                              this
+                                                                                  .state
+                                                                                  .topics_remarks
+                                                                          }
+                                                                          topics={
+                                                                              this
+                                                                                  .state
+                                                                                  .topics
+                                                                          }
+                                                                          chapterEventKey={
+                                                                              this
+                                                                                  .state
+                                                                                  .chapterEventKey
+                                                                          }
+                                                                          topicEventKey={
+                                                                              this
+                                                                                  .state
+                                                                                  .topicEventKey
+                                                                          }
+                                                                          toggleCollapse={
+                                                                              this
+                                                                                  .toggleCollapse
+                                                                          }
+                                                                          handleAllTopicCompletion={
+                                                                              this
+                                                                                  .handleAllTopicCompletion
+                                                                          }
+                                                                          handleTopicCompletion={
+                                                                              this
+                                                                                  .handleTopicCompletion
+                                                                          }
+                                                                          toggleTopicCollapse={
+                                                                              this
+                                                                                  .toggleTopicCollapse
+                                                                          }
+                                                                          topic={
+                                                                              this
+                                                                                  .topic
+                                                                          }
+                                                                          cycleTest={
+                                                                              this
+                                                                                  .cycleTest
+                                                                          }
+                                                                      />
+                                                                  ) : null;
                                                               }
+                                                          )}
+                                                          {/* ----- Semester list ----- */}
+                                                          <div
+                                                              className="card card-header pinkrange-bg shadow-sm"
+                                                              style={{
+                                                                  marginBottom:
+                                                                      "0.75rem",
+                                                              }}
                                                           >
                                                               <div className="row align-items-center">
-                                                                  <div className="col-md-4 mb-2 mb-md-0">
-                                                                      <div className="row align-items-center">
-                                                                          <div className="col-1">
-                                                                              <span>
-                                                                                  <i
-                                                                                      className={`fas fa-chevron-circle-down ${
-                                                                                          this
-                                                                                              .state
-                                                                                              .chapterEventKey ===
-                                                                                          `chapter-${index}`
-                                                                                              ? ""
-                                                                                              : "fa-rotate-270"
-                                                                                      }`}
-                                                                                  ></i>
-                                                                              </span>
-                                                                          </div>
-                                                                          <div className="col-1 small font-weight-bold-600">
-                                                                              {index +
-                                                                                  1}
-                                                                          </div>
-                                                                          <div className="col-8 small font-weight-bold-600">
-                                                                              {
-                                                                                  data.chapter_name
-                                                                              }
-                                                                          </div>
-                                                                      </div>
+                                                                  <div className="col-6">
+                                                                      <p className="small font-weight-bold-600 mb-0">
+                                                                          {
+                                                                              semester.semester_name
+                                                                          }
+                                                                      </p>
                                                                   </div>
-                                                                  <div className="col-md-8 small primary-text font-weight-bold-600">
-                                                                      <div className="row align-items-center justify-content-end">
-                                                                          <div className="col-md-2 mb-2 mb-md-0">
-                                                                              {
-                                                                                  data.weightage
-                                                                              }
-                                                                          </div>
-                                                                          <div className="col-md-2 mb-2 mb-md-0">
-                                                                              <Link
-                                                                                  to={`${this.props.match.url}/chapter/${data.chapter_id}/summary`}
+                                                                  <div className="col-6 text-right">
+                                                                      {semester.chapters_completed ===
+                                                                      true ? (
+                                                                          // Check if semester exam is created or not
+                                                                          semester.direct_question ===
+                                                                              false &&
+                                                                          semester.auto_test_question ===
+                                                                              false ? (
+                                                                              // if not then display the error message in tooltip
+                                                                              <OverlayTrigger
+                                                                                  key="top"
+                                                                                  placement="top"
+                                                                                  overlay={
+                                                                                      <Tooltip id="tooltip">
+                                                                                          Semester
+                                                                                          exam
+                                                                                          is
+                                                                                          not
+                                                                                          created
+                                                                                          yet
+                                                                                      </Tooltip>
+                                                                                  }
                                                                               >
-                                                                                  <button className="btn btn-light btn-sm">
-                                                                                      <i className="fas fa-eye fa-sm"></i>
+                                                                                  <button className="btn btn-sm primary-text">
+                                                                                      <i className="fas fa-lock"></i>
+                                                                                  </button>
+                                                                              </OverlayTrigger>
+                                                                          ) : // if exist, then redirect them to appropriate cycle test
+                                                                          semester.direct_question ===
+                                                                            true ? (
+                                                                              <Link
+                                                                                  to={`${this.props.match.url}/semester/${semester.semester_id}/direct`}
+                                                                              >
+                                                                                  <button className="btn btn-primary btn-sm shadow-none">
+                                                                                      Start
                                                                                   </button>
                                                                               </Link>
-                                                                          </div>
-                                                                          <div className="col-md-2 mb-2 mb-md-0">
+                                                                          ) : (
                                                                               <Link
-                                                                                  to={`${this.props.match.url}/chapter/${data.chapter_id}/notes`}
+                                                                                  to={`${this.props.match.url}/semester/${semester.semester_id}`}
                                                                               >
-                                                                                  <button className="btn btn-light btn-sm">
-                                                                                      <i className="fas fa-eye fa-sm"></i>
+                                                                                  <button className="btn btn-primary btn-sm shadow-none">
+                                                                                      Start
                                                                                   </button>
                                                                               </Link>
-                                                                          </div>
-                                                                          <div className="col-md-2 mb-2 mb-md-0">
-                                                                              <div className="d-inline p-2 rounded">
-                                                                                  Remarks
-                                                                              </div>
-                                                                          </div>
-                                                                          <div className="col-md-2 mb-2 mb-md-0"></div>
-                                                                          <div className="col-md-2 text-right mb-2 mb-md-0">
-                                                                              <button
-                                                                                  className={`btn btn-sm shadow-none ${
-                                                                                      this
-                                                                                          .state
-                                                                                          .topics
-                                                                                          .length !==
-                                                                                          0 &&
-                                                                                      this
-                                                                                          .state
-                                                                                          .topics_completed
-                                                                                          .length !==
-                                                                                          0
-                                                                                          ? this
-                                                                                                .state
-                                                                                                .topics_completed
-                                                                                                .length ===
-                                                                                            this
-                                                                                                .state
-                                                                                                .subjectItems
-                                                                                                .chapters
-                                                                                                .length
-                                                                                              ? this
-                                                                                                    .state
-                                                                                                    .topics[
-                                                                                                    index
-                                                                                                ] !==
-                                                                                                    undefined &&
-                                                                                                this
-                                                                                                    .state
-                                                                                                    .topics_completed[
-                                                                                                    index
-                                                                                                ] !==
-                                                                                                    undefined
-                                                                                                  ? this
-                                                                                                        .state
-                                                                                                        .topics[
-                                                                                                        index
-                                                                                                    ]
-                                                                                                        .length ===
-                                                                                                    this
-                                                                                                        .state
-                                                                                                        .topics_completed[
-                                                                                                        index
-                                                                                                    ]
-                                                                                                        .length
-                                                                                                      ? "text-success"
-                                                                                                      : "text-muted"
-                                                                                                  : "text-muted"
-                                                                                              : "text-muted"
-                                                                                          : "text-muted"
-                                                                                  }`}
-                                                                                  style={{
-                                                                                      fontSize:
-                                                                                          "18px",
-                                                                                  }}
-                                                                                  onClick={(
-                                                                                      event
-                                                                                  ) => {
-                                                                                      this.handleAllTopicCompletion(
-                                                                                          index,
-                                                                                          data.chapter_id
-                                                                                      );
-                                                                                      event.stopPropagation();
-                                                                                  }}
-                                                                              >
-                                                                                  <i className="fas fa-check-circle"></i>
-                                                                              </button>
-                                                                          </div>
-                                                                      </div>
+                                                                          )
+                                                                      ) : (
+                                                                          <Lock />
+                                                                      )}
                                                                   </div>
                                                               </div>
-                                                          </Accordion.Toggle>
-
-                                                          <Accordion.Collapse
-                                                              eventKey={`chapter-${index}`}
-                                                          >
-                                                              <>
-                                                                  <Accordion>
-                                                                      {/* ----- Topic list ----- */}
-                                                                      {data.topics.map(
-                                                                          (
-                                                                              topic,
-                                                                              structure_index
-                                                                          ) => {
-                                                                              return topic.chapter_structure.map(
-                                                                                  (
-                                                                                      topics,
-                                                                                      topic_index
-                                                                                  ) => {
-                                                                                      return (
-                                                                                          <div
-                                                                                              key={
-                                                                                                  topic_index
-                                                                                              }
-                                                                                          >
-                                                                                              <Accordion.Toggle
-                                                                                                  as={
-                                                                                                      Card.Header
-                                                                                                  }
-                                                                                                  eventKey={`topic-${index}-${topic_index}`}
-                                                                                                  className="light-bg shadow-sm py-2 mb-2"
-                                                                                                  style={{
-                                                                                                      borderRadius:
-                                                                                                          "8px",
-                                                                                                  }}
-                                                                                                  onClick={() =>
-                                                                                                      this.toggleTopicCollapse(
-                                                                                                          `topic-${index}-${topic_index}`
-                                                                                                      )
-                                                                                                  }
-                                                                                              >
-                                                                                                  <div className="row align-items-center">
-                                                                                                      <div className="col-md-4 mb-2 mb-md-0">
-                                                                                                          <div className="row">
-                                                                                                              <div className="col-1">
-                                                                                                                  <span>
-                                                                                                                      <i
-                                                                                                                          className={`fas fa-chevron-circle-down ${
-                                                                                                                              this
-                                                                                                                                  .state
-                                                                                                                                  .topicEventKey ===
-                                                                                                                              `topic-${index}-${topic_index}`
-                                                                                                                                  ? ""
-                                                                                                                                  : "fa-rotate-270"
-                                                                                                                          }`}
-                                                                                                                      ></i>
-                                                                                                                  </span>
-                                                                                                              </div>
-                                                                                                              <div className="col-2 small font-weight-bold-600">
-                                                                                                                  {
-                                                                                                                      topics.topic_num
-                                                                                                                  }
-                                                                                                              </div>
-                                                                                                              <div className="col-9 small font-weight-bold-600">
-                                                                                                                  <Link
-                                                                                                                      to={`${this.props.match.url}/chapter/${data.chapter_id}/${topics.topic_num}/learn`}
-                                                                                                                      className="primary-text"
-                                                                                                                  >
-                                                                                                                      {
-                                                                                                                          topics.topic_name
-                                                                                                                      }
-                                                                                                                      <i className="fas fa-external-link-alt fa-xs ml-2"></i>
-                                                                                                                  </Link>
-                                                                                                              </div>
-                                                                                                          </div>
-                                                                                                      </div>
-
-                                                                                                      <div className="col-md-8 small primary-text font-weight-bold-600">
-                                                                                                          <div className="row align-items-center">
-                                                                                                              <div className="col-md-2 mb-2 mb-md-0"></div>
-                                                                                                              <div className="col-md-2 mb-2 mb-md-0"></div>
-                                                                                                              <div className="col-md-2 mb-2 mb-md-0"></div>
-                                                                                                              <div className="col-md-2 mb-2 mb-md-0">
-                                                                                                                  {this
-                                                                                                                      .state
-                                                                                                                      .topics_remarks[
-                                                                                                                      index
-                                                                                                                  ] !==
-                                                                                                                  undefined ? (
-                                                                                                                      this
-                                                                                                                          .state
-                                                                                                                          .topics_remarks[
-                                                                                                                          index
-                                                                                                                      ][
-                                                                                                                          topics
-                                                                                                                              .topic_num
-                                                                                                                      ] !==
-                                                                                                                      undefined ? (
-                                                                                                                          this
-                                                                                                                              .state
-                                                                                                                              .topics_remarks[
-                                                                                                                              index
-                                                                                                                          ][
-                                                                                                                              topics
-                                                                                                                                  .topic_num
-                                                                                                                          ]
-                                                                                                                              .remarks !==
-                                                                                                                          undefined ? (
-                                                                                                                              <div
-                                                                                                                                  className="text-white d-inline p-2 rounded"
-                                                                                                                                  style={{
-                                                                                                                                      backgroundColor: this
-                                                                                                                                          .state
-                                                                                                                                          .topics_remarks[
-                                                                                                                                          index
-                                                                                                                                      ][
-                                                                                                                                          topics
-                                                                                                                                              .topic_num
-                                                                                                                                      ]
-                                                                                                                                          .color,
-                                                                                                                                      textTransform:
-                                                                                                                                          "capitalize",
-                                                                                                                                  }}
-                                                                                                                              >
-                                                                                                                                  {
-                                                                                                                                      this
-                                                                                                                                          .state
-                                                                                                                                          .topics_remarks[
-                                                                                                                                          index
-                                                                                                                                      ][
-                                                                                                                                          topics
-                                                                                                                                              .topic_num
-                                                                                                                                      ]
-                                                                                                                                          .remarks
-                                                                                                                                  }
-                                                                                                                              </div>
-                                                                                                                          ) : (
-                                                                                                                              ""
-                                                                                                                          )
-                                                                                                                      ) : null
-                                                                                                                  ) : null}
-                                                                                                              </div>
-                                                                                                              <div className="col-md-2 mb-2 mb-md-0">
-                                                                                                                  {
-                                                                                                                      topics.next_topic
-                                                                                                                  }
-                                                                                                              </div>
-                                                                                                              <div className="col-md-2 mb-2 mb-md-0 text-right">
-                                                                                                                  <button
-                                                                                                                      className={`btn btn-sm shadow-none ${
-                                                                                                                          this
-                                                                                                                              .state
-                                                                                                                              .topics_completed[
-                                                                                                                              index
-                                                                                                                          ] !==
-                                                                                                                          undefined
-                                                                                                                              ? this.state.topics_completed[
-                                                                                                                                    index
-                                                                                                                                ].includes(
-                                                                                                                                    topics.topic_num
-                                                                                                                                )
-                                                                                                                                  ? "text-success"
-                                                                                                                                  : "text-muted"
-                                                                                                                              : "text-muted"
-                                                                                                                      }`}
-                                                                                                                      style={{
-                                                                                                                          fontSize:
-                                                                                                                              "18px",
-                                                                                                                      }}
-                                                                                                                      onClick={(
-                                                                                                                          event
-                                                                                                                      ) => {
-                                                                                                                          this.handleTopicCompletion(
-                                                                                                                              topics.topic_num,
-                                                                                                                              topics.topic_name,
-                                                                                                                              index,
-                                                                                                                              data.chapter_id
-                                                                                                                          );
-
-                                                                                                                          event.stopPropagation();
-                                                                                                                      }}
-                                                                                                                  >
-                                                                                                                      <i className="fas fa-check-circle"></i>
-                                                                                                                  </button>
-                                                                                                              </div>
-                                                                                                          </div>
-                                                                                                      </div>
-                                                                                                  </div>
-                                                                                              </Accordion.Toggle>
-
-                                                                                              <Accordion.Collapse
-                                                                                                  eventKey={`topic-${index}-${topic_index}`}
-                                                                                                  //   eventKey={
-                                                                                                  //       this
-                                                                                                  //           .state
-                                                                                                  //           .chapterEventKey ===
-                                                                                                  //       `chapter-${index}`
-                                                                                                  //           ? `topic-${index}-${topic_index}`
-                                                                                                  //           : ""
-                                                                                                  //   }
-                                                                                                  //   className={
-                                                                                                  //       this
-                                                                                                  //           .state
-                                                                                                  //           .topicEventKey ===
-                                                                                                  //       `topic-${index}-${topic_index}`
-                                                                                                  //           ? "show"
-                                                                                                  //           : ""
-                                                                                                  //   }
-                                                                                              >
-                                                                                                  <Card>
-                                                                                                      {/* ----- Sub topic list ----- */}
-                                                                                                      {(
-                                                                                                          topics.child ||
-                                                                                                          []
-                                                                                                      ).map(
-                                                                                                          (
-                                                                                                              child,
-                                                                                                              child_index
-                                                                                                          ) => {
-                                                                                                              return this.topic(
-                                                                                                                  child,
-                                                                                                                  child_index,
-                                                                                                                  index,
-                                                                                                                  data.chapter_id
-                                                                                                              );
-                                                                                                          }
-                                                                                                      )}
-                                                                                                  </Card>
-                                                                                              </Accordion.Collapse>
-                                                                                          </div>
-                                                                                      );
-                                                                                  }
-                                                                              );
-                                                                          }
-                                                                      )}
-                                                                  </Accordion>
-
-                                                                  {/* ----- Cycle test list ----- */}
-                                                                  {data.cycle_tests.map(
-                                                                      (
-                                                                          cycle,
-                                                                          cycle_index
-                                                                      ) => {
-                                                                          return this.cycleTest(
-                                                                              cycle,
-                                                                              cycle_index,
-                                                                              index,
-                                                                              data.chapter_id
-                                                                          );
-                                                                      }
-                                                                  )}
-                                                              </>
-                                                          </Accordion.Collapse>
-                                                      </Card>
+                                                          </div>
+                                                      </React.Fragment>
                                                   );
                                               }
                                           )
                                         : null}
+                                    {/* ----- Unassigned chapter list ----- */}
+                                    {this.state.subjectItems.length !== 0
+                                        ? this.state.subjectItems.chapters.map(
+                                              (chapter, chapter_index) => {
+                                                  return !this.state.semester_chapters.includes(
+                                                      chapter.chapter_id
+                                                  ) ? (
+                                                      <ChapterListRender
+                                                          key={chapter_index}
+                                                          chapter={chapter}
+                                                          chapter_index={
+                                                              chapter_index
+                                                          }
+                                                          all_chapters={
+                                                              all_chapters
+                                                          }
+                                                          url={
+                                                              this.props.match
+                                                                  .url
+                                                          }
+                                                          subjectItems={
+                                                              this.state
+                                                                  .subjectItems
+                                                          }
+                                                          topics_completed={
+                                                              this.state
+                                                                  .topics_completed
+                                                          }
+                                                          topics_remarks={
+                                                              this.state
+                                                                  .topics_remarks
+                                                          }
+                                                          topics={
+                                                              this.state.topics
+                                                          }
+                                                          chapterEventKey={
+                                                              this.state
+                                                                  .chapterEventKey
+                                                          }
+                                                          topicEventKey={
+                                                              this.state
+                                                                  .topicEventKey
+                                                          }
+                                                          toggleCollapse={
+                                                              this
+                                                                  .toggleCollapse
+                                                          }
+                                                          handleAllTopicCompletion={
+                                                              this
+                                                                  .handleAllTopicCompletion
+                                                          }
+                                                          handleTopicCompletion={
+                                                              this
+                                                                  .handleTopicCompletion
+                                                          }
+                                                          toggleTopicCollapse={
+                                                              this
+                                                                  .toggleTopicCollapse
+                                                          }
+                                                          topic={this.topic}
+                                                          cycleTest={
+                                                              this.cycleTest
+                                                          }
+                                                      />
+                                                  ) : null;
+                                              }
+                                          )
+                                        : null}
                                 </Accordion>
-
-                                <div className="card card-header secondary-bg shadow-sm">
-                                    <div className="row align-items-center">
-                                        <div className="col-6">
-                                            <p className="small font-weight-bold-600 mb-0">
-                                                Semester Exams
-                                            </p>
-                                        </div>
-                                        <div className="col-6 text-right">
-                                            <button className="btn btn-primary btn-sm">
-                                                Start
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                         {/* Loading component */}
@@ -1018,3 +1229,389 @@ class Subject extends Component {
 }
 
 export default Subject;
+
+// {
+//     /* <>
+//     <div className="card-body">
+//         <Accordion defaultActiveKey="chapter-0">
+//             {this.state.subjectItems.length !== 0
+//                 ? this.state.subjectItems.chapters.map((data, index) => {
+//                       return (
+//                           <Card className="mb-2" key={index}>
+//                               <Accordion.Toggle
+//                                   as={Card.Header}
+//                                   eventKey={`chapter-${index}`}
+//                                   className="pinkrange-bg shadow-sm mb-2"
+//                                   style={{
+//                                       borderRadius: "8px",
+//                                   }}
+//                                   onClick={() =>
+//                                       this.toggleCollapse(`chapter-${index}`)
+//                                   }
+//                               >
+//                                   <div className="row align-items-center">
+//                                       <div className="col-md-4 mb-2 mb-md-0">
+//                                           <div className="row align-items-center">
+//                                               <div className="col-1">
+//                                                   <span>
+//                                                       <i
+//                                                           className={`fas fa-chevron-circle-down ${
+//                                                               this.state
+//                                                                   .chapterEventKey ===
+//                                                               `chapter-${index}`
+//                                                                   ? ""
+//                                                                   : "fa-rotate-270"
+//                                                           }`}
+//                                                       ></i>
+//                                                   </span>
+//                                               </div>
+//                                               <div className="col-1 small font-weight-bold-600">
+//                                                   {index + 1}
+//                                               </div>
+//                                               <div className="col-8 small font-weight-bold-600">
+//                                                   {data.chapter_name}
+//                                               </div>
+//                                           </div>
+//                                       </div>
+//                                       <div className="col-md-8 small primary-text font-weight-bold-600">
+//                                           <div className="row align-items-center justify-content-end">
+//                                               <div className="col-md-2 mb-2 mb-md-0">
+//                                                   {data.weightage}
+//                                               </div>
+//                                               <div className="col-md-2 mb-2 mb-md-0">
+//                                                   <Link
+//                                                       to={`${this.props.match.url}/chapter/${data.chapter_id}/summary`}
+//                                                   >
+//                                                       <button className="btn btn-light btn-sm">
+//                                                           <i className="fas fa-eye fa-sm"></i>
+//                                                       </button>
+//                                                   </Link>
+//                                               </div>
+//                                               <div className="col-md-2 mb-2 mb-md-0">
+//                                                   <Link
+//                                                       to={`${this.props.match.url}/chapter/${data.chapter_id}/notes`}
+//                                                   >
+//                                                       <button className="btn btn-light btn-sm">
+//                                                           <i className="fas fa-eye fa-sm"></i>
+//                                                       </button>
+//                                                   </Link>
+//                                               </div>
+//                                               <div className="col-md-2 mb-2 mb-md-0">
+//                                                   <div className="d-inline p-2 rounded">
+//                                                       Remarks
+//                                                   </div>
+//                                               </div>
+//                                               <div className="col-md-2 mb-2 mb-md-0"></div>
+//                                               <div className="col-md-2 text-right mb-2 mb-md-0">
+//                                                   <button
+//                                                       className={`btn btn-sm shadow-none ${
+//                                                           this.state.topics
+//                                                               .length !== 0 &&
+//                                                           this.state
+//                                                               .topics_completed
+//                                                               .length !== 0
+//                                                               ? this.state
+//                                                                     .topics_completed
+//                                                                     .length ===
+//                                                                 this.state
+//                                                                     .subjectItems
+//                                                                     .chapters
+//                                                                     .length
+//                                                                   ? this.state
+//                                                                         .topics[
+//                                                                         index
+//                                                                     ] !==
+//                                                                         undefined &&
+//                                                                     this.state
+//                                                                         .topics_completed[
+//                                                                         index
+//                                                                     ] !==
+//                                                                         undefined
+//                                                                       ? this
+//                                                                             .state
+//                                                                             .topics[
+//                                                                             index
+//                                                                         ]
+//                                                                             .length ===
+//                                                                         this
+//                                                                             .state
+//                                                                             .topics_completed[
+//                                                                             index
+//                                                                         ].length
+//                                                                           ? "text-success"
+//                                                                           : "text-muted"
+//                                                                       : "text-muted"
+//                                                                   : "text-muted"
+//                                                               : "text-muted"
+//                                                       }`}
+//                                                       style={{
+//                                                           fontSize: "18px",
+//                                                       }}
+//                                                       onClick={(event) => {
+//                                                           this.handleAllTopicCompletion(
+//                                                               index,
+//                                                               data.chapter_id
+//                                                           );
+//                                                           event.stopPropagation();
+//                                                       }}
+//                                                   >
+//                                                       <i className="fas fa-check-circle"></i>
+//                                                   </button>
+//                                               </div>
+//                                           </div>
+//                                       </div>
+//                                   </div>
+//                               </Accordion.Toggle>
+
+//                               <Accordion.Collapse eventKey={`chapter-${index}`}>
+//                                   <>
+//                                       <Accordion>
+//                                           {/* ----- Topic list ----- */
+// }
+// //   {data.topics.map(
+// //       (topic, structure_index) => {
+// //           return topic.chapter_structure.map(
+// //               (topics, topic_index) => {
+// //                   return (
+// //                       <div
+// //                           key={
+// //                               topic_index
+// //                           }
+// //                       >
+// //                           <Accordion.Toggle
+// //                               as={
+// //                                   Card.Header
+// //                               }
+// //                               eventKey={`topic-${index}-${topic_index}`}
+// //                               className="light-bg shadow-sm py-2 mb-2"
+// //                               style={{
+// //                                   borderRadius:
+// //                                       "8px",
+// //                               }}
+// //                               onClick={() =>
+// //                                   this.toggleTopicCollapse(
+// //                                       `topic-${index}-${topic_index}`
+// //                                   )
+// //                               }
+// //                           >
+// //                               <div className="row align-items-center">
+// //                                   <div className="col-md-4 mb-2 mb-md-0">
+// //                                       <div className="row">
+// //                                           <div className="col-1">
+// //                                               <span>
+// //                                                   <i
+// //                                                       className={`fas fa-chevron-circle-down ${
+// //                                                           this
+// //                                                               .state
+// //                                                               .topicEventKey ===
+// //                                                           `topic-${index}-${topic_index}`
+// //                                                               ? ""
+// //                                                               : "fa-rotate-270"
+// //                                                       }`}
+// //                                                   ></i>
+// //                                               </span>
+// //                                           </div>
+// //                                           <div className="col-2 small font-weight-bold-600">
+// //                                               {
+// //                                                   topics.topic_num
+// //                                               }
+// //                                           </div>
+// //                                           <div className="col-9 small font-weight-bold-600">
+// //                                               <Link
+// //                                                   to={`${this.props.match.url}/chapter/${data.chapter_id}/${topics.topic_num}/learn`}
+// //                                                   className="primary-text"
+// //                                               >
+// //                                                   {
+// //                                                       topics.topic_name
+// //                                                   }
+// //                                                   <i className="fas fa-external-link-alt fa-xs ml-2"></i>
+// //                                               </Link>
+// //                                           </div>
+// //                                       </div>
+// //                                   </div>
+
+// //                                   <div className="col-md-8 small primary-text font-weight-bold-600">
+// //                                       <div className="row align-items-center">
+// //                                           <div className="col-md-2 mb-2 mb-md-0"></div>
+// //                                           <div className="col-md-2 mb-2 mb-md-0"></div>
+// //                                           <div className="col-md-2 mb-2 mb-md-0"></div>
+// //                                           <div className="col-md-2 mb-2 mb-md-0">
+// //                                               {this
+// //                                                   .state
+// //                                                   .topics_remarks[
+// //                                                   index
+// //                                               ] !==
+// //                                               undefined ? (
+// //                                                   this
+// //                                                       .state
+// //                                                       .topics_remarks[
+// //                                                       index
+// //                                                   ][
+// //                                                       topics
+// //                                                           .topic_num
+// //                                                   ] !==
+// //                                                   undefined ? (
+// //                                                       this
+// //                                                           .state
+// //                                                           .topics_remarks[
+// //                                                           index
+// //                                                       ][
+// //                                                           topics
+// //                                                               .topic_num
+// //                                                       ]
+// //                                                           .remarks !==
+// //                                                       undefined ? (
+// //                                                           <div
+// //                                                               className="text-white text-center p-2 rounded"
+// //                                                               style={{
+// //                                                                   backgroundColor: this
+// //                                                                       .state
+// //                                                                       .topics_remarks[
+// //                                                                       index
+// //                                                                   ][
+// //                                                                       topics
+// //                                                                           .topic_num
+// //                                                                   ]
+// //                                                                       .color,
+// //                                                                   textTransform:
+// //                                                                       "capitalize",
+// //                                                               }}
+// //                                                           >
+// //                                                               {
+// //                                                                   this
+// //                                                                       .state
+// //                                                                       .topics_remarks[
+// //                                                                       index
+// //                                                                   ][
+// //                                                                       topics
+// //                                                                           .topic_num
+// //                                                                   ]
+// //                                                                       .remarks
+// //                                                               }
+// //                                                           </div>
+// //                                                       ) : (
+// //                                                           ""
+// //                                                       )
+// //                                                   ) : null
+// //                                               ) : null}
+// //                                           </div>
+// //                                           <div className="col-md-2 mb-2 mb-md-0">
+// //                                               {
+// //                                                   topics.next_topic
+// //                                               }
+// //                                           </div>
+// //                                           <div className="col-md-2 mb-2 mb-md-0 text-right">
+// //                                               <button
+// //                                                   className={`btn btn-sm shadow-none ${
+// //                                                       this
+// //                                                           .state
+// //                                                           .topics_completed[
+// //                                                           index
+// //                                                       ] !==
+// //                                                       undefined
+// //                                                           ? this.state.topics_completed[
+// //                                                                 index
+// //                                                             ].includes(
+// //                                                                 topics.topic_num
+// //                                                             )
+// //                                                               ? "text-success"
+// //                                                               : "text-muted"
+// //                                                           : "text-muted"
+// //                                                   }`}
+// //                                                   style={{
+// //                                                       fontSize:
+// //                                                           "18px",
+// //                                                   }}
+// //                                                   onClick={(
+// //                                                       event
+// //                                                   ) => {
+// //                                                       this.handleTopicCompletion(
+// //                                                           topics.topic_num,
+// //                                                           topics.topic_name,
+// //                                                           index,
+// //                                                           data.chapter_id
+// //                                                       );
+
+// //                                                       event.stopPropagation();
+// //                                                   }}
+// //                                               >
+// //                                                   <i className="fas fa-check-circle"></i>
+// //                                               </button>
+// //                                           </div>
+// //                                       </div>
+// //                                   </div>
+// //                               </div>
+// //                           </Accordion.Toggle>
+
+// //                           <Accordion.Collapse
+// //                               eventKey={`topic-${index}-${topic_index}`}
+// //                           >
+// //                               <Card>
+// {
+//     /* ----- Sub topic list ----- */
+// }
+// {
+//     /* {(
+//                                                                               topics.child ||
+//                                                                               []
+//                                                                           ).map(
+//                                                                               (
+//                                                                                   child,
+//                                                                                   child_index
+//                                                                               ) => {
+//                                                                                   return this.topic(
+//                                                                                       child,
+//                                                                                       child_index,
+//                                                                                       index,
+//                                                                                       data.chapter_id
+//                                                                                   );
+//                                                                               }
+//                                                                           )}
+//                                                                       </Card>
+//                                                                   </Accordion.Collapse>
+//                                                               </div>
+//                                                           );
+//                                                       }
+//                                                   );
+//                                               }
+//                                           )}
+//                                       </Accordion> */
+// }
+
+// {
+//     /* ----- Cycle test list ----- */
+// }
+// {
+//     /* {data.cycle_tests.map(
+//                                           (cycle, cycle_index) => {
+//                                               return this.cycleTest(
+//                                                   cycle,
+//                                                   cycle_index,
+//                                                   index,
+//                                                   data.chapter_id
+//                                               );
+//                                           }
+//                                       )}
+//                                   </>
+//                               </Accordion.Collapse>
+//                           </Card>
+//                       );
+//                   })
+//                 : null}
+//         </Accordion>
+
+//         <div className="card card-header secondary-bg shadow-sm">
+//             <div className="row align-items-center">
+//                 <div className="col-6">
+//                     <p className="small font-weight-bold-600 mb-0">
+//                         Semester Exams
+//                     </p>
+//                 </div>
+//                 <div className="col-6 text-right">
+//                     <button className="btn btn-primary btn-sm">Start</button>
+//                 </div>
+//             </div>
+//         </div>
+//     </div>
+// </> */
+// }

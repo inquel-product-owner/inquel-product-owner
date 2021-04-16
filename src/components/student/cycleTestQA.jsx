@@ -80,7 +80,7 @@ class CycleTestQA extends Component {
                             });
                             questions.push({
                                 question_random_id: question.question_random_id,
-                                answer: sub_question,
+                                sub_question: sub_question,
                             });
                         }
                     });
@@ -699,7 +699,7 @@ class CycleTestQA extends Component {
         let data = event.dataTransfer.getData("data") || null;
         let index = event.dataTransfer.getData("index") || null;
         if (data !== null && index !== null) {
-            sections[this.state.currentSectionIndex].questions[index].answer[
+            sections[this.state.currentSectionIndex].questions[index].sub_question[
                 this.state.currentSubQuestionIndex[
                     this.state.currentSectionIndex
                 ][index]
@@ -715,7 +715,7 @@ class CycleTestQA extends Component {
     handleDropFillin = (event, index) => {
         let sections = [...this.state.answerSection];
         if (event.target.value !== "") {
-            sections[this.state.currentSectionIndex].questions[index].answer[
+            sections[this.state.currentSectionIndex].questions[index].sub_question[
                 this.state.currentSubQuestionIndex[
                     this.state.currentSectionIndex
                 ][index]
@@ -725,7 +725,7 @@ class CycleTestQA extends Component {
             });
             localStorage.setItem("data", JSON.stringify(sections));
         } else {
-            sections[this.state.currentSectionIndex].questions[index].answer[
+            sections[this.state.currentSectionIndex].questions[index].sub_question[
                 this.state.currentSubQuestionIndex[
                     this.state.currentSectionIndex
                 ][index]
@@ -826,7 +826,7 @@ class CycleTestQA extends Component {
                             {/* Questions & options */}
                             <div className="w-100">
                                 <div
-                                    className="py-2"
+                                    className="mb-3"
                                     dangerouslySetInnerHTML={{
                                         __html: data.question,
                                     }}
@@ -1073,7 +1073,7 @@ class CycleTestQA extends Component {
         let isAnswerAvailable = [];
         answerSection.forEach((item1) => {
             let temp = false;
-            item1.answer.forEach((item2) => {
+            item1.sub_question.forEach((item2) => {
                 if (item2.answer.length !== 0) {
                     temp = true;
                 }
@@ -1127,7 +1127,7 @@ class CycleTestQA extends Component {
                                                     {answerSection.length !== 0
                                                         ? answerSection[
                                                               index
-                                                          ].answer.map(
+                                                          ].sub_question.map(
                                                               (
                                                                   sub_answer,
                                                                   answer_index
@@ -1260,11 +1260,11 @@ class CycleTestQA extends Component {
                                                         placeholder="Type your answer here"
                                                         value={
                                                             answerSection[index]
-                                                                .answer
+                                                                .sub_question
                                                                 .length !== 0
                                                                 ? answerSection[
                                                                       index
-                                                                  ].answer[
+                                                                  ].sub_question[
                                                                       this.state
                                                                           .currentSubQuestionIndex[
                                                                           this

@@ -1044,7 +1044,7 @@ class Subject extends Component {
                                                                       ) : null;
                                                                   }
                                                               )}
-                                                              {/* Semester list */}
+                                                              {/* ----- Semester list ----- */}
                                                               <tr key={index}>
                                                                   <td>
                                                                       {
@@ -1230,7 +1230,7 @@ class Subject extends Component {
                                                   }
                                               )
                                             : null}
-                                        {/* Unassigned chapter list */}
+                                        {/* ----- Unassigned chapter list ----- */}
                                         {this.state.subjectItems.length !== 0
                                             ? this.state.subjectItems.map(
                                                   (chapter, index) => {
