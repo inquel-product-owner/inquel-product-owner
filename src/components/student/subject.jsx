@@ -18,7 +18,7 @@ function Lock() {
                 </Tooltip>
             }
         >
-            <button className="btn btn-sm primary-text">
+            <button className="btn btn-sm primary-text shadow-none">
                 <i className="fas fa-lock"></i>
             </button>
         </OverlayTrigger>
@@ -96,9 +96,54 @@ const ChapterListRender = (props) => {
                                 </Link>
                             </div>
                             <div className="col-md-2 mb-2 mb-md-0">
-                                <div className="d-inline p-2 rounded">
-                                    Remarks
-                                </div>
+                                {props.chapter_remarks[
+                                    props.all_chapters.indexOf(
+                                        props.chapter.chapter_id
+                                    )
+                                ] !== undefined ? (
+                                    props.chapter_remarks[
+                                        props.all_chapters.indexOf(
+                                            props.chapter.chapter_id
+                                        )
+                                    ][props.chapter.chapter_id] !==
+                                    undefined ? (
+                                        props.chapter_remarks[
+                                            props.all_chapters.indexOf(
+                                                props.chapter.chapter_id
+                                            )
+                                        ][props.chapter.chapter_id].remarks !==
+                                        undefined ? (
+                                            <div
+                                                className="text-white text-center p-2 rounded"
+                                                style={{
+                                                    backgroundColor:
+                                                        props.chapter_remarks[
+                                                            props.all_chapters.indexOf(
+                                                                props.chapter
+                                                                    .chapter_id
+                                                            )
+                                                        ][
+                                                            props.chapter
+                                                                .chapter_id
+                                                        ].color,
+                                                    textTransform: "capitalize",
+                                                }}
+                                            >
+                                                {
+                                                    props.chapter_remarks[
+                                                        props.all_chapters.indexOf(
+                                                            props.chapter
+                                                                .chapter_id
+                                                        )
+                                                    ][props.chapter.chapter_id]
+                                                        .remarks
+                                                }
+                                            </div>
+                                        ) : (
+                                            ""
+                                        )
+                                    ) : null
+                                ) : null}
                             </div>
                             <div className="col-md-2 mb-2 mb-md-0"></div>
                             <div className="col-md-2 text-right mb-2 mb-md-0">
@@ -192,7 +237,7 @@ const ChapterListRender = (props) => {
                                             >
                                                 <div className="row align-items-center">
                                                     <div className="col-md-4 mb-2 mb-md-0">
-                                                        <div className="row">
+                                                        <div className="row align-items-center">
                                                             <div className="col-1">
                                                                 <span>
                                                                     <i
@@ -430,11 +475,11 @@ class Subject extends Component {
             topics: [],
             topics_completed: [],
             topics_remarks: [],
+            chapter_remarks: [],
             all_topics_completed: [],
 
             all_chapters: [],
             semester_chapters: [],
-            unassigned_chapters: [],
 
             chapterEventKey: "chapter-0",
             topicEventKey: "",
@@ -491,6 +536,7 @@ class Subject extends Component {
                         ...this.state.all_topics_completed,
                     ];
                     let topics_remarks = [...this.state.topics_remarks];
+                    let chapter_remarks = [...this.state.chapter_remarks];
                     topics_completed[chapter_index] =
                         result.data.topics_completed !== undefined
                             ? Array.isArray(result.data.topics_completed)
@@ -504,6 +550,10 @@ class Subject extends Component {
                     topics_remarks[chapter_index] =
                         result.data.topics_remarks !== undefined
                             ? result.data.topics_remarks
+                            : "";
+                    chapter_remarks[chapter_index] =
+                        result.data.chapter_remarks !== undefined
+                            ? result.data.chapter_remarks
                             : "";
 
                     // Updating the completed topics data in topics state
@@ -531,6 +581,7 @@ class Subject extends Component {
                         topics_completed: topics_completed,
                         all_topics_completed: all_topics_completed,
                         topics_remarks: topics_remarks,
+                        chapter_remarks: chapter_remarks,
                         page_loading: false,
                     });
                 } else {
@@ -825,7 +876,7 @@ class Subject extends Component {
                                             </Tooltip>
                                         }
                                     >
-                                        <button className="btn btn-sm primary-text">
+                                        <button className="btn btn-sm primary-text shadow-none">
                                             <i className="fas fa-lock"></i>
                                         </button>
                                     </OverlayTrigger>
@@ -937,14 +988,14 @@ class Subject extends Component {
                                 </nav>
                             </div>
                             <div className="col-md-6 d-flex justify-content-start justify-content-md-end">
-                                <button className="btn btn-primary btn-sm mr-1">
+                                <button className="btn btn-primary btn-sm shadow-none mr-1">
                                     My Personal Notes
                                 </button>
-                                <button className="btn btn-primary btn-sm mr-1">
+                                <button className="btn btn-primary btn-sm shadow-none mr-1">
                                     Simulation
                                 </button>
                                 <Link to={`${this.props.match.url}/results`}>
-                                    <button className="btn btn-primary btn-sm">
+                                    <button className="btn btn-primary btn-sm shadow-none">
                                         Test Result
                                     </button>
                                 </Link>
@@ -1031,6 +1082,11 @@ class Subject extends Component {
                                                                               this
                                                                                   .state
                                                                                   .topics_remarks
+                                                                          }
+                                                                          chapter_remarks={
+                                                                              this
+                                                                                  .state
+                                                                                  .chapter_remarks
                                                                           }
                                                                           topics={
                                                                               this
@@ -1179,6 +1235,10 @@ class Subject extends Component {
                                                           topics_remarks={
                                                               this.state
                                                                   .topics_remarks
+                                                          }
+                                                          chapter_remarks={
+                                                              this.state
+                                                                  .chapter_remarks
                                                           }
                                                           topics={
                                                               this.state.topics

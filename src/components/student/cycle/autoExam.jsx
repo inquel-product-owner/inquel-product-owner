@@ -1,13 +1,13 @@
 import React, { Component } from "react";
-import Header from "./shared/examNavbar";
-import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
-import AlertBox from "../sharedComponents/alert";
-import Loading from "../sharedComponents/loader";
+import Header from "../shared/examNavbar";
+import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
+import AlertBox from "../../sharedComponents/alert";
+import Loading from "../../sharedComponents/loader";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
 // import dateFormat from "dateformat";
 
-class CycleTestQA extends Component {
+class CycleAutoExam extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -1565,4 +1565,4 @@ class CycleTestQA extends Component {
     }
 }
 
-export default CycleTestQA;
+export default CycleAutoExam;

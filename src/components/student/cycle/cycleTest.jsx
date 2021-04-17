@@ -1,8 +1,8 @@
 import React, { Component } from "react";
-import Header from "./shared/examNavbar";
-import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
-import AlertBox from "../sharedComponents/alert";
-import Loading from "../sharedComponents/loader";
+import Header from "../shared/examNavbar";
+import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
+import AlertBox from "../../sharedComponents/alert";
+import Loading from "../../sharedComponents/loader";
 
 class CycleTest extends Component {
     constructor(props) {
@@ -118,7 +118,7 @@ class CycleTest extends Component {
             .then((result) => {
                 console.log(result);
                 if (result.sts === true) {
-                    this.props.history.push(`${this.props.match.url}/test`);
+                    this.props.history.push(`${this.props.match.url}/auto`);
                 } else {
                     this.setState({
                         errorMsg: result.detail ? result.detail : result.msg,

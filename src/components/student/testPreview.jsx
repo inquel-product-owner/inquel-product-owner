@@ -31,6 +31,7 @@ class TestPreview extends Component {
         };
         this.subjectId = this.props.match.params.subjectId;
         this.cycleTestId = this.props.match.params.cycleTestId;
+        this.semesterId = this.props.match.params.semesterId;
         this.url = baseUrl + studentUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
@@ -49,7 +50,10 @@ class TestPreview extends Component {
         let currentSubQuestionIndex = [];
         let totalQuestion = 0;
         this.result.data.forEach((data) => {
-            if (data.cycle_test_id === this.cycleTestId) {
+            if (
+                data.cycle_test_id === this.cycleTestId ||
+                data.semester_id === this.semesterId
+            ) {
                 data.sections.forEach((section) => {
                     questions = [];
                     let total = [];
@@ -86,7 +90,7 @@ class TestPreview extends Component {
                                 sub_question.push({
                                     question:
                                         section.questions[i].sub_question[j]
-                                            .question || "",
+                                            .sub_question || "",
                                     sub_question_id:
                                         section.questions[i].sub_question[j]
                                             .sub_question_id,
@@ -159,9 +163,9 @@ class TestPreview extends Component {
         }
     };
 
-    componentWillUnmount = () => {
-        sessionStorage.removeItem("data");
-    };
+    // componentWillUnmount = () => {
+    //     sessionStorage.removeItem("data");
+    // };
 
     // ---------- Navigation ----------
 
@@ -205,7 +209,9 @@ class TestPreview extends Component {
         this.setState((state) => ({ pageNumber: state.pageNumber + 1 }));
 
     render() {
-        document.title = `${this.result.cycle_test_name} test preview - Teacher | IQLabs`;
+        document.title = `${
+            this.result.cycle_test_name || this.result.semester_name
+        } test preview - Teacher | IQLabs`;
         var data = [];
         if (this.result.auto === true) {
             data = this.state.section[this.state.currentSectionIndex] || [];
@@ -215,7 +221,7 @@ class TestPreview extends Component {
                 {/* Navbar */}
                 <Header
                     name={this.state.subject_name}
-                    chapter_name={this.result.cycle_test_name}
+                    chapter_name={this.result.cycle_test_name || this.result.semester_name}
                     goBack={this.props.history.goBack}
                 />
 
@@ -510,6 +516,39 @@ class TestPreview extends Component {
                                                               {/* ---------- Student answers ---------- */}
                                                               <div className="col-md-5">
                                                                   <div
+                                                                      className="card"
+                                                                      id="drop-area"
+                                                                  >
+                                                                      <div className="card-header font-weight-bold-600 pb-0">
+                                                                          Your
+                                                                          answer(s):
+                                                                      </div>
+                                                                      <div className="card-body">
+                                                                          {question.sub_question.map(
+                                                                              (
+                                                                                  sub_answer,
+                                                                                  sub_index
+                                                                              ) => {
+                                                                                  return (
+                                                                                      <div key={sub_index}
+                                                                                          className={`card card-body shadow-sm small font-weight-bold-600 ${
+                                                                                              sub_answer.marks ===
+                                                                                              0
+                                                                                                  ? "danger-bg"
+                                                                                                  : "success-bg"
+                                                                                          } py-3 mb-2`}
+                                                                                      >
+                                                                                          {
+                                                                                              sub_answer
+                                                                                                  .answer[0]
+                                                                                          }
+                                                                                      </div>
+                                                                                  );
+                                                                              }
+                                                                          )}
+                                                                      </div>
+                                                                  </div>
+                                                                  {/* <div
                                                                       className={`card card-body ${
                                                                           question
                                                                               .sub_question[
@@ -566,7 +605,7 @@ class TestPreview extends Component {
                                                                               );
                                                                           }
                                                                       )}
-                                                                  </div>
+                                                                  </div> */}
                                                               </div>
 
                                                               {/* ----- Sub Question ----- */}

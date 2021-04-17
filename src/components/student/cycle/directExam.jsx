@@ -1,14 +1,14 @@
 import React, { Component } from "react";
 import axios from "axios";
-import Header from "./shared/examNavbar";
+import Header from "../shared/examNavbar";
 import { Spinner } from "react-bootstrap";
-import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
-import AlertBox from "../sharedComponents/alert";
-import Loading from "../sharedComponents/loader";
+import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
+import AlertBox from "../../sharedComponents/alert";
+import Loading from "../../sharedComponents/loader";
 import { Document, Page, pdfjs } from "react-pdf";
 import dateFormat from "dateformat";
 
-class DirectExam extends Component {
+class CycleDirectExam extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -432,6 +432,13 @@ class DirectExam extends Component {
                                                                 .question_url
                                                         }
                                                         className="btn btn-primary btn-block btn-sm shadow-none"
+                                                        disabled={
+                                                            this.state
+                                                                .question_url ===
+                                                            null
+                                                                ? true
+                                                                : false
+                                                        }
                                                         download
                                                     >
                                                         Download Question
@@ -544,4 +551,4 @@ class DirectExam extends Component {
     }
 }
 
-export default DirectExam;
+export default CycleDirectExam;
