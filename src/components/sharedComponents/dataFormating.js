@@ -296,7 +296,6 @@ export function Type2DataFormat(result) {
             sub_question.push({
                 sub_question_id: response[i].sub_question[k].sub_question_id,
                 question: response[i].sub_question[k].question,
-                explanation: response[i].sub_question[k].explanation,
                 mcq: response[i].sub_question[k].mcq,
                 fill_in: response[i].sub_question[k].fill_in,
                 fillin_answer:

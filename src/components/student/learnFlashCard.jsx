@@ -1042,19 +1042,19 @@ class FlashCard extends Component {
     handleDragStart = (event, data, index) => {
         event.dataTransfer.setData("data", data);
         event.dataTransfer.setData("index", index);
-        var node = document.getElementById(event.target.id);
-        var crt = node.cloneNode(true);
-        crt.id = event.target.id + "-copy";
-        crt.classList.remove("light-bg");
-        crt.classList.add("ghost-card");
-        document.getElementById("root").appendChild(crt);
-        event.dataTransfer.setDragImage(crt, 0, 0);
+        // var node = document.getElementById(event.target.id);
+        // var crt = node.cloneNode(true);
+        // crt.id = event.target.id + "-copy";
+        // crt.classList.remove("light-bg");
+        // crt.classList.add("ghost-card");
+        // document.getElementById("root").appendChild(crt);
+        // event.dataTransfer.setDragImage(crt, 0, 0);
     };
 
     handleDragEnd = (event) => {
-        var id = event.target.id + "-copy";
-        var node = document.getElementById(id);
-        node.parentNode.removeChild(node);
+        // var id = event.target.id + "-copy";
+        // var node = document.getElementById(id);
+        // node.parentNode.removeChild(node);
     };
 
     handleDrop = (event) => {
@@ -1138,11 +1138,11 @@ class FlashCard extends Component {
                                                           ].answer === false
                                                             ? "danger-bg"
                                                             : "success-bg"
-                                                        : "pinkrange-bg"
+                                                        : "pinkrange-bg primary-text"
                                                 }`}
                                                 key={index}
                                             >
-                                                <div className="card-body small font-weight-bold-600 primary-text py-3">
+                                                <div className="card-body small font-weight-bold-600 py-3">
                                                     {data.answers[0]}
                                                 </div>
                                             </div>

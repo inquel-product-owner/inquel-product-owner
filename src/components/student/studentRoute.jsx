@@ -12,9 +12,13 @@ import Summary from "./summary";
 import Notes from "./notes";
 import FlashCard from "./learnFlashCard";
 
-import CycleTest from "./cycleTest";
-import DirectExam from "./directExam";
-import CycleTestQA from "./cycleTestQA";
+import CycleTest from "./cycle/cycleTest";
+import CycleDirectExam from "./cycle/directExam";
+import CycleAutoExam from "./cycle/autoExam";
+
+import SemesterExam from "./semester/semesterExam";
+import SemesterDirectExam from "./semester/directExam";
+import SemesterAutoExam from "./semester/autoExam";
 
 import EmailVerify from "./emailVerification";
 import errorPage from "../404";
@@ -101,6 +105,18 @@ const studentRoutes = (
         />
         <Route
             exact
+            path="/student/subject/:subjectId/results/semester/:semesterId/preview"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/student/login" />
+                ) : (
+                    <TestPreview {...props} />
+                )
+            }
+        />
+        <Route
+            exact
             path="/student/subject/:subjectId/chapter/:chapterId/summary"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
@@ -152,13 +168,13 @@ const studentRoutes = (
         />
         <Route
             exact
-            path="/student/subject/:subjectId/chapter/:chapterId/cycle/:cycleTestId/test"
+            path="/student/subject/:subjectId/chapter/:chapterId/cycle/:cycleTestId/auto"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (
                     <Redirect to="/student/login" />
                 ) : (
-                    <CycleTestQA {...props} />
+                    <CycleAutoExam {...props} />
                 )
             }
         />
@@ -170,7 +186,46 @@ const studentRoutes = (
                 !localStorage.getItem("is_student") ? (
                     <Redirect to="/student/login" />
                 ) : (
-                    <DirectExam {...props} />
+                    <CycleDirectExam {...props} />
+                )
+            }
+        />
+
+        {/* --------------- Semester exam --------------- */}
+
+        <Route
+            exact
+            path="/student/subject/:subjectId/semester/:semesterId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/student/login" />
+                ) : (
+                    <SemesterExam {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/student/subject/:subjectId/semester/:semesterId/auto"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/student/login" />
+                ) : (
+                    <SemesterAutoExam {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/student/subject/:subjectId/semester/:semesterId/direct"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/student/login" />
+                ) : (
+                    <SemesterDirectExam {...props} />
                 )
             }
         />
