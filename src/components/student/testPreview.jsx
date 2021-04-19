@@ -548,64 +548,6 @@ class TestPreview extends Component {
                                                                           )}
                                                                       </div>
                                                                   </div>
-                                                                  {/* <div
-                                                                      className={`card card-body ${
-                                                                          question
-                                                                              .sub_question[
-                                                                              this
-                                                                                  .state
-                                                                                  .currentSubQuestionIndex[
-                                                                                  this
-                                                                                      .state
-                                                                                      .currentSectionIndex
-                                                                              ][
-                                                                                  q_index
-                                                                              ]
-                                                                          ]
-                                                                              .marks ===
-                                                                          0
-                                                                              ? "danger-bg"
-                                                                              : "success-bg"
-                                                                      } h-100`}
-                                                                      style={{
-                                                                          minHeight:
-                                                                              "100px",
-                                                                      }}
-                                                                  >
-                                                                      <p className="font-weight-bold-600 mb-2">
-                                                                          Your
-                                                                          answer(s):
-                                                                      </p>
-                                                                      {question.sub_question[
-                                                                          this
-                                                                              .state
-                                                                              .currentSubQuestionIndex[
-                                                                              this
-                                                                                  .state
-                                                                                  .currentSectionIndex
-                                                                          ][
-                                                                              q_index
-                                                                          ]
-                                                                      ].answer.map(
-                                                                          (
-                                                                              answer,
-                                                                              answer_index
-                                                                          ) => {
-                                                                              return (
-                                                                                  <p
-                                                                                      className="small mb-2"
-                                                                                      key={
-                                                                                          answer_index
-                                                                                      }
-                                                                                  >
-                                                                                      {
-                                                                                          answer
-                                                                                      }
-                                                                                  </p>
-                                                                              );
-                                                                          }
-                                                                      )}
-                                                                  </div> */}
                                                               </div>
 
                                                               {/* ----- Sub Question ----- */}

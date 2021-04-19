@@ -329,9 +329,9 @@ class Notes extends Component {
                             result.data.notes_name !== undefined
                                 ? result.data.limited
                                 : false,
-                        notes_id: result.data.notes_id,
+                        notes_id: result.data.notes_id || "",
                         notes_name: result.data.notes_name,
-                        url: result.data.direct_question_urls,
+                        url: result.data.direct_question_urls || [],
                         page_loading: false,
                     });
                 } else if (result.sts === false) {
