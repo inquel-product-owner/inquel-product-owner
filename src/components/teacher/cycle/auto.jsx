@@ -1155,7 +1155,7 @@ class CycleTestAuto extends Component {
     };
 
     render() {
-        document.title = `${this.props.chapter_name} Auto - Teacher | IQLabs`;
+        document.title = `${this.props.cycle_name} - Teacher | IQLabs`;
         return (
             <div className="wrapper">
                 {/* Navbar */}

@@ -704,6 +704,9 @@ class FlashCard extends Component {
                     // --------------- Type 1 content ---------------
                     <div className="row w-100">
                         <div className="col-md-8">
+                            <p className="font-weight-bold mb-2">
+                                {index <= 9 ? `0${index + 1}` : index + 1}
+                            </p>
                             <div
                                 className="font-weight-bold-600 mb-4"
                                 dangerouslySetInnerHTML={{
@@ -1042,19 +1045,19 @@ class FlashCard extends Component {
     handleDragStart = (event, data, index) => {
         event.dataTransfer.setData("data", data);
         event.dataTransfer.setData("index", index);
-        // var node = document.getElementById(event.target.id);
-        // var crt = node.cloneNode(true);
-        // crt.id = event.target.id + "-copy";
-        // crt.classList.remove("light-bg");
-        // crt.classList.add("ghost-card");
-        // document.getElementById("root").appendChild(crt);
-        // event.dataTransfer.setDragImage(crt, 0, 0);
+        var node = document.getElementById(event.target.id);
+        var crt = node.cloneNode(true);
+        crt.id = event.target.id + "-copy";
+        crt.classList.remove("light-bg");
+        crt.classList.add("ghost-card");
+        document.getElementById("root").appendChild(crt);
+        event.dataTransfer.setDragImage(crt, 0, 0);
     };
 
     handleDragEnd = (event) => {
-        // var id = event.target.id + "-copy";
-        // var node = document.getElementById(id);
-        // node.parentNode.removeChild(node);
+        var id = event.target.id + "-copy";
+        var node = document.getElementById(id);
+        node.parentNode.removeChild(node);
     };
 
     handleDrop = (event) => {
@@ -1102,13 +1105,16 @@ class FlashCard extends Component {
         return (
             <>
                 {/* ---------- Main Question ---------- */}
+                <p className="font-weight-bold mb-2">
+                    {index <= 9 ? `0${index + 1}` : index + 1}
+                </p>
                 <div
                     className="mb-4"
                     dangerouslySetInnerHTML={{
                         __html: data[index].question,
                     }}
                 ></div>
-                <div className="row w-100 mb-3">
+                <div className="row mb-3">
                     {/* ---------- Drop area ---------- */}
                     <div className="col-md-6">
                         <div

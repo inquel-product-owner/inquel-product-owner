@@ -57,12 +57,6 @@ class TemplateUpload extends Component {
                 showErrorAlert: true,
                 showLoader: false,
             });
-        } else if (event.target.files[0].size > 5242880) {
-            this.setState({
-                errorMsg: "File sixe exceeds more then 5MB!",
-                showErrorAlert: true,
-                showLoader: false,
-            });
         } else {
             axios
                 .post(this.props.url, form_data, options)
@@ -175,7 +169,7 @@ class TemplateUpload extends Component {
                         className="form-text text-muted mb-2"
                         style={{ marginTop: "0px" }}
                     >
-                        Select only .xlsx format. Max size is 5MB
+                        Select only .xlsx format
                     </small>
                 </Modal.Body>
             </Modal>

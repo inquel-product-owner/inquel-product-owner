@@ -428,7 +428,7 @@ export function dataFormat(result) {
     let response = result.data.results;
 
     for (let i = 0; i < response.length; i++) {
-        if (response[i].type_1 === true) {
+        if (response[i].sub_question === undefined) {
             type = "type_1";
             images = [];
             if (response[i].files.length !== 0) {

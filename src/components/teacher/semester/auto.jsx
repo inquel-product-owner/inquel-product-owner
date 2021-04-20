@@ -1148,7 +1148,7 @@ class SemesterAuto extends Component {
     };
 
     render() {
-        document.title = `${this.props.semester_name} Auto - Teacher | IQLabs`;
+        document.title = `${this.props.semester_name} - Teacher | IQLabs`;
         return (
             <div className="wrapper">
                 {/* Navbar */}

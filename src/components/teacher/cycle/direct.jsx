@@ -128,7 +128,7 @@ class CyleTestDirect extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.props.chapter_name} - Teacher | IQLabs`;
+        document.title = `${this.props.cycle_name} - Teacher | IQLabs`;
 
         this.loadCycletestData();
     };

@@ -156,8 +156,6 @@ class CycleTestAutoQA extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.props.cycle_name} - Teacher | IQLabs`;
-
         this.loadQAData();
         this.loadSectionData();
     };
@@ -227,6 +225,12 @@ class CycleTestAutoQA extends Component {
     };
 
     render() {
+        document.title = `${this.props.cycle_name} : ${
+            this.state.sectionData.length !== 0
+                ? this.state.sectionData[this.state.currentSectionIndex]
+                      .section_description
+                : ""
+        } - Teacher | IQLabs`;
         return (
             <div className="wrapper">
                 {/* Navbar */}
