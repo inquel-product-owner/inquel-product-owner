@@ -138,8 +138,8 @@ class Concepts extends Component {
 
     // -------------------------- Load concept data --------------------------
 
-    loadConceptData = () => {
-        fetch(
+    loadConceptData = async () => {
+        await fetch(
             `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/?chapter_id=${this.chapterId}&topic_num=${this.topicNum}`,
             {
                 method: "GET",
@@ -352,6 +352,7 @@ class Concepts extends Component {
             .catch((err) => {
                 console.log(err);
             });
+        window.MathJax.typeset();
     };
 
     componentDidMount = () => {
@@ -727,22 +728,24 @@ class Concepts extends Component {
 
     // -------------------------- Terms & Definition --------------------------
 
-    onEditorChange = (evt) => {
+    onEditorChange = async (evt) => {
         const values = [...this.state.concepts];
         values[this.state.activeConcept].content.terms = evt.editor.getData();
-        this.setState({
+        await this.setState({
             concepts: values,
         });
+        window.MathJax.typeset();
     };
 
-    handleDefinition = (evt) => {
+    handleDefinition = async (evt) => {
         const values = [...this.state.concepts];
         values[
             this.state.activeConcept
         ].content.definition = evt.editor.getData();
-        this.setState({
+        await this.setState({
             concepts: values,
         });
+        window.MathJax.typeset();
     };
 
     // -------------------------- Image --------------------------

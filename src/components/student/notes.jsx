@@ -58,8 +58,8 @@ class Notes extends Component {
     };
 
     // loads notes data
-    loadNotesData = () => {
-        fetch(
+    loadNotesData = async () => {
+        await fetch(
             `${this.url}/student/subject/${this.subjectId}/chapter/${this.state.chapterId}/notes/?topic_name=${this.state.topicName}`,
             {
                 method: "GET",
@@ -85,6 +85,7 @@ class Notes extends Component {
             .catch((err) => {
                 console.log(err);
             });
+        window.MathJax.typeset();
     };
 
     componentDidMount = () => {
@@ -517,7 +518,7 @@ class Notes extends Component {
                                                               );
                                                           }
                                                       )
-                                                    : 'No content to display...'}
+                                                    : "No content to display..."}
                                             </div>
                                         </div>
                                     </div>

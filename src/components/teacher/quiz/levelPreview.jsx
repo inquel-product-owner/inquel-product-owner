@@ -62,8 +62,8 @@ class LevelPreview extends Component {
     };
 
     // loads question & answer
-    loadQAData = () => {
-        fetch(
+    loadQAData = async () => {
+        await fetch(
             `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/${this.quizId}/level/${this.state.levelId}/?attempt_name=${this.attempt}`,
             {
                 method: "GET",
@@ -94,6 +94,7 @@ class LevelPreview extends Component {
             .catch((err) => {
                 console.log(err);
             });
+        window.MathJax.typeset();
     };
 
     loadLevelData = () => {

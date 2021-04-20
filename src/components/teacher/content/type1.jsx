@@ -161,8 +161,8 @@ class Type1 extends Component {
 
     // -------------------------- Form submission --------------------------
 
-    loadMCQData = () => {
-        fetch(
+    loadMCQData = async () => {
+        await fetch(
             `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/?chapter_id=${this.chapterId}&topic_num=${this.topicNum}`,
             {
                 headers: this.headers,
@@ -452,6 +452,7 @@ class Type1 extends Component {
             .catch((err) => {
                 console.log(err);
             });
+        window.MathJax.typeset();
     };
 
     componentDidMount = () => {
@@ -1019,22 +1020,24 @@ class Type1 extends Component {
 
     // -------------------------- Question & Explanation --------------------------
 
-    onEditorChange = (evt) => {
+    onEditorChange = async (evt) => {
         const values = [...this.state.questions];
         values[this.state.activeQuestion].question = evt.editor.getData();
-        this.setState({
+        await this.setState({
             questions: values,
         });
+        window.MathJax.typeset();
     };
 
-    handleExplanation = (evt) => {
+    handleExplanation = async (evt) => {
         const values = [...this.state.questions];
         values[
             this.state.activeQuestion
         ].content.explanation = evt.editor.getData();
-        this.setState({
+        await this.setState({
             questions: values,
         });
+        window.MathJax.typeset();
     };
 
     // -------------------------- Options --------------------------

@@ -66,8 +66,8 @@ class CycleTestAutoQA extends Component {
     };
 
     // loads question & answer
-    loadQAData = () => {
-        fetch(
+    loadQAData = async () => {
+        await fetch(
             `${this.url}/teacher/subject/${this.subjectId}/cycle/${this.cycle_testId}/auto/${this.state.sectionId}/?attempt_number=${this.attempt}`,
             {
                 method: "GET",
@@ -109,6 +109,7 @@ class CycleTestAutoQA extends Component {
             .catch((err) => {
                 console.log(err);
             });
+        window.MathJax.typeset();
     };
 
     loadSectionData = () => {
@@ -208,20 +209,22 @@ class CycleTestAutoQA extends Component {
         );
     };
 
-    handleSubQPrev = (main_index) => {
+    handleSubQPrev = async (main_index) => {
         let index = this.state.currentSubQuestionIndex;
         index[main_index] = index[main_index] - 1;
-        this.setState({
+        await this.setState({
             currentSubQuestionIndex: index,
         });
+        window.MathJax.typeset();
     };
 
-    handleSubQNext = (main_index) => {
+    handleSubQNext = async (main_index) => {
         let index = this.state.currentSubQuestionIndex;
         index[main_index] = index[main_index] + 1;
-        this.setState({
+        await this.setState({
             currentSubQuestionIndex: index,
         });
+        window.MathJax.typeset();
     };
 
     render() {

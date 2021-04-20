@@ -113,12 +113,12 @@ class FlashCard extends Component {
 
     // ---------- loads concepts data ----------
 
-    loadConceptData = (path) => {
+    loadConceptData = async (path) => {
         var apiURL =
             path === undefined || path === null
                 ? `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/concepts/?topic_num=${this.topicNum}`
                 : path;
-        fetch(apiURL, {
+        await fetch(apiURL, {
             method: "GET",
             headers: this.headers,
         })
@@ -307,6 +307,7 @@ class FlashCard extends Component {
             .catch((err) => {
                 console.log(err);
             });
+        window.MathJax.typeset();
     };
 
     conceptRender = (data, index) => {
@@ -456,12 +457,12 @@ class FlashCard extends Component {
 
     // ---------- loads practice data ----------
 
-    loadPracticeData = (type1_path, type2_path) => {
+    loadPracticeData = async (type1_path, type2_path) => {
         var apiURL =
             type1_path === undefined || type1_path === null
                 ? `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/typeone/learn/?topic_num=${this.topicNum}`
                 : type1_path;
-        fetch(apiURL, {
+        await fetch(apiURL, {
             method: "GET",
             headers: this.headers,
         })
@@ -502,14 +503,15 @@ class FlashCard extends Component {
             .catch((err) => {
                 console.log(err);
             });
+        window.MathJax.typeset();
     };
 
-    loadType2Data = (path) => {
+    loadType2Data = async (path) => {
         var apiURL =
             path === undefined || path === null
                 ? `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/learn/?topic_num=${this.topicNum}`
                 : path;
-        fetch(apiURL, {
+        await fetch(apiURL, {
             method: "GET",
             headers: this.headers,
         })
@@ -566,6 +568,7 @@ class FlashCard extends Component {
             .catch((err) => {
                 console.log(err);
             });
+        window.MathJax.typeset();
     };
 
     // ---------- creates section structure and explanation structure ----------
@@ -1401,7 +1404,7 @@ class FlashCard extends Component {
 
     // ---------- Post the options answers ----------
 
-    handleCheck = (data, type) => {
+    handleCheck = async (data, type) => {
         this.setState({
             page_loading: true,
         });
@@ -1409,7 +1412,7 @@ class FlashCard extends Component {
         let explanation = [...this.state.explanation];
 
         if (type === "type_1") {
-            fetch(
+            await fetch(
                 `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/typeone/learn/`,
                 {
                     method: "POST",
@@ -1446,7 +1449,7 @@ class FlashCard extends Component {
                     console.log(err);
                 });
         } else if (type === "type_2") {
-            fetch(
+            await fetch(
                 `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/learn/`,
                 {
                     method: "POST",
@@ -1491,6 +1494,7 @@ class FlashCard extends Component {
                     console.log(err);
                 });
         }
+        window.MathJax.typeset();
     };
 
     // ---------- loads match data ----------
@@ -1552,12 +1556,12 @@ class FlashCard extends Component {
         return chunked_arr;
     };
 
-    loadMatchData = (path) => {
+    loadMatchData = async (path) => {
         var apiURL =
             path === undefined || path === null
                 ? `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/match/?topic_num=${this.topicNum}`
                 : path;
-        fetch(apiURL, {
+        await fetch(apiURL, {
             method: "GET",
             headers: this.headers,
         })
@@ -1627,14 +1631,16 @@ class FlashCard extends Component {
             .catch((err) => {
                 console.log(err);
             });
+        window.MathJax.typeset();
     };
 
     // handle match terms and definition matching
-    handleMatch = (id, type) => {
+    handleMatch = async (id, type) => {
         let terms = this.state.match_terms;
         let ids = [...this.state.match_ids];
         let color = "match-active-bg";
         if (terms.id.length < 2) {
+            // if clicked on same card
             if (terms.id.includes(id) && terms.type.includes(type)) {
                 terms.id = [];
                 terms.type = [];
@@ -1642,22 +1648,24 @@ class FlashCard extends Component {
                 terms.id.push(id);
                 terms.type.push(type);
                 if (terms.id.length === 2) {
+                    // if terms and definition matches
                     if (terms.id[0] === terms.id[1]) {
                         ids.splice(ids.indexOf(terms.id[0]), 1);
                         terms.id = [];
                         terms.type = [];
                     } else {
                         color = "danger-bg";
-                        setTimeout(() => {
+                        setTimeout(async () => {
                             terms.id = [];
                             terms.type = [];
-                            this.setState({
+                            await this.setState({
                                 match_terms: terms,
                                 match_temp: this.chunk(
                                     this.divideMatch(this.state.match, "false"),
                                     3
                                 ),
                             });
+                            window.MathJax.typeset();
                         }, 1000);
                     }
                 }
@@ -1668,36 +1676,39 @@ class FlashCard extends Component {
             terms.id.push(id);
             terms.type.push(type);
         }
-        this.setState(
+        await this.setState(
             {
                 match_ids: ids,
                 match_terms: terms,
                 match_color: color,
             },
-            () => {
+            async () => {
                 // loads next set of data
                 if (ids.length === 0) {
                     if (
                         this.state.match[this.state.activeData + 1] !==
                         undefined
                     ) {
-                        this.setState(
+                        await this.setState(
                             {
                                 activeData: this.state.activeData + 1,
                             },
-                            () => {
-                                this.setState({
+                            async () => {
+                                await this.setState({
                                     match_temp: this.chunk(
                                         this.divideMatch(this.state.match),
                                         3
                                     ),
                                 });
+                                window.MathJax.typeset();
                             }
                         );
+                        window.MathJax.typeset();
                     }
                 }
             }
         );
+        window.MathJax.typeset();
     };
 
     matchType = (data) => {
@@ -1885,8 +1896,8 @@ class FlashCard extends Component {
         );
     };
 
-    handleNext = () => {
-        this.setState({
+    handleNext = async () => {
+        await this.setState({
             activeData: this.state.activeData + 1,
             isFlipped: false,
             selectedImageData: {
@@ -1896,10 +1907,11 @@ class FlashCard extends Component {
                 path: "",
             },
         });
+        window.MathJax.typeset();
     };
 
-    handlePrev = () => {
-        this.setState({
+    handlePrev = async () => {
+        await this.setState({
             activeData: this.state.activeData - 1,
             isFlipped: false,
             selectedImageData: {
@@ -1909,22 +1921,25 @@ class FlashCard extends Component {
                 path: "",
             },
         });
+        window.MathJax.typeset();
     };
 
-    handleSubQPrev = (main_index) => {
+    handleSubQPrev = async (main_index) => {
         let index = this.state.currentSubQuestionIndex;
         index[main_index] = index[main_index] - 1;
-        this.setState({
+        await this.setState({
             currentSubQuestionIndex: index,
         });
+        window.MathJax.typeset();
     };
 
-    handleSubQNext = (main_index) => {
+    handleSubQNext = async (main_index) => {
         let index = this.state.currentSubQuestionIndex;
         index[main_index] = index[main_index] + 1;
-        this.setState({
+        await this.setState({
             currentSubQuestionIndex: index,
         });
+        window.MathJax.typeset();
     };
 
     // ---------- Tab selection ----------
