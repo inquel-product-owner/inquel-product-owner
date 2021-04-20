@@ -154,7 +154,7 @@ class SemesterAutoQA extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.props.section_name} - Teacher | IQLabs`;
+        document.title = `${this.props.semester_name} : ${this.props.section_name} - Teacher | IQLabs`;
 
         this.loadQAData();
         this.loadSectionData();

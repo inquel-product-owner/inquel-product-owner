@@ -519,6 +519,417 @@ class ChapterEditModal extends Component {
     }
 }
 
+class Scorecard extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: false,
+            scorecard: [],
+            page_loading: true,
+        };
+        this.subjectId = this.props.subjectId;
+        this.chapterId = this.props.chapterId;
+        this.cycle_testId = this.props.cycle_testId;
+        this.url = baseUrl + teacherUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
+    }
+
+    componentDidMount = () => {
+        this.setState(
+            {
+                scorecard: this.props.scorecard,
+            },
+            () => {
+                this.setState({
+                    page_loading: false,
+                });
+            }
+        );
+    };
+
+    handleData = (event, category, type, index) => {
+        let scorecard = this.state.scorecard;
+
+        if (type === "remarks") {
+            var temp = Object.entries(scorecard);
+            for (let i = 0; i < Object.keys(scorecard).length; i++) {
+                if (temp[i][0] === category) {
+                    temp[i][0] = event.target.value;
+                } else {
+                    continue;
+                }
+            }
+            scorecard = Object.fromEntries(temp);
+        } else if (type === "range") {
+            scorecard[category][type][index] = Number(event.target.value);
+        } else {
+            scorecard[category][type] = event.target.value;
+        }
+
+        this.setState({
+            scorecard: scorecard,
+        });
+    };
+
+    handleSubmit = () => {
+        this.setState({
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: true,
+        });
+
+        fetch(`${this.url}/teacher/subject/${this.subjectId}/scorecard/`, {
+            method: "POST",
+            headers: this.headers,
+            body: JSON.stringify({
+                score_card_config: this.state.scorecard,
+            }),
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        showLoader: false,
+                    });
+                    this.props.formSubmission();
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    render() {
+        return (
+            <Modal
+                show={this.props.show}
+                onHide={this.props.onHide}
+                size="xl"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Header closeButton className="align-items-center">
+                    Scorecard Configuration
+                    {this.state.page_loading ? (
+                        <Spinner
+                            as="span"
+                            animation="border"
+                            size="sm"
+                            role="status"
+                            aria-hidden="true"
+                            className="ml-3 mb-0"
+                        />
+                    ) : (
+                        ""
+                    )}
+                </Modal.Header>
+                <Modal.Body>
+                    <Alert
+                        variant="danger"
+                        show={this.state.showErrorAlert}
+                        onClose={() => {
+                            this.setState({
+                                showErrorAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.errorMsg}
+                    </Alert>
+                    <Alert
+                        variant="success"
+                        show={this.state.showSuccessAlert}
+                        onClose={() => {
+                            this.setState({
+                                showSuccessAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.successMsg}
+                    </Alert>
+
+                    <div className="table-responsive">
+                        <table className="table">
+                            <thead>
+                                <th scope="col">Range in %</th>
+                                <th scope="col">Retake Duration</th>
+                                <th scope="col">Reduction %</th>
+                                <th scope="col">Reduction Duration</th>
+                                <th scope="col">Remarks</th>
+                            </thead>
+                            <tbody>
+                                {Object.keys(this.state.scorecard).length !== 0
+                                    ? Object.entries(this.state.scorecard).map(
+                                          ([key, value], index) => {
+                                              return (
+                                                  <tr key={index}>
+                                                      <td className="d-flex align-items-center">
+                                                          <input
+                                                              type="number"
+                                                              name="range1"
+                                                              value={
+                                                                  value.range[0]
+                                                              }
+                                                              onChange={(
+                                                                  event
+                                                              ) =>
+                                                                  this.handleData(
+                                                                      event,
+                                                                      key,
+                                                                      "range",
+                                                                      0
+                                                                  )
+                                                              }
+                                                              className="form-control form-shadow"
+                                                          />
+                                                          <span className="mx-2">
+                                                              to
+                                                          </span>
+                                                          <input
+                                                              type="number"
+                                                              name="range2"
+                                                              value={
+                                                                  value.range[1]
+                                                              }
+                                                              onChange={(
+                                                                  event
+                                                              ) =>
+                                                                  this.handleData(
+                                                                      event,
+                                                                      key,
+                                                                      "range",
+                                                                      1
+                                                                  )
+                                                              }
+                                                              className="form-control form-shadow"
+                                                          />
+                                                      </td>
+                                                      <td>
+                                                          <input
+                                                              type="text"
+                                                              name="retake"
+                                                              value={
+                                                                  value.retake
+                                                              }
+                                                              className="form-control form-shadow"
+                                                              onChange={(
+                                                                  event
+                                                              ) =>
+                                                                  this.handleData(
+                                                                      event,
+                                                                      key,
+                                                                      "retake"
+                                                                  )
+                                                              }
+                                                          />
+                                                      </td>
+                                                      <td>
+                                                          <input
+                                                              type="text"
+                                                              name="reducation"
+                                                              value={
+                                                                  value.reduction
+                                                              }
+                                                              className="form-control form-shadow"
+                                                              onChange={(
+                                                                  event
+                                                              ) =>
+                                                                  this.handleData(
+                                                                      event,
+                                                                      key,
+                                                                      "reduction"
+                                                                  )
+                                                              }
+                                                          />
+                                                      </td>
+                                                      <td>
+                                                          <input
+                                                              type="text"
+                                                              name="duration"
+                                                              value={
+                                                                  value.reduction_duration
+                                                              }
+                                                              className="form-control form-shadow"
+                                                              onChange={(
+                                                                  event
+                                                              ) =>
+                                                                  this.handleData(
+                                                                      event,
+                                                                      key,
+                                                                      "reduction_duration"
+                                                                  )
+                                                              }
+                                                          />
+                                                      </td>
+                                                      <td>
+                                                          <input
+                                                              type="text"
+                                                              name="remarks"
+                                                              className="form-control form-shadow"
+                                                              style={{
+                                                                  borderColor:
+                                                                      value.color,
+                                                                  borderWidth:
+                                                                      "2px",
+                                                              }}
+                                                              value={key}
+                                                              onChange={(
+                                                                  event
+                                                              ) =>
+                                                                  this.handleData(
+                                                                      event,
+                                                                      key,
+                                                                      "remarks"
+                                                                  )
+                                                              }
+                                                          />
+                                                      </td>
+                                                  </tr>
+                                              );
+                                          }
+                                      )
+                                    : null}
+                            </tbody>
+                        </table>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer className="text-right">
+                    <button
+                        className="btn btn-primary btn-sm shadow-none"
+                        onClick={this.handleSubmit}
+                    >
+                        {this.state.showLoader ? (
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                                className="mr-2"
+                            />
+                        ) : (
+                            ""
+                        )}
+                        Save & Close
+                    </button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
+}
+
+function ChapterList(props) {
+    return (
+        <tr key={props.index}>
+            <td>{props.chapter.chapter_name}</td>
+            <td>
+                {props.chapter.chapter_status === "Yet to start" ? (
+                    <span className="text-danger">
+                        {props.chapter.chapter_status}
+                    </span>
+                ) : props.chapter.chapter_status === "Approved" ? (
+                    <span className="text-success">
+                        {props.chapter.chapter_status}
+                    </span>
+                ) : props.chapter.chapter_status === "In Progress" ? (
+                    <span className="text-warning">
+                        {props.chapter.chapter_status}
+                    </span>
+                ) : props.chapter.chapter_status === "Review" ? (
+                    <span className="text-primary">
+                        {props.chapter.chapter_status}
+                    </span>
+                ) : props.chapter.chapter_status === "Ready for review" ? (
+                    <span className="text-primary">
+                        {props.chapter.chapter_status}
+                    </span>
+                ) : (
+                    props.chapter.chapter_status
+                )}
+            </td>
+            <td>{props.chapter.weightage}</td>
+            <td>
+                <Link
+                    to={`${props.url}/chapter/${props.chapter.chapter_id}/summary/upload`}
+                    className="primary-text"
+                >
+                    <button
+                        className="btn btn-primary btn-sm shadow-none mr-2"
+                        onClick={() =>
+                            props.dispatchChapter(props.chapter.chapter_name)
+                        }
+                    >
+                        <i className="fas fa-file-upload"></i>
+                    </button>
+                </Link>
+                <Link
+                    to={`${props.url}/chapter/${props.chapter.chapter_id}/summary`}
+                    className="primary-text"
+                >
+                    <button
+                        className="btn btn-primary btn-sm shadow-none"
+                        onClick={() =>
+                            props.dispatchChapter(props.chapter.chapter_name)
+                        }
+                    >
+                        <i className="fas fa-file-medical"></i>
+                    </button>
+                </Link>
+            </td>
+            <td className="d-flex justify-content-end">
+                <Link to={`${props.url}/chapter/${props.chapter.chapter_id}`}>
+                    <button
+                        className="btn btn-primary btn-sm shadow-none"
+                        onClick={() =>
+                            props.dispatchChapter(props.chapter.chapter_name)
+                        }
+                    >
+                        Add
+                    </button>
+                </Link>
+
+                <Dropdown>
+                    <Dropdown.Toggle
+                        variant="white"
+                        className="btn btn-link btn-sm shadow-none caret-off ml-2"
+                    >
+                        <i className="fas fa-ellipsis-v"></i>
+                    </Dropdown.Toggle>
+
+                    <Dropdown.Menu>
+                        <Dropdown.Item
+                            onClick={() =>
+                                props.toggleChapter_EditModal(props.chapter)
+                            }
+                        >
+                            <i className="far fa-edit fa-sm mr-1"></i> Edit
+                        </Dropdown.Item>
+                    </Dropdown.Menu>
+                </Dropdown>
+            </td>
+        </tr>
+    );
+}
+
 const mapStateToProps = (state) => ({
     group_name: state.group_name,
     subject_name: state.subject_name,
@@ -534,11 +945,13 @@ class Subject extends Component {
             showChapter_EditModal: false,
             showSemester_EditModal: false,
             showSemester_DeleteModal: false,
+            showScorecardModal: false,
 
             subjectItems: [], // Chapter data
             semesterItems: [], // Semester data
             chapter_id: [], // List of unassigned chapters
             semester_chapters: [], // List of assigned chapters under a semester
+            scorecard: [],
 
             selectedChapter: "",
             selectedSemester: "",
@@ -624,6 +1037,7 @@ class Subject extends Component {
                 if (result.sts === true) {
                     this.setState({
                         subjectItems: result.data.results,
+                        scorecard: result.data.score_card_config,
                         is_independent: result.data.is_independent,
                         page_loading: false,
                     });
@@ -690,7 +1104,7 @@ class Subject extends Component {
             this.setState({
                 showModal: false,
                 showChapter_EditModal: false,
-                showChapter_DeleteModal: false,
+                page_loading: true,
             });
         }, 1000);
         this.loadChapterData();
@@ -705,6 +1119,21 @@ class Subject extends Component {
             });
         }, 1000);
         this.loadSemesterData();
+    };
+
+    toggleScorecardModal = () => {
+        this.setState({
+            showScorecardModal: !this.state.showScorecardModal,
+        });
+    };
+
+    scorecardFormSubmission = () => {
+        setTimeout(() => {
+            this.setState({
+                showScorecardModal: !this.state.showScorecardModal,
+            });
+        }, 1000);
+        this.loadChapterData();
     };
 
     dispatchChapter = (data) => {
@@ -825,6 +1254,19 @@ class Subject extends Component {
                     ""
                 )}
 
+                {/* Scorecard modal */}
+                {this.state.showScorecardModal ? (
+                    <Scorecard
+                        show={this.state.showScorecardModal}
+                        onHide={this.toggleScorecardModal}
+                        subjectId={this.subjectId}
+                        formSubmission={this.scorecardFormSubmission}
+                        scorecard={this.state.scorecard}
+                    />
+                ) : (
+                    ""
+                )}
+
                 <div
                     className={`section content ${
                         this.state.showSideNav ? "active" : ""
@@ -873,6 +1315,12 @@ class Subject extends Component {
                                 </nav>
                             </div>
                             <div className="col-md-6 text-right">
+                                <button
+                                    className="btn btn-primary btn-sm shadow-none mr-1"
+                                    onClick={this.toggleScorecardModal}
+                                >
+                                    Subject score config
+                                </button>
                                 <button className="btn btn-primary btn-sm shadow-none">
                                     Publish
                                 </button>
@@ -915,132 +1363,28 @@ class Subject extends Component {
                                                                       return data.chapters.includes(
                                                                           chapter.chapter_id
                                                                       ) ? (
-                                                                          <tr
+                                                                          <ChapterList
                                                                               key={
                                                                                   index
                                                                               }
-                                                                          >
-                                                                              <td>
-                                                                                  {
-                                                                                      chapter.chapter_name
-                                                                                  }
-                                                                              </td>
-                                                                              <td>
-                                                                                  {chapter.chapter_status ===
-                                                                                  "Yet to start" ? (
-                                                                                      <span className="text-danger">
-                                                                                          {
-                                                                                              chapter.chapter_status
-                                                                                          }
-                                                                                      </span>
-                                                                                  ) : chapter.chapter_status ===
-                                                                                    "Approved" ? (
-                                                                                      <span className="text-success">
-                                                                                          {
-                                                                                              chapter.chapter_status
-                                                                                          }
-                                                                                      </span>
-                                                                                  ) : chapter.chapter_status ===
-                                                                                    "In Progress" ? (
-                                                                                      <span className="text-warning">
-                                                                                          {
-                                                                                              chapter.chapter_status
-                                                                                          }
-                                                                                      </span>
-                                                                                  ) : chapter.chapter_status ===
-                                                                                    "Review" ? (
-                                                                                      <span className="text-primary">
-                                                                                          {
-                                                                                              chapter.chapter_status
-                                                                                          }
-                                                                                      </span>
-                                                                                  ) : chapter.chapter_status ===
-                                                                                    "Ready for review" ? (
-                                                                                      <span className="text-primary">
-                                                                                          {
-                                                                                              chapter.chapter_status
-                                                                                          }
-                                                                                      </span>
-                                                                                  ) : (
-                                                                                      chapter.chapter_status
-                                                                                  )}
-                                                                              </td>
-                                                                              <td>
-                                                                                  {
-                                                                                      chapter.weightage
-                                                                                  }
-                                                                              </td>
-                                                                              <td>
-                                                                                  <Link
-                                                                                      to={`${this.props.match.url}/chapter/${chapter.chapter_id}/summary/upload`}
-                                                                                      className="primary-text"
-                                                                                  >
-                                                                                      <button
-                                                                                          className="btn btn-primary btn-sm shadow-none mr-2"
-                                                                                          onClick={() =>
-                                                                                              this.dispatchChapter(
-                                                                                                  chapter.chapter_name
-                                                                                              )
-                                                                                          }
-                                                                                      >
-                                                                                          <i className="fas fa-file-upload"></i>
-                                                                                      </button>
-                                                                                  </Link>
-                                                                                  <Link
-                                                                                      to={`${this.props.match.url}/chapter/${chapter.chapter_id}/summary`}
-                                                                                      className="primary-text"
-                                                                                  >
-                                                                                      <button
-                                                                                          className="btn btn-primary btn-sm shadow-none"
-                                                                                          onClick={() =>
-                                                                                              this.dispatchChapter(
-                                                                                                  chapter.chapter_name
-                                                                                              )
-                                                                                          }
-                                                                                      >
-                                                                                          <i className="fas fa-file-medical"></i>
-                                                                                      </button>
-                                                                                  </Link>
-                                                                              </td>
-                                                                              <td className="d-flex justify-content-end">
-                                                                                  <Link
-                                                                                      to={`${this.props.match.url}/chapter/${chapter.chapter_id}`}
-                                                                                  >
-                                                                                      <button
-                                                                                          className="btn btn-primary btn-sm shadow-none"
-                                                                                          onClick={() =>
-                                                                                              this.dispatchChapter(
-                                                                                                  chapter.chapter_name
-                                                                                              )
-                                                                                          }
-                                                                                      >
-                                                                                          Add
-                                                                                      </button>
-                                                                                  </Link>
-
-                                                                                  <Dropdown>
-                                                                                      <Dropdown.Toggle
-                                                                                          variant="white"
-                                                                                          className="btn btn-link btn-sm shadow-none caret-off ml-2"
-                                                                                      >
-                                                                                          <i className="fas fa-ellipsis-v"></i>
-                                                                                      </Dropdown.Toggle>
-
-                                                                                      <Dropdown.Menu>
-                                                                                          <Dropdown.Item
-                                                                                              onClick={() =>
-                                                                                                  this.toggleChapter_EditModal(
-                                                                                                      chapter
-                                                                                                  )
-                                                                                              }
-                                                                                          >
-                                                                                              <i className="far fa-edit fa-sm mr-1"></i>{" "}
-                                                                                              Edit
-                                                                                          </Dropdown.Item>
-                                                                                      </Dropdown.Menu>
-                                                                                  </Dropdown>
-                                                                              </td>
-                                                                          </tr>
+                                                                              chapter={
+                                                                                  chapter
+                                                                              }
+                                                                              dispatchChapter={
+                                                                                  this
+                                                                                      .dispatchChapter
+                                                                              }
+                                                                              toggleChapter_EditModal={
+                                                                                  this
+                                                                                      .toggleChapter_EditModal
+                                                                              }
+                                                                              url={
+                                                                                  this
+                                                                                      .props
+                                                                                      .match
+                                                                                      .url
+                                                                              }
+                                                                          />
                                                                       ) : null;
                                                                   }
                                                               )}
@@ -1237,128 +1581,22 @@ class Subject extends Component {
                                                       return !this.state.semester_chapters.includes(
                                                           chapter.chapter_id
                                                       ) ? (
-                                                          <tr key={index}>
-                                                              <td>
-                                                                  {
-                                                                      chapter.chapter_name
-                                                                  }
-                                                              </td>
-                                                              <td>
-                                                                  {chapter.chapter_status ===
-                                                                  "Yet to start" ? (
-                                                                      <span className="text-danger">
-                                                                          {
-                                                                              chapter.chapter_status
-                                                                          }
-                                                                      </span>
-                                                                  ) : chapter.chapter_status ===
-                                                                    "Approved" ? (
-                                                                      <span className="text-success">
-                                                                          {
-                                                                              chapter.chapter_status
-                                                                          }
-                                                                      </span>
-                                                                  ) : chapter.chapter_status ===
-                                                                    "In Progress" ? (
-                                                                      <span className="text-warning">
-                                                                          {
-                                                                              chapter.chapter_status
-                                                                          }
-                                                                      </span>
-                                                                  ) : chapter.chapter_status ===
-                                                                    "Review" ? (
-                                                                      <span className="text-primary">
-                                                                          {
-                                                                              chapter.chapter_status
-                                                                          }
-                                                                      </span>
-                                                                  ) : chapter.chapter_status ===
-                                                                    "Ready for review" ? (
-                                                                      <span className="text-primary">
-                                                                          {
-                                                                              chapter.chapter_status
-                                                                          }
-                                                                      </span>
-                                                                  ) : (
-                                                                      chapter.chapter_status
-                                                                  )}
-                                                              </td>
-                                                              <td>
-                                                                  {
-                                                                      chapter.weightage
-                                                                  }
-                                                              </td>
-                                                              <td>
-                                                                  <Link
-                                                                      to={`${this.props.match.url}/chapter/${chapter.chapter_id}/summary/upload`}
-                                                                      className="primary-text"
-                                                                  >
-                                                                      <button
-                                                                          className="btn btn-primary btn-sm shadow-none mr-2"
-                                                                          onClick={() =>
-                                                                              this.dispatchChapter(
-                                                                                  chapter.chapter_name
-                                                                              )
-                                                                          }
-                                                                      >
-                                                                          <i className="fas fa-file-upload"></i>
-                                                                      </button>
-                                                                  </Link>
-                                                                  <Link
-                                                                      to={`${this.props.match.url}/chapter/${chapter.chapter_id}/summary`}
-                                                                      className="primary-text"
-                                                                  >
-                                                                      <button
-                                                                          className="btn btn-primary btn-sm shadow-none"
-                                                                          onClick={() =>
-                                                                              this.dispatchChapter(
-                                                                                  chapter.chapter_name
-                                                                              )
-                                                                          }
-                                                                      >
-                                                                          <i className="fas fa-file-medical"></i>
-                                                                      </button>
-                                                                  </Link>
-                                                              </td>
-                                                              <td className="d-flex justify-content-end">
-                                                                  <Link
-                                                                      to={`${this.props.match.url}/chapter/${chapter.chapter_id}`}
-                                                                  >
-                                                                      <button
-                                                                          className="btn btn-primary btn-sm shadow-none"
-                                                                          onClick={() =>
-                                                                              this.dispatchChapter(
-                                                                                  chapter.chapter_name
-                                                                              )
-                                                                          }
-                                                                      >
-                                                                          Add
-                                                                      </button>
-                                                                  </Link>
-
-                                                                  <Dropdown>
-                                                                      <Dropdown.Toggle
-                                                                          variant="white"
-                                                                          className="btn btn-link btn-sm shadow-none caret-off ml-2"
-                                                                      >
-                                                                          <i className="fas fa-ellipsis-v"></i>
-                                                                      </Dropdown.Toggle>
-
-                                                                      <Dropdown.Menu>
-                                                                          <Dropdown.Item
-                                                                              onClick={() =>
-                                                                                  this.toggleChapter_EditModal(
-                                                                                      chapter
-                                                                                  )
-                                                                              }
-                                                                          >
-                                                                              <i className="far fa-edit fa-sm mr-1"></i>{" "}
-                                                                              Edit
-                                                                          </Dropdown.Item>
-                                                                      </Dropdown.Menu>
-                                                                  </Dropdown>
-                                                              </td>
-                                                          </tr>
+                                                          <ChapterList
+                                                              key={index}
+                                                              chapter={chapter}
+                                                              dispatchChapter={
+                                                                  this
+                                                                      .dispatchChapter
+                                                              }
+                                                              toggleChapter_EditModal={
+                                                                  this
+                                                                      .toggleChapter_EditModal
+                                                              }
+                                                              url={
+                                                                  this.props
+                                                                      .match.url
+                                                              }
+                                                          />
                                                       ) : null;
                                                   }
                                               )

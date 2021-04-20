@@ -31,6 +31,9 @@ import SemesterAutoQA from "./semester/sectionPreview";
 import SemesterDirect from "./semester/direct";
 import EvaluateStudents from "./evaluateStudents";
 
+import QuizLevel from "./quiz/level";
+import LevelPreview from "./quiz/levelPreview";
+
 import EmailVerify from "./emailVerification";
 import errorPage from "../404";
 import TeacherLogin from "./login";
@@ -322,6 +325,36 @@ const teacherRoutes = (
                 )
             }
         />
+
+        {/* --------------- Quiz --------------- */}
+
+        <Route
+            exact
+            path="/teacher/group/:groupId/subject/:subjectId/chapter/:chapterId/quiz/:quizId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <QuizLevel {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/teacher/group/:groupId/subject/:subjectId/chapter/:chapterId/quiz/:quizId/level/:levelId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <LevelPreview {...props} />
+                )
+            }
+        />
+
+        {/* --------------- Group Student --------------- */}
+
         <Route
             exact
             path="/teacher/group/:groupId/student"
@@ -579,6 +612,21 @@ const teacherRoutes = (
                     <Redirect to="/teacher/login" />
                 ) : (
                     <EvaluateStudents {...props} />
+                )
+            }
+        />
+
+        {/* --------------- Quiz --------------- */}
+
+        <Route
+            exact
+            path="/teacher/subject/:subjectId/chapter/:chapterId/quiz/:quizId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <QuizLevel {...props} />
                 )
             }
         />

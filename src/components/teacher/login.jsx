@@ -352,6 +352,7 @@ class TeacherLogin extends Component {
                                                     }
                                                     value={this.state.username}
                                                     placeholder="Username"
+                                                    autoFocus
                                                     required
                                                 />
                                             </div>
