@@ -37,8 +37,8 @@ class Summary extends Component {
     }
 
     // loads summary data
-    loadSummaryData = () => {
-        fetch(
+    loadSummaryData = async () => {
+        await fetch(
             `${this.url}/student/subject/${this.subjectId}/chapter/${this.state.chapterId}/summary/`,
             {
                 method: "GET",
@@ -64,6 +64,7 @@ class Summary extends Component {
             .catch((err) => {
                 console.log(err);
             });
+        window.MathJax.typeset();
     };
 
     componentDidMount = () => {
@@ -397,7 +398,7 @@ class Summary extends Component {
                                                                           );
                                                                       }
                                                                   )
-                                                                : 'No content to display...'}
+                                                                : "No content to display..."}
                                                         </div>
                                                     </div>
                                                 </Tab.Pane>

@@ -96,8 +96,8 @@ class CycleAutoExam extends Component {
     };
 
     // loads sections and question data
-    loadCycleTestData = () => {
-        fetch(
+    loadCycleTestData = async () => {
+        await fetch(
             `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/cycletest/auto/?cycle_test_id=${this.cycleTestId}`,
             {
                 method: "GET",
@@ -433,6 +433,7 @@ class CycleAutoExam extends Component {
             .catch((err) => {
                 console.log(err);
             });
+        window.MathJax.typeset();
     };
 
     // loads exam start and end time info
@@ -563,34 +564,38 @@ class CycleAutoExam extends Component {
 
     // ---------- Navigation ----------
 
-    handleNext = () => {
-        this.setState({
+    handleNext = async () => {
+        await this.setState({
             currentSectionIndex: this.state.currentSectionIndex + 1,
         });
+        window.MathJax.typeset();
     };
 
-    handlePrev = () => {
-        this.setState({
+    handlePrev = async () => {
+        await this.setState({
             currentSectionIndex: this.state.currentSectionIndex - 1,
         });
+        window.MathJax.typeset();
     };
 
-    handleSubQPrev = (main_index) => {
+    handleSubQPrev = async (main_index) => {
         let index = this.state.currentSubQuestionIndex;
         index[this.state.currentSectionIndex][main_index] =
             index[this.state.currentSectionIndex][main_index] - 1;
-        this.setState({
+        await this.setState({
             currentSubQuestionIndex: index,
         });
+        window.MathJax.typeset();
     };
 
-    handleSubQNext = (main_index) => {
+    handleSubQNext = async (main_index) => {
         let index = this.state.currentSubQuestionIndex;
         index[this.state.currentSectionIndex][main_index] =
             index[this.state.currentSectionIndex][main_index] + 1;
-        this.setState({
+        await this.setState({
             currentSubQuestionIndex: index,
         });
+        window.MathJax.typeset();
     };
 
     // ---------- handle option selection ----------
@@ -691,7 +696,9 @@ class CycleAutoExam extends Component {
         let data = event.dataTransfer.getData("data") || null;
         let index = event.dataTransfer.getData("index") || null;
         if (data !== null && index !== null) {
-            sections[this.state.currentSectionIndex].questions[index].sub_question[
+            sections[this.state.currentSectionIndex].questions[
+                index
+            ].sub_question[
                 this.state.currentSubQuestionIndex[
                     this.state.currentSectionIndex
                 ][index]
@@ -707,7 +714,9 @@ class CycleAutoExam extends Component {
     handleDropFillin = (event, index) => {
         let sections = [...this.state.answerSection];
         if (event.target.value !== "") {
-            sections[this.state.currentSectionIndex].questions[index].sub_question[
+            sections[this.state.currentSectionIndex].questions[
+                index
+            ].sub_question[
                 this.state.currentSubQuestionIndex[
                     this.state.currentSectionIndex
                 ][index]
@@ -717,7 +726,9 @@ class CycleAutoExam extends Component {
             });
             localStorage.setItem("data", JSON.stringify(sections));
         } else {
-            sections[this.state.currentSectionIndex].questions[index].sub_question[
+            sections[this.state.currentSectionIndex].questions[
+                index
+            ].sub_question[
                 this.state.currentSubQuestionIndex[
                     this.state.currentSectionIndex
                 ][index]
@@ -771,7 +782,7 @@ class CycleAutoExam extends Component {
             time: this.secondsToTime(seconds),
             seconds: seconds,
         });
-        localStorage.setItem("duration", seconds);
+        // localStorage.setItem("duration", seconds);
 
         // Check if we're at zero.
         if (seconds === 0) {
@@ -1256,7 +1267,8 @@ class CycleAutoExam extends Component {
                                                                 .length !== 0
                                                                 ? answerSection[
                                                                       index
-                                                                  ].sub_question[
+                                                                  ]
+                                                                      .sub_question[
                                                                       this.state
                                                                           .currentSubQuestionIndex[
                                                                           this

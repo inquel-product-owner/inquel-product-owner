@@ -83,8 +83,8 @@ class Match extends Component {
 
     // -------------------------- Form submission --------------------------
 
-    loadMatchData = () => {
-        fetch(
+    loadMatchData = async () => {
+        await fetch(
             `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/match/?topic_num=${this.topicNum}`,
             {
                 headers: this.headers,
@@ -125,6 +125,7 @@ class Match extends Component {
             .catch((err) => {
                 console.log(err);
             });
+        window.MathJax.typeset();
     };
 
     componentDidMount = () => {
@@ -264,20 +265,22 @@ class Match extends Component {
 
     // -------------------------- Match & Explanation --------------------------
 
-    handleTerms = (evt) => {
+    handleTerms = async (evt) => {
         const values = [...this.state.match];
         values[this.state.activeMatch].match_terms = evt.editor.getData();
-        this.setState({
+        await this.setState({
             match: values,
         });
+        window.MathJax.typeset();
     };
 
-    handleDefinition = (evt) => {
+    handleDefinition = async (evt) => {
         const values = [...this.state.match];
         values[this.state.activeMatch].match_definition = evt.editor.getData();
-        this.setState({
+        await this.setState({
             match: values,
         });
+        window.MathJax.typeset();
     };
 
     // -------------------------- Adding, Removing, Deleting match --------------------------

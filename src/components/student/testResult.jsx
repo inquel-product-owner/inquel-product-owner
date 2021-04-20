@@ -6,6 +6,166 @@ import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import AlertBox from "../sharedComponents/alert";
 import Loading from "../sharedComponents/loader";
 
+function CycleTestAttempts(props) {
+    return (
+        <OverlayTrigger
+            placement="top"
+            overlay={
+                <Tooltip
+                    id="tooltip4"
+                    style={{
+                        textTransform: "capitalize",
+                    }}
+                >
+                    {props.attempt.evaluted === true
+                        ? props.attempt.auto_section.length !== 0
+                            ? props.attempt.auto_section[0].remarks
+                            : Object.entries(props.attempt.direct_question)
+                                  .length !== 0
+                            ? props.attempt.direct_question.remarks !==
+                              undefined
+                                ? props.attempt.direct_question.remarks
+                                : "Not yet evaluated"
+                            : "Remarks"
+                        : "Not yet evaluated"}
+                </Tooltip>
+            }
+        >
+            {props.attempt.evaluted === true ? (
+                <Link
+                    to={`${props.url}/cycle/${props.attempt.cycle_test_id}/preview`}
+                    onClick={() => {
+                        props.attempt.auto_section.length !== 0
+                            ? sessionStorage.setItem(
+                                  "data",
+                                  JSON.stringify({
+                                      auto: true,
+                                      direct: false,
+                                      cycle_test_name:
+                                          props.data.cycle_test_name,
+                                      data: props.attempt.auto_section,
+                                  })
+                              )
+                            : sessionStorage.setItem(
+                                  "data",
+                                  JSON.stringify({
+                                      auto: false,
+                                      direct: true,
+                                      cycle_test_name:
+                                          props.data.cycle_test_name,
+                                      data: props.attempt.direct_question,
+                                  })
+                              );
+                    }}
+                >
+                    <i
+                        className="fas fa-circle fa-lg mx-2"
+                        style={{
+                            color:
+                                props.attempt.auto_section.length !== 0
+                                    ? props.attempt.auto_section[0].color
+                                    : Object.entries(
+                                          props.attempt.direct_question
+                                      ).length !== 0
+                                    ? props.attempt.direct_question.color !==
+                                      undefined
+                                        ? props.attempt.direct_question.color
+                                        : "grey"
+                                    : "",
+                        }}
+                    ></i>
+                </Link>
+            ) : (
+                <i
+                    className="fas fa-circle fa-lg mx-2"
+                    style={{
+                        color: "grey",
+                    }}
+                ></i>
+            )}
+        </OverlayTrigger>
+    );
+}
+
+function SemesterAttempts(props) {
+    return (
+        <OverlayTrigger
+            placement="top"
+            overlay={
+                <Tooltip
+                    id="tooltip4"
+                    style={{
+                        textTransform: "capitalize",
+                    }}
+                >
+                    {props.attempt.evaluted === true
+                        ? props.attempt.auto_section.length !== 0
+                            ? props.attempt.auto_section[0].remarks
+                            : Object.entries(props.attempt.direct_question)
+                                  .length !== 0
+                            ? props.attempt.direct_question.remarks !==
+                              undefined
+                                ? props.attempt.direct_question.remarks
+                                : "Not yet evaluated"
+                            : "Remarks"
+                        : "Not yet evaluated"}
+                </Tooltip>
+            }
+        >
+            {props.attempt.evaluted === true ? (
+                <Link
+                    to={`${props.url}/semester/${props.attempt.semester_id}/preview`}
+                    onClick={() => {
+                        props.attempt.auto_section.length !== 0
+                            ? sessionStorage.setItem(
+                                  "data",
+                                  JSON.stringify({
+                                      auto: true,
+                                      direct: false,
+                                      semester_name: props.data.semester_name,
+                                      data: props.attempt.auto_section,
+                                  })
+                              )
+                            : sessionStorage.setItem(
+                                  "data",
+                                  JSON.stringify({
+                                      auto: false,
+                                      direct: true,
+                                      semester_name: props.data.semester_name,
+                                      data: props.attempt.direct_question,
+                                  })
+                              );
+                    }}
+                >
+                    <i
+                        className="fas fa-circle fa-lg mx-2"
+                        style={{
+                            color:
+                                props.attempt.auto_section.length !== 0
+                                    ? props.attempt.auto_section[0].color
+                                    : Object.entries(
+                                          props.attempt.direct_question
+                                      ).length !== 0
+                                    ? props.attempt.direct_question.color !==
+                                      undefined
+                                        ? props.attempt.direct_question.color
+                                        : "grey"
+                                    : "",
+                        }}
+                    ></i>
+                </Link>
+            ) : (
+                <i
+                    className="fas fa-circle fa-lg mx-2"
+                    style={{
+                        color: "grey",
+                    }}
+                ></i>
+            )}
+        </OverlayTrigger>
+    );
+}
+
 class TestResult extends Component {
     constructor(props) {
         super(props);
@@ -158,107 +318,23 @@ class TestResult extends Component {
                                                                             attempt_index
                                                                         ) => {
                                                                             return (
-                                                                                <OverlayTrigger
+                                                                                <CycleTestAttempts
                                                                                     key={
                                                                                         attempt_index
                                                                                     }
-                                                                                    placement="top"
-                                                                                    overlay={
-                                                                                        <Tooltip
-                                                                                            id="tooltip4"
-                                                                                            style={{
-                                                                                                textTransform:
-                                                                                                    "capitalize",
-                                                                                            }}
-                                                                                        >
-                                                                                            {attempt
-                                                                                                .auto_section
-                                                                                                .length !==
-                                                                                            0
-                                                                                                ? attempt
-                                                                                                      .auto_section[0]
-                                                                                                      .remarks
-                                                                                                : Object.entries(
-                                                                                                      attempt.direct_question
-                                                                                                  )
-                                                                                                      .length !==
-                                                                                                  0
-                                                                                                ? attempt
-                                                                                                      .direct_question
-                                                                                                      .remarks !==
-                                                                                                  undefined
-                                                                                                    ? attempt
-                                                                                                          .direct_question
-                                                                                                          .remarks
-                                                                                                    : "Not yet evaluated"
-                                                                                                : "Remarks"}
-                                                                                        </Tooltip>
+                                                                                    attempt={
+                                                                                        attempt
                                                                                     }
-                                                                                >
-                                                                                    <Link
-                                                                                        to={`${this.props.match.url}/cycle/${attempt.cycle_test_id}/preview`}
-                                                                                        onClick={() => {
-                                                                                            attempt
-                                                                                                .auto_section
-                                                                                                .length !==
-                                                                                            0
-                                                                                                ? sessionStorage.setItem(
-                                                                                                      "data",
-                                                                                                      JSON.stringify(
-                                                                                                          {
-                                                                                                              auto: true,
-                                                                                                              direct: false,
-                                                                                                              cycle_test_name:
-                                                                                                                  data.cycle_test_name,
-                                                                                                              data:
-                                                                                                                  attempt.auto_section,
-                                                                                                          }
-                                                                                                      )
-                                                                                                  )
-                                                                                                : sessionStorage.setItem(
-                                                                                                      "data",
-                                                                                                      JSON.stringify(
-                                                                                                          {
-                                                                                                              auto: false,
-                                                                                                              direct: true,
-                                                                                                              cycle_test_name:
-                                                                                                                  data.cycle_test_name,
-                                                                                                              data:
-                                                                                                                  attempt.direct_question,
-                                                                                                          }
-                                                                                                      )
-                                                                                                  );
-                                                                                        }}
-                                                                                    >
-                                                                                        <i
-                                                                                            className="fas fa-circle fa-lg mx-2"
-                                                                                            style={{
-                                                                                                color:
-                                                                                                    attempt
-                                                                                                        .auto_section
-                                                                                                        .length !==
-                                                                                                    0
-                                                                                                        ? attempt
-                                                                                                              .auto_section[0]
-                                                                                                              .color
-                                                                                                        : Object.entries(
-                                                                                                              attempt.direct_question
-                                                                                                          )
-                                                                                                              .length !==
-                                                                                                          0
-                                                                                                        ? attempt
-                                                                                                              .direct_question
-                                                                                                              .color !==
-                                                                                                          undefined
-                                                                                                            ? attempt
-                                                                                                                  .direct_question
-                                                                                                                  .color
-                                                                                                            : "grey"
-                                                                                                        : "",
-                                                                                            }}
-                                                                                        ></i>
-                                                                                    </Link>
-                                                                                </OverlayTrigger>
+                                                                                    data={
+                                                                                        data
+                                                                                    }
+                                                                                    url={
+                                                                                        this
+                                                                                            .props
+                                                                                            .match
+                                                                                            .url
+                                                                                    }
+                                                                                />
                                                                             );
                                                                         }
                                                                     )
@@ -288,119 +364,35 @@ class TestResult extends Component {
                                                           </div>
                                                       </div>
                                                       <div className="col-9">
-                                                      {data.student_semester !==
-                                                              undefined
-                                                                  ? data.student_semester.map(
-                                                                        (
-                                                                            attempt,
-                                                                            attempt_index
-                                                                        ) => {
-                                                                            return (
-                                                                                <OverlayTrigger
-                                                                                    key={
-                                                                                        attempt_index
-                                                                                    }
-                                                                                    placement="top"
-                                                                                    overlay={
-                                                                                        <Tooltip
-                                                                                            id="tooltip4"
-                                                                                            style={{
-                                                                                                textTransform:
-                                                                                                    "capitalize",
-                                                                                            }}
-                                                                                        >
-                                                                                            {attempt
-                                                                                                .auto_section
-                                                                                                .length !==
-                                                                                            0
-                                                                                                ? attempt
-                                                                                                      .auto_section[0]
-                                                                                                      .remarks
-                                                                                                : Object.entries(
-                                                                                                      attempt.direct_question
-                                                                                                  )
-                                                                                                      .length !==
-                                                                                                  0
-                                                                                                ? attempt
-                                                                                                      .direct_question
-                                                                                                      .remarks !==
-                                                                                                  undefined
-                                                                                                    ? attempt
-                                                                                                          .direct_question
-                                                                                                          .remarks
-                                                                                                    : "Not yet evaluated"
-                                                                                                : "Remarks"}
-                                                                                        </Tooltip>
-                                                                                    }
-                                                                                >
-                                                                                    <Link
-                                                                                        to={`${this.props.match.url}/semester/${attempt.semester_id}/preview`}
-                                                                                        onClick={() => {
-                                                                                            attempt
-                                                                                                .auto_section
-                                                                                                .length !==
-                                                                                            0
-                                                                                                ? sessionStorage.setItem(
-                                                                                                      "data",
-                                                                                                      JSON.stringify(
-                                                                                                          {
-                                                                                                              auto: true,
-                                                                                                              direct: false,
-                                                                                                              semester_name:
-                                                                                                                  data.semester_name,
-                                                                                                              data:
-                                                                                                                  attempt.auto_section,
-                                                                                                          }
-                                                                                                      )
-                                                                                                  )
-                                                                                                : sessionStorage.setItem(
-                                                                                                      "data",
-                                                                                                      JSON.stringify(
-                                                                                                          {
-                                                                                                              auto: false,
-                                                                                                              direct: true,
-                                                                                                              semester_name:
-                                                                                                                  data.semester_name,
-                                                                                                              data:
-                                                                                                                  attempt.direct_question,
-                                                                                                          }
-                                                                                                      )
-                                                                                                  );
-                                                                                        }}
-                                                                                    >
-                                                                                        <i
-                                                                                            className="fas fa-circle fa-lg mx-2"
-                                                                                            style={{
-                                                                                                color:
-                                                                                                    attempt
-                                                                                                        .auto_section
-                                                                                                        .length !==
-                                                                                                    0
-                                                                                                        ? attempt
-                                                                                                              .auto_section[0]
-                                                                                                              .color
-                                                                                                        : Object.entries(
-                                                                                                              attempt.direct_question
-                                                                                                          )
-                                                                                                              .length !==
-                                                                                                          0
-                                                                                                        ? attempt
-                                                                                                              .direct_question
-                                                                                                              .color !==
-                                                                                                          undefined
-                                                                                                            ? attempt
-                                                                                                                  .direct_question
-                                                                                                                  .color
-                                                                                                            : "grey"
-                                                                                                        : "",
-                                                                                            }}
-                                                                                        ></i>
-                                                                                    </Link>
-                                                                                </OverlayTrigger>
-                                                                            );
-                                                                        }
-                                                                    )
-                                                                  : ""}
+                                                          {data.student_semester !==
+                                                          undefined
+                                                              ? data.student_semester.map(
+                                                                    (
+                                                                        attempt,
+                                                                        attempt_index
+                                                                    ) => {
+                                                                        return (
+                                                                            <SemesterAttempts
+                                                                                key={
+                                                                                    attempt_index
+                                                                                }
+                                                                                attempt={
+                                                                                    attempt
+                                                                                }
+                                                                                data={
+                                                                                    data
+                                                                                }
+                                                                                url={
+                                                                                    this
+                                                                                        .props
+                                                                                        .match
+                                                                                        .url
+                                                                                }
+                                                                            />
+                                                                        );
+                                                                    }
+                                                                )
+                                                              : ""}
                                                       </div>
                                                   </div>
                                               </div>

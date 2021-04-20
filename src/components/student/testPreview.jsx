@@ -43,7 +43,7 @@ class TestPreview extends Component {
         this.result = JSON.parse(sessionStorage.getItem("data"));
     }
 
-    loopAutoSection = () => {
+    loopAutoSection = async () => {
         let sections = [];
         let questions = [];
         let totalSubQuestion = [];
@@ -120,13 +120,14 @@ class TestPreview extends Component {
                 });
             }
         });
-        this.setState({
+        await this.setState({
             section: sections,
             totalSubQuestion: totalSubQuestion,
             currentSubQuestionIndex: currentSubQuestionIndex,
             totalSection: sections.length,
             totalQuestion: totalQuestion,
         });
+        window.MathJax.typeset();
     };
 
     componentDidMount = () => {
@@ -163,40 +164,44 @@ class TestPreview extends Component {
         }
     };
 
-    // componentWillUnmount = () => {
-    //     sessionStorage.removeItem("data");
-    // };
+    componentWillUnmount = () => {
+        sessionStorage.removeItem("data");
+    };
 
     // ---------- Navigation ----------
 
-    handlePrev = () => {
-        this.setState({
+    handlePrev = async () => {
+        await this.setState({
             currentSectionIndex: this.state.currentSectionIndex - 1,
         });
+        window.MathJax.typeset();
     };
 
-    handleNext = () => {
-        this.setState({
+    handleNext = async () => {
+        await this.setState({
             currentSectionIndex: this.state.currentSectionIndex + 1,
         });
+        window.MathJax.typeset();
     };
 
-    handleSubQPrev = (main_index) => {
+    handleSubQPrev = async (main_index) => {
         let index = this.state.currentSubQuestionIndex;
         index[this.state.currentSectionIndex][main_index] =
             index[this.state.currentSectionIndex][main_index] - 1;
-        this.setState({
+        await this.setState({
             currentSubQuestionIndex: index,
         });
+        window.MathJax.typeset();
     };
 
-    handleSubQNext = (main_index) => {
+    handleSubQNext = async (main_index) => {
         let index = this.state.currentSubQuestionIndex;
         index[this.state.currentSectionIndex][main_index] =
             index[this.state.currentSectionIndex][main_index] + 1;
-        this.setState({
+        await this.setState({
             currentSubQuestionIndex: index,
         });
+        window.MathJax.typeset();
     };
 
     onDocumentLoadSuccess = ({ numPages }) => {
@@ -221,7 +226,9 @@ class TestPreview extends Component {
                 {/* Navbar */}
                 <Header
                     name={this.state.subject_name}
-                    chapter_name={this.result.cycle_test_name || this.result.semester_name}
+                    chapter_name={
+                        this.result.cycle_test_name || this.result.semester_name
+                    }
                     goBack={this.props.history.goBack}
                 />
 
@@ -530,7 +537,10 @@ class TestPreview extends Component {
                                                                                   sub_index
                                                                               ) => {
                                                                                   return (
-                                                                                      <div key={sub_index}
+                                                                                      <div
+                                                                                          key={
+                                                                                              sub_index
+                                                                                          }
                                                                                           className={`card card-body shadow-sm small font-weight-bold-600 ${
                                                                                               sub_answer.marks ===
                                                                                               0
