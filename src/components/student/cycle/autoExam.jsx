@@ -5,7 +5,6 @@ import AlertBox from "../../sharedComponents/alert";
 import Loading from "../../sharedComponents/loader";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
-// import dateFormat from "dateformat";
 
 class CycleAutoExam extends Component {
     constructor(props) {
@@ -449,18 +448,11 @@ class CycleAutoExam extends Component {
             .then((result) => {
                 console.log(result);
                 if (result.sts === true) {
-                    // var date = new Date();
-                    // var endTime = new Date(dateFormat(result.data.end_time));
                     this.setState({
                         examInfo: result.data,
                         page_loading: false,
                     });
                     this.startTimer();
-                    // console.log(date);
-                    // console.log(endTime);
-                    // console.log(dateFormat("Wed, 03 Mar 2021 05:40:52 GMT"));
-                    // currentDate = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
-                    // (currentDate - endDate.getTime()) / 1000
                 } else {
                     this.setState({
                         errorMsg: result.detail ? result.detail : result.msg,
