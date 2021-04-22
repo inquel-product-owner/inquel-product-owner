@@ -868,32 +868,55 @@ function ChapterList(props) {
             </td>
             <td>{props.chapter.weightage}</td>
             <td>
-                <Link
-                    to={`${props.url}/chapter/${props.chapter.chapter_id}/summary/upload`}
-                    className="primary-text"
-                >
-                    <button
-                        className="btn btn-primary btn-sm shadow-none mr-2"
-                        onClick={() =>
-                            props.dispatchChapter(props.chapter.chapter_name)
-                        }
-                    >
-                        <i className="fas fa-file-upload"></i>
-                    </button>
-                </Link>
-                <Link
-                    to={`${props.url}/chapter/${props.chapter.chapter_id}/summary`}
-                    className="primary-text"
-                >
-                    <button
-                        className="btn btn-primary btn-sm shadow-none"
-                        onClick={() =>
-                            props.dispatchChapter(props.chapter.chapter_name)
-                        }
-                    >
-                        <i className="fas fa-file-medical"></i>
-                    </button>
-                </Link>
+                {props.permissions.summary === true ? (
+                    <>
+                        <Link
+                            to={`${props.url}/chapter/${props.chapter.chapter_id}/summary/upload`}
+                            className="primary-text"
+                        >
+                            <button
+                                className="btn btn-primary btn-sm shadow-none mr-2"
+                                onClick={() =>
+                                    props.dispatchChapter(
+                                        props.chapter.chapter_name
+                                    )
+                                }
+                            >
+                                <i className="fas fa-file-upload"></i>
+                            </button>
+                        </Link>
+                        <Link
+                            to={`${props.url}/chapter/${props.chapter.chapter_id}/summary`}
+                            className="primary-text"
+                        >
+                            <button
+                                className="btn btn-primary btn-sm shadow-none"
+                                onClick={() =>
+                                    props.dispatchChapter(
+                                        props.chapter.chapter_name
+                                    )
+                                }
+                            >
+                                <i className="fas fa-file-medical"></i>
+                            </button>
+                        </Link>
+                    </>
+                ) : (
+                    <>
+                        <button
+                            className="btn btn-primary btn-sm shadow-none mr-2"
+                            disabled
+                        >
+                            <i className="fas fa-file-upload"></i>
+                        </button>
+                        <button
+                            className="btn btn-primary btn-sm shadow-none"
+                            disabled
+                        >
+                            <i className="fas fa-file-medical"></i>
+                        </button>
+                    </>
+                )}
             </td>
             <td className="d-flex justify-content-end">
                 <Link to={`${props.url}/chapter/${props.chapter.chapter_id}`}>
@@ -952,6 +975,7 @@ class Subject extends Component {
             chapter_id: [], // List of unassigned chapters
             semester_chapters: [], // List of assigned chapters under a semester
             scorecard: [],
+            permissions: {},
 
             selectedChapter: "",
             selectedSemester: "",
@@ -1038,6 +1062,7 @@ class Subject extends Component {
                     this.setState({
                         subjectItems: result.data.results,
                         scorecard: result.data.score_card_config,
+                        permissions: result.data.permissions,
                         is_independent: result.data.is_independent,
                         page_loading: false,
                     });
@@ -1384,6 +1409,11 @@ class Subject extends Component {
                                                                                       .match
                                                                                       .url
                                                                               }
+                                                                              permissions={
+                                                                                  this
+                                                                                      .state
+                                                                                      .permissions
+                                                                              }
                                                                           />
                                                                       ) : null;
                                                                   }
@@ -1595,6 +1625,10 @@ class Subject extends Component {
                                                               url={
                                                                   this.props
                                                                       .match.url
+                                                              }
+                                                              permissions={
+                                                                  this.state
+                                                                      .permissions
                                                               }
                                                           />
                                                       ) : null;

@@ -11,7 +11,6 @@ import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
 import ReactCardFlip from "react-card-flip";
 import Loading from "../../sharedComponents/loader";
 import AlertBox from "../../sharedComponents/alert";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import FileModal from "../shared/fileExplorer";
 import { ContentDeleteModal } from "../../sharedComponents/contentManagementModal";
 import TemplateUpload from "../shared/templateUpload";
@@ -22,6 +21,26 @@ const mapStateToProps = (state) => ({
     chapter_name: state.chapter_name,
     topic_name: state.topic_name,
 });
+
+const images = [
+    { title: "", file_name: "", image: null, path: "" },
+    { title: "", file_name: "", image: null, path: "" },
+    { title: "", file_name: "", image: null, path: "" },
+    { title: "", file_name: "", image: null, path: "" },
+];
+
+const audio = [
+    { title: "", file_name: "", audio: null, path: "" },
+    { title: "", file_name: "", audio: null, path: "" },
+];
+
+const video = {
+    title: "",
+    file_name: "",
+    video: null,
+    path: "",
+    url: "",
+};
 
 class Concepts extends Component {
     constructor(props) {
@@ -35,7 +54,6 @@ class Concepts extends Component {
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
-            showLoader: false,
             showPublishLoader: false,
 
             page_loading: true,
@@ -62,26 +80,16 @@ class Concepts extends Component {
 
             concepts: [
                 {
+                    concepts_random_id: "",
                     chapter_id: this.props.match.params.chapterId,
                     topic_num: this.props.match.params.topicNum,
-                    concepts_random_id: "",
-                    is_image_uploaded: false,
+                    is_file_uploaded: false,
                     content: {
                         terms: "<p>Terms goes here</p>",
                         definition: "<p>Definition goes here</p>",
-                        images: [
-                            { title: "", file_name: "", image: null, path: "" },
-                        ],
-                        video: {
-                            title: "",
-                            file_name: "",
-                            video: null,
-                            path: "",
-                            url: "",
-                        },
-                        audio: [
-                            { title: "", file_name: "", audio: null, path: "" },
-                        ],
+                        images: images,
+                        video: video,
+                        audio: audio,
                     },
                     settings: {
                         virtual_keyboard: [],
@@ -90,8 +98,6 @@ class Concepts extends Component {
                 },
             ],
         };
-        this.image_limit = 4;
-        this.audio_limit = 2;
         this.groupId = this.props.match.params.groupId;
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
@@ -152,89 +158,77 @@ class Concepts extends Component {
                 if (result.sts === true) {
                     let data = [];
                     let keyboards = [];
-                    let images = [];
-                    let audio = [];
+                    let imgArr = [];
+                    let audioArr = [];
                     let response = result.data.results;
                     if (response.length !== 0) {
                         for (let i = 0; i < response.length; i++) {
-                            images = [];
-                            audio = [];
+                            imgArr = [];
+                            audioArr = [];
                             if (response[i].files.length !== 0) {
                                 // image
-                                if (response[i].files[0].concepts_image_1) {
-                                    images.push({
-                                        title:
-                                            response[i].files[0]
-                                                .concepts_image_1_title,
-                                        file_name: "",
-                                        image: null,
-                                        path:
-                                            response[i].files[0]
-                                                .concepts_image_1,
-                                    });
-                                }
-                                if (response[i].files[0].concepts_image_2) {
-                                    images.push({
-                                        title:
-                                            response[i].files[0]
-                                                .concepts_image_2_title,
-                                        file_name: "",
-                                        image: null,
-                                        path:
-                                            response[i].files[0]
-                                                .concepts_image_2,
-                                    });
-                                }
-                                if (response[i].files[0].concepts_image_3) {
-                                    images.push({
-                                        title:
-                                            response[i].files[0]
-                                                .concepts_image_3_title,
-                                        file_name: "",
-                                        image: null,
-                                        path:
-                                            response[i].files[0]
-                                                .concepts_image_3,
-                                    });
-                                }
-                                if (response[i].files[0].concepts_image_4) {
-                                    images.push({
-                                        title:
-                                            response[i].files[0]
-                                                .concepts_image_4_title,
-                                        file_name: "",
-                                        image: null,
-                                        path:
-                                            response[i].files[0]
-                                                .concepts_image_4,
-                                    });
-                                }
+                                imgArr.push({
+                                    title:
+                                        response[i].files[0]
+                                            .concepts_image_1_title || "",
+                                    file_name: "",
+                                    image: null,
+                                    path:
+                                        response[i].files[0].concepts_image_1 ||
+                                        "",
+                                });
+                                imgArr.push({
+                                    title:
+                                        response[i].files[0]
+                                            .concepts_image_2_title || "",
+                                    file_name: "",
+                                    image: null,
+                                    path:
+                                        response[i].files[0].concepts_image_2 ||
+                                        "",
+                                });
+                                imgArr.push({
+                                    title:
+                                        response[i].files[0]
+                                            .concepts_image_3_title || "",
+                                    file_name: "",
+                                    image: null,
+                                    path:
+                                        response[i].files[0].concepts_image_3 ||
+                                        "",
+                                });
+                                imgArr.push({
+                                    title:
+                                        response[i].files[0]
+                                            .concepts_image_4_title || "",
+                                    file_name: "",
+                                    image: null,
+                                    path:
+                                        response[i].files[0].concepts_image_4 ||
+                                        "",
+                                });
 
                                 // audio
-                                if (response[i].files[0].concepts_audio_1) {
-                                    audio.push({
-                                        title:
-                                            response[i].files[0]
-                                                .concepts_audio_1_title,
-                                        file_name: "",
-                                        audio: null,
-                                        path:
-                                            response[i].files[0]
-                                                .concepts_audio_1,
-                                    });
-                                }
-                                if (response[i].files[0].concepts_audio_2) {
-                                    audio.push({
-                                        title:
-                                            response[i].files[0]
-                                                .concepts_audio_2_title,
-                                        file_name: "",
-                                        audio: null,
-                                        path:
-                                            response[i].files[0]
-                                                .concepts_audio_2,
-                                    });
-                                }
+                                audioArr.push({
+                                    title:
+                                        response[i].files[0]
+                                            .concepts_audio_1_title || "",
+                                    file_name: "",
+                                    audio: null,
+                                    path:
+                                        response[i].files[0].concepts_audio_1 ||
+                                        "",
+                                });
+                                audioArr.push({
+                                    title:
+                                        response[i].files[0]
+                                            .concepts_audio_2_title || "",
+                                    file_name: "",
+                                    audio: null,
+                                    path:
+                                        response[i].files[0].concepts_audio_2 ||
+                                        "",
+                                });
                             }
 
                             // video
@@ -254,7 +248,7 @@ class Concepts extends Component {
                                 topic_num: this.props.match.params.topicNum,
                                 concepts_random_id:
                                     response[i].concepts_random_id,
-                                is_image_uploaded:
+                                is_file_uploaded:
                                     response[i].files.length !== 0
                                         ? true
                                         : false,
@@ -262,16 +256,7 @@ class Concepts extends Component {
                                     terms: response[i].terms,
                                     definition: response[i].definition,
                                     images:
-                                        images.length === 0
-                                            ? [
-                                                  {
-                                                      title: "",
-                                                      file_name: "",
-                                                      image: null,
-                                                      path: "",
-                                                  },
-                                              ]
-                                            : images,
+                                        imgArr.length === 0 ? images : imgArr,
                                     video: {
                                         title:
                                             response[i].files.length !== 0 &&
@@ -286,16 +271,9 @@ class Concepts extends Component {
                                         url: "",
                                     },
                                     audio:
-                                        audio.length === 0
-                                            ? [
-                                                  {
-                                                      title: "",
-                                                      file_name: "",
-                                                      audio: null,
-                                                      path: "",
-                                                  },
-                                              ]
-                                            : audio,
+                                        audioArr.length === 0
+                                            ? audio
+                                            : audioArr,
                                 },
                                 settings: {
                                     virtual_keyboard:
@@ -363,7 +341,7 @@ class Concepts extends Component {
 
     handleSubmit = () => {
         this.setState({
-            showLoader: true,
+            page_loading: true,
             showErrorAlert: false,
             showSuccessAlert: false,
         });
@@ -374,13 +352,13 @@ class Concepts extends Component {
             this.setState({
                 errorMsg: "Terms is required",
                 showErrorAlert: true,
-                showLoader: false,
+                page_loading: false,
             });
         } else if (data[this.state.activeConcept].content.definition === "") {
             this.setState({
                 errorMsg: "Definition is required",
                 showErrorAlert: true,
-                showLoader: false,
+                page_loading: false,
             });
         } else {
             if (data[this.state.activeConcept].concepts_random_id === "") {
@@ -429,7 +407,7 @@ class Concepts extends Component {
                     this.setState({
                         errorMsg: result.detail ? result.detail : result.msg,
                         showErrorAlert: true,
-                        showLoader: false,
+                        page_loading: false,
                     });
                 }
             })
@@ -478,7 +456,7 @@ class Concepts extends Component {
                     this.setState({
                         errorMsg: result.detail ? result.detail : result.msg,
                         showErrorAlert: true,
-                        showLoader: false,
+                        page_loading: false,
                     });
                 }
             })
@@ -494,7 +472,7 @@ class Concepts extends Component {
             this.state.isForm_submitted === true
         ) {
             this.setState({
-                showLoader: true,
+                page_loading: true,
                 showErrorAlert: false,
                 showSuccessAlert: false,
                 isForm_submitted: false,
@@ -601,8 +579,8 @@ class Concepts extends Component {
 
             if (files_arr.length !== 3) {
                 if (
-                    conceptValues[this.state.activeConcept]
-                        .is_image_uploaded === false
+                    conceptValues[this.state.activeConcept].is_file_uploaded ===
+                    false
                 ) {
                     this.handleImgPOST(options, form_data, conceptValues);
                 } else {
@@ -614,7 +592,6 @@ class Concepts extends Component {
                         concepts: conceptValues,
                         successMsg: "Concepts added",
                         showSuccessAlert: true,
-                        showLoader: false,
                     },
                     () => {
                         setTimeout(() => {
@@ -623,11 +600,10 @@ class Concepts extends Component {
                                 contentCollapsed: true,
                                 filesCollapsed: true,
                                 settingsCollapsed: true,
-                                page_loading: true,
                                 activeConcept: "",
                             });
-                            this.loadConceptData();
                         }, 1000);
+                        this.loadConceptData();
                     }
                 );
             }
@@ -649,7 +625,7 @@ class Concepts extends Component {
                             concepts: conceptValues,
                             successMsg: result.data.msg,
                             showSuccessAlert: true,
-                            showLoader: false,
+                            page_loading: false,
                         },
                         () => {
                             setTimeout(() => {
@@ -671,7 +647,7 @@ class Concepts extends Component {
                             ? result.data.detail
                             : result.data.msg,
                         showErrorAlert: true,
-                        showLoader: false,
+                        page_loading: false,
                     });
                 }
             })
@@ -695,7 +671,7 @@ class Concepts extends Component {
                             concepts: conceptValues,
                             successMsg: result.data.msg,
                             showSuccessAlert: true,
-                            showLoader: false,
+                            page_loading: false,
                         },
                         () => {
                             setTimeout(() => {
@@ -717,7 +693,7 @@ class Concepts extends Component {
                             ? result.data.detail
                             : result.data.msg,
                         showErrorAlert: true,
-                        showLoader: false,
+                        page_loading: false,
                     });
                 }
             })
@@ -759,20 +735,7 @@ class Concepts extends Component {
         });
     };
 
-    handleAddImageFields = () => {
-        const values = [...this.state.concepts];
-        values[this.state.activeConcept].content.images.push({
-            title: "",
-            file_name: "",
-            image: null,
-            path: "",
-        });
-        this.setState({
-            concepts: values,
-        });
-    };
-
-    handleRemoveImageFields = (index) => {
+    handleDeleteImages = (index) => {
         const values = [...this.state.concepts];
 
         this.setState({
@@ -782,7 +745,7 @@ class Concepts extends Component {
 
         if (
             values[this.state.activeConcept].concepts_random_id !== "" &&
-            values[this.state.activeConcept].is_image_uploaded === true &&
+            values[this.state.activeConcept].is_file_uploaded === true &&
             values[this.state.activeConcept].content.images[index].file_name ===
                 "" &&
             values[this.state.activeConcept].content.images[index].path !== ""
@@ -794,7 +757,8 @@ class Concepts extends Component {
                     values[this.state.activeConcept].concepts_random_id,
             };
             body[`concepts_image_${index + 1}_title`] =
-                values[this.state.activeConcept].content.images[index].title;
+                values[this.state.activeConcept].content.images[index].title ||
+                "title";
 
             fetch(
                 `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/files/`,
@@ -812,33 +776,17 @@ class Concepts extends Component {
                             successMsg: result.msg,
                             showSuccessAlert: true,
                         });
-                        values[this.state.activeConcept].content.images.splice(
-                            index,
-                            1
-                        );
-                        this.setState(
-                            {
-                                concepts: values,
-                            },
-                            () => {
-                                if (
-                                    values[this.state.activeConcept].content
-                                        .images.length === 0
-                                ) {
-                                    values[
-                                        this.state.activeConcept
-                                    ].content.images.push({
-                                        title: "",
-                                        file_name: "",
-                                        image: null,
-                                        path: "",
-                                    });
-                                }
-                                this.setState({
-                                    concepts: values,
-                                });
-                            }
-                        );
+                        values[this.state.activeConcept].content.images[
+                            index
+                        ] = {
+                            title: "",
+                            file_name: "",
+                            image: null,
+                            path: "",
+                        };
+                        this.setState({
+                            concepts: values,
+                        });
                     } else {
                         this.setState({
                             errorMsg: result.detail
@@ -852,28 +800,15 @@ class Concepts extends Component {
                     console.log(err);
                 });
         } else {
-            values[this.state.activeConcept].content.images.splice(index, 1);
-            this.setState(
-                {
-                    concepts: values,
-                },
-                () => {
-                    if (
-                        values[this.state.activeConcept].content.images
-                            .length === 0
-                    ) {
-                        values[this.state.activeConcept].content.images.push({
-                            title: "",
-                            file_name: "",
-                            image: null,
-                            path: "",
-                        });
-                    }
-                    this.setState({
-                        concepts: values,
-                    });
-                }
-            );
+            values[this.state.activeConcept].content.images[index] = {
+                title: "",
+                file_name: "",
+                image: null,
+                path: "",
+            };
+            this.setState({
+                concepts: values,
+            });
         }
     };
 
@@ -908,17 +843,17 @@ class Concepts extends Component {
 
     clearImages = () => {
         const values = [...this.state.concepts];
-        values[this.state.activeConcept].content.images = [
-            {
-                title: "",
-                file_name: "",
-                image: null,
-                path: "",
-            },
-        ];
         this.setState({
-            concepts: values,
+            showErrorAlert: false,
+            showSuccessAlert: false,
         });
+        for (
+            let i = 0;
+            i < values[this.state.activeConcept].content.images.length;
+            i++
+        ) {
+            this.handleDeleteImages(i);
+        }
     };
 
     // -------------------------- Video --------------------------
@@ -979,7 +914,7 @@ class Concepts extends Component {
 
         if (
             values[this.state.activeConcept].concepts_random_id !== "" &&
-            values[this.state.activeConcept].is_image_uploaded === true &&
+            values[this.state.activeConcept].is_file_uploaded === true &&
             values[this.state.activeConcept].content.video.file_name === "" &&
             values[this.state.activeConcept].content.video.path !== ""
         ) {
@@ -995,7 +930,7 @@ class Concepts extends Component {
                             values[this.state.activeConcept].concepts_random_id,
                         concepts_video_1_title:
                             values[this.state.activeConcept].content.video
-                                .title,
+                                .title || "title",
                     }),
                 }
             )
@@ -1056,20 +991,7 @@ class Concepts extends Component {
         });
     };
 
-    handleAddAudioFields = () => {
-        const values = [...this.state.concepts];
-        values[this.state.activeConcept].content.audio.push({
-            title: "",
-            file_name: "",
-            audio: null,
-            path: "",
-        });
-        this.setState({
-            concepts: values,
-        });
-    };
-
-    handleRemoveAudioFields = (index) => {
+    handleDeleteAudio = (index) => {
         const values = [...this.state.concepts];
 
         this.setState({
@@ -1079,7 +1001,7 @@ class Concepts extends Component {
 
         if (
             values[this.state.activeConcept].concepts_random_id !== "" &&
-            values[this.state.activeConcept].is_image_uploaded === true &&
+            values[this.state.activeConcept].is_file_uploaded === true &&
             values[this.state.activeConcept].content.audio[index].file_name ===
                 "" &&
             values[this.state.activeConcept].content.audio[index].path !== ""
@@ -1091,7 +1013,8 @@ class Concepts extends Component {
                     values[this.state.activeConcept].concepts_random_id,
             };
             body[`concepts_audio_${index + 1}_title`] =
-                values[this.state.activeConcept].content.audio[index].title;
+                values[this.state.activeConcept].content.audio[index].title ||
+                "title";
 
             fetch(
                 `${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/files/`,
@@ -1109,33 +1032,17 @@ class Concepts extends Component {
                             successMsg: result.msg,
                             showSuccessAlert: true,
                         });
-                        values[this.state.activeConcept].content.audio.splice(
-                            index,
-                            1
-                        );
-                        this.setState(
-                            {
-                                concepts: values,
-                            },
-                            () => {
-                                if (
-                                    values[this.state.activeConcept].content
-                                        .audio.length === 0
-                                ) {
-                                    values[
-                                        this.state.activeConcept
-                                    ].content.audio.push({
-                                        title: "",
-                                        file_name: "",
-                                        audio: null,
-                                        path: "",
-                                    });
-                                }
-                                this.setState({
-                                    concepts: values,
-                                });
-                            }
-                        );
+                        values[this.state.activeConcept].content.audio[
+                            index
+                        ] = {
+                            title: "",
+                            file_name: "",
+                            audio: null,
+                            path: "",
+                        };
+                        this.setState({
+                            concepts: values,
+                        });
                     } else {
                         this.setState({
                             errorMsg: result.detail
@@ -1149,28 +1056,15 @@ class Concepts extends Component {
                     console.log(err);
                 });
         } else {
-            values[this.state.activeConcept].content.audio.splice(index, 1);
-            this.setState(
-                {
-                    concepts: values,
-                },
-                () => {
-                    if (
-                        values[this.state.activeConcept].content.audio
-                            .length === 0
-                    ) {
-                        values[this.state.activeConcept].content.audio.push({
-                            title: "",
-                            file_name: "",
-                            audio: null,
-                            path: "",
-                        });
-                    }
-                    this.setState({
-                        concepts: values,
-                    });
-                }
-            );
+            values[this.state.activeConcept].content.audio[index] = {
+                title: "",
+                file_name: "",
+                audio: null,
+                path: "",
+            };
+            this.setState({
+                concepts: values,
+            });
         }
     };
 
@@ -1205,12 +1099,17 @@ class Concepts extends Component {
 
     clearAudios = () => {
         const values = [...this.state.concepts];
-        values[this.state.activeConcept].content.audio = [
-            { title: "", file_name: "", audio: null, path: "" },
-        ];
         this.setState({
-            concepts: values,
+            showErrorAlert: false,
+            showSuccessAlert: false,
         });
+        for (
+            let i = 0;
+            i < values[this.state.activeConcept].content.audio.length;
+            i++
+        ) {
+            this.handleDeleteAudio(i);
+        }
     };
 
     // -------------------------- Settings --------------------------
@@ -1330,7 +1229,7 @@ class Concepts extends Component {
 
     // -------------------------- Adding new concept --------------------------
 
-    addNewConcept = () => {
+    handleAddConcept = () => {
         const values = [...this.state.concepts];
         const keyboards = [...this.state.keyboards];
         const flips = [...this.state.flipState];
@@ -1345,19 +1244,13 @@ class Concepts extends Component {
             chapter_id: this.props.match.params.chapterId,
             topic_num: this.props.match.params.topicNum,
             concepts_random_id: "",
-            is_image_uploaded: false,
+            is_file_uploaded: false,
             content: {
                 terms: "<p>Terms goes here</p>",
                 definition: "<p>Definition goes here</p>",
-                images: [{ title: "", file_name: "", image: null, path: "" }],
-                video: {
-                    title: "",
-                    file_name: "",
-                    video: null,
-                    path: "",
-                    url: "",
-                },
-                audio: [{ title: "", file_name: "", audio: null, path: "" }],
+                images: images,
+                video: video,
+                audio: audio,
             },
             settings: {
                 virtual_keyboard: [],
@@ -1372,7 +1265,54 @@ class Concepts extends Component {
         });
     };
 
-    removingConcept = (index) => {
+    copyConcept = async (index) => {
+        const values = [...this.state.concepts];
+        const keyboards = [...this.state.keyboards];
+        const flips = [...this.state.flipState];
+
+        flips.push(flips[index]);
+        keyboards.splice(index + 1, 0, {
+            all: keyboards[index].all,
+            chemistry: keyboards[index].chemistry,
+            physics: keyboards[index].physics,
+            maths: keyboards[index].maths,
+        });
+        values.splice(index + 1, 0, {
+            chapter_id: this.chapterId,
+            topic_num: this.topicNum,
+            concepts_random_id: "",
+            is_file_uploaded: false,
+            content: {
+                terms: values[index].content.terms,
+                definition: values[index].content.definition,
+                images: images,
+                video: video,
+                audio: audio,
+            },
+            settings: {
+                virtual_keyboard: values[index].settings.virtual_keyboard,
+                limited: values[index].settings.limited,
+            },
+        });
+        await this.setState({
+            concepts: values,
+            keyboards: keyboards,
+            flipState: flips,
+            activeConcept: index + 1,
+        });
+        window.MathJax.typeset();
+    };
+
+    editConcept = (index, concept) => {
+        this.setState({
+            showEdit_option: true,
+            activeConcept: index,
+            showErrorAlert: false,
+            showSuccessAlert: false,
+        });
+    };
+
+    deleteConcept = (index) => {
         const values = [...this.state.concepts];
         const keyboards = [...this.state.keyboards];
         const flips = [...this.state.flipState];
@@ -1414,33 +1354,13 @@ class Concepts extends Component {
                             chapter_id: this.props.match.params.chapterId,
                             topic_num: this.props.match.params.topicNum,
                             concepts_random_id: "",
-                            is_image_uploaded: false,
+                            is_file_uploaded: false,
                             content: {
                                 terms: "<p>Terms goes here</p>",
                                 definition: "<p>Definition goes here</p>",
-                                images: [
-                                    {
-                                        title: "",
-                                        file_name: "",
-                                        image: null,
-                                        path: "",
-                                    },
-                                ],
-                                video: {
-                                    title: "",
-                                    file_name: "",
-                                    video: null,
-                                    path: "",
-                                    url: "",
-                                },
-                                audio: [
-                                    {
-                                        title: "",
-                                        file_name: "",
-                                        audio: null,
-                                        path: "",
-                                    },
-                                ],
+                                images: images,
+                                video: video,
+                                audio: audio,
                             },
                             settings: {
                                 virtual_keyboard: [],
@@ -1458,61 +1378,9 @@ class Concepts extends Component {
         }
     };
 
-    closeConcept_DeleteModal = () => {
+    toggleDeleteModal = () => {
         this.setState({
             showConceptDelete_Modal: !this.state.showConceptDelete_Modal,
-        });
-    };
-
-    copyConcept = (index) => {
-        const values = [...this.state.concepts];
-        const keyboards = [...this.state.keyboards];
-        const flips = [...this.state.flipState];
-
-        flips.push(flips[index]);
-        keyboards.splice(index + 1, 0, {
-            all: keyboards[index].all,
-            chemistry: keyboards[index].chemistry,
-            physics: keyboards[index].physics,
-            maths: keyboards[index].maths,
-        });
-        values.splice(index + 1, 0, {
-            chapter_id: this.chapterId,
-            topic_num: this.topicNum,
-            concepts_random_id: "",
-            is_image_uploaded: false,
-            content: {
-                terms: values[index].content.terms,
-                definition: values[index].content.definition,
-                images: [{ title: "", file_name: "", image: null, path: "" }],
-                video: {
-                    title: "",
-                    file_name: "",
-                    video: null,
-                    path: "",
-                    url: "",
-                },
-                audio: [{ title: "", file_name: "", audio: null, path: "" }],
-            },
-            settings: {
-                virtual_keyboard: values[index].settings.virtual_keyboard,
-                limited: values[index].settings.limited,
-            },
-        });
-        this.setState({
-            concepts: values,
-            keyboards: keyboards,
-            flipState: flips,
-            activeConcept: index + 1,
-        });
-    };
-
-    editConcept = (index, concept) => {
-        this.setState({
-            showEdit_option: true,
-            activeConcept: index,
-            showErrorAlert: false,
-            showSuccessAlert: false,
         });
     };
 
@@ -1545,33 +1413,13 @@ class Concepts extends Component {
                         chapter_id: this.props.match.params.chapterId,
                         topic_num: this.props.match.params.topicNum,
                         concepts_random_id: "",
-                        is_image_uploaded: false,
+                        is_file_uploaded: false,
                         content: {
                             terms: "<p>Terms goes here</p>",
                             definition: "<p>Definition goes here</p>",
-                            images: [
-                                {
-                                    title: "",
-                                    file_name: "",
-                                    image: null,
-                                    path: "",
-                                },
-                            ],
-                            video: {
-                                title: "",
-                                file_name: "",
-                                video: null,
-                                path: "",
-                                url: "",
-                            },
-                            audio: [
-                                {
-                                    title: "",
-                                    file_name: "",
-                                    audio: null,
-                                    path: "",
-                                },
-                            ],
+                            images: images,
+                            video: video,
+                            audio: audio,
                         },
                         settings: {
                             virtual_keyboard: [],
@@ -1671,38 +1519,6 @@ class Concepts extends Component {
     render() {
         let data = [...this.state.concepts];
         let boards = [...this.state.keyboards];
-        let isImageAvailable = false;
-        if (this.state.activeConcept !== "") {
-            if (data[this.state.activeConcept].content !== undefined) {
-                for (
-                    let i = 0;
-                    i < data[this.state.activeConcept].content.images.length;
-                    i++
-                ) {
-                    isImageAvailable =
-                        data[this.state.activeConcept].content.images[i]
-                            .path !== ""
-                            ? true
-                            : false;
-                }
-            }
-        }
-        let isAudioAvailable = false;
-        if (this.state.activeConcept !== "") {
-            if (data[this.state.activeConcept].content !== undefined) {
-                for (
-                    let i = 0;
-                    i < data[this.state.activeConcept].content.audio.length;
-                    i++
-                ) {
-                    isAudioAvailable =
-                        data[this.state.activeConcept].content.audio[i].path !==
-                        ""
-                            ? true
-                            : false;
-                }
-            }
-        }
         return (
             <div className="wrapper">
                 {/* Navbar */}
@@ -1739,7 +1555,7 @@ class Concepts extends Component {
                 {this.state.showConceptDelete_Modal ? (
                     <ContentDeleteModal
                         show={this.state.showConceptDelete_Modal}
-                        onHide={this.closeConcept_DeleteModal}
+                        onHide={this.toggleDeleteModal}
                         formSubmission={this.handleConcept_Deletion}
                         url={`${this.url}/teacher/subject/${this.subjectId}/chapter/concepts/`}
                         type="concept"
@@ -1749,7 +1565,7 @@ class Concepts extends Component {
                             topic_num: this.topicNum,
                             concepts_random_id: this.state.selectedConcept,
                         }}
-                        toggleModal={this.closeConcept_DeleteModal}
+                        toggleModal={this.toggleDeleteModal}
                     />
                 ) : null}
 
@@ -1955,7 +1771,7 @@ class Concepts extends Component {
                                                             type="button"
                                                             className="btn btn-light bg-white btn-block shadow-sm"
                                                             onClick={() =>
-                                                                this.removingConcept(
+                                                                this.deleteConcept(
                                                                     c_index
                                                                 )
                                                             }
@@ -2094,7 +1910,7 @@ class Concepts extends Component {
 
                                 <button
                                     className="btn btn-primary btn-block shadow-none"
-                                    onClick={this.addNewConcept}
+                                    onClick={this.handleAddConcept}
                                 >
                                     Add +
                                 </button>
@@ -2109,18 +1925,6 @@ class Concepts extends Component {
                                             onClick={this.handleSubmit}
                                             disabled={this.state.btnDisabled}
                                         >
-                                            {this.state.showLoader ? (
-                                                <Spinner
-                                                    as="span"
-                                                    animation="border"
-                                                    size="sm"
-                                                    role="status"
-                                                    aria-hidden="true"
-                                                    className="mr-2"
-                                                />
-                                            ) : (
-                                                ""
-                                            )}
                                             Save
                                         </button>
                                         <button
@@ -2207,7 +2011,7 @@ class Concepts extends Component {
                                             </Accordion.Collapse>
                                         </Card>
 
-                                        {/* ---------- image / video ---------- */}
+                                        {/* ---------- Image | Video | Audio ---------- */}
                                         <Card className="shadow-sm mb-2">
                                             <Accordion.Toggle
                                                 as={Card.Body}
@@ -2233,29 +2037,11 @@ class Concepts extends Component {
                                             <Accordion.Collapse eventKey="1">
                                                 <Card.Body className="p-3">
                                                     {/* ---------- Image ---------- */}
-
                                                     <div className="form-group">
                                                         <div className="row align-items-center mb-2">
                                                             <div className="col-md-6">
                                                                 <p className="mb-0">
                                                                     Image
-                                                                    <OverlayTrigger
-                                                                        key="right"
-                                                                        placement="right"
-                                                                        overlay={
-                                                                            <Tooltip id="tooltip">
-                                                                                You
-                                                                                can
-                                                                                upload
-                                                                                Max
-                                                                                of
-                                                                                04
-                                                                                Images
-                                                                            </Tooltip>
-                                                                        }
-                                                                    >
-                                                                        <i className="fas fa-info-circle fa-xs ml-2"></i>
-                                                                    </OverlayTrigger>
                                                                 </p>
                                                             </div>
                                                             <div className="col-md-6 text-right">
@@ -2276,10 +2062,12 @@ class Concepts extends Component {
                                                         ].content.images.map(
                                                             (
                                                                 options,
-                                                                index
+                                                                image_index
                                                             ) => (
                                                                 <Fragment
-                                                                    key={index}
+                                                                    key={
+                                                                        image_index
+                                                                    }
                                                                 >
                                                                     <div
                                                                         className="input-group border-secondary mb-1"
@@ -2291,11 +2079,10 @@ class Concepts extends Component {
                                                                         <input
                                                                             type="text"
                                                                             className="form-control form-control-sm"
-                                                                            id={`image${index}`}
+                                                                            id={`image${image_index}`}
                                                                             name="image"
-                                                                            autoComplete="off"
                                                                             placeholder={`Image title 0${
-                                                                                index +
+                                                                                image_index +
                                                                                 1
                                                                             }`}
                                                                             value={
@@ -2305,10 +2092,11 @@ class Concepts extends Component {
                                                                                 event
                                                                             ) =>
                                                                                 this.handleImageTitle(
-                                                                                    index,
+                                                                                    image_index,
                                                                                     event
                                                                                 )
                                                                             }
+                                                                            autoComplete="off"
                                                                         />
                                                                         <div className="input-group-append">
                                                                             <div
@@ -2320,8 +2108,8 @@ class Concepts extends Component {
                                                                                     type="button"
                                                                                     className="btn btn-light btn-sm shadow-none"
                                                                                     onClick={() =>
-                                                                                        this.handleRemoveImageFields(
-                                                                                            index
+                                                                                        this.handleDeleteImages(
+                                                                                            image_index
                                                                                         )
                                                                                     }
                                                                                 >
@@ -2334,21 +2122,29 @@ class Concepts extends Component {
                                                                         <input
                                                                             type="file"
                                                                             className="custom-file-input"
-                                                                            id={`file${index}`}
+                                                                            id={`file${image_index}`}
                                                                             accept="image/*"
                                                                             aria-describedby="inputGroupFileAddon01"
                                                                             onChange={(
                                                                                 event
                                                                             ) =>
                                                                                 this.handleImageFile(
-                                                                                    index,
+                                                                                    image_index,
                                                                                     event
                                                                                 )
+                                                                            }
+                                                                            disabled={
+                                                                                options.file_name !==
+                                                                                    "" ||
+                                                                                options.path !==
+                                                                                    ""
+                                                                                    ? true
+                                                                                    : false
                                                                             }
                                                                         />
                                                                         <label
                                                                             className="custom-file-label"
-                                                                            htmlFor={`file${index}`}
+                                                                            htmlFor={`file${image_index}`}
                                                                         >
                                                                             {options.file_name ===
                                                                             ""
@@ -2369,33 +2165,6 @@ class Concepts extends Component {
                                                             Select only .png
                                                             .jpg .jpeg .webp
                                                         </small>
-
-                                                        {data[
-                                                            this.state
-                                                                .activeConcept
-                                                        ].content.images
-                                                            .length <
-                                                        this.image_limit ? (
-                                                            <div className="form-group mb-0">
-                                                                <button
-                                                                    className="btn btn-light btn-block border-secondary btn-sm"
-                                                                    onClick={
-                                                                        this
-                                                                            .handleAddImageFields
-                                                                    }
-                                                                    disabled={
-                                                                        isImageAvailable ===
-                                                                        true
-                                                                            ? false
-                                                                            : true
-                                                                    }
-                                                                >
-                                                                    Add +
-                                                                </button>
-                                                            </div>
-                                                        ) : (
-                                                            ""
-                                                        )}
                                                     </div>
 
                                                     {/* ---------- Video ---------- */}
@@ -2424,7 +2193,6 @@ class Concepts extends Component {
                                                             name="video"
                                                             id="video"
                                                             placeholder="Video title"
-                                                            autoComplete="off"
                                                             className="form-control form-control-sm border-secondary mb-1"
                                                             value={
                                                                 data[
@@ -2437,6 +2205,7 @@ class Concepts extends Component {
                                                                 this
                                                                     .handleVideoTitle
                                                             }
+                                                            autoComplete="off"
                                                         />
                                                         <div className="custom-file mb-2">
                                                             <input
@@ -2451,6 +2220,34 @@ class Concepts extends Component {
                                                                     this.handleVideoFile(
                                                                         event
                                                                     )
+                                                                }
+                                                                disabled={
+                                                                    data[
+                                                                        this
+                                                                            .state
+                                                                            .activeConcept
+                                                                    ].content
+                                                                        .video
+                                                                        .file_name !==
+                                                                        "" ||
+                                                                    data[
+                                                                        this
+                                                                            .state
+                                                                            .activeConcept
+                                                                    ].content
+                                                                        .video
+                                                                        .path !==
+                                                                        "" ||
+                                                                    data[
+                                                                        this
+                                                                            .state
+                                                                            .activeConcept
+                                                                    ].content
+                                                                        .video
+                                                                        .url !==
+                                                                        ""
+                                                                        ? true
+                                                                        : false
                                                                 }
                                                             />
                                                             <label
@@ -2505,6 +2302,22 @@ class Concepts extends Component {
                                                                 ].content.video
                                                                     .url
                                                             }
+                                                            disabled={
+                                                                data[
+                                                                    this.state
+                                                                        .activeConcept
+                                                                ].content.video
+                                                                    .file_name !==
+                                                                    "" ||
+                                                                data[
+                                                                    this.state
+                                                                        .activeConcept
+                                                                ].content.video
+                                                                    .path !== ""
+                                                                    ? true
+                                                                    : false
+                                                            }
+                                                            autoComplete="off"
                                                         />
                                                         <small className="form-text text-muted mb-2">
                                                             Only https supported
@@ -2519,23 +2332,6 @@ class Concepts extends Component {
                                                             <div className="col-md-6">
                                                                 <p className="mb-0">
                                                                     Audio
-                                                                    <OverlayTrigger
-                                                                        key="right"
-                                                                        placement="right"
-                                                                        overlay={
-                                                                            <Tooltip id="tooltip">
-                                                                                You
-                                                                                can
-                                                                                upload
-                                                                                Max
-                                                                                of
-                                                                                02
-                                                                                Audio
-                                                                            </Tooltip>
-                                                                        }
-                                                                    >
-                                                                        <i className="fas fa-info-circle fa-xs ml-2"></i>
-                                                                    </OverlayTrigger>
                                                                 </p>
                                                             </div>
                                                             <div className="col-md-6 text-right">
@@ -2556,10 +2352,12 @@ class Concepts extends Component {
                                                         ].content.audio.map(
                                                             (
                                                                 options,
-                                                                index
+                                                                audio_index
                                                             ) => (
                                                                 <Fragment
-                                                                    key={index}
+                                                                    key={
+                                                                        audio_index
+                                                                    }
                                                                 >
                                                                     <div
                                                                         className="input-group border-secondary mb-1"
@@ -2571,10 +2369,10 @@ class Concepts extends Component {
                                                                         <input
                                                                             type="text"
                                                                             className="form-control form-control-sm"
-                                                                            id={`audio${index}`}
+                                                                            id={`audio${audio_index}`}
                                                                             name="audio"
                                                                             placeholder={`Audio title 0${
-                                                                                index +
+                                                                                audio_index +
                                                                                 1
                                                                             }`}
                                                                             value={
@@ -2584,7 +2382,7 @@ class Concepts extends Component {
                                                                                 event
                                                                             ) =>
                                                                                 this.handleAudioTitle(
-                                                                                    index,
+                                                                                    audio_index,
                                                                                     event
                                                                                 )
                                                                             }
@@ -2600,8 +2398,8 @@ class Concepts extends Component {
                                                                                     type="button"
                                                                                     className="btn btn-light btn-sm shadow-none"
                                                                                     onClick={() =>
-                                                                                        this.handleRemoveAudioFields(
-                                                                                            index
+                                                                                        this.handleDeleteAudio(
+                                                                                            audio_index
                                                                                         )
                                                                                     }
                                                                                 >
@@ -2614,21 +2412,29 @@ class Concepts extends Component {
                                                                         <input
                                                                             type="file"
                                                                             className="custom-file-input"
-                                                                            id={`audio${index}`}
+                                                                            id={`audio${audio_index}`}
                                                                             accept="audio/*"
                                                                             aria-describedby="inputGroupFileAddon01"
                                                                             onChange={(
                                                                                 event
                                                                             ) =>
                                                                                 this.handleAudioFile(
-                                                                                    index,
+                                                                                    audio_index,
                                                                                     event
                                                                                 )
+                                                                            }
+                                                                            disabled={
+                                                                                options.file_name !==
+                                                                                    "" ||
+                                                                                options.path !==
+                                                                                    ""
+                                                                                    ? true
+                                                                                    : false
                                                                             }
                                                                         />
                                                                         <label
                                                                             className="custom-file-label"
-                                                                            htmlFor={`audio${index}`}
+                                                                            htmlFor={`audio${audio_index}`}
                                                                         >
                                                                             {options.file_name ===
                                                                             ""
@@ -2649,32 +2455,6 @@ class Concepts extends Component {
                                                             Select only .wav
                                                             .mp3
                                                         </small>
-
-                                                        {data[
-                                                            this.state
-                                                                .activeConcept
-                                                        ].content.audio.length <
-                                                        this.audio_limit ? (
-                                                            <div className="form-group mb-0">
-                                                                <button
-                                                                    className="btn btn-light btn-block border-secondary btn-sm"
-                                                                    onClick={
-                                                                        this
-                                                                            .handleAddAudioFields
-                                                                    }
-                                                                    disabled={
-                                                                        isAudioAvailable ===
-                                                                        true
-                                                                            ? false
-                                                                            : true
-                                                                    }
-                                                                >
-                                                                    Add +
-                                                                </button>
-                                                            </div>
-                                                        ) : (
-                                                            ""
-                                                        )}
                                                     </div>
                                                 </Card.Body>
                                             </Accordion.Collapse>

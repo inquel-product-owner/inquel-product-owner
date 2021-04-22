@@ -512,6 +512,7 @@ class Chapters extends Component {
                 chapter_id: this.props.match.params.chapterId,
                 chapter_structure: [],
             },
+            permissions: {},
             chapterIndex: 1,
             activeTopic: "",
             ancestor: "",
@@ -647,6 +648,7 @@ class Chapters extends Component {
                             result.data.topics_list !== undefined
                                 ? result.data.topics_list
                                 : [],
+                        permissions: result.data.permissions,
                         page_loading: false,
                     });
                 } else {
@@ -967,6 +969,12 @@ class Chapters extends Component {
                                                     data.topic_name
                                                 )
                                             }
+                                            disabled={
+                                                this.state.permissions.match ===
+                                                true
+                                                    ? false
+                                                    : true
+                                            }
                                         >
                                             View / Edit
                                         </button>
@@ -999,6 +1007,12 @@ class Chapters extends Component {
                                                     data.topic_name
                                                 )
                                             }
+                                            disabled={
+                                                this.state.permissions
+                                                    .type_1_q === true
+                                                    ? false
+                                                    : true
+                                            }
                                         >
                                             View / Edit
                                         </button>
@@ -1014,6 +1028,12 @@ class Chapters extends Component {
                                                 this.dispatchTopic(
                                                     data.topic_name
                                                 )
+                                            }
+                                            disabled={
+                                                this.state.permissions
+                                                    .type_2_q === true
+                                                    ? false
+                                                    : true
                                             }
                                         >
                                             View / Edit
@@ -1491,7 +1511,7 @@ class Chapters extends Component {
                                                       )
                                                     : null}
 
-                                                {/* Cycle test list */}
+                                                {/* ----- Cycle test list ----- */}
                                                 {this.state.cycle_test
                                                     .length !== 0
                                                     ? this.state.cycle_test.map(
@@ -1688,7 +1708,7 @@ class Chapters extends Component {
                                                       )
                                                     : null}
 
-                                                {/* Quiz list */}
+                                                {/* ----- Quiz list ----- */}
                                                 {Object.entries(this.state.quiz)
                                                     .length !== 0 ? (
                                                     <div className="card card-header shadow-sm light-bg mb-2">
@@ -1791,7 +1811,8 @@ class Chapters extends Component {
                             className="btn btn-tomato btn-block shadow-sm"
                             onClick={this.toggleQuiz_CreateModal}
                             disabled={
-                                Object.entries(this.state.quiz).length !== 0
+                                Object.entries(this.state.quiz).length !== 0 ||
+                                this.state.permissions.quiz === false
                                     ? true
                                     : false
                             }

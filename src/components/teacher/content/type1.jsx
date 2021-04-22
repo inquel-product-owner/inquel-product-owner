@@ -6,7 +6,7 @@ import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import CKeditor from "../../sharedComponents/CKeditor";
 import ReactSwitch from "../../sharedComponents/switchComponent";
-import { Accordion, Card, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { Accordion, Card } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
 import Loading from "../../sharedComponents/loader";
 import AlertBox from "../../sharedComponents/alert";
@@ -20,6 +20,26 @@ const mapStateToProps = (state) => ({
     chapter_name: state.chapter_name,
     topic_name: state.topic_name,
 });
+
+const images = [
+    { title: "", file_name: "", image: null, path: "" },
+    { title: "", file_name: "", image: null, path: "" },
+    { title: "", file_name: "", image: null, path: "" },
+    { title: "", file_name: "", image: null, path: "" },
+];
+
+const audio = [
+    { title: "", file_name: "", audio: null, path: "" },
+    { title: "", file_name: "", audio: null, path: "" },
+];
+
+const video = {
+    title: "",
+    file_name: "",
+    video: null,
+    path: "",
+    url: "",
+};
 
 class Type1 extends Component {
     constructor(props) {
@@ -40,6 +60,7 @@ class Type1 extends Component {
             showMCQDelete_Modal: false,
 
             contentCollapsed: true,
+            filesCollapsed: true,
             propertiesCollapsed: true,
             settingsCollapsed: true,
             showEdit_option: false,
@@ -64,7 +85,7 @@ class Type1 extends Component {
                     topic_num: this.props.match.params.topicNum,
                     question: "<p>Question goes here</p>",
                     question_random_id: "",
-                    is_image_uploaded: false,
+                    is_file_uploaded: false,
                     content: {
                         mcq: true,
                         fill_in: false,
@@ -81,19 +102,9 @@ class Type1 extends Component {
                             { correct: false, content: "" },
                         ],
                         explanation: "<p>Explanation goes here</p>",
-                        images: [
-                            { title: "", file_name: "", image: null, path: "" },
-                        ],
-                        video: {
-                            title: "",
-                            file_name: "",
-                            video: null,
-                            path: "",
-                            url: "",
-                        },
-                        audio: [
-                            { title: "", file_name: "", audio: null, path: "" },
-                        ],
+                        images: images,
+                        video: video,
+                        audio: audio,
                     },
                     properties: {
                         marks: "",
@@ -175,114 +186,77 @@ class Type1 extends Component {
                 if (result.sts === true) {
                     let data = [];
                     let keyboards = [];
-                    let images = [];
-                    let audio = [];
+                    let imgArr = [];
+                    let audioArr = [];
                     let response = result.data.results;
                     if (response.length !== 0) {
                         for (let i = 0; i < response.length; i++) {
-                            images = [];
-                            audio = [];
+                            imgArr = [];
+                            audioArr = [];
                             if (response[i].files.length !== 0) {
                                 // image
-                                if (
-                                    response[i].files[0].type1_image_1 !==
-                                        undefined ||
-                                    response[i].files[0].type1_image_2 !==
-                                        undefined ||
-                                    response[i].files[0].type1_image_3 !==
-                                        undefined ||
-                                    response[i].files[0].type1_image_4 !==
-                                        undefined
-                                ) {
-                                    images.push({
-                                        title:
-                                            response[i].files[0]
-                                                .type1_image_1_title || "",
-                                        file_name: "",
-                                        image: null,
-                                        path:
-                                            response[i].files[0]
-                                                .type1_image_1 || "",
-                                    });
-                                    if (
-                                        response[i].files[0].type1_image_2 !==
-                                            undefined ||
-                                        response[i].files[0].type1_image_3 !==
-                                            undefined ||
-                                        response[i].files[0].type1_image_4 !==
-                                            undefined
-                                    ) {
-                                        images.push({
-                                            title:
-                                                response[i].files[0]
-                                                    .type1_image_2_title || "",
-                                            file_name: "",
-                                            image: null,
-                                            path:
-                                                response[i].files[0]
-                                                    .type1_image_2 || "",
-                                        });
-                                        if (
-                                            response[i].files[0]
-                                                .type1_image_3 !== undefined ||
-                                            response[i].files[0]
-                                                .type1_image_4 !== undefined
-                                        ) {
-                                            images.push({
-                                                title:
-                                                    response[i].files[0]
-                                                        .type1_image_3_title ||
-                                                    "",
-                                                file_name: "",
-                                                image: null,
-                                                path:
-                                                    response[i].files[0]
-                                                        .type1_image_3 || "",
-                                            });
-                                            if (
-                                                response[i].files[0]
-                                                    .type1_image_4 !== undefined
-                                            ) {
-                                                images.push({
-                                                    title:
-                                                        response[i].files[0]
-                                                            .type1_image_4_title ||
-                                                        "",
-                                                    file_name: "",
-                                                    image: null,
-                                                    path:
-                                                        response[i].files[0]
-                                                            .type1_image_4 ||
-                                                        "",
-                                                });
-                                            }
-                                        }
-                                    }
-                                }
+                                imgArr.push({
+                                    title:
+                                        response[i].files[0]
+                                            .type1_image_1_title || "",
+                                    file_name: "",
+                                    image: null,
+                                    path:
+                                        response[i].files[0].type1_image_1 ||
+                                        "",
+                                });
+                                imgArr.push({
+                                    title:
+                                        response[i].files[0]
+                                            .type1_image_2_title || "",
+                                    file_name: "",
+                                    image: null,
+                                    path:
+                                        response[i].files[0].type1_image_2 ||
+                                        "",
+                                });
+                                imgArr.push({
+                                    title:
+                                        response[i].files[0]
+                                            .type1_image_3_title || "",
+                                    file_name: "",
+                                    image: null,
+                                    path:
+                                        response[i].files[0].type1_image_3 ||
+                                        "",
+                                });
+                                imgArr.push({
+                                    title:
+                                        response[i].files[0]
+                                            .type1_image_4_title || "",
+                                    file_name: "",
+                                    image: null,
+                                    path:
+                                        response[i].files[0].type1_image_4 ||
+                                        "",
+                                });
 
                                 // audio
-                                if (response[i].files[0].type1_audio_1) {
-                                    audio.push({
-                                        title:
-                                            response[i].files[0]
-                                                .type1_audio_1_title,
-                                        file_name: "",
-                                        audio: null,
-                                        path:
-                                            response[i].files[0].type1_audio_1,
-                                    });
-                                }
-                                if (response[i].files[0].type1_audio_2) {
-                                    audio.push({
-                                        title:
-                                            response[i].files[0]
-                                                .type1_audio_2_title,
-                                        file_name: "",
-                                        audio: null,
-                                        path:
-                                            response[i].files[0].type1_audio_2,
-                                    });
-                                }
+                                audioArr.push({
+                                    title:
+                                        response[i].files[0]
+                                            .type1_audio_1_title || "",
+                                    file_name: "",
+                                    audio: null,
+                                    path:
+                                        response[i].files[0].type1_audio_1 ||
+                                        "",
+                                });
+                                audioArr.push({
+                                    title:
+                                        response[i].files[0]
+                                            .type1_audio_2_title || "",
+                                    file_name: "",
+                                    audio: null,
+                                    path:
+                                        response[i].files[0].type1_audio_2 ||
+                                        "",
+                                });
                             }
 
                             // video
@@ -302,7 +276,7 @@ class Type1 extends Component {
                                 question: response[i].question,
                                 question_random_id:
                                     response[i].question_random_id,
-                                is_image_uploaded:
+                                is_file_uploaded:
                                     response[i].files.length !== 0
                                         ? true
                                         : false,
@@ -351,16 +325,7 @@ class Type1 extends Component {
                                               ],
                                     explanation: response[i].explanation,
                                     images:
-                                        images.length === 0
-                                            ? [
-                                                  {
-                                                      title: "",
-                                                      file_name: "",
-                                                      image: null,
-                                                      path: "",
-                                                  },
-                                              ]
-                                            : images,
+                                        imgArr.length === 0 ? images : imgArr,
                                     video: {
                                         title:
                                             response[i].files.length !== 0 &&
@@ -375,16 +340,9 @@ class Type1 extends Component {
                                         url: "",
                                     },
                                     audio:
-                                        audio.length === 0
-                                            ? [
-                                                  {
-                                                      title: "",
-                                                      file_name: "",
-                                                      audio: null,
-                                                      path: "",
-                                                  },
-                                              ]
-                                            : audio,
+                                        audioArr.length === 0
+                                            ? audio
+                                            : audioArr,
                                 },
                                 properties: {
                                     marks: response[i].properties.marks,
@@ -900,8 +858,8 @@ class Type1 extends Component {
 
             if (files_arr.length !== 3) {
                 if (
-                    questionData[this.state.activeQuestion]
-                        .is_image_uploaded === false
+                    questionData[this.state.activeQuestion].is_file_uploaded ===
+                    false
                 ) {
                     this.handleImgPOST(options, form_data, questionData);
                 } else {
@@ -918,6 +876,7 @@ class Type1 extends Component {
                         this.setState({
                             showEdit_option: false,
                             contentCollapsed: true,
+                            filesCollapsed: true,
                             propertiesCollapsed: true,
                             settingsCollapsed: true,
                             page_loading: true,
@@ -951,6 +910,7 @@ class Type1 extends Component {
                             this.setState({
                                 showEdit_option: false,
                                 contentCollapsed: true,
+                                filesCollapsed: true,
                                 propertiesCollapsed: true,
                                 settingsCollapsed: true,
                                 page_loading: true,
@@ -995,6 +955,7 @@ class Type1 extends Component {
                             this.setState({
                                 showEdit_option: false,
                                 contentCollapsed: true,
+                                filesCollapsed: true,
                                 propertiesCollapsed: true,
                                 settingsCollapsed: true,
                                 page_loading: true,
@@ -1221,20 +1182,7 @@ class Type1 extends Component {
         });
     };
 
-    handleAddImageFields = () => {
-        const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.images.push({
-            title: "",
-            file_name: "",
-            image: null,
-            path: "",
-        });
-        this.setState({
-            questions: values,
-        });
-    };
-
-    handleRemoveImageFields = (index) => {
+    handleDeleteImages = (index) => {
         const values = [...this.state.questions];
 
         this.setState({
@@ -1244,7 +1192,7 @@ class Type1 extends Component {
 
         if (
             values[this.state.activeQuestion].question_random_id !== "" &&
-            values[this.state.activeQuestion].is_image_uploaded === true &&
+            values[this.state.activeQuestion].is_file_uploaded === true &&
             values[this.state.activeQuestion].content.images[index]
                 .file_name === "" &&
             values[this.state.activeQuestion].content.images[index].path !== ""
@@ -1256,7 +1204,8 @@ class Type1 extends Component {
                     values[this.state.activeQuestion].question_random_id,
             };
             body[`type1_image_${index + 1}_title`] =
-                values[this.state.activeQuestion].content.images[index].title;
+                values[this.state.activeQuestion].content.images[index].title ||
+                "title";
 
             fetch(
                 `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/files/`,
@@ -1274,33 +1223,17 @@ class Type1 extends Component {
                             successMsg: result.msg,
                             showSuccessAlert: true,
                         });
-                        values[this.state.activeQuestion].content.images.splice(
-                            index,
-                            1
-                        );
-                        this.setState(
-                            {
-                                questions: values,
-                            },
-                            () => {
-                                if (
-                                    values[this.state.activeQuestion].content
-                                        .images.length === 0
-                                ) {
-                                    values[
-                                        this.state.activeQuestion
-                                    ].content.images.push({
-                                        title: "",
-                                        file_name: "",
-                                        image: null,
-                                        path: "",
-                                    });
-                                }
-                                this.setState({
-                                    questions: values,
-                                });
-                            }
-                        );
+                        values[this.state.activeQuestion].content.images[
+                            index
+                        ] = {
+                            title: "",
+                            file_name: "",
+                            image: null,
+                            path: "",
+                        };
+                        this.setState({
+                            questions: values,
+                        });
                     } else {
                         this.setState({
                             errorMsg: result.detail
@@ -1314,28 +1247,15 @@ class Type1 extends Component {
                     console.log(err);
                 });
         } else {
-            values[this.state.activeQuestion].content.images.splice(index, 1);
-            this.setState(
-                {
-                    questions: values,
-                },
-                () => {
-                    if (
-                        values[this.state.activeQuestion].content.images
-                            .length === 0
-                    ) {
-                        values[this.state.activeQuestion].content.images.push({
-                            title: "",
-                            file_name: "",
-                            image: null,
-                            path: "",
-                        });
-                    }
-                    this.setState({
-                        questions: values,
-                    });
-                }
-            );
+            values[this.state.activeQuestion].content.images[index] = {
+                title: "",
+                file_name: "",
+                image: null,
+                path: "",
+            };
+            this.setState({
+                questions: values,
+            });
         }
     };
 
@@ -1370,17 +1290,17 @@ class Type1 extends Component {
 
     clearImages = () => {
         const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.images = [
-            {
-                title: "",
-                file_name: "",
-                image: null,
-                path: "",
-            },
-        ];
         this.setState({
-            questions: values,
+            showErrorAlert: false,
+            showSuccessAlert: false,
         });
+        for (
+            let i = 0;
+            i < values[this.state.activeQuestion].content.images.length;
+            i++
+        ) {
+            this.handleDeleteImages(i);
+        }
     };
 
     // -------------------------- Video --------------------------
@@ -1441,7 +1361,7 @@ class Type1 extends Component {
 
         if (
             values[this.state.activeQuestion].question_random_id !== "" &&
-            values[this.state.activeQuestion].is_image_uploaded === true &&
+            values[this.state.activeQuestion].is_file_uploaded === true &&
             values[this.state.activeQuestion].content.video.file_name === "" &&
             values[this.state.activeQuestion].content.video.path !== ""
         ) {
@@ -1458,7 +1378,7 @@ class Type1 extends Component {
                                 .question_random_id,
                         type1_video_1_title:
                             values[this.state.activeQuestion].content.video
-                                .title,
+                                .title || "title",
                     }),
                 }
             )
@@ -1520,20 +1440,7 @@ class Type1 extends Component {
         });
     };
 
-    handleAddAudioFields = () => {
-        const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.audio.push({
-            title: "",
-            file_name: "",
-            audio: null,
-            path: "",
-        });
-        this.setState({
-            questions: values,
-        });
-    };
-
-    handleRemoveAudioFields = (index) => {
+    handleDeleteAudio = (index) => {
         const values = [...this.state.questions];
 
         this.setState({
@@ -1543,7 +1450,7 @@ class Type1 extends Component {
 
         if (
             values[this.state.activeQuestion].question_random_id !== "" &&
-            values[this.state.activeQuestion].is_image_uploaded === true &&
+            values[this.state.activeQuestion].is_file_uploaded === true &&
             values[this.state.activeQuestion].content.audio[index].file_name ===
                 "" &&
             values[this.state.activeQuestion].content.audio[index].path !== ""
@@ -1555,7 +1462,8 @@ class Type1 extends Component {
                     values[this.state.activeQuestion].question_random_id,
             };
             body[`type1_audio_${index + 1}_title`] =
-                values[this.state.activeQuestion].content.audio[index].title;
+                values[this.state.activeQuestion].content.audio[index].title ||
+                "title";
 
             fetch(
                 `${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/files/`,
@@ -1573,33 +1481,17 @@ class Type1 extends Component {
                             successMsg: result.msg,
                             showSuccessAlert: true,
                         });
-                        values[this.state.activeQuestion].content.audio.splice(
-                            index,
-                            1
-                        );
-                        this.setState(
-                            {
-                                questions: values,
-                            },
-                            () => {
-                                if (
-                                    values[this.state.activeQuestion].content
-                                        .audio.length === 0
-                                ) {
-                                    values[
-                                        this.state.activeQuestion
-                                    ].content.audio.push({
-                                        title: "",
-                                        file_name: "",
-                                        audio: null,
-                                        path: "",
-                                    });
-                                }
-                                this.setState({
-                                    questions: values,
-                                });
-                            }
-                        );
+                        values[this.state.activeQuestion].content.audio[
+                            index
+                        ] = {
+                            title: "",
+                            file_name: "",
+                            audio: null,
+                            path: "",
+                        };
+                        this.setState({
+                            questions: values,
+                        });
                     } else {
                         this.setState({
                             errorMsg: result.detail
@@ -1613,28 +1505,15 @@ class Type1 extends Component {
                     console.log(err);
                 });
         } else {
-            values[this.state.activeQuestion].content.audio.splice(index, 1);
-            this.setState(
-                {
-                    questions: values,
-                },
-                () => {
-                    if (
-                        values[this.state.activeQuestion].content.audio
-                            .length === 0
-                    ) {
-                        values[this.state.activeQuestion].content.audio.push({
-                            title: "",
-                            file_name: "",
-                            audio: null,
-                            path: "",
-                        });
-                    }
-                    this.setState({
-                        questions: values,
-                    });
-                }
-            );
+            values[this.state.activeQuestion].content.audio[index] = {
+                title: "",
+                file_name: "",
+                audio: null,
+                path: "",
+            };
+            this.setState({
+                questions: values,
+            });
         }
     };
 
@@ -1669,12 +1548,17 @@ class Type1 extends Component {
 
     clearAudios = () => {
         const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.audio = [
-            { title: "", file_name: "", audio: null, path: "" },
-        ];
         this.setState({
-            questions: values,
+            showErrorAlert: false,
+            showSuccessAlert: false,
         });
+        for (
+            let i = 0;
+            i < values[this.state.activeQuestion].content.audio.length;
+            i++
+        ) {
+            this.handleDeleteAudio(i);
+        }
     };
 
     // -------------------------- Properties --------------------------
@@ -1826,12 +1710,17 @@ class Type1 extends Component {
     toggleCollapse = (component) => {
         this.setState({
             contentCollapsed: true,
+            filesCollapsed: true,
             propertiesCollapsed: true,
             settingsCollapsed: true,
         });
         if (component === "content") {
             this.setState({
                 contentCollapsed: !this.state.contentCollapsed,
+            });
+        } else if (component === "files") {
+            this.setState({
+                filesCollapsed: !this.state.filesCollapsed,
             });
         } else if (component === "properties") {
             this.setState({
@@ -1846,7 +1735,7 @@ class Type1 extends Component {
 
     // -------------------------- Adding, Removing, Deleting question --------------------------
 
-    addNewQuestion = () => {
+    handleAddQuestion = () => {
         const values = [...this.state.questions];
         const keyboards = [...this.state.keyboards];
         keyboards.push({
@@ -1860,7 +1749,7 @@ class Type1 extends Component {
             topic_num: this.topicNum,
             question: "<p>Question goes here</p>",
             question_random_id: "",
-            is_image_uploaded: false,
+            is_file_uploaded: false,
             content: {
                 mcq: true,
                 fill_in: false,
@@ -1877,15 +1766,9 @@ class Type1 extends Component {
                     { correct: false, content: "" },
                 ],
                 explanation: "<p>Explanation goes here</p>",
-                images: [{ title: "", file_name: "", image: null, path: "" }],
-                video: {
-                    title: "",
-                    file_name: "",
-                    video: null,
-                    path: "",
-                    url: "",
-                },
-                audio: [{ title: "", file_name: "", audio: null, path: "" }],
+                images: images,
+                video: video,
+                audio: audio,
             },
             properties: {
                 marks: "",
@@ -1909,117 +1792,7 @@ class Type1 extends Component {
         });
     };
 
-    removingQuestions = (index) => {
-        const values = [...this.state.questions];
-        const keyboards = [...this.state.keyboards];
-        this.setState({
-            showEdit_option: false,
-            contentCollapsed: true,
-            propertiesCollapsed: true,
-            settingsCollapsed: true,
-            activeQuestion: index,
-        });
-
-        if (values[index].question_random_id !== "") {
-            this.setState({
-                selectedQuestion: values[index].question_random_id,
-                showMCQDelete_Modal: !this.state.showMCQDelete_Modal,
-            });
-        } else {
-            keyboards.splice(index, 1);
-            values.splice(index, 1);
-            this.setState(
-                {
-                    questions: values,
-                    keyboards: keyboards,
-                    activeQuestion: "",
-                },
-                () => {
-                    if (values.length === 0) {
-                        keyboards.push({
-                            all: false,
-                            chemistry: false,
-                            physics: false,
-                            maths: false,
-                        });
-                        values.push({
-                            chapter_id: this.chapterId,
-                            topic_num: this.topicNum,
-                            question: "<p>Question goes here</p>",
-                            question_random_id: "",
-                            is_image_uploaded: false,
-                            content: {
-                                mcq: true,
-                                fill_in: false,
-                                boolean: false,
-                                fillin_answer: [""],
-                                boolean_question: [
-                                    { correct: false, content: "True" },
-                                    { correct: false, content: "False" },
-                                ],
-                                options: [
-                                    { correct: false, content: "" },
-                                    { correct: false, content: "" },
-                                    { correct: false, content: "" },
-                                    { correct: false, content: "" },
-                                ],
-                                explanation: "<p>Explanation goes here</p>",
-                                images: [
-                                    {
-                                        title: "",
-                                        file_name: "",
-                                        image: null,
-                                        path: "",
-                                    },
-                                ],
-                                video: {
-                                    title: "",
-                                    file_name: "",
-                                    video: null,
-                                    path: "",
-                                    url: "",
-                                },
-                                audio: [
-                                    {
-                                        title: "",
-                                        file_name: "",
-                                        audio: null,
-                                        path: "",
-                                    },
-                                ],
-                            },
-                            properties: {
-                                marks: "",
-                                complexity: "",
-                                priority: "",
-                                theme: "",
-                                test: [false, false, false, false, false],
-                                semester: [false, false, false, false, false],
-                                quiz: [false, false, false, false, false],
-                                learn: false,
-                            },
-                            settings: {
-                                virtual_keyboard: [],
-                                limited: false,
-                            },
-                        });
-                        this.setState({
-                            questions: values,
-                            keyboards: keyboards,
-                        });
-                    }
-                }
-            );
-        }
-    };
-
-    closeMCQ_DeleteModal = () => {
-        this.setState({
-            showMCQDelete_Modal: !this.state.showMCQDelete_Modal,
-        });
-    };
-
-    copyQuestions = (index) => {
+    copyQuestions = async (index) => {
         const values = [...this.state.questions];
         const keyboards = [...this.state.keyboards];
 
@@ -2068,7 +1841,7 @@ class Type1 extends Component {
             topic_num: this.topicNum,
             question: values[index].question,
             question_random_id: "",
-            is_image_uploaded: false,
+            is_file_uploaded: false,
             content: {
                 mcq: values[index].content.mcq,
                 fill_in: values[index].content.fill_in,
@@ -2077,15 +1850,9 @@ class Type1 extends Component {
                 boolean_question: boolean,
                 options: options,
                 explanation: values[index].content.explanation,
-                images: [{ title: "", file_name: "", image: null, path: "" }],
-                video: {
-                    title: "",
-                    file_name: "",
-                    video: null,
-                    path: "",
-                    url: "",
-                },
-                audio: [{ title: "", file_name: "", audio: null, path: "" }],
+                images: images,
+                video: video,
+                audio: audio,
             },
             properties: {
                 marks: values[index].properties.marks,
@@ -2102,11 +1869,12 @@ class Type1 extends Component {
                 limited: values[index].settings.limited,
             },
         });
-        this.setState({
+        await this.setState({
             questions: values,
             keyboards: keyboards,
             activeQuestion: index + 1,
         });
+        window.MathJax.typeset();
     };
 
     editQuestion = (index) => {
@@ -2115,6 +1883,97 @@ class Type1 extends Component {
             activeQuestion: index,
             showErrorAlert: false,
             showSuccessAlert: false,
+        });
+    };
+
+    deleteQuestion = (index) => {
+        const values = [...this.state.questions];
+        const keyboards = [...this.state.keyboards];
+        this.setState({
+            showEdit_option: false,
+            contentCollapsed: true,
+            filesCollapsed: true,
+            propertiesCollapsed: true,
+            settingsCollapsed: true,
+            activeQuestion: index,
+        });
+
+        if (values[index].question_random_id !== "") {
+            this.setState({
+                selectedQuestion: values[index].question_random_id,
+                showMCQDelete_Modal: !this.state.showMCQDelete_Modal,
+            });
+        } else {
+            keyboards.splice(index, 1);
+            values.splice(index, 1);
+            this.setState(
+                {
+                    questions: values,
+                    keyboards: keyboards,
+                    activeQuestion: "",
+                },
+                () => {
+                    if (values.length === 0) {
+                        keyboards.push({
+                            all: false,
+                            chemistry: false,
+                            physics: false,
+                            maths: false,
+                        });
+                        values.push({
+                            chapter_id: this.chapterId,
+                            topic_num: this.topicNum,
+                            question: "<p>Question goes here</p>",
+                            question_random_id: "",
+                            is_file_uploaded: false,
+                            content: {
+                                mcq: true,
+                                fill_in: false,
+                                boolean: false,
+                                fillin_answer: [""],
+                                boolean_question: [
+                                    { correct: false, content: "True" },
+                                    { correct: false, content: "False" },
+                                ],
+                                options: [
+                                    { correct: false, content: "" },
+                                    { correct: false, content: "" },
+                                    { correct: false, content: "" },
+                                    { correct: false, content: "" },
+                                ],
+                                explanation: "<p>Explanation goes here</p>",
+                                images: images,
+                                video: video,
+                                audio: audio,
+                            },
+                            properties: {
+                                marks: "",
+                                complexity: "",
+                                priority: "",
+                                theme: "",
+                                test: [false, false, false, false, false],
+                                semester: [false, false, false, false, false],
+                                quiz: [false, false, false, false, false],
+                                learn: false,
+                            },
+                            settings: {
+                                virtual_keyboard: [],
+                                limited: false,
+                            },
+                        });
+                        this.setState({
+                            questions: values,
+                            keyboards: keyboards,
+                        });
+                    }
+                }
+            );
+        }
+    };
+
+    toggleDeleteModal = () => {
+        this.setState({
+            showMCQDelete_Modal: !this.state.showMCQDelete_Modal,
         });
     };
 
@@ -2144,7 +2003,7 @@ class Type1 extends Component {
                         topic_num: this.topicNum,
                         question: "<p>Question goes here</p>",
                         question_random_id: "",
-                        is_image_uploaded: false,
+                        is_file_uploaded: false,
                         content: {
                             mcq: true,
                             fill_in: false,
@@ -2167,29 +2026,9 @@ class Type1 extends Component {
                                 { correct: false, content: "" },
                             ],
                             explanation: "<p>Explanation goes here</p>",
-                            images: [
-                                {
-                                    title: "",
-                                    file_name: "",
-                                    image: null,
-                                    path: "",
-                                },
-                            ],
-                            video: {
-                                title: "",
-                                file_name: "",
-                                video: null,
-                                path: "",
-                                url: "",
-                            },
-                            audio: [
-                                {
-                                    title: "",
-                                    file_name: "",
-                                    audio: null,
-                                    path: "",
-                                },
-                            ],
+                            images: images,
+                            video: video,
+                            audio: audio,
                         },
                         properties: {
                             marks: "",
@@ -2290,38 +2129,6 @@ class Type1 extends Component {
     render() {
         let data = [...this.state.questions];
         let boards = [...this.state.keyboards];
-        let isImageAvailable = false;
-        if (this.state.activeQuestion !== "") {
-            if (data[this.state.activeQuestion].content !== undefined) {
-                for (
-                    let i = 0;
-                    i < data[this.state.activeQuestion].content.images.length;
-                    i++
-                ) {
-                    isImageAvailable =
-                        data[this.state.activeQuestion].content.images[i]
-                            .path !== ""
-                            ? true
-                            : false;
-                }
-            }
-        }
-        let isAudioAvailable = false;
-        if (this.state.activeQuestion !== "") {
-            if (data[this.state.activeQuestion].content !== undefined) {
-                for (
-                    let i = 0;
-                    i < data[this.state.activeQuestion].content.audio.length;
-                    i++
-                ) {
-                    isAudioAvailable =
-                        data[this.state.activeQuestion].content.audio[i]
-                            .path !== ""
-                            ? true
-                            : false;
-                }
-            }
-        }
         return (
             <div className="wrapper">
                 {/* Navbar */}
@@ -2358,7 +2165,7 @@ class Type1 extends Component {
                 {this.state.showMCQDelete_Modal ? (
                     <ContentDeleteModal
                         show={this.state.showMCQDelete_Modal}
-                        onHide={this.closeMCQ_DeleteModal}
+                        onHide={this.toggleDeleteModal}
                         formSubmission={this.handleMCQ_Deletion}
                         url={`${this.url}/teacher/subject/${this.subjectId}/chapter/mcq/`}
                         type="question"
@@ -2368,7 +2175,7 @@ class Type1 extends Component {
                             topic_num: this.topicNum,
                             question_random_id: this.state.selectedQuestion,
                         }}
-                        toggleModal={this.closeMCQ_DeleteModal}
+                        toggleModal={this.toggleDeleteModal}
                     />
                 ) : null}
 
@@ -2565,7 +2372,7 @@ class Type1 extends Component {
                                                                 type="button"
                                                                 className="btn btn-light bg-white btn-block shadow-sm"
                                                                 onClick={() =>
-                                                                    this.removingQuestions(
+                                                                    this.deleteQuestion(
                                                                         q_index
                                                                     )
                                                                 }
@@ -2804,7 +2611,7 @@ class Type1 extends Component {
 
                                 <button
                                     className="btn btn-primary btn-block shadow-none"
-                                    onClick={this.addNewQuestion}
+                                    onClick={this.handleAddQuestion}
                                 >
                                     Add +
                                 </button>
@@ -2827,6 +2634,7 @@ class Type1 extends Component {
                                                 this.setState({
                                                     showEdit_option: false,
                                                     contentCollapsed: true,
+                                                    filesCollapsed: true,
                                                     propertiesCollapsed: true,
                                                     settingsCollapsed: true,
                                                     activeQuestion: "",
@@ -2838,7 +2646,7 @@ class Type1 extends Component {
                                     </div>
 
                                     <Accordion defaultActiveKey="">
-                                        {/* Content | image / video */}
+                                        {/* ---------- Content ---------- */}
                                         <Card className="shadow-sm mb-2">
                                             <Accordion.Toggle
                                                 as={Card.Body}
@@ -2853,7 +2661,7 @@ class Type1 extends Component {
                                                 }
                                             >
                                                 <div className="d-flex justify-content-between align-items-center">
-                                                    Content | Image / Video
+                                                    Content
                                                     {this.state
                                                         .contentCollapsed ? (
                                                         <i className="fas fa-angle-right "></i>
@@ -3254,31 +3062,41 @@ class Type1 extends Component {
                                                             }
                                                         />
                                                     </div>
+                                                </Card.Body>
+                                            </Accordion.Collapse>
+                                        </Card>
 
+                                        {/* ---------- Image | Video | Audio ---------- */}
+                                        <Card className="shadow-sm mb-2">
+                                            <Accordion.Toggle
+                                                as={Card.Body}
+                                                variant="link"
+                                                eventKey="1"
+                                                className="text-dark"
+                                                style={{ cursor: "default" }}
+                                                onClick={() =>
+                                                    this.toggleCollapse("files")
+                                                }
+                                            >
+                                                <div className="d-flex justify-content-between align-items-center">
+                                                    Image | Video | Audio
+                                                    {this.state
+                                                        .filesCollapsed ? (
+                                                        <i className="fas fa-angle-right "></i>
+                                                    ) : (
+                                                        <i className="fas fa-angle-down "></i>
+                                                    )}
+                                                </div>
+                                            </Accordion.Toggle>
+
+                                            <Accordion.Collapse eventKey="1">
+                                                <Card.Body className="p-3">
                                                     {/* ---------- Image ---------- */}
-
                                                     <div className="form-group">
                                                         <div className="row align-items-center mb-2">
                                                             <div className="col-md-6">
                                                                 <p className="mb-0">
                                                                     Image
-                                                                    <OverlayTrigger
-                                                                        key="right"
-                                                                        placement="right"
-                                                                        overlay={
-                                                                            <Tooltip id="tooltip">
-                                                                                You
-                                                                                can
-                                                                                upload
-                                                                                Max
-                                                                                of
-                                                                                04
-                                                                                Images
-                                                                            </Tooltip>
-                                                                        }
-                                                                    >
-                                                                        <i className="fas fa-info-circle fa-xs ml-2"></i>
-                                                                    </OverlayTrigger>
                                                                 </p>
                                                             </div>
                                                             <div className="col-md-6 text-right">
@@ -3299,10 +3117,12 @@ class Type1 extends Component {
                                                         ].content.images.map(
                                                             (
                                                                 options,
-                                                                index
+                                                                image_index
                                                             ) => (
                                                                 <Fragment
-                                                                    key={index}
+                                                                    key={
+                                                                        image_index
+                                                                    }
                                                                 >
                                                                     <div
                                                                         className="input-group border-secondary mb-1"
@@ -3314,10 +3134,10 @@ class Type1 extends Component {
                                                                         <input
                                                                             type="text"
                                                                             className="form-control form-control-sm"
-                                                                            id={`image${index}`}
+                                                                            id={`image${image_index}`}
                                                                             name="image"
                                                                             placeholder={`Image title 0${
-                                                                                index +
+                                                                                image_index +
                                                                                 1
                                                                             }`}
                                                                             value={
@@ -3327,7 +3147,7 @@ class Type1 extends Component {
                                                                                 event
                                                                             ) =>
                                                                                 this.handleImageTitle(
-                                                                                    index,
+                                                                                    image_index,
                                                                                     event
                                                                                 )
                                                                             }
@@ -3343,8 +3163,8 @@ class Type1 extends Component {
                                                                                     type="button"
                                                                                     className="btn btn-light btn-sm shadow-none"
                                                                                     onClick={() =>
-                                                                                        this.handleRemoveImageFields(
-                                                                                            index
+                                                                                        this.handleDeleteImages(
+                                                                                            image_index
                                                                                         )
                                                                                     }
                                                                                 >
@@ -3357,21 +3177,29 @@ class Type1 extends Component {
                                                                         <input
                                                                             type="file"
                                                                             className="custom-file-input"
-                                                                            id={`file${index}`}
+                                                                            id={`file${image_index}`}
                                                                             accept="image/*"
                                                                             aria-describedby="inputGroupFileAddon01"
                                                                             onChange={(
                                                                                 event
                                                                             ) =>
                                                                                 this.handleImageFile(
-                                                                                    index,
+                                                                                    image_index,
                                                                                     event
                                                                                 )
+                                                                            }
+                                                                            disabled={
+                                                                                options.file_name !==
+                                                                                    "" ||
+                                                                                options.path !==
+                                                                                    ""
+                                                                                    ? true
+                                                                                    : false
                                                                             }
                                                                         />
                                                                         <label
                                                                             className="custom-file-label"
-                                                                            htmlFor={`file${index}`}
+                                                                            htmlFor={`file${image_index}`}
                                                                         >
                                                                             {options.file_name ===
                                                                             ""
@@ -3392,33 +3220,6 @@ class Type1 extends Component {
                                                             Select only .png
                                                             .jpg .jpeg .webp
                                                         </small>
-
-                                                        {data[
-                                                            this.state
-                                                                .activeQuestion
-                                                        ].content.images
-                                                            .length <
-                                                        this.image_limit ? (
-                                                            <div className="form-group mb-0">
-                                                                <button
-                                                                    className="btn btn-light btn-block border-secondary btn-sm"
-                                                                    onClick={
-                                                                        this
-                                                                            .handleAddImageFields
-                                                                    }
-                                                                    disabled={
-                                                                        isImageAvailable ===
-                                                                        true
-                                                                            ? false
-                                                                            : true
-                                                                    }
-                                                                >
-                                                                    Add +
-                                                                </button>
-                                                            </div>
-                                                        ) : (
-                                                            ""
-                                                        )}
                                                     </div>
 
                                                     {/* ---------- Video ---------- */}
@@ -3448,16 +3249,16 @@ class Type1 extends Component {
                                                             id="video"
                                                             placeholder="Video title"
                                                             className="form-control form-control-sm border-secondary mb-1"
-                                                            onChange={
-                                                                this
-                                                                    .handleVideoTitle
-                                                            }
                                                             value={
                                                                 data[
                                                                     this.state
                                                                         .activeQuestion
                                                                 ].content.video
                                                                     .title
+                                                            }
+                                                            onChange={
+                                                                this
+                                                                    .handleVideoTitle
                                                             }
                                                             autoComplete="off"
                                                         />
@@ -3474,6 +3275,34 @@ class Type1 extends Component {
                                                                     this.handleVideoFile(
                                                                         event
                                                                     )
+                                                                }
+                                                                disabled={
+                                                                    data[
+                                                                        this
+                                                                            .state
+                                                                            .activeQuestion
+                                                                    ].content
+                                                                        .video
+                                                                        .file_name !==
+                                                                        "" ||
+                                                                    data[
+                                                                        this
+                                                                            .state
+                                                                            .activeQuestion
+                                                                    ].content
+                                                                        .video
+                                                                        .path !==
+                                                                        "" ||
+                                                                    data[
+                                                                        this
+                                                                            .state
+                                                                            .activeQuestion
+                                                                    ].content
+                                                                        .video
+                                                                        .url !==
+                                                                        ""
+                                                                        ? true
+                                                                        : false
                                                                 }
                                                             />
                                                             <label
@@ -3521,7 +3350,6 @@ class Type1 extends Component {
                                                                     event
                                                                 )
                                                             }
-                                                            autoComplete="off"
                                                             value={
                                                                 data[
                                                                     this.state
@@ -3529,6 +3357,22 @@ class Type1 extends Component {
                                                                 ].content.video
                                                                     .url
                                                             }
+                                                            disabled={
+                                                                data[
+                                                                    this.state
+                                                                        .activeQuestion
+                                                                ].content.video
+                                                                    .file_name !==
+                                                                    "" ||
+                                                                data[
+                                                                    this.state
+                                                                        .activeQuestion
+                                                                ].content.video
+                                                                    .path !== ""
+                                                                    ? true
+                                                                    : false
+                                                            }
+                                                            autoComplete="off"
                                                         />
                                                         <small className="form-text text-muted mb-2">
                                                             Only https supported
@@ -3543,23 +3387,6 @@ class Type1 extends Component {
                                                             <div className="col-md-6">
                                                                 <p className="mb-0">
                                                                     Audio
-                                                                    <OverlayTrigger
-                                                                        key="right"
-                                                                        placement="right"
-                                                                        overlay={
-                                                                            <Tooltip id="tooltip">
-                                                                                You
-                                                                                can
-                                                                                upload
-                                                                                Max
-                                                                                of
-                                                                                02
-                                                                                Audio
-                                                                            </Tooltip>
-                                                                        }
-                                                                    >
-                                                                        <i className="fas fa-info-circle fa-xs ml-2"></i>
-                                                                    </OverlayTrigger>
                                                                 </p>
                                                             </div>
                                                             <div className="col-md-6 text-right">
@@ -3580,10 +3407,12 @@ class Type1 extends Component {
                                                         ].content.audio.map(
                                                             (
                                                                 options,
-                                                                index
+                                                                audio_index
                                                             ) => (
                                                                 <Fragment
-                                                                    key={index}
+                                                                    key={
+                                                                        audio_index
+                                                                    }
                                                                 >
                                                                     <div
                                                                         className="input-group border-secondary mb-1"
@@ -3595,10 +3424,10 @@ class Type1 extends Component {
                                                                         <input
                                                                             type="text"
                                                                             className="form-control form-control-sm"
-                                                                            id={`audio${index}`}
+                                                                            id={`audio${audio_index}`}
                                                                             name="audio"
                                                                             placeholder={`Audio title 0${
-                                                                                index +
+                                                                                audio_index +
                                                                                 1
                                                                             }`}
                                                                             value={
@@ -3608,7 +3437,7 @@ class Type1 extends Component {
                                                                                 event
                                                                             ) =>
                                                                                 this.handleAudioTitle(
-                                                                                    index,
+                                                                                    audio_index,
                                                                                     event
                                                                                 )
                                                                             }
@@ -3624,8 +3453,8 @@ class Type1 extends Component {
                                                                                     type="button"
                                                                                     className="btn btn-light btn-sm shadow-none"
                                                                                     onClick={() =>
-                                                                                        this.handleRemoveAudioFields(
-                                                                                            index
+                                                                                        this.handleDeleteAudio(
+                                                                                            audio_index
                                                                                         )
                                                                                     }
                                                                                 >
@@ -3638,21 +3467,29 @@ class Type1 extends Component {
                                                                         <input
                                                                             type="file"
                                                                             className="custom-file-input"
-                                                                            id={`audio${index}`}
+                                                                            id={`audio${audio_index}`}
                                                                             accept="audio/*"
                                                                             aria-describedby="inputGroupFileAddon01"
                                                                             onChange={(
                                                                                 event
                                                                             ) =>
                                                                                 this.handleAudioFile(
-                                                                                    index,
+                                                                                    audio_index,
                                                                                     event
                                                                                 )
+                                                                            }
+                                                                            disabled={
+                                                                                options.file_name !==
+                                                                                    "" ||
+                                                                                options.path !==
+                                                                                    ""
+                                                                                    ? true
+                                                                                    : false
                                                                             }
                                                                         />
                                                                         <label
                                                                             className="custom-file-label"
-                                                                            htmlFor={`audio${index}`}
+                                                                            htmlFor={`audio${audio_index}`}
                                                                         >
                                                                             {options.file_name ===
                                                                             ""
@@ -3673,32 +3510,6 @@ class Type1 extends Component {
                                                             Select only .wav
                                                             .mp3
                                                         </small>
-
-                                                        {data[
-                                                            this.state
-                                                                .activeQuestion
-                                                        ].content.audio.length <
-                                                        this.audio_limit ? (
-                                                            <div className="form-group mb-0">
-                                                                <button
-                                                                    className="btn btn-light btn-block border-secondary btn-sm"
-                                                                    onClick={
-                                                                        this
-                                                                            .handleAddAudioFields
-                                                                    }
-                                                                    disabled={
-                                                                        isAudioAvailable ===
-                                                                        true
-                                                                            ? false
-                                                                            : true
-                                                                    }
-                                                                >
-                                                                    Add +
-                                                                </button>
-                                                            </div>
-                                                        ) : (
-                                                            ""
-                                                        )}
                                                     </div>
                                                 </Card.Body>
                                             </Accordion.Collapse>
@@ -3709,7 +3520,7 @@ class Type1 extends Component {
                                             <Accordion.Toggle
                                                 as={Card.Body}
                                                 variant="link"
-                                                eventKey="1"
+                                                eventKey="2"
                                                 className="text-dark"
                                                 style={{ cursor: "default" }}
                                                 onClick={() =>
@@ -3729,7 +3540,7 @@ class Type1 extends Component {
                                                 </div>
                                             </Accordion.Toggle>
 
-                                            <Accordion.Collapse eventKey="1">
+                                            <Accordion.Collapse eventKey="2">
                                                 <Card.Body className="p-3">
                                                     {/* ---------- Marks ---------- */}
                                                     <div className="form-group row align-items-center">
@@ -4060,7 +3871,7 @@ class Type1 extends Component {
                                             <Accordion.Toggle
                                                 as={Card.Body}
                                                 variant="link"
-                                                eventKey="2"
+                                                eventKey="3"
                                                 className="text-dark"
                                                 style={{ cursor: "default" }}
                                                 onClick={this.toggleCollapse}
@@ -4076,7 +3887,7 @@ class Type1 extends Component {
                                                 </div>
                                             </Accordion.Toggle>
 
-                                            <Accordion.Collapse eventKey="2">
+                                            <Accordion.Collapse eventKey="3">
                                                 <Card.Body className="p-3">
                                                     {/* ---------- Virtual keyboard ---------- */}
                                                     <div className="form-group">

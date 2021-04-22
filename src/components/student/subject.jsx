@@ -613,8 +613,8 @@ class Subject extends Component {
         return result;
     };
 
-    // loads chapter and topic data
-    componentDidMount = () => {
+    // loads chapter, topic and semester data
+    loadSubjectData = () => {
         fetch(`${this.url}/student/subject/${this.subjectId}/`, {
             method: "GET",
             headers: this.headers,
@@ -623,9 +623,6 @@ class Subject extends Component {
             .then((result) => {
                 console.log(result);
                 if (result.sts === true) {
-                    this.setState({
-                        subjectItems: result.data,
-                    });
                     let topics = [];
                     let all_chapters = [];
                     let semester_chapters = [];
@@ -664,6 +661,7 @@ class Subject extends Component {
                         }
                     }
                     this.setState({
+                        subjectItems: result.data,
                         topics: topics,
                         all_chapters: all_chapters,
                         semester_chapters: semester_chapters,
@@ -679,6 +677,10 @@ class Subject extends Component {
             .catch((err) => {
                 console.log(err);
             });
+    };
+
+    componentDidMount = () => {
+        this.loadSubjectData()
     };
 
     // Topic completion toggle
@@ -752,10 +754,7 @@ class Subject extends Component {
                             showSuccessAlert: true,
                         },
                         () => {
-                            this.loadTopicCompletedData(
-                                chapter_id,
-                                chapter_index
-                            );
+                            this.loadSubjectData()
                         }
                     );
                 } else {

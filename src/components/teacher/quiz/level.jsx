@@ -189,6 +189,12 @@ class QuizLevel extends Component {
                 showErrorAlert: true,
                 page_loading: false,
             });
+        } else if (quiz[index].min_points === "") {
+            this.setState({
+                errorMsg: "Enter the min points",
+                showErrorAlert: true,
+                page_loading: false,
+            });
         } else if (quiz[index].bonus_points === "") {
             this.setState({
                 errorMsg: "Enter the bonus points",
@@ -372,7 +378,7 @@ class QuizLevel extends Component {
                         <div className="row align-items-center justify-content-end mb-3">
                             <div className="col-md-8">
                                 <div className="row align-items-center">
-                                    <div className="col-md-5">
+                                    <div className="col-md-5 mb-2 mb-md-0">
                                         <div className="row">
                                             <label className="col-4 col-form-label">
                                                 Total Points
@@ -392,7 +398,7 @@ class QuizLevel extends Component {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="col-md-4">
+                                    <div className="col-md-4 mb-2 mb-md-0">
                                         <Select
                                             className="basic-single form-shadow"
                                             placeholder={
@@ -446,8 +452,8 @@ class QuizLevel extends Component {
                                 style={{ minWidth: "1100px" }}
                             >
                                 <div className="row">
-                                    <div className="col-3">Quiz level</div>
-                                    <div className="col-9">
+                                    <div className="col-2">Quiz level</div>
+                                    <div className="col-10">
                                         <div className="row">
                                             <div className="col-2">
                                                 Points / Questions
@@ -455,13 +461,20 @@ class QuizLevel extends Component {
                                             <div className="col-2">
                                                 Total Questions
                                             </div>
-                                            <div className="col-2">
-                                                Max Points
-                                            </div>
                                             <div className="col-3">
+                                                <div className="row">
+                                                    <div className="col-6">
+                                                        Max Points
+                                                    </div>
+                                                    <div className="col-6">
+                                                        Min Points
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="col-2">
                                                 Bonus Point / Sec
                                             </div>
-                                            <div className="col-2">
+                                            <div className="col-2 pr-0">
                                                 Time / Question
                                             </div>
                                             <div className="col-1 text-right">
@@ -481,7 +494,7 @@ class QuizLevel extends Component {
                                               key={index}
                                           >
                                               <div className="row">
-                                                  <div className="col-3">
+                                                  <div className="col-2">
                                                       <input
                                                           type="text"
                                                           className="form-control form-control-sm border-secondary"
@@ -501,7 +514,7 @@ class QuizLevel extends Component {
                                                           required
                                                       />
                                                   </div>
-                                                  <div className="col-9">
+                                                  <div className="col-10">
                                                       <div className="row">
                                                           <div className="col-2">
                                                               <input
@@ -541,26 +554,49 @@ class QuizLevel extends Component {
                                                                   required
                                                               />
                                                           </div>
-                                                          <div className="col-2">
-                                                              <input
-                                                                  type="text"
-                                                                  className="form-control form-control-sm border-secondary text-center"
-                                                                  value={
-                                                                      quiz.max_points
-                                                                  }
-                                                                  onChange={(
-                                                                      event
-                                                                  ) =>
-                                                                      this.handleInput(
-                                                                          event,
-                                                                          index,
-                                                                          "max_points"
-                                                                      )
-                                                                  }
-                                                                  required
-                                                              />
-                                                          </div>
                                                           <div className="col-3">
+                                                              <div className="row">
+                                                                  <div className="col-6">
+                                                                      <input
+                                                                          type="text"
+                                                                          className="form-control form-control-sm border-secondary text-center"
+                                                                          value={
+                                                                              quiz.max_points
+                                                                          }
+                                                                          onChange={(
+                                                                              event
+                                                                          ) =>
+                                                                              this.handleInput(
+                                                                                  event,
+                                                                                  index,
+                                                                                  "max_points"
+                                                                              )
+                                                                          }
+                                                                          required
+                                                                      />
+                                                                  </div>
+                                                                  <div className="col-6">
+                                                                      <input
+                                                                          type="text"
+                                                                          className="form-control form-control-sm border-secondary text-center"
+                                                                          value={
+                                                                              quiz.min_points
+                                                                          }
+                                                                          onChange={(
+                                                                              event
+                                                                          ) =>
+                                                                              this.handleInput(
+                                                                                  event,
+                                                                                  index,
+                                                                                  "min_points"
+                                                                              )
+                                                                          }
+                                                                          required
+                                                                      />
+                                                                  </div>
+                                                              </div>
+                                                          </div>
+                                                          <div className="col-2">
                                                               <div className="d-flex align-items-center">
                                                                   <input
                                                                       type="text"
@@ -601,7 +637,7 @@ class QuizLevel extends Component {
                                                                   />
                                                               </div>
                                                           </div>
-                                                          <div className="col-2">
+                                                          <div className="col-2 pr-0">
                                                               <div
                                                                   className="input-group input-group-sm border-secondary rounded-lg"
                                                                   style={{

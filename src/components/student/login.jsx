@@ -1,125 +1,10 @@
-import React, { Component, useState } from "react";
-import { Alert, Spinner, Modal } from "react-bootstrap";
+import React, { Component } from "react";
+import { Alert, Spinner } from "react-bootstrap";
 import { Link, Redirect } from "react-router-dom";
 import { baseUrl, accountsUrl, adminPathUrl } from "../../shared/baseUrl.js";
 import Footer from "./shared/footer";
 import AccountNavbar from "./shared/accountNavbar";
-
-function ForgotPasswordModal(props) {
-    const [email, setEmail] = useState("");
-    const [errorMsg, setErrorMsg] = useState("");
-    const [successMsg, setSuccessMsg] = useState("");
-    const [showErrorAlert, setErrorAlert] = useState(false);
-    const [showSuccessAlert, setSuccessAlert] = useState(false);
-    const [showLoader, setLoader] = useState(false);
-
-    function handleSubmit(event) {
-        event.preventDefault();
-        var url = baseUrl + accountsUrl;
-        var authToken = localStorage.getItem("Authorization");
-        var headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: authToken,
-        };
-
-        setLoader(true);
-        setErrorAlert(false);
-        setSuccessAlert(false);
-
-        fetch(`${url}/forgotpassword/`, {
-            headers: headers,
-            method: "POST",
-            body: JSON.stringify({
-                email: email,
-            }),
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts) {
-                    setSuccessMsg(result.msg);
-                    setSuccessAlert(true);
-                    setLoader(false);
-                    setTimeout(() => {
-                        props.formSubmission(true);
-                    }, 2500);
-                } else {
-                    setErrorMsg(result.msg);
-                    setErrorAlert(true);
-                    setLoader(false);
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    }
-
-    return (
-        <Modal
-            {...props}
-            size="md"
-            aria-labelledby="contained-modal-title-vcenter"
-            centered
-        >
-            <Modal.Header closeButton>Forgot password</Modal.Header>
-            <form onSubmit={handleSubmit} autoComplete="off">
-                <Modal.Body>
-                    <Alert
-                        variant="danger"
-                        show={showErrorAlert}
-                        onClose={() => {
-                            setErrorAlert(false);
-                        }}
-                        dismissible
-                    >
-                        {errorMsg}
-                    </Alert>
-                    <Alert
-                        variant="success"
-                        show={showSuccessAlert}
-                        onClose={() => {
-                            setSuccessAlert(false);
-                        }}
-                        dismissible
-                    >
-                        {successMsg}
-                    </Alert>
-
-                    <label htmlFor="email">Email</label>
-                    <input
-                        type="email"
-                        name="email"
-                        id="email"
-                        className="form-control borders"
-                        placeholder="Enter your email ID"
-                        onChange={(event) => {
-                            setEmail(event.target.value);
-                        }}
-                        required
-                    />
-                </Modal.Body>
-                <Modal.Footer>
-                    <button className="btn btn-primary btn-block shadow-none">
-                        {showLoader ? (
-                            <Spinner
-                                as="span"
-                                animation="border"
-                                size="sm"
-                                role="status"
-                                aria-hidden="true"
-                                className="mr-2"
-                            />
-                        ) : (
-                            ""
-                        )}
-                        Send Email
-                    </button>
-                </Modal.Footer>
-            </form>
-        </Modal>
-    );
-}
+import { ForgotPasswordModal } from "../sharedComponents/forgotPassword";
 
 class StudentLogin extends Component {
     constructor(props) {
@@ -281,24 +166,12 @@ class StudentLogin extends Component {
         document.title = "Login - Student | IQLabs";
     };
 
-    componentDidUpdate = (prevProps, prevState) => {
-        if (
-            prevState.is_formSubmitted !== this.state.is_formSubmitted &&
-            this.state.is_formSubmitted === true
-        ) {
+    formSubmission = () => {
+        setTimeout(() => {
             this.setState({
-                showModal: !this.state.showModal,
-                is_formSubmitted: false,
+                showModal: false,
             });
-        }
-    };
-
-    formSubmission = (is_formSubmitted) => {
-        if (is_formSubmitted) {
-            this.setState({
-                is_formSubmitted: true,
-            });
-        }
+        }, 2500);
     };
 
     render() {

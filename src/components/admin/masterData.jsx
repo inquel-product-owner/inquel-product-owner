@@ -3,18 +3,191 @@ import Header from "./navbar";
 import SideNav from "./sidenav";
 import { Link } from "react-router-dom";
 import Select from "react-select";
+import { Modal, Spinner, Alert } from "react-bootstrap";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
 import Loading from "../sharedComponents/loader";
 import AlertBox from "../sharedComponents/alert";
+
+class ContentAdding extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            data: {},
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: false,
+        };
+        this.url = baseUrl + adminPathUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
+    }
+
+    componentDidMount = () => {
+        this.setState({
+            data: this.props.data,
+        });
+    };
+
+    handleSubmit = (event) => {
+        event.preventDefault();
+        this.setState({
+            showLoader: true,
+        });
+
+        fetch(`${this.url}/data/master/`, {
+            headers: this.headers,
+            method: "PUT",
+            body: JSON.stringify(this.state.data),
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        showLoader: false,
+                    });
+                    this.props.formSubmission();
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    handleInput = (event) => {
+        let data = this.state.data;
+        if (this.props.type === "category") {
+            data.category[event.target.name] = event.target.value;
+        }
+        if (this.props.type === "sub_category") {
+            data.category.sub_category[event.target.name] = event.target.value;
+        }
+        if (
+            this.props.type === "discipline" ||
+            this.props.type === "level" ||
+            this.props.type === "subject"
+        ) {
+            data.category.sub_category[this.props.type][event.target.name] =
+                event.target.value;
+        }
+        if (this.props.type === "board" || this.props.type === "course") {
+            data[this.props.type][event.target.name] = event.target.value;
+        }
+        this.setState({
+            data: data,
+        });
+    };
+
+    render() {
+        return (
+            <Modal
+                show={this.props.show}
+                onHide={this.props.onHide}
+                size="md"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Header closeButton>Add master data</Modal.Header>
+                <form onSubmit={this.handleSubmit} autoComplete="off">
+                    <Modal.Body>
+                        <Alert
+                            variant="danger"
+                            show={this.state.showErrorAlert}
+                            onClose={() => {
+                                this.setState({
+                                    showErrorAlert: false,
+                                });
+                            }}
+                            dismissible
+                        >
+                            {this.state.errorMsg}
+                        </Alert>
+                        <Alert
+                            variant="success"
+                            show={this.state.showSuccessAlert}
+                            onClose={() => {
+                                this.setState({
+                                    showSuccessAlert: false,
+                                });
+                            }}
+                            dismissible
+                        >
+                            {this.state.successMsg}
+                        </Alert>
+
+                        <div className="form-group">
+                            <label htmlFor="code">Code</label>
+                            <input
+                                type="text"
+                                name="code"
+                                id="code"
+                                className="form-control borders"
+                                onChange={this.handleInput}
+                                placeholder="Enter code"
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="title">Title</label>
+                            <input
+                                type="text"
+                                name="title"
+                                id="title"
+                                className="form-control borders"
+                                onChange={this.handleInput}
+                                placeholder="Enter title"
+                                required
+                            />
+                        </div>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <button className="btn btn-primary btn-block shadow-none">
+                            {this.state.showLoader ? (
+                                <Spinner
+                                    as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    aria-hidden="true"
+                                    className="mr-2"
+                                />
+                            ) : (
+                                ""
+                            )}
+                            Add
+                        </button>
+                    </Modal.Footer>
+                </form>
+            </Modal>
+        );
+    }
+}
 
 class MasterData extends Component {
     constructor(props) {
         super(props);
         this.state = {
             showSideNav: false,
-            activeType: "category",
-            activeCategory: "",
-            activeSubcategory: "",
+            showModal: false,
+            activeType: "",
+            selectedCategory: { label: "", value: "" },
+            selectedSubcategory: { label: "", value: "" },
+            contentAddingType: "",
+            selectedData: "",
 
             category: [],
             subcategory: [],
@@ -29,7 +202,7 @@ class MasterData extends Component {
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
-            page_loading: false,
+            page_loading: true,
         };
         this.url = baseUrl + adminPathUrl;
         this.authToken = localStorage.getItem("Inquel-Auth");
@@ -49,14 +222,12 @@ class MasterData extends Component {
     handleType = (event) => {
         this.setState({
             activeType: event.value,
-            activeCategory: "",
-            activeSubcategory: "",
+            selectedCategory: { label: "", value: "" },
+            selectedSubcategory: { label: "", value: "" },
         });
     };
 
-    componentDidMount = () => {
-        document.title = "Master Data - Admin | IQLabs";
-
+    loadMasterData = () => {
         fetch(`${this.url}/data/filter/`, {
             headers: this.headers,
             method: "GET",
@@ -68,13 +239,15 @@ class MasterData extends Component {
                         category: result.data.CATEGORY,
                         board: result.data.BOARD,
                         type: result.data.TYPE,
-                        activeCategory: "",
-                        activeSubcategory: "",
+                        selectedCategory: { label: "", value: "" },
+                        selectedSubcategory: { label: "", value: "" },
+                        page_loading: false,
                     });
                 } else {
                     this.setState({
                         errorMsg: result.detail ? result.detail : result.msg,
                         showErrorAlert: true,
+                        page_loading: false,
                     });
                 }
                 console.log(result);
@@ -84,12 +257,21 @@ class MasterData extends Component {
             });
     };
 
+    componentDidMount = () => {
+        document.title = "Master Data - Admin | IQLabs";
+
+        this.loadMasterData();
+    };
+
     handleCategory = (event) => {
+        let category = this.state.selectedCategory;
+        category.label = event.label;
+        category.value = event.value;
         this.setState({
-            activeCategory: event.value,
+            selectedCategory: category,
             subcategory: [],
             discipline: [],
-            activeSubcategory: "",
+            selectedSubcategory: { label: "", value: "" },
             subcategory_loading: true,
         });
 
@@ -122,8 +304,11 @@ class MasterData extends Component {
     };
 
     handleSubcategory = (event) => {
+        let sub_category = this.state.selectedSubcategory;
+        sub_category.label = event.label;
+        sub_category.value = event.value;
         this.setState({
-            activeSubcategory: event.value,
+            selectedSubcategory: sub_category,
             page_loading: true,
         });
 
@@ -137,7 +322,7 @@ class MasterData extends Component {
 
         if (event.value !== "") {
             fetch(
-                `${url}/data/filter/?category=${this.state.activeCategory}&sub_category=${event.value}`,
+                `${url}/data/filter/?category=${this.state.selectedCategory.value}&sub_category=${event.value}`,
                 {
                     headers: headers,
                     method: "GET",
@@ -169,6 +354,90 @@ class MasterData extends Component {
         }
     };
 
+    toggleModal = (type) => {
+        if (type === "category") {
+            this.setState({
+                selectedData: {
+                    category: {
+                        code: "",
+                        title: "",
+                    },
+                    category_update: true,
+                },
+            });
+        }
+        if (type === "sub_category") {
+            this.setState({
+                selectedData: {
+                    category: {
+                        code: this.state.selectedCategory.value,
+                        sub_category: {
+                            code: "",
+                            title: "",
+                        },
+                    },
+                    sub_category_update: true,
+                },
+            });
+        }
+        if (type === "discipline" || type === "level" || type === "subject") {
+            this.setState({
+                selectedData: {
+                    category: {
+                        code: this.state.selectedCategory.value,
+                        sub_category: {
+                            code: this.state.selectedSubcategory.value,
+                            [type]: {
+                                code: "",
+                                title: "",
+                            },
+                        },
+                    },
+                    [`${type}_update`]: true,
+                },
+            });
+        }
+        if (type === "board" || type === "course") {
+            this.setState({
+                selectedData: {
+                    [type]: {
+                        code: "",
+                        title: "",
+                    },
+                },
+            });
+        }
+        this.setState({
+            contentAddingType: type,
+            showModal: !this.state.showModal,
+        });
+    };
+
+    formSubmission = () => {
+        setTimeout(() => {
+            this.setState({
+                showModal: false,
+            });
+            if (
+                this.state.contentAddingType === "category" ||
+                this.state.contentAddingType === "board" ||
+                this.state.contentAddingType === "course"
+            ) {
+                this.loadMasterData();
+            }
+            if (this.state.contentAddingType === "sub_category") {
+                this.handleCategory(this.state.selectedCategory);
+            }
+            if (
+                this.state.contentAddingType === "discipline" ||
+                this.state.contentAddingType === "level" ||
+                this.state.contentAddingType === "subject"
+            ) {
+                this.handleSubcategory(this.state.selectedSubcategory);
+            }
+        }, 1000);
+    };
+
     render() {
         return (
             <div className="wrapper">
@@ -198,6 +467,18 @@ class MasterData extends Component {
                         });
                     }}
                 />
+
+                {this.state.showModal ? (
+                    <ContentAdding
+                        show={this.state.showModal}
+                        onHide={this.toggleModal}
+                        formSubmission={this.formSubmission}
+                        type={this.state.contentAddingType}
+                        data={this.state.selectedData}
+                    />
+                ) : (
+                    ""
+                )}
 
                 <div
                     className={`section content ${
@@ -239,7 +520,7 @@ class MasterData extends Component {
                             </div>
                         </div>
 
-                        {/* Options */}
+                        {/* ----- Options ----- */}
                         <div className="row">
                             <div className="col-md-3 mb-3 mb-md-0">
                                 <div className="card shadow-sm">
@@ -277,13 +558,6 @@ class MasterData extends Component {
                                             </label>
                                             <Select
                                                 className="basic-single form-shadow"
-                                                placeholder="Select category"
-                                                isDisabled={
-                                                    this.state.activeType ===
-                                                    "category"
-                                                        ? false
-                                                        : true
-                                                }
                                                 isSearchable={true}
                                                 name="category"
                                                 options={this.state.category.map(
@@ -294,12 +568,40 @@ class MasterData extends Component {
                                                         };
                                                     }
                                                 )}
+                                                value={
+                                                    this.state.selectedCategory
+                                                        .label !== ""
+                                                        ? this.state
+                                                              .selectedCategory
+                                                        : {
+                                                              label:
+                                                                  "Select category",
+                                                              value: "",
+                                                          }
+                                                }
+                                                isDisabled={
+                                                    this.state.activeType ===
+                                                    "category"
+                                                        ? false
+                                                        : true
+                                                }
                                                 onChange={this.handleCategory}
                                                 required
                                             />
                                         </div>
 
-                                        <button className="btn btn-light btn-sm btn-block border-secondary shadow-none mb-2">
+                                        <button
+                                            className="btn btn-light btn-sm btn-block border-secondary shadow-none mb-2"
+                                            onClick={() =>
+                                                this.toggleModal("category")
+                                            }
+                                            disabled={
+                                                this.state.activeType ===
+                                                "category"
+                                                    ? false
+                                                    : true
+                                            }
+                                        >
                                             Add +
                                         </button>
 
@@ -309,21 +611,14 @@ class MasterData extends Component {
                                             </label>
                                             <Select
                                                 className="basic-single form-shadow"
-                                                placeholder="Select subcategory"
-                                                isDisabled={
-                                                    this.state
-                                                        .activeCategory === ""
-                                                        ? true
-                                                        : false
-                                                }
+                                                isSearchable={true}
+                                                name="subcategory"
                                                 isLoading={
                                                     this.state
                                                         .subcategory_loading
                                                         ? true
                                                         : false
                                                 }
-                                                isSearchable={true}
-                                                name="subcategory"
                                                 options={this.state.subcategory.map(
                                                     function (list) {
                                                         return {
@@ -332,6 +627,24 @@ class MasterData extends Component {
                                                         };
                                                     }
                                                 )}
+                                                value={
+                                                    this.state
+                                                        .selectedSubcategory
+                                                        .label !== ""
+                                                        ? this.state
+                                                              .selectedSubcategory
+                                                        : {
+                                                              label:
+                                                                  "Select subcategory",
+                                                              value: "",
+                                                          }
+                                                }
+                                                isDisabled={
+                                                    this.state.selectedCategory
+                                                        .value === ""
+                                                        ? true
+                                                        : false
+                                                }
                                                 onChange={
                                                     this.handleSubcategory
                                                 }
@@ -339,7 +652,18 @@ class MasterData extends Component {
                                             />
                                         </div>
 
-                                        <button className="btn btn-light btn-sm btn-block border-secondary shadow-none">
+                                        <button
+                                            className="btn btn-light btn-sm btn-block border-secondary shadow-none"
+                                            onClick={() =>
+                                                this.toggleModal("sub_category")
+                                            }
+                                            disabled={
+                                                this.state.selectedCategory
+                                                    .value === ""
+                                                    ? true
+                                                    : false
+                                            }
+                                        >
                                             Add +
                                         </button>
                                     </div>
@@ -347,10 +671,10 @@ class MasterData extends Component {
                             </div>
 
                             <div className="col-md-9">
-                                {/* Category Data */}
+                                {/* ----- Category Data ----- */}
                                 {this.state.activeType === "category" &&
-                                this.state.activeCategory !== "" &&
-                                this.state.activeSubcategory !== "" ? (
+                                this.state.selectedCategory.value !== "" &&
+                                this.state.selectedSubcategory.value !== "" ? (
                                     <div className="row">
                                         <div className="col-md-4 mb-3 mb-md-0">
                                             <div className="card border-primary">
@@ -380,7 +704,14 @@ class MasterData extends Component {
                                                             Data not available
                                                         </p>
                                                     )}
-                                                    <button className="btn btn-light btn-sm btn-block border-secondary shadow-none">
+                                                    <button
+                                                        className="btn btn-light btn-sm btn-block border-secondary shadow-none"
+                                                        onClick={() =>
+                                                            this.toggleModal(
+                                                                "discipline"
+                                                            )
+                                                        }
+                                                    >
                                                         Add +
                                                     </button>
                                                 </div>
@@ -413,7 +744,14 @@ class MasterData extends Component {
                                                             Data not available
                                                         </p>
                                                     )}
-                                                    <button className="btn btn-light btn-sm btn-block border-secondary shadow-none">
+                                                    <button
+                                                        className="btn btn-light btn-sm btn-block border-secondary shadow-none"
+                                                        onClick={() =>
+                                                            this.toggleModal(
+                                                                "level"
+                                                            )
+                                                        }
+                                                    >
                                                         Add +
                                                     </button>
                                                 </div>
@@ -446,7 +784,14 @@ class MasterData extends Component {
                                                             Data not available
                                                         </p>
                                                     )}
-                                                    <button className="btn btn-light btn-sm btn-block border-secondary shadow-none">
+                                                    <button
+                                                        className="btn btn-light btn-sm btn-block border-secondary shadow-none"
+                                                        onClick={() =>
+                                                            this.toggleModal(
+                                                                "subject"
+                                                            )
+                                                        }
+                                                    >
                                                         Add +
                                                     </button>
                                                 </div>
@@ -457,7 +802,7 @@ class MasterData extends Component {
                                     ""
                                 )}
 
-                                {/* Board Data */}
+                                {/* ----- Board Data ----- */}
                                 {this.state.activeType === "board" ? (
                                     <div className="row">
                                         <div className="col-md-4 mb-3 mb-md-0">
@@ -491,7 +836,14 @@ class MasterData extends Component {
                                                             Data not available
                                                         </p>
                                                     )}
-                                                    <button className="btn btn-light btn-sm btn-block border-secondary shadow-none">
+                                                    <button
+                                                        className="btn btn-light btn-sm btn-block border-secondary shadow-none"
+                                                        onClick={() =>
+                                                            this.toggleModal(
+                                                                "board"
+                                                            )
+                                                        }
+                                                    >
                                                         Add +
                                                     </button>
                                                 </div>
@@ -502,7 +854,7 @@ class MasterData extends Component {
                                     ""
                                 )}
 
-                                {/* Type Data */}
+                                {/* ----- Type Data ----- */}
                                 {this.state.activeType === "types" ? (
                                     <div className="row">
                                         <div className="col-md-4 mb-3 mb-md-0">
@@ -536,7 +888,14 @@ class MasterData extends Component {
                                                             Data not available
                                                         </p>
                                                     )}
-                                                    <button className="btn btn-light btn-sm btn-block border-secondary shadow-none">
+                                                    <button
+                                                        className="btn btn-light btn-sm btn-block border-secondary shadow-none"
+                                                        onClick={() =>
+                                                            this.toggleModal(
+                                                                "course"
+                                                            )
+                                                        }
+                                                    >
                                                         Add +
                                                     </button>
                                                 </div>

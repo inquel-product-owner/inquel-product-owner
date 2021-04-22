@@ -8,7 +8,7 @@ export class Logout extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            timeout: 1000 * 60 * 30,
+            timeout: 1000 * 60 * 15,
             showModal: false,
             isTimedOut: false,
             isLoggedOut: false,
@@ -107,7 +107,7 @@ export class AdminLogout extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            timeout: 1000 * 60 * 30,
+            timeout: 1000 * 60 * 15,
             showModal: false,
             isTimedOut: false,
             isLoggedOut: false,
