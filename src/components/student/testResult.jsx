@@ -6,6 +6,46 @@ import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import AlertBox from "../sharedComponents/alert";
 import Loading from "../sharedComponents/loader";
 
+function remarksCondition(data) {
+    let remarks = "";
+
+    if (data.evaluated === true) {
+        if (data.auto_section.length !== 0) {
+            remarks = data.auto_section[0].remarks;
+        } else if (Object.entries(data.direct_question).length !== 0) {
+            remarks = data.direct_question.remarks;
+        }
+    } else {
+        remarks = "Not yet evaluated";
+    }
+
+    return remarks;
+
+    // props.attempt.evaluated === true
+    //                         ? props.attempt.auto_section.length !== 0
+    //                             ? props.attempt.auto_section[0].remarks
+    //                             : Object.entries(props.attempt.direct_question)
+    //                                   .length !== 0
+    //                             ? props.attempt.direct_question.remarks !==
+    //                               undefined
+    //                                 ? props.attempt.direct_question.remarks
+    //                                 : "Not yet evaluated"
+    //                             : "Remarks"
+    //                         : ""
+}
+
+function colorCondition(data) {
+    let color = "";
+
+    if (data.auto_section.length !== 0) {
+        color = data.auto_section[0].color;
+    } else if (Object.entries(data.direct_question).length !== 0) {
+        color = data.direct_question.color;
+    }
+
+    return color;
+}
+
 function CycleTestAttempts(props) {
     return (
         <OverlayTrigger
@@ -17,21 +57,11 @@ function CycleTestAttempts(props) {
                         textTransform: "capitalize",
                     }}
                 >
-                    {props.attempt.evaluted === true
-                        ? props.attempt.auto_section.length !== 0
-                            ? props.attempt.auto_section[0].remarks
-                            : Object.entries(props.attempt.direct_question)
-                                  .length !== 0
-                            ? props.attempt.direct_question.remarks !==
-                              undefined
-                                ? props.attempt.direct_question.remarks
-                                : "Not yet evaluated"
-                            : "Remarks"
-                        : "Not yet evaluated"}
+                    {remarksCondition(props.attempt)}
                 </Tooltip>
             }
         >
-            {props.attempt.evaluted === true ? (
+            {props.attempt.evaluated === true ? (
                 <Link
                     to={`${props.url}/cycle/${props.attempt.cycle_test_id}/preview`}
                     onClick={() => {
@@ -61,17 +91,7 @@ function CycleTestAttempts(props) {
                     <i
                         className="fas fa-circle fa-lg mx-2"
                         style={{
-                            color:
-                                props.attempt.auto_section.length !== 0
-                                    ? props.attempt.auto_section[0].color
-                                    : Object.entries(
-                                          props.attempt.direct_question
-                                      ).length !== 0
-                                    ? props.attempt.direct_question.color !==
-                                      undefined
-                                        ? props.attempt.direct_question.color
-                                        : "grey"
-                                    : "",
+                            color: colorCondition(props.attempt),
                         }}
                     ></i>
                 </Link>
@@ -98,21 +118,11 @@ function SemesterAttempts(props) {
                         textTransform: "capitalize",
                     }}
                 >
-                    {props.attempt.evaluted === true
-                        ? props.attempt.auto_section.length !== 0
-                            ? props.attempt.auto_section[0].remarks
-                            : Object.entries(props.attempt.direct_question)
-                                  .length !== 0
-                            ? props.attempt.direct_question.remarks !==
-                              undefined
-                                ? props.attempt.direct_question.remarks
-                                : "Not yet evaluated"
-                            : "Remarks"
-                        : "Not yet evaluated"}
+                    {remarksCondition(props.attempt)}
                 </Tooltip>
             }
         >
-            {props.attempt.evaluted === true ? (
+            {props.attempt.evaluated === true ? (
                 <Link
                     to={`${props.url}/semester/${props.attempt.semester_id}/preview`}
                     onClick={() => {
@@ -140,17 +150,7 @@ function SemesterAttempts(props) {
                     <i
                         className="fas fa-circle fa-lg mx-2"
                         style={{
-                            color:
-                                props.attempt.auto_section.length !== 0
-                                    ? props.attempt.auto_section[0].color
-                                    : Object.entries(
-                                          props.attempt.direct_question
-                                      ).length !== 0
-                                    ? props.attempt.direct_question.color !==
-                                      undefined
-                                        ? props.attempt.direct_question.color
-                                        : "grey"
-                                    : "",
+                            color: colorCondition(props.attempt),
                         }}
                     ></i>
                 </Link>

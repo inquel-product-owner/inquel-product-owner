@@ -285,7 +285,7 @@ class Match extends Component {
 
     // -------------------------- Adding, Removing, Deleting match --------------------------
 
-    handleAddNew = () => {
+    handleAddMatch = () => {
         const values = [...this.state.match];
         values.push({
             match_id: "",
@@ -298,7 +298,7 @@ class Match extends Component {
         });
     };
 
-    handleCopy = (index) => {
+    handleCopy = async (index) => {
         const values = [...this.state.match];
 
         values.splice(index + 1, 0, {
@@ -306,10 +306,11 @@ class Match extends Component {
             match_terms: values[index].match_terms,
             match_definition: values[index].match_definition,
         });
-        this.setState({
+        await this.setState({
             match: values,
             activeMatch: index + 1,
         });
+        window.MathJax.typeset();
     };
 
     handleEdit = (index) => {
@@ -743,7 +744,7 @@ class Match extends Component {
 
                                 <button
                                     className="btn btn-primary btn-block shadow-none"
-                                    onClick={this.handleAddNew}
+                                    onClick={this.handleAddMatch}
                                 >
                                     Add +
                                 </button>

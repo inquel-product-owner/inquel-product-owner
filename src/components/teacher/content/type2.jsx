@@ -21,6 +21,71 @@ const mapStateToProps = (state) => ({
     topic_name: state.topic_name,
 });
 
+const main_question = {
+    question_random_id: "",
+    question: "<p>Main Question goes here</p>",
+    explanation: "<p>Explanation goes here</p>",
+    is_file_uploaded: false,
+    mcq: true,
+    fill_in: false,
+    sub_question: [
+        {
+            sub_question_id: "",
+            question: "<p>Sub question goes here</p>",
+            mcq: true,
+            fill_in: false,
+            fillin_answer: [""],
+            options: [
+                { correct: false, content: "" },
+                { correct: false, content: "" },
+                { correct: false, content: "" },
+                { correct: false, content: "" },
+            ],
+            marks: "",
+            negative_marks: "0",
+        },
+    ],
+    content: {
+        images: [
+            { title: "", file_name: "", image: null, path: "" },
+            { title: "", file_name: "", image: null, path: "" },
+            { title: "", file_name: "", image: null, path: "" },
+            { title: "", file_name: "", image: null, path: "" },
+        ],
+        video: {
+            title: "",
+            file_name: "",
+            video: null,
+            path: "",
+            url: "",
+        },
+        audio: [
+            { title: "", file_name: "", audio: null, path: "" },
+            { title: "", file_name: "", audio: null, path: "" },
+        ],
+    },
+    properties: {
+        complexity: "",
+        priority: "",
+        theme: "",
+        test: [false, false, false, false, false],
+        semester: [false, false, false, false, false],
+        quiz: [false, false, false, false, false],
+        learn: false,
+    },
+    settings: {
+        virtual_keyboard: [],
+        limited: false,
+    },
+};
+
+const keyboard = {
+    all: false,
+    chemistry: false,
+    physics: false,
+    maths: false,
+};
+
 class Type2 extends Component {
     constructor(props) {
         super(props);
@@ -52,7 +117,6 @@ class Type2 extends Component {
 
             themeData: [],
             complexityData: [],
-            isForm_submitted: false,
 
             activeQuestion: "",
             activeSubQuestion: "",
@@ -62,69 +126,8 @@ class Type2 extends Component {
             selectedQuestion: "",
             selectedSubQuestion: "",
 
-            keyboards: [
-                { all: false, chemistry: false, physics: false, maths: false },
-            ],
-
-            questions: [
-                {
-                    question_random_id: "",
-                    question: "<p>Main Question goes here</p>",
-                    explanation: "<p>Explanation goes here</p>",
-                    is_file_uploaded: false,
-                    mcq: true,
-                    fill_in: false,
-                    sub_question: [
-                        {
-                            sub_question_id: "",
-                            question: "<p>Sub question goes here</p>",
-                            mcq: true,
-                            fill_in: false,
-                            fillin_answer: [""],
-                            options: [
-                                { correct: false, content: "" },
-                                { correct: false, content: "" },
-                                { correct: false, content: "" },
-                                { correct: false, content: "" },
-                            ],
-                            marks: "",
-                            negative_marks: "0",
-                        },
-                    ],
-                    content: {
-                        images: [
-                            { title: "", file_name: "", image: null, path: "" },
-                            { title: "", file_name: "", image: null, path: "" },
-                            { title: "", file_name: "", image: null, path: "" },
-                            { title: "", file_name: "", image: null, path: "" },
-                        ],
-                        video: {
-                            title: "",
-                            file_name: "",
-                            video: null,
-                            path: "",
-                            url: "",
-                        },
-                        audio: [
-                            { title: "", file_name: "", audio: null, path: "" },
-                            { title: "", file_name: "", audio: null, path: "" },
-                        ],
-                    },
-                    properties: {
-                        complexity: "",
-                        priority: "",
-                        theme: "",
-                        test: [false, false, false, false, false],
-                        semester: [false, false, false, false, false],
-                        quiz: [false, false, false, false, false],
-                        learn: false,
-                    },
-                    settings: {
-                        virtual_keyboard: [],
-                        limited: false,
-                    },
-                },
-            ],
+            keyboards: [keyboard],
+            questions: [main_question],
         };
         this.option_limit = 6;
         this.sub_question_limit = 10;
@@ -1025,7 +1028,7 @@ class Type2 extends Component {
         });
     };
 
-    handleRemoveImageFields = (index) => {
+    handleDeleteImages = (index) => {
         const values = [...this.state.questions];
 
         this.setState({
@@ -1045,7 +1048,7 @@ class Type2 extends Component {
                     values[this.state.activeQuestion].question_random_id,
             };
             body[`type2_image_${index + 1}_title`] =
-                values[this.state.activeQuestion].content.images[index].title;
+                values[this.state.activeQuestion].content.images[index].title || 'title';
 
             fetch(
                 `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/`,
@@ -1139,70 +1142,7 @@ class Type2 extends Component {
             i < values[this.state.activeQuestion].content.images.length;
             i++
         ) {
-            if (
-                values[this.state.activeQuestion].question_random_id !== "" &&
-                values[this.state.activeQuestion].is_file_uploaded === true &&
-                values[this.state.activeQuestion].content.images[i]
-                    .file_name === "" &&
-                values[this.state.activeQuestion].content.images[i].path !== ""
-            ) {
-                let body = {
-                    question_random_id:
-                        values[this.state.activeQuestion].question_random_id,
-                };
-                body[`type2_image_${i + 1}_title`] =
-                    values[this.state.activeQuestion].content.images[i].title;
-
-                fetch(
-                    `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/`,
-                    {
-                        method: "DELETE",
-                        headers: this.headers,
-                        body: JSON.stringify(body),
-                    }
-                )
-                    .then((res) => res.json())
-                    .then((result) => {
-                        console.log(result);
-                        if (result.sts === true) {
-                            this.setState({
-                                successMsg: result.msg,
-                                showSuccessAlert: true,
-                            });
-                            values[this.state.activeQuestion].content.images[
-                                i
-                            ] = {
-                                title: "",
-                                file_name: "",
-                                image: null,
-                                path: "",
-                            };
-                            this.setState({
-                                questions: values,
-                            });
-                        } else {
-                            this.setState({
-                                errorMsg: result.detail
-                                    ? result.detail
-                                    : result.msg,
-                                showErrorAlert: true,
-                            });
-                        }
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                    });
-            } else {
-                values[this.state.activeQuestion].content.images[i] = {
-                    title: "",
-                    file_name: "",
-                    image: null,
-                    path: "",
-                };
-                this.setState({
-                    questions: values,
-                });
-            }
+            this.handleDeleteImages(i)
         }
     };
 
@@ -1279,7 +1219,7 @@ class Type2 extends Component {
                                 .question_random_id,
                         type2_video_1_title:
                             values[this.state.activeQuestion].content.video
-                                .title,
+                                .title || 'title',
                     }),
                 }
             )
@@ -1341,7 +1281,7 @@ class Type2 extends Component {
         });
     };
 
-    handleRemoveAudioFields = (index) => {
+    handleDeleteAudio = (index) => {
         const values = [...this.state.questions];
 
         this.setState({
@@ -1361,7 +1301,7 @@ class Type2 extends Component {
                     values[this.state.activeQuestion].question_random_id,
             };
             body[`type2_audio_${index + 1}_title`] =
-                values[this.state.activeQuestion].content.audio[index].title;
+                values[this.state.activeQuestion].content.audio[index].title || 'title';
 
             fetch(
                 `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/`,
@@ -1455,70 +1395,7 @@ class Type2 extends Component {
             i < values[this.state.activeQuestion].content.audio.length;
             i++
         ) {
-            if (
-                values[this.state.activeQuestion].question_random_id !== "" &&
-                values[this.state.activeQuestion].is_file_uploaded === true &&
-                values[this.state.activeQuestion].content.audio[i].file_name ===
-                    "" &&
-                values[this.state.activeQuestion].content.audio[i].path !== ""
-            ) {
-                let body = {
-                    question_random_id:
-                        values[this.state.activeQuestion].question_random_id,
-                };
-                body[`type2_audio_${i + 1}_title`] =
-                    values[this.state.activeQuestion].content.audio[i].title;
-
-                fetch(
-                    `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/`,
-                    {
-                        method: "DELETE",
-                        headers: this.headers,
-                        body: JSON.stringify(body),
-                    }
-                )
-                    .then((res) => res.json())
-                    .then((result) => {
-                        console.log(result);
-                        if (result.sts === true) {
-                            this.setState({
-                                successMsg: result.msg,
-                                showSuccessAlert: true,
-                            });
-                            values[this.state.activeQuestion].content.audio[
-                                i
-                            ] = {
-                                title: "",
-                                file_name: "",
-                                audio: null,
-                                path: "",
-                            };
-                            this.setState({
-                                questions: values,
-                            });
-                        } else {
-                            this.setState({
-                                errorMsg: result.detail
-                                    ? result.detail
-                                    : result.msg,
-                                showErrorAlert: true,
-                            });
-                        }
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                    });
-            } else {
-                values[this.state.activeQuestion].content.audio[i] = {
-                    title: "",
-                    file_name: "",
-                    audio: null,
-                    path: "",
-                };
-                this.setState({
-                    questions: values,
-                });
-            }
+            this.handleDeleteAudio(i);
         }
     };
 
@@ -1701,72 +1578,11 @@ class Type2 extends Component {
 
     // -------------------------- Adding, Removing, Deleting question --------------------------
 
-    addNewQuestion = () => {
+    handleAddMainQuestion = () => {
         const values = [...this.state.questions];
         const keyboards = [...this.state.keyboards];
-        keyboards.push({
-            all: false,
-            chemistry: false,
-            physics: false,
-            maths: false,
-        });
-        values.push({
-            question_random_id: "",
-            question: "<p>Main Question goes here</p>",
-            explanation: "<p>Explanation goes here</p>",
-            is_file_uploaded: false,
-            mcq: true,
-            fill_in: false,
-            sub_question: [
-                {
-                    sub_question_id: "",
-                    question: "<p>Sub question goes here</p>",
-                    mcq: true,
-                    fill_in: false,
-                    fillin_answer: [""],
-                    options: [
-                        { correct: false, content: "" },
-                        { correct: false, content: "" },
-                        { correct: false, content: "" },
-                        { correct: false, content: "" },
-                    ],
-                    marks: "",
-                    negative_marks: "0",
-                },
-            ],
-            content: {
-                images: [
-                    { title: "", file_name: "", image: null, path: "" },
-                    { title: "", file_name: "", image: null, path: "" },
-                    { title: "", file_name: "", image: null, path: "" },
-                    { title: "", file_name: "", image: null, path: "" },
-                ],
-                video: {
-                    title: "",
-                    file_name: "",
-                    video: null,
-                    path: "",
-                    url: "",
-                },
-                audio: [
-                    { title: "", file_name: "", audio: null, path: "" },
-                    { title: "", file_name: "", audio: null, path: "" },
-                ],
-            },
-            properties: {
-                complexity: "",
-                priority: "",
-                theme: "",
-                test: [false, false, false, false, false],
-                semester: [false, false, false, false, false],
-                quiz: [false, false, false, false, false],
-                learn: false,
-            },
-            settings: {
-                virtual_keyboard: [],
-                limited: false,
-            },
-        });
+        keyboards.push(keyboard);
+        values.push(main_question);
         this.setState({
             questions: values,
             keyboards: keyboards,
@@ -1774,7 +1590,7 @@ class Type2 extends Component {
         });
     };
 
-    addNewSubQuestion = (index) => {
+    handleAddSubQuestion = (index) => {
         const values = [...this.state.questions];
         values[index].sub_question.push({
             sub_question_id: "",
@@ -1800,7 +1616,7 @@ class Type2 extends Component {
 
     // --------------- Copy question ---------------
 
-    copyQuestions = (index) => {
+    copyQuestions = async (index) => {
         const values = [...this.state.questions];
         const keyboards = [...this.state.keyboards];
 
@@ -1895,14 +1711,15 @@ class Type2 extends Component {
                 limited: values[index].settings.limited,
             },
         });
-        this.setState({
+        await this.setState({
             questions: values,
             keyboards: keyboards,
             activeQuestion: index + 1,
         });
+        window.MathJax.typeset();
     };
 
-    copySubQuestions = (main_index, sub_index) => {
+    copySubQuestions = async (main_index, sub_index) => {
         const values = [...this.state.questions];
 
         const options = [];
@@ -1940,11 +1757,12 @@ class Type2 extends Component {
             negative_marks:
                 values[main_index].sub_question[sub_index].negative_marks,
         });
-        this.setState({
+        await this.setState({
             questions: values,
             activeQuestion: main_index,
             activeSubQuestion: sub_index + 1,
         });
+        window.MathJax.typeset();
     };
 
     // --------------- Edit question ---------------
@@ -2012,99 +1830,8 @@ class Type2 extends Component {
                 },
                 () => {
                     if (values.length === 0) {
-                        keyboards.push({
-                            all: false,
-                            chemistry: false,
-                            physics: false,
-                            maths: false,
-                        });
-                        values.push({
-                            question_random_id: "",
-                            question: "<p>Main Question goes here</p>",
-                            explanation: "<p>Explanation goes here</p>",
-                            is_file_uploaded: false,
-                            mcq: true,
-                            fill_in: false,
-                            sub_question: [
-                                {
-                                    sub_question_id: "",
-                                    question: "<p>Sub question goes here</p>",
-                                    mcq: true,
-                                    fill_in: false,
-                                    fillin_answer: [""],
-                                    options: [
-                                        { correct: false, content: "" },
-                                        { correct: false, content: "" },
-                                        { correct: false, content: "" },
-                                        { correct: false, content: "" },
-                                    ],
-                                    marks: "",
-                                    negative_marks: "0",
-                                },
-                            ],
-                            content: {
-                                images: [
-                                    {
-                                        title: "",
-                                        file_name: "",
-                                        image: null,
-                                        path: "",
-                                    },
-                                    {
-                                        title: "",
-                                        file_name: "",
-                                        image: null,
-                                        path: "",
-                                    },
-                                    {
-                                        title: "",
-                                        file_name: "",
-                                        image: null,
-                                        path: "",
-                                    },
-                                    {
-                                        title: "",
-                                        file_name: "",
-                                        image: null,
-                                        path: "",
-                                    },
-                                ],
-                                video: {
-                                    title: "",
-                                    file_name: "",
-                                    video: null,
-                                    path: "",
-                                    url: "",
-                                },
-                                audio: [
-                                    {
-                                        title: "",
-                                        file_name: "",
-                                        audio: null,
-                                        path: "",
-                                    },
-                                    {
-                                        title: "",
-                                        file_name: "",
-                                        audio: null,
-                                        path: "",
-                                    },
-                                ],
-                            },
-                            properties: {
-                                complexity: "",
-                                priority: "",
-                                theme: "",
-                                test: [false, false, false, false, false],
-                                semester: [false, false, false, false, false],
-                                quiz: [false, false, false, false, false],
-                                learn: false,
-                            },
-                            settings: {
-                                virtual_keyboard: [],
-                                limited: false,
-                            },
-                        });
+                        keyboards.push(keyboard);
+                        values.push(main_question);
                         this.setState({
                             questions: values,
                             keyboards: keyboards,
@@ -2115,7 +1842,7 @@ class Type2 extends Component {
         }
     };
 
-    closeMCQ_DeleteModal = () => {
+    toggleDeleteModal = () => {
         this.setState({
             showMCQDelete_Modal: !this.state.showMCQDelete_Modal,
         });
@@ -2136,99 +1863,8 @@ class Type2 extends Component {
             },
             () => {
                 if (values.length === 0) {
-                    keyboards.push({
-                        all: false,
-                        chemistry: false,
-                        physics: false,
-                        maths: false,
-                    });
-                    values.push({
-                        question_random_id: "",
-                        question: "<p>Main Question goes here</p>",
-                        explanation: "<p>Explanation goes here</p>",
-                        is_file_uploaded: false,
-                        mcq: true,
-                        fill_in: false,
-                        sub_question: [
-                            {
-                                sub_question_id: "",
-                                question: "<p>Sub question goes here</p>",
-                                mcq: true,
-                                fill_in: false,
-                                fillin_answer: [""],
-                                options: [
-                                    { correct: false, content: "" },
-                                    { correct: false, content: "" },
-                                    { correct: false, content: "" },
-                                    { correct: false, content: "" },
-                                ],
-                                marks: "",
-                                negative_marks: "0",
-                            },
-                        ],
-                        content: {
-                            images: [
-                                {
-                                    title: "",
-                                    file_name: "",
-                                    image: null,
-                                    path: "",
-                                },
-                                {
-                                    title: "",
-                                    file_name: "",
-                                    image: null,
-                                    path: "",
-                                },
-                                {
-                                    title: "",
-                                    file_name: "",
-                                    image: null,
-                                    path: "",
-                                },
-                                {
-                                    title: "",
-                                    file_name: "",
-                                    image: null,
-                                    path: "",
-                                },
-                            ],
-                            video: {
-                                title: "",
-                                file_name: "",
-                                video: null,
-                                path: "",
-                                url: "",
-                            },
-                            audio: [
-                                {
-                                    title: "",
-                                    file_name: "",
-                                    audio: null,
-                                    path: "",
-                                },
-                                {
-                                    title: "",
-                                    file_name: "",
-                                    audio: null,
-                                    path: "",
-                                },
-                            ],
-                        },
-                        properties: {
-                            complexity: "",
-                            priority: "",
-                            theme: "",
-                            test: [false, false, false, false, false],
-                            semester: [false, false, false, false, false],
-                            quiz: [false, false, false, false, false],
-                            learn: false,
-                        },
-                        settings: {
-                            virtual_keyboard: [],
-                            limited: false,
-                        },
-                    });
+                    keyboards.push(keyboard);
+                    values.push(main_question);
                     this.setState({
                         questions: values,
                         keyboards: keyboards,
@@ -2301,7 +1937,7 @@ class Type2 extends Component {
         }
     };
 
-    closeSubMCQ_DeleteModal = () => {
+    toggleSubDeleteModal = () => {
         this.setState({
             showSubMCQDelete_Modal: !this.state.showSubMCQDelete_Modal,
         });
@@ -2454,7 +2090,7 @@ class Type2 extends Component {
                 {this.state.showMCQDelete_Modal ? (
                     <ContentDeleteModal
                         show={this.state.showMCQDelete_Modal}
-                        onHide={this.closeMCQ_DeleteModal}
+                        onHide={this.toggleDeleteModal}
                         formSubmission={this.handleMCQ_Deletion}
                         url={`${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/`}
                         type="question"
@@ -2462,7 +2098,7 @@ class Type2 extends Component {
                         data={{
                             question_random_id: this.state.selectedQuestion,
                         }}
-                        toggleModal={this.closeMCQ_DeleteModal}
+                        toggleModal={this.toggleDeleteModal}
                     />
                 ) : null}
 
@@ -2470,7 +2106,7 @@ class Type2 extends Component {
                 {this.state.showSubMCQDelete_Modal ? (
                     <ContentDeleteModal
                         show={this.state.showSubMCQDelete_Modal}
-                        onHide={this.closeSubMCQ_DeleteModal}
+                        onHide={this.toggleSubDeleteModal}
                         formSubmission={this.handleSubMCQ_Deletion}
                         url={`${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/`}
                         type="sub question"
@@ -2479,7 +2115,7 @@ class Type2 extends Component {
                             question_random_id: this.state.selectedQuestion,
                             sub_question_id: this.state.selectedSubQuestion,
                         }}
-                        toggleModal={this.closeSubMCQ_DeleteModal}
+                        toggleModal={this.toggleSubDeleteModal}
                     />
                 ) : null}
 
@@ -2742,7 +2378,7 @@ class Type2 extends Component {
                                                         <button
                                                             className="btn btn-light bg-white btn-block shadow-sm"
                                                             onClick={() =>
-                                                                this.addNewSubQuestion(
+                                                                this.handleAddSubQuestion(
                                                                     q_index
                                                                 )
                                                             }
@@ -2991,7 +2627,7 @@ class Type2 extends Component {
 
                                 <button
                                     className="btn btn-primary btn-block shadow-none"
-                                    onClick={this.addNewQuestion}
+                                    onClick={this.handleAddMainQuestion}
                                 >
                                     Add +
                                 </button>
@@ -3247,7 +2883,7 @@ class Type2 extends Component {
                                                                                     type="button"
                                                                                     className="btn btn-light btn-sm shadow-none"
                                                                                     onClick={() =>
-                                                                                        this.handleRemoveImageFields(
+                                                                                        this.handleDeleteImages(
                                                                                             image_index
                                                                                         )
                                                                                     }
@@ -3434,7 +3070,6 @@ class Type2 extends Component {
                                                                     event
                                                                 )
                                                             }
-                                                            autoComplete="off"
                                                             value={
                                                                 data[
                                                                     this.state
@@ -3457,6 +3092,7 @@ class Type2 extends Component {
                                                                     ? true
                                                                     : false
                                                             }
+                                                            autoComplete="off"
                                                         />
                                                         <small className="form-text text-muted mb-2">
                                                             Only https supported
@@ -3537,7 +3173,7 @@ class Type2 extends Component {
                                                                                     type="button"
                                                                                     className="btn btn-light btn-sm shadow-none"
                                                                                     onClick={() =>
-                                                                                        this.handleRemoveAudioFields(
+                                                                                        this.handleDeleteAudio(
                                                                                             audio_index
                                                                                         )
                                                                                     }

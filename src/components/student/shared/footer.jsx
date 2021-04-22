@@ -2,7 +2,6 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 export default function Footer() {
-    let date = new Date()
     return (
         <footer className="primary-bg py-5">
             <div className="container">
@@ -194,7 +193,7 @@ export default function Footer() {
                 </div>
                 <div className="dropdown-divider mb-4"></div>
                 <h6 className="text-white text-center mb-0">
-                    &copy;{date.getFullYear()} Inquel inc. Powered By{" "}
+                    &copy;{new Date().getFullYear()} Inquel inc. Powered By{" "}
                     <a
                         href="https://sachirva.com/"
                         target="_blank"

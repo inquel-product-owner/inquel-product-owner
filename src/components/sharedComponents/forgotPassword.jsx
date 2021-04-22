@@ -1,12 +1,125 @@
-import React from "react";
-import { Component } from "react";
+import React, { Component, useState } from "react";
 import { Redirect, Link } from "react-router-dom";
-import { Alert, Spinner, Navbar } from "react-bootstrap";
-import { baseUrl, accountsUrl } from "../shared/baseUrl.js";
-import Loading from "./sharedComponents/loader";
-import logo from "../assets/IQ_Labs_V5.png";
+import { Alert, Spinner, Navbar, Modal } from "react-bootstrap";
+import { baseUrl, accountsUrl } from "../../shared/baseUrl.js";
+import Loading from "./loader";
+import logo from "../../assets/IQ_Labs_V5.png";
 
-export default class ForgotPassword extends Component {
+export function ForgotPasswordModal(props) {
+    const [email, setEmail] = useState("");
+    const [errorMsg, setErrorMsg] = useState("");
+    const [successMsg, setSuccessMsg] = useState("");
+    const [showErrorAlert, setErrorAlert] = useState(false);
+    const [showSuccessAlert, setSuccessAlert] = useState(false);
+    const [showLoader, setLoader] = useState(false);
+
+    function handleSubmit(event) {
+        event.preventDefault();
+        var url = baseUrl + accountsUrl;
+        var authToken = localStorage.getItem("Authorization");
+        var headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: authToken,
+        };
+
+        setLoader(true);
+        setErrorAlert(false);
+        setSuccessAlert(false);
+
+        fetch(`${url}/forgotpassword/`, {
+            headers: headers,
+            method: "POST",
+            body: JSON.stringify({
+                email: email,
+            }),
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts) {
+                    setSuccessMsg(result.msg);
+                    setSuccessAlert(true);
+                    setLoader(false);
+                    props.formSubmission();
+                } else {
+                    setErrorMsg(result.msg);
+                    setErrorAlert(true);
+                    setLoader(false);
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
+
+    return (
+        <Modal
+            {...props}
+            size="md"
+            aria-labelledby="contained-modal-title-vcenter"
+            centered
+        >
+            <Modal.Header closeButton>Forgot password</Modal.Header>
+            <form onSubmit={handleSubmit} autoComplete="off">
+                <Modal.Body>
+                    <Alert
+                        variant="danger"
+                        show={showErrorAlert}
+                        onClose={() => {
+                            setErrorAlert(false);
+                        }}
+                        dismissible
+                    >
+                        {errorMsg}
+                    </Alert>
+                    <Alert
+                        variant="success"
+                        show={showSuccessAlert}
+                        onClose={() => {
+                            setSuccessAlert(false);
+                        }}
+                        dismissible
+                    >
+                        {successMsg}
+                    </Alert>
+
+                    <label htmlFor="email">Email</label>
+                    <input
+                        type="email"
+                        name="email"
+                        id="email"
+                        className="form-control borders"
+                        placeholder="Enter your email ID"
+                        onChange={(event) => {
+                            setEmail(event.target.value);
+                        }}
+                        required
+                    />
+                </Modal.Body>
+                <Modal.Footer>
+                    <button className="btn btn-primary btn-block shadow-none">
+                        {showLoader ? (
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                                className="mr-2"
+                            />
+                        ) : (
+                            ""
+                        )}
+                        Send Email
+                    </button>
+                </Modal.Footer>
+            </form>
+        </Modal>
+    );
+}
+
+export class ForgotPassword extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -326,7 +439,7 @@ export default class ForgotPassword extends Component {
                                                         </div>
                                                     </div>
                                                     <div className="form-group">
-                                                        <button className="btn btn-primary btn-block">
+                                                        <button className="btn btn-primary btn-block shadow-none">
                                                             {this.state
                                                                 .showLoader ? (
                                                                 <Spinner
@@ -356,7 +469,7 @@ export default class ForgotPassword extends Component {
                                 <div className="row">
                                     <div className="col-md-6">
                                         <p className="mb-3 mb-md-0 text-white text-center text-md-left">
-                                            &copy;2020 Inquel inc. Powered By{" "}
+                                            &copy;{new Date().getFullYear()} Inquel inc. Powered By{" "}
                                             <a
                                                 href="https://sachirva.com/"
                                                 target="_blank"
