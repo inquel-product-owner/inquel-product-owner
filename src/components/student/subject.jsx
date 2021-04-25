@@ -477,6 +477,7 @@ class Subject extends Component {
             topics_remarks: [],
             chapter_remarks: [],
             all_topics_completed: [],
+            quiz: [],
 
             all_chapters: [],
             semester_chapters: [],
@@ -613,6 +614,38 @@ class Subject extends Component {
         return result;
     };
 
+    // Loads quiz data
+    loadQuizData = (chapter_id, chapter_index) => {
+        fetch(
+            `${this.url}/student/subject/${this.subjectId}/chapter/${chapter_id}/quiz/`,
+            {
+                method: "GET",
+                headers: this.headers,
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    // let quiz = [...this.state.quiz];
+                    // quiz[chapter_index] = result.data;
+                    // this.setState({
+                    //     quiz: quiz,
+                    //     page_loading: false,
+                    // });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     // loads chapter, topic and semester data
     loadSubjectData = () => {
         fetch(`${this.url}/student/subject/${this.subjectId}/`, {
@@ -642,6 +675,11 @@ class Subject extends Component {
                         }
                         // function to load completed topic list from API
                         this.loadTopicCompletedData(
+                            result.data.chapters[i].chapter_id,
+                            i
+                        );
+                        // function to load quiz data from API
+                        this.loadQuizData(
                             result.data.chapters[i].chapter_id,
                             i
                         );
@@ -680,7 +718,7 @@ class Subject extends Component {
     };
 
     componentDidMount = () => {
-        this.loadSubjectData()
+        this.loadSubjectData();
     };
 
     // Topic completion toggle
@@ -754,7 +792,7 @@ class Subject extends Component {
                             showSuccessAlert: true,
                         },
                         () => {
-                            this.loadSubjectData()
+                            this.loadSubjectData();
                         }
                     );
                 } else {
@@ -987,9 +1025,18 @@ class Subject extends Component {
                                 </nav>
                             </div>
                             <div className="col-md-6 d-flex justify-content-start justify-content-md-end">
-                                <button className="btn btn-primary btn-sm shadow-none mr-1">
-                                    My Personal Notes
-                                </button>
+                                <Link
+                                    to={`${this.props.match.url}/personal-notes`}
+                                >
+                                    <button className="btn btn-primary btn-sm shadow-none mr-1">
+                                        My Personal Notes
+                                    </button>
+                                </Link>
+                                <Link to={`${this.props.match.url}/favourites`}>
+                                    <button className="btn btn-primary btn-sm shadow-none mr-1">
+                                        Favourites
+                                    </button>
+                                </Link>
                                 <button className="btn btn-primary btn-sm shadow-none mr-1">
                                     Simulation
                                 </button>

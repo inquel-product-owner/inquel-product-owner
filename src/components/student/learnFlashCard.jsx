@@ -4,7 +4,14 @@ import ReactCardFlip from "react-card-flip";
 import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
 import AlertBox from "../sharedComponents/alert";
 import Loading from "../sharedComponents/loader";
-import { OverlayTrigger, Tooltip, Popover, Modal } from "react-bootstrap";
+import {
+    OverlayTrigger,
+    Tooltip,
+    Popover,
+    Modal,
+    Spinner,
+    Alert,
+} from "react-bootstrap";
 import FullScreen from "react-fullscreen-crossbrowser";
 import { Player } from "video-react";
 import "video-react/dist/video-react.css";
@@ -14,6 +21,7 @@ import {
     Type1DataFormat,
     Type2DataFormat,
 } from "../sharedComponents/dataFormating";
+import CKeditor from "../sharedComponents/CKeditor";
 
 class VideoModal extends Component {
     constructor(props) {
@@ -55,14 +63,244 @@ class VideoModal extends Component {
     }
 }
 
+class PersonalNotes extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: false,
+
+            personal_notes_id: this.props.data.personal_notes_id || "",
+            title: this.props.data.personal_notes_title || "",
+            content: this.props.data.personal_notes_content || "",
+        };
+        this.url = baseUrl + studentUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
+    }
+
+    onEditorChange = (evt) => {
+        this.setState({
+            content: evt.editor.getData(),
+        });
+    };
+
+    handleTitle = (event) => {
+        this.setState({
+            title: event.target.value,
+        });
+    };
+
+    handleSubmit = () => {
+        this.setState({
+            showLoader: true,
+            showErrorAlert: false,
+            showSuccessAlert: false,
+        });
+        if (this.state.title === "") {
+            this.setState({
+                errorMsg: "Enter notes title",
+                showErrorAlert: true,
+                showLoader: false,
+            });
+        } else if (this.state.content === "") {
+            this.setState({
+                errorMsg: "Enter notes content",
+                showErrorAlert: true,
+                showLoader: false,
+            });
+        } else {
+            let body = {
+                topic_num: this.props.topic_num,
+                personal_notes_title: this.state.title,
+                personal_notes_content: this.state.content,
+            };
+
+            if (this.state.personal_notes_id === "") {
+                this.handlePOST(body);
+            } else {
+                this.handlePUT(body);
+            }
+        }
+    };
+
+    handlePOST = (body) => {
+        if (this.props.type === "concept") {
+            body["concept_id"] = this.props.id;
+        } else {
+            body["question_id"] = this.props.id;
+        }
+
+        fetch(
+            `${this.url}/student/subject/${this.props.subjectId}/chapter/${this.props.chapterId}/personalnotes/`,
+            {
+                headers: this.headers,
+                method: "POST",
+                body: JSON.stringify(body),
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        showLoader: false,
+                    });
+                    this.props.formSubmission();
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    handlePUT = (body) => {
+        if (this.props.type === "concept") {
+            body["concept"] = true;
+            body["question"] = false;
+        } else {
+            body["concept"] = false;
+            body["question"] = true;
+        }
+        body["personal_notes_id"] = this.state.personal_notes_id;
+        fetch(
+            `${this.url}/student/subject/${this.props.subjectId}/chapter/${this.props.chapterId}/personalnotes/`,
+            {
+                headers: this.headers,
+                method: "PUT",
+                body: JSON.stringify(body),
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        showLoader: false,
+                    });
+                    this.props.formSubmission();
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    render() {
+        return (
+            <Modal
+                show={this.props.show}
+                onHide={this.props.onHide}
+                size="xl"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+                scrollable
+            >
+                <Modal.Header closeButton>Personal notes</Modal.Header>
+                <Modal.Body>
+                    <Alert
+                        variant="danger"
+                        show={this.state.showErrorAlert}
+                        onClose={() => {
+                            this.setState({
+                                showErrorAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.errorMsg}
+                    </Alert>
+                    <Alert
+                        variant="success"
+                        show={this.state.showSuccessAlert}
+                        onClose={() => {
+                            this.setState({
+                                showSuccessAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.successMsg}
+                    </Alert>
+
+                    <div className="form-group">
+                        <input
+                            type="text"
+                            name="title"
+                            id="title"
+                            value={this.state.title}
+                            className="form-control border-secondary"
+                            placeholder="Add notes title"
+                            onChange={this.handleTitle}
+                            autoComplete="off"
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <CKeditor
+                            data={this.state.content}
+                            onChange={this.onEditorChange}
+                        />
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <button
+                        className="btn btn-primary btn-block shadow-none"
+                        onClick={this.handleSubmit}
+                    >
+                        {this.state.showLoader ? (
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                                className="mr-2"
+                            />
+                        ) : (
+                            ""
+                        )}
+                        Save
+                    </button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
+}
+
 class FlashCard extends Component {
     constructor(props) {
         super(props);
         this.state = {
             isFlipped: false,
             showVideoModal: false,
+            showNotesModal: false,
             subject_name: "",
             chapter_name: "",
+            topic_name: "",
             concepts: [],
             practice: [],
             match: [],
@@ -87,8 +325,6 @@ class FlashCard extends Component {
             isFullscreenEnabled: false,
             isLightBoxOpen: false,
 
-            selectedImage: 0,
-            selectedImageData: {},
             selectedImageArray: [],
             imageStartIndex: 0,
             selectedVideoData: "",
@@ -98,6 +334,7 @@ class FlashCard extends Component {
             showErrorAlert: false,
             showSuccessAlert: false,
             page_loading: true,
+            isSlideshowPlaying: false,
         };
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
@@ -225,10 +462,11 @@ class FlashCard extends Component {
                             }
 
                             data.push({
-                                chapter_id: this.props.match.params.chapterId,
-                                topic_num: this.props.match.params.topicNum,
+                                topic_num: response[i].topic_num,
                                 concepts_random_id:
                                     response[i].concepts_random_id,
+                                favourite: response[i].favourite,
+                                personal_notes: response[i].personal_notes,
                                 content: {
                                     terms: response[i].terms,
                                     definition: response[i].definition,
@@ -277,16 +515,9 @@ class FlashCard extends Component {
                         }
                         this.setState({
                             concepts: data,
-                            activeData: 0,
                             totalItems: response.length,
                             previous: result.data.previous,
                             next: result.data.next,
-                            selectedImageData: {
-                                title: "",
-                                file_name: "",
-                                image: null,
-                                path: "",
-                            },
                             page_loading: false,
                         });
                     } else {
@@ -311,16 +542,7 @@ class FlashCard extends Component {
     };
 
     conceptRender = (data, index) => {
-        return data.length === 0 ? (
-            <div
-                className="card card-body shadow-sm align-items-center justify-content-center font-weight-bold-600"
-                style={{
-                    minHeight: "80vh",
-                }}
-            >
-                No content to display
-            </div>
-        ) : (
+        return (
             <FullScreen
                 enabled={this.state.isFullscreenEnabled}
                 onChange={(isFullscreenEnabled) =>
@@ -337,8 +559,10 @@ class FlashCard extends Component {
                             minHeight: `${
                                 this.state.isFullscreenEnabled
                                     ? "100vh"
-                                    : "80vh"
+                                    : "70vh"
                             }`,
+                            maxHeight: "100vh",
+                            overflowY: "auto",
                         }}
                         onClick={() => {
                             this.setState({
@@ -349,7 +573,7 @@ class FlashCard extends Component {
                         <div
                             className="h4 font-weight-bold-600"
                             dangerouslySetInnerHTML={{
-                                __html: data[index].content.terms,
+                                __html: data[index].content.terms || "",
                             }}
                         ></div>
                         <button
@@ -375,13 +599,15 @@ class FlashCard extends Component {
                         </button>
                     </div>
                     <div
-                        className="card card-body shadow-sm align-items-center justify-content-center"
+                        className="card card-body shadow-sm"
                         style={{
                             minHeight: `${
                                 this.state.isFullscreenEnabled
                                     ? "100vh"
-                                    : "80vh"
+                                    : "70vh"
                             }`,
+                            maxHeight: "100vh",
+                            overflowY: "auto",
                         }}
                         onClick={() => {
                             this.setState({
@@ -389,24 +615,10 @@ class FlashCard extends Component {
                             });
                         }}
                     >
-                        <div className="row w-100">
+                        <div className="d-flex w-100">
                             {/* ---------- Content ---------- */}
-                            <div
-                                className={`${
-                                    data[index] !== undefined &&
-                                    data[index].content !== undefined &&
-                                    data[index].content.images !== undefined
-                                        ? this.state.selectedImageData.path !==
-                                              "" ||
-                                          data[index].content.images[0].path !==
-                                              ""
-                                            ? "col-md-9"
-                                            : "col-12"
-                                        : ""
-                                }`}
-                            >
+                            <div className="w-100">
                                 <div
-                                    className="lead"
                                     dangerouslySetInnerHTML={{
                                         __html:
                                             data[index] !== undefined &&
@@ -418,15 +630,11 @@ class FlashCard extends Component {
                                     }}
                                 ></div>
                             </div>
-                            {/* ---------- Image ---------- */}
-                            {data[index] !== undefined &&
-                            data[index].content !== undefined &&
-                            data[index].content.images !== undefined
-                                ? this.state.selectedImageData.path !== "" ||
-                                  data[index].content.images[0].path !== ""
-                                    ? this.imageRender(data, index)
-                                    : ""
-                                : ""}
+                            {/* <!----- Image & Video viewer -----> */}
+                            <div className="ml-3 mt-4">
+                                {this.imageRender(data[index])}
+                            </div>
+                            {/* <!-- Image viewer ends here --> */}
                         </div>
                         <button
                             className="btn btn-link btn-sm shadow-none"
@@ -475,15 +683,8 @@ class FlashCard extends Component {
                         this.setState(
                             {
                                 practice: data.result,
-                                activeData: 0,
                                 previous: result.data.previous,
                                 next: result.data.next,
-                                selectedImageData: {
-                                    title: "",
-                                    file_name: "",
-                                    image: null,
-                                    path: "",
-                                },
                             },
                             () => {
                                 this.loadType2Data(type2_path);
@@ -541,16 +742,9 @@ class FlashCard extends Component {
                             practice: values,
                             totalSubQuestion: total,
                             currentSubQuestionIndex: currentIndex,
-                            activeData: 0,
                             totalItems: values.length,
                             type2_previous: result.data.previous,
                             type2_next: result.data.next,
-                            selectedImageData: {
-                                title: "",
-                                file_name: "",
-                                image: null,
-                                path: "",
-                            },
                             page_loading: false,
                         },
                         () => {
@@ -693,7 +887,7 @@ class FlashCard extends Component {
             <div
                 className="card card-body shadow-sm align-items-center justify-content-center font-weight-bold-600"
                 style={{
-                    minHeight: "80vh",
+                    minHeight: "70vh",
                 }}
             >
                 No content to display
@@ -701,21 +895,25 @@ class FlashCard extends Component {
         ) : (
             <div
                 className="card card-body shadow-sm"
-                style={{ minHeight: "80vh" }}
+                style={{ minHeight: "70vh" }}
             >
                 {data[index].type === "type_1" ? (
                     // --------------- Type 1 content ---------------
-                    <div className="row w-100">
-                        <div className="col-md-8">
-                            <p className="font-weight-bold mb-2">
-                                {index <= 9 ? `0${index + 1}` : index + 1}
-                            </p>
-                            <div
-                                className="font-weight-bold-600 mb-4"
-                                dangerouslySetInnerHTML={{
-                                    __html: data[index].question,
-                                }}
-                            ></div>
+                    <div className="d-flex">
+                        <div className="w-100">
+                            <div className="d-flex mb-2">
+                                <p className="font-weight-bold mr-2">
+                                    {index <= 9
+                                        ? `0${index + 1}.`
+                                        : `${index + 1}.`}
+                                </p>
+                                <div
+                                    className="font-weight-bold-600 w-100"
+                                    dangerouslySetInnerHTML={{
+                                        __html: data[index].question,
+                                    }}
+                                ></div>
+                            </div>
 
                             {/* ---------- Explanation ---------- */}
                             {explanation.lenght !== 0 ? (
@@ -844,132 +1042,157 @@ class FlashCard extends Component {
                                             )}
                                         </div>
                                     </>
-                                ) : // ---------- MCQ Optins ----------
-                                data[index].content.mcq === true ? (
-                                    data[index].content.options.map(
-                                        (option, option_index) => {
-                                            return (
-                                                <div
-                                                    className="card shadow-sm mb-2 bg-light card-body small font-weight-bold-600 py-3"
-                                                    key={option_index}
-                                                >
-                                                    <div className="custom-control custom-checkbox">
-                                                        <input
-                                                            type="checkbox"
-                                                            className="custom-control-input"
-                                                            id={`option_${option_index}`}
-                                                            value={
-                                                                option.content
-                                                            }
-                                                            onChange={(event) =>
-                                                                this.handleMCQ(
-                                                                    event,
-                                                                    index
-                                                                )
-                                                            }
-                                                            checked={
-                                                                section.length !==
-                                                                0
-                                                                    ? section
-                                                                          .answers
-                                                                          .length !==
-                                                                      0
-                                                                        ? section.answers.includes(
-                                                                              option.content
-                                                                          )
-                                                                            ? true
-                                                                            : false
-                                                                        : false
-                                                                    : false
-                                                            }
-                                                        />
-                                                        <label
-                                                            className="custom-control-label"
-                                                            htmlFor={`option_${option_index}`}
-                                                        >
-                                                            {option.content}
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            );
-                                        }
-                                    )
-                                ) : // ---------- True or False ----------
-                                data[index].content.boolean === true ? (
-                                    data[index].content.boolean_question.map(
-                                        (option, boolean_index) => {
-                                            return (
-                                                <div
-                                                    className="card shadow-sm mb-2 bg-light card-body small font-weight-bold-600 py-3"
-                                                    key={boolean_index}
-                                                >
-                                                    <div className="custom-control custom-radio">
-                                                        <input
-                                                            type="radio"
-                                                            id={`customRadio${index}-${boolean_index}`}
-                                                            name={`customRadio${index}`}
-                                                            className="custom-control-input"
-                                                            value={
-                                                                option.content
-                                                            }
-                                                            onChange={(event) =>
-                                                                this.handleBoolean(
-                                                                    event,
-                                                                    index
-                                                                )
-                                                            }
-                                                            checked={
-                                                                section.length !==
-                                                                0
-                                                                    ? section
-                                                                          .answers
-                                                                          .length !==
-                                                                      0
-                                                                        ? section.answers.includes(
-                                                                              option.content
-                                                                          )
-                                                                            ? true
-                                                                            : false
-                                                                        : false
-                                                                    : false
-                                                            }
-                                                        />
-                                                        <label
-                                                            className="custom-control-label"
-                                                            htmlFor={`customRadio${index}-${boolean_index}`}
-                                                        >
-                                                            {option.content}
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            );
-                                        }
-                                    )
-                                ) : // ---------- Fill in answers ----------
-                                data[index].content.fill_in === true ? (
-                                    <input
-                                        type="text"
-                                        name="fill_in"
-                                        className="form-control borders"
-                                        placeholder="Type your answer here"
-                                        value={
-                                            section.length !== 0
-                                                ? section.answers.length !== 0
-                                                    ? section.answers[0]
-                                                    : ""
-                                                : ""
-                                        }
-                                        onChange={(event) =>
-                                            this.handleFillin(
-                                                event,
-                                                index,
-                                                "type_1"
-                                            )
-                                        }
-                                        autoComplete="off"
-                                    />
                                 ) : (
-                                    ""
+                                    // ---------- MCQ Optins ----------
+                                    <div className="row">
+                                        <div className="col-md-6">
+                                            {data[index].content.mcq ===
+                                            true ? (
+                                                data[index].content.options.map(
+                                                    (option, option_index) => {
+                                                        return (
+                                                            <div
+                                                                className="card shadow-sm mb-2 bg-light card-body small font-weight-bold-600 py-3"
+                                                                key={
+                                                                    option_index
+                                                                }
+                                                            >
+                                                                <div className="custom-control custom-checkbox">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        className="custom-control-input"
+                                                                        id={`option_${option_index}`}
+                                                                        value={
+                                                                            option.content
+                                                                        }
+                                                                        onChange={(
+                                                                            event
+                                                                        ) =>
+                                                                            this.handleMCQ(
+                                                                                event,
+                                                                                index
+                                                                            )
+                                                                        }
+                                                                        checked={
+                                                                            section.length !==
+                                                                            0
+                                                                                ? section
+                                                                                      .answers
+                                                                                      .length !==
+                                                                                  0
+                                                                                    ? section.answers.includes(
+                                                                                          option.content
+                                                                                      )
+                                                                                        ? true
+                                                                                        : false
+                                                                                    : false
+                                                                                : false
+                                                                        }
+                                                                    />
+                                                                    <label
+                                                                        className="custom-control-label"
+                                                                        htmlFor={`option_${option_index}`}
+                                                                    >
+                                                                        {
+                                                                            option.content
+                                                                        }
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    }
+                                                )
+                                            ) : // ---------- True or False ----------
+                                            data[index].content.boolean ===
+                                              true ? (
+                                                data[
+                                                    index
+                                                ].content.boolean_question.map(
+                                                    (option, boolean_index) => {
+                                                        return (
+                                                            <div
+                                                                className="card shadow-sm mb-2 bg-light card-body small font-weight-bold-600 py-3"
+                                                                key={
+                                                                    boolean_index
+                                                                }
+                                                            >
+                                                                <div className="custom-control custom-radio">
+                                                                    <input
+                                                                        type="radio"
+                                                                        id={`customRadio${index}-${boolean_index}`}
+                                                                        name={`customRadio${index}`}
+                                                                        className="custom-control-input"
+                                                                        value={
+                                                                            option.content
+                                                                        }
+                                                                        onChange={(
+                                                                            event
+                                                                        ) =>
+                                                                            this.handleBoolean(
+                                                                                event,
+                                                                                index
+                                                                            )
+                                                                        }
+                                                                        checked={
+                                                                            section.length !==
+                                                                            0
+                                                                                ? section
+                                                                                      .answers
+                                                                                      .length !==
+                                                                                  0
+                                                                                    ? section.answers.includes(
+                                                                                          option.content
+                                                                                      )
+                                                                                        ? true
+                                                                                        : false
+                                                                                    : false
+                                                                                : false
+                                                                        }
+                                                                    />
+                                                                    <label
+                                                                        className="custom-control-label"
+                                                                        htmlFor={`customRadio${index}-${boolean_index}`}
+                                                                    >
+                                                                        {
+                                                                            option.content
+                                                                        }
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    }
+                                                )
+                                            ) : // ---------- Fill in answers ----------
+                                            data[index].content.fill_in ===
+                                              true ? (
+                                                <input
+                                                    type="text"
+                                                    name="fill_in"
+                                                    className="form-control borders"
+                                                    placeholder="Type your answer here"
+                                                    value={
+                                                        section.length !== 0
+                                                            ? section.answers
+                                                                  .length !== 0
+                                                                ? section
+                                                                      .answers[0]
+                                                                : ""
+                                                            : ""
+                                                    }
+                                                    onChange={(event) =>
+                                                        this.handleFillin(
+                                                            event,
+                                                            index,
+                                                            "type_1"
+                                                        )
+                                                    }
+                                                    autoComplete="off"
+                                                />
+                                            ) : (
+                                                ""
+                                            )}
+                                        </div>
+                                    </div>
                                 )
                             ) : (
                                 ""
@@ -1027,15 +1250,11 @@ class FlashCard extends Component {
                                 ""
                             )}
                         </div>
-                        {/* ---------- Image ---------- */}
-                        <div className="col-md-4">
-                            {data[index].content.images !== undefined
-                                ? this.state.selectedImageData.path !== "" ||
-                                  data[index].content.images[0].path !== ""
-                                    ? this.imageRender(data, index)
-                                    : ""
-                                : ""}
+                        {/* <!----- Image & Video viewer -----> */}
+                        <div className="ml-3">
+                            {this.imageRender(data[index])}
                         </div>
+                        {/* <!-- Image viewer ends here --> */}
                     </div>
                 ) : (
                     // --------------- Type 2 render function ---------------
@@ -1106,299 +1325,301 @@ class FlashCard extends Component {
             }
         }
         return (
-            <>
-                {/* ---------- Main Question ---------- */}
-                <p className="font-weight-bold mb-2">
-                    {index <= 9 ? `0${index + 1}` : index + 1}
-                </p>
-                <div
-                    className="mb-4"
-                    dangerouslySetInnerHTML={{
-                        __html: data[index].question,
-                    }}
-                ></div>
-                <div className="row mb-3">
-                    {/* ---------- Drop area ---------- */}
-                    <div className="col-md-6">
+            <div className="d-flex">
+                <div className="w-100">
+                    {/* ---------- Main Question ---------- */}
+                    <div className="d-flex mb-2">
+                        <p className="font-weight-bold mr-2">
+                            {index <= 9 ? `0${index + 1}.` : `${index + 1}.`}
+                        </p>
                         <div
-                            id="drop-area"
-                            className="position-relative p-3"
-                            onDragOver={(e) => e.preventDefault()}
-                            onDrop={(e) => this.handleDrop(e)}
-                            onDragEnter={(e) => this.handleDragEnter(e)}
-                            onDragLeave={(e) => this.handleDragLeave(e)}
-                        >
-                            {isAnswerAvailable === false ? (
-                                <div id="drop-here" draggable={false}>
-                                    <i className="fas fa-arrows-alt mr-2"></i>{" "}
-                                    Drop answer here...
-                                </div>
-                            ) : (
-                                <>
-                                    {section.answers.map((data, index) => {
-                                        return data.answers.length !== 0 ? (
-                                            <div
-                                                className={`card shadow-sm mb-2 ${
-                                                    explanation.isAnswered ===
-                                                    true
-                                                        ? explanation
-                                                              .sub_question[
-                                                              index
-                                                          ].answer === false
-                                                            ? "danger-bg"
-                                                            : "success-bg"
-                                                        : "pinkrange-bg primary-text"
-                                                }`}
-                                                key={index}
-                                            >
-                                                <div className="card-body small font-weight-bold-600 py-3">
-                                                    {data.answers[0]}
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            ""
-                                        );
-                                    })}
-                                    {/* ----- Check button ----- */}
-                                    {answerCount ===
-                                    this.state.totalSubQuestion[index] ? (
-                                        explanation.isAnswered === false ? (
-                                            <div className="row mt-3">
-                                                <div className="col-md-4">
-                                                    <button
-                                                        className="btn btn-primary btn-block btn-sm shadow-none"
-                                                        onClick={() => {
-                                                            this.handleCheck(
-                                                                section,
-                                                                "type_2"
-                                                            );
-                                                        }}
-                                                    >
-                                                        Check
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            ""
-                                        )
-                                    ) : (
-                                        ""
-                                    )}
-                                </>
-                            )}
-                        </div>
+                            className="w-100"
+                            dangerouslySetInnerHTML={{
+                                __html: data[index].question,
+                            }}
+                        ></div>
                     </div>
-                    {/* ---------- Sub question ---------- */}
-                    <div className="col-md-6">
-                        {/* ----- Explanation ----- */}
-                        {Object.entries(explanation).lenght !== 0 ? (
-                            explanation.isAnswered === true ? (
-                                <div
-                                    className="card card-body bg-light"
-                                    style={{
-                                        minHeight: "250px",
-                                    }}
-                                >
-                                    <p className="font-weight-bold-600 mb-2">
-                                        Explanation:
-                                    </p>
-                                    <p
-                                        className="small"
-                                        dangerouslySetInnerHTML={{
-                                            __html: explanation.explanation,
-                                        }}
-                                    ></p>
-                                </div>
-                            ) : (
-                                /* ---------- Sub Question ---------- */
-                                <div className="d-flex align-items-start justify-content">
-                                    <button className="btn secondary-bg btn-sm shadow-sm mr-1 mt-1 px-3 font-weight-bold-600 rounded-lg">
-                                        {this.state.currentSubQuestionIndex[
-                                            index
-                                        ] + 1}
-                                    </button>
-
-                                    <div className="card w-100">
-                                        <div className="card secondary-bg py-2 px-3 mb-2">
-                                            <div
-                                                dangerouslySetInnerHTML={{
-                                                    __html:
-                                                        data[index]
-                                                            .sub_question[
-                                                            this.state
-                                                                .currentSubQuestionIndex[
-                                                                index
-                                                            ]
-                                                        ].question,
-                                                }}
-                                            ></div>
-                                        </div>
-                                        {/* Multiple choice question */}
-                                        {data[index].sub_question[
-                                            this.state.currentSubQuestionIndex[
-                                                index
-                                            ]
-                                        ].mcq
-                                            ? data[index].sub_question[
-                                                  this.state
-                                                      .currentSubQuestionIndex[
-                                                      index
-                                                  ]
-                                              ].options.map(
-                                                  (options, option_index) => {
-                                                      return (
-                                                          <div
-                                                              className="card shadow-sm mb-2 light-bg"
-                                                              key={option_index}
-                                                              id={`option-${option_index}`}
-                                                              style={{
-                                                                  cursor:
-                                                                      "move",
-                                                              }}
-                                                              onDragStart={(
-                                                                  e
-                                                              ) =>
-                                                                  this.handleDragStart(
-                                                                      e,
-                                                                      options.content,
-                                                                      index
-                                                                  )
-                                                              }
-                                                              onDragEnd={(e) =>
-                                                                  this.handleDragEnd(
-                                                                      e
-                                                                  )
-                                                              }
-                                                              draggable
-                                                          >
-                                                              <div className="card-body small font-weight-bold-600 primary-text py-3">
-                                                                  {
-                                                                      options.content
-                                                                  }
-                                                              </div>
-                                                          </div>
-                                                      );
-                                                  }
-                                              )
-                                            : ""}
-                                        {/* Fill in the blanks */}
-                                        {data[index].sub_question[
-                                            this.state.currentSubQuestionIndex[
-                                                index
-                                            ]
-                                        ].fill_in ? (
-                                            <input
-                                                type="text"
-                                                name="fill_in"
-                                                className="form-control borders"
-                                                placeholder="Type your answer here"
-                                                value={
-                                                    section.length !== 0
-                                                        ? section.answers
-                                                              .length !== 0
-                                                            ? section.answers[
-                                                                  this.state
-                                                                      .currentSubQuestionIndex[
-                                                                      index
-                                                                  ]
-                                                              ].answers[0] || ""
-                                                            : ""
-                                                        : ""
-                                                }
-                                                onChange={(event) =>
-                                                    this.handleFillin(
-                                                        event,
-                                                        index,
-                                                        "type_2"
-                                                    )
-                                                }
-                                                autoComplete="off"
-                                            />
+                    <div className="row mb-3">
+                        {/* ---------- Drop area ---------- */}
+                        <div className="col-md-6">
+                            <div
+                                id="drop-area"
+                                className="position-relative p-3"
+                                onDragOver={(e) => e.preventDefault()}
+                                onDrop={(e) => this.handleDrop(e)}
+                                onDragEnter={(e) => this.handleDragEnter(e)}
+                                onDragLeave={(e) => this.handleDragLeave(e)}
+                            >
+                                {isAnswerAvailable === false ? (
+                                    <div id="drop-here" draggable={false}>
+                                        <i className="fas fa-arrows-alt mr-2"></i>{" "}
+                                        Drop answer here...
+                                    </div>
+                                ) : (
+                                    <>
+                                        {section.answers.map((data, index) => {
+                                            return data.answers.length !== 0 ? (
+                                                <div
+                                                    className={`card shadow-sm mb-2 ${
+                                                        explanation.isAnswered ===
+                                                        true
+                                                            ? explanation
+                                                                  .sub_question[
+                                                                  index
+                                                              ].answer === false
+                                                                ? "danger-bg"
+                                                                : "success-bg"
+                                                            : "pinkrange-bg primary-text"
+                                                    }`}
+                                                    key={index}
+                                                >
+                                                    <div className="card-body small font-weight-bold-600 py-3">
+                                                        {data.answers[0]}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                ""
+                                            );
+                                        })}
+                                        {/* ----- Check button ----- */}
+                                        {answerCount ===
+                                        this.state.totalSubQuestion[index] ? (
+                                            explanation.isAnswered === false ? (
+                                                <div className="row mt-3">
+                                                    <div className="col-md-4">
+                                                        <button
+                                                            className="btn btn-primary btn-block btn-sm shadow-none"
+                                                            onClick={() => {
+                                                                this.handleCheck(
+                                                                    section,
+                                                                    "type_2"
+                                                                );
+                                                            }}
+                                                        >
+                                                            Check
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                ""
+                                            )
                                         ) : (
                                             ""
                                         )}
-                                        <div className="d-flex align-items-center justify-content-center mt-3">
-                                            <button
-                                                className="btn btn-sm primary-text shadow-none"
-                                                onClick={() =>
-                                                    this.handleSubQPrev(index)
-                                                }
-                                                disabled={
-                                                    this.state
-                                                        .currentSubQuestionIndex[
-                                                        index
-                                                    ] === 0
-                                                        ? true
-                                                        : false
-                                                }
-                                            >
-                                                <i className="fas fa-arrow-circle-left fa-lg"></i>
-                                            </button>
-                                            <div className="border-primary small font-weight-bold-600 rounded-lg px-3 py-1 mx-3">
-                                                {this.state
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                        {/* ---------- Sub question ---------- */}
+                        <div className="col-md-6">
+                            {/* ----- Explanation ----- */}
+                            {Object.entries(explanation).lenght !== 0 ? (
+                                explanation.isAnswered === true ? (
+                                    <div
+                                        className="card card-body bg-light"
+                                        style={{
+                                            minHeight: "250px",
+                                        }}
+                                    >
+                                        <p className="font-weight-bold-600 mb-2">
+                                            Explanation:
+                                        </p>
+                                        <p
+                                            className="small"
+                                            dangerouslySetInnerHTML={{
+                                                __html: explanation.explanation,
+                                            }}
+                                        ></p>
+                                    </div>
+                                ) : (
+                                    /* ---------- Sub Question ---------- */
+                                    <div className="d-flex align-items-start justify-content">
+                                        <button className="btn secondary-bg btn-sm shadow-sm mr-1 mt-1 px-3 font-weight-bold-600 rounded-lg">
+                                            {this.state.currentSubQuestionIndex[
+                                                index
+                                            ] + 1}
+                                        </button>
+
+                                        <div className="card w-100">
+                                            <div className="card secondary-bg py-2 px-3 mb-2">
+                                                <div
+                                                    dangerouslySetInnerHTML={{
+                                                        __html:
+                                                            data[index]
+                                                                .sub_question[
+                                                                this.state
+                                                                    .currentSubQuestionIndex[
+                                                                    index
+                                                                ]
+                                                            ].question,
+                                                    }}
+                                                ></div>
+                                            </div>
+                                            {/* Multiple choice question */}
+                                            {data[index].sub_question[
+                                                this.state
                                                     .currentSubQuestionIndex[
                                                     index
-                                                ] + 1}{" "}
-                                                /{" "}
-                                                {
-                                                    this.state.totalSubQuestion[
-                                                        index
-                                                    ]
-                                                }
-                                            </div>
-                                            <button
-                                                className="btn btn-sm primary-text shadow-none"
-                                                onClick={() =>
-                                                    this.handleSubQNext(index)
-                                                }
-                                                disabled={
-                                                    this.state
+                                                ]
+                                            ].mcq
+                                                ? data[index].sub_question[
+                                                      this.state
+                                                          .currentSubQuestionIndex[
+                                                          index
+                                                      ]
+                                                  ].options.map(
+                                                      (
+                                                          options,
+                                                          option_index
+                                                      ) => {
+                                                          return (
+                                                              <div
+                                                                  className="card shadow-sm mb-2 light-bg"
+                                                                  key={
+                                                                      option_index
+                                                                  }
+                                                                  id={`option-${option_index}`}
+                                                                  style={{
+                                                                      cursor:
+                                                                          "move",
+                                                                  }}
+                                                                  onDragStart={(
+                                                                      e
+                                                                  ) =>
+                                                                      this.handleDragStart(
+                                                                          e,
+                                                                          options.content,
+                                                                          index
+                                                                      )
+                                                                  }
+                                                                  onDragEnd={(
+                                                                      e
+                                                                  ) =>
+                                                                      this.handleDragEnd(
+                                                                          e
+                                                                      )
+                                                                  }
+                                                                  draggable
+                                                              >
+                                                                  <div className="card-body small font-weight-bold-600 primary-text py-3">
+                                                                      {
+                                                                          options.content
+                                                                      }
+                                                                  </div>
+                                                              </div>
+                                                          );
+                                                      }
+                                                  )
+                                                : ""}
+                                            {/* Fill in the blanks */}
+                                            {data[index].sub_question[
+                                                this.state
+                                                    .currentSubQuestionIndex[
+                                                    index
+                                                ]
+                                            ].fill_in ? (
+                                                <input
+                                                    type="text"
+                                                    name="fill_in"
+                                                    className="form-control borders"
+                                                    placeholder="Type your answer here"
+                                                    value={
+                                                        section.length !== 0
+                                                            ? section.answers
+                                                                  .length !== 0
+                                                                ? section
+                                                                      .answers[
+                                                                      this.state
+                                                                          .currentSubQuestionIndex[
+                                                                          index
+                                                                      ]
+                                                                  ]
+                                                                      .answers[0] ||
+                                                                  ""
+                                                                : ""
+                                                            : ""
+                                                    }
+                                                    onChange={(event) =>
+                                                        this.handleFillin(
+                                                            event,
+                                                            index,
+                                                            "type_2"
+                                                        )
+                                                    }
+                                                    autoComplete="off"
+                                                />
+                                            ) : (
+                                                ""
+                                            )}
+                                            <div className="d-flex align-items-center justify-content-center mt-3">
+                                                <button
+                                                    className="btn btn-sm primary-text shadow-none"
+                                                    onClick={() =>
+                                                        this.handleSubQPrev(
+                                                            index
+                                                        )
+                                                    }
+                                                    disabled={
+                                                        this.state
+                                                            .currentSubQuestionIndex[
+                                                            index
+                                                        ] === 0
+                                                            ? true
+                                                            : false
+                                                    }
+                                                >
+                                                    <i className="fas fa-arrow-circle-left fa-lg"></i>
+                                                </button>
+                                                <div className="border-primary small font-weight-bold-600 rounded-lg px-3 py-1 mx-3">
+                                                    {this.state
                                                         .currentSubQuestionIndex[
                                                         index
-                                                    ] +
-                                                        1 <
-                                                    this.state.totalSubQuestion[
-                                                        index
-                                                    ]
-                                                        ? false
-                                                        : true
-                                                }
-                                            >
-                                                <i className="fas fa-arrow-circle-right fa-lg"></i>
-                                            </button>
+                                                    ] + 1}{" "}
+                                                    /{" "}
+                                                    {
+                                                        this.state
+                                                            .totalSubQuestion[
+                                                            index
+                                                        ]
+                                                    }
+                                                </div>
+                                                <button
+                                                    className="btn btn-sm primary-text shadow-none"
+                                                    onClick={() =>
+                                                        this.handleSubQNext(
+                                                            index
+                                                        )
+                                                    }
+                                                    disabled={
+                                                        this.state
+                                                            .currentSubQuestionIndex[
+                                                            index
+                                                        ] +
+                                                            1 <
+                                                        this.state
+                                                            .totalSubQuestion[
+                                                            index
+                                                        ]
+                                                            ? false
+                                                            : true
+                                                    }
+                                                >
+                                                    <i className="fas fa-arrow-circle-right fa-lg"></i>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            )
-                        ) : (
-                            ""
-                        )}
+                                )
+                            ) : (
+                                ""
+                            )}
+                        </div>
                     </div>
                 </div>
-                {/* <!----- Image viewer -----> */}
-                <div className="d-flex justify-content-center">
-                    {data[index].content.images.map((images, image_index) => {
-                        return images.path !== "" ? (
-                            <div
-                                className="card preview-img-circle shadow-sm mx-2"
-                                key={image_index}
-                                style={{
-                                    backgroundImage: `url(${images.path})`,
-                                }}
-                                onClick={() =>
-                                    this.changeImageLightbox(
-                                        data[index].content.images,
-                                        image_index
-                                    )
-                                }
-                            ></div>
-                        ) : (
-                            ""
-                        );
-                    })}
-                </div>
+                {/* <!----- Image & Video viewer -----> */}
+                <div className="ml-3">{this.imageRender(data[index])}</div>
                 {/* <!-- Image viewer ends here --> */}
-            </>
+            </div>
         );
     };
 
@@ -1723,7 +1944,7 @@ class FlashCard extends Component {
             <div
                 className="card card-body shadow-sm align-items-center justify-content-center font-weight-bold-600"
                 style={{
-                    minHeight: "80vh",
+                    minHeight: "70vh",
                 }}
             >
                 No content to display
@@ -1733,7 +1954,7 @@ class FlashCard extends Component {
             <div
                 className="card card-body shadow-sm align-items-center justify-content-center"
                 style={{
-                    minHeight: "80vh",
+                    minHeight: "70vh",
                 }}
             >
                 <h3 className="primary-text mb-4">Congratulations!</h3>
@@ -1800,6 +2021,18 @@ class FlashCard extends Component {
 
     // ---------- loads subject information ----------
 
+    loopTopicStructure = (array) => {
+        var topic_name = "";
+        array.forEach((a) => {
+            if (this.topicNum === a.topic_num) {
+                topic_name = a.topic_name;
+            } else if (Array.isArray(a.child)) {
+                topic_name = this.loopTopicStructure(a.child);
+            }
+        });
+        return topic_name;
+    };
+
     componentDidMount = () => {
         this.loadConceptData();
 
@@ -1812,6 +2045,7 @@ class FlashCard extends Component {
                 console.log(result);
                 if (result.sts === true) {
                     let chapter_name = "";
+                    let topic_name = "";
                     // extract currently selected chapter name
                     for (let i = 0; i < result.data.chapters.length; i++) {
                         if (
@@ -1819,6 +2053,17 @@ class FlashCard extends Component {
                             this.chapterId
                         ) {
                             chapter_name = result.data.chapters[i].chapter_name;
+                            // Extracting topics from the chapter_structure
+                            for (
+                                let j = 0;
+                                j < result.data.chapters[i].topics.length;
+                                j++
+                            ) {
+                                topic_name = this.loopTopicStructure(
+                                    result.data.chapters[i].topics[j]
+                                        .chapter_structure
+                                );
+                            }
                         } else {
                             continue;
                         }
@@ -1826,6 +2071,7 @@ class FlashCard extends Component {
                     this.setState({
                         subject_name: result.data.subject_name,
                         chapter_name: chapter_name,
+                        topic_name: topic_name,
                     });
                 } else {
                     this.setState({
@@ -1838,21 +2084,31 @@ class FlashCard extends Component {
             .catch((err) => {
                 console.log(err);
             });
+
+        document.addEventListener("keydown", this.handleKeys);
+    };
+
+    componentWillUnmount = () => {
+        document.removeEventListener("keydown", this.handleKeys);
     };
 
     // ---------- Navigation ----------
+
+    handleKeys = (event) => {
+        let keyCode = event.key;
+        if (keyCode === "ArrowLeft") {
+            if (this.state.activeData !== 0) this.handlePrev();
+        } else if (keyCode === "ArrowRight") {
+            if (this.state.activeData + 1 < this.state.totalItems)
+                this.handleNext();
+        }
+    };
 
     handleNextPage = () => {
         this.setState(
             {
                 isFlipped: false,
                 page_loading: true,
-                selectedImageData: {
-                    title: "",
-                    file_name: "",
-                    image: null,
-                    path: "",
-                },
             },
             () => {
                 if (this.state.activeTab === "concept") {
@@ -1874,12 +2130,6 @@ class FlashCard extends Component {
             {
                 isFlipped: false,
                 page_loading: true,
-                selectedImageData: {
-                    title: "",
-                    file_name: "",
-                    image: null,
-                    path: "",
-                },
             },
             () => {
                 if (this.state.activeTab === "concept") {
@@ -1900,12 +2150,6 @@ class FlashCard extends Component {
         await this.setState({
             activeData: this.state.activeData + 1,
             isFlipped: false,
-            selectedImageData: {
-                title: "",
-                file_name: "",
-                image: null,
-                path: "",
-            },
         });
         window.MathJax.typeset();
     };
@@ -1914,12 +2158,6 @@ class FlashCard extends Component {
         await this.setState({
             activeData: this.state.activeData - 1,
             isFlipped: false,
-            selectedImageData: {
-                title: "",
-                file_name: "",
-                image: null,
-                path: "",
-            },
         });
         window.MathJax.typeset();
     };
@@ -1947,6 +2185,7 @@ class FlashCard extends Component {
     toggleTab = (type) => {
         this.setState({
             activeTab: type,
+            activeData: 0,
             page_loading: true,
             type2_next: null,
             type2_previous: null,
@@ -1960,24 +2199,9 @@ class FlashCard extends Component {
         }
     };
 
-    // ---------- Image ----------
+    // ---------- Image & Video ----------
 
-    changeImage = (image_index, index) => {
-        let image = "";
-        if (this.state.activeTab === "concept") {
-            image = this.state.concepts;
-        } else if (this.state.activeTab === "practice") {
-            image = this.state.practice;
-        } else if (this.state.activeTab === "match") {
-            image = this.state.match;
-        }
-        this.setState({
-            selectedImage: image_index,
-            selectedImageData: image[index].content.images[image_index],
-        });
-    };
-
-    changeImageLightbox = (images, index) => {
+    changeImage = (images, index) => {
         let imageArr = [];
         this.setState({
             selectedImageArray: [],
@@ -1996,88 +2220,237 @@ class FlashCard extends Component {
         });
     };
 
-    imageRender = (data, index) => {
+    imageRender = (data) => {
         return (
-            <div className="card">
-                {/* Single image view */}
-                <div className="card-body text-center p-0">
-                    {data[index] !== undefined &&
-                    data[index].content !== undefined &&
-                    data[index].content.images !== undefined ? (
-                        <>
-                            <img
-                                src={
-                                    this.state.selectedImageData.path === ""
-                                        ? data[index].content.images[0].path
-                                        : this.state.selectedImageData.path
-                                }
-                                alt={
-                                    this.state.selectedImageData.file_name ===
-                                    ""
-                                        ? data[index].content.images[0]
-                                              .file_name
-                                        : this.state.selectedImageData.file_name
-                                }
-                                className="img-fluid rounded-lg shadow-sm"
-                            />
-                            <div className="card-body primary-text font-weight-bold-600 text-center small p-2">
-                                {this.state.selectedImageData.title}
-                            </div>
-                        </>
+            <>
+                {data.content.images[0].path !== ""
+                    ? data.content.images.map((images, index) => {
+                          return images.path !== "" ? (
+                              <div
+                                  key={index}
+                                  className="card preview-img-circle shadow-sm"
+                                  style={{
+                                      backgroundImage: `url(${images.path})`,
+                                  }}
+                                  onClick={(e) => {
+                                      this.changeImage(
+                                          data.content.images,
+                                          index
+                                      );
+                                      e.stopPropagation();
+                                  }}
+                              ></div>
+                          ) : (
+                              ""
+                          );
+                      })
+                    : ""}
+                {data !== undefined &&
+                data.content !== undefined &&
+                data.content.video !== undefined ? (
+                    data.content.video.path !== "" ? (
+                        <OverlayTrigger
+                            key="top5"
+                            placement="top"
+                            overlay={<Tooltip id="tooltip4">Video</Tooltip>}
+                        >
+                            <button
+                                className="btn btn-primary-invert btn-sm shadow-sm rounded-circle shadow-none mt-1"
+                                onClick={(e) => {
+                                    this.toggleVideoModal(data.content.video);
+                                    e.stopPropagation();
+                                }}
+                            >
+                                <i
+                                    className="fas fa-video fa-sm"
+                                    style={{
+                                        marginLeft: "4px",
+                                        marginRight: "1px",
+                                        marginBottom: "7px",
+                                        marginTop: "7px",
+                                    }}
+                                ></i>
+                            </button>
+                        </OverlayTrigger>
                     ) : (
                         ""
-                    )}
-                </div>
-                {/* Thumbnails */}
-                <div className="card-footer px-0">
-                    <div className="row justify-content-center">
-                        {data[index] !== undefined &&
-                        data[index].content !== undefined &&
-                        data[index].content.images !== undefined
-                            ? data[index].content.images.map(
-                                  (images, image_index) => {
-                                      return images.path !== "" ? (
-                                          <div
-                                              key={image_index}
-                                              className="col-md-3"
-                                          >
-                                              <div
-                                                  className={`card preview-img-xs shadow-sm ${
-                                                      this.state
-                                                          .selectedImage ===
-                                                      image_index
-                                                          ? "border-primary"
-                                                          : ""
-                                                  }`}
-                                                  style={{
-                                                      backgroundImage: `url(${images.path})`,
-                                                  }}
-                                                  onClick={(e) => {
-                                                      this.changeImage(
-                                                          image_index,
-                                                          index
-                                                      );
-                                                      e.stopPropagation();
-                                                  }}
-                                              ></div>
-                                          </div>
-                                      ) : null;
-                                  }
-                              )
-                            : null}
-                    </div>
-                </div>
-            </div>
+                    )
+                ) : (
+                    ""
+                )}
+            </>
         );
     };
-
-    // ---------- Video ----------
 
     toggleVideoModal = (data) => {
         this.setState({
             showVideoModal: !this.state.showVideoModal,
             selectedVideoData: data,
         });
+    };
+
+    // ---------- Bookmark | Favourites ----------
+
+    handleBookmark = (data, index) => {
+        let body = {
+            topic_num: this.topicNum.toString(),
+        };
+        if (data[index] !== undefined) {
+            if (this.state.activeTab === "concept") {
+                body["concept_id"] = data[index].concepts_random_id;
+            } else {
+                body["question_id"] = data[index].question_random_id;
+            }
+            this.setState({
+                showSuccessAlert: false,
+                showErrorAlert: false,
+            });
+
+            fetch(
+                `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/favourites/`,
+                {
+                    method: "POST",
+                    headers: this.headers,
+                    body: JSON.stringify(body),
+                }
+            )
+                .then((res) => res.json())
+                .then((result) => {
+                    console.log(result);
+                    if (result.sts === true) {
+                        this.setState({
+                            successMsg: result.msg,
+                            showSuccessAlert: true,
+                        });
+                        if (this.state.activeTab === "concept") {
+                            data[index].favourite = !data[index].favourite;
+                            this.setState({
+                                concepts: data,
+                            });
+                        } else {
+                            data[index].favourite = !data[index].favourite;
+                            this.setState({
+                                practice: data,
+                            });
+                        }
+                    } else {
+                        this.setState({
+                            errorMsg: result.msg,
+                            showErrorAlert: true,
+                        });
+                    }
+                })
+                .then((err) => console.log(err));
+        }
+    };
+
+    // if (this.state.isSlideshowPlaying === false) {
+    //     this.setState({
+    //         isSlideshowPlaying: true,
+    //     });
+    //     setInterval(() => {
+    //         if (this.state.isSlideshowPlaying) {
+    //             this.setState({
+    //                 activeData:
+    //                     this.state.activeData + 1 ===
+    //                     this.state.totalItems
+    //                         ? 0
+    //                         : this.state.activeData + 1,
+    //                 isFlipped: false,
+    //             });
+    //             // if (
+    //             //     this.state.activeData + 1 ===
+    //             //     this.state.totalItems
+    //             // ) {
+    //             //     this.setState({
+    //             //         isSlideshowPlaying: false,
+    //             //     });
+    //             // }
+    //         }
+    //     }, 3000);
+    // } else {
+    //     this.setState({
+    //         isSlideshowPlaying: false,
+    //     });
+    // }
+
+    handleSlideShow = () => {
+        if (this.state.activeTab === "concept") {
+            var slideInterval = setInterval(nextSlide.bind(this), 2000);
+
+            function nextSlide() {
+                this.setState({
+                    activeData:
+                        this.state.activeData + 1 === this.state.totalItems
+                            ? 0
+                            : this.state.activeData + 1,
+                    isFlipped: false,
+                });
+            }
+
+            function pauseSlideshow() {
+                this.setState({
+                    isSlideshowPlaying: false,
+                });
+                clearInterval(slideInterval);
+            }
+
+            function playSlideshow() {
+                this.setState({
+                    isSlideshowPlaying: true,
+                });
+                slideInterval = setInterval(nextSlide.bind(this), 2000);
+            }
+
+            if (this.state.isSlideshowPlaying) {
+                pauseSlideshow.bind(this);
+            } else {
+                playSlideshow.bind(this);
+            }
+        }
+    };
+
+    // nextSlide = async () => {
+    //     if (this.state.isSlideshowPlaying) {
+    //         await this.setState({
+    //             activeData:
+    //                 this.state.activeData + 1 === this.state.totalItems
+    //                     ? 0
+    //                     : this.state.activeData + 1,
+    //             isFlipped: false,
+    //         });
+    //     }
+    //     window.MathJax.typeset();
+    // };
+
+    // pauseSlideshow = async (slideInterval) => {
+    //     await this.setState({
+    //         isSlideshowPlaying: false,
+    //     });
+    //     clearInterval(slideInterval);
+    //     window.MathJax.typeset();
+    // };
+
+    // playSlideshow = async (slideInterval) => {
+    //     await this.setState({
+    //         isSlideshowPlaying: true,
+    //     });
+    //     slideInterval = setInterval(this.nextSlide, 3000);
+    //     window.MathJax.typeset();
+    // };
+
+    formSubmission = () => {
+        setTimeout(() => {
+            this.setState({
+                showNotesModal: false,
+                activeData: this.state.activeData,
+            });
+        }, 1000);
+        if (this.state.activeTab === "concept") {
+            this.loadConceptData();
+        } else {
+            this.loadPracticeData();
+        }
     };
 
     render() {
@@ -2117,14 +2490,14 @@ class FlashCard extends Component {
         const total = this.state.totalItems;
         return (
             <>
-                {/* Navbar */}
+                {/* ----- Navbar ----- */}
                 <Header
                     name={this.state.subject_name}
-                    chapter_name={`${this.state.chapter_name}`}
+                    chapter_name={`${this.state.chapter_name} - ${this.state.topic_name}`}
                     goBack={this.props.history.goBack}
                 />
 
-                {/* ALert message */}
+                {/* ----- Alert message ----- */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
                     successMsg={this.state.successMsg}
@@ -2142,7 +2515,7 @@ class FlashCard extends Component {
                     }}
                 />
 
-                {/* Video modal */}
+                {/* ----- Video modal ----- */}
                 {this.state.showVideoModal ? (
                     <VideoModal
                         show={this.state.showVideoModal}
@@ -2153,7 +2526,7 @@ class FlashCard extends Component {
                     ""
                 )}
 
-                {/* Image lightbox */}
+                {/* ----- Image lightbox ----- */}
                 {this.state.isLightBoxOpen ? (
                     <Lightbox
                         images={this.state.selectedImageArray}
@@ -2168,7 +2541,33 @@ class FlashCard extends Component {
                     ""
                 )}
 
+                {/* ----- Personal notes modal ----- */}
+                {this.state.showNotesModal ? (
+                    <PersonalNotes
+                        show={this.state.showNotesModal}
+                        onHide={() =>
+                            this.setState({
+                                showNotesModal: false,
+                            })
+                        }
+                        type={this.state.activeTab}
+                        subjectId={this.subjectId}
+                        chapterId={this.chapterId}
+                        topic_num={this.topicNum}
+                        id={
+                            this.state.activeTab === "concept"
+                                ? data[index].concepts_random_id
+                                : data[index].question_random_id
+                        }
+                        data={data[index].personal_notes}
+                        formSubmission={this.formSubmission}
+                    />
+                ) : (
+                    ""
+                )}
+
                 {/* ---------- Header tab section ---------- */}
+
                 <div className="light-bg p-3 mt-1 mb-3">
                     <div className="row justify-content-center">
                         <div className="col-md-11">
@@ -2217,15 +2616,57 @@ class FlashCard extends Component {
                                 </div>
                                 <div className="col-md-6 text-right">
                                     {this.state.activeTab !== "match" ? (
-                                        <button className="btn btn-primary btn-sm rounded-circle mr-3 shadow-none">
-                                            <i
-                                                className="fas fa-bookmark fa-sm"
-                                                style={{
-                                                    marginLeft: "1px",
-                                                    marginRight: "1px",
-                                                }}
-                                            ></i>
-                                        </button>
+                                        <OverlayTrigger
+                                            key="top6"
+                                            placement="top"
+                                            overlay={
+                                                <Tooltip id="tooltip1">
+                                                    {data[index] !== undefined
+                                                        ? data[index]
+                                                              .favourite !==
+                                                          undefined
+                                                            ? data[index]
+                                                                  .favourite ===
+                                                              true
+                                                                ? "Bookmarked"
+                                                                : `Bookmark this ${
+                                                                      this.state
+                                                                          .activeTab ===
+                                                                      "concept"
+                                                                          ? "concept"
+                                                                          : "question"
+                                                                  }`
+                                                            : "Bookmark"
+                                                        : "Bookmark"}
+                                                </Tooltip>
+                                            }
+                                        >
+                                            <button
+                                                className="btn btn-primary btn-sm rounded-circle mr-3 shadow-none"
+                                                onClick={() =>
+                                                    this.handleBookmark(
+                                                        data,
+                                                        index
+                                                    )
+                                                }
+                                            >
+                                                <i
+                                                    className={`${
+                                                        data[index]
+                                                            ? data[index]
+                                                                  .favourite ===
+                                                              true
+                                                                ? "fas secondary-text"
+                                                                : "far"
+                                                            : "far"
+                                                    } fa-bookmark fa-sm`}
+                                                    style={{
+                                                        marginLeft: "1px",
+                                                        marginRight: "1px",
+                                                    }}
+                                                ></i>
+                                            </button>
+                                        </OverlayTrigger>
                                     ) : (
                                         ""
                                     )}
@@ -2290,11 +2731,24 @@ class FlashCard extends Component {
                 </div>
 
                 {/* ---------- Main content ---------- */}
+
                 <div className="container-fluid mb-3">
                     <div className="row justify-content-center">
                         <div className="col-md-11">
                             {this.state.activeTab === "concept" ? (
-                                this.conceptRender(data, index)
+                                data[index] !== undefined &&
+                                data[index].content !== undefined ? (
+                                    this.conceptRender(data, index)
+                                ) : (
+                                    <div
+                                        className="card card-body shadow-sm align-items-center justify-content-center font-weight-bold-600"
+                                        style={{
+                                            minHeight: "70vh",
+                                        }}
+                                    >
+                                        No content to display
+                                    </div>
+                                )
                             ) : this.state.activeTab === "practice" ? (
                                 data[index] !== undefined &&
                                 data[index].content !== undefined ? (
@@ -2308,7 +2762,7 @@ class FlashCard extends Component {
                                     <div
                                         className="card card-body shadow-sm align-items-center justify-content-center font-weight-bold-600"
                                         style={{
-                                            minHeight: "80vh",
+                                            minHeight: "70vh",
                                         }}
                                     >
                                         No content to display
@@ -2323,31 +2777,97 @@ class FlashCard extends Component {
                     </div>
                 </div>
 
-                {/* ---------- footer ---------- */}
+                {/* ---------- Footer ---------- */}
+
                 {this.state.activeTab !== "match" ? (
                     <div className="secondary-bg p-3">
-                        <div className="row justify-content-center">
+                        <div className="row align-items-center justify-content-center">
                             <div className="col-md-11">
                                 <div className="row align-items-center">
+                                    {/* ---------- keyboard & Notes button ---------- */}
                                     <div className="col-md-4">
-                                        <button className="btn btn-primary btn-sm rounded-circle shadow-none mr-3">
-                                            <i className="fas fa-keyboard fa-sm"></i>
-                                        </button>
-                                        <button className="btn btn-primary btn-sm rounded-circle shadow-none">
-                                            <i className="fas fa-pencil-ruler fa-sm"></i>
-                                        </button>
-                                    </div>
-                                    <div className="col-md-4 align-items-center text-center small">
-                                        {/* ----- Previous button ----- */}
                                         <OverlayTrigger
-                                            key="top1"
+                                            key="top6"
                                             placement="top"
                                             overlay={
                                                 <Tooltip id="tooltip1">
-                                                    Previous page
+                                                    Virtual keyboard
                                                 </Tooltip>
                                             }
                                         >
+                                            <button className="btn btn-primary btn-sm rounded-circle shadow-none mr-3">
+                                                <i
+                                                    className="fas fa-keyboard fa-sm"
+                                                    style={{
+                                                        marginBottom: "4px",
+                                                    }}
+                                                ></i>
+                                            </button>
+                                        </OverlayTrigger>
+                                        <OverlayTrigger
+                                            key="top7"
+                                            placement="top"
+                                            overlay={
+                                                <Tooltip id="tooltip1">
+                                                    Personal notes
+                                                </Tooltip>
+                                            }
+                                        >
+                                            <div className="d-inline">
+                                                <button
+                                                    className="btn btn-primary btn-sm rounded-circle shadow-none"
+                                                    onClick={() =>
+                                                        data[index]
+                                                            ? this.setState({
+                                                                  showNotesModal: !this
+                                                                      .state
+                                                                      .showNotesModal,
+                                                              })
+                                                            : ""
+                                                    }
+                                                >
+                                                    <i
+                                                        className="fas fa-pencil-ruler fa-sm"
+                                                        style={{
+                                                            marginBottom: "5px",
+                                                            marginLeft: "1px",
+                                                        }}
+                                                    ></i>
+                                                </button>
+                                                {data[index] ? (
+                                                    Object.entries(
+                                                        data[index]
+                                                            .personal_notes
+                                                    ).length !== 0 ? (
+                                                        <span
+                                                            className="position-absolute text-danger"
+                                                            style={{
+                                                                marginTop:
+                                                                    "-6px",
+                                                                marginLeft:
+                                                                    "-5px",
+                                                                fontSize: "8px",
+                                                            }}
+                                                        >
+                                                            <i className="fas fa-circle fa-sm"></i>
+                                                        </span>
+                                                    ) : (
+                                                        ""
+                                                    )
+                                                ) : (
+                                                    ""
+                                                )}
+                                            </div>
+                                        </OverlayTrigger>
+                                    </div>
+
+                                    {/* ---------- Pagination ---------- */}
+
+                                    <div className="col-md-4 d-flex align-items-center justify-content-center small">
+                                        {/* ----- Previous page button ----- */}
+
+                                        {this.state.previous === null &&
+                                        this.state.type2_previous === null ? (
                                             <button
                                                 className="btn btn-link btn-sm mr-2 shadow-none"
                                                 onClick={this.handlePrevPage}
@@ -2360,18 +2880,41 @@ class FlashCard extends Component {
                                                         : false
                                                 }
                                             >
-                                                <i className="fas fa-angle-double-left"></i>
+                                                <i className="fas fa-angle-double-left fa-lg"></i>
                                             </button>
-                                        </OverlayTrigger>
-                                        <OverlayTrigger
-                                            key="top2"
-                                            placement="top"
-                                            overlay={
-                                                <Tooltip id="tooltip2">
-                                                    Previous slide
-                                                </Tooltip>
-                                            }
-                                        >
+                                        ) : (
+                                            <OverlayTrigger
+                                                key="top1"
+                                                placement="top"
+                                                overlay={
+                                                    <Tooltip id="tooltip1">
+                                                        Previous page
+                                                    </Tooltip>
+                                                }
+                                            >
+                                                <button
+                                                    className="btn btn-link btn-sm mr-2 shadow-none"
+                                                    onClick={
+                                                        this.handlePrevPage
+                                                    }
+                                                    disabled={
+                                                        this.state.previous ===
+                                                            null &&
+                                                        this.state
+                                                            .type2_previous ===
+                                                            null
+                                                            ? true
+                                                            : false
+                                                    }
+                                                >
+                                                    <i className="fas fa-angle-double-left fa-lg"></i>
+                                                </button>
+                                            </OverlayTrigger>
+                                        )}
+
+                                        {/* ----- Previous slide button ----- */}
+
+                                        {index === 0 ? (
                                             <button
                                                 className="btn btn-link btn-sm mr-2 shadow-none"
                                                 onClick={() =>
@@ -2381,31 +2924,90 @@ class FlashCard extends Component {
                                                     index === 0 ? true : false
                                                 }
                                             >
-                                                <i className="fas fa-chevron-left fa-sm"></i>
+                                                <i className="fas fa-chevron-left"></i>
                                             </button>
-                                        </OverlayTrigger>
+                                        ) : (
+                                            <OverlayTrigger
+                                                key="top2"
+                                                placement="top"
+                                                overlay={
+                                                    <Tooltip id="tooltip2">
+                                                        Previous slide
+                                                    </Tooltip>
+                                                }
+                                            >
+                                                <button
+                                                    className="btn btn-link btn-sm mr-2 shadow-none"
+                                                    onClick={() =>
+                                                        this.handlePrev(
+                                                            data,
+                                                            index
+                                                        )
+                                                    }
+                                                    disabled={
+                                                        index === 0
+                                                            ? true
+                                                            : false
+                                                    }
+                                                >
+                                                    <i className="fas fa-chevron-left"></i>
+                                                </button>
+                                            </OverlayTrigger>
+                                        )}
 
                                         {/* ----- Pagination number ----- */}
-                                        <span className="font-weight-bold-600 mr-2">
-                                            {index <= 9
-                                                ? `0${index + 1}`
-                                                : index + 1}
-                                        </span>
-                                        <span>/</span>
-                                        <span className="font-weight-bold-600 ml-2">
-                                            {total <= 9 ? `0${total}` : total}
-                                        </span>
 
-                                        {/* ----- Next button ----- */}
-                                        <OverlayTrigger
-                                            key="top3"
-                                            placement="top"
-                                            overlay={
-                                                <Tooltip id="tooltip3">
-                                                    Next slide
-                                                </Tooltip>
-                                            }
+                                        <div
+                                            className="d-inline border-primary primary-text font-weight-bold-600 rounded-lg"
+                                            style={{
+                                                padding: "5px 10px",
+                                            }}
                                         >
+                                            <span className="mr-1">
+                                                {total !== 0
+                                                    ? index <= 9
+                                                        ? `0${index + 1}`
+                                                        : index + 1
+                                                    : 0}
+                                            </span>
+                                            <span>/</span>
+                                            <span className="ml-1">
+                                                {total <= 9
+                                                    ? `0${total}`
+                                                    : total}
+                                            </span>
+                                        </div>
+
+                                        {/* ----- Next slide button ----- */}
+
+                                        {index + 1 < total ? (
+                                            <OverlayTrigger
+                                                key="top3"
+                                                placement="top"
+                                                overlay={
+                                                    <Tooltip id="tooltip3">
+                                                        Next slide
+                                                    </Tooltip>
+                                                }
+                                            >
+                                                <button
+                                                    className="btn btn-link btn-sm ml-2 shadow-none"
+                                                    onClick={() =>
+                                                        this.handleNext(
+                                                            data,
+                                                            index
+                                                        )
+                                                    }
+                                                    disabled={
+                                                        index + 1 < total
+                                                            ? false
+                                                            : true
+                                                    }
+                                                >
+                                                    <i className="fas fa-chevron-right"></i>
+                                                </button>
+                                            </OverlayTrigger>
+                                        ) : (
                                             <button
                                                 className="btn btn-link btn-sm ml-2 shadow-none"
                                                 onClick={() =>
@@ -2417,18 +3019,14 @@ class FlashCard extends Component {
                                                         : true
                                                 }
                                             >
-                                                <i className="fas fa-chevron-right fa-sm"></i>
+                                                <i className="fas fa-chevron-right"></i>
                                             </button>
-                                        </OverlayTrigger>
-                                        <OverlayTrigger
-                                            key="top4"
-                                            placement="top"
-                                            overlay={
-                                                <Tooltip id="tooltip4">
-                                                    Next page
-                                                </Tooltip>
-                                            }
-                                        >
+                                        )}
+
+                                        {/* ----- Next page button ----- */}
+
+                                        {this.state.next === null &&
+                                        this.state.type2_next === null ? (
                                             <button
                                                 className="btn btn-link btn-sm ml-2 shadow-none"
                                                 onClick={this.handleNextPage}
@@ -2440,40 +3038,80 @@ class FlashCard extends Component {
                                                         : false
                                                 }
                                             >
-                                                <i className="fas fa-angle-double-right"></i>
+                                                <i className="fas fa-angle-double-right fa-lg"></i>
                                             </button>
-                                        </OverlayTrigger>
+                                        ) : (
+                                            <OverlayTrigger
+                                                key="top4"
+                                                placement="top"
+                                                overlay={
+                                                    <Tooltip id="tooltip4">
+                                                        Next page
+                                                    </Tooltip>
+                                                }
+                                            >
+                                                <button
+                                                    className="btn btn-link btn-sm ml-2 shadow-none"
+                                                    onClick={
+                                                        this.handleNextPage
+                                                    }
+                                                    disabled={
+                                                        this.state.next ===
+                                                            null &&
+                                                        this.state
+                                                            .type2_next === null
+                                                            ? true
+                                                            : false
+                                                    }
+                                                >
+                                                    <i className="fas fa-angle-double-right fa-lg"></i>
+                                                </button>
+                                            </OverlayTrigger>
+                                        )}
                                     </div>
-                                    <div className="col-md-4 text-right">
-                                        {data[index] !== undefined &&
-                                        data[index].content !== undefined &&
-                                        data[index].content.video !==
-                                            undefined ? (
-                                            data[index].content.video.path !==
-                                            "" ? (
+
+                                    {/* ---------- Video button ---------- */}
+
+                                    {this.state.activeTab === "concept" ? (
+                                        <div className="col-md-4 text-right">
+                                            <OverlayTrigger
+                                                key="top5"
+                                                placement="top"
+                                                overlay={
+                                                    <Tooltip id="tooltip4">
+                                                        {this.state
+                                                            .isSlideshowPlaying
+                                                            ? "Pause"
+                                                            : "Play"}{" "}
+                                                        slideshow
+                                                    </Tooltip>
+                                                }
+                                            >
                                                 <button
                                                     className="btn btn-primary btn-sm rounded-circle shadow-none"
-                                                    onClick={() =>
-                                                        this.toggleVideoModal(
-                                                            data[index].content
-                                                                .video
-                                                        )
+                                                    onClick={
+                                                        this.handleSlideShow
                                                     }
                                                 >
                                                     <i
-                                                        className="fas fa-play fa-sm"
+                                                        className={`fas ${
+                                                            this.state
+                                                                .isSlideshowPlaying
+                                                                ? "fa-pause"
+                                                                : "fa-play"
+                                                        } fa-sm`}
                                                         style={{
-                                                            marginLeft: "2px",
+                                                            marginLeft: "3px",
+                                                            marginRight: "1px",
+                                                            marginBottom: "5px",
                                                         }}
                                                     ></i>
                                                 </button>
-                                            ) : (
-                                                ""
-                                            )
-                                        ) : (
-                                            ""
-                                        )}
-                                    </div>
+                                            </OverlayTrigger>
+                                        </div>
+                                    ) : (
+                                        ""
+                                    )}
                                 </div>
                             </div>
                         </div>

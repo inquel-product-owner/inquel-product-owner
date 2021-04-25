@@ -76,6 +76,8 @@ export function Type1DataFormat(result) {
             type: "type_1",
             question: response[i].question,
             question_random_id: response[i].question_random_id,
+            favourite: response[i].favourite || false,
+            personal_notes: response[i].personal_notes || {},
             content: {
                 mcq: response[i].mcq,
                 fill_in: response[i].fill_in,
@@ -358,6 +360,8 @@ export function Type2DataFormat(result) {
             type: "type_2",
             question: response[i].question,
             question_random_id: response[i].question_random_id,
+            favourite: response[i].favourite || false,
+            personal_notes: response[i].personal_notes || {},
             sub_question: sub_question,
             content: {
                 images:
@@ -636,4 +640,130 @@ export function dataFormat(result) {
         total: totalSubQuestion,
         current: currentSubQuestionIndex,
     };
+}
+
+export function conceptFormat(result) {
+    let data = [];
+    let images = [];
+    let audio = [];
+    let response = result.data.results;
+
+    for (let i = 0; i < response.length; i++) {
+        images = [];
+        audio = [];
+        if (response[i].files && response[i].files.length !== 0) {
+            // image
+            if (response[i].files[0].concepts_image_1) {
+                images.push({
+                    title: response[i].files[0].concepts_image_1_title,
+                    file_name: "",
+                    image: null,
+                    path: response[i].files[0].concepts_image_1,
+                });
+            }
+            if (response[i].files[0].concepts_image_2) {
+                images.push({
+                    title: response[i].files[0].concepts_image_2_title,
+                    file_name: "",
+                    image: null,
+                    path: response[i].files[0].concepts_image_2,
+                });
+            }
+            if (response[i].files[0].concepts_image_3) {
+                images.push({
+                    title: response[i].files[0].concepts_image_3_title,
+                    file_name: "",
+                    image: null,
+                    path: response[i].files[0].concepts_image_3,
+                });
+            }
+            if (response[i].files[0].concepts_image_4) {
+                images.push({
+                    title: response[i].files[0].concepts_image_4_title,
+                    file_name: "",
+                    image: null,
+                    path: response[i].files[0].concepts_image_4,
+                });
+            }
+
+            // audio
+            if (response[i].files[0].concepts_audio_1) {
+                audio.push({
+                    title: response[i].files[0].concepts_audio_1_title,
+                    file_name: "",
+                    audio: null,
+                    path: response[i].files[0].concepts_audio_1,
+                });
+            }
+            if (response[i].files[0].concepts_audio_2) {
+                audio.push({
+                    title: response[i].files[0].concepts_audio_2_title,
+                    file_name: "",
+                    audio: null,
+                    path: response[i].files[0].concepts_audio_2,
+                });
+            }
+        }
+
+        // video
+        var path = "";
+        if (response[i].files && response[i].files.length !== 0) {
+            if (response[i].files[0].paste_video_url) {
+                path = response[i].files[0].paste_video_url;
+            }
+            if (response[i].files[0].concepts_video_1) {
+                path = response[i].files[0].concepts_video_1;
+            }
+        }
+
+        data.push({
+            topic_num: response[i].topic_num,
+            concepts_random_id: response[i].concepts_random_id,
+            favourite: response[i].favourite,
+            personal_notes: response[i].personal_notes,
+            content: {
+                terms: response[i].terms,
+                definition: response[i].definition,
+                images:
+                    images.length === 0
+                        ? [
+                              {
+                                  title: "",
+                                  file_name: "",
+                                  image: null,
+                                  path: "",
+                              },
+                          ]
+                        : images,
+                video: {
+                    title:
+                    response[i].files && response[i].files.length !== 0 &&
+                        response[i].files[0].concepts_video_1_title
+                            ? response[i].files[0].concepts_video_1_title
+                            : "",
+                    file_name: "",
+                    video: null,
+                    path: path,
+                    url: "",
+                },
+                audio:
+                    audio.length === 0
+                        ? [
+                              {
+                                  title: "",
+                                  file_name: "",
+                                  audio: null,
+                                  path: "",
+                              },
+                          ]
+                        : audio,
+            },
+            settings: {
+                virtual_keyboard: response[i].settings.virtual_keyboard,
+                limited: response[i].settings.limited,
+            },
+        });
+    }
+
+    return { result: data };
 }

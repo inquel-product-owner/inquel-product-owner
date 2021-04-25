@@ -21,26 +21,6 @@ const mapStateToProps = (state) => ({
     topic_name: state.topic_name,
 });
 
-const images = [
-    { title: "", file_name: "", image: null, path: "" },
-    { title: "", file_name: "", image: null, path: "" },
-    { title: "", file_name: "", image: null, path: "" },
-    { title: "", file_name: "", image: null, path: "" },
-];
-
-const audio = [
-    { title: "", file_name: "", audio: null, path: "" },
-    { title: "", file_name: "", audio: null, path: "" },
-];
-
-const video = {
-    title: "",
-    file_name: "",
-    video: null,
-    path: "",
-    url: "",
-};
-
 class Type1 extends Component {
     constructor(props) {
         super(props);
@@ -102,9 +82,23 @@ class Type1 extends Component {
                             { correct: false, content: "" },
                         ],
                         explanation: "<p>Explanation goes here</p>",
-                        images: images,
-                        video: video,
-                        audio: audio,
+                        images: [
+                            { title: "", file_name: "", image: null, path: "" },
+                            { title: "", file_name: "", image: null, path: "" },
+                            { title: "", file_name: "", image: null, path: "" },
+                            { title: "", file_name: "", image: null, path: "" },
+                        ],
+                        video: {
+                            title: "",
+                            file_name: "",
+                            video: null,
+                            path: "",
+                            url: "",
+                        },
+                        audio: [
+                            { title: "", file_name: "", audio: null, path: "" },
+                            { title: "", file_name: "", audio: null, path: "" },
+                        ],
                     },
                     properties: {
                         marks: "",
@@ -325,7 +319,34 @@ class Type1 extends Component {
                                               ],
                                     explanation: response[i].explanation,
                                     images:
-                                        imgArr.length === 0 ? images : imgArr,
+                                        imgArr.length === 0
+                                            ? [
+                                                  {
+                                                      title: "",
+                                                      file_name: "",
+                                                      image: null,
+                                                      path: "",
+                                                  },
+                                                  {
+                                                      title: "",
+                                                      file_name: "",
+                                                      image: null,
+                                                      path: "",
+                                                  },
+                                                  {
+                                                      title: "",
+                                                      file_name: "",
+                                                      image: null,
+                                                      path: "",
+                                                  },
+                                                  {
+                                                      title: "",
+                                                      file_name: "",
+                                                      image: null,
+                                                      path: "",
+                                                  },
+                                              ]
+                                            : imgArr,
                                     video: {
                                         title:
                                             response[i].files.length !== 0 &&
@@ -341,7 +362,20 @@ class Type1 extends Component {
                                     },
                                     audio:
                                         audioArr.length === 0
-                                            ? audio
+                                            ? [
+                                                  {
+                                                      title: "",
+                                                      file_name: "",
+                                                      audio: null,
+                                                      path: "",
+                                                  },
+                                                  {
+                                                      title: "",
+                                                      file_name: "",
+                                                      audio: null,
+                                                      path: "",
+                                                  },
+                                              ]
                                             : audioArr,
                                 },
                                 properties: {
@@ -1766,9 +1800,23 @@ class Type1 extends Component {
                     { correct: false, content: "" },
                 ],
                 explanation: "<p>Explanation goes here</p>",
-                images: images,
-                video: video,
-                audio: audio,
+                images: [
+                    { title: "", file_name: "", image: null, path: "" },
+                    { title: "", file_name: "", image: null, path: "" },
+                    { title: "", file_name: "", image: null, path: "" },
+                    { title: "", file_name: "", image: null, path: "" },
+                ],
+                video: {
+                    title: "",
+                    file_name: "",
+                    video: null,
+                    path: "",
+                    url: "",
+                },
+                audio: [
+                    { title: "", file_name: "", audio: null, path: "" },
+                    { title: "", file_name: "", audio: null, path: "" },
+                ],
             },
             properties: {
                 marks: "",
@@ -1850,9 +1898,23 @@ class Type1 extends Component {
                 boolean_question: boolean,
                 options: options,
                 explanation: values[index].content.explanation,
-                images: images,
-                video: video,
-                audio: audio,
+                images: [
+                    { title: "", file_name: "", image: null, path: "" },
+                    { title: "", file_name: "", image: null, path: "" },
+                    { title: "", file_name: "", image: null, path: "" },
+                    { title: "", file_name: "", image: null, path: "" },
+                ],
+                video: {
+                    title: "",
+                    file_name: "",
+                    video: null,
+                    path: "",
+                    url: "",
+                },
+                audio: [
+                    { title: "", file_name: "", audio: null, path: "" },
+                    { title: "", file_name: "", audio: null, path: "" },
+                ],
             },
             properties: {
                 marks: values[index].properties.marks,
@@ -1942,9 +2004,53 @@ class Type1 extends Component {
                                     { correct: false, content: "" },
                                 ],
                                 explanation: "<p>Explanation goes here</p>",
-                                images: images,
-                                video: video,
-                                audio: audio,
+                                images: [
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        image: null,
+                                        path: "",
+                                    },
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        image: null,
+                                        path: "",
+                                    },
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        image: null,
+                                        path: "",
+                                    },
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        image: null,
+                                        path: "",
+                                    },
+                                ],
+                                video: {
+                                    title: "",
+                                    file_name: "",
+                                    video: null,
+                                    path: "",
+                                    url: "",
+                                },
+                                audio: [
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        audio: null,
+                                        path: "",
+                                    },
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        audio: null,
+                                        path: "",
+                                    },
+                                ],
                             },
                             properties: {
                                 marks: "",
@@ -2026,9 +2132,53 @@ class Type1 extends Component {
                                 { correct: false, content: "" },
                             ],
                             explanation: "<p>Explanation goes here</p>",
-                            images: images,
-                            video: video,
-                            audio: audio,
+                            images: [
+                                {
+                                    title: "",
+                                    file_name: "",
+                                    image: null,
+                                    path: "",
+                                },
+                                {
+                                    title: "",
+                                    file_name: "",
+                                    image: null,
+                                    path: "",
+                                },
+                                {
+                                    title: "",
+                                    file_name: "",
+                                    image: null,
+                                    path: "",
+                                },
+                                {
+                                    title: "",
+                                    file_name: "",
+                                    image: null,
+                                    path: "",
+                                },
+                            ],
+                            video: {
+                                title: "",
+                                file_name: "",
+                                video: null,
+                                path: "",
+                                url: "",
+                            },
+                            audio: [
+                                {
+                                    title: "",
+                                    file_name: "",
+                                    audio: null,
+                                    path: "",
+                                },
+                                {
+                                    title: "",
+                                    file_name: "",
+                                    audio: null,
+                                    path: "",
+                                },
+                            ],
                         },
                         properties: {
                             marks: "",

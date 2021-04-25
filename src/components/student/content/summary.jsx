@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import { Tab, Nav } from "react-bootstrap";
-import Header from "./shared/navbar";
-import SideNav from "./shared/sidenav";
+import Header from "../shared/navbar";
+import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
-import Loading from "../sharedComponents/loader";
-import AlertBox from "../sharedComponents/alert";
-import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
+import Loading from "../../sharedComponents/loader";
+import AlertBox from "../../sharedComponents/alert";
+import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
 import { Document, Page, pdfjs } from "react-pdf";
 
 class Summary extends Component {
@@ -221,7 +221,7 @@ class Summary extends Component {
                                     defaultActiveKey={this.state.chapterId}
                                 >
                                     <div className="row">
-                                        {/* chapter list */}
+                                        {/* ----- chapter list ----- */}
                                         <div className="col-md-3 mb-2 mb-md-0 border-right">
                                             <Nav
                                                 variant="pills"
@@ -263,7 +263,9 @@ class Summary extends Component {
                                                     : null}
                                             </Nav>
                                         </div>
-                                        {/* summary data */}
+
+                                        {/* ----- Summary data ----- */}
+
                                         <div className="col-md-9 pl-md-0">
                                             <Tab.Content>
                                                 <Tab.Pane
@@ -272,7 +274,7 @@ class Summary extends Component {
                                                     }
                                                 >
                                                     <div className="card">
-                                                        <div className="card-body">
+                                                        <div className="card-body py-0">
                                                             {this.state
                                                                 .summaryData
                                                                 .length !== 0
