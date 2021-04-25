@@ -22,26 +22,6 @@ const mapStateToProps = (state) => ({
     topic_name: state.topic_name,
 });
 
-const images = [
-    { title: "", file_name: "", image: null, path: "" },
-    { title: "", file_name: "", image: null, path: "" },
-    { title: "", file_name: "", image: null, path: "" },
-    { title: "", file_name: "", image: null, path: "" },
-];
-
-const audio = [
-    { title: "", file_name: "", audio: null, path: "" },
-    { title: "", file_name: "", audio: null, path: "" },
-];
-
-const video = {
-    title: "",
-    file_name: "",
-    video: null,
-    path: "",
-    url: "",
-};
-
 class Concepts extends Component {
     constructor(props) {
         super(props);
@@ -87,9 +67,23 @@ class Concepts extends Component {
                     content: {
                         terms: "<p>Terms goes here</p>",
                         definition: "<p>Definition goes here</p>",
-                        images: images,
-                        video: video,
-                        audio: audio,
+                        images: [
+                            { title: "", file_name: "", image: null, path: "" },
+                            { title: "", file_name: "", image: null, path: "" },
+                            { title: "", file_name: "", image: null, path: "" },
+                            { title: "", file_name: "", image: null, path: "" },
+                        ],
+                        video: {
+                            title: "",
+                            file_name: "",
+                            video: null,
+                            path: "",
+                            url: "",
+                        },
+                        audio: [
+                            { title: "", file_name: "", audio: null, path: "" },
+                            { title: "", file_name: "", audio: null, path: "" },
+                        ],
                     },
                     settings: {
                         virtual_keyboard: [],
@@ -256,7 +250,12 @@ class Concepts extends Component {
                                     terms: response[i].terms,
                                     definition: response[i].definition,
                                     images:
-                                        imgArr.length === 0 ? images : imgArr,
+                                        imgArr.length === 0 ? [
+                                            { title: "", file_name: "", image: null, path: "" },
+                                            { title: "", file_name: "", image: null, path: "" },
+                                            { title: "", file_name: "", image: null, path: "" },
+                                            { title: "", file_name: "", image: null, path: "" },
+                                        ] : imgArr,
                                     video: {
                                         title:
                                             response[i].files.length !== 0 &&
@@ -272,7 +271,10 @@ class Concepts extends Component {
                                     },
                                     audio:
                                         audioArr.length === 0
-                                            ? audio
+                                            ? [
+                                                { title: "", file_name: "", audio: null, path: "" },
+                                                { title: "", file_name: "", audio: null, path: "" },
+                                            ]
                                             : audioArr,
                                 },
                                 settings: {
@@ -1248,9 +1250,23 @@ class Concepts extends Component {
             content: {
                 terms: "<p>Terms goes here</p>",
                 definition: "<p>Definition goes here</p>",
-                images: images,
-                video: video,
-                audio: audio,
+                images: [
+                    { title: "", file_name: "", image: null, path: "" },
+                    { title: "", file_name: "", image: null, path: "" },
+                    { title: "", file_name: "", image: null, path: "" },
+                    { title: "", file_name: "", image: null, path: "" },
+                ],
+                video: {
+                    title: "",
+                    file_name: "",
+                    video: null,
+                    path: "",
+                    url: "",
+                },
+                audio: [
+                    { title: "", file_name: "", audio: null, path: "" },
+                    { title: "", file_name: "", audio: null, path: "" },
+                ],
             },
             settings: {
                 virtual_keyboard: [],
@@ -1285,9 +1301,23 @@ class Concepts extends Component {
             content: {
                 terms: values[index].content.terms,
                 definition: values[index].content.definition,
-                images: images,
-                video: video,
-                audio: audio,
+                images: [
+                    { title: "", file_name: "", image: null, path: "" },
+                    { title: "", file_name: "", image: null, path: "" },
+                    { title: "", file_name: "", image: null, path: "" },
+                    { title: "", file_name: "", image: null, path: "" },
+                ],
+                video: {
+                    title: "",
+                    file_name: "",
+                    video: null,
+                    path: "",
+                    url: "",
+                },
+                audio: [
+                    { title: "", file_name: "", audio: null, path: "" },
+                    { title: "", file_name: "", audio: null, path: "" },
+                ],
             },
             settings: {
                 virtual_keyboard: values[index].settings.virtual_keyboard,
@@ -1358,9 +1388,23 @@ class Concepts extends Component {
                             content: {
                                 terms: "<p>Terms goes here</p>",
                                 definition: "<p>Definition goes here</p>",
-                                images: images,
-                                video: video,
-                                audio: audio,
+                                images: [
+                                    { title: "", file_name: "", image: null, path: "" },
+                                    { title: "", file_name: "", image: null, path: "" },
+                                    { title: "", file_name: "", image: null, path: "" },
+                                    { title: "", file_name: "", image: null, path: "" },
+                                ],
+                                video: {
+                                    title: "",
+                                    file_name: "",
+                                    video: null,
+                                    path: "",
+                                    url: "",
+                                },
+                                audio: [
+                                    { title: "", file_name: "", audio: null, path: "" },
+                                    { title: "", file_name: "", audio: null, path: "" },
+                                ],
                             },
                             settings: {
                                 virtual_keyboard: [],
@@ -1417,9 +1461,23 @@ class Concepts extends Component {
                         content: {
                             terms: "<p>Terms goes here</p>",
                             definition: "<p>Definition goes here</p>",
-                            images: images,
-                            video: video,
-                            audio: audio,
+                            images: [
+                                { title: "", file_name: "", image: null, path: "" },
+                                { title: "", file_name: "", image: null, path: "" },
+                                { title: "", file_name: "", image: null, path: "" },
+                                { title: "", file_name: "", image: null, path: "" },
+                            ],
+                            video: {
+                                title: "",
+                                file_name: "",
+                                video: null,
+                                path: "",
+                                url: "",
+                            },
+                            audio: [
+                                { title: "", file_name: "", audio: null, path: "" },
+                                { title: "", file_name: "", audio: null, path: "" },
+                            ],
                         },
                         settings: {
                             virtual_keyboard: [],

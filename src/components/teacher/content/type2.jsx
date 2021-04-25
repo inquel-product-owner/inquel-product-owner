@@ -21,71 +21,6 @@ const mapStateToProps = (state) => ({
     topic_name: state.topic_name,
 });
 
-const main_question = {
-    question_random_id: "",
-    question: "<p>Main Question goes here</p>",
-    explanation: "<p>Explanation goes here</p>",
-    is_file_uploaded: false,
-    mcq: true,
-    fill_in: false,
-    sub_question: [
-        {
-            sub_question_id: "",
-            question: "<p>Sub question goes here</p>",
-            mcq: true,
-            fill_in: false,
-            fillin_answer: [""],
-            options: [
-                { correct: false, content: "" },
-                { correct: false, content: "" },
-                { correct: false, content: "" },
-                { correct: false, content: "" },
-            ],
-            marks: "",
-            negative_marks: "0",
-        },
-    ],
-    content: {
-        images: [
-            { title: "", file_name: "", image: null, path: "" },
-            { title: "", file_name: "", image: null, path: "" },
-            { title: "", file_name: "", image: null, path: "" },
-            { title: "", file_name: "", image: null, path: "" },
-        ],
-        video: {
-            title: "",
-            file_name: "",
-            video: null,
-            path: "",
-            url: "",
-        },
-        audio: [
-            { title: "", file_name: "", audio: null, path: "" },
-            { title: "", file_name: "", audio: null, path: "" },
-        ],
-    },
-    properties: {
-        complexity: "",
-        priority: "",
-        theme: "",
-        test: [false, false, false, false, false],
-        semester: [false, false, false, false, false],
-        quiz: [false, false, false, false, false],
-        learn: false,
-    },
-    settings: {
-        virtual_keyboard: [],
-        limited: false,
-    },
-};
-
-const keyboard = {
-    all: false,
-    chemistry: false,
-    physics: false,
-    maths: false,
-};
-
 class Type2 extends Component {
     constructor(props) {
         super(props);
@@ -126,8 +61,69 @@ class Type2 extends Component {
             selectedQuestion: "",
             selectedSubQuestion: "",
 
-            keyboards: [keyboard],
-            questions: [main_question],
+            keyboards: [{
+                all: false,
+                chemistry: false,
+                physics: false,
+                maths: false,
+            }],
+            questions: [{
+                question_random_id: "",
+                question: "<p>Main Question goes here</p>",
+                explanation: "<p>Explanation goes here</p>",
+                is_file_uploaded: false,
+                mcq: true,
+                fill_in: false,
+                sub_question: [
+                    {
+                        sub_question_id: "",
+                        question: "<p>Sub question goes here</p>",
+                        mcq: true,
+                        fill_in: false,
+                        fillin_answer: [""],
+                        options: [
+                            { correct: false, content: "" },
+                            { correct: false, content: "" },
+                            { correct: false, content: "" },
+                            { correct: false, content: "" },
+                        ],
+                        marks: "",
+                        negative_marks: "0",
+                    },
+                ],
+                content: {
+                    images: [
+                        { title: "", file_name: "", image: null, path: "" },
+                        { title: "", file_name: "", image: null, path: "" },
+                        { title: "", file_name: "", image: null, path: "" },
+                        { title: "", file_name: "", image: null, path: "" },
+                    ],
+                    video: {
+                        title: "",
+                        file_name: "",
+                        video: null,
+                        path: "",
+                        url: "",
+                    },
+                    audio: [
+                        { title: "", file_name: "", audio: null, path: "" },
+                        { title: "", file_name: "", audio: null, path: "" },
+                    ],
+                },
+                properties: {
+                    complexity: "",
+                    priority: "",
+                    theme: "",
+                    test: [false, false, false, false, false],
+                    semester: [false, false, false, false, false],
+                    quiz: [false, false, false, false, false],
+                    learn: false,
+                },
+                settings: {
+                    virtual_keyboard: [],
+                    limited: false,
+                },
+            }],
         };
         this.option_limit = 6;
         this.sub_question_limit = 10;
@@ -1581,8 +1577,69 @@ class Type2 extends Component {
     handleAddMainQuestion = () => {
         const values = [...this.state.questions];
         const keyboards = [...this.state.keyboards];
-        keyboards.push(keyboard);
-        values.push(main_question);
+        keyboards.push({
+            all: false,
+            chemistry: false,
+            physics: false,
+            maths: false,
+        });
+        values.push({
+            question_random_id: "",
+            question: "<p>Main Question goes here</p>",
+            explanation: "<p>Explanation goes here</p>",
+            is_file_uploaded: false,
+            mcq: true,
+            fill_in: false,
+            sub_question: [
+                {
+                    sub_question_id: "",
+                    question: "<p>Sub question goes here</p>",
+                    mcq: true,
+                    fill_in: false,
+                    fillin_answer: [""],
+                    options: [
+                        { correct: false, content: "" },
+                        { correct: false, content: "" },
+                        { correct: false, content: "" },
+                        { correct: false, content: "" },
+                    ],
+                    marks: "",
+                    negative_marks: "0",
+                },
+            ],
+            content: {
+                images: [
+                    { title: "", file_name: "", image: null, path: "" },
+                    { title: "", file_name: "", image: null, path: "" },
+                    { title: "", file_name: "", image: null, path: "" },
+                    { title: "", file_name: "", image: null, path: "" },
+                ],
+                video: {
+                    title: "",
+                    file_name: "",
+                    video: null,
+                    path: "",
+                    url: "",
+                },
+                audio: [
+                    { title: "", file_name: "", audio: null, path: "" },
+                    { title: "", file_name: "", audio: null, path: "" },
+                ],
+            },
+            properties: {
+                complexity: "",
+                priority: "",
+                theme: "",
+                test: [false, false, false, false, false],
+                semester: [false, false, false, false, false],
+                quiz: [false, false, false, false, false],
+                learn: false,
+            },
+            settings: {
+                virtual_keyboard: [],
+                limited: false,
+            },
+        });
         this.setState({
             questions: values,
             keyboards: keyboards,
@@ -1830,8 +1887,69 @@ class Type2 extends Component {
                 },
                 () => {
                     if (values.length === 0) {
-                        keyboards.push(keyboard);
-                        values.push(main_question);
+                        keyboards.push({
+                            all: false,
+                            chemistry: false,
+                            physics: false,
+                            maths: false,
+                        });
+                        values.push({
+                            question_random_id: "",
+                            question: "<p>Main Question goes here</p>",
+                            explanation: "<p>Explanation goes here</p>",
+                            is_file_uploaded: false,
+                            mcq: true,
+                            fill_in: false,
+                            sub_question: [
+                                {
+                                    sub_question_id: "",
+                                    question: "<p>Sub question goes here</p>",
+                                    mcq: true,
+                                    fill_in: false,
+                                    fillin_answer: [""],
+                                    options: [
+                                        { correct: false, content: "" },
+                                        { correct: false, content: "" },
+                                        { correct: false, content: "" },
+                                        { correct: false, content: "" },
+                                    ],
+                                    marks: "",
+                                    negative_marks: "0",
+                                },
+                            ],
+                            content: {
+                                images: [
+                                    { title: "", file_name: "", image: null, path: "" },
+                                    { title: "", file_name: "", image: null, path: "" },
+                                    { title: "", file_name: "", image: null, path: "" },
+                                    { title: "", file_name: "", image: null, path: "" },
+                                ],
+                                video: {
+                                    title: "",
+                                    file_name: "",
+                                    video: null,
+                                    path: "",
+                                    url: "",
+                                },
+                                audio: [
+                                    { title: "", file_name: "", audio: null, path: "" },
+                                    { title: "", file_name: "", audio: null, path: "" },
+                                ],
+                            },
+                            properties: {
+                                complexity: "",
+                                priority: "",
+                                theme: "",
+                                test: [false, false, false, false, false],
+                                semester: [false, false, false, false, false],
+                                quiz: [false, false, false, false, false],
+                                learn: false,
+                            },
+                            settings: {
+                                virtual_keyboard: [],
+                                limited: false,
+                            },
+                        });
                         this.setState({
                             questions: values,
                             keyboards: keyboards,
@@ -1863,8 +1981,69 @@ class Type2 extends Component {
             },
             () => {
                 if (values.length === 0) {
-                    keyboards.push(keyboard);
-                    values.push(main_question);
+                    keyboards.push({
+                        all: false,
+                        chemistry: false,
+                        physics: false,
+                        maths: false,
+                    });
+                    values.push({
+                        question_random_id: "",
+                        question: "<p>Main Question goes here</p>",
+                        explanation: "<p>Explanation goes here</p>",
+                        is_file_uploaded: false,
+                        mcq: true,
+                        fill_in: false,
+                        sub_question: [
+                            {
+                                sub_question_id: "",
+                                question: "<p>Sub question goes here</p>",
+                                mcq: true,
+                                fill_in: false,
+                                fillin_answer: [""],
+                                options: [
+                                    { correct: false, content: "" },
+                                    { correct: false, content: "" },
+                                    { correct: false, content: "" },
+                                    { correct: false, content: "" },
+                                ],
+                                marks: "",
+                                negative_marks: "0",
+                            },
+                        ],
+                        content: {
+                            images: [
+                                { title: "", file_name: "", image: null, path: "" },
+                                { title: "", file_name: "", image: null, path: "" },
+                                { title: "", file_name: "", image: null, path: "" },
+                                { title: "", file_name: "", image: null, path: "" },
+                            ],
+                            video: {
+                                title: "",
+                                file_name: "",
+                                video: null,
+                                path: "",
+                                url: "",
+                            },
+                            audio: [
+                                { title: "", file_name: "", audio: null, path: "" },
+                                { title: "", file_name: "", audio: null, path: "" },
+                            ],
+                        },
+                        properties: {
+                            complexity: "",
+                            priority: "",
+                            theme: "",
+                            test: [false, false, false, false, false],
+                            semester: [false, false, false, false, false],
+                            quiz: [false, false, false, false, false],
+                            learn: false,
+                        },
+                        settings: {
+                            virtual_keyboard: [],
+                            limited: false,
+                        },
+                    });
                     this.setState({
                         questions: values,
                         keyboards: keyboards,

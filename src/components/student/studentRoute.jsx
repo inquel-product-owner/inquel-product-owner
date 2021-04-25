@@ -8,8 +8,11 @@ import Group from "./group";
 import Subject from "./subject";
 import TestResult from "./testResult";
 import TestPreview from "./testPreview";
-import Summary from "./summary";
-import Notes from "./notes";
+
+import Summary from "./content/summary";
+import Notes from "./content/notes";
+import PersonalNotes from "./content/personalNotes";
+import Favourites from "./content/favourites";
 import FlashCard from "./learnFlashCard";
 
 import CycleTest from "./cycle/cycleTest";
@@ -79,42 +82,36 @@ const studentRoutes = (
                 )
             }
         />
+
+        {/* --------------- Personal notes & Favourites --------------- */}
+
         <Route
             exact
-            path="/student/subject/:subjectId/results"
+            path="/student/subject/:subjectId/personal-notes"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (
                     <Redirect to="/student/login" />
                 ) : (
-                    <TestResult {...props} />
+                    <PersonalNotes {...props} />
                 )
             }
         />
         <Route
             exact
-            path="/student/subject/:subjectId/results/cycle/:cycleTestId/preview"
+            path="/student/subject/:subjectId/favourites"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_student") ? (
                     <Redirect to="/student/login" />
                 ) : (
-                    <TestPreview {...props} />
+                    <Favourites {...props} />
                 )
             }
         />
-        <Route
-            exact
-            path="/student/subject/:subjectId/results/semester/:semesterId/preview"
-            render={(props) =>
-                !localStorage.getItem("Authorization") ||
-                !localStorage.getItem("is_student") ? (
-                    <Redirect to="/student/login" />
-                ) : (
-                    <TestPreview {...props} />
-                )
-            }
-        />
+
+        {/* --------------- Summary & Notes --------------- */}
+
         <Route
             exact
             path="/student/subject/:subjectId/chapter/:chapterId/summary"
@@ -139,6 +136,9 @@ const studentRoutes = (
                 )
             }
         />
+
+        {/* --------------- Flashcard --------------- */}
+
         <Route
             exact
             path="/student/subject/:subjectId/chapter/:chapterId/:topicNum/learn"
@@ -226,6 +226,45 @@ const studentRoutes = (
                     <Redirect to="/student/login" />
                 ) : (
                     <SemesterDirectExam {...props} />
+                )
+            }
+        />
+
+        {/* --------------- Test result & Preview --------------- */}
+
+        <Route
+            exact
+            path="/student/subject/:subjectId/results"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/student/login" />
+                ) : (
+                    <TestResult {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/student/subject/:subjectId/results/cycle/:cycleTestId/preview"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/student/login" />
+                ) : (
+                    <TestPreview {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/student/subject/:subjectId/results/semester/:semesterId/preview"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/student/login" />
+                ) : (
+                    <TestPreview {...props} />
                 )
             }
         />

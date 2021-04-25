@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import { Accordion, Card } from "react-bootstrap";
-import Header from "./shared/navbar";
-import SideNav from "./shared/sidenav";
+import Header from "../shared/navbar";
+import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
-import Loading from "../sharedComponents/loader";
-import AlertBox from "../sharedComponents/alert";
-import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
+import Loading from "../../sharedComponents/loader";
+import AlertBox from "../../sharedComponents/alert";
+import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
 import { Document, Page, pdfjs } from "react-pdf";
 
 class Notes extends Component {

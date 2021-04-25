@@ -1811,9 +1811,12 @@ class Chapters extends Component {
                             className="btn btn-tomato btn-block shadow-sm"
                             onClick={this.toggleQuiz_CreateModal}
                             disabled={
-                                Object.entries(this.state.quiz).length !== 0 ||
-                                this.state.permissions.quiz === false
-                                    ? true
+                                Object.entries(this.state.quiz).length !== 0
+                                    ? this.state.permissions.quiz
+                                        ? this.state.permissions.quiz === false
+                                            ? true
+                                            : false
+                                        : false
                                     : false
                             }
                         >

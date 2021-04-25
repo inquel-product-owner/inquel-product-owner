@@ -100,14 +100,14 @@ class QuizLevel extends Component {
             .then((result) => {
                 console.log(result);
                 if (result.sts === true) {
-                    let levels = result.data.levels;
-                    for (let i = 0; i < levels.length; i++) {
-                        levels[i].total_questions = Object.values(
-                            this.state.total_questions[i]
-                        )[0];
-                    }
+                    // let levels = result.data.levels;
+                    // for (let i = 0; i < levels.length; i++) {
+                    //     levels[i].total_questions = Object.values(
+                    //         this.state.total_questions[i]
+                    //     )[0];
+                    // }
                     this.setState({
-                        quiz: levels,
+                        quiz: result.data.levels,
                         negative_points: result.data.negative_points,
                         total_points: result.data.total_points,
                         page_loading: false,
@@ -143,12 +143,18 @@ class QuizLevel extends Component {
 
     handleInput = (event, index, type) => {
         let data = [...this.state.quiz];
-        let total_points = 0;
         data[index][type] = event.target.value;
-        if (type === "max_points") {
-            for (let i = 0; i < data.length; i++) {
-                total_points += Number(data[i].max_points);
-            }
+        this.setState({
+            quiz: data,
+        });
+    };
+
+    handleMaxPoint = (event, index, type) => {
+        let total_points = 0;
+        let data = [...this.state.quiz];
+        data[index][type] = event.target.value;
+        for (let i = 0; i < data.length; i++) {
+            total_points += Number(data[i].max_points);
         }
         this.setState({
             quiz: data,
@@ -225,6 +231,7 @@ class QuizLevel extends Component {
                         points: quiz[index].points_per_question.toString(),
                         total_questions: quiz[index].total_questions.toString(),
                         max_points: quiz[index].max_points.toString(),
+                        min_points: quiz[index].min_points.toString(),
                         bonus_points: quiz[index].bonus_points.toString(),
                         time_for_bonus: quiz[
                             index
@@ -259,6 +266,47 @@ class QuizLevel extends Component {
                     console.log(err);
                 });
         }
+    };
+
+    // -------------------------- Publishing the quiz --------------------------
+
+    handlePublish = () => {
+        this.setState({
+            showSuccessAlert: false,
+            showErrorAlert: false,
+            page_loading: true,
+        });
+
+        fetch(
+            `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/publish/`,
+            {
+                headers: this.headers,
+                method: "POST",
+                body: JSON.stringify({
+                    quiz_id: this.quizId,
+                }),
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     };
 
     levelRedirect = (id) => {
@@ -375,29 +423,9 @@ class QuizLevel extends Component {
 
                         {/* ----- Header configuration ----- */}
 
-                        <div className="row align-items-center justify-content-end mb-3">
-                            <div className="col-md-8">
+                        <div className="row align-items-center mb-3">
+                            <div className="col-md-8 mb-2 mb-md-0">
                                 <div className="row align-items-center">
-                                    <div className="col-md-5 mb-2 mb-md-0">
-                                        <div className="row">
-                                            <label className="col-4 col-form-label">
-                                                Total Points
-                                            </label>
-                                            <div className="col-8">
-                                                <input
-                                                    type="text"
-                                                    name="total_points"
-                                                    className="form-control form-shadow text-center"
-                                                    placeholder="Total points"
-                                                    value={
-                                                        this.state.total_points
-                                                    }
-                                                    disabled
-                                                    required
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
                                     <div className="col-md-4 mb-2 mb-md-0">
                                         <Select
                                             className="basic-single form-shadow"
@@ -427,6 +455,26 @@ class QuizLevel extends Component {
                                             required
                                         />
                                     </div>
+                                    <div className="col-md-5 mb-2 mb-md-0">
+                                        <div className="row">
+                                            <label className="col-4 col-form-label">
+                                                Total Points
+                                            </label>
+                                            <div className="col-8">
+                                                <input
+                                                    type="text"
+                                                    name="total_points"
+                                                    className="form-control form-shadow text-center"
+                                                    placeholder="Total points"
+                                                    value={
+                                                        this.state.total_points
+                                                    }
+                                                    disabled
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div className="col-md-3">
                                         <div className="d-flex align-items-center">
                                             <span className="mr-4">
@@ -443,6 +491,14 @@ class QuizLevel extends Component {
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                            <div className="col-md-4 text-right">
+                                <button
+                                    className="btn btn-primary btn-sm shadow-none"
+                                    onClick={this.handlePublish}
+                                >
+                                    <span className="mx-2">Publish</span>
+                                </button>
                             </div>
                         </div>
 
@@ -462,7 +518,7 @@ class QuizLevel extends Component {
                                                 Total Questions
                                             </div>
                                             <div className="col-3">
-                                                <div className="row">
+                                                <div className="form-row">
                                                     <div className="col-6">
                                                         Max Points
                                                     </div>
@@ -536,26 +592,46 @@ class QuizLevel extends Component {
                                                               />
                                                           </div>
                                                           <div className="col-2">
-                                                              <input
-                                                                  type="text"
-                                                                  className="form-control form-control-sm border-secondary text-center"
-                                                                  value={
-                                                                      quiz.total_questions
-                                                                  }
-                                                                  onChange={(
-                                                                      event
-                                                                  ) =>
-                                                                      this.handleInput(
-                                                                          event,
-                                                                          index,
-                                                                          "total_questions"
-                                                                      )
-                                                                  }
-                                                                  required
-                                                              />
+                                                              <div className="form-row">
+                                                                  <div className="col-6">
+                                                                      <input
+                                                                          type="text"
+                                                                          className="form-control form-control-sm border-secondary text-center"
+                                                                          value={
+                                                                              Object.values(
+                                                                                  this
+                                                                                      .state
+                                                                                      .total_questions[
+                                                                                      index
+                                                                                  ]
+                                                                              )[0]
+                                                                          }
+                                                                          disabled
+                                                                      />
+                                                                  </div>
+                                                                  <div className="col-6">
+                                                                      <input
+                                                                          type="text"
+                                                                          className="form-control form-control-sm border-secondary text-center"
+                                                                          value={
+                                                                              quiz.total_questions
+                                                                          }
+                                                                          onChange={(
+                                                                              event
+                                                                          ) =>
+                                                                              this.handleInput(
+                                                                                  event,
+                                                                                  index,
+                                                                                  "total_questions"
+                                                                              )
+                                                                          }
+                                                                          required
+                                                                      />
+                                                                  </div>
+                                                              </div>
                                                           </div>
                                                           <div className="col-3">
-                                                              <div className="row">
+                                                              <div className="form-row">
                                                                   <div className="col-6">
                                                                       <input
                                                                           type="text"
@@ -566,7 +642,7 @@ class QuizLevel extends Component {
                                                                           onChange={(
                                                                               event
                                                                           ) =>
-                                                                              this.handleInput(
+                                                                              this.handleMaxPoint(
                                                                                   event,
                                                                                   index,
                                                                                   "max_points"
