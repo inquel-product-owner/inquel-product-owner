@@ -509,38 +509,44 @@ class SemesterAutoQA extends Component {
                                                                   ""
                                                               )}
                                                           </div>
-                                                          {/* image preview */}
-                                                          <div className="ml-3">
-                                                              {data.content.images.map(
-                                                                  (
-                                                                      images,
-                                                                      index
-                                                                  ) => {
-                                                                      return images.path !==
-                                                                          "" ? (
-                                                                          <div
-                                                                              key={
-                                                                                  index
-                                                                              }
-                                                                              className="card preview-img-circle shadow-sm"
-                                                                              style={{
-                                                                                  backgroundImage: `url(${images.path})`,
-                                                                              }}
-                                                                              onClick={() =>
-                                                                                  this.changeImage(
-                                                                                      data
-                                                                                          .content
-                                                                                          .images,
+                                                          {/* ----- image preview ----- */}
+                                                          {data.content
+                                                              .images[0]
+                                                              .path !== "" ? (
+                                                              <div className="ml-3">
+                                                                  {data.content.images.map(
+                                                                      (
+                                                                          images,
+                                                                          index
+                                                                      ) => {
+                                                                          return images.path !==
+                                                                              "" ? (
+                                                                              <div
+                                                                                  key={
                                                                                       index
-                                                                                  )
-                                                                              }
-                                                                          ></div>
-                                                                      ) : (
-                                                                          ""
-                                                                      );
-                                                                  }
-                                                              )}
-                                                          </div>
+                                                                                  }
+                                                                                  className="card preview-img-circle shadow-sm"
+                                                                                  style={{
+                                                                                      backgroundImage: `url(${images.path})`,
+                                                                                  }}
+                                                                                  onClick={() =>
+                                                                                      this.changeImage(
+                                                                                          data
+                                                                                              .content
+                                                                                              .images,
+                                                                                          index
+                                                                                      )
+                                                                                  }
+                                                                              ></div>
+                                                                          ) : (
+                                                                              ""
+                                                                          );
+                                                                      }
+                                                                  )}
+                                                              </div>
+                                                          ) : (
+                                                              ""
+                                                          )}
                                                       </div>
                                                   </div>
                                                   {/* ----- Answer type tag ----- */}
@@ -792,38 +798,43 @@ class SemesterAutoQA extends Component {
                                                               </div>
                                                           </div>
                                                       </div>
-                                                      {/* ----- Image thumbnail ----- */}
-                                                      <div className="ml-3">
-                                                          {data.content.images.map(
-                                                              (
-                                                                  images,
-                                                                  index
-                                                              ) => {
-                                                                  return images.path !==
-                                                                      "" ? (
-                                                                      <div
-                                                                          key={
-                                                                              index
-                                                                          }
-                                                                          className="card preview-img-circle shadow-sm"
-                                                                          style={{
-                                                                              backgroundImage: `url(${images.path})`,
-                                                                          }}
-                                                                          onClick={() =>
-                                                                              this.changeImage(
-                                                                                  data
-                                                                                      .content
-                                                                                      .images,
+                                                      {/* ----- image preview ----- */}
+                                                      {data.content.images[0]
+                                                          .path !== "" ? (
+                                                          <div className="ml-3">
+                                                              {data.content.images.map(
+                                                                  (
+                                                                      images,
+                                                                      index
+                                                                  ) => {
+                                                                      return images.path !==
+                                                                          "" ? (
+                                                                          <div
+                                                                              key={
                                                                                   index
-                                                                              )
-                                                                          }
-                                                                      ></div>
-                                                                  ) : (
-                                                                      ""
-                                                                  );
-                                                              }
-                                                          )}
-                                                      </div>
+                                                                              }
+                                                                              className="card preview-img-circle shadow-sm"
+                                                                              style={{
+                                                                                  backgroundImage: `url(${images.path})`,
+                                                                              }}
+                                                                              onClick={() =>
+                                                                                  this.changeImage(
+                                                                                      data
+                                                                                          .content
+                                                                                          .images,
+                                                                                      index
+                                                                                  )
+                                                                              }
+                                                                          ></div>
+                                                                      ) : (
+                                                                          ""
+                                                                      );
+                                                                  }
+                                                              )}
+                                                          </div>
+                                                      ) : (
+                                                          ""
+                                                      )}
                                                   </div>
                                               </div>
                                           </div>

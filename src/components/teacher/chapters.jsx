@@ -1807,21 +1807,26 @@ class Chapters extends Component {
                         >
                             Add Cycle test
                         </button>
-                        <button
-                            className="btn btn-tomato btn-block shadow-sm"
-                            onClick={this.toggleQuiz_CreateModal}
-                            disabled={
-                                Object.entries(this.state.quiz).length !== 0
-                                    ? this.state.permissions.quiz
-                                        ? this.state.permissions.quiz === false
+                        {this.state.permissions.quiz ? (
+                            this.state.permissions.quiz !== false ? (
+                                <button
+                                    className="btn btn-tomato btn-block shadow-sm"
+                                    onClick={this.toggleQuiz_CreateModal}
+                                    disabled={
+                                        Object.entries(this.state.quiz)
+                                            .length !== 0
                                             ? true
                                             : false
-                                        : false
-                                    : false
-                            }
-                        >
-                            Add Quiz
-                        </button>
+                                    }
+                                >
+                                    Add Quiz
+                                </button>
+                            ) : (
+                                ""
+                            )
+                        ) : (
+                            ""
+                        )}
                         {/* Loading component */}
                         {this.state.page_loading ? <Loading /> : ""}
                     </div>

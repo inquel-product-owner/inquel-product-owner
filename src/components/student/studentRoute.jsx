@@ -13,7 +13,8 @@ import Summary from "./content/summary";
 import Notes from "./content/notes";
 import PersonalNotes from "./content/personalNotes";
 import Favourites from "./content/favourites";
-import FlashCard from "./learnFlashCard";
+import FavouritesFlashcard from "./flashcard/bookmarkFlashcard";
+import FlashCard from "./flashcard/learnFlashCard";
 
 import CycleTest from "./cycle/cycleTest";
 import CycleDirectExam from "./cycle/directExam";
@@ -106,6 +107,18 @@ const studentRoutes = (
                     <Redirect to="/student/login" />
                 ) : (
                     <Favourites {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/student/subject/:subjectId/favourites/:chapterId/:topicNum/:type"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/student/login" />
+                ) : (
+                    <FavouritesFlashcard {...props} />
                 )
             }
         />

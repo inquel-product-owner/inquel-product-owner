@@ -106,14 +106,16 @@ class NotesModal extends Component {
                         {this.state.successMsg}
                     </Alert>
 
-                    <div className="h5 font-weight-bold-600 mb-3">
-                        {this.props.data.personal_notes_title}
+                    <div style={{ minHeight: "50vh" }}>
+                        <div className="h5 font-weight-bold-600 mb-3">
+                            {this.props.data.personal_notes_title}
+                        </div>
+                        <div
+                            dangerouslySetInnerHTML={{
+                                __html: this.props.data.personal_notes_content,
+                            }}
+                        ></div>
                     </div>
-                    <div
-                        dangerouslySetInnerHTML={{
-                            __html: this.props.data.personal_notes_content,
-                        }}
-                    ></div>
                 </Modal.Body>
                 <Modal.Footer>
                     <button

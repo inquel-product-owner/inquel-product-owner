@@ -7,6 +7,8 @@ export function Type1DataFormat(result) {
     for (let i = 0; i < response.length; i++) {
         images = [];
         audio = [];
+        let videoTitle = "";
+        let videoPath = "";
         if (response[i].files.length !== 0) {
             // image
             if (response[i].files[0].type1_image_1) {
@@ -59,16 +61,16 @@ export function Type1DataFormat(result) {
                     path: response[i].files[0].type1_audio_2,
                 });
             }
-        }
 
-        // video
-        var path = "";
-        if (response[i].files.length !== 0) {
+            // video
             if (response[i].files[0].paste_video_url) {
-                path = response[i].files[0].paste_video_url;
+                videoPath = response[i].files[0].paste_video_url;
             }
             if (response[i].files[0].type1_video_1) {
-                path = response[i].files[0].type1_video_1;
+                videoPath = response[i].files[0].type1_video_1;
+            }
+            if (response[i].files[0].type1_video_1_title) {
+                videoTitle = response[i].files[0].type1_video_1_title;
             }
         }
 
@@ -170,14 +172,10 @@ export function Type1DataFormat(result) {
                           ]
                         : images,
                 video: {
-                    title:
-                        response[i].files.length !== 0 &&
-                        response[i].files[0].type1_video_1_title
-                            ? response[i].files[0].type1_video_1_title
-                            : "",
+                    title: videoTitle,
                     file_name: "",
                     video: null,
-                    path: path,
+                    path: videoPath,
                     url: "",
                 },
                 audio:
@@ -224,6 +222,8 @@ export function Type2DataFormat(result) {
     for (let i = 0; i < response.length; i++) {
         images = [];
         audio = [];
+        let videoPath = "";
+        let videoTitle = "";
         sub_question = [];
         totalSubQuestion.push(response[i].sub_question.length);
         currentSubQuestionIndex.push(0);
@@ -262,34 +262,34 @@ export function Type2DataFormat(result) {
                     path: response[i].files.type2_image_4,
                 });
             }
-        }
 
-        // audio
-        if (response[i].files.type2_audio_1) {
-            audio.push({
-                title: response[i].files.type2_audio_1_title,
-                file_name: "",
-                audio: null,
-                path: response[i].files.type2_audio_1,
-            });
-        }
-        if (response[i].files.type2_audio_2) {
-            audio.push({
-                title: response[i].files.type2_audio_2_title,
-                file_name: "",
-                audio: null,
-                path: response[i].files.type2_audio_2,
-            });
-        }
+            // audio
+            if (response[i].files.type2_audio_1) {
+                audio.push({
+                    title: response[i].files.type2_audio_1_title,
+                    file_name: "",
+                    audio: null,
+                    path: response[i].files.type2_audio_1,
+                });
+            }
+            if (response[i].files.type2_audio_2) {
+                audio.push({
+                    title: response[i].files.type2_audio_2_title,
+                    file_name: "",
+                    audio: null,
+                    path: response[i].files.type2_audio_2,
+                });
+            }
 
-        // video
-        var path = "";
-        if (response[i].files.length !== 0) {
+            // video
             if (response[i].files.paste_video_url) {
-                path = response[i].files.paste_video_url;
+                videoPath = response[i].files.paste_video_url;
             }
             if (response[i].files.type2_video_1) {
-                path = response[i].files.type2_video_1;
+                videoPath = response[i].files.type2_video_1;
+            }
+            if (response[i].files.type2_video_1_title) {
+                videoTitle = response[i].files.type2_video_1_title;
             }
         }
 
@@ -376,14 +376,10 @@ export function Type2DataFormat(result) {
                           ]
                         : images,
                 video: {
-                    title:
-                        response[i].files.length !== 0 &&
-                        response[i].files.type2_video_1_title !== undefined
-                            ? response[i].files.type2_video_1_title
-                            : "",
+                    title: videoTitle,
                     file_name: "",
                     video: null,
-                    path: path,
+                    path: videoPath,
                     url: "",
                 },
                 audio:
@@ -425,6 +421,7 @@ export function Type2DataFormat(result) {
 export function dataFormat(result) {
     let data = [];
     let images = [];
+    let audio = [];
     let type = "";
     let sub_question = [];
     let totalSubQuestion = [];
@@ -435,6 +432,9 @@ export function dataFormat(result) {
         if (response[i].sub_question === undefined) {
             type = "type_1";
             images = [];
+            audio = [];
+            let videoTitle = "";
+            let videoPath = "";
             if (response[i].files.length !== 0) {
                 // image
                 if (response[i].files[0].type1_image_1) {
@@ -469,9 +469,39 @@ export function dataFormat(result) {
                         path: response[i].files[0].type1_image_4,
                     });
                 }
+
+                // audio
+                if (response[i].files[0].type1_audio_1) {
+                    audio.push({
+                        title: response[i].files[0].type1_audio_1_title,
+                        file_name: "",
+                        audio: null,
+                        path: response[i].files[0].type1_audio_1,
+                    });
+                }
+                if (response[i].files[0].type1_audio_2) {
+                    audio.push({
+                        title: response[i].files[0].type1_audio_2_title,
+                        file_name: "",
+                        audio: null,
+                        path: response[i].files[0].type1_audio_2,
+                    });
+                }
+
+                // video
+                if (response[i].files[0].paste_video_url) {
+                    videoPath = response[i].files[0].paste_video_url;
+                }
+                if (response[i].files[0].type1_video_1) {
+                    videoPath = response[i].files[0].type1_video_1;
+                }
+                if (response[i].files[0].type1_video_1_title) {
+                    videoTitle = response[i].files[0].type1_video_1_title;
+                }
             }
 
             data.push({
+                type: "type_1",
                 question: response[i].question,
                 question_random_id: response[i].question_random_id,
                 content: {
@@ -528,11 +558,32 @@ export function dataFormat(result) {
                                   },
                               ]
                             : images,
+                    video: {
+                        title: videoTitle,
+                        file_name: "",
+                        video: null,
+                        path: videoPath,
+                        url: "",
+                    },
+                    audio:
+                        audio.length === 0
+                            ? [
+                                  {
+                                      title: "",
+                                      file_name: "",
+                                      audio: null,
+                                      path: "",
+                                  },
+                              ]
+                            : audio,
                 },
             });
         } else {
             type = "type_2";
             images = [];
+            audio = [];
+            let videoTitle = "";
+            let videoPath = "";
             sub_question = [];
             totalSubQuestion.push(response[i].sub_question.length);
             currentSubQuestionIndex.push(0);
@@ -571,6 +622,35 @@ export function dataFormat(result) {
                         path: response[i].files.type2_image_4,
                     });
                 }
+
+                // audio
+                if (response[i].files.type2_audio_1) {
+                    audio.push({
+                        title: response[i].files.type2_audio_1_title,
+                        file_name: "",
+                        audio: null,
+                        path: response[i].files.type2_audio_1,
+                    });
+                }
+                if (response[i].files.type2_audio_2) {
+                    audio.push({
+                        title: response[i].files.type2_audio_2_title,
+                        file_name: "",
+                        audio: null,
+                        path: response[i].files.type2_audio_2,
+                    });
+                }
+
+                // video
+                if (response[i].files.paste_video_url) {
+                    videoPath = response[i].files.paste_video_url;
+                }
+                if (response[i].files.type2_video_1) {
+                    videoPath = response[i].files.type2_video_1;
+                }
+                if (response[i].files.type2_video_1_title) {
+                    videoTitle = response[i].files.type2_video_1_title;
+                }
             }
 
             // Sub question
@@ -583,11 +663,11 @@ export function dataFormat(result) {
                     mcq: response[i].sub_question[k].mcq,
                     fill_in: response[i].sub_question[k].fill_in,
                     fillin_answer:
-                        response[i].sub_question[k].fillin_answer.length !== 0
+                        response[i].sub_question[k].fillin_answer
                             ? response[i].sub_question[k].fillin_answer
                             : [""],
                     options:
-                        response[i].sub_question[k].options.length !== 0
+                        response[i].sub_question[k].options
                             ? response[i].sub_question[k].options
                             : [
                                   {
@@ -614,6 +694,7 @@ export function dataFormat(result) {
 
             // Main question
             data.push({
+                type: "type_2",
                 question: response[i].question,
                 question_random_id: response[i].question_random_id,
                 sub_question: sub_question,
@@ -629,6 +710,24 @@ export function dataFormat(result) {
                                   },
                               ]
                             : images,
+                    video: {
+                        title: videoTitle,
+                        file_name: "",
+                        video: null,
+                        path: videoPath,
+                        url: "",
+                    },
+                    audio:
+                        audio.length === 0
+                            ? [
+                                  {
+                                      title: "",
+                                      file_name: "",
+                                      audio: null,
+                                      path: "",
+                                  },
+                              ]
+                            : audio,
                 },
             });
         }
@@ -737,7 +836,8 @@ export function conceptFormat(result) {
                         : images,
                 video: {
                     title:
-                    response[i].files && response[i].files.length !== 0 &&
+                        response[i].files &&
+                        response[i].files.length !== 0 &&
                         response[i].files[0].concepts_video_1_title
                             ? response[i].files[0].concepts_video_1_title
                             : "",

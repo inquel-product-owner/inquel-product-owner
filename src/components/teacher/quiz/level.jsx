@@ -90,7 +90,7 @@ class QuizLevel extends Component {
 
     loadQuizData = () => {
         fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/?attempt_name=${this.state.selectedAttempt}`,
+            `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/`,
             {
                 method: "GET",
                 headers: this.headers,
@@ -100,12 +100,6 @@ class QuizLevel extends Component {
             .then((result) => {
                 console.log(result);
                 if (result.sts === true) {
-                    // let levels = result.data.levels;
-                    // for (let i = 0; i < levels.length; i++) {
-                    //     levels[i].total_questions = Object.values(
-                    //         this.state.total_questions[i]
-                    //     )[0];
-                    // }
                     this.setState({
                         quiz: result.data.levels,
                         negative_points: result.data.negative_points,
