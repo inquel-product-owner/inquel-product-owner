@@ -78,7 +78,6 @@ class Favourites extends Component {
                             };
                             if (item.concepts.length !== 0) {
                                 item.concepts.forEach((concept) => {
-                                    concept["type"] = "concept";
                                     favourites[item.topic_num].concepts.push(
                                         concept
                                     );
@@ -86,7 +85,6 @@ class Favourites extends Component {
                             }
                             if (item.questions.length !== 0) {
                                 item.questions.forEach((question) => {
-                                    question["type"] = "question";
                                     favourites[item.topic_num].questions.push(
                                         question
                                     );
@@ -184,6 +182,13 @@ class Favourites extends Component {
         });
 
         return topic_name;
+    };
+
+    handleRouting = (data, type, topic_num) => {
+        sessionStorage.setItem("data", JSON.stringify(data));
+        this.props.history.push(
+            `${this.props.match.url}/${this.state.chapterId}/${topic_num}/${type}`
+        );
     };
 
     render() {
@@ -349,7 +354,16 @@ class Favourites extends Component {
                                                                                                   Concept
                                                                                               </div>
                                                                                               <div className="col-2">
-                                                                                                  <button className="btn btn-primary btn-sm shadow-none">
+                                                                                                  <button
+                                                                                                      className="btn btn-primary btn-sm shadow-none"
+                                                                                                      onClick={() => {
+                                                                                                          this.handleRouting(
+                                                                                                              value.concepts,
+                                                                                                              "concept",
+                                                                                                              key
+                                                                                                          );
+                                                                                                      }}
+                                                                                                  >
                                                                                                       View
                                                                                                   </button>
                                                                                               </div>
@@ -372,7 +386,16 @@ class Favourites extends Component {
                                                                                                   Practice
                                                                                               </div>
                                                                                               <div className="col-2">
-                                                                                                  <button className="btn btn-primary btn-sm shadow-none">
+                                                                                                  <button
+                                                                                                      className="btn btn-primary btn-sm shadow-none"
+                                                                                                      onClick={() => {
+                                                                                                          this.handleRouting(
+                                                                                                              value.questions,
+                                                                                                              "practice",
+                                                                                                              key
+                                                                                                          );
+                                                                                                      }}
+                                                                                                  >
                                                                                                       View
                                                                                                   </button>
                                                                                               </div>
