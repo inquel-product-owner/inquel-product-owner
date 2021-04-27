@@ -1129,7 +1129,6 @@ class Subject extends Component {
             this.setState({
                 showModal: false,
                 showChapter_EditModal: false,
-                page_loading: true,
             });
         }, 1000);
         this.loadChapterData();
@@ -1214,19 +1213,6 @@ class Subject extends Component {
                     ""
                 )}
 
-                {/* Semester modal */}
-                {this.state.showSemesterModal ? (
-                    <SemesterModal
-                        show={this.state.showSemesterModal}
-                        onHide={this.toggleSemesterModal}
-                        formSubmission={this.semesterFormSubmission}
-                        chapter_id={this.state.chapter_id}
-                        subjectId={this.subjectId}
-                    />
-                ) : (
-                    ""
-                )}
-
                 {/* Chapter Edit modal */}
                 {this.state.showChapter_EditModal ? (
                     <ChapterEditModal
@@ -1235,6 +1221,19 @@ class Subject extends Component {
                         formSubmission={this.chapterFormSubmission}
                         subjectId={this.subjectId}
                         data={this.state.selectedChapter}
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Semester modal */}
+                {this.state.showSemesterModal ? (
+                    <SemesterModal
+                        show={this.state.showSemesterModal}
+                        onHide={this.toggleSemesterModal}
+                        formSubmission={this.semesterFormSubmission}
+                        chapter_id={this.state.chapter_id}
+                        subjectId={this.subjectId}
                     />
                 ) : (
                     ""

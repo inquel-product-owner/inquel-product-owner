@@ -13,25 +13,15 @@ function remarksCondition(data) {
         if (data.auto_section.length !== 0) {
             remarks = data.auto_section[0].remarks;
         } else if (Object.entries(data.direct_question).length !== 0) {
-            remarks = data.direct_question.remarks;
+            remarks = data.direct_question.remarks
+                ? data.direct_question.remarks
+                : "Not yet evaluated";
         }
     } else {
         remarks = "Not yet evaluated";
     }
 
     return remarks;
-
-    // props.attempt.evaluated === true
-    //                         ? props.attempt.auto_section.length !== 0
-    //                             ? props.attempt.auto_section[0].remarks
-    //                             : Object.entries(props.attempt.direct_question)
-    //                                   .length !== 0
-    //                             ? props.attempt.direct_question.remarks !==
-    //                               undefined
-    //                                 ? props.attempt.direct_question.remarks
-    //                                 : "Not yet evaluated"
-    //                             : "Remarks"
-    //                         : ""
 }
 
 function colorCondition(data) {
@@ -40,7 +30,9 @@ function colorCondition(data) {
     if (data.auto_section.length !== 0) {
         color = data.auto_section[0].color;
     } else if (Object.entries(data.direct_question).length !== 0) {
-        color = data.direct_question.color;
+        color = data.direct_question.color
+            ? data.direct_question.color
+            : "grey";
     }
 
     return color;

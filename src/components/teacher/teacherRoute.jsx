@@ -25,11 +25,12 @@ import Match from "./content/match";
 import CycleTestAuto from "./cycle/auto";
 import CyleTestDirect from "./cycle/direct";
 import CycleTestAutoQA from "./cycle/sectionPreview";
+import CycleDirectEvaluation from "./cycle/evaluateStudents";
 
 import SemesterAuto from "./semester/auto";
 import SemesterAutoQA from "./semester/sectionPreview";
 import SemesterDirect from "./semester/direct";
-import EvaluateStudents from "./evaluateStudents";
+import SemesterDirectEvaluation from "./semester/evaluateStudents";
 
 import QuizLevel from "./quiz/level";
 import LevelPreview from "./quiz/levelPreview";
@@ -264,13 +265,13 @@ const teacherRoutes = (
         />
         <Route
             exact
-            path="/teacher/group/:groupId/subject/:subjectId/semester/:semesterId/direct/student/:studentId"
+            path="/teacher/group/:groupId/subject/:subjectId/semester/:semesterId/direct/evaluation"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
                     <Redirect to="/teacher/login" />
                 ) : (
-                    <EvaluateStudents {...props} />
+                    <SemesterDirectEvaluation {...props} />
                 )
             }
         />
@@ -315,13 +316,13 @@ const teacherRoutes = (
         />
         <Route
             exact
-            path="/teacher/group/:groupId/subject/:subjectId/chapter/:chapterId/cycle/:cycle_testId/direct/student/:studentId"
+            path="/teacher/group/:groupId/subject/:subjectId/chapter/:chapterId/cycle/:cycle_testId/direct/evaluation"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
                     <Redirect to="/teacher/login" />
                 ) : (
-                    <EvaluateStudents {...props} />
+                    <CycleDirectEvaluation {...props} />
                 )
             }
         />
@@ -554,13 +555,13 @@ const teacherRoutes = (
         />
         <Route
             exact
-            path="/teacher/subject/:subjectId/semester/:semesterId/direct/student/:studentId"
+            path="/teacher/subject/:subjectId/semester/:semesterId/direct/evaluation"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
                     <Redirect to="/teacher/login" />
                 ) : (
-                    <EvaluateStudents {...props} />
+                    <SemesterDirectEvaluation {...props} />
                 )
             }
         />
@@ -605,13 +606,13 @@ const teacherRoutes = (
         />
         <Route
             exact
-            path="/teacher/subject/:subjectId/chapter/:chapterId/cycle/:cycle_testId/direct/student/:studentId"
+            path="/teacher/subject/:subjectId/chapter/:chapterId/cycle/:cycle_testId/direct/evaluation"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_teacher") ? (
                     <Redirect to="/teacher/login" />
                 ) : (
-                    <EvaluateStudents {...props} />
+                    <CycleDirectEvaluation {...props} />
                 )
             }
         />
