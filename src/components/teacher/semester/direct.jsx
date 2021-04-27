@@ -489,17 +489,13 @@ class SemesterDirect extends Component {
                                                 <i className="fas fa-home fa-sm"></i>
                                             </Link>
                                         </li>
-                                        {this.groupId !== undefined ? (
-                                            <li className="breadcrumb-item">
-                                                <Link
-                                                    to={`/teacher/group/${this.groupId}`}
-                                                >
-                                                    {this.props.group_name}
-                                                </Link>
-                                            </li>
-                                        ) : (
-                                            ""
-                                        )}
+                                        <li className="breadcrumb-item">
+                                            <Link
+                                                to={`/teacher/group/${this.groupId}`}
+                                            >
+                                                {this.props.group_name}
+                                            </Link>
+                                        </li>
                                         <li className="breadcrumb-item">
                                             <Link
                                                 to="#"
@@ -517,7 +513,7 @@ class SemesterDirect extends Component {
                                 </nav>
                             </div>
                             <div className="col-md-6 text-right">
-                                <Link to={`${this.props.match.url}/student/1`}>
+                                <Link to={`${this.props.match.url}/evaluation`}>
                                     <button className="btn btn-primary btn-sm">
                                         Evaluate Student
                                     </button>

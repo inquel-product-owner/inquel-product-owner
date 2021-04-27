@@ -523,7 +523,7 @@ class CyleTestDirect extends Component {
                                 </nav>
                             </div>
                             <div className="col-md-6 text-right">
-                                <Link to={`${this.props.match.url}/student/1`}>
+                                <Link to={`${this.props.match.url}/evaluation`}>
                                     <button className="btn btn-primary btn-sm">
                                         Evaluate Student
                                     </button>

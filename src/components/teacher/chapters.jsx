@@ -1807,25 +1807,39 @@ class Chapters extends Component {
                         >
                             Add Cycle test
                         </button>
-                        {this.state.permissions.quiz ? (
-                            this.state.permissions.quiz !== false ? (
+                        {this.state.permissions !== undefined ? (
+                            this.state.permissions.quiz !== undefined ? (
+                                this.state.permissions.quiz !== false ? (
+                                    <button
+                                        className="btn btn-tomato btn-block shadow-sm"
+                                        onClick={this.toggleQuiz_CreateModal}
+                                        disabled={
+                                            Object.entries(this.state.quiz)
+                                                .length !== 0
+                                                ? true
+                                                : false
+                                        }
+                                    >
+                                        Add Quiz
+                                    </button>
+                                ) : (
+                                    ""
+                                )
+                            ) : (
                                 <button
                                     className="btn btn-tomato btn-block shadow-sm"
-                                    onClick={this.toggleQuiz_CreateModal}
-                                    disabled={
-                                        Object.entries(this.state.quiz)
-                                            .length !== 0
-                                            ? true
-                                            : false
-                                    }
+                                    disabled
                                 >
                                     Add Quiz
                                 </button>
-                            ) : (
-                                ""
                             )
                         ) : (
-                            ""
+                            <button
+                                className="btn btn-tomato btn-block shadow-sm"
+                                disabled
+                            >
+                                Add Quiz
+                            </button>
                         )}
                         {/* Loading component */}
                         {this.state.page_loading ? <Loading /> : ""}

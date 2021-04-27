@@ -336,9 +336,9 @@ class Favourites extends Component {
                                                                   key={index}
                                                               >
                                                                   <div className="card-header font-weight-bold-600 pb-0">
-                                                                      {this.loopSubjectData(
+                                                                      {`${key} - ${this.loopSubjectData(
                                                                           key
-                                                                      )}
+                                                                      )}`}
                                                                   </div>
                                                                   <div className="card-body">
                                                                       <div className="row">

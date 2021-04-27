@@ -11,7 +11,6 @@ import "video-react/dist/video-react.css";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
 import {
-    Type2DataFormat,
     conceptFormat,
     dataFormat,
 } from "../../sharedComponents/dataFormating";
@@ -89,7 +88,7 @@ class FavouritesFlashcard extends Component {
             showErrorAlert: false,
             showSuccessAlert: false,
             page_loading: true,
-            isSlideshowPlaying: false,
+            isSlideshowPlaying: true,
         };
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
@@ -101,6 +100,7 @@ class FavouritesFlashcard extends Component {
             "Content-Type": "application/json",
             Authorization: this.authToken,
         };
+        this.slideInterval = setInterval(this.nextSlide, 10000);
     }
 
     // ---------- loads concepts data ----------
@@ -272,102 +272,6 @@ class FavouritesFlashcard extends Component {
                 this.loopSectionStructure();
             }
         );
-        // var apiURL =
-        //     type1_path === undefined || type1_path === null
-        //         ? `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/typeone/learn/?topic_num=${this.topicNum}`
-        //         : type1_path;
-        // await fetch(apiURL, {
-        //     method: "GET",
-        //     headers: this.headers,
-        // })
-        //     .then((res) => res.json())
-        //     .then((result) => {
-        //         console.log(result);
-        //         if (result.sts === true) {
-        //             if (result.data.results.length !== 0) {
-        //                 let data = Type1DataFormat(result);
-        //                 this.setState(
-        //                     {
-        //                         practice: data.result,
-        //                         previous: result.data.previous,
-        //                         next: result.data.next,
-        //                     },
-        //                     () => {
-        //                         this.loadType2Data(type2_path);
-        //                     }
-        //                 );
-        //             } else {
-        //                 this.loadType2Data(type2_path);
-        //             }
-        //         } else {
-        //             this.setState({
-        //                 errorMsg: result.detail ? result.detail : result.msg,
-        //                 showErrorAlert: true,
-        //                 page_loading: false,
-        //             });
-        //         }
-        //     })
-        //     .catch((err) => {
-        //         console.log(err);
-        //     });
-        window.MathJax.typeset();
-    };
-
-    loadType2Data = async (path) => {
-        var apiURL =
-            path === undefined || path === null
-                ? `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/learn/?topic_num=${this.topicNum}`
-                : path;
-        await fetch(apiURL, {
-            method: "GET",
-            headers: this.headers,
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    let values = [...this.state.practice];
-                    let data = Type2DataFormat(result);
-                    let total = [];
-                    let currentIndex = [];
-                    values.forEach(() => {
-                        total.push(0);
-                        currentIndex.push(0);
-                    });
-                    data.total.forEach((data) => {
-                        total.push(data);
-                    });
-                    data.current.forEach((data) => {
-                        currentIndex.push(data);
-                    });
-                    data.result.forEach((section) => {
-                        values.push(section);
-                    });
-                    this.setState(
-                        {
-                            practice: values,
-                            totalSubQuestion: total,
-                            currentSubQuestionIndex: currentIndex,
-                            totalItems: values.length,
-                            type2_previous: result.data.previous,
-                            type2_next: result.data.next,
-                            page_loading: false,
-                        },
-                        () => {
-                            this.loopSectionStructure();
-                        }
-                    );
-                } else {
-                    this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
         window.MathJax.typeset();
     };
 
@@ -1338,6 +1242,10 @@ class FavouritesFlashcard extends Component {
     };
 
     componentDidMount = () => {
+        if (!sessionStorage.getItem("data")) {
+            this.props.history.goBack();
+        }
+
         if (this.state.activeTab === "concept") {
             this.loadConceptData();
         } else {
@@ -1399,6 +1307,7 @@ class FavouritesFlashcard extends Component {
 
     componentWillUnmount = () => {
         document.removeEventListener("keydown", this.handleKeys);
+        sessionStorage.removeItem("data");
     };
 
     // ---------- Navigation ----------
@@ -1486,6 +1395,7 @@ class FavouritesFlashcard extends Component {
                                           index
                                       );
                                       e.stopPropagation();
+                                      this.pauseSlideshow();
                                   }}
                               ></div>
                           ) : (
@@ -1507,6 +1417,7 @@ class FavouritesFlashcard extends Component {
                                 onClick={(e) => {
                                     this.toggleVideoModal(data.content.video);
                                     e.stopPropagation();
+                                    this.pauseSlideshow();
                                 }}
                             >
                                 <i
@@ -1537,100 +1448,57 @@ class FavouritesFlashcard extends Component {
         });
     };
 
-    // if (this.state.isSlideshowPlaying === false) {
-    //     this.setState({
-    //         isSlideshowPlaying: true,
-    //     });
-    //     setInterval(() => {
-    //         if (this.state.isSlideshowPlaying) {
-    //             this.setState({
-    //                 activeData:
-    //                     this.state.activeData + 1 ===
-    //                     this.state.totalItems
-    //                         ? 0
-    //                         : this.state.activeData + 1,
-    //                 isFlipped: false,
-    //             });
-    //             // if (
-    //             //     this.state.activeData + 1 ===
-    //             //     this.state.totalItems
-    //             // ) {
-    //             //     this.setState({
-    //             //         isSlideshowPlaying: false,
-    //             //     });
-    //             // }
-    //         }
-    //     }, 3000);
-    // } else {
-    //     this.setState({
-    //         isSlideshowPlaying: false,
-    //     });
-    // }
+    // ---------- Slideshow ----------
 
     handleSlideShow = () => {
+        if (this.state.isSlideshowPlaying) {
+            this.pauseSlideshow();
+        } else {
+            this.playSlideshow();
+        }
+    };
+
+    nextSlide = async () => {
         if (this.state.activeTab === "concept") {
-            var slideInterval = setInterval(nextSlide.bind(this), 2000);
-
-            function nextSlide() {
-                this.setState({
-                    activeData:
-                        this.state.activeData + 1 === this.state.totalItems
-                            ? 0
-                            : this.state.activeData + 1,
-                    isFlipped: false,
-                });
-            }
-
-            function pauseSlideshow() {
-                this.setState({
-                    isSlideshowPlaying: false,
-                });
-                clearInterval(slideInterval);
-            }
-
-            function playSlideshow() {
-                this.setState({
-                    isSlideshowPlaying: true,
-                });
-                slideInterval = setInterval(nextSlide.bind(this), 2000);
-            }
-
             if (this.state.isSlideshowPlaying) {
-                pauseSlideshow.bind(this);
-            } else {
-                playSlideshow.bind(this);
+                if (this.state.activeData + 1 < this.state.totalItems) {
+                    this.setState({
+                        activeData: this.state.activeData + 1,
+                        isFlipped: false,
+                    });
+                }
+                if (this.state.activeData + 1 === this.state.totalItems) {
+                    this.setState({
+                        isSlideshowPlaying: false,
+                    });
+                    clearInterval(this.slideInterval);
+                }
+                window.MathJax.typeset();
             }
         }
     };
 
-    // nextSlide = async () => {
-    //     if (this.state.isSlideshowPlaying) {
-    //         await this.setState({
-    //             activeData:
-    //                 this.state.activeData + 1 === this.state.totalItems
-    //                     ? 0
-    //                     : this.state.activeData + 1,
-    //             isFlipped: false,
-    //         });
-    //     }
-    //     window.MathJax.typeset();
-    // };
+    pauseSlideshow = async () => {
+        await this.setState({
+            isSlideshowPlaying: false,
+        });
+        clearInterval(this.slideInterval);
+        window.MathJax.typeset();
+    };
 
-    // pauseSlideshow = async (slideInterval) => {
-    //     await this.setState({
-    //         isSlideshowPlaying: false,
-    //     });
-    //     clearInterval(slideInterval);
-    //     window.MathJax.typeset();
-    // };
-
-    // playSlideshow = async (slideInterval) => {
-    //     await this.setState({
-    //         isSlideshowPlaying: true,
-    //     });
-    //     slideInterval = setInterval(this.nextSlide, 3000);
-    //     window.MathJax.typeset();
-    // };
+    playSlideshow = async () => {
+        // restarting the slideshow again
+        if (this.state.activeData + 1 === this.state.totalItems) {
+            this.setState({
+                activeData: 0,
+            });
+        }
+        await this.setState({
+            isSlideshowPlaying: true,
+        });
+        this.slideInterval = setInterval(this.nextSlide, 10000);
+        window.MathJax.typeset();
+    };
 
     render() {
         document.title = `${this.state.chapter_name} learn - Teacher | IQLabs`;
@@ -1760,6 +1628,10 @@ class FavouritesFlashcard extends Component {
                                                       >
                                                           <button
                                                               className="btn btn-primary btn-sm rounded-circle mr-3 shadow-none"
+                                                              onClick={
+                                                                  this
+                                                                      .pauseSlideshow
+                                                              }
                                                               key={audio_index}
                                                           >
                                                               <i className="fas fa-volume-up buttton fa-sm"></i>

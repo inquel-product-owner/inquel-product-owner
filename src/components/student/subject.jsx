@@ -460,6 +460,37 @@ const ChapterListRender = (props) => {
                             props.chapter.chapter_id
                         );
                     })}
+
+                    {/* ----- Quiz list ----- */}
+                    {Object.entries(props.quiz).length !== 0 ? (
+                        <div className="card card-header shadow-sm light-bg mb-2">
+                            <div className="row align-items-center">
+                                <div className="col-md-6">
+                                    <p className="small primary-text font-weight-bold-600 mb-0">
+                                        {props.quiz.quiz_name}
+                                    </p>
+                                </div>
+                                <div className="col-md-6 d-flex align-items-center justify-content-end">
+                                    <Link
+                                        to={`${props.url}/chapter/${props.chapter.chapter_id}/quiz/${props.quiz.quiz_id}`}
+                                    >
+                                        <button
+                                            className="btn btn-primary btn-sm shadow-none"
+                                            onClick={() =>
+                                                this.dispatchQuiz(
+                                                    props.quiz.quiz_name
+                                                )
+                                            }
+                                        >
+                                            Start
+                                        </button>
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        ""
+                    )}
                 </>
             </Accordion.Collapse>
         </Card>
@@ -627,12 +658,12 @@ class Subject extends Component {
             .then((result) => {
                 console.log(result);
                 if (result.sts === true) {
-                    // let quiz = [...this.state.quiz];
-                    // quiz[chapter_index] = result.data;
-                    // this.setState({
-                    //     quiz: quiz,
-                    //     page_loading: false,
-                    // });
+                    let quiz = [...this.state.quiz];
+                    quiz[chapter_index] = result.data;
+                    this.setState({
+                        quiz: quiz,
+                        page_loading: false,
+                    });
                 } else {
                     this.setState({
                         errorMsg: result.detail ? result.detail : result.msg,
@@ -1173,6 +1204,19 @@ class Subject extends Component {
                                                                               this
                                                                                   .cycleTest
                                                                           }
+                                                                          quiz={
+                                                                              this
+                                                                                  .state
+                                                                                  .quiz[
+                                                                                  chapter_index
+                                                                              ]
+                                                                                  ? this
+                                                                                        .state
+                                                                                        .quiz[
+                                                                                        chapter_index
+                                                                                    ]
+                                                                                  : {}
+                                                                          }
                                                                       />
                                                                   ) : null;
                                                               }
@@ -1316,6 +1360,16 @@ class Subject extends Component {
                                                           topic={this.topic}
                                                           cycleTest={
                                                               this.cycleTest
+                                                          }
+                                                          quiz={
+                                                              this.state.quiz[
+                                                                  chapter_index
+                                                              ]
+                                                                  ? this.state
+                                                                        .quiz[
+                                                                        chapter_index
+                                                                    ]
+                                                                  : {}
                                                           }
                                                       />
                                                   ) : null;

@@ -351,7 +351,7 @@ class TestPreview extends Component {
                         ) : (
                             <>
                                 {/* ----- Header Info ----- */}
-                                <div className="card card-body primary-bg text-white font-weight-bold-600 small shadow-sm mb-3">
+                                <div className="card card-body primary-bg text-white font-weight-bold-600 small shadow-sm py-3 mb-3">
                                     <div className="row align-items-center">
                                         <div className="col-md-6">
                                             {
@@ -379,6 +379,23 @@ class TestPreview extends Component {
                                                         ? `0${this.result.data[0].student_scored_marks}`
                                                         : this.result.data[0]
                                                               .student_scored_marks}
+                                                </div>
+                                                <div className="col-md-3">
+                                                    <div
+                                                        className="text-center rounded py-2"
+                                                        style={{
+                                                            backgroundColor: this
+                                                                .result.data[0]
+                                                                .color,
+                                                            textTransform:
+                                                                "capitalize",
+                                                        }}
+                                                    >
+                                                        {
+                                                            this.result.data[0]
+                                                                .remarks
+                                                        }
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
