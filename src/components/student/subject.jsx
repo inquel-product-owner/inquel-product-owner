@@ -474,14 +474,7 @@ const ChapterListRender = (props) => {
                                     <Link
                                         to={`${props.url}/chapter/${props.chapter.chapter_id}/quiz/${props.quiz.quiz_id}`}
                                     >
-                                        <button
-                                            className="btn btn-primary btn-sm shadow-none"
-                                            onClick={() =>
-                                                this.dispatchQuiz(
-                                                    props.quiz.quiz_name
-                                                )
-                                            }
-                                        >
+                                        <button className="btn btn-primary btn-sm shadow-none">
                                             Start
                                         </button>
                                     </Link>

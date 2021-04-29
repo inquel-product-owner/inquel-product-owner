@@ -517,6 +517,7 @@ class CycleAutoExam extends Component {
         this.setState({
             page_loading: true,
         });
+        clearInterval(this.timer)
 
         fetch(
             `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/cycletest/auto/`,
@@ -817,7 +818,7 @@ class CycleAutoExam extends Component {
     typeOneRender = (data, index, answerSection) => {
         return (
             <div
-                className="d-flex align-items-start justify-content mb-3"
+                className="d-flex align-items-start mb-3"
                 key={index}
             >
                 <button className="btn btn-light light-bg btn-sm border-0 shadow-sm mr-1 px-3 font-weight-bold-600 rounded-lg">

@@ -24,6 +24,9 @@ import SemesterExam from "./semester/semesterExam";
 import SemesterDirectExam from "./semester/directExam";
 import SemesterAutoExam from "./semester/autoExam";
 
+import Quiz from "./quiz/quiz";
+import QuizLevelExam from "./quiz/levelExam";
+
 import EmailVerify from "./emailVerification";
 import errorPage from "../404";
 import StudentLogin from "./login";
@@ -200,6 +203,33 @@ const studentRoutes = (
                     <Redirect to="/student/login" />
                 ) : (
                     <CycleDirectExam {...props} />
+                )
+            }
+        />
+
+        {/* --------------- Quiz --------------- */}
+
+        <Route
+            exact
+            path="/student/subject/:subjectId/chapter/:chapterId/quiz/:quizId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/student/login" />
+                ) : (
+                    <Quiz {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/student/subject/:subjectId/chapter/:chapterId/quiz/:quizId/level/:levelId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/student/login" />
+                ) : (
+                    <QuizLevelExam {...props} />
                 )
             }
         />

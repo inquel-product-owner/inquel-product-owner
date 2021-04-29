@@ -761,16 +761,6 @@ class QuizLevel extends Component {
                                                                   >
                                                                       <Dropdown.Item
                                                                           onClick={() => {
-                                                                              this.levelRedirect(
-                                                                                  quiz.level_id
-                                                                              );
-                                                                          }}
-                                                                      >
-                                                                          <i className="far fa-eye fa-sm mr-1"></i>{" "}
-                                                                          View
-                                                                      </Dropdown.Item>
-                                                                      <Dropdown.Item
-                                                                          onClick={() => {
                                                                               this.handleSubmit(
                                                                                   index
                                                                               );
@@ -778,6 +768,16 @@ class QuizLevel extends Component {
                                                                       >
                                                                           <i className="far fa-save fa-sm mr-1"></i>{" "}
                                                                           Save
+                                                                      </Dropdown.Item>
+                                                                      <Dropdown.Item
+                                                                          onClick={() => {
+                                                                              this.levelRedirect(
+                                                                                  quiz.level_id
+                                                                              );
+                                                                          }}
+                                                                      >
+                                                                          <i className="far fa-eye fa-sm mr-1"></i>{" "}
+                                                                          View
                                                                       </Dropdown.Item>
                                                                   </Dropdown.Menu>
                                                               </Dropdown>
