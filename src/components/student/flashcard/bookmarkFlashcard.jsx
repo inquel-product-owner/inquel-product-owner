@@ -1462,13 +1462,13 @@ class FavouritesFlashcard extends Component {
         if (this.state.activeTab === "concept") {
             if (this.state.isSlideshowPlaying) {
                 if (this.state.activeData + 1 < this.state.totalItems) {
-                    this.setState({
+                    await this.setState({
                         activeData: this.state.activeData + 1,
                         isFlipped: false,
                     });
                 }
                 if (this.state.activeData + 1 === this.state.totalItems) {
-                    this.setState({
+                    await this.setState({
                         isSlideshowPlaying: false,
                     });
                     clearInterval(this.slideInterval);
@@ -1489,7 +1489,7 @@ class FavouritesFlashcard extends Component {
     playSlideshow = async () => {
         // restarting the slideshow again
         if (this.state.activeData + 1 === this.state.totalItems) {
-            this.setState({
+            await this.setState({
                 activeData: 0,
             });
         }

@@ -1,486 +1,25 @@
 import React, { Component } from "react";
-import store from "../../redux/store";
+import store from "../../../redux/store";
 import { connect } from "react-redux";
-import Header from "./shared/navbar";
-import SideNav from "./shared/sidenav";
-import {
-    Card,
-    Accordion,
-    Modal,
-    Alert,
-    Spinner,
-    Dropdown,
-} from "react-bootstrap";
+import Header from "../shared/navbar";
+import SideNav from "../shared/sidenav";
+import { Card, Accordion, Dropdown } from "react-bootstrap";
 import Select from "react-select";
 import { Link } from "react-router-dom";
-import Loading from "../sharedComponents/loader";
-import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
-import AlertBox from "../sharedComponents/alert";
+import Loading from "../../sharedComponents/loader";
+import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
+import AlertBox from "../../sharedComponents/alert";
 import {
     ContentDeleteModal,
     ContentUpdateModal,
-} from "../sharedComponents/contentManagementModal";
-
-class TopicModal extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            topic_name: "",
-            chapters: this.props.chapters,
-            errorMsg: "",
-            successMsg: "",
-            showErrorAlert: false,
-            showSuccessAlert: false,
-            showLoader: false,
-        };
-        this.url = baseUrl + teacherUrl;
-        this.authToken = localStorage.getItem("Authorization");
-        this.headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: this.authToken,
-        };
-    }
-
-    handleSubmit = (event) => {
-        event.preventDefault();
-
-        this.setState({
-            showLoader: true,
-            showErrorAlert: false,
-            showSuccessAlert: false,
-        });
-
-        const chapters = this.state.chapters;
-
-        function formatData(arr, parentId, topic_name, ancestor) {
-            arr.forEach((i) => {
-                if (i.topic_num === parentId) {
-                    i.child = [
-                        ...i.child,
-                        {
-                            topic_name: topic_name,
-                            topic_num: `${parentId}.${i.child.length + 1}`,
-                            parent_id: parentId,
-                            next_topic: "",
-                            child: [],
-                            ancestor: ancestor,
-                        },
-                    ];
-                } else {
-                    formatData(i.child, parentId, topic_name, ancestor);
-                }
-            });
-            return arr;
-        }
-
-        if (Number.isInteger(this.props.activeTopic)) {
-            chapters.chapter_structure.push({
-                topic_name: this.state.topic_name,
-                topic_num: `${this.props.activeTopic}.${
-                    chapters.chapter_structure.length + 1
-                }`,
-                parent_id: this.props.activeTopic.toString(),
-                next_topic: "",
-                child: [],
-                ancestor: `${this.props.activeTopic}.${
-                    chapters.chapter_structure.length + 1
-                }`,
-            });
-        } else {
-            chapters.chapter_structure = formatData(
-                chapters.chapter_structure,
-                this.props.activeTopic,
-                this.state.topic_name,
-                this.props.ancestor
-            );
-        }
-
-        fetch(
-            `${this.url}/teacher/subject/${this.props.subjectId}/chapter/topics/`,
-            {
-                headers: this.headers,
-                method: "POST",
-                body: JSON.stringify(chapters),
-            }
-        )
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    this.setState({
-                        successMsg: result.msg,
-                        showSuccessAlert: true,
-                        showLoader: false,
-                    });
-                    this.props.formSubmission();
-                } else {
-                    this.setState({
-                        errorMsg: result.msg,
-                        showErrorAlert: true,
-                        showLoader: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    handleTopic = (event) => {
-        this.setState({
-            topic_name: event.target.value,
-        });
-    };
-
-    render() {
-        return (
-            <Modal
-                show={this.props.show}
-                onHide={this.props.onHide}
-                size="md"
-                aria-labelledby="contained-modal-title-vcenter"
-                centered
-            >
-                <Modal.Header closeButton>Create Topic</Modal.Header>
-                <form onSubmit={this.handleSubmit} autoComplete="off">
-                    <Modal.Body>
-                        <Alert
-                            variant="danger"
-                            show={this.state.showErrorAlert}
-                            onClose={() => {
-                                this.setState({
-                                    showErrorAlert: false,
-                                });
-                            }}
-                            dismissible
-                        >
-                            {this.state.errorMsg}
-                        </Alert>
-                        <Alert
-                            variant="success"
-                            show={this.state.showSuccessAlert}
-                            onClose={() => {
-                                this.setState({
-                                    showSuccessAlert: false,
-                                });
-                            }}
-                            dismissible
-                        >
-                            {this.state.successMsg}
-                        </Alert>
-
-                        <label htmlFor="topic">Topic name</label>
-                        <input
-                            type="text"
-                            name="topic"
-                            id="topic"
-                            className="form-control borders"
-                            onChange={this.handleTopic}
-                            placeholder="Topic name"
-                            required
-                        />
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <button className="btn btn-primary btn-block shadow-none">
-                            {this.state.showLoader ? (
-                                <Spinner
-                                    as="span"
-                                    animation="border"
-                                    size="sm"
-                                    role="status"
-                                    aria-hidden="true"
-                                    className="mr-2"
-                                />
-                            ) : (
-                                ""
-                            )}
-                            Add
-                        </button>
-                    </Modal.Footer>
-                </form>
-            </Modal>
-        );
-    }
-}
-
-class CycleTestModal extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            cycle_test: "",
-            chapter_id: this.props.chapter_id,
-            errorMsg: "",
-            successMsg: "",
-            showErrorAlert: false,
-            showSuccessAlert: false,
-            showLoader: false,
-        };
-        this.url = baseUrl + teacherUrl;
-        this.authToken = localStorage.getItem("Authorization");
-        this.headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: this.authToken,
-        };
-    }
-
-    handleSubmit = (event) => {
-        event.preventDefault();
-
-        this.setState({
-            showLoader: true,
-            showErrorAlert: false,
-            showSuccessAlert: false,
-        });
-
-        fetch(`${this.url}/teacher/subject/${this.props.subjectId}/cycle/`, {
-            headers: this.headers,
-            method: "POST",
-            body: JSON.stringify({
-                chapter_id: this.state.chapter_id,
-                cycle_test_name: this.state.cycle_test,
-            }),
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    this.setState({
-                        successMsg: result.msg,
-                        showSuccessAlert: true,
-                        showLoader: false,
-                    });
-                    this.props.formSubmission();
-                } else {
-                    this.setState({
-                        errorMsg: result.msg,
-                        showErrorAlert: true,
-                        showLoader: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    handleCycleTest = (event) => {
-        this.setState({
-            cycle_test: event.target.value,
-        });
-    };
-
-    render() {
-        return (
-            <Modal
-                show={this.props.show}
-                onHide={this.props.onHide}
-                size="md"
-                aria-labelledby="contained-modal-title-vcenter"
-                centered
-            >
-                <Modal.Header closeButton>Create Cycle test</Modal.Header>
-                <form onSubmit={this.handleSubmit} autoComplete="off">
-                    <Modal.Body>
-                        <Alert
-                            variant="danger"
-                            show={this.state.showErrorAlert}
-                            onClose={() => {
-                                this.setState({
-                                    showErrorAlert: false,
-                                });
-                            }}
-                            dismissible
-                        >
-                            {this.state.errorMsg}
-                        </Alert>
-                        <Alert
-                            variant="success"
-                            show={this.state.showSuccessAlert}
-                            onClose={() => {
-                                this.setState({
-                                    showSuccessAlert: false,
-                                });
-                            }}
-                            dismissible
-                        >
-                            {this.state.successMsg}
-                        </Alert>
-
-                        <label htmlFor="cycle_test">Cycle test name</label>
-                        <input
-                            type="text"
-                            name="cycle_test"
-                            id="cycle_test"
-                            className="form-control borders"
-                            onChange={this.handleCycleTest}
-                            placeholder="Cycle test name"
-                            required
-                        />
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <button className="btn btn-primary btn-block shadow-none">
-                            {this.state.showLoader ? (
-                                <Spinner
-                                    as="span"
-                                    animation="border"
-                                    size="sm"
-                                    role="status"
-                                    aria-hidden="true"
-                                    className="mr-2"
-                                />
-                            ) : (
-                                ""
-                            )}
-                            Add
-                        </button>
-                    </Modal.Footer>
-                </form>
-            </Modal>
-        );
-    }
-}
-
-class QuizModal extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            quiz_name: "",
-            errorMsg: "",
-            successMsg: "",
-            showErrorAlert: false,
-            showSuccessAlert: false,
-            showLoader: false,
-        };
-        this.url = baseUrl + teacherUrl;
-        this.authToken = localStorage.getItem("Authorization");
-        this.headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: this.authToken,
-        };
-    }
-
-    handleSubmit = (event) => {
-        event.preventDefault();
-
-        this.setState({
-            showLoader: true,
-            showErrorAlert: false,
-            showSuccessAlert: false,
-        });
-
-        fetch(
-            `${this.url}/teacher/subject/${this.props.subjectId}/chapter/${this.props.chapterId}/quiz/`,
-            {
-                headers: this.headers,
-                method: "POST",
-                body: JSON.stringify({
-                    chapter_id: this.props.chapter_id,
-                    quiz_name: this.state.quiz_name,
-                }),
-            }
-        )
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    this.setState({
-                        successMsg: result.msg,
-                        showSuccessAlert: true,
-                        showLoader: false,
-                    });
-                    this.props.formSubmission();
-                } else {
-                    this.setState({
-                        errorMsg: result.msg,
-                        showErrorAlert: true,
-                        showLoader: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
-    handleQuizName = (event) => {
-        this.setState({
-            quiz_name: event.target.value,
-        });
-    };
-
-    render() {
-        return (
-            <Modal
-                show={this.props.show}
-                onHide={this.props.onHide}
-                size="md"
-                aria-labelledby="contained-modal-title-vcenter"
-                centered
-            >
-                <Modal.Header closeButton>Create Quiz</Modal.Header>
-                <form onSubmit={this.handleSubmit} autoComplete="off">
-                    <Modal.Body>
-                        <Alert
-                            variant="danger"
-                            show={this.state.showErrorAlert}
-                            onClose={() => {
-                                this.setState({
-                                    showErrorAlert: false,
-                                });
-                            }}
-                            dismissible
-                        >
-                            {this.state.errorMsg}
-                        </Alert>
-                        <Alert
-                            variant="success"
-                            show={this.state.showSuccessAlert}
-                            onClose={() => {
-                                this.setState({
-                                    showSuccessAlert: false,
-                                });
-                            }}
-                            dismissible
-                        >
-                            {this.state.successMsg}
-                        </Alert>
-
-                        <label htmlFor="quiz_name">Quiz name</label>
-                        <input
-                            type="text"
-                            name="quiz_name"
-                            id="quiz_name"
-                            className="form-control borders"
-                            onChange={this.handleQuizName}
-                            placeholder="Quiz name"
-                            required
-                        />
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <button className="btn btn-primary btn-block shadow-none">
-                            {this.state.showLoader ? (
-                                <Spinner
-                                    as="span"
-                                    animation="border"
-                                    size="sm"
-                                    role="status"
-                                    aria-hidden="true"
-                                    className="mr-2"
-                                />
-                            ) : (
-                                ""
-                            )}
-                            Add
-                        </button>
-                    </Modal.Footer>
-                </form>
-            </Modal>
-        );
-    }
-}
+} from "../../sharedComponents/contentManagementModal";
+import {
+    TopicModal,
+    CycleTestModal,
+    IndependentCycleTestModal,
+    IndependentCycleEditModal,
+    QuizModal,
+} from "./contentManagementModal";
 
 const mapStateToProps = (state) => ({
     group_name: state.group_name,
@@ -493,16 +32,22 @@ class Chapters extends Component {
         super(props);
         this.state = {
             showSideNav: false,
+            collapsed: false,
+
             showTopicModal: false,
             showTopic_EditModal: false,
             showTopic_DeleteModal: false,
+
             showCycle_TestModal: false,
             showCycle_EditModal: false,
             showCycle_DeleteModal: false,
+
+            showIndependentCycle_TestModal: false,
+            showIndependentCycle_EditModal: false,
+
             showQuiz_CreateModal: false,
             showQuiz_EditModal: false,
             showQuiz_DeleteModal: false,
-            collapsed: false,
 
             chapterList: [],
             chapterId: "",
@@ -569,16 +114,31 @@ class Chapters extends Component {
     // ----- Cycle test Modals -----
 
     toggleCycleTestModal = () => {
-        this.setState({
-            showCycle_TestModal: !this.state.showCycle_TestModal,
-        });
+        if (this.state.is_independent === false) {
+            this.setState({
+                showCycle_TestModal: !this.state.showCycle_TestModal,
+            });
+        } else {
+            this.setState({
+                showIndependentCycle_TestModal: !this.state
+                    .showIndependentCycle_TestModal,
+            });
+        }
     };
 
     toggleCycle_EditModal = (data) => {
-        this.setState({
-            selectedCycleData: data,
-            showCycle_EditModal: !this.state.showCycle_EditModal,
-        });
+        if (this.state.is_independent === false) {
+            this.setState({
+                selectedCycleData: data,
+                showCycle_EditModal: !this.state.showCycle_EditModal,
+            });
+        } else {
+            this.setState({
+                selectedCycleData: data,
+                showIndependentCycle_EditModal: !this.state
+                    .showIndependentCycle_EditModal,
+            });
+        }
     };
 
     toggleCycle_DeleteModal = (data) => {
@@ -816,6 +376,8 @@ class Chapters extends Component {
                 showCycle_TestModal: false,
                 showCycle_EditModal: false,
                 showCycle_DeleteModal: false,
+                showIndependentCycle_TestModal: false,
+                showIndependentCycle_EditModal: false,
             });
         }, 1000);
         this.loadCycleTestData();
@@ -900,6 +462,7 @@ class Chapters extends Component {
             this.setState({
                 errorMsg: "Select a topic",
                 showErrorAlert: true,
+                page_loading:false
             });
         }
     };
@@ -1260,7 +823,6 @@ class Chapters extends Component {
                             cycle_test_name: this.state.selectedCycleData
                                 .cycle_test_name,
                         }}
-                        toggleModal={this.toggleCycle_DeleteModal}
                     />
                 ) : (
                     ""
@@ -1281,6 +843,33 @@ class Chapters extends Component {
                                 .cycle_test_id,
                         }}
                         toggleModal={this.toggleCycle_DeleteModal}
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Independent Cycle test modal */}
+                {this.state.showIndependentCycle_TestModal ? (
+                    <IndependentCycleTestModal
+                        show={this.state.showIndependentCycle_TestModal}
+                        onHide={this.toggleCycleTestModal}
+                        formSubmission={this.cycleTest_formSubmission}
+                        subjectId={this.subjectId}
+                        chapter_id={this.state.chapterId}
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Independent Cycle test edit modal */}
+                {this.state.showIndependentCycle_EditModal ? (
+                    <IndependentCycleEditModal
+                        show={this.state.showIndependentCycle_EditModal}
+                        onHide={this.toggleCycle_EditModal}
+                        formSubmission={this.cycleTest_formSubmission}
+                        subjectId={this.subjectId}
+                        chapter_id={this.state.chapterId}
+                        data={this.state.selectedCycleData}
                     />
                 ) : (
                     ""
@@ -1494,7 +1083,7 @@ class Chapters extends Component {
 
                                         <Accordion.Collapse eventKey="0">
                                             <Card>
-                                                {/* Topic list */}
+                                                {/* ----- Topic list ----- */}
                                                 {this.state.chapters
                                                     .chapter_structure
                                                     .length !== 0

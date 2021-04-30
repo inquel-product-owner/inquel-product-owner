@@ -502,6 +502,7 @@ class SemesterAutoExam extends Component {
         this.setState({
             page_loading: true,
         });
+        clearInterval(this.timer)
 
         fetch(
             `${this.url}/student/subject/${this.subjectId}/semester/${this.semesterId}/auto/`,

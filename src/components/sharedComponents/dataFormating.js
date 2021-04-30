@@ -9,7 +9,7 @@ export function Type1DataFormat(result) {
         audio = [];
         let videoTitle = "";
         let videoPath = "";
-        if (response[i].files.length !== 0) {
+        if (response[i].files && response[i].files.length !== 0) {
             // image
             if (response[i].files[0].type1_image_1) {
                 images.push({
@@ -229,7 +229,10 @@ export function Type2DataFormat(result) {
         currentSubQuestionIndex.push(0);
 
         // Image
-        if (Object.entries(response[i].files).length !== 0) {
+        if (
+            response[i].files &&
+            Object.entries(response[i].files).length !== 0
+        ) {
             if (response[i].files.type2_image_1) {
                 images.push({
                     title: response[i].files.type2_image_1_title,
@@ -435,7 +438,7 @@ export function dataFormat(result) {
             audio = [];
             let videoTitle = "";
             let videoPath = "";
-            if (response[i].files.length !== 0) {
+            if (response[i].files && response[i].files.length !== 0) {
                 // image
                 if (response[i].files[0].type1_image_1) {
                     images.push({
@@ -662,31 +665,29 @@ export function dataFormat(result) {
                     explanation: response[i].sub_question[k].explanation,
                     mcq: response[i].sub_question[k].mcq,
                     fill_in: response[i].sub_question[k].fill_in,
-                    fillin_answer:
-                        response[i].sub_question[k].fillin_answer
-                            ? response[i].sub_question[k].fillin_answer
-                            : [""],
-                    options:
-                        response[i].sub_question[k].options
-                            ? response[i].sub_question[k].options
-                            : [
-                                  {
-                                      correct: false,
-                                      content: "",
-                                  },
-                                  {
-                                      correct: false,
-                                      content: "",
-                                  },
-                                  {
-                                      correct: false,
-                                      content: "",
-                                  },
-                                  {
-                                      correct: false,
-                                      content: "",
-                                  },
-                              ],
+                    fillin_answer: response[i].sub_question[k].fillin_answer
+                        ? response[i].sub_question[k].fillin_answer
+                        : [""],
+                    options: response[i].sub_question[k].options
+                        ? response[i].sub_question[k].options
+                        : [
+                              {
+                                  correct: false,
+                                  content: "",
+                              },
+                              {
+                                  correct: false,
+                                  content: "",
+                              },
+                              {
+                                  correct: false,
+                                  content: "",
+                              },
+                              {
+                                  correct: false,
+                                  content: "",
+                              },
+                          ],
                     marks: response[i].sub_question[k].marks,
                     negative_marks: response[i].sub_question[k].negative_marks,
                 });
