@@ -10,8 +10,9 @@ import StudentProfile from "./studentProfile";
 import Group from "./group";
 import GroupStudents from "./groupStudents";
 
-import Subject from "./subject";
-import Chapters from "./chapters";
+import Subject from "./subject/groupSubject";
+import IndependentSubject from "./subject/independentSubject";
+import Chapters from "./chapter/chapters";
 import Summary from "./content/summary";
 import SummaryUpload from "./content/summaryUpload";
 import Notes from "./content/notes";
@@ -393,7 +394,7 @@ const teacherRoutes = (
                 !localStorage.getItem("is_teacher") ? (
                     <Redirect to="/teacher/login" />
                 ) : (
-                    <Subject {...props} />
+                    <IndependentSubject {...props} />
                 )
             }
         />
