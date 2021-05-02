@@ -1,9 +1,5 @@
 import React, { Component } from "react";
-import {
-    Modal,
-    Alert,
-    Spinner,
-} from "react-bootstrap";
+import { Modal, Alert, Spinner } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
 import ReactSwitch from "../../sharedComponents/switchComponent";
 
@@ -359,15 +355,18 @@ export class IndependentCycleTestModal extends Component {
             showSuccessAlert: false,
         });
 
-        fetch(`${this.url}/teacher/subject/${this.props.subjectId}/cycle/`, {
-            headers: this.headers,
-            method: "POST",
-            body: JSON.stringify({
-                chapter_id: this.state.chapter_id,
-                cycle_test_name: this.state.cycle_test,
-                limited: this.state.limited,
-            }),
-        })
+        fetch(
+            `${this.url}/teacher/independent/subject/${this.props.subjectId}/cycle/`,
+            {
+                headers: this.headers,
+                method: "POST",
+                body: JSON.stringify({
+                    chapter_id: this.state.chapter_id,
+                    cycle_test_name: this.state.cycle_test,
+                    limited: this.state.limited,
+                }),
+            }
+        )
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
@@ -515,15 +514,19 @@ export class IndependentCycleEditModal extends Component {
             showSuccessAlert: false,
         });
 
-        fetch(`${this.url}/teacher/subject/${this.props.subjectId}/cycle/`, {
-            headers: this.headers,
-            method: "PATCH",
-            body: JSON.stringify({
-                chapter_id: this.state.chapter_id,
-                cycle_test_name: this.state.cycle_test,
-                limited: this.state.limited,
-            }),
-        })
+        fetch(
+            `${this.url}/teacher/independent/subject/${this.props.subjectId}/cycle/`,
+            {
+                headers: this.headers,
+                method: "PATCH",
+                body: JSON.stringify({
+                    chapter_id: this.state.chapter_id,
+                    cycle_test_id: this.props.data.cycle_test_id,
+                    cycle_test_name: this.state.cycle_test,
+                    limited: this.state.limited,
+                }),
+            }
+        )
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
