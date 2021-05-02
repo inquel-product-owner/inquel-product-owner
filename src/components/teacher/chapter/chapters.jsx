@@ -50,7 +50,7 @@ class Chapters extends Component {
             showQuiz_DeleteModal: false,
 
             chapterList: [],
-            chapterId: "",
+            chapterId: this.props.match.params.chapterId,
             chapterName: "",
             chapters: {
                 topic_id: "",
@@ -225,13 +225,16 @@ class Chapters extends Component {
     };
 
     loadCycleTestData = () => {
-        fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/cycle/?chapter_id=${this.state.chapterId}`,
-            {
-                headers: this.headers,
-                method: "GET",
-            }
-        )
+        let url = "";
+        if (this.state.is_independent === true) {
+            url = `${this.url}/teacher/independent/subject/${this.subjectId}/cycle/?chapter_id=${this.state.chapterId}`;
+        } else {
+            url = `${this.url}/teacher/subject/${this.subjectId}/cycle/?chapter_id=${this.state.chapterId}`;
+        }
+        fetch(url, {
+            headers: this.headers,
+            method: "GET",
+        })
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
@@ -295,19 +298,8 @@ class Chapters extends Component {
         });
     };
 
-    componentDidMount = () => {
-        this.setState(
-            {
-                chapterId: this.props.match.params.chapterId,
-            },
-            () => {
-                this.loadTopicData();
-                this.loadCycleTestData();
-                this.loadQuizData();
-            }
-        );
-
-        fetch(`${this.url}/teacher/subject/${this.subjectId}/`, {
+    componentDidMount = async () => {
+        await fetch(`${this.url}/teacher/subject/${this.subjectId}/`, {
             headers: this.headers,
             method: "GET",
         })
@@ -335,6 +327,10 @@ class Chapters extends Component {
             .catch((err) => {
                 console.log(err);
             });
+
+        this.loadTopicData();
+        this.loadCycleTestData();
+        this.loadQuizData();
     };
 
     componentDidUpdate = (prevProps, prevState) => {
@@ -462,7 +458,7 @@ class Chapters extends Component {
             this.setState({
                 errorMsg: "Select a topic",
                 showErrorAlert: true,
-                page_loading:false
+                page_loading: false,
             });
         }
     };

@@ -842,7 +842,7 @@ export class IndependentSemesterEditModal extends Component {
         this.state = {
             chapter: this.props.chapter_id, // list of all chapters
             semester_name: this.props.data.semester_name,
-            chapter_id: this.props.data.chapter_id || [],
+            semester_chapters: this.props.data.chapters || [],
             limited: this.props.data.limited,
 
             errorMsg: "",
@@ -873,10 +873,11 @@ export class IndependentSemesterEditModal extends Component {
             `${this.url}/teacher/independent/subject/${this.props.subjectId}/semester/`,
             {
                 headers: this.headers,
-                method: "PUT",
+                method: "PATCH",
                 body: JSON.stringify({
+                    semester_id: this.props.data.semester_id,
                     semester_name: this.state.semester_name,
-                    chapter_ids: this.state.chapter_id,
+                    chapter_ids: this.state.semester_chapters,
                     limited: this.state.limited,
                 }),
             }
@@ -911,14 +912,14 @@ export class IndependentSemesterEditModal extends Component {
     };
 
     handleCheck = (event) => {
-        let chapter_id = [...this.state.chapter_id];
+        let chapter_id = [...this.state.semester_chapters];
         if (event.target.checked) {
             chapter_id.push(event.target.value);
         } else {
             chapter_id.splice(chapter_id.indexOf(event.target.value), 1);
         }
         this.setState({
-            chapter_id: chapter_id,
+            semester_chapters: chapter_id,
         });
     };
 
@@ -989,7 +990,7 @@ export class IndependentSemesterEditModal extends Component {
                                                               this.handleCheck
                                                           }
                                                           checked={
-                                                              this.state.chapter_id.includes(
+                                                              this.state.semester_chapters.includes(
                                                                   chapter.chapter_id
                                                               )
                                                                   ? true
