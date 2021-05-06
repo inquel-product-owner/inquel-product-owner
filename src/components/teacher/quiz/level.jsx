@@ -514,10 +514,10 @@ class QuizLevel extends Component {
                                             <div className="col-3">
                                                 <div className="form-row">
                                                     <div className="col-6">
-                                                        Max Points
+                                                        Min Points
                                                     </div>
                                                     <div className="col-6">
-                                                        Min Points
+                                                        Max Points
                                                     </div>
                                                 </div>
                                             </div>
@@ -631,15 +631,15 @@ class QuizLevel extends Component {
                                                                           type="text"
                                                                           className="form-control form-control-sm border-secondary text-center"
                                                                           value={
-                                                                              quiz.max_points
+                                                                              quiz.min_points
                                                                           }
                                                                           onChange={(
                                                                               event
                                                                           ) =>
-                                                                              this.handleMaxPoint(
+                                                                              this.handleInput(
                                                                                   event,
                                                                                   index,
-                                                                                  "max_points"
+                                                                                  "min_points"
                                                                               )
                                                                           }
                                                                           required
@@ -650,15 +650,15 @@ class QuizLevel extends Component {
                                                                           type="text"
                                                                           className="form-control form-control-sm border-secondary text-center"
                                                                           value={
-                                                                              quiz.min_points
+                                                                              quiz.max_points
                                                                           }
                                                                           onChange={(
                                                                               event
                                                                           ) =>
-                                                                              this.handleInput(
+                                                                              this.handleMaxPoint(
                                                                                   event,
                                                                                   index,
-                                                                                  "min_points"
+                                                                                  "max_points"
                                                                               )
                                                                           }
                                                                           required
@@ -685,7 +685,7 @@ class QuizLevel extends Component {
                                                                       }
                                                                       required
                                                                   />
-                                                                  <span className="h5 mx-2 mb-0">
+                                                                  <span className="h5 mx-1 mb-0">
                                                                       /
                                                                   </span>
                                                                   <input

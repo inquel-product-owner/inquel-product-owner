@@ -255,35 +255,36 @@ class TestPreview extends Component {
                         {this.result.direct === true ? (
                             <>
                                 {/* Header configuration */}
-                                <div className="row align-items-center justify-content-center mb-3">
-                                    <div className="col-md-2">
-                                        <div className="form-group">
-                                            <p className="mb-2 font-weight-bold-600">
+                                <div className="card card-body primary-bg text-white small shadow-sm mb-3">
+                                    <div className="row align-items-center justify-content-center text-center">
+                                        <div className="col-md-2">
+                                            <span className="font-weight-bold-600">
                                                 Exam Date:
-                                            </p>
-                                            <p className="small mb-0">
-                                                {dateFormat(
-                                                    this.result.data.exam_date,
-                                                    "dd/mm/yyyy"
-                                                )}
-                                            </p>
+                                            </span>{" "}
+                                            {dateFormat(
+                                                this.result.data.exam_date,
+                                                "dd/mm/yyyy"
+                                            )}
                                         </div>
-                                    </div>
-                                    <div className="col-md-2">
-                                        <div className="form-group">
-                                            <p className="mb-2 font-weight-bold-600">
-                                                Submission Time:
-                                            </p>
-                                            <p className="small mb-0">
-                                                {dateFormat(
-                                                    this.result.data
-                                                        .submission_time,
-                                                    "dd/mm/yyyy hh:MM:ss"
-                                                )}
-                                            </p>
+                                        <div className="col-md-2">
+                                            <span className="font-weight-bold-600">
+                                                Submitted On:
+                                            </span>{" "}
+                                            {dateFormat(
+                                                this.result.data
+                                                    .submission_time,
+                                                "dd/mm/yyyy"
+                                            )}
+                                        </div>
+                                        <div className="col-md-2">
+                                            <span className="font-weight-bold-600">
+                                                Scored Marks:
+                                            </span>{" "}
+                                            0
                                         </div>
                                     </div>
                                 </div>
+
                                 <div className="card light-bg shadow-sm">
                                     {/* File displaying */}
                                     <div className="card-body">
@@ -353,7 +354,7 @@ class TestPreview extends Component {
                                 {/* ----- Header Info ----- */}
                                 <div className="card card-body primary-bg text-white font-weight-bold-600 small shadow-sm py-3 mb-3">
                                     <div className="row align-items-center">
-                                        <div className="col-md-6">
+                                        <div className="col-md-5">
                                             {
                                                 this.result.data[0].sections[
                                                     this.state
@@ -361,7 +362,7 @@ class TestPreview extends Component {
                                                 ].section_description
                                             }
                                         </div>
-                                        <div className="col-md-6">
+                                        <div className="col-md-7">
                                             <div className="row align-items-center justify-content-end">
                                                 <div className="col-md-3">
                                                     Total questions:{" "}
@@ -380,7 +381,14 @@ class TestPreview extends Component {
                                                         : this.result.data[0]
                                                               .student_scored_marks}
                                                 </div>
-                                                <div className="col-md-3">
+                                                <div className="col-md-4">
+                                                    Submitted On:{" "}
+                                                    {dateFormat(
+                                                        this.result.submit_time,
+                                                        "dd-mm-yyyy"
+                                                    )}
+                                                </div>
+                                                <div className="col-md-2">
                                                     <div
                                                         className="text-center rounded py-2"
                                                         style={{
@@ -447,12 +455,18 @@ class TestPreview extends Component {
                                                                               <div className="form-group">
                                                                                   <div
                                                                                       className={`card shadow-sm ${
-                                                                                          option.correct !==
-                                                                                          undefined
-                                                                                              ? option.correct
-                                                                                                  ? "success-bg"
-                                                                                                  : "bg-white"
-                                                                                              : ""
+                                                                                          question.answer.includes(
+                                                                                              option.content
+                                                                                                  ? option.content
+                                                                                                  : option
+                                                                                          )
+                                                                                              ? question.marks >
+                                                                                                0
+                                                                                                  ? "success-bg 1"
+                                                                                                  : "danger-bg"
+                                                                                              : option.correct
+                                                                                              ? "success-bg"
+                                                                                              : "bg-white"
                                                                                       }`}
                                                                                   >
                                                                                       <div className="card-body small py-3">
@@ -471,7 +485,7 @@ class TestPreview extends Component {
 
                                                           {/* ---------- Student answers ---------- */}
 
-                                                          <div className="row">
+                                                          {/* <div className="row">
                                                               <div className="col-md-6">
                                                                   <div
                                                                       className={`card card-body ${
@@ -510,7 +524,52 @@ class TestPreview extends Component {
                                                                       )}
                                                                   </div>
                                                               </div>
-                                                          </div>
+                                                          </div> */}
+
+                                                          {question.marks ===
+                                                              0 &&
+                                                          question
+                                                              .proper_answer[0]
+                                                              .content ===
+                                                              undefined ? (
+                                                              <div className="row">
+                                                                  <div className="col-md-6">
+                                                                      <div
+                                                                          className="card card-body danger-bg h-100"
+                                                                          style={{
+                                                                              minHeight:
+                                                                                  "100px",
+                                                                          }}
+                                                                      >
+                                                                          <p className="font-weight-bold-600 mb-2">
+                                                                              Your
+                                                                              answer(s):
+                                                                          </p>
+                                                                          {question.answer.map(
+                                                                              (
+                                                                                  answer,
+                                                                                  answer_index
+                                                                              ) => {
+                                                                                  return (
+                                                                                      <p
+                                                                                          className="small mb-2"
+                                                                                          key={
+                                                                                              answer_index
+                                                                                          }
+                                                                                      >
+                                                                                          {
+                                                                                              answer
+                                                                                          }
+                                                                                      </p>
+                                                                                  );
+                                                                              }
+                                                                          )}
+                                                                      </div>
+                                                                  </div>
+                                                              </div>
+                                                          ) : (
+                                                              ""
+                                                          )}
                                                       </div>
                                                   </div>
                                               </div>
@@ -647,23 +706,21 @@ class TestPreview extends Component {
                                                                                                   option_index
                                                                                               }
                                                                                           >
-                                                                                              <div className="form-group">
-                                                                                                  <div
-                                                                                                      className={`card shadow-sm ${
-                                                                                                          option.correct !==
-                                                                                                          undefined
-                                                                                                              ? option.correct
-                                                                                                                  ? "success-bg"
-                                                                                                                  : "bg-white"
-                                                                                                              : ""
-                                                                                                      }`}
-                                                                                                  >
-                                                                                                      <div className="card-body small py-3">
-                                                                                                          {option.content !==
-                                                                                                          undefined
-                                                                                                              ? option.content
-                                                                                                              : option}
-                                                                                                      </div>
+                                                                                              <div
+                                                                                                  className={`card shadow-sm mb-2 ${
+                                                                                                      option.correct !==
+                                                                                                      undefined
+                                                                                                          ? option.correct
+                                                                                                              ? "success-bg"
+                                                                                                              : "bg-white"
+                                                                                                          : ""
+                                                                                                  }`}
+                                                                                              >
+                                                                                                  <div className="card-body small py-3">
+                                                                                                      {option.content !==
+                                                                                                      undefined
+                                                                                                          ? option.content
+                                                                                                          : option}
                                                                                                   </div>
                                                                                               </div>
                                                                                           </div>

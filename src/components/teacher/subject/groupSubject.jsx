@@ -402,13 +402,10 @@ class Subject extends Component {
                             </div>
                             <div className="col-md-6 text-right">
                                 <button
-                                    className="btn btn-primary btn-sm shadow-none mr-1"
+                                    className="btn btn-primary btn-sm shadow-none"
                                     onClick={this.toggleScorecardModal}
                                 >
                                     Subject score config
-                                </button>
-                                <button className="btn btn-primary btn-sm shadow-none">
-                                    Publish
                                 </button>
                             </div>
                         </div>

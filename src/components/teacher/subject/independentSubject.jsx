@@ -8,9 +8,7 @@ import { Dropdown } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl";
 import Loading from "../../sharedComponents/loader";
 import AlertBox from "../../sharedComponents/alert";
-import {
-    ContentDeleteModal,
-} from "../../sharedComponents/contentManagementModal";
+import { ContentDeleteModal } from "../../sharedComponents/contentManagementModal";
 import {
     ChapterList,
     ChapterEditModal,
@@ -357,13 +355,10 @@ class IndependentSubject extends Component {
                             </div>
                             <div className="col-md-6 text-right">
                                 <button
-                                    className="btn btn-primary btn-sm shadow-none mr-1"
+                                    className="btn btn-primary btn-sm shadow-none"
                                     onClick={this.toggleScorecardModal}
                                 >
                                     Subject score config
-                                </button>
-                                <button className="btn btn-primary btn-sm shadow-none">
-                                    Publish
                                 </button>
                             </div>
                         </div>
