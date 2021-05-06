@@ -742,7 +742,7 @@ export function dataFormat(result) {
     };
 }
 
-export function conceptFormat(result) {
+export function ConceptFormat(result) {
     let data = [];
     let images = [];
     let audio = [];

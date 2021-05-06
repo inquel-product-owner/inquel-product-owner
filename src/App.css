@@ -929,3 +929,10 @@ audio {
     width: 200px;
     overflow: hidden;
 }
+
+.concept-content-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-flow: row wrap;
+}

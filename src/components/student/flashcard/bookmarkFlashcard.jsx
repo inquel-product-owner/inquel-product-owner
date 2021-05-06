@@ -11,7 +11,7 @@ import "video-react/dist/video-react.css";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
 import {
-    conceptFormat,
+    ConceptFormat,
     dataFormat,
 } from "../../sharedComponents/dataFormating";
 
@@ -88,7 +88,9 @@ class FavouritesFlashcard extends Component {
             showErrorAlert: false,
             showSuccessAlert: false,
             page_loading: true,
-            isSlideshowPlaying: true,
+
+            seconds: 0,
+            isSlideshowPlaying: false,
         };
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
@@ -100,7 +102,7 @@ class FavouritesFlashcard extends Component {
             "Content-Type": "application/json",
             Authorization: this.authToken,
         };
-        this.slideInterval = setInterval(this.nextSlide, 10000);
+        this.slideInterval = 0;
     }
 
     // ---------- loads concepts data ----------
@@ -111,10 +113,11 @@ class FavouritesFlashcard extends Component {
                 results: JSON.parse(sessionStorage.getItem("data")),
             },
         };
-        let response = conceptFormat(result);
+        let response = ConceptFormat(result);
         await this.setState({
             data: response.result,
             totalItems: response.result.length,
+            seconds: 15,
         });
         window.MathJax.typeset();
     };
@@ -132,7 +135,7 @@ class FavouritesFlashcard extends Component {
                     flipDirection="vertical"
                 >
                     <div
-                        className="card card-body shadow-sm align-items-center justify-content-center"
+                        className="card card-body shadow-sm concept-content-center"
                         style={{
                             minHeight: `${
                                 this.state.isFullscreenEnabled
@@ -149,7 +152,6 @@ class FavouritesFlashcard extends Component {
                         }}
                     >
                         <div
-                            className="h4 font-weight-bold-600"
                             dangerouslySetInnerHTML={{
                                 __html: data[index].content.terms || "",
                             }}
@@ -177,7 +179,7 @@ class FavouritesFlashcard extends Component {
                         </button>
                     </div>
                     <div
-                        className="card card-body shadow-sm"
+                        className="card card-body shadow-sm concept-content-center"
                         style={{
                             minHeight: `${
                                 this.state.isFullscreenEnabled
@@ -193,7 +195,7 @@ class FavouritesFlashcard extends Component {
                             });
                         }}
                     >
-                        <div className="d-flex w-100">
+                        <div className="d-flex align-items-center w-100">
                             {/* ---------- Content ---------- */}
                             <div className="w-100">
                                 <div
@@ -209,7 +211,7 @@ class FavouritesFlashcard extends Component {
                                 ></div>
                             </div>
                             {/* <!----- Image & Video viewer -----> */}
-                            <div className="ml-3 mt-4">
+                            <div className="ml-3">
                                 {this.imageRender(data[index])}
                             </div>
                             {/* <!-- Image viewer ends here --> */}
@@ -1234,7 +1236,7 @@ class FavouritesFlashcard extends Component {
         array.forEach((a) => {
             if (this.topicNum === a.topic_num) {
                 topic_name = a.topic_name;
-            } else if (Array.isArray(a.child)) {
+            } else if (Array.isArray(a.child) && a.child.length !== 0) {
                 topic_name = this.loopTopicStructure(a.child);
             }
         });
@@ -1323,17 +1325,21 @@ class FavouritesFlashcard extends Component {
     };
 
     handleNext = async () => {
+        clearInterval(this.slideInterval);
         await this.setState({
             activeData: this.state.activeData + 1,
             isFlipped: false,
+            seconds: 15,
         });
         window.MathJax.typeset();
     };
 
     handlePrev = async () => {
+        clearInterval(this.slideInterval);
         await this.setState({
             activeData: this.state.activeData - 1,
             isFlipped: false,
+            seconds: 15,
         });
         window.MathJax.typeset();
     };
@@ -1458,46 +1464,78 @@ class FavouritesFlashcard extends Component {
         }
     };
 
-    nextSlide = async () => {
-        if (this.state.activeTab === "concept") {
-            if (this.state.isSlideshowPlaying) {
-                if (this.state.activeData + 1 < this.state.totalItems) {
-                    await this.setState({
-                        activeData: this.state.activeData + 1,
-                        isFlipped: false,
-                    });
-                }
-                if (this.state.activeData + 1 === this.state.totalItems) {
-                    await this.setState({
-                        isSlideshowPlaying: false,
-                    });
-                    clearInterval(this.slideInterval);
-                }
-                window.MathJax.typeset();
-            }
-        }
-    };
-
     pauseSlideshow = async () => {
+        clearInterval(this.slideInterval);
         await this.setState({
             isSlideshowPlaying: false,
         });
-        clearInterval(this.slideInterval);
         window.MathJax.typeset();
     };
 
     playSlideshow = async () => {
-        // restarting the slideshow again
-        if (this.state.activeData + 1 === this.state.totalItems) {
+        clearInterval(this.slideInterval);
+        if (
+            this.state.seconds === 0 &&
+            this.state.activeData + 1 === this.state.totalItems
+        ) {
             await this.setState({
                 activeData: 0,
+                seconds: 15,
+                isFlipped: false,
             });
+            this.slideInterval = setInterval(this.conceptCountDown, 1000);
+        } else {
+            this.slideInterval = setInterval(this.conceptCountDown, 1000);
         }
-        await this.setState({
+        this.setState({
             isSlideshowPlaying: true,
         });
-        this.slideInterval = setInterval(this.nextSlide, 10000);
         window.MathJax.typeset();
+    };
+
+    componentDidUpdate = async (prevProps, prevState) => {
+        if (this.state.activeTab === "concept") {
+            if (this.state.isSlideshowPlaying === true) {
+                if (this.state.activeData !== prevState.activeData) {
+                    this.slideInterval = setInterval(
+                        this.conceptCountDown,
+                        1000
+                    );
+                }
+            }
+        }
+    };
+
+    nextSlide = async () => {
+        await this.setState({
+            activeData: this.state.activeData + 1,
+            seconds: 15,
+            isFlipped: false,
+        });
+        window.MathJax.typeset();
+    };
+
+    conceptCountDown = () => {
+        let seconds = this.state.seconds - 1;
+        this.setState({
+            seconds: seconds,
+        });
+
+        if (seconds === 10) {
+            this.setState({
+                isFlipped: true,
+            });
+        } else if (seconds === 0) {
+            if (this.state.activeData + 1 === this.state.totalItems) {
+                clearInterval(this.slideInterval);
+                this.setState({
+                    isSlideshowPlaying: false,
+                });
+            } else {
+                clearInterval(this.slideInterval);
+                this.nextSlide();
+            }
+        }
     };
 
     render() {

@@ -25,6 +25,194 @@ function Lock() {
     );
 }
 
+const TopicListRender = (props) => {
+    const nestedTopics = (props.topics.child || []).map((topic, index) => {
+        return (
+            <Accordion key={index}>
+                <TopicListRender
+                    {...props}
+                    topics={topic}
+                    topic_index={index}
+                />
+            </Accordion>
+        );
+    });
+
+    return (
+        <>
+            <Accordion.Toggle
+                as={Card.Header}
+                eventKey={`topic-${props.topic_index}-${props.topics.topic_num}`}
+                className="light-bg shadow-sm py-2 mb-2"
+                style={{
+                    borderRadius: "8px",
+                }}
+                onClick={() =>
+                    props.topics.child.length !== 0
+                        ? props.toggleTopicCollapse(
+                              `topic-${props.topic_index}-${props.topics.topic_num}`,
+                              props.chapter_index
+                          )
+                        : ""
+                }
+            >
+                <div className="row align-items-center">
+                    <div className="col-md-4 mb-2 mb-md-0">
+                        <div className="row align-items-center">
+                            {props.topics.child.length !== 0 ? (
+                                <div className="col-1">
+                                    <span>
+                                        <i
+                                            className={`fas fa-chevron-circle-down ${
+                                                props.topicEventKey[
+                                                    props.chapter_index
+                                                ].includes(
+                                                    `topic-${props.topic_index}-${props.topics.topic_num}`
+                                                )
+                                                    ? "fa-rotate-360"
+                                                    : "fa-rotate-270"
+                                            }`}
+                                        ></i>
+                                    </span>
+                                </div>
+                            ) : (
+                                ""
+                            )}
+                            <div className="col-11 d-flex small font-weight-bold-600">
+                                <div className="mr-3">
+                                    {props.topics.topic_num}
+                                </div>
+                                <div>
+                                    <Link
+                                        to={`${props.url}/chapter/${props.chapter.chapter_id}/${props.topics.topic_num}/learn`}
+                                        className="primary-text"
+                                    >
+                                        {props.topics.topic_name}
+                                        <i className="fas fa-external-link-alt fa-xs ml-2"></i>
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="col-md-8 small primary-text font-weight-bold-600">
+                        <div className="row align-items-center">
+                            <div className="col-md-2 mb-2 mb-md-0"></div>
+                            <div className="col-md-2 mb-2 mb-md-0"></div>
+                            <div className="col-md-2 mb-2 mb-md-0"></div>
+                            <div className="col-md-2 mb-2 mb-md-0">
+                                {props.topics_remarks[
+                                    props.all_chapters.indexOf(
+                                        props.chapter.chapter_id
+                                    )
+                                ] !== undefined ? (
+                                    props.topics_remarks[
+                                        props.all_chapters.indexOf(
+                                            props.chapter.chapter_id
+                                        )
+                                    ][props.topics.topic_num] !== undefined ? (
+                                        props.topics_remarks[
+                                            props.all_chapters.indexOf(
+                                                props.chapter.chapter_id
+                                            )
+                                        ][props.topics.topic_num].remarks !==
+                                        undefined ? (
+                                            <div
+                                                className="text-white text-center p-2 rounded"
+                                                style={{
+                                                    backgroundColor:
+                                                        props.topics_remarks[
+                                                            props.all_chapters.indexOf(
+                                                                props.chapter
+                                                                    .chapter_id
+                                                            )
+                                                        ][
+                                                            props.topics
+                                                                .topic_num
+                                                        ].color,
+                                                    textTransform: "capitalize",
+                                                }}
+                                            >
+                                                {
+                                                    props.topics_remarks[
+                                                        props.all_chapters.indexOf(
+                                                            props.chapter
+                                                                .chapter_id
+                                                        )
+                                                    ][props.topics.topic_num]
+                                                        .remarks
+                                                }
+                                            </div>
+                                        ) : (
+                                            ""
+                                        )
+                                    ) : null
+                                ) : null}
+                            </div>
+                            <div className="col-md-2 mb-2 mb-md-0 text-center">
+                                {props.topics.next_topic ? (
+                                    <Link
+                                        to={`${props.url}/chapter/${props.chapter.chapter_id}/${props.topics.next_topic}/learn`}
+                                        className="text-dark"
+                                    >
+                                        {props.topics.next_topic}
+                                        <i className="fas fa-external-link-alt fa-xs ml-2"></i>
+                                    </Link>
+                                ) : (
+                                    ""
+                                )}
+                            </div>
+                            <div className="col-md-2 mb-2 mb-md-0 text-right">
+                                <button
+                                    className={`btn btn-sm shadow-none ${
+                                        props.topics_completed[
+                                            props.all_chapters.indexOf(
+                                                props.chapter.chapter_id
+                                            )
+                                        ] !== undefined
+                                            ? props.topics_completed[
+                                                  props.all_chapters.indexOf(
+                                                      props.chapter.chapter_id
+                                                  )
+                                              ].includes(props.topics.topic_num)
+                                                ? "text-success"
+                                                : "text-muted"
+                                            : "text-muted"
+                                    }`}
+                                    style={{
+                                        fontSize: "18px",
+                                    }}
+                                    onClick={(event) => {
+                                        props.handleTopicCompletion(
+                                            props.topics.topic_num,
+                                            props.topics.topic_name,
+                                            props.all_chapters.indexOf(
+                                                props.chapter.chapter_id
+                                            ),
+                                            props.chapter.chapter_id
+                                        );
+
+                                        event.stopPropagation();
+                                    }}
+                                >
+                                    <i className="fas fa-check-circle"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </Accordion.Toggle>
+
+            <Accordion.Collapse
+                eventKey={`topic-${props.topic_index}-${props.topics.topic_num}`}
+                className="ml-3"
+            >
+                <div>{nestedTopics}</div>
+            </Accordion.Collapse>
+        </>
+    );
+};
+
 const ChapterListRender = (props) => {
     return (
         <Card className="mb-1" key={props.chapter_index}>
@@ -210,244 +398,22 @@ const ChapterListRender = (props) => {
                 )}`}
             >
                 <>
-                    <Accordion>
-                        {/* ----- Topic list ----- */}
-                        {props.chapter.topics.map((topic, structure_index) => {
-                            return topic.chapter_structure.map(
-                                (topics, topic_index) => {
-                                    return (
-                                        <div key={topic_index}>
-                                            <Accordion.Toggle
-                                                as={Card.Header}
-                                                eventKey={`topic-${props.all_chapters.indexOf(
-                                                    props.chapter.chapter_id
-                                                )}-${topic_index}`}
-                                                className="light-bg shadow-sm py-2 mb-2"
-                                                style={{
-                                                    borderRadius: "8px",
-                                                }}
-                                                onClick={() =>
-                                                    props.toggleTopicCollapse(
-                                                        `topic-${props.all_chapters.indexOf(
-                                                            props.chapter
-                                                                .chapter_id
-                                                        )}-${topic_index}`
-                                                    )
-                                                }
-                                            >
-                                                <div className="row align-items-center">
-                                                    <div className="col-md-4 mb-2 mb-md-0">
-                                                        <div className="row align-items-center">
-                                                            <div className="col-1">
-                                                                <span>
-                                                                    <i
-                                                                        className={`fas fa-chevron-circle-down ${
-                                                                            props.topicEventKey ===
-                                                                            `topic-${props.all_chapters.indexOf(
-                                                                                props
-                                                                                    .chapter
-                                                                                    .chapter_id
-                                                                            )}-${topic_index}`
-                                                                                ? ""
-                                                                                : "fa-rotate-270"
-                                                                        }`}
-                                                                    ></i>
-                                                                </span>
-                                                            </div>
-                                                            <div className="col-2 small font-weight-bold-600">
-                                                                {
-                                                                    topics.topic_num
-                                                                }
-                                                            </div>
-                                                            <div className="col-9 small font-weight-bold-600">
-                                                                <Link
-                                                                    to={`${props.url}/chapter/${props.chapter.chapter_id}/${topics.topic_num}/learn`}
-                                                                    className="primary-text"
-                                                                >
-                                                                    {
-                                                                        topics.topic_name
-                                                                    }
-                                                                    <i className="fas fa-external-link-alt fa-xs ml-2"></i>
-                                                                </Link>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="col-md-8 small primary-text font-weight-bold-600">
-                                                        <div className="row align-items-center">
-                                                            <div className="col-md-2 mb-2 mb-md-0"></div>
-                                                            <div className="col-md-2 mb-2 mb-md-0"></div>
-                                                            <div className="col-md-2 mb-2 mb-md-0"></div>
-                                                            <div className="col-md-2 mb-2 mb-md-0">
-                                                                {props
-                                                                    .topics_remarks[
-                                                                    props.all_chapters.indexOf(
-                                                                        props
-                                                                            .chapter
-                                                                            .chapter_id
-                                                                    )
-                                                                ] !==
-                                                                undefined ? (
-                                                                    props
-                                                                        .topics_remarks[
-                                                                        props.all_chapters.indexOf(
-                                                                            props
-                                                                                .chapter
-                                                                                .chapter_id
-                                                                        )
-                                                                    ][
-                                                                        topics
-                                                                            .topic_num
-                                                                    ] !==
-                                                                    undefined ? (
-                                                                        props
-                                                                            .topics_remarks[
-                                                                            props.all_chapters.indexOf(
-                                                                                props
-                                                                                    .chapter
-                                                                                    .chapter_id
-                                                                            )
-                                                                        ][
-                                                                            topics
-                                                                                .topic_num
-                                                                        ]
-                                                                            .remarks !==
-                                                                        undefined ? (
-                                                                            <div
-                                                                                className="text-white text-center p-2 rounded"
-                                                                                style={{
-                                                                                    backgroundColor:
-                                                                                        props
-                                                                                            .topics_remarks[
-                                                                                            props.all_chapters.indexOf(
-                                                                                                props
-                                                                                                    .chapter
-                                                                                                    .chapter_id
-                                                                                            )
-                                                                                        ][
-                                                                                            topics
-                                                                                                .topic_num
-                                                                                        ]
-                                                                                            .color,
-                                                                                    textTransform:
-                                                                                        "capitalize",
-                                                                                }}
-                                                                            >
-                                                                                {
-                                                                                    props
-                                                                                        .topics_remarks[
-                                                                                        props.all_chapters.indexOf(
-                                                                                            props
-                                                                                                .chapter
-                                                                                                .chapter_id
-                                                                                        )
-                                                                                    ][
-                                                                                        topics
-                                                                                            .topic_num
-                                                                                    ]
-                                                                                        .remarks
-                                                                                }
-                                                                            </div>
-                                                                        ) : (
-                                                                            ""
-                                                                        )
-                                                                    ) : null
-                                                                ) : null}
-                                                            </div>
-                                                            <div className="col-md-2 mb-2 mb-md-0">
-                                                                {
-                                                                    topics.next_topic
-                                                                }
-                                                            </div>
-                                                            <div className="col-md-2 mb-2 mb-md-0 text-right">
-                                                                <button
-                                                                    className={`btn btn-sm shadow-none ${
-                                                                        props
-                                                                            .topics_completed[
-                                                                            props.all_chapters.indexOf(
-                                                                                props
-                                                                                    .chapter
-                                                                                    .chapter_id
-                                                                            )
-                                                                        ] !==
-                                                                        undefined
-                                                                            ? props.topics_completed[
-                                                                                  props.all_chapters.indexOf(
-                                                                                      props
-                                                                                          .chapter
-                                                                                          .chapter_id
-                                                                                  )
-                                                                              ].includes(
-                                                                                  topics.topic_num
-                                                                              )
-                                                                                ? "text-success"
-                                                                                : "text-muted"
-                                                                            : "text-muted"
-                                                                    }`}
-                                                                    style={{
-                                                                        fontSize:
-                                                                            "18px",
-                                                                    }}
-                                                                    onClick={(
-                                                                        event
-                                                                    ) => {
-                                                                        props.handleTopicCompletion(
-                                                                            topics.topic_num,
-                                                                            topics.topic_name,
-                                                                            props.all_chapters.indexOf(
-                                                                                props
-                                                                                    .chapter
-                                                                                    .chapter_id
-                                                                            ),
-                                                                            props
-                                                                                .chapter
-                                                                                .chapter_id
-                                                                        );
-
-                                                                        event.stopPropagation();
-                                                                    }}
-                                                                >
-                                                                    <i className="fas fa-check-circle"></i>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </Accordion.Toggle>
-
-                                            <Accordion.Collapse
-                                                eventKey={`topic-${props.all_chapters.indexOf(
-                                                    props.chapter.chapter_id
-                                                )}-${topic_index}`}
-                                            >
-                                                <Card>
-                                                    {/* ----- Sub topic list ----- */}
-                                                    {(topics.child || []).map(
-                                                        (
-                                                            child,
-                                                            child_index
-                                                        ) => {
-                                                            return props.topic(
-                                                                child,
-                                                                child_index,
-                                                                props.all_chapters.indexOf(
-                                                                    props
-                                                                        .chapter
-                                                                        .chapter_id
-                                                                ),
-                                                                props.chapter
-                                                                    .chapter_id
-                                                            );
-                                                        }
-                                                    )}
-                                                </Card>
-                                            </Accordion.Collapse>
-                                        </div>
-                                    );
-                                }
-                            );
-                        })}
-                    </Accordion>
+                    {/* ----- Topic list ----- */}
+                    {props.chapter.topics.map((topic, structure_index) => {
+                        return topic.chapter_structure.map(
+                            (topics, topic_index) => {
+                                return (
+                                    <Accordion key={topic_index}>
+                                        <TopicListRender
+                                            {...props}
+                                            topics={topics}
+                                            topic_index={topic_index}
+                                        />
+                                    </Accordion>
+                                );
+                            }
+                        );
+                    })}
 
                     {/* ----- Cycle test list ----- */}
                     {props.chapter.cycle_tests.map((cycle, cycle_index) => {
@@ -507,7 +473,7 @@ class Subject extends Component {
             semester_chapters: [],
 
             chapterEventKey: "chapter-0",
-            topicEventKey: "",
+            topicEventKey: [],
 
             errorMsg: "",
             successMsg: "",
@@ -537,9 +503,21 @@ class Subject extends Component {
         });
     };
 
-    toggleTopicCollapse = (index) => {
+    toggleTopicCollapse = (key, chapter_index) => {
+        let topicEventKey = this.state.topicEventKey;
+        if (topicEventKey.length !== 0 && topicEventKey[chapter_index]) {
+            if (topicEventKey[chapter_index].includes(key)) {
+                topicEventKey[chapter_index].splice(
+                    topicEventKey[chapter_index].indexOf(key),
+                    1
+                );
+            } else {
+                topicEventKey[chapter_index].push(key);
+            }
+        }
+
         this.setState({
-            topicEventKey: this.state.topicEventKey !== index ? index : "",
+            topicEventKey: topicEventKey,
         });
     };
 
@@ -683,6 +661,7 @@ class Subject extends Component {
                     let topics = [];
                     let all_chapters = [];
                     let semester_chapters = [];
+                    let topicKey = [];
                     for (let i = 0; i < result.data.chapters.length; i++) {
                         // Extracting topics from the chapter_structure
                         for (
@@ -709,6 +688,7 @@ class Subject extends Component {
                         );
                         // Gets all chapter id from the chapters list
                         all_chapters.push(result.data.chapters[i].chapter_id);
+                        topicKey.push([]);
                     }
                     for (let i = 0; i < result.data.semesters.length; i++) {
                         // Gets all chapter id from the semester list
@@ -727,6 +707,7 @@ class Subject extends Component {
                         topics: topics,
                         all_chapters: all_chapters,
                         semester_chapters: semester_chapters,
+                        topicEventKey: topicKey,
                     });
                 } else {
                     this.setState({
@@ -830,81 +811,6 @@ class Subject extends Component {
             .catch((err) => {
                 console.log(err);
             });
-    };
-
-    topic = (data, index, chapter_index, chapter_id) => {
-        const nestedTopics = (data.child || []).map((topic, index) => {
-            return this.topic(topic, index, chapter_index, chapter_id);
-        });
-        let topics_completed = [...this.state.topics_completed];
-
-        return (
-            <div className="ml-md-3" key={index}>
-                <Card.Header
-                    className="small light-bg shadow-sm py-2 mb-2"
-                    style={{ borderRadius: "8px" }}
-                >
-                    <div className="row align-items-center">
-                        <div className="col-md-4 mb-2 mb-md-0">
-                            <div className="row">
-                                <div className="col-md-2 col-3">
-                                    {data.topic_num}
-                                </div>
-                                <div className="col-md-10 col-9">
-                                    <Link
-                                        to={`${this.props.match.url}/chapter/${chapter_id}/${data.topic_num}/learn`}
-                                        className="primary-text"
-                                    >
-                                        {data.topic_name}
-                                        <i className="fas fa-external-link-alt fa-xs ml-2"></i>
-                                    </Link>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="col-md-8">
-                            <div className="row align-items-center">
-                                <div className="col-md-2 mb-2 mb-md-0"></div>
-                                <div className="col-md-2 mb-2 mb-md-0"></div>
-                                <div className="col-md-2 mb-2 mb-md-0"></div>
-                                <div className="col-md-2 mb-2 mb-md-0"></div>
-                                <div className="col-md-2 mb-2 mb-md-0">
-                                    {data.next_topic}
-                                </div>
-                                <div className="col-md-2 mb-2 mb-md-0 text-right">
-                                    <button
-                                        className={`btn btn-sm shadow-none ${
-                                            topics_completed[chapter_index] !==
-                                            undefined
-                                                ? topics_completed[
-                                                      chapter_index
-                                                  ].includes(data.topic_num)
-                                                    ? "text-success"
-                                                    : "text-muted"
-                                                : "text-muted"
-                                        }`}
-                                        style={{
-                                            fontSize: "18px",
-                                        }}
-                                        onClick={() =>
-                                            this.handleTopicCompletion(
-                                                data.topic_num,
-                                                data.topic_name,
-                                                chapter_index,
-                                                chapter_id
-                                            )
-                                        }
-                                    >
-                                        <i className="fas fa-check-circle"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </Card.Header>
-                <div>{nestedTopics}</div>
-            </div>
-        );
     };
 
     cycleTest = (data, index, chapter_index, chapter_id) => {
@@ -1066,7 +972,7 @@ class Subject extends Component {
                                 </button>
                                 <Link to={`${this.props.match.url}/results`}>
                                     <button className="btn btn-primary btn-sm shadow-none">
-                                        Test Result
+                                        Test Analysis
                                     </button>
                                 </Link>
                             </div>
@@ -1188,10 +1094,6 @@ class Subject extends Component {
                                                                           toggleTopicCollapse={
                                                                               this
                                                                                   .toggleTopicCollapse
-                                                                          }
-                                                                          topic={
-                                                                              this
-                                                                                  .topic
                                                                           }
                                                                           cycleTest={
                                                                               this
@@ -1350,7 +1252,6 @@ class Subject extends Component {
                                                               this
                                                                   .toggleTopicCollapse
                                                           }
-                                                          topic={this.topic}
                                                           cycleTest={
                                                               this.cycleTest
                                                           }

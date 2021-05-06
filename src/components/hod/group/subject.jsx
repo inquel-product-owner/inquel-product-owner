@@ -141,44 +141,28 @@ class GroupSubject extends Component {
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
 
-                        <div className="row align-items-center mb-3">
-                            <div className="col-md-6">
-                                {/* Breadcrumb */}
-                                <nav aria-label="breadcrumb">
-                                    <ol className="breadcrumb">
-                                        <li className="breadcrumb-item">
-                                            <Link to="/hod">
-                                                <i className="fas fa-home fa-sm"></i>
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item">
-                                            <Link
-                                                to="#"
-                                                onClick={
-                                                    this.props.history.goBack
-                                                }
-                                            >
-                                                Group
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item active">
-                                            <span>Subject:</span>
-                                            {
-                                                this.state.subjectItems
-                                                    .subject_name
-                                            }
-                                        </li>
-                                    </ol>
-                                </nav>
-                            </div>
-                            <div className="col-md-6 text-center text-md-right">
-                                <Link to={`${this.props.match.url}/configure`}>
-                                    <button className="btn btn-primary btn-sm">
-                                        Configure Course
-                                    </button>
-                                </Link>
-                            </div>
-                        </div>
+                        {/* ----- Breadcrumb ----- */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb mb-3">
+                                <li className="breadcrumb-item">
+                                    <Link to="/hod">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item">
+                                    <Link
+                                        to="#"
+                                        onClick={this.props.history.goBack}
+                                    >
+                                        Group
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    <span>Subject:</span>
+                                    {this.state.subjectItems.subject_name}
+                                </li>
+                            </ol>
+                        </nav>
 
                         <div className="card shadow-sm">
                             <div className="table-responsive">
