@@ -13,6 +13,7 @@ import "react-awesome-lightbox/build/style.css";
 import {
     Type1DataFormat,
     Type2DataFormat,
+    ConceptFormat,
 } from "../../sharedComponents/dataFormating";
 import PersonalNotes from "./notesModal";
 
@@ -99,7 +100,9 @@ class FlashCard extends Component {
             showErrorAlert: false,
             showSuccessAlert: false,
             page_loading: true,
-            isSlideshowPlaying: true,
+
+            seconds: 0,
+            isSlideshowPlaying: false,
         };
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
@@ -111,7 +114,7 @@ class FlashCard extends Component {
             "Content-Type": "application/json",
             Authorization: this.authToken,
         };
-        this.slideInterval = setInterval(this.nextSlide, 10000);
+        this.slideInterval = 0;
     }
 
     // ---------- loads concepts data ----------
@@ -129,169 +132,20 @@ class FlashCard extends Component {
             .then((result) => {
                 console.log(result);
                 if (result.sts === true) {
-                    let data = [];
-                    let images = [];
-                    let audio = [];
-                    let response = result.data.results;
-                    if (response.length !== 0) {
-                        for (let i = 0; i < response.length; i++) {
-                            images = [];
-                            audio = [];
-                            if (response[i].files.length !== 0) {
-                                // image
-                                if (response[i].files[0].concepts_image_1) {
-                                    images.push({
-                                        title:
-                                            response[i].files[0]
-                                                .concepts_image_1_title,
-                                        file_name: "",
-                                        image: null,
-                                        path:
-                                            response[i].files[0]
-                                                .concepts_image_1,
-                                    });
-                                }
-                                if (response[i].files[0].concepts_image_2) {
-                                    images.push({
-                                        title:
-                                            response[i].files[0]
-                                                .concepts_image_2_title,
-                                        file_name: "",
-                                        image: null,
-                                        path:
-                                            response[i].files[0]
-                                                .concepts_image_2,
-                                    });
-                                }
-                                if (response[i].files[0].concepts_image_3) {
-                                    images.push({
-                                        title:
-                                            response[i].files[0]
-                                                .concepts_image_3_title,
-                                        file_name: "",
-                                        image: null,
-                                        path:
-                                            response[i].files[0]
-                                                .concepts_image_3,
-                                    });
-                                }
-                                if (response[i].files[0].concepts_image_4) {
-                                    images.push({
-                                        title:
-                                            response[i].files[0]
-                                                .concepts_image_4_title,
-                                        file_name: "",
-                                        image: null,
-                                        path:
-                                            response[i].files[0]
-                                                .concepts_image_4,
-                                    });
-                                }
-
-                                // audio
-                                if (response[i].files[0].concepts_audio_1) {
-                                    audio.push({
-                                        title:
-                                            response[i].files[0]
-                                                .concepts_audio_1_title,
-                                        file_name: "",
-                                        audio: null,
-                                        path:
-                                            response[i].files[0]
-                                                .concepts_audio_1,
-                                    });
-                                }
-                                if (response[i].files[0].concepts_audio_2) {
-                                    audio.push({
-                                        title:
-                                            response[i].files[0]
-                                                .concepts_audio_2_title,
-                                        file_name: "",
-                                        audio: null,
-                                        path:
-                                            response[i].files[0]
-                                                .concepts_audio_2,
-                                    });
-                                }
-                            }
-
-                            // video
-                            var path = "";
-                            if (response[i].files.length !== 0) {
-                                if (response[i].files[0].paste_video_url) {
-                                    path = response[i].files[0].paste_video_url;
-                                }
-                                if (response[i].files[0].concepts_video_1) {
-                                    path =
-                                        response[i].files[0].concepts_video_1;
-                                }
-                            }
-
-                            data.push({
-                                topic_num: response[i].topic_num,
-                                concepts_random_id:
-                                    response[i].concepts_random_id,
-                                favourite: response[i].favourite,
-                                personal_notes: response[i].personal_notes,
-                                content: {
-                                    terms: response[i].terms,
-                                    definition: response[i].definition,
-                                    images:
-                                        images.length === 0
-                                            ? [
-                                                  {
-                                                      title: "",
-                                                      file_name: "",
-                                                      image: null,
-                                                      path: "",
-                                                  },
-                                              ]
-                                            : images,
-                                    video: {
-                                        title:
-                                            response[i].files.length !== 0 &&
-                                            response[i].files[0]
-                                                .concepts_video_1_title
-                                                ? response[i].files[0]
-                                                      .concepts_video_1_title
-                                                : "",
-                                        file_name: "",
-                                        video: null,
-                                        path: path,
-                                        url: "",
-                                    },
-                                    audio:
-                                        audio.length === 0
-                                            ? [
-                                                  {
-                                                      title: "",
-                                                      file_name: "",
-                                                      audio: null,
-                                                      path: "",
-                                                  },
-                                              ]
-                                            : audio,
-                                },
-                                settings: {
-                                    virtual_keyboard:
-                                        response[i].settings.virtual_keyboard,
-                                    limited: response[i].settings.limited,
-                                },
-                            });
-                        }
+                    if (result.data.results.length !== 0) {
+                        let response = ConceptFormat(result);
                         this.setState({
-                            concepts: data,
-                            totalItems: response.length,
+                            concepts: response.result,
+                            totalItems: response.result.length,
                             previous: result.data.previous,
                             next: result.data.next,
                             page_loading: false,
+                            seconds: 15,
                         });
                     } else {
                         this.setState({
                             page_loading: false,
-                            // activeTab: "practice",
                         });
-                        // this.loadPracticeData();
                     }
                 } else {
                     this.setState({
@@ -320,7 +174,7 @@ class FlashCard extends Component {
                     flipDirection="vertical"
                 >
                     <div
-                        className="card card-body shadow-sm align-items-center justify-content-center"
+                        className="card card-body shadow-sm concept-content-center"
                         style={{
                             minHeight: `${
                                 this.state.isFullscreenEnabled
@@ -337,7 +191,6 @@ class FlashCard extends Component {
                         }}
                     >
                         <div
-                            className="h4 font-weight-bold-600"
                             dangerouslySetInnerHTML={{
                                 __html: data[index].content.terms || "",
                             }}
@@ -365,7 +218,7 @@ class FlashCard extends Component {
                         </button>
                     </div>
                     <div
-                        className="card card-body shadow-sm"
+                        className="card card-body shadow-sm concept-content-center"
                         style={{
                             minHeight: `${
                                 this.state.isFullscreenEnabled
@@ -381,7 +234,7 @@ class FlashCard extends Component {
                             });
                         }}
                     >
-                        <div className="d-flex w-100">
+                        <div className="d-flex align-items-center w-100">
                             {/* ---------- Content ---------- */}
                             <div className="w-100">
                                 <div
@@ -397,7 +250,7 @@ class FlashCard extends Component {
                                 ></div>
                             </div>
                             {/* <!----- Image & Video viewer -----> */}
-                            <div className="ml-3 mt-4">
+                            <div className="ml-3">
                                 {this.imageRender(data[index])}
                             </div>
                             {/* <!-- Image viewer ends here --> */}
@@ -1792,7 +1645,7 @@ class FlashCard extends Component {
         array.forEach((a) => {
             if (this.topicNum === a.topic_num) {
                 topic_name = a.topic_name;
-            } else if (Array.isArray(a.child)) {
+            } else if (Array.isArray(a.child) && a.child.length !== 0) {
                 topic_name = this.loopTopicStructure(a.child);
             }
         });
@@ -1871,10 +1724,14 @@ class FlashCard extends Component {
     };
 
     handleNextPage = () => {
+        clearInterval(this.slideInterval);
         this.setState(
             {
                 isFlipped: false,
                 page_loading: true,
+                seconds: 15,
+                isSlideshowPlaying: false,
+                activeData: 0,
             },
             () => {
                 if (this.state.activeTab === "concept") {
@@ -1892,10 +1749,14 @@ class FlashCard extends Component {
     };
 
     handlePrevPage = () => {
+        clearInterval(this.slideInterval);
         this.setState(
             {
                 isFlipped: false,
                 page_loading: true,
+                seconds: 15,
+                isSlideshowPlaying: false,
+                activeData: 0,
             },
             () => {
                 if (this.state.activeTab === "concept") {
@@ -1913,17 +1774,21 @@ class FlashCard extends Component {
     };
 
     handleNext = async () => {
+        clearInterval(this.slideInterval);
         await this.setState({
             activeData: this.state.activeData + 1,
             isFlipped: false,
+            seconds: 15,
         });
         window.MathJax.typeset();
     };
 
     handlePrev = async () => {
+        clearInterval(this.slideInterval);
         await this.setState({
             activeData: this.state.activeData - 1,
             isFlipped: false,
+            seconds: 15,
         });
         window.MathJax.typeset();
     };
@@ -1949,12 +1814,16 @@ class FlashCard extends Component {
     // ---------- Tab selection ----------
 
     toggleTab = (type) => {
+        clearInterval(this.slideInterval);
         this.setState({
             activeTab: type,
             activeData: 0,
             page_loading: true,
+            next: null,
+            previous: null,
             type2_next: null,
             type2_previous: null,
+            isSlideshowPlaying: false,
         });
         if (type === "concept") {
             this.loadConceptData();
@@ -2122,46 +1991,78 @@ class FlashCard extends Component {
         }
     };
 
-    nextSlide = async () => {
-        if (this.state.activeTab === "concept") {
-            if (this.state.isSlideshowPlaying) {
-                if (this.state.activeData + 1 < this.state.totalItems) {
-                    await this.setState({
-                        activeData: this.state.activeData + 1,
-                        isFlipped: false,
-                    });
-                }
-                if (this.state.activeData + 1 === this.state.totalItems) {
-                    await this.setState({
-                        isSlideshowPlaying: false,
-                    });
-                    clearInterval(this.slideInterval);
-                }
-                window.MathJax.typeset();
-            }
-        }
-    };
-
     pauseSlideshow = async () => {
+        clearInterval(this.slideInterval);
         await this.setState({
             isSlideshowPlaying: false,
         });
-        clearInterval(this.slideInterval);
         window.MathJax.typeset();
     };
 
     playSlideshow = async () => {
-        // restarting the slideshow again
-        if (this.state.activeData + 1 === this.state.totalItems) {
+        clearInterval(this.slideInterval);
+        if (
+            this.state.seconds === 0 &&
+            this.state.activeData + 1 === this.state.totalItems
+        ) {
             await this.setState({
                 activeData: 0,
+                seconds: 15,
+                isFlipped: false,
             });
+            this.slideInterval = setInterval(this.conceptCountDown, 1000);
+        } else {
+            this.slideInterval = setInterval(this.conceptCountDown, 1000);
         }
-        await this.setState({
+        this.setState({
             isSlideshowPlaying: true,
         });
-        this.slideInterval = setInterval(this.nextSlide, 10000);
         window.MathJax.typeset();
+    };
+
+    componentDidUpdate = async (prevProps, prevState) => {
+        if (this.state.activeTab === "concept") {
+            if (this.state.isSlideshowPlaying === true) {
+                if (this.state.activeData !== prevState.activeData) {
+                    this.slideInterval = setInterval(
+                        this.conceptCountDown,
+                        1000
+                    );
+                }
+            }
+        }
+    };
+
+    nextSlide = async () => {
+        await this.setState({
+            activeData: this.state.activeData + 1,
+            seconds: 15,
+            isFlipped: false,
+        });
+        window.MathJax.typeset();
+    };
+
+    conceptCountDown = () => {
+        let seconds = this.state.seconds - 1;
+        this.setState({
+            seconds: seconds,
+        });
+
+        if (seconds === 10) {
+            this.setState({
+                isFlipped: true,
+            });
+        } else if (seconds === 0) {
+            if (this.state.activeData + 1 === this.state.totalItems) {
+                clearInterval(this.slideInterval);
+                this.setState({
+                    isSlideshowPlaying: false,
+                });
+            } else {
+                clearInterval(this.slideInterval);
+                this.nextSlide();
+            }
+        }
     };
 
     // ---------- Personal Notes ----------

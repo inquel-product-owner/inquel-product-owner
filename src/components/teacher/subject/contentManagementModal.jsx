@@ -842,7 +842,7 @@ export class IndependentSemesterEditModal extends Component {
         this.state = {
             chapter: this.props.chapter_id, // list of all chapters
             semester_name: this.props.data.semester_name,
-            semester_chapters: this.props.data.chapters || [],
+            semester_chapters: this.props.data.chapter_ids,
             limited: this.props.data.limited,
 
             errorMsg: "",

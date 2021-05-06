@@ -61,69 +61,72 @@ class Type2 extends Component {
             selectedQuestion: "",
             selectedSubQuestion: "",
 
-            keyboards: [{
-                all: false,
-                chemistry: false,
-                physics: false,
-                maths: false,
-            }],
-            questions: [{
-                question_random_id: "",
-                question: "<p>Main Question goes here</p>",
-                explanation: "<p>Explanation goes here</p>",
-                is_file_uploaded: false,
-                mcq: true,
-                fill_in: false,
-                sub_question: [
-                    {
-                        sub_question_id: "",
-                        question: "<p>Sub question goes here</p>",
-                        mcq: true,
-                        fill_in: false,
-                        fillin_answer: [""],
-                        options: [
-                            { correct: false, content: "" },
-                            { correct: false, content: "" },
-                            { correct: false, content: "" },
-                            { correct: false, content: "" },
+            keyboards: [
+                {
+                    all: false,
+                    chemistry: false,
+                    physics: false,
+                    maths: false,
+                },
+            ],
+            questions: [
+                {
+                    question_random_id: "",
+                    question: "<p>Main Question goes here</p>",
+                    explanation: "<p>Explanation goes here</p>",
+                    is_file_uploaded: false,
+                    mcq: true,
+                    fill_in: false,
+                    sub_question: [
+                        {
+                            sub_question_id: "",
+                            question: "<p>Sub question goes here</p>",
+                            mcq: true,
+                            fill_in: false,
+                            fillin_answer: [""],
+                            options: [
+                                { correct: false, content: "" },
+                                { correct: false, content: "" },
+                                { correct: false, content: "" },
+                                { correct: false, content: "" },
+                            ],
+                            marks: "",
+                            negative_marks: "0",
+                        },
+                    ],
+                    content: {
+                        images: [
+                            { title: "", file_name: "", image: null, path: "" },
+                            { title: "", file_name: "", image: null, path: "" },
+                            { title: "", file_name: "", image: null, path: "" },
+                            { title: "", file_name: "", image: null, path: "" },
                         ],
-                        marks: "",
-                        negative_marks: "0",
+                        video: {
+                            title: "",
+                            file_name: "",
+                            video: null,
+                            path: "",
+                            url: "",
+                        },
+                        audio: [
+                            { title: "", file_name: "", audio: null, path: "" },
+                            { title: "", file_name: "", audio: null, path: "" },
+                        ],
                     },
-                ],
-                content: {
-                    images: [
-                        { title: "", file_name: "", image: null, path: "" },
-                        { title: "", file_name: "", image: null, path: "" },
-                        { title: "", file_name: "", image: null, path: "" },
-                        { title: "", file_name: "", image: null, path: "" },
-                    ],
-                    video: {
-                        title: "",
-                        file_name: "",
-                        video: null,
-                        path: "",
-                        url: "",
+                    properties: {
+                        complexity: "",
+                        priority: "",
+                        theme: "",
+                        test: [false, false, false, false, false],
+                        semester: [false, false, false, false, false],
+                        learn: false,
                     },
-                    audio: [
-                        { title: "", file_name: "", audio: null, path: "" },
-                        { title: "", file_name: "", audio: null, path: "" },
-                    ],
+                    settings: {
+                        virtual_keyboard: [],
+                        limited: false,
+                    },
                 },
-                properties: {
-                    complexity: "",
-                    priority: "",
-                    theme: "",
-                    test: [false, false, false, false, false],
-                    semester: [false, false, false, false, false],
-                    quiz: [false, false, false, false, false],
-                    learn: false,
-                },
-                settings: {
-                    virtual_keyboard: [],
-                    limited: false,
-                },
-            }],
+            ],
         };
         this.option_limit = 6;
         this.sub_question_limit = 10;
@@ -409,7 +412,6 @@ class Type2 extends Component {
                                     theme: response[i].properties.theme,
                                     test: response[i].properties.test,
                                     semester: response[i].properties.semester,
-                                    quiz: response[i].properties.quiz,
                                     learn: response[i].properties.learn,
                                 },
                                 settings: {
@@ -526,7 +528,6 @@ class Type2 extends Component {
                         test: data[this.state.activeQuestion].properties.test,
                         semester:
                             data[this.state.activeQuestion].properties.semester,
-                        quiz: data[this.state.activeQuestion].properties.quiz,
                         learn: data[this.state.activeQuestion].properties.learn,
                     },
                     settings: {
@@ -1044,7 +1045,8 @@ class Type2 extends Component {
                     values[this.state.activeQuestion].question_random_id,
             };
             body[`type2_image_${index + 1}_title`] =
-                values[this.state.activeQuestion].content.images[index].title || 'title';
+                values[this.state.activeQuestion].content.images[index].title ||
+                "title";
 
             fetch(
                 `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/`,
@@ -1138,7 +1140,7 @@ class Type2 extends Component {
             i < values[this.state.activeQuestion].content.images.length;
             i++
         ) {
-            this.handleDeleteImages(i)
+            this.handleDeleteImages(i);
         }
     };
 
@@ -1215,7 +1217,7 @@ class Type2 extends Component {
                                 .question_random_id,
                         type2_video_1_title:
                             values[this.state.activeQuestion].content.video
-                                .title || 'title',
+                                .title || "title",
                     }),
                 }
             )
@@ -1297,7 +1299,8 @@ class Type2 extends Component {
                     values[this.state.activeQuestion].question_random_id,
             };
             body[`type2_audio_${index + 1}_title`] =
-                values[this.state.activeQuestion].content.audio[index].title || 'title';
+                values[this.state.activeQuestion].content.audio[index].title ||
+                "title";
 
             fetch(
                 `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/`,
@@ -1432,10 +1435,6 @@ class Type2 extends Component {
             values[this.state.activeQuestion].properties.semester[
                 index
             ] = !values[this.state.activeQuestion].properties.semester[index];
-        } else {
-            values[this.state.activeQuestion].properties.quiz[index] = !values[
-                this.state.activeQuestion
-            ].properties.quiz[index];
         }
         this.setState({
             questions: values,
@@ -1632,7 +1631,6 @@ class Type2 extends Component {
                 theme: "",
                 test: [false, false, false, false, false],
                 semester: [false, false, false, false, false],
-                quiz: [false, false, false, false, false],
                 learn: false,
             },
             settings: {
@@ -1690,10 +1688,6 @@ class Type2 extends Component {
         const semester = [];
         for (let i = 0; i < values[index].properties.semester.length; i++) {
             semester[i] = values[index].properties.semester[i];
-        }
-        const quiz = [];
-        for (let i = 0; i < values[index].properties.quiz.length; i++) {
-            quiz[i] = values[index].properties.quiz[i];
         }
         const sub_question = [];
         for (let i = 0; i < values[index].sub_question.length; i++) {
@@ -1760,7 +1754,6 @@ class Type2 extends Component {
                 theme: values[index].properties.theme,
                 test: test,
                 semester: semester,
-                quiz: quiz,
                 learn: values[index].properties.learn,
             },
             settings: {
@@ -1919,10 +1912,30 @@ class Type2 extends Component {
                             ],
                             content: {
                                 images: [
-                                    { title: "", file_name: "", image: null, path: "" },
-                                    { title: "", file_name: "", image: null, path: "" },
-                                    { title: "", file_name: "", image: null, path: "" },
-                                    { title: "", file_name: "", image: null, path: "" },
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        image: null,
+                                        path: "",
+                                    },
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        image: null,
+                                        path: "",
+                                    },
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        image: null,
+                                        path: "",
+                                    },
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        image: null,
+                                        path: "",
+                                    },
                                 ],
                                 video: {
                                     title: "",
@@ -1932,8 +1945,18 @@ class Type2 extends Component {
                                     url: "",
                                 },
                                 audio: [
-                                    { title: "", file_name: "", audio: null, path: "" },
-                                    { title: "", file_name: "", audio: null, path: "" },
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        audio: null,
+                                        path: "",
+                                    },
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        audio: null,
+                                        path: "",
+                                    },
                                 ],
                             },
                             properties: {
@@ -1942,7 +1965,6 @@ class Type2 extends Component {
                                 theme: "",
                                 test: [false, false, false, false, false],
                                 semester: [false, false, false, false, false],
-                                quiz: [false, false, false, false, false],
                                 learn: false,
                             },
                             settings: {
@@ -2013,10 +2035,30 @@ class Type2 extends Component {
                         ],
                         content: {
                             images: [
-                                { title: "", file_name: "", image: null, path: "" },
-                                { title: "", file_name: "", image: null, path: "" },
-                                { title: "", file_name: "", image: null, path: "" },
-                                { title: "", file_name: "", image: null, path: "" },
+                                {
+                                    title: "",
+                                    file_name: "",
+                                    image: null,
+                                    path: "",
+                                },
+                                {
+                                    title: "",
+                                    file_name: "",
+                                    image: null,
+                                    path: "",
+                                },
+                                {
+                                    title: "",
+                                    file_name: "",
+                                    image: null,
+                                    path: "",
+                                },
+                                {
+                                    title: "",
+                                    file_name: "",
+                                    image: null,
+                                    path: "",
+                                },
                             ],
                             video: {
                                 title: "",
@@ -2026,8 +2068,18 @@ class Type2 extends Component {
                                 url: "",
                             },
                             audio: [
-                                { title: "", file_name: "", audio: null, path: "" },
-                                { title: "", file_name: "", audio: null, path: "" },
+                                {
+                                    title: "",
+                                    file_name: "",
+                                    audio: null,
+                                    path: "",
+                                },
+                                {
+                                    title: "",
+                                    file_name: "",
+                                    audio: null,
+                                    path: "",
+                                },
                             ],
                         },
                         properties: {
@@ -2036,7 +2088,6 @@ class Type2 extends Component {
                             theme: "",
                             test: [false, false, false, false, false],
                             semester: [false, false, false, false, false],
-                            quiz: [false, false, false, false, false],
                             learn: false,
                         },
                         settings: {
@@ -3623,7 +3674,7 @@ class Type2 extends Component {
                                                                             )}
                                                                         </div>
                                                                     </div>
-                                                                    <div className="card card-body bg-white p-1 px-2 mb-2">
+                                                                    <div className="card card-body bg-white p-1 px-2">
                                                                         <div className="d-flex justify-content-between">
                                                                             {data[
                                                                                 this
@@ -3655,38 +3706,6 @@ class Type2 extends Component {
                                                                             )}
                                                                         </div>
                                                                     </div>
-                                                                    <div className="card card-body bg-white p-1 px-2">
-                                                                        <div className="d-flex justify-content-between">
-                                                                            {data[
-                                                                                this
-                                                                                    .state
-                                                                                    .activeQuestion
-                                                                            ].properties.quiz.map(
-                                                                                (
-                                                                                    options,
-                                                                                    index
-                                                                                ) => {
-                                                                                    return (
-                                                                                        <input
-                                                                                            type="checkbox"
-                                                                                            key={
-                                                                                                index
-                                                                                            }
-                                                                                            checked={
-                                                                                                options
-                                                                                            }
-                                                                                            onChange={() =>
-                                                                                                this.handleAttemptSequence(
-                                                                                                    index,
-                                                                                                    "quiz"
-                                                                                                )
-                                                                                            }
-                                                                                        />
-                                                                                    );
-                                                                                }
-                                                                            )}
-                                                                        </div>
-                                                                    </div>
                                                                 </div>
                                                             </div>
                                                             <div className="col-5 pl-0">
@@ -3694,11 +3713,8 @@ class Type2 extends Component {
                                                                     <div className="card-body p-1 px-2 mb-1 small">
                                                                         Test
                                                                     </div>
-                                                                    <div className="card-body p-1 px-2 mb-1 small">
-                                                                        Semester
-                                                                    </div>
                                                                     <div className="card-body p-1 px-2 small">
-                                                                        Quiz
+                                                                        Semester
                                                                     </div>
                                                                 </div>
                                                             </div>
