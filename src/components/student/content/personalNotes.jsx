@@ -137,6 +137,7 @@ class PersonalNotes extends Component {
             showSideNav: false,
             showModal: false,
             collapsed: [],
+            topicEventKey: [],
             subjectItems: [],
             notesData: "",
 
@@ -208,6 +209,24 @@ class PersonalNotes extends Component {
         );
     };
 
+    toggleTopicCollapse = (key, chapter_index) => {
+        let topicEventKey = this.state.topicEventKey;
+        if (topicEventKey.length !== 0 && topicEventKey[chapter_index]) {
+            if (topicEventKey[chapter_index].includes(key)) {
+                topicEventKey[chapter_index].splice(
+                    topicEventKey[chapter_index].indexOf(key),
+                    1
+                );
+            } else {
+                topicEventKey[chapter_index].push(key);
+            }
+        }
+
+        this.setState({
+            topicEventKey: topicEventKey,
+        });
+    };
+
     // loads notes data
     loadNotesData = async () => {
         await fetch(
@@ -271,12 +290,14 @@ class PersonalNotes extends Component {
                         subjectItems: result.data,
                     });
                     let collapsed = [];
+                    let topicEventKey = [];
                     let chapterId = "";
                     let topicName = "";
                     let topic_num = "";
                     for (let i = 0; i < result.data.chapters.length; i++) {
                         // adds collapse state
                         collapsed.push(i === 0 ? false : true);
+                        topicEventKey.push([]);
 
                         chapterId = result.data.chapters[0].chapter_id;
 
@@ -302,6 +323,7 @@ class PersonalNotes extends Component {
                             chapterId: chapterId,
                             topicName: topicName,
                             topic_num: topic_num,
+                            topicEventKey: topicEventKey,
                         },
                         () => {
                             this.loadNotesData();
@@ -329,35 +351,103 @@ class PersonalNotes extends Component {
     };
 
     // topic list
-    topic = (data, index) => {
+    topic = (data, index, chapter_index) => {
         const nestedTopics = (data.child || []).map((topic, index) => {
-            return this.topic(topic, index);
+            return (
+                <Accordion key={index}>
+                    {this.topic(topic, index, chapter_index)}
+                </Accordion>
+            );
         });
 
+        let topicEventKey = this.state.topicEventKey;
+
         return (
-            <div key={index}>
-                <Card.Header
-                    className={`small ${
-                        this.state.topic_num === data.topic_num
+            <>
+                <Accordion.Toggle
+                    as={Card.Header}
+                    eventKey={`topic-${index}-${data.topic_num}`}
+                    className={`${
+                        this.state.topic_num === data.topic_num &&
+                        this.state.topicName === data.topic_name
                             ? "light-bg"
                             : "bg-light"
-                    } shadow-sm mb-2`}
+                    } shadow-sm py-2 align-items-center mb-2`}
+                    style={{
+                        borderRadius: "8px",
+                        cursor: "default",
+                    }}
                     onClick={() =>
-                        this.handleSelect(data.topic_name, data.topic_num)
+                        data.child.length !== 0
+                            ? this.toggleTopicCollapse(
+                                  `topic-${index}-${data.topic_num}`,
+                                  chapter_index
+                              )
+                            : ""
                     }
-                    style={{ borderRadius: "8px" }}
                 >
-                    <div className="row">
-                        <div className="col-md-3 col-3 pr-0">
-                            {data.topic_num}
+                    <div className="row align-items-center">
+                        <div className="col-9">
+                            <div className="row align-items-center">
+                                {data.child.length !== 0 ? (
+                                    <div className="col-1">
+                                        <span>
+                                            <i
+                                                className={`fas fa-chevron-circle-down ${
+                                                    topicEventKey[chapter_index]
+                                                        ? topicEventKey[
+                                                              chapter_index
+                                                          ].includes(
+                                                              `topic-${index}-${data.topic_num}`
+                                                          )
+                                                            ? "fa-rotate-360"
+                                                            : "fa-rotate-270"
+                                                        : ""
+                                                }`}
+                                            ></i>
+                                        </span>
+                                    </div>
+                                ) : (
+                                    ""
+                                )}
+                                <div
+                                    className={`${
+                                        data.child.length !== 0
+                                            ? "col-9 pr-0"
+                                            : "col-12"
+                                    } d-flex small font-weight-bold-600`}
+                                >
+                                    <div className="mr-2">{data.topic_num}</div>
+                                    <div className="w-100 text-truncate">
+                                        {data.topic_name}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div className="col-md-9 col-9 pl-0">
-                            {data.topic_name}
+                        <div className="col-3 text-right pr-1">
+                            <button
+                                className="btn btn-link btn-sm shadow-none"
+                                onClick={(e) => {
+                                    this.handleSelect(
+                                        data.topic_name,
+                                        data.topic_num
+                                    );
+                                    e.stopPropagation();
+                                }}
+                            >
+                                <i className="fas fa-eye"></i>
+                            </button>
                         </div>
                     </div>
-                </Card.Header>
-                <div className="ml-md-3">{nestedTopics}</div>
-            </div>
+                </Accordion.Toggle>
+
+                <Accordion.Collapse
+                    eventKey={`topic-${index}-${data.topic_num}`}
+                    className="ml-2"
+                >
+                    <div>{nestedTopics}</div>
+                </Accordion.Collapse>
+            </>
         );
     };
 
@@ -395,7 +485,7 @@ class PersonalNotes extends Component {
                     togglenav={this.toggleSideNav}
                 />
 
-                {/* ALert message */}
+                {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
                     successMsg={this.state.successMsg}
@@ -498,6 +588,8 @@ class PersonalNotes extends Component {
                                                                               style={{
                                                                                   borderRadius:
                                                                                       "8px",
+                                                                                  cursor:
+                                                                                      "default",
                                                                               }}
                                                                               onClick={() =>
                                                                                   this.toggleCollapse(
@@ -544,9 +636,18 @@ class PersonalNotes extends Component {
                                                                                                   topics,
                                                                                                   topic_index
                                                                                               ) => {
-                                                                                                  return this.topic(
-                                                                                                      topics,
-                                                                                                      topic_index
+                                                                                                  return (
+                                                                                                      <Accordion
+                                                                                                          key={
+                                                                                                              topic_index
+                                                                                                          }
+                                                                                                      >
+                                                                                                          {this.topic(
+                                                                                                              topics,
+                                                                                                              topic_index,
+                                                                                                              index
+                                                                                                          )}
+                                                                                                      </Accordion>
                                                                                                   );
                                                                                               }
                                                                                           );

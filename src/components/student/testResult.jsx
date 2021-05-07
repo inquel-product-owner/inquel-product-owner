@@ -66,6 +66,8 @@ function CycleTestAttempts(props) {
                                       cycle_test_name:
                                           props.data.cycle_test_name,
                                       data: props.attempt.auto_section,
+                                      submit_time:
+                                          props.attempt.actual_submit_time,
                                   })
                               )
                             : sessionStorage.setItem(
@@ -126,6 +128,8 @@ function SemesterAttempts(props) {
                                       direct: false,
                                       semester_name: props.data.semester_name,
                                       data: props.attempt.auto_section,
+                                      submit_time:
+                                          props.attempt.actual_submit_time,
                                   })
                               )
                             : sessionStorage.setItem(

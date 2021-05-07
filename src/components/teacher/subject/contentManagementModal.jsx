@@ -93,7 +93,7 @@ export function ChapterList(props) {
                             props.dispatchChapter(props.chapter.chapter_name)
                         }
                     >
-                        Add
+                        Add / Edit
                     </button>
                 </Link>
 

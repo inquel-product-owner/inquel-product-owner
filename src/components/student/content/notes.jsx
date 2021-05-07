@@ -14,16 +14,19 @@ class Notes extends Component {
         this.state = {
             showSideNav: false,
             collapsed: [],
+            topicEventKey: [],
+
             subjectItems: [],
             notesData: "",
             chapterId: this.props.match.params.chapterId,
             topicName: "",
             topic_num: "",
-            page_loading: true,
+
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
+            page_loading: true,
             numPages: null,
             pageNumber: 1,
         };
@@ -44,7 +47,7 @@ class Notes extends Component {
         });
     };
 
-    toggleCollapse = (index) => {
+    toggleCollapse = (index, chapter_id) => {
         let collapsed = [...this.state.collapsed];
         for (let i = 0; i < collapsed.length; i++) {
             if (i !== index) {
@@ -52,15 +55,66 @@ class Notes extends Component {
             }
         }
         collapsed[index] = !collapsed[index];
+
+        let topicName = "";
+        let topic_num = "";
+        for (let i = 0; i < this.state.subjectItems.chapters.length; i++) {
+            // extract topic name from the current chapter
+            if (this.state.subjectItems.chapters[i].chapter_id === chapter_id) {
+                topicName =
+                    this.state.subjectItems.chapters[i].topics.length !== 0
+                        ? this.state.subjectItems.chapters[i].topics[0]
+                              .chapter_structure[0].topic_name
+                        : "Topic";
+                topic_num =
+                    this.state.subjectItems.chapters[i].topics.length !== 0
+                        ? this.state.subjectItems.chapters[i].topics[0]
+                              .chapter_structure[0].topic_num
+                        : "1.1";
+            } else {
+                continue;
+            }
+        }
+        this.setState(
+            {
+                collapsed: collapsed,
+                chapterId: chapter_id,
+                topicName: topicName,
+                topic_num: topic_num,
+            },
+            () => {
+                if (collapsed[index] === false) {
+                    this.setState({
+                        page_loading: true,
+                    });
+                    this.loadNotesData();
+                }
+            }
+        );
+    };
+
+    toggleTopicCollapse = (key, chapter_index) => {
+        let topicEventKey = this.state.topicEventKey;
+        if (topicEventKey.length !== 0 && topicEventKey[chapter_index]) {
+            if (topicEventKey[chapter_index].includes(key)) {
+                topicEventKey[chapter_index].splice(
+                    topicEventKey[chapter_index].indexOf(key),
+                    1
+                );
+            } else {
+                topicEventKey[chapter_index].push(key);
+            }
+        }
+
         this.setState({
-            collapsed: collapsed,
+            topicEventKey: topicEventKey,
         });
     };
 
     // loads notes data
     loadNotesData = async () => {
         await fetch(
-            `${this.url}/student/subject/${this.subjectId}/chapter/${this.state.chapterId}/notes/?topic_name=${this.state.topicName}`,
+            `${this.url}/student/subject/${this.subjectId}/chapter/${this.state.chapterId}/notes/?topic_num=${this.state.topic_num}`,
             {
                 method: "GET",
                 headers: this.headers,
@@ -101,6 +155,7 @@ class Notes extends Component {
                         subjectItems: result.data,
                     });
                     let collapsed = [];
+                    let topicEventKey = [];
                     let topicName = "";
                     let topic_num = "";
                     for (let i = 0; i < result.data.chapters.length; i++) {
@@ -111,6 +166,7 @@ class Notes extends Component {
                                 ? false
                                 : true
                         );
+                        topicEventKey.push([]);
                         // extract topic name from the current chapter
                         if (
                             result.data.chapters[i].chapter_id ===
@@ -135,6 +191,7 @@ class Notes extends Component {
                             collapsed: collapsed,
                             topicName: topicName,
                             topic_num: topic_num,
+                            topicEventKey: topicEventKey,
                         },
                         () => {
                             this.loadNotesData();
@@ -154,10 +211,9 @@ class Notes extends Component {
     };
 
     // loads data on selecting a topic
-    handleSelect = (chapterId, topicName, topic_num) => {
+    handleSelect = (topicName, topic_num) => {
         this.setState(
             {
-                chapterId: chapterId,
                 topicName: topicName,
                 topic_num: topic_num,
                 page_loading: true,
@@ -178,40 +234,103 @@ class Notes extends Component {
         this.setState((state) => ({ pageNumber: state.pageNumber + 1 }));
 
     // topic list
-    topic = (data, index, chapter_id) => {
+    topic = (data, index, chapter_index) => {
         const nestedTopics = (data.child || []).map((topic, index) => {
-            return this.topic(topic, index, chapter_id);
+            return (
+                <Accordion key={index}>
+                    {this.topic(topic, index, chapter_index)}
+                </Accordion>
+            );
         });
 
+        let topicEventKey = this.state.topicEventKey;
+
         return (
-            <div key={index}>
-                <Card.Header
-                    className={`small ${
+            <>
+                <Accordion.Toggle
+                    as={Card.Header}
+                    eventKey={`topic-${index}-${data.topic_num}`}
+                    className={`${
                         this.state.topic_num === data.topic_num &&
                         this.state.topicName === data.topic_name
                             ? "light-bg"
                             : "bg-light"
-                    } shadow-sm mb-2`}
+                    } shadow-sm py-2 align-items-center mb-2`}
+                    style={{
+                        borderRadius: "8px",
+                        cursor: "default",
+                    }}
                     onClick={() =>
-                        this.handleSelect(
-                            chapter_id,
-                            data.topic_name,
-                            data.topic_num
-                        )
+                        data.child.length !== 0
+                            ? this.toggleTopicCollapse(
+                                  `topic-${index}-${data.topic_num}`,
+                                  chapter_index
+                              )
+                            : ""
                     }
-                    style={{ borderRadius: "8px", cursor: "pointer" }}
                 >
-                    <div className="row">
-                        <div className="col-md-3 col-3 pr-0">
-                            {data.topic_num}
+                    <div className="row align-items-center">
+                        <div className="col-9">
+                            <div className="row align-items-center">
+                                {data.child.length !== 0 ? (
+                                    <div className="col-1">
+                                        <span>
+                                            <i
+                                                className={`fas fa-chevron-circle-down ${
+                                                    topicEventKey[chapter_index]
+                                                        ? topicEventKey[
+                                                              chapter_index
+                                                          ].includes(
+                                                              `topic-${index}-${data.topic_num}`
+                                                          )
+                                                            ? "fa-rotate-360"
+                                                            : "fa-rotate-270"
+                                                        : ""
+                                                }`}
+                                            ></i>
+                                        </span>
+                                    </div>
+                                ) : (
+                                    ""
+                                )}
+                                <div
+                                    className={`${
+                                        data.child.length !== 0
+                                            ? "col-9 pr-0"
+                                            : "col-12"
+                                    } d-flex small font-weight-bold-600`}
+                                >
+                                    <div className="mr-2">{data.topic_num}</div>
+                                    <div className="w-100 text-truncate">
+                                        {data.topic_name}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div className="col-md-9 col-9 pl-0">
-                            {data.topic_name}
+                        <div className="col-3 text-right pr-1">
+                            <button
+                                className="btn btn-link btn-sm shadow-none"
+                                onClick={(e) => {
+                                    this.handleSelect(
+                                        data.topic_name,
+                                        data.topic_num
+                                    );
+                                    e.stopPropagation();
+                                }}
+                            >
+                                <i className="fas fa-eye"></i>
+                            </button>
                         </div>
                     </div>
-                </Card.Header>
-                <div className="ml-md-3">{nestedTopics}</div>
-            </div>
+                </Accordion.Toggle>
+
+                <Accordion.Collapse
+                    eventKey={`topic-${index}-${data.topic_num}`}
+                    className="ml-2"
+                >
+                    <div>{nestedTopics}</div>
+                </Accordion.Collapse>
+            </>
         );
     };
 
@@ -230,7 +349,7 @@ class Notes extends Component {
                     togglenav={this.toggleSideNav}
                 />
 
-                {/* ALert message */}
+                {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
                     successMsg={this.state.successMsg}
@@ -293,7 +412,7 @@ class Notes extends Component {
                         <div className="card shadow-sm">
                             <div className="card-body">
                                 <div className="row">
-                                    {/* Chapter list */}
+                                    {/* ----- Chapter list ----- */}
                                     <div className="col-md-3 mb-2 mb-md-0 border-right">
                                         <div className="card">
                                             <Accordion
@@ -322,14 +441,15 @@ class Notes extends Component {
                                                                               }
                                                                               className="pinkrange-bg shadow-sm mb-2"
                                                                               style={{
-                                                                                  cursor:
-                                                                                      "pointer",
                                                                                   borderRadius:
                                                                                       "8px",
+                                                                                  cursor:
+                                                                                      "default",
                                                                               }}
                                                                               onClick={() =>
                                                                                   this.toggleCollapse(
-                                                                                      index
+                                                                                      index,
+                                                                                      data.chapter_id
                                                                                   )
                                                                               }
                                                                           >
@@ -363,7 +483,7 @@ class Notes extends Component {
                                                                               }
                                                                           >
                                                                               <Card>
-                                                                                  {/* Topic list */}
+                                                                                  {/* ----- Topic list ----- */}
                                                                                   {data.topics.map(
                                                                                       (
                                                                                           topic
@@ -373,10 +493,18 @@ class Notes extends Component {
                                                                                                   topics,
                                                                                                   topic_index
                                                                                               ) => {
-                                                                                                  return this.topic(
-                                                                                                      topics,
-                                                                                                      topic_index,
-                                                                                                      data.chapter_id
+                                                                                                  return (
+                                                                                                      <Accordion
+                                                                                                          key={
+                                                                                                              topic_index
+                                                                                                          }
+                                                                                                      >
+                                                                                                          {this.topic(
+                                                                                                              topics,
+                                                                                                              topic_index,
+                                                                                                              index
+                                                                                                          )}
+                                                                                                      </Accordion>
                                                                                                   );
                                                                                               }
                                                                                           );
@@ -393,7 +521,9 @@ class Notes extends Component {
                                             </Accordion>
                                         </div>
                                     </div>
-                                    {/* Notes data */}
+
+                                    {/* ----- Notes data ----- */}
+
                                     <div className="col-md-9 pl-md-0">
                                         <div className="card">
                                             <div className="card-body">

@@ -1324,7 +1324,7 @@ class SemesterAuto extends Component {
                                                   (section, index) => {
                                                       return (
                                                           <tr key={index}>
-                                                              <td width="200px">
+                                                              <td>
                                                                   <input
                                                                       type="text"
                                                                       className="form-control form-control-sm border-secondary"
@@ -1348,7 +1348,7 @@ class SemesterAuto extends Component {
                                                                       required
                                                                   />
                                                               </td>
-                                                              <td width="150px">
+                                                              <td>
                                                                   <select
                                                                       name="type"
                                                                       id="type"
@@ -1404,7 +1404,7 @@ class SemesterAuto extends Component {
                                                                           : null}
                                                                   </select>
                                                               </td>
-                                                              <td width="150px">
+                                                              <td>
                                                                   <select
                                                                       name="category"
                                                                       className="form-control form-control-sm border-secondary"
@@ -1474,7 +1474,7 @@ class SemesterAuto extends Component {
                                                                           : null}
                                                                   </select>
                                                               </td>
-                                                              <td width="160px">
+                                                              <td>
                                                                   <select
                                                                       name="marks"
                                                                       id="marks"
@@ -1545,7 +1545,7 @@ class SemesterAuto extends Component {
                                                                           : null}
                                                                   </select>
                                                               </td>
-                                                              <td width="160px">
+                                                              <td>
                                                                   <input
                                                                       className="form-control form-control-sm border-secondary"
                                                                       type="text"
@@ -1557,7 +1557,7 @@ class SemesterAuto extends Component {
                                                                       disabled
                                                                   />
                                                               </td>
-                                                              <td width="160px">
+                                                              <td>
                                                                   <input
                                                                       className="form-control form-control-sm border-secondary"
                                                                       type="text"
@@ -1584,7 +1584,7 @@ class SemesterAuto extends Component {
                                                                       required
                                                                   />
                                                               </td>
-                                                              <td width="160px">
+                                                              <td>
                                                                   <input
                                                                       className="form-control form-control-sm border-secondary"
                                                                       type="text"
@@ -1611,7 +1611,7 @@ class SemesterAuto extends Component {
                                                                       required
                                                                   />
                                                               </td>
-                                                              <td width="160px">
+                                                              <td>
                                                                   <input
                                                                       className="form-control form-control-sm border-secondary"
                                                                       type="text"

@@ -1347,7 +1347,7 @@ class CycleTestAuto extends Component {
                                                   (section, index) => {
                                                       return (
                                                           <tr key={index}>
-                                                              <td width="200px">
+                                                              <td>
                                                                   <input
                                                                       type="text"
                                                                       className="form-control form-control-sm border-secondary"
@@ -1371,7 +1371,7 @@ class CycleTestAuto extends Component {
                                                                       required
                                                                   />
                                                               </td>
-                                                              <td width="150px">
+                                                              <td>
                                                                   <select
                                                                       name="type"
                                                                       id="type"
@@ -1427,7 +1427,7 @@ class CycleTestAuto extends Component {
                                                                           : null}
                                                                   </select>
                                                               </td>
-                                                              <td width="150px">
+                                                              <td>
                                                                   <select
                                                                       name="category"
                                                                       className="form-control form-control-sm border-secondary"
@@ -1497,7 +1497,7 @@ class CycleTestAuto extends Component {
                                                                           : null}
                                                                   </select>
                                                               </td>
-                                                              <td width="160px">
+                                                              <td>
                                                                   <select
                                                                       name="marks"
                                                                       id="marks"
@@ -1568,7 +1568,7 @@ class CycleTestAuto extends Component {
                                                                           : null}
                                                                   </select>
                                                               </td>
-                                                              <td width="160px">
+                                                              <td>
                                                                   <input
                                                                       className="form-control form-control-sm border-secondary"
                                                                       type="text"
@@ -1580,7 +1580,7 @@ class CycleTestAuto extends Component {
                                                                       disabled
                                                                   />
                                                               </td>
-                                                              <td width="160px">
+                                                              <td>
                                                                   <input
                                                                       className="form-control form-control-sm border-secondary"
                                                                       type="text"
@@ -1607,7 +1607,7 @@ class CycleTestAuto extends Component {
                                                                       required
                                                                   />
                                                               </td>
-                                                              <td width="160px">
+                                                              <td>
                                                                   <input
                                                                       className="form-control form-control-sm border-secondary"
                                                                       type="text"
@@ -1634,7 +1634,7 @@ class CycleTestAuto extends Component {
                                                                       required
                                                                   />
                                                               </td>
-                                                              <td width="160px">
+                                                              <td>
                                                                   <input
                                                                       className="form-control form-control-sm border-secondary"
                                                                       type="text"

@@ -57,6 +57,19 @@ class VideoModal extends Component {
     }
 }
 
+const NoContentToDisplay = () => {
+    return (
+        <div
+            className="card card-body shadow-sm align-items-center justify-content-center font-weight-bold-600"
+            style={{
+                minHeight: "70vh",
+            }}
+        >
+            No content to display
+        </div>
+    );
+};
+
 class FlashCard extends Component {
     constructor(props) {
         super(props);
@@ -134,14 +147,26 @@ class FlashCard extends Component {
                 if (result.sts === true) {
                     if (result.data.results.length !== 0) {
                         let response = ConceptFormat(result);
-                        this.setState({
-                            concepts: response.result,
-                            totalItems: response.result.length,
-                            previous: result.data.previous,
-                            next: result.data.next,
-                            page_loading: false,
-                            seconds: 15,
+                        let conceptTemp = [...this.state.concepts];
+                        response.result.forEach((data) => {
+                            conceptTemp.push(data);
                         });
+                        this.setState(
+                            {
+                                concepts: conceptTemp,
+                                totalItems: result.data.count,
+                                seconds: 15,
+                            },
+                            () => {
+                                if (result.data.next !== null) {
+                                    this.loadConceptData(result.data.next);
+                                } else {
+                                    this.setState({
+                                        page_loading: false,
+                                    });
+                                }
+                            }
+                        );
                     } else {
                         this.setState({
                             page_loading: false,
@@ -162,7 +187,54 @@ class FlashCard extends Component {
     };
 
     conceptRender = (data, index) => {
-        return (
+        return index === this.state.totalItems ? (
+            <div
+                className="card card-body shadow-sm align-items-center justify-content-center"
+                style={{
+                    minHeight: "70vh",
+                }}
+            >
+                <h3 className="primary-text mb-3">Congratulations!</h3>
+                <p className="mb-4">
+                    You just completed all the Terms and Definitions
+                </p>
+                <div className="row justify-content-center w-100">
+                    <div className="col-lg-3 col-md-6">
+                        <button
+                            className="btn btn-primary btn-block shadow-none"
+                            onClick={() => {
+                                this.setState({
+                                    activeTab: "practice",
+                                    activeData: 0,
+                                    page_loading: true,
+                                });
+                                this.loadPracticeData();
+                            }}
+                        >
+                            Try Practice Mode
+                        </button>
+
+                        <button
+                            className="btn btn-link btn-block shadow-none"
+                            onClick={() => {
+                                this.setState(
+                                    {
+                                        activeData: 0,
+                                        concepts: [],
+                                        page_loading: true,
+                                    },
+                                    () => {
+                                        this.loadConceptData();
+                                    }
+                                );
+                            }}
+                        >
+                            Study with Flashcards again
+                        </button>
+                    </div>
+                </div>
+            </div>
+        ) : (
             <FullScreen
                 enabled={this.state.isFullscreenEnabled}
                 onChange={(isFullscreenEnabled) =>
@@ -284,7 +356,7 @@ class FlashCard extends Component {
 
     // ---------- loads practice data ----------
 
-    loadPracticeData = async (type1_path, type2_path) => {
+    loadPracticeData = async (type1_path) => {
         var apiURL =
             type1_path === undefined || type1_path === null
                 ? `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/typeone/learn/?topic_num=${this.topicNum}`
@@ -299,18 +371,35 @@ class FlashCard extends Component {
                 if (result.sts === true) {
                     if (result.data.results.length !== 0) {
                         let data = Type1DataFormat(result);
+                        let practiceTemp = [...this.state.practice];
+                        let total = [...this.state.totalSubQuestion];
+                        let currentIndex = [
+                            ...this.state.currentSubQuestionIndex,
+                        ];
+                        data.result.forEach((data) => {
+                            total.push(0);
+                            currentIndex.push(0);
+                            practiceTemp.push(data);
+                        });
                         this.setState(
                             {
-                                practice: data.result,
-                                previous: result.data.previous,
-                                next: result.data.next,
+                                practice: practiceTemp,
+                                totalSubQuestion: total,
+                                currentSubQuestionIndex: currentIndex,
                             },
                             () => {
-                                this.loadType2Data(type2_path);
+                                if (result.data.next !== null) {
+                                    this.loadPracticeData(result.data.next);
+                                } else {
+                                    this.setState({
+                                        totalItems: practiceTemp.length,
+                                    });
+                                    this.loadType2Data();
+                                }
                             }
                         );
                     } else {
-                        this.loadType2Data(type2_path);
+                        this.loadType2Data();
                     }
                 } else {
                     this.setState({
@@ -339,37 +428,45 @@ class FlashCard extends Component {
             .then((result) => {
                 console.log(result);
                 if (result.sts === true) {
-                    let values = [...this.state.practice];
-                    let data = Type2DataFormat(result);
-                    let total = [];
-                    let currentIndex = [];
-                    values.forEach(() => {
-                        total.push(0);
-                        currentIndex.push(0);
-                    });
-                    data.total.forEach((data) => {
-                        total.push(data);
-                    });
-                    data.current.forEach((data) => {
-                        currentIndex.push(data);
-                    });
-                    data.result.forEach((section) => {
-                        values.push(section);
-                    });
-                    this.setState(
-                        {
-                            practice: values,
-                            totalSubQuestion: total,
-                            currentSubQuestionIndex: currentIndex,
-                            totalItems: values.length,
-                            type2_previous: result.data.previous,
-                            type2_next: result.data.next,
+                    if (result.data.results.length !== 0) {
+                        let practiceTemp = [...this.state.practice];
+                        let data = Type2DataFormat(result);
+                        let total = [...this.state.totalSubQuestion];
+                        let currentIndex = [
+                            ...this.state.currentSubQuestionIndex,
+                        ];
+                        data.total.forEach((data) => {
+                            total.push(data);
+                        });
+                        data.current.forEach((data) => {
+                            currentIndex.push(data);
+                        });
+                        data.result.forEach((section) => {
+                            practiceTemp.push(section);
+                        });
+                        this.setState(
+                            {
+                                practice: practiceTemp,
+                                totalSubQuestion: total,
+                                currentSubQuestionIndex: currentIndex,
+                                totalItems: practiceTemp.length,
+                            },
+                            () => {
+                                if (result.data.next !== null) {
+                                    this.loadType2Data(result.data.next);
+                                } else {
+                                    this.setState({
+                                        page_loading: false,
+                                    });
+                                    this.loopSectionStructure();
+                                }
+                            }
+                        );
+                    } else {
+                        this.setState({
                             page_loading: false,
-                        },
-                        () => {
-                            this.loopSectionStructure();
-                        }
-                    );
+                        });
+                    }
                 } else {
                     this.setState({
                         errorMsg: result.detail ? result.detail : result.msg,
@@ -448,18 +545,25 @@ class FlashCard extends Component {
 
     // ---------- handle option selection ----------
 
-    handleMCQ = (event, index) => {
+    handleMCQ = (event, index, type) => {
         let sections = [...this.state.sections];
-        if (event.target.checked) {
-            sections[index].answers.push(event.target.value);
-            this.setState({
-                sections: sections,
-            });
-        } else {
-            sections[index].answers.splice(
-                sections[index].answers.indexOf(event.target.value),
-                1
-            );
+        if (type === "checkbox") {
+            if (event.target.checked) {
+                sections[index].answers.push(event.target.value);
+                this.setState({
+                    sections: sections,
+                });
+            } else {
+                sections[index].answers.splice(
+                    sections[index].answers.indexOf(event.target.value),
+                    1
+                );
+                this.setState({
+                    sections: sections,
+                });
+            }
+        } else if (type === "radio") {
+            sections[index].answers[0] = event.target.value;
             this.setState({
                 sections: sections,
             });
@@ -502,14 +606,53 @@ class FlashCard extends Component {
     };
 
     practiceRender = (data, index, section, explanation) => {
-        return data.lenght === 0 ? (
+        return index === this.state.totalItems ? (
             <div
-                className="card card-body shadow-sm align-items-center justify-content-center font-weight-bold-600"
+                className="card card-body shadow-sm align-items-center justify-content-center"
                 style={{
                     minHeight: "70vh",
                 }}
             >
-                No content to display
+                <h3 className="primary-text mb-3">Congratulations!</h3>
+                <p className="mb-4">You just completed all the Practices</p>
+                <div className="row justify-content-center w-100">
+                    <div className="col-lg-3 col-md-6">
+                        <button
+                            className="btn btn-primary btn-block shadow-none"
+                            onClick={() => {
+                                this.setState({
+                                    activeTab: "match",
+                                    activeData: 0,
+                                    page_loading: true,
+                                });
+                                this.loadMatchData();
+                            }}
+                        >
+                            Try Match Mode
+                        </button>
+
+                        <button
+                            className="btn btn-link btn-block shadow-none"
+                            onClick={() => {
+                                this.setState(
+                                    {
+                                        activeData: 0,
+                                        practice: [],
+                                        explanation: [],
+                                        currentSubQuestionIndex: [],
+                                        totalSubQuestion: [],
+                                        page_loading: true,
+                                    },
+                                    () => {
+                                        this.loadPracticeData();
+                                    }
+                                );
+                            }}
+                        >
+                            Study with Practice again
+                        </button>
+                    </div>
+                </div>
             </div>
         ) : (
             <div
@@ -522,7 +665,7 @@ class FlashCard extends Component {
                         <div className="w-100">
                             <div className="d-flex mb-2">
                                 <p className="font-weight-bold mr-2">
-                                    {index <= 9
+                                    {index < 9
                                         ? `0${index + 1}.`
                                         : `${index + 1}.`}
                                 </p>
@@ -535,7 +678,7 @@ class FlashCard extends Component {
                             </div>
 
                             {/* ---------- Explanation ---------- */}
-                            {explanation.lenght !== 0 ? (
+                            {explanation.length !== 0 ? (
                                 explanation.isAnswered === true ? (
                                     <>
                                         <div
@@ -555,7 +698,7 @@ class FlashCard extends Component {
                                                 }}
                                             ></p>
                                         </div>
-                                        {/* show answer */}
+                                        {/* ----- show answer ----- */}
                                         <div className="row">
                                             <div className="col-md-6">
                                                 <div
@@ -572,7 +715,7 @@ class FlashCard extends Component {
                                                         ? explanation.answers !==
                                                               undefined &&
                                                           explanation.answers
-                                                              .lenght !== 0
+                                                              .length !== 0
                                                             ? explanation.answers.map(
                                                                   (
                                                                       data,
@@ -676,47 +819,97 @@ class FlashCard extends Component {
                                                                     option_index
                                                                 }
                                                             >
-                                                                <div className="custom-control custom-checkbox">
-                                                                    <input
-                                                                        type="checkbox"
-                                                                        className="custom-control-input"
-                                                                        id={`option_${option_index}`}
-                                                                        value={
-                                                                            option.content
-                                                                        }
-                                                                        onChange={(
-                                                                            event
-                                                                        ) =>
-                                                                            this.handleMCQ(
-                                                                                event,
-                                                                                index
-                                                                            )
-                                                                        }
-                                                                        checked={
-                                                                            section.length !==
-                                                                            0
-                                                                                ? section
-                                                                                      .answers
-                                                                                      .length !==
-                                                                                  0
-                                                                                    ? section.answers.includes(
-                                                                                          option.content
-                                                                                      )
-                                                                                        ? true
+                                                                {data[index]
+                                                                    .content
+                                                                    .mcq_answers >
+                                                                1 ? (
+                                                                    <div className="custom-control custom-checkbox">
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            className="custom-control-input"
+                                                                            id={`option_${option_index}`}
+                                                                            value={
+                                                                                option.content
+                                                                            }
+                                                                            onChange={(
+                                                                                event
+                                                                            ) =>
+                                                                                this.handleMCQ(
+                                                                                    event,
+                                                                                    index,
+                                                                                    "checkbox"
+                                                                                )
+                                                                            }
+                                                                            checked={
+                                                                                section.length !==
+                                                                                0
+                                                                                    ? section
+                                                                                          .answers
+                                                                                          .length !==
+                                                                                      0
+                                                                                        ? section.answers.includes(
+                                                                                              option.content
+                                                                                          )
+                                                                                            ? true
+                                                                                            : false
                                                                                         : false
                                                                                     : false
-                                                                                : false
-                                                                        }
-                                                                    />
-                                                                    <label
-                                                                        className="custom-control-label"
-                                                                        htmlFor={`option_${option_index}`}
-                                                                    >
-                                                                        {
-                                                                            option.content
-                                                                        }
-                                                                    </label>
-                                                                </div>
+                                                                            }
+                                                                        />
+                                                                        <label
+                                                                            className="custom-control-label"
+                                                                            htmlFor={`option_${option_index}`}
+                                                                        >
+                                                                            {
+                                                                                option.content
+                                                                            }
+                                                                        </label>
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="custom-control custom-radio">
+                                                                        <input
+                                                                            type="radio"
+                                                                            id={`customRadio${index}-${option_index}`}
+                                                                            name={`customRadio${index}`}
+                                                                            className="custom-control-input"
+                                                                            value={
+                                                                                option.content
+                                                                            }
+                                                                            onChange={(
+                                                                                event
+                                                                            ) =>
+                                                                                this.handleMCQ(
+                                                                                    event,
+                                                                                    index,
+                                                                                    "radio"
+                                                                                )
+                                                                            }
+                                                                            checked={
+                                                                                section.length !==
+                                                                                0
+                                                                                    ? section
+                                                                                          .answers
+                                                                                          .length !==
+                                                                                      0
+                                                                                        ? section.answers.includes(
+                                                                                              option.content
+                                                                                          )
+                                                                                            ? true
+                                                                                            : false
+                                                                                        : false
+                                                                                    : false
+                                                                            }
+                                                                        />
+                                                                        <label
+                                                                            className="custom-control-label"
+                                                                            htmlFor={`customRadio${index}-${option_index}`}
+                                                                        >
+                                                                            {
+                                                                                option.content
+                                                                            }
+                                                                        </label>
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         );
                                                     }
@@ -823,7 +1016,7 @@ class FlashCard extends Component {
                                     data[index].content.mcq_answers !==
                                     undefined ? (
                                         data[index].content.mcq_answers > 1 ? (
-                                            <div className="small">
+                                            <div className="small mt-2">
                                                 <b>Note:</b>{" "}
                                                 {
                                                     data[index].content
@@ -844,21 +1037,44 @@ class FlashCard extends Component {
                             {Object.entries(explanation).length !== 0 ? (
                                 explanation.isAnswered === false ? (
                                     section.answers.length !== 0 ? (
-                                        <div className="row mt-4">
-                                            <div className="col-md-3">
-                                                <button
-                                                    className="btn btn-primary btn-block btn-sm shadow-none"
-                                                    onClick={() => {
-                                                        this.handleCheck(
-                                                            section,
-                                                            "type_1"
-                                                        );
-                                                    }}
-                                                >
-                                                    Check
-                                                </button>
+                                        data[index].content.mcq_answers ? (
+                                            data[index].content.mcq_answers ===
+                                            section.answers.length ? (
+                                                <div className="row mt-4">
+                                                    <div className="col-md-3">
+                                                        <button
+                                                            className="btn btn-primary btn-block btn-sm shadow-none"
+                                                            onClick={() => {
+                                                                this.handleCheck(
+                                                                    section,
+                                                                    "type_1"
+                                                                );
+                                                            }}
+                                                        >
+                                                            Check1
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                ""
+                                            )
+                                        ) : (
+                                            <div className="row mt-4">
+                                                <div className="col-md-3">
+                                                    <button
+                                                        className="btn btn-primary btn-block btn-sm shadow-none"
+                                                        onClick={() => {
+                                                            this.handleCheck(
+                                                                section,
+                                                                "type_1"
+                                                            );
+                                                        }}
+                                                    >
+                                                        Check2
+                                                    </button>
+                                                </div>
                                             </div>
-                                        </div>
+                                        )
                                     ) : (
                                         ""
                                     )
@@ -949,7 +1165,7 @@ class FlashCard extends Component {
                     {/* ---------- Main Question ---------- */}
                     <div className="d-flex mb-2">
                         <p className="font-weight-bold mr-2">
-                            {index <= 9 ? `0${index + 1}.` : `${index + 1}.`}
+                            {index < 9 ? `0${index + 1}.` : `${index + 1}.`}
                         </p>
                         <div
                             className="w-100"
@@ -1032,7 +1248,7 @@ class FlashCard extends Component {
                         {/* ---------- Sub question ---------- */}
                         <div className="col-md-6">
                             {/* ----- Explanation ----- */}
-                            {Object.entries(explanation).lenght !== 0 ? (
+                            {Object.entries(explanation).length !== 0 ? (
                                 explanation.isAnswered === true ? (
                                     <div
                                         className="card card-body bg-light"
@@ -1718,59 +1934,29 @@ class FlashCard extends Component {
         if (keyCode === "ArrowLeft") {
             if (this.state.activeData !== 0) this.handlePrev();
         } else if (keyCode === "ArrowRight") {
-            if (this.state.activeData + 1 < this.state.totalItems)
+            if (this.state.activeData < this.state.totalItems)
                 this.handleNext();
         }
     };
 
-    handleNextPage = () => {
+    handleFirstSlide = async () => {
         clearInterval(this.slideInterval);
-        this.setState(
-            {
-                isFlipped: false,
-                page_loading: true,
-                seconds: 15,
-                isSlideshowPlaying: false,
-                activeData: 0,
-            },
-            () => {
-                if (this.state.activeTab === "concept") {
-                    this.loadConceptData(this.state.next);
-                } else if (this.state.activeTab === "practice") {
-                    this.loadPracticeData(
-                        this.state.next,
-                        this.state.type2_next
-                    );
-                } else if (this.state.activeTab === "match") {
-                    this.loadMatchData(this.state.next);
-                }
-            }
-        );
+        await this.setState({
+            activeData: 0,
+            isFlipped: false,
+            seconds: 15,
+        });
+        window.MathJax.typeset();
     };
 
-    handlePrevPage = () => {
+    handleLastSlide = async () => {
         clearInterval(this.slideInterval);
-        this.setState(
-            {
-                isFlipped: false,
-                page_loading: true,
-                seconds: 15,
-                isSlideshowPlaying: false,
-                activeData: 0,
-            },
-            () => {
-                if (this.state.activeTab === "concept") {
-                    this.loadConceptData(this.state.previous);
-                } else if (this.state.activeTab === "practice") {
-                    this.loadPracticeData(
-                        this.state.previous,
-                        this.state.type2_previous
-                    );
-                } else if (this.state.activeTab === "match") {
-                    this.loadMatchData(this.state.previous);
-                }
-            }
-        );
+        await this.setState({
+            activeData: this.state.totalItems - 1,
+            isFlipped: false,
+            seconds: 15,
+        });
+        window.MathJax.typeset();
     };
 
     handleNext = async () => {
@@ -2001,10 +2187,7 @@ class FlashCard extends Component {
 
     playSlideshow = async () => {
         clearInterval(this.slideInterval);
-        if (
-            this.state.seconds === 0 &&
-            this.state.activeData + 1 === this.state.totalItems
-        ) {
+        if (this.state.activeData === this.state.totalItems) {
             await this.setState({
                 activeData: 0,
                 seconds: 15,
@@ -2024,13 +2207,24 @@ class FlashCard extends Component {
         if (this.state.activeTab === "concept") {
             if (this.state.isSlideshowPlaying === true) {
                 if (this.state.activeData !== prevState.activeData) {
-                    this.slideInterval = setInterval(
-                        this.conceptCountDown,
-                        1000
-                    );
+                    if (this.state.activeData === this.state.totalItems) {
+                        clearInterval(this.slideInterval);
+                        this.setState({
+                            isSlideshowPlaying: false,
+                        });
+                    } else {
+                        this.slideInterval = setInterval(
+                            this.conceptCountDown,
+                            1000
+                        );
+                    }
                 }
             }
         }
+    };
+
+    componentWillUnmount = () => {
+        clearInterval(this.slideInterval);
     };
 
     nextSlide = async () => {
@@ -2053,15 +2247,8 @@ class FlashCard extends Component {
                 isFlipped: true,
             });
         } else if (seconds === 0) {
-            if (this.state.activeData + 1 === this.state.totalItems) {
-                clearInterval(this.slideInterval);
-                this.setState({
-                    isSlideshowPlaying: false,
-                });
-            } else {
-                clearInterval(this.slideInterval);
-                this.nextSlide();
-            }
+            clearInterval(this.slideInterval);
+            this.nextSlide();
         }
     };
 
@@ -2377,22 +2564,13 @@ class FlashCard extends Component {
                     <div className="row justify-content-center">
                         <div className="col-md-11">
                             {this.state.activeTab === "concept" ? (
-                                data[index] !== undefined &&
-                                data[index].content !== undefined ? (
+                                data.length !== 0 ? (
                                     this.conceptRender(data, index)
                                 ) : (
-                                    <div
-                                        className="card card-body shadow-sm align-items-center justify-content-center font-weight-bold-600"
-                                        style={{
-                                            minHeight: "70vh",
-                                        }}
-                                    >
-                                        No content to display
-                                    </div>
+                                    <NoContentToDisplay />
                                 )
                             ) : this.state.activeTab === "practice" ? (
-                                data[index] !== undefined &&
-                                data[index].content !== undefined ? (
+                                data.length !== 0 ? (
                                     this.practiceRender(
                                         data,
                                         index,
@@ -2400,19 +2578,12 @@ class FlashCard extends Component {
                                         explanation
                                     )
                                 ) : (
-                                    <div
-                                        className="card card-body shadow-sm align-items-center justify-content-center font-weight-bold-600"
-                                        style={{
-                                            minHeight: "70vh",
-                                        }}
-                                    >
-                                        No content to display
-                                    </div>
+                                    <NoContentToDisplay />
                                 )
                             ) : this.state.activeTab === "match" ? (
                                 this.matchRender()
                             ) : (
-                                ""
+                                <NoContentToDisplay />
                             )}
                         </div>
                     </div>
@@ -2505,19 +2676,10 @@ class FlashCard extends Component {
                                     <div className="col-md-4 d-flex align-items-center justify-content-center small">
                                         {/* ----- Previous page button ----- */}
 
-                                        {this.state.previous === null &&
-                                        this.state.type2_previous === null ? (
+                                        {index === 0 ? (
                                             <button
                                                 className="btn btn-link btn-sm mr-2 shadow-none"
-                                                onClick={this.handlePrevPage}
-                                                disabled={
-                                                    this.state.previous ===
-                                                        null &&
-                                                    this.state
-                                                        .type2_previous === null
-                                                        ? true
-                                                        : false
-                                                }
+                                                disabled
                                             >
                                                 <i className="fas fa-angle-double-left fa-lg"></i>
                                             </button>
@@ -2527,21 +2689,17 @@ class FlashCard extends Component {
                                                 placement="top"
                                                 overlay={
                                                     <Tooltip id="tooltip1">
-                                                        Previous page
+                                                        First slide
                                                     </Tooltip>
                                                 }
                                             >
                                                 <button
                                                     className="btn btn-link btn-sm mr-2 shadow-none"
                                                     onClick={
-                                                        this.handlePrevPage
+                                                        this.handleFirstSlide
                                                     }
                                                     disabled={
-                                                        this.state.previous ===
-                                                            null &&
-                                                        this.state
-                                                            .type2_previous ===
-                                                            null
+                                                        index === 0
                                                             ? true
                                                             : false
                                                     }
@@ -2556,12 +2714,7 @@ class FlashCard extends Component {
                                         {index === 0 ? (
                                             <button
                                                 className="btn btn-link btn-sm mr-2 shadow-none"
-                                                onClick={() =>
-                                                    this.handlePrev(data, index)
-                                                }
-                                                disabled={
-                                                    index === 0 ? true : false
-                                                }
+                                                disabled
                                             >
                                                 <i className="fas fa-chevron-left"></i>
                                             </button>
@@ -2604,14 +2757,18 @@ class FlashCard extends Component {
                                         >
                                             <span className="mr-1">
                                                 {total !== 0
-                                                    ? index <= 9
-                                                        ? `0${index + 1}`
-                                                        : index + 1
+                                                    ? index + 1 < total
+                                                        ? index < 9
+                                                            ? `0${index + 1}`
+                                                            : index + 1
+                                                        : total < 9
+                                                        ? `0${total}`
+                                                        : total
                                                     : 0}
                                             </span>
                                             <span>/</span>
                                             <span className="ml-1">
-                                                {total <= 9
+                                                {total < 9
                                                     ? `0${total}`
                                                     : total}
                                             </span>
@@ -2619,7 +2776,7 @@ class FlashCard extends Component {
 
                                         {/* ----- Next slide button ----- */}
 
-                                        {index + 1 < total ? (
+                                        {index < total ? (
                                             <OverlayTrigger
                                                 key="top3"
                                                 placement="top"
@@ -2638,7 +2795,7 @@ class FlashCard extends Component {
                                                         )
                                                     }
                                                     disabled={
-                                                        index + 1 < total
+                                                        index < total
                                                             ? false
                                                             : true
                                                     }
@@ -2649,14 +2806,7 @@ class FlashCard extends Component {
                                         ) : (
                                             <button
                                                 className="btn btn-link btn-sm ml-2 shadow-none"
-                                                onClick={() =>
-                                                    this.handleNext(data, index)
-                                                }
-                                                disabled={
-                                                    index + 1 < total
-                                                        ? false
-                                                        : true
-                                                }
+                                                disabled
                                             >
                                                 <i className="fas fa-chevron-right"></i>
                                             </button>
@@ -2664,18 +2814,10 @@ class FlashCard extends Component {
 
                                         {/* ----- Next page button ----- */}
 
-                                        {this.state.next === null &&
-                                        this.state.type2_next === null ? (
+                                        {index + 1 >= total ? (
                                             <button
                                                 className="btn btn-link btn-sm ml-2 shadow-none"
-                                                onClick={this.handleNextPage}
-                                                disabled={
-                                                    this.state.next === null &&
-                                                    this.state.type2_next ===
-                                                        null
-                                                        ? true
-                                                        : false
-                                                }
+                                                disabled
                                             >
                                                 <i className="fas fa-angle-double-right fa-lg"></i>
                                             </button>
@@ -2685,20 +2827,17 @@ class FlashCard extends Component {
                                                 placement="top"
                                                 overlay={
                                                     <Tooltip id="tooltip4">
-                                                        Next page
+                                                        Last slide
                                                     </Tooltip>
                                                 }
                                             >
                                                 <button
                                                     className="btn btn-link btn-sm ml-2 shadow-none"
                                                     onClick={
-                                                        this.handleNextPage
+                                                        this.handleLastSlide
                                                     }
                                                     disabled={
-                                                        this.state.next ===
-                                                            null &&
-                                                        this.state
-                                                            .type2_next === null
+                                                        index + 1 >= total
                                                             ? true
                                                             : false
                                                     }
@@ -2709,7 +2848,7 @@ class FlashCard extends Component {
                                         )}
                                     </div>
 
-                                    {/* ---------- Video button ---------- */}
+                                    {/* ---------- Slideshow button ---------- */}
 
                                     {this.state.activeTab === "concept" ? (
                                         <div className="col-md-4 text-right">

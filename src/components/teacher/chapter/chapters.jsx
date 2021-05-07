@@ -969,7 +969,7 @@ class Chapters extends Component {
                             </ol>
                         </nav>
 
-                        <div className="row align-items-center mb-3">
+                        <div className="row mb-3">
                             <div className="col-md-4">
                                 <Select
                                     className="basic-single form-shadow"
@@ -988,13 +988,6 @@ class Chapters extends Component {
                                     onChange={this.handleSelect}
                                     required
                                 />
-                            </div>
-                            <div className="col-md-8">
-                                <div className="d-flex flex-wrap justify-content-end">
-                                    <button className="btn btn-primary btn-sm">
-                                        Publish
-                                    </button>
-                                </div>
                             </div>
                         </div>
 

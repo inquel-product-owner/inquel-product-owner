@@ -340,18 +340,25 @@ class FavouritesFlashcard extends Component {
 
     // ---------- handle option selection ----------
 
-    handleMCQ = (event, index) => {
+    handleMCQ = (event, index, type) => {
         let sections = [...this.state.sections];
-        if (event.target.checked) {
-            sections[index].answers.push(event.target.value);
-            this.setState({
-                sections: sections,
-            });
-        } else {
-            sections[index].answers.splice(
-                sections[index].answers.indexOf(event.target.value),
-                1
-            );
+        if (type === "checkbox") {
+            if (event.target.checked) {
+                sections[index].answers.push(event.target.value);
+                this.setState({
+                    sections: sections,
+                });
+            } else {
+                sections[index].answers.splice(
+                    sections[index].answers.indexOf(event.target.value),
+                    1
+                );
+                this.setState({
+                    sections: sections,
+                });
+            }
+        } else if (type === "radio") {
+            sections[index].answers[0] = event.target.value;
             this.setState({
                 sections: sections,
             });
@@ -414,7 +421,7 @@ class FavouritesFlashcard extends Component {
                         <div className="w-100">
                             <div className="d-flex mb-2">
                                 <p className="font-weight-bold mr-2">
-                                    {index <= 9
+                                    {index < 9
                                         ? `0${index + 1}.`
                                         : `${index + 1}.`}
                                 </p>
@@ -568,47 +575,97 @@ class FavouritesFlashcard extends Component {
                                                                     option_index
                                                                 }
                                                             >
-                                                                <div className="custom-control custom-checkbox">
-                                                                    <input
-                                                                        type="checkbox"
-                                                                        className="custom-control-input"
-                                                                        id={`option_${option_index}`}
-                                                                        value={
-                                                                            option.content
-                                                                        }
-                                                                        onChange={(
-                                                                            event
-                                                                        ) =>
-                                                                            this.handleMCQ(
-                                                                                event,
-                                                                                index
-                                                                            )
-                                                                        }
-                                                                        checked={
-                                                                            section.length !==
-                                                                            0
-                                                                                ? section
-                                                                                      .answers
-                                                                                      .length !==
-                                                                                  0
-                                                                                    ? section.answers.includes(
-                                                                                          option.content
-                                                                                      )
-                                                                                        ? true
+                                                                {data[index]
+                                                                    .content
+                                                                    .mcq_answers >
+                                                                1 ? (
+                                                                    <div className="custom-control custom-checkbox">
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            className="custom-control-input"
+                                                                            id={`option_${option_index}`}
+                                                                            value={
+                                                                                option.content
+                                                                            }
+                                                                            onChange={(
+                                                                                event
+                                                                            ) =>
+                                                                                this.handleMCQ(
+                                                                                    event,
+                                                                                    index,
+                                                                                    "checkbox"
+                                                                                )
+                                                                            }
+                                                                            checked={
+                                                                                section.length !==
+                                                                                0
+                                                                                    ? section
+                                                                                          .answers
+                                                                                          .length !==
+                                                                                      0
+                                                                                        ? section.answers.includes(
+                                                                                              option.content
+                                                                                          )
+                                                                                            ? true
+                                                                                            : false
                                                                                         : false
                                                                                     : false
-                                                                                : false
-                                                                        }
-                                                                    />
-                                                                    <label
-                                                                        className="custom-control-label"
-                                                                        htmlFor={`option_${option_index}`}
-                                                                    >
-                                                                        {
-                                                                            option.content
-                                                                        }
-                                                                    </label>
-                                                                </div>
+                                                                            }
+                                                                        />
+                                                                        <label
+                                                                            className="custom-control-label"
+                                                                            htmlFor={`option_${option_index}`}
+                                                                        >
+                                                                            {
+                                                                                option.content
+                                                                            }
+                                                                        </label>
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="custom-control custom-radio">
+                                                                        <input
+                                                                            type="radio"
+                                                                            id={`customRadio${index}-${option_index}`}
+                                                                            name={`customRadio${index}`}
+                                                                            className="custom-control-input"
+                                                                            value={
+                                                                                option.content
+                                                                            }
+                                                                            onChange={(
+                                                                                event
+                                                                            ) =>
+                                                                                this.handleMCQ(
+                                                                                    event,
+                                                                                    index,
+                                                                                    "radio"
+                                                                                )
+                                                                            }
+                                                                            checked={
+                                                                                section.length !==
+                                                                                0
+                                                                                    ? section
+                                                                                          .answers
+                                                                                          .length !==
+                                                                                      0
+                                                                                        ? section.answers.includes(
+                                                                                              option.content
+                                                                                          )
+                                                                                            ? true
+                                                                                            : false
+                                                                                        : false
+                                                                                    : false
+                                                                            }
+                                                                        />
+                                                                        <label
+                                                                            className="custom-control-label"
+                                                                            htmlFor={`customRadio${index}-${option_index}`}
+                                                                        >
+                                                                            {
+                                                                                option.content
+                                                                            }
+                                                                        </label>
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         );
                                                     }
@@ -841,7 +898,7 @@ class FavouritesFlashcard extends Component {
                     {/* ---------- Main Question ---------- */}
                     <div className="d-flex mb-2">
                         <p className="font-weight-bold mr-2">
-                            {index <= 9 ? `0${index + 1}.` : `${index + 1}.`}
+                            {index < 9 ? `0${index + 1}.` : `${index + 1}.`}
                         </p>
                         <div
                             className="w-100"
@@ -1324,6 +1381,26 @@ class FavouritesFlashcard extends Component {
         }
     };
 
+    handleFirstSlide = async () => {
+        clearInterval(this.slideInterval);
+        await this.setState({
+            activeData: 0,
+            isFlipped: false,
+            seconds: 15,
+        });
+        window.MathJax.typeset();
+    };
+
+    handleLastSlide = async () => {
+        clearInterval(this.slideInterval);
+        await this.setState({
+            activeData: this.state.totalItems - 1,
+            isFlipped: false,
+            seconds: 15,
+        });
+        window.MathJax.typeset();
+    };
+
     handleNext = async () => {
         clearInterval(this.slideInterval);
         await this.setState({
@@ -1504,6 +1581,10 @@ class FavouritesFlashcard extends Component {
                 }
             }
         }
+    };
+
+    componentWillUnmount = () => {
+        clearInterval(this.slideInterval);
     };
 
     nextSlide = async () => {
@@ -1763,17 +1844,43 @@ class FavouritesFlashcard extends Component {
                                 {/* ---------- Pagination ---------- */}
 
                                 <div className="col-md-4 d-flex align-items-center justify-content-center small">
+                                    {/* ----- Previous page button ----- */}
+
+                                    {index === 0 ? (
+                                        <button
+                                            className="btn btn-link btn-sm mr-2 shadow-none"
+                                            disabled
+                                        >
+                                            <i className="fas fa-angle-double-left fa-lg"></i>
+                                        </button>
+                                    ) : (
+                                        <OverlayTrigger
+                                            key="top1"
+                                            placement="top"
+                                            overlay={
+                                                <Tooltip id="tooltip1">
+                                                    First slide
+                                                </Tooltip>
+                                            }
+                                        >
+                                            <button
+                                                className="btn btn-link btn-sm mr-2 shadow-none"
+                                                onClick={this.handleFirstSlide}
+                                                disabled={
+                                                    index === 0 ? true : false
+                                                }
+                                            >
+                                                <i className="fas fa-angle-double-left fa-lg"></i>
+                                            </button>
+                                        </OverlayTrigger>
+                                    )}
+
                                     {/* ----- Previous slide button ----- */}
 
                                     {index === 0 ? (
                                         <button
                                             className="btn btn-link btn-sm mr-2 shadow-none"
-                                            onClick={() =>
-                                                this.handlePrev(data, index)
-                                            }
-                                            disabled={
-                                                index === 0 ? true : false
-                                            }
+                                            disabled
                                         >
                                             <i className="fas fa-chevron-left"></i>
                                         </button>
@@ -1851,15 +1958,43 @@ class FavouritesFlashcard extends Component {
                                     ) : (
                                         <button
                                             className="btn btn-link btn-sm ml-2 shadow-none"
-                                            onClick={() =>
-                                                this.handleNext(data, index)
-                                            }
-                                            disabled={
-                                                index + 1 < total ? false : true
-                                            }
+                                            disabled
                                         >
                                             <i className="fas fa-chevron-right"></i>
                                         </button>
+                                    )}
+
+                                    {/* ----- Next page button ----- */}
+
+                                    {index + 1 >= total ? (
+                                        <button
+                                            className="btn btn-link btn-sm ml-2 shadow-none"
+                                            disabled
+                                        >
+                                            <i className="fas fa-angle-double-right fa-lg"></i>
+                                        </button>
+                                    ) : (
+                                        <OverlayTrigger
+                                            key="top4"
+                                            placement="top"
+                                            overlay={
+                                                <Tooltip id="tooltip4">
+                                                    Last slide
+                                                </Tooltip>
+                                            }
+                                        >
+                                            <button
+                                                className="btn btn-link btn-sm ml-2 shadow-none"
+                                                onClick={this.handleLastSlide}
+                                                disabled={
+                                                    index + 1 >= total
+                                                        ? true
+                                                        : false
+                                                }
+                                            >
+                                                <i className="fas fa-angle-double-right fa-lg"></i>
+                                            </button>
+                                        </OverlayTrigger>
                                     )}
                                 </div>
 
