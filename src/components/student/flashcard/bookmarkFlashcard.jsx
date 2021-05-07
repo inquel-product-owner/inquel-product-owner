@@ -575,47 +575,97 @@ class FavouritesFlashcard extends Component {
                                                                     option_index
                                                                 }
                                                             >
-                                                                <div className="custom-control custom-checkbox">
-                                                                    <input
-                                                                        type="checkbox"
-                                                                        className="custom-control-input"
-                                                                        id={`option_${option_index}`}
-                                                                        value={
-                                                                            option.content
-                                                                        }
-                                                                        onChange={(
-                                                                            event
-                                                                        ) =>
-                                                                            this.handleMCQ(
-                                                                                event,
-                                                                                index
-                                                                            )
-                                                                        }
-                                                                        checked={
-                                                                            section.length !==
-                                                                            0
-                                                                                ? section
-                                                                                      .answers
-                                                                                      .length !==
-                                                                                  0
-                                                                                    ? section.answers.includes(
-                                                                                          option.content
-                                                                                      )
-                                                                                        ? true
+                                                                {data[index]
+                                                                    .content
+                                                                    .mcq_answers >
+                                                                1 ? (
+                                                                    <div className="custom-control custom-checkbox">
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            className="custom-control-input"
+                                                                            id={`option_${option_index}`}
+                                                                            value={
+                                                                                option.content
+                                                                            }
+                                                                            onChange={(
+                                                                                event
+                                                                            ) =>
+                                                                                this.handleMCQ(
+                                                                                    event,
+                                                                                    index,
+                                                                                    "checkbox"
+                                                                                )
+                                                                            }
+                                                                            checked={
+                                                                                section.length !==
+                                                                                0
+                                                                                    ? section
+                                                                                          .answers
+                                                                                          .length !==
+                                                                                      0
+                                                                                        ? section.answers.includes(
+                                                                                              option.content
+                                                                                          )
+                                                                                            ? true
+                                                                                            : false
                                                                                         : false
                                                                                     : false
-                                                                                : false
-                                                                        }
-                                                                    />
-                                                                    <label
-                                                                        className="custom-control-label"
-                                                                        htmlFor={`option_${option_index}`}
-                                                                    >
-                                                                        {
-                                                                            option.content
-                                                                        }
-                                                                    </label>
-                                                                </div>
+                                                                            }
+                                                                        />
+                                                                        <label
+                                                                            className="custom-control-label"
+                                                                            htmlFor={`option_${option_index}`}
+                                                                        >
+                                                                            {
+                                                                                option.content
+                                                                            }
+                                                                        </label>
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="custom-control custom-radio">
+                                                                        <input
+                                                                            type="radio"
+                                                                            id={`customRadio${index}-${option_index}`}
+                                                                            name={`customRadio${index}`}
+                                                                            className="custom-control-input"
+                                                                            value={
+                                                                                option.content
+                                                                            }
+                                                                            onChange={(
+                                                                                event
+                                                                            ) =>
+                                                                                this.handleMCQ(
+                                                                                    event,
+                                                                                    index,
+                                                                                    "radio"
+                                                                                )
+                                                                            }
+                                                                            checked={
+                                                                                section.length !==
+                                                                                0
+                                                                                    ? section
+                                                                                          .answers
+                                                                                          .length !==
+                                                                                      0
+                                                                                        ? section.answers.includes(
+                                                                                              option.content
+                                                                                          )
+                                                                                            ? true
+                                                                                            : false
+                                                                                        : false
+                                                                                    : false
+                                                                            }
+                                                                        />
+                                                                        <label
+                                                                            className="custom-control-label"
+                                                                            htmlFor={`customRadio${index}-${option_index}`}
+                                                                        >
+                                                                            {
+                                                                                option.content
+                                                                            }
+                                                                        </label>
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         );
                                                     }

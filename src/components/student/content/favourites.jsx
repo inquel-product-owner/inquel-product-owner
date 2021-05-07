@@ -301,6 +301,8 @@ class Favourites extends Component {
                                                                               "13px",
                                                                           paddingTop:
                                                                               "13px",
+                                                                          cursor:
+                                                                              "default",
                                                                       }}
                                                                   >
                                                                       {
@@ -417,116 +419,6 @@ class Favourites extends Component {
                                                 : "No content to display..."}
                                         </div>
                                     </div>
-
-                                    {/* <div className="col-md-9 pl-md-0">
-                                        <div className="card card-body py-0">
-                                            {Object.entries(
-                                                this.state.favouritesData
-                                            ).length !== 0 ? (
-                                                this.state.favouritesData[
-                                                    this.state.topic_num
-                                                ] !== undefined ? (
-                                                    this.state.favouritesData[
-                                                        this.state.topic_num
-                                                    ].concepts.length !== 0 ||
-                                                    this.state.favouritesData[
-                                                        this.state.topic_num
-                                                    ].questions.length !== 0 ? (
-                                                        <div className="row">
-                                                            {this.state
-                                                                .favouritesData[
-                                                                this.state
-                                                                    .topic_num
-                                                            ].concepts
-                                                                .length !==
-                                                            0 ? (
-                                                                <div className="col-md-6 mb-3">
-                                                                    <div className="card light-bg shadow-sm">
-                                                                        <div className="card-body">
-                                                                            <div className="row align-items-center pr-2">
-                                                                                <div className="col-10 primary-text font-weight-bold-600 small">
-                                                                                    Concept
-                                                                                </div>
-                                                                                <div className="col-2">
-                                                                                    <button
-                                                                                        className="btn btn-primary btn-sm shadow-none"
-                                                                                        onClick={() =>
-                                                                                            this.toggleModal(
-                                                                                                this
-                                                                                                    .state
-                                                                                                    .favouritesData[
-                                                                                                    this
-                                                                                                        .state
-                                                                                                        .topic_num
-                                                                                                ]
-                                                                                                    .concepts,
-                                                                                                "concept"
-                                                                                            )
-                                                                                        }
-                                                                                    >
-                                                                                        View
-                                                                                    </button>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            ) : (
-                                                                ""
-                                                            )}
-                                                            {this.state
-                                                                .favouritesData[
-                                                                this.state
-                                                                    .topic_num
-                                                            ].questions
-                                                                .length !==
-                                                            0 ? (
-                                                                <div className="col-md-6 mb-3">
-                                                                    <div className="card light-bg shadow-sm">
-                                                                        <div className="card-body">
-                                                                            <div className="row align-items-center pr-2">
-                                                                                <div className="col-10 primary-text font-weight-bold-600 small">
-                                                                                    Practice
-                                                                                </div>
-                                                                                <div className="col-2">
-                                                                                    <button
-                                                                                        className="btn btn-primary btn-sm shadow-none"
-                                                                                        onClick={() =>
-                                                                                            this.toggleModal(
-                                                                                                this
-                                                                                                    .state
-                                                                                                    .favouritesData[
-                                                                                                    this
-                                                                                                        .state
-                                                                                                        .topic_num
-                                                                                                ]
-                                                                                                    .questions,
-                                                                                                "practice"
-                                                                                            )
-                                                                                        }
-                                                                                    >
-                                                                                        View
-                                                                                    </button>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            ) : (
-                                                                ""
-                                                            )}
-                                                        </div>
-                                                    ) : (
-                                                        "No content to display..."
-                                                    )
-                                                ) : (
-                                                    "No content to display..."
-                                                )
-                                            ) : (
-                                                "No content to display..."
-                                            )}
-                                        </div>
-                                    </div> */}
                                 </div>
                             </div>
                         </div>
