@@ -592,7 +592,7 @@ export function dataFormat(result) {
             currentSubQuestionIndex.push(0);
 
             // Image
-            if (Object.entries(response[i].files).length !== 0) {
+            if (response[i].files && Object.entries(response[i].files).length !== 0) {
                 if (response[i].files.type2_image_1) {
                     images.push({
                         title: response[i].files.type2_image_1_title,

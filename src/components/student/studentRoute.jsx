@@ -16,11 +16,11 @@ import Favourites from "./content/favourites";
 import FavouritesFlashcard from "./flashcard/bookmarkFlashcard";
 import FlashCard from "./flashcard/learnFlashCard";
 
-import CycleTest from "./cycle/cycleTest";
+// import CycleTest from "./cycle/cycleTest";
 import CycleDirectExam from "./cycle/directExam";
 import CycleAutoExam from "./cycle/autoExam";
 
-import SemesterExam from "./semester/semesterExam";
+// import SemesterExam from "./semester/semesterExam";
 import SemesterDirectExam from "./semester/directExam";
 import SemesterAutoExam from "./semester/autoExam";
 
@@ -170,7 +170,7 @@ const studentRoutes = (
 
         {/* --------------- Cycle test --------------- */}
 
-        <Route
+        {/* <Route
             exact
             path="/student/subject/:subjectId/chapter/:chapterId/cycle/:cycleTestId"
             render={(props) =>
@@ -181,7 +181,7 @@ const studentRoutes = (
                     <CycleTest {...props} />
                 )
             }
-        />
+        /> */}
         <Route
             exact
             path="/student/subject/:subjectId/chapter/:chapterId/cycle/:cycleTestId/auto"
@@ -236,7 +236,7 @@ const studentRoutes = (
 
         {/* --------------- Semester exam --------------- */}
 
-        <Route
+        {/* <Route
             exact
             path="/student/subject/:subjectId/semester/:semesterId"
             render={(props) =>
@@ -247,7 +247,7 @@ const studentRoutes = (
                     <SemesterExam {...props} />
                 )
             }
-        />
+        /> */}
         <Route
             exact
             path="/student/subject/:subjectId/semester/:semesterId/auto"

@@ -388,7 +388,7 @@ class SemesterAutoQA extends Component {
                                                               }}
                                                           >
                                                               <div
-                                                                  className="font-weight-bold-600 py-2"
+                                                                  className="pb-2"
                                                                   dangerouslySetInnerHTML={{
                                                                       __html:
                                                                           data.question,
@@ -417,10 +417,13 @@ class SemesterAutoQA extends Component {
                                                                                                       : "bg-light"
                                                                                               }`}
                                                                                           >
-                                                                                              <div className="card-body small py-3">
-                                                                                                  {
-                                                                                                      options.content
-                                                                                                  }
+                                                                                              <div className="card-body small font-weight-bold-600 pt-3 pb-0">
+                                                                                                  <div
+                                                                                                      dangerouslySetInnerHTML={{
+                                                                                                          __html:
+                                                                                                              options.content,
+                                                                                                      }}
+                                                                                                  ></div>
                                                                                               </div>
                                                                                           </div>
                                                                                       </div>
@@ -449,16 +452,10 @@ class SemesterAutoQA extends Component {
                                                                                   >
                                                                                       <div className="form-group">
                                                                                           <div className="card form-shadow">
-                                                                                              <div className="card-body small py-3">
-                                                                                                  {fill_in !==
-                                                                                                  "" ? (
+                                                                                              <div className="card-body small font-weight-bold-600 py-3">
+                                                                                                  {
                                                                                                       fill_in
-                                                                                                  ) : (
-                                                                                                      <span className="text-muted">{`Answer 0${
-                                                                                                          index +
-                                                                                                          1
-                                                                                                      }`}</span>
-                                                                                                  )}
+                                                                                                  }
                                                                                               </div>
                                                                                           </div>
                                                                                       </div>
@@ -493,7 +490,7 @@ class SemesterAutoQA extends Component {
                                                                                                       : "bg-light"
                                                                                               }`}
                                                                                           >
-                                                                                              <div className="card-body small py-3">
+                                                                                              <div className="card-body small font-weight-bold-600 py-3">
                                                                                                   {
                                                                                                       boolean.content
                                                                                                   }
@@ -679,10 +676,13 @@ class SemesterAutoQA extends Component {
                                                                                                 index
                                                                                             }
                                                                                         >
-                                                                                            <div className="card-body small font-weight-bold-600 py-3">
-                                                                                                {
-                                                                                                    options.content
-                                                                                                }
+                                                                                            <div className="card-body small font-weight-bold-600 pt-3 pb-0">
+                                                                                                <div
+                                                                                                    dangerouslySetInnerHTML={{
+                                                                                                        __html:
+                                                                                                            options.content,
+                                                                                                    }}
+                                                                                                ></div>
                                                                                             </div>
                                                                                         </div>
                                                                                     );
@@ -716,15 +716,9 @@ class SemesterAutoQA extends Component {
                                                                                             }
                                                                                         >
                                                                                             <div className="card-body small font-weight-bold-600 py-3">
-                                                                                                {fill_in !==
-                                                                                                "" ? (
+                                                                                                {
                                                                                                     fill_in
-                                                                                                ) : (
-                                                                                                    <span className="text-muted">{`Answer 0${
-                                                                                                        index +
-                                                                                                        1
-                                                                                                    }`}</span>
-                                                                                                )}
+                                                                                                }
                                                                                             </div>
                                                                                         </div>
                                                                                     );

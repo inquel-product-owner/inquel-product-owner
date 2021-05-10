@@ -8,6 +8,7 @@ import { Modal, Alert, Spinner, Dropdown } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
 import Loading from "../../sharedComponents/loader";
 import AlertBox from "../../sharedComponents/alert";
+import ScoreCardTable from "../shared/scorecard";
 
 const mapStateToProps = (state) => ({
     group_name: state.group_name,
@@ -124,6 +125,10 @@ class Scorecard extends Component {
             scorecard = Object.fromEntries(temp);
         } else if (type === "range") {
             scorecard[category][type][index] = Number(event.target.value);
+        } else if (type === "retake" || type === "reduction_duration") {
+            scorecard[category][type] = `${event.target.value.trim()} week`;
+        } else if (type === "reduction") {
+            scorecard[category][type] = `${event.target.value.trim()}%`;
         } else {
             scorecard[category][type] = event.target.value;
         }
@@ -224,150 +229,12 @@ class Scorecard extends Component {
                         {this.state.successMsg}
                     </Alert>
 
-                    <div className="table-responsive">
-                        <table className="table">
-                            <thead>
-                                <th scope="col">Range in %</th>
-                                <th scope="col">Retake Duration</th>
-                                <th scope="col">Reduction %</th>
-                                <th scope="col">Reduction Duration</th>
-                                <th scope="col">Remarks</th>
-                            </thead>
-                            <tbody>
-                                {Object.keys(this.state.scorecard).length !== 0
-                                    ? Object.entries(this.state.scorecard).map(
-                                          ([key, value], index) => {
-                                              return (
-                                                  <tr key={index}>
-                                                      <td className="d-flex align-items-center">
-                                                          <input
-                                                              type="number"
-                                                              name="range1"
-                                                              value={
-                                                                  value.range[0]
-                                                              }
-                                                              onChange={(
-                                                                  event
-                                                              ) =>
-                                                                  this.handleData(
-                                                                      event,
-                                                                      key,
-                                                                      "range",
-                                                                      0
-                                                                  )
-                                                              }
-                                                              className="form-control form-shadow"
-                                                          />
-                                                          <span className="mx-2">
-                                                              to
-                                                          </span>
-                                                          <input
-                                                              type="number"
-                                                              name="range2"
-                                                              value={
-                                                                  value.range[1]
-                                                              }
-                                                              onChange={(
-                                                                  event
-                                                              ) =>
-                                                                  this.handleData(
-                                                                      event,
-                                                                      key,
-                                                                      "range",
-                                                                      1
-                                                                  )
-                                                              }
-                                                              className="form-control form-shadow"
-                                                          />
-                                                      </td>
-                                                      <td>
-                                                          <input
-                                                              type="text"
-                                                              name="retake"
-                                                              value={
-                                                                  value.retake
-                                                              }
-                                                              className="form-control form-shadow"
-                                                              onChange={(
-                                                                  event
-                                                              ) =>
-                                                                  this.handleData(
-                                                                      event,
-                                                                      key,
-                                                                      "retake"
-                                                                  )
-                                                              }
-                                                          />
-                                                      </td>
-                                                      <td>
-                                                          <input
-                                                              type="text"
-                                                              name="reducation"
-                                                              value={
-                                                                  value.reduction
-                                                              }
-                                                              className="form-control form-shadow"
-                                                              onChange={(
-                                                                  event
-                                                              ) =>
-                                                                  this.handleData(
-                                                                      event,
-                                                                      key,
-                                                                      "reduction"
-                                                                  )
-                                                              }
-                                                          />
-                                                      </td>
-                                                      <td>
-                                                          <input
-                                                              type="text"
-                                                              name="duration"
-                                                              value={
-                                                                  value.reduction_duration
-                                                              }
-                                                              className="form-control form-shadow"
-                                                              onChange={(
-                                                                  event
-                                                              ) =>
-                                                                  this.handleData(
-                                                                      event,
-                                                                      key,
-                                                                      "reduction_duration"
-                                                                  )
-                                                              }
-                                                          />
-                                                      </td>
-                                                      <td>
-                                                          <input
-                                                              type="text"
-                                                              name="remarks"
-                                                              className="form-control form-shadow"
-                                                              style={{
-                                                                  borderColor:
-                                                                      value.color,
-                                                                  borderWidth:
-                                                                      "2px",
-                                                              }}
-                                                              value={key}
-                                                              onChange={(
-                                                                  event
-                                                              ) =>
-                                                                  this.handleData(
-                                                                      event,
-                                                                      key,
-                                                                      "remarks"
-                                                                  )
-                                                              }
-                                                          />
-                                                      </td>
-                                                  </tr>
-                                              );
-                                          }
-                                      )
-                                    : null}
-                            </tbody>
-                        </table>
-                    </div>
+                    {/* <!----- Scorecard Table -----> */}
+
+                    <ScoreCardTable
+                        scorecard={this.state.scorecard}
+                        handleData={this.handleData}
+                    />
                 </Modal.Body>
                 <Modal.Footer className="text-right">
                     <button

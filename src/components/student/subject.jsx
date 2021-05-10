@@ -724,7 +724,7 @@ class Subject extends Component {
 
     componentDidMount = () => {
         this.loadSubjectData();
-        
+
         // let secret = new fernet.Secret(
         //     "4Fy2fTI1oyK9McR5mRunLmfynGdzOdxiRQRNqhUY70k="
         // );
@@ -825,6 +825,73 @@ class Subject extends Component {
             });
     };
 
+    handleCycleStart = (chapter_id, cycle_test_id) => {
+        this.setState({
+            page_loading: true,
+        });
+
+        fetch(
+            `${this.url}/student/subject/${this.subjectId}/chapter/${chapter_id}/cycletest/auto/start/`,
+            {
+                method: "POST",
+                headers: this.headers,
+                body: JSON.stringify({
+                    cycle_test_id: cycle_test_id,
+                }),
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.props.history.push(
+                        `${this.props.match.url}/chapter/${chapter_id}/cycle/${cycle_test_id}/auto`
+                    );
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    handleSemesterStart = (semester_id) => {
+        this.setState({
+            page_loading: true,
+        });
+
+        fetch(
+            `${this.url}/student/subject/${this.subjectId}/semester/${semester_id}/auto/start/`,
+            {
+                method: "POST",
+                headers: this.headers,
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.props.history.push(
+                        `${this.props.match.url}/semester/${semester_id}/auto`
+                    );
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     cycleTest = (data, index, chapter_index, chapter_id) => {
         return (
             <div
@@ -869,13 +936,17 @@ class Subject extends Component {
                                         </button>
                                     </Link>
                                 ) : (
-                                    <Link
-                                        to={`${this.props.match.url}/chapter/${chapter_id}/cycle/${data.cycle_test_id}`}
+                                    <button
+                                        className="btn btn-primary btn-sm shadow-none"
+                                        onClick={() =>
+                                            this.handleCycleStart(
+                                                chapter_id,
+                                                data.cycle_test_id
+                                            )
+                                        }
                                     >
-                                        <button className="btn btn-primary btn-sm shadow-none">
-                                            Start
-                                        </button>
-                                    </Link>
+                                        Start
+                                    </button>
                                 )
                             ) : (
                                 // if not then display the error message in tooltip
@@ -1182,13 +1253,16 @@ class Subject extends Component {
                                                                                   </button>
                                                                               </Link>
                                                                           ) : (
-                                                                              <Link
-                                                                                  to={`${this.props.match.url}/semester/${semester.semester_id}`}
+                                                                              <button
+                                                                                  className="btn btn-primary btn-sm shadow-none"
+                                                                                  onClick={() =>
+                                                                                      this.handleSemesterStart(
+                                                                                          semester.semester_id
+                                                                                      )
+                                                                                  }
                                                                               >
-                                                                                  <button className="btn btn-primary btn-sm shadow-none">
-                                                                                      Start
-                                                                                  </button>
-                                                                              </Link>
+                                                                                  Start
+                                                                              </button>
                                                                           )
                                                                       ) : (
                                                                           <Lock />

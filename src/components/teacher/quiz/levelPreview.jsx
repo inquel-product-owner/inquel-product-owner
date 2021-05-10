@@ -365,7 +365,7 @@ class LevelPreview extends Component {
                                                           }}
                                                       >
                                                           <div
-                                                              className="font-weight-bold-600 py-2"
+                                                              className="pb-2"
                                                               dangerouslySetInnerHTML={{
                                                                   __html:
                                                                       data.question,
@@ -393,48 +393,13 @@ class LevelPreview extends Component {
                                                                                                   : "bg-light"
                                                                                           }`}
                                                                                       >
-                                                                                          <div className="card-body small py-3">
-                                                                                              {
-                                                                                                  options.content
-                                                                                              }
-                                                                                          </div>
-                                                                                      </div>
-                                                                                  </div>
-                                                                              </div>
-                                                                          );
-                                                                      }
-                                                                  )}
-                                                              </div>
-                                                          ) : (
-                                                              ""
-                                                          )}
-                                                          {data.content
-                                                              .fill_in ? (
-                                                              <div className="row">
-                                                                  {data.content.fillin_answer.map(
-                                                                      (
-                                                                          fill_in,
-                                                                          index
-                                                                      ) => {
-                                                                          return (
-                                                                              <div
-                                                                                  className="col-md-6"
-                                                                                  key={
-                                                                                      index
-                                                                                  }
-                                                                              >
-                                                                                  <div className="form-group">
-                                                                                      <div className="card form-shadow">
-                                                                                          <div className="card-body small py-3">
-                                                                                              {fill_in !==
-                                                                                              "" ? (
-                                                                                                  fill_in
-                                                                                              ) : (
-                                                                                                  <span className="text-muted">{`Answer 0${
-                                                                                                      index +
-                                                                                                      1
-                                                                                                  }`}</span>
-                                                                                              )}
+                                                                                          <div className="card-body small font-weight-bold-600 pt-3 pb-0">
+                                                                                              <div
+                                                                                                  dangerouslySetInnerHTML={{
+                                                                                                      __html:
+                                                                                                          options.content,
+                                                                                                  }}
+                                                                                              ></div>
                                                                                           </div>
                                                                                       </div>
                                                                                   </div>
@@ -469,7 +434,7 @@ class LevelPreview extends Component {
                                                                                                   : "bg-light"
                                                                                           }`}
                                                                                       >
-                                                                                          <div className="card-body small py-3">
+                                                                                          <div className="card-body small font-weight-bold-600 py-3">
                                                                                               {
                                                                                                   boolean.content
                                                                                               }
@@ -485,7 +450,9 @@ class LevelPreview extends Component {
                                                               ""
                                                           )}
                                                       </div>
-                                                      {/* image preview */}
+
+                                                      {/* ----- image preview ----- */}
+
                                                       <div className="ml-3">
                                                           {data.content.images.map(
                                                               (
@@ -567,8 +534,18 @@ class LevelPreview extends Component {
                                     className="btn btn-primary btn-sm shadow-none"
                                     onClick={this.handlePrev}
                                     disabled={
-                                        this.state.currentLevelIndex > 0
-                                            ? false
+                                        this.state.currentLevelIndex === 0
+                                            ? true
+                                            : this.state.levels[
+                                                  this.state.currentLevelIndex -
+                                                      1
+                                              ]
+                                            ? this.state.levels[
+                                                  this.state.currentLevelIndex -
+                                                      1
+                                              ].questions
+                                                ? false
+                                                : true
                                             : true
                                     }
                                 >
@@ -584,7 +561,17 @@ class LevelPreview extends Component {
                                         this.state.currentLevelIndex + 1 >=
                                         this.state.totalLevels
                                             ? true
-                                            : false
+                                            : this.state.levels[
+                                                  this.state.currentLevelIndex +
+                                                      1
+                                              ]
+                                            ? this.state.levels[
+                                                  this.state.currentLevelIndex +
+                                                      1
+                                              ].questions
+                                                ? false
+                                                : true
+                                            : true
                                     }
                                 >
                                     Next

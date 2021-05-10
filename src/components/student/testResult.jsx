@@ -83,7 +83,7 @@ function CycleTestAttempts(props) {
                     }}
                 >
                     <i
-                        className="fas fa-circle fa-lg mx-2"
+                        className="fas fa-circle fa-lg mx-3"
                         style={{
                             color: colorCondition(props.attempt),
                         }}
@@ -91,7 +91,7 @@ function CycleTestAttempts(props) {
                 </Link>
             ) : (
                 <i
-                    className="fas fa-circle fa-lg mx-2"
+                    className="fas fa-circle fa-lg mx-3"
                     style={{
                         color: "grey",
                     }}
@@ -144,7 +144,7 @@ function SemesterAttempts(props) {
                     }}
                 >
                     <i
-                        className="fas fa-circle fa-lg mx-2"
+                        className="fas fa-circle fa-lg mx-3"
                         style={{
                             color: colorCondition(props.attempt),
                         }}
@@ -152,7 +152,7 @@ function SemesterAttempts(props) {
                 </Link>
             ) : (
                 <i
-                    className="fas fa-circle fa-lg mx-2"
+                    className="fas fa-circle fa-lg mx-3"
                     style={{
                         color: "grey",
                     }}
