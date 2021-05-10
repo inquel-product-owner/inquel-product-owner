@@ -5,11 +5,39 @@ import AlertBox from "../sharedComponents/alert";
 import Loading from "../sharedComponents/loader";
 import { Document, Page, pdfjs } from "react-pdf";
 import dateFormat from "dateformat";
+import { Modal } from "react-bootstrap";
+
+const ExplanationModal = (props) => {
+    return (
+        <Modal
+            show={props.show}
+            onHide={props.onHide}
+            size="lg"
+            aria-labelledby="contained-modal-title-vcenter"
+            centered
+            scrollable
+        >
+            <Modal.Header closeButton>Explanation</Modal.Header>
+            <Modal.Body>
+                <div style={{ minHeight: "50vh" }}>
+                    <div
+                        dangerouslySetInnerHTML={{
+                            __html: props.data,
+                        }}
+                    ></div>
+                </div>
+            </Modal.Body>
+        </Modal>
+    );
+};
 
 class TestPreview extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            showExplanationModal: false,
+            selectedData: "",
+
             subject_name: "",
             section: [],
 
@@ -68,6 +96,7 @@ class TestPreview extends Component {
                                 question: section.questions[i].question,
                                 question_random_id:
                                     section.questions[i].question_random_id,
+                                explanation: section.questions[i].explanation,
                                 proper_answer:
                                     section.questions[i].proper_answer,
                                 answer: section.questions[i].answer,
@@ -110,6 +139,7 @@ class TestPreview extends Component {
                                 question: section.questions[i].question,
                                 question_random_id:
                                     section.questions[i].question_random_id,
+                                explanation: section.questions[i].explanation,
                                 sub_question: sub_question,
                             });
                         }
@@ -213,6 +243,13 @@ class TestPreview extends Component {
     goToNextPage = () =>
         this.setState((state) => ({ pageNumber: state.pageNumber + 1 }));
 
+    toggleModal = (data) => {
+        this.setState({
+            showExplanationModal: !this.state.showExplanationModal,
+            selectedData: data,
+        });
+    };
+
     render() {
         document.title = `${
             this.result.cycle_test_name || this.result.semester_name
@@ -232,7 +269,7 @@ class TestPreview extends Component {
                     goBack={this.props.history.goBack}
                 />
 
-                {/* ALert message */}
+                {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
                     successMsg={this.state.successMsg}
@@ -249,6 +286,17 @@ class TestPreview extends Component {
                         });
                     }}
                 />
+
+                {/* ----- Explanation modal ----- */}
+                {this.state.showExplanationModal ? (
+                    <ExplanationModal
+                        show={this.state.showExplanationModal}
+                        onHide={this.toggleModal}
+                        data={this.state.selectedData}
+                    />
+                ) : (
+                    ""
+                )}
 
                 <div className="exam-section">
                     <div className="container-fluid">
@@ -455,26 +503,40 @@ class TestPreview extends Component {
                                                                               <div className="form-group">
                                                                                   <div
                                                                                       className={`card shadow-sm ${
-                                                                                          question.answer.includes(
-                                                                                              option.content
-                                                                                                  ? option.content
-                                                                                                  : option
-                                                                                          )
+                                                                                          question.answer
+                                                                                              .map(
+                                                                                                  (
+                                                                                                      data
+                                                                                                  ) =>
+                                                                                                      data.toLowerCase()
+                                                                                              )
+                                                                                              .includes(
+                                                                                                  option.content
+                                                                                                      ? option.content
+                                                                                                      : option.toLowerCase()
+                                                                                              )
                                                                                               ? question.marks >
                                                                                                 0
                                                                                                   ? "success-bg 1"
+                                                                                                  : option.correct
+                                                                                                  ? "success-bg"
                                                                                                   : "danger-bg"
                                                                                               : option.correct
                                                                                               ? "success-bg"
                                                                                               : "bg-white"
                                                                                       }`}
                                                                                   >
-                                                                                      <div className="card-body small py-3">
-                                                                                          {option.content !==
-                                                                                          undefined
-                                                                                              ? option.content
-                                                                                              : option}
-                                                                                      </div>
+                                                                                      <div
+                                                                                          className="card-body small font-weight-bold-600 pt-3 pb-0"
+                                                                                          dangerouslySetInnerHTML={{
+                                                                                              __html: `<div class="mb-3">${
+                                                                                                  option.content !==
+                                                                                                  undefined
+                                                                                                      ? option.content
+                                                                                                      : option
+                                                                                              }</div>`,
+                                                                                          }}
+                                                                                      ></div>
                                                                                   </div>
                                                                               </div>
                                                                           </div>
@@ -485,54 +547,13 @@ class TestPreview extends Component {
 
                                                           {/* ---------- Student answers ---------- */}
 
-                                                          {/* <div className="row">
-                                                              <div className="col-md-6">
-                                                                  <div
-                                                                      className={`card card-body ${
-                                                                          question.marks ===
-                                                                          0
-                                                                              ? "danger-bg"
-                                                                              : "success-bg"
-                                                                      } h-100`}
-                                                                      style={{
-                                                                          minHeight:
-                                                                              "100px",
-                                                                      }}
-                                                                  >
-                                                                      <p className="font-weight-bold-600 mb-2">
-                                                                          Your
-                                                                          answer(s):
-                                                                      </p>
-                                                                      {question.answer.map(
-                                                                          (
-                                                                              answer,
-                                                                              answer_index
-                                                                          ) => {
-                                                                              return (
-                                                                                  <p
-                                                                                      className="small mb-2"
-                                                                                      key={
-                                                                                          answer_index
-                                                                                      }
-                                                                                  >
-                                                                                      {
-                                                                                          answer
-                                                                                      }
-                                                                                  </p>
-                                                                              );
-                                                                          }
-                                                                      )}
-                                                                  </div>
-                                                              </div>
-                                                          </div> */}
-
                                                           {question.marks ===
                                                               0 &&
                                                           question
                                                               .proper_answer[0]
                                                               .content ===
                                                               undefined ? (
-                                                              <div className="row">
+                                                              <div className="row mb-2">
                                                                   <div className="col-md-6">
                                                                       <div
                                                                           className="card card-body danger-bg h-100"
@@ -556,11 +577,10 @@ class TestPreview extends Component {
                                                                                           key={
                                                                                               answer_index
                                                                                           }
-                                                                                      >
-                                                                                          {
-                                                                                              answer
-                                                                                          }
-                                                                                      </p>
+                                                                                          dangerouslySetInnerHTML={{
+                                                                                              __html: answer,
+                                                                                          }}
+                                                                                      ></p>
                                                                                   );
                                                                               }
                                                                           )}
@@ -570,6 +590,20 @@ class TestPreview extends Component {
                                                           ) : (
                                                               ""
                                                           )}
+
+                                                          {/* ----- Explanation ----- */}
+
+                                                          <button
+                                                              className="btn btn-link btn-sm shadow-none"
+                                                              onClick={() =>
+                                                                  this.toggleModal(
+                                                                      question.explanation
+                                                                  )
+                                                              }
+                                                          >
+                                                              <i className="fas fa-info-circle mr-1"></i>{" "}
+                                                              Explanation
+                                                          </button>
                                                       </div>
                                                   </div>
                                               </div>
@@ -595,7 +629,7 @@ class TestPreview extends Component {
                                                               }}
                                                           ></div>
 
-                                                          <div className="row w-100">
+                                                          <div className="row w-100 mb-2">
                                                               {/* ---------- Student answers ---------- */}
                                                               <div className="col-md-5">
                                                                   <div
@@ -622,12 +656,13 @@ class TestPreview extends Component {
                                                                                               0
                                                                                                   ? "danger-bg"
                                                                                                   : "success-bg"
-                                                                                          } py-3 mb-2`}
+                                                                                          } pt-3 pb-0 mb-2`}
                                                                                       >
-                                                                                          {
-                                                                                              sub_answer
-                                                                                                  .answer[0]
-                                                                                          }
+                                                                                          <div
+                                                                                              dangerouslySetInnerHTML={{
+                                                                                                  __html: `<div class="mb-3">${sub_answer.answer[0]}</div>`,
+                                                                                              }}
+                                                                                          ></div>
                                                                                       </div>
                                                                                   );
                                                                               }
@@ -716,12 +751,17 @@ class TestPreview extends Component {
                                                                                                           : ""
                                                                                                   }`}
                                                                                               >
-                                                                                                  <div className="card-body small py-3">
-                                                                                                      {option.content !==
-                                                                                                      undefined
-                                                                                                          ? option.content
-                                                                                                          : option}
-                                                                                                  </div>
+                                                                                                  <div
+                                                                                                      className="card-body small font-weight-bold-600 pt-3 pb-0"
+                                                                                                      dangerouslySetInnerHTML={{
+                                                                                                          __html: `<div class="mb-3">${
+                                                                                                              option.content !==
+                                                                                                              undefined
+                                                                                                                  ? option.content
+                                                                                                                  : option
+                                                                                                          }</div>`,
+                                                                                                      }}
+                                                                                                  ></div>
                                                                                               </div>
                                                                                           </div>
                                                                                       );
@@ -818,6 +858,20 @@ class TestPreview extends Component {
                                                                   </div>
                                                               </div>
                                                           </div>
+
+                                                          {/* ----- Explanation ----- */}
+
+                                                          <button
+                                                              className="btn btn-link btn-sm shadow-none"
+                                                              onClick={() =>
+                                                                  this.toggleModal(
+                                                                      question.explanation
+                                                                  )
+                                                              }
+                                                          >
+                                                              <i className="fas fa-info-circle mr-1"></i>{" "}
+                                                              Explanation
+                                                          </button>
                                                       </div>
                                                   </div>
                                               </div>

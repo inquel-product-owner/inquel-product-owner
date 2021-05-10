@@ -517,7 +517,7 @@ class CycleAutoExam extends Component {
         this.setState({
             page_loading: true,
         });
-        clearInterval(this.timer)
+        clearInterval(this.timer);
 
         fetch(
             `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/cycletest/auto/`,
@@ -604,34 +604,38 @@ class CycleAutoExam extends Component {
     handleMCQ = (event, index, type) => {
         let sections = [...this.state.answerSection];
         if (type === "checkbox") {
-            if (event.target.checked) {
+            if (
                 sections[this.state.currentSectionIndex].questions[
                     index
-                ].answer.push(event.target.value);
-                this.setState({
-                    sections: sections,
-                });
-                localStorage.setItem("data", JSON.stringify(sections));
-            } else {
+                ].answer.includes(event)
+            ) {
                 sections[this.state.currentSectionIndex].questions[
                     index
                 ].answer.splice(
                     sections[this.state.currentSectionIndex].questions[
                         index
-                    ].answer.indexOf(event.target.value),
+                    ].answer.indexOf(event),
                     1
                 );
                 this.setState({
-                    sections: sections,
+                    answerSection: sections,
+                });
+                localStorage.setItem("data", JSON.stringify(sections));
+            } else {
+                sections[this.state.currentSectionIndex].questions[
+                    index
+                ].answer.push(event);
+                this.setState({
+                    answerSection: sections,
                 });
                 localStorage.setItem("data", JSON.stringify(sections));
             }
         } else if (type === "radio") {
             sections[this.state.currentSectionIndex].questions[
                 index
-            ].answer[0] = event.target.value;
+            ].answer[0] = event;
             this.setState({
-                sections: sections,
+                answerSection: sections,
             });
             localStorage.setItem("data", JSON.stringify(sections));
         }
@@ -644,7 +648,7 @@ class CycleAutoExam extends Component {
                 index
             ].answer[0] = event.target.value;
             this.setState({
-                sections: sections,
+                answerSection: sections,
             });
             localStorage.setItem("data", JSON.stringify(sections));
         } else {
@@ -652,7 +656,7 @@ class CycleAutoExam extends Component {
                 index
             ].answer = [];
             this.setState({
-                sections: sections,
+                answerSection: sections,
             });
             localStorage.setItem("data", JSON.stringify(sections));
         }
@@ -660,10 +664,11 @@ class CycleAutoExam extends Component {
 
     handleBoolean = (event, index) => {
         let sections = [...this.state.answerSection];
-        sections[this.state.currentSectionIndex].questions[index].answer[0] =
-            event.target.value;
+        sections[this.state.currentSectionIndex].questions[
+            index
+        ].answer[0] = event;
         this.setState({
-            sections: sections,
+            answerSection: sections,
         });
         localStorage.setItem("data", JSON.stringify(sections));
     };
@@ -674,22 +679,26 @@ class CycleAutoExam extends Component {
         event.dataTransfer.setData("data", data);
         event.dataTransfer.setData("index", index);
         var node = document.getElementById(event.target.id);
-        var crt = node.cloneNode(true);
-        crt.id = event.target.id + "-copy";
-        crt.classList.remove("light-bg");
-        crt.classList.add("ghost-card");
-        document.getElementById("root").appendChild(crt);
-        event.dataTransfer.setDragImage(crt, 0, 0);
+        if (node !== null) {
+            var crt = node.cloneNode(true);
+            crt.id = event.target.id + "-copy";
+            crt.classList.remove("light-bg");
+            crt.classList.add("ghost-card");
+            document.getElementById("root").appendChild(crt);
+            event.dataTransfer.setDragImage(crt, 0, 0);
+        }
     };
 
     handleDragEnd = (event) => {
         var id = event.target.id + "-copy";
         var node = document.getElementById(id);
-        node.parentNode.removeChild(node);
+        if (node !== null) {
+            node.parentNode.removeChild(node);
+        }
     };
 
-    handleDrop = (event) => {
-        const sections = [...this.state.answerSection];
+    handleDrop = async (event) => {
+        let sections = [...this.state.answerSection];
 
         var areaNode = document.getElementById("drop-area");
         areaNode.classList.toggle("over");
@@ -706,9 +715,10 @@ class CycleAutoExam extends Component {
             ].answer[0] = data;
         }
 
-        this.setState({
-            sections: sections,
+        await this.setState({
+            answerSection: sections,
         });
+        window.MathJax.typeset();
         localStorage.setItem("data", JSON.stringify(sections));
     };
 
@@ -723,7 +733,7 @@ class CycleAutoExam extends Component {
                 ][index]
             ].answer[0] = event.target.value;
             this.setState({
-                sections: sections,
+                answerSection: sections,
             });
             localStorage.setItem("data", JSON.stringify(sections));
         } else {
@@ -735,7 +745,7 @@ class CycleAutoExam extends Component {
                 ][index]
             ].answer = [];
             this.setState({
-                sections: sections,
+                answerSection: sections,
             });
             localStorage.setItem("data", JSON.stringify(sections));
         }
@@ -817,10 +827,7 @@ class CycleAutoExam extends Component {
 
     typeOneRender = (data, index, answerSection) => {
         return (
-            <div
-                className="d-flex align-items-start mb-3"
-                key={index}
-            >
+            <div className="d-flex align-items-start mb-3" key={index}>
                 <button className="btn btn-light light-bg btn-sm border-0 shadow-sm mr-1 px-3 font-weight-bold-600 rounded-lg">
                     {index <= 8 ? `0${index + 1}` : index + 1}
                 </button>
@@ -846,7 +853,20 @@ class CycleAutoExam extends Component {
                                                         className="col-md-6 mb-3"
                                                         key={option_index}
                                                     >
-                                                        <div className="card card-body secondary-bg shadow-sm p-3">
+                                                        <div
+                                                            className="card card-body secondary-bg shadow-sm small font-weight-bold-600 pt-3 pb-0"
+                                                            onClick={() =>
+                                                                this.handleMCQ(
+                                                                    option.content,
+                                                                    index,
+                                                                    data.content
+                                                                        .mcq_answers >
+                                                                        1
+                                                                        ? "checkbox"
+                                                                        : "radio"
+                                                                )
+                                                            }
+                                                        >
                                                             {data.content
                                                                 .mcq_answers !==
                                                             undefined ? (
@@ -861,15 +881,6 @@ class CycleAutoExam extends Component {
                                                                             value={
                                                                                 option.content
                                                                             }
-                                                                            onChange={(
-                                                                                event
-                                                                            ) =>
-                                                                                this.handleMCQ(
-                                                                                    event,
-                                                                                    index,
-                                                                                    "checkbox"
-                                                                                )
-                                                                            }
                                                                             checked={
                                                                                 answerSection.length !==
                                                                                 0
@@ -889,15 +900,17 @@ class CycleAutoExam extends Component {
                                                                                         : false
                                                                                     : false
                                                                             }
+                                                                            onChange={(
+                                                                                e
+                                                                            ) => {}}
                                                                         />
                                                                         <label
                                                                             className="custom-control-label"
                                                                             htmlFor={`customCheck1${index}-${option_index}`}
-                                                                        >
-                                                                            {
-                                                                                option.content
-                                                                            }
-                                                                        </label>
+                                                                            dangerouslySetInnerHTML={{
+                                                                                __html: `<div class="mb-3">${option.content}</div>`,
+                                                                            }}
+                                                                        ></label>
                                                                     </div>
                                                                 ) : (
                                                                     <div className="custom-control custom-radio">
@@ -909,15 +922,6 @@ class CycleAutoExam extends Component {
                                                                             value={
                                                                                 option.content
                                                                             }
-                                                                            onChange={(
-                                                                                event
-                                                                            ) =>
-                                                                                this.handleMCQ(
-                                                                                    event,
-                                                                                    index,
-                                                                                    "radio"
-                                                                                )
-                                                                            }
                                                                             checked={
                                                                                 answerSection.length !==
                                                                                 0
@@ -937,15 +941,17 @@ class CycleAutoExam extends Component {
                                                                                         : false
                                                                                     : false
                                                                             }
+                                                                            onChange={(
+                                                                                e
+                                                                            ) => {}}
                                                                         />
                                                                         <label
                                                                             className="custom-control-label"
                                                                             htmlFor={`customRadio1${index}-${option_index}`}
-                                                                        >
-                                                                            {
-                                                                                option.content
-                                                                            }
-                                                                        </label>
+                                                                            dangerouslySetInnerHTML={{
+                                                                                __html: `<div class="mb-3">${option.content}</div>`,
+                                                                            }}
+                                                                        ></label>
                                                                     </div>
                                                                 )
                                                             ) : (
@@ -965,7 +971,15 @@ class CycleAutoExam extends Component {
                                                         className="col-md-6 mb-3"
                                                         key={boolean_index}
                                                     >
-                                                        <div className="card card-body secondary-bg shadow-sm p-3">
+                                                        <div
+                                                            className="card card-body secondary-bg shadow-sm small font-weight-bold-600 p-3"
+                                                            onClick={() =>
+                                                                this.handleBoolean(
+                                                                    option.content,
+                                                                    index
+                                                                )
+                                                            }
+                                                        >
                                                             <div className="custom-control custom-radio">
                                                                 <input
                                                                     type="radio"
@@ -974,14 +988,6 @@ class CycleAutoExam extends Component {
                                                                     className="custom-control-input"
                                                                     value={
                                                                         option.content
-                                                                    }
-                                                                    onChange={(
-                                                                        event
-                                                                    ) =>
-                                                                        this.handleBoolean(
-                                                                            event,
-                                                                            index
-                                                                        )
                                                                     }
                                                                     checked={
                                                                         answerSection.length !==
@@ -1002,6 +1008,9 @@ class CycleAutoExam extends Component {
                                                                                 : false
                                                                             : false
                                                                     }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) => {}}
                                                                 />
                                                                 <label
                                                                     className="custom-control-label"
@@ -1146,12 +1155,12 @@ class CycleAutoExam extends Component {
                                                                               answer_index
                                                                           }
                                                                       >
-                                                                          <div className="card-body small font-weight-bold-600 primary-text py-3">
-                                                                              {
-                                                                                  sub_answer
-                                                                                      .answer[0]
-                                                                              }
-                                                                          </div>
+                                                                          <div
+                                                                              className="card-body small font-weight-bold-600 primary-text pt-3 pb-0"
+                                                                              dangerouslySetInnerHTML={{
+                                                                                  __html: `<div class="mb-3">${sub_answer.answer[0]}</div>`,
+                                                                              }}
+                                                                          ></div>
                                                                       </div>
                                                                   ) : (
                                                                       ""
@@ -1239,11 +1248,12 @@ class CycleAutoExam extends Component {
                                                                       }
                                                                       draggable
                                                                   >
-                                                                      <div className="card-body small font-weight-bold-600 primary-text py-3">
-                                                                          {
-                                                                              options.content
-                                                                          }
-                                                                      </div>
+                                                                      <div
+                                                                          className="card-body small font-weight-bold-600 primary-text pt-3 pb-0"
+                                                                          dangerouslySetInnerHTML={{
+                                                                              __html: `<div class="mb-3">${options.content}</div>`,
+                                                                          }}
+                                                                      ></div>
                                                                   </div>
                                                               );
                                                           }

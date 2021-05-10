@@ -4,7 +4,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
-import CKeditor from "../../sharedComponents/CKeditor";
+import CKeditor, { OptionEditor } from "../../sharedComponents/CKeditor";
 import ReactSwitch from "../../sharedComponents/switchComponent";
 import { Accordion, Card } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
@@ -916,14 +916,15 @@ class Type2 extends Component {
         }
     };
 
-    handleOptionChange = (index, event) => {
+    handleOptionChange = async (index, event) => {
         const values = [...this.state.questions];
         values[this.state.activeQuestion].sub_question[
             this.state.activeSubQuestion
-        ].options[index].content = event.target.value;
-        this.setState({
+        ].options[index].content = event.editor.getData();
+        await this.setState({
             questions: values,
         });
+        window.MathJax.typeset();
     };
 
     handleAddOptionFields = () => {
@@ -2563,22 +2564,22 @@ class Type2 extends Component {
                                                                     ? "border-primary"
                                                                     : ""
                                                             }`}
+                                                            style={{
+                                                                minHeight:
+                                                                    "115px",
+                                                            }}
                                                         >
                                                             <div className="card-body">
                                                                 <div className="row">
                                                                     {/* Questions */}
                                                                     <div className="col-11 pr-md-0">
-                                                                        <div className="form-group">
-                                                                            <div className="card">
-                                                                                <div
-                                                                                    className="card-body py-2"
-                                                                                    dangerouslySetInnerHTML={{
-                                                                                        __html:
-                                                                                            question.question,
-                                                                                    }}
-                                                                                ></div>
-                                                                            </div>
-                                                                        </div>
+                                                                        <div
+                                                                            className="pb-2"
+                                                                            dangerouslySetInnerHTML={{
+                                                                                __html:
+                                                                                    question.question,
+                                                                            }}
+                                                                        ></div>
                                                                     </div>
 
                                                                     {/* File modal button */}
@@ -2719,16 +2720,14 @@ class Type2 extends Component {
                                                                             }`}
                                                                         >
                                                                             <div className="card-body">
-                                                                                <div className="form-group">
-                                                                                    <div className="card pl-3">
-                                                                                        <div
-                                                                                            dangerouslySetInnerHTML={{
-                                                                                                __html:
-                                                                                                    sub_question.question,
-                                                                                            }}
-                                                                                        ></div>
-                                                                                    </div>
-                                                                                </div>
+                                                                                <div
+                                                                                    className="pb-2"
+                                                                                    dangerouslySetInnerHTML={{
+                                                                                        __html:
+                                                                                            sub_question.question,
+                                                                                    }}
+                                                                                ></div>
+
                                                                                 {sub_question.mcq ? (
                                                                                     <div className="row">
                                                                                         {sub_question.options.map(
@@ -2751,16 +2750,19 @@ class Type2 extends Component {
                                                                                                                         : "bg-light"
                                                                                                                 }`}
                                                                                                             >
-                                                                                                                <div className="card-body small py-2">
-                                                                                                                    {options.content !==
-                                                                                                                    "" ? (
-                                                                                                                        options.content
-                                                                                                                    ) : (
-                                                                                                                        <span className="text-muted">{`Option 0${
-                                                                                                                            index +
-                                                                                                                            1
-                                                                                                                        }`}</span>
-                                                                                                                    )}
+                                                                                                                <div className="card-body small font-weight-bold-600 pt-3 pb-0">
+                                                                                                                    <div
+                                                                                                                        dangerouslySetInnerHTML={{
+                                                                                                                            __html:
+                                                                                                                                options.content !==
+                                                                                                                                ""
+                                                                                                                                    ? options.content
+                                                                                                                                    : `<p class="text-muted">Option 0${
+                                                                                                                                          index +
+                                                                                                                                          1
+                                                                                                                                      }</p>`,
+                                                                                                                        }}
+                                                                                                                    ></div>
                                                                                                                 </div>
                                                                                                             </div>
                                                                                                         </div>
@@ -2788,7 +2790,7 @@ class Type2 extends Component {
                                                                                                     >
                                                                                                         <div className="form-group">
                                                                                                             <div className="card shadow-sm bg-light">
-                                                                                                                <div className="card-body small py-2">
+                                                                                                                <div className="card-body small font-weight-bold-600 py-3">
                                                                                                                     {fill_in !==
                                                                                                                     "" ? (
                                                                                                                         fill_in
@@ -4056,54 +4058,38 @@ class Type2 extends Component {
                                                                         >
                                                                             <div className="col-10 mb-2 pr-0">
                                                                                 <div
-                                                                                    className="input-group border-secondary"
+                                                                                    className="d-flex border-secondary"
                                                                                     style={{
                                                                                         borderRadius:
-                                                                                            "6px",
+                                                                                            "4px",
                                                                                     }}
                                                                                 >
-                                                                                    <input
-                                                                                        type="text"
-                                                                                        className="form-control form-control-sm"
-                                                                                        id={`option${index}`}
-                                                                                        name="option"
-                                                                                        placeholder={`Option 0${
-                                                                                            index +
-                                                                                            1
-                                                                                        }`}
-                                                                                        value={
-                                                                                            options.content
-                                                                                        }
-                                                                                        onChange={(
-                                                                                            event
-                                                                                        ) =>
-                                                                                            this.handleOptionChange(
-                                                                                                index,
+                                                                                    <div className="w-100">
+                                                                                        <OptionEditor
+                                                                                            data={
+                                                                                                options.content
+                                                                                            }
+                                                                                            onChange={(
                                                                                                 event
+                                                                                            ) =>
+                                                                                                this.handleOptionChange(
+                                                                                                    index,
+                                                                                                    event
+                                                                                                )
+                                                                                            }
+                                                                                        />
+                                                                                    </div>
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        className="btn btn-light btn-sm shadow-none font-weight-bold"
+                                                                                        onClick={() =>
+                                                                                            this.handleRemoveOptionFields(
+                                                                                                index
                                                                                             )
                                                                                         }
-                                                                                        autoComplete="off"
-                                                                                        required
-                                                                                    />
-                                                                                    <div className="input-group-append">
-                                                                                        <div
-                                                                                            className="btn-group"
-                                                                                            role="group"
-                                                                                            aria-label="Basic example"
-                                                                                        >
-                                                                                            <button
-                                                                                                type="button"
-                                                                                                className="btn btn-light btn-sm shadow-none font-weight-bold"
-                                                                                                onClick={() =>
-                                                                                                    this.handleRemoveOptionFields(
-                                                                                                        index
-                                                                                                    )
-                                                                                                }
-                                                                                            >
-                                                                                                -
-                                                                                            </button>
-                                                                                        </div>
-                                                                                    </div>
+                                                                                    >
+                                                                                        -
+                                                                                    </button>
                                                                                 </div>
                                                                             </div>
                                                                             <div className="col-2 mb-2">

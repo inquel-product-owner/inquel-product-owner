@@ -143,17 +143,23 @@ class QuizLevel extends Component {
         });
     };
 
-    handleMaxPoint = (event, index, type) => {
+    handleTotalPoints = (event, index, type) => {
         let total_points = 0;
         let data = [...this.state.quiz];
         data[index][type] = event.target.value;
-        for (let i = 0; i < data.length; i++) {
-            total_points += Number(data[i].max_points);
-        }
-        this.setState({
-            quiz: data,
-            total_points: total_points,
-        });
+        this.setState(
+            {
+                quiz: data,
+            },
+            () => {
+                if (index === 2) {
+                    total_points = event.target.value;
+                    this.setState({
+                        total_points: total_points,
+                    });
+                }
+            }
+        );
     };
 
     handleSubmit = (index) => {
@@ -189,12 +195,6 @@ class QuizLevel extends Component {
                 showErrorAlert: true,
                 page_loading: false,
             });
-        } else if (quiz[index].min_points === "") {
-            this.setState({
-                errorMsg: "Enter the min points",
-                showErrorAlert: true,
-                page_loading: false,
-            });
         } else if (quiz[index].bonus_points === "") {
             this.setState({
                 errorMsg: "Enter the bonus points",
@@ -225,7 +225,10 @@ class QuizLevel extends Component {
                         points: quiz[index].points_per_question.toString(),
                         total_questions: quiz[index].total_questions.toString(),
                         max_points: quiz[index].max_points.toString(),
-                        min_points: quiz[index].min_points.toString(),
+                        min_points:
+                            index === 0
+                                ? "0"
+                                : quiz[index - 1].max_points.toString(),
                         bonus_points: quiz[index].bonus_points.toString(),
                         time_for_bonus: quiz[
                             index
@@ -631,7 +634,16 @@ class QuizLevel extends Component {
                                                                           type="text"
                                                                           className="form-control form-control-sm border-secondary text-center"
                                                                           value={
-                                                                              quiz.min_points
+                                                                              index ===
+                                                                              0
+                                                                                  ? index
+                                                                                  : this
+                                                                                        .state
+                                                                                        .quiz[
+                                                                                        index -
+                                                                                            1
+                                                                                    ]
+                                                                                        .max_points
                                                                           }
                                                                           onChange={(
                                                                               event
@@ -642,7 +654,7 @@ class QuizLevel extends Component {
                                                                                   "min_points"
                                                                               )
                                                                           }
-                                                                          required
+                                                                          disabled
                                                                       />
                                                                   </div>
                                                                   <div className="col-6">
@@ -655,7 +667,7 @@ class QuizLevel extends Component {
                                                                           onChange={(
                                                                               event
                                                                           ) =>
-                                                                              this.handleMaxPoint(
+                                                                              this.handleTotalPoints(
                                                                                   event,
                                                                                   index,
                                                                                   "max_points"
@@ -748,17 +760,7 @@ class QuizLevel extends Component {
                                                                       <i className="fas fa-ellipsis-h"></i>
                                                                   </Dropdown.Toggle>
 
-                                                                  <Dropdown.Menu
-                                                                      className={`${
-                                                                          this
-                                                                              .state
-                                                                              .quiz
-                                                                              .length <=
-                                                                          2
-                                                                              ? "position-fixed"
-                                                                              : "position-absolute"
-                                                                      }`}
-                                                                  >
+                                                                  <Dropdown.Menu>
                                                                       <Dropdown.Item
                                                                           onClick={() => {
                                                                               this.handleSubmit(
@@ -775,6 +777,7 @@ class QuizLevel extends Component {
                                                                                   quiz.level_id
                                                                               );
                                                                           }}
+                                                                          disabled={quiz.questions ? false:true}
                                                                       >
                                                                           <i className="far fa-eye fa-sm mr-1"></i>{" "}
                                                                           View

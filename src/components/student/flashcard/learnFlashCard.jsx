@@ -548,22 +548,22 @@ class FlashCard extends Component {
     handleMCQ = (event, index, type) => {
         let sections = [...this.state.sections];
         if (type === "checkbox") {
-            if (event.target.checked) {
-                sections[index].answers.push(event.target.value);
-                this.setState({
-                    sections: sections,
-                });
-            } else {
+            if (sections[index].answers.includes(event)) {
                 sections[index].answers.splice(
-                    sections[index].answers.indexOf(event.target.value),
+                    sections[index].answers.indexOf(event),
                     1
                 );
                 this.setState({
                     sections: sections,
                 });
+            } else {
+                sections[index].answers.push(event);
+                this.setState({
+                    sections: sections,
+                });
             }
         } else if (type === "radio") {
-            sections[index].answers[0] = event.target.value;
+            sections[index].answers[0] = event;
             this.setState({
                 sections: sections,
             });
@@ -599,7 +599,7 @@ class FlashCard extends Component {
 
     handleBoolean = (event, index) => {
         let sections = [...this.state.sections];
-        sections[index].answers[0] = event.target.value;
+        sections[index].answers[0] = event;
         this.setState({
             sections: sections,
         });
@@ -727,11 +727,10 @@ class FlashCard extends Component {
                                                                               key={
                                                                                   index
                                                                               }
-                                                                          >
-                                                                              {
-                                                                                  data
-                                                                              }
-                                                                          </p>
+                                                                              dangerouslySetInnerHTML={{
+                                                                                  __html: data,
+                                                                              }}
+                                                                          ></p>
                                                                       );
                                                                   }
                                                               )
@@ -750,11 +749,10 @@ class FlashCard extends Component {
                                                                               key={
                                                                                   index
                                                                               }
-                                                                          >
-                                                                              {
-                                                                                  data
-                                                                              }
-                                                                          </p>
+                                                                              dangerouslySetInnerHTML={{
+                                                                                  __html: data,
+                                                                              }}
+                                                                          ></p>
                                                                       );
                                                                   }
                                                               )
@@ -787,11 +785,10 @@ class FlashCard extends Component {
                                                                                   key={
                                                                                       index
                                                                                   }
-                                                                              >
-                                                                                  {
-                                                                                      data
-                                                                                  }
-                                                                              </p>
+                                                                                  dangerouslySetInnerHTML={{
+                                                                                      __html: data,
+                                                                                  }}
+                                                                              ></p>
                                                                           );
                                                                       }
                                                                   )
@@ -814,9 +811,23 @@ class FlashCard extends Component {
                                                     (option, option_index) => {
                                                         return (
                                                             <div
-                                                                className="card shadow-sm mb-2 bg-light card-body small font-weight-bold-600 py-3"
+                                                                className="card shadow-sm mb-2 bg-light card-body small font-weight-bold-600 pt-3 pb-0"
                                                                 key={
                                                                     option_index
+                                                                }
+                                                                onClick={() =>
+                                                                    this.handleMCQ(
+                                                                        option.content,
+                                                                        index,
+                                                                        data[
+                                                                            index
+                                                                        ]
+                                                                            .content
+                                                                            .mcq_answers >
+                                                                            1
+                                                                            ? "checkbox"
+                                                                            : "radio"
+                                                                    )
                                                                 }
                                                             >
                                                                 {data[index]
@@ -831,15 +842,6 @@ class FlashCard extends Component {
                                                                             value={
                                                                                 option.content
                                                                             }
-                                                                            onChange={(
-                                                                                event
-                                                                            ) =>
-                                                                                this.handleMCQ(
-                                                                                    event,
-                                                                                    index,
-                                                                                    "checkbox"
-                                                                                )
-                                                                            }
                                                                             checked={
                                                                                 section.length !==
                                                                                 0
@@ -855,15 +857,17 @@ class FlashCard extends Component {
                                                                                         : false
                                                                                     : false
                                                                             }
+                                                                            onChange={(
+                                                                                e
+                                                                            ) => {}}
                                                                         />
                                                                         <label
                                                                             className="custom-control-label"
                                                                             htmlFor={`option_${option_index}`}
-                                                                        >
-                                                                            {
-                                                                                option.content
-                                                                            }
-                                                                        </label>
+                                                                            dangerouslySetInnerHTML={{
+                                                                                __html: `<div class="mb-3">${option.content}</div>`,
+                                                                            }}
+                                                                        ></label>
                                                                     </div>
                                                                 ) : (
                                                                     <div className="custom-control custom-radio">
@@ -875,15 +879,6 @@ class FlashCard extends Component {
                                                                             value={
                                                                                 option.content
                                                                             }
-                                                                            onChange={(
-                                                                                event
-                                                                            ) =>
-                                                                                this.handleMCQ(
-                                                                                    event,
-                                                                                    index,
-                                                                                    "radio"
-                                                                                )
-                                                                            }
                                                                             checked={
                                                                                 section.length !==
                                                                                 0
@@ -899,15 +894,17 @@ class FlashCard extends Component {
                                                                                         : false
                                                                                     : false
                                                                             }
+                                                                            onChange={(
+                                                                                e
+                                                                            ) => {}}
                                                                         />
                                                                         <label
                                                                             className="custom-control-label"
                                                                             htmlFor={`customRadio${index}-${option_index}`}
-                                                                        >
-                                                                            {
-                                                                                option.content
-                                                                            }
-                                                                        </label>
+                                                                            dangerouslySetInnerHTML={{
+                                                                                __html: `<div class="mb-3">${option.content}</div>`,
+                                                                            }}
+                                                                        ></label>
                                                                     </div>
                                                                 )}
                                                             </div>
@@ -927,6 +924,12 @@ class FlashCard extends Component {
                                                                 key={
                                                                     boolean_index
                                                                 }
+                                                                onClick={() =>
+                                                                    this.handleBoolean(
+                                                                        option.content,
+                                                                        index
+                                                                    )
+                                                                }
                                                             >
                                                                 <div className="custom-control custom-radio">
                                                                     <input
@@ -936,14 +939,6 @@ class FlashCard extends Component {
                                                                         className="custom-control-input"
                                                                         value={
                                                                             option.content
-                                                                        }
-                                                                        onChange={(
-                                                                            event
-                                                                        ) =>
-                                                                            this.handleBoolean(
-                                                                                event,
-                                                                                index
-                                                                            )
                                                                         }
                                                                         checked={
                                                                             section.length !==
@@ -960,6 +955,9 @@ class FlashCard extends Component {
                                                                                     : false
                                                                                 : false
                                                                         }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) => {}}
                                                                     />
                                                                     <label
                                                                         className="custom-control-label"
@@ -1051,7 +1049,7 @@ class FlashCard extends Component {
                                                                 );
                                                             }}
                                                         >
-                                                            Check1
+                                                            Check
                                                         </button>
                                                     </div>
                                                 </div>
@@ -1070,7 +1068,7 @@ class FlashCard extends Component {
                                                             );
                                                         }}
                                                     >
-                                                        Check2
+                                                        Check
                                                     </button>
                                                 </div>
                                             </div>
@@ -1103,22 +1101,26 @@ class FlashCard extends Component {
         event.dataTransfer.setData("data", data);
         event.dataTransfer.setData("index", index);
         var node = document.getElementById(event.target.id);
-        var crt = node.cloneNode(true);
-        crt.id = event.target.id + "-copy";
-        crt.classList.remove("light-bg");
-        crt.classList.add("ghost-card");
-        document.getElementById("root").appendChild(crt);
-        event.dataTransfer.setDragImage(crt, 0, 0);
+        if (node !== null) {
+            var crt = node.cloneNode(true);
+            crt.id = event.target.id + "-copy";
+            crt.classList.remove("light-bg");
+            crt.classList.add("ghost-card");
+            document.getElementById("root").appendChild(crt);
+            event.dataTransfer.setDragImage(crt, 0, 0);
+        }
     };
 
     handleDragEnd = (event) => {
         var id = event.target.id + "-copy";
         var node = document.getElementById(id);
-        node.parentNode.removeChild(node);
+        if (node !== null) {
+            node.parentNode.removeChild(node);
+        }
     };
 
-    handleDrop = (event) => {
-        const sections = [...this.state.sections];
+    handleDrop = async (event) => {
+        let sections = [...this.state.sections];
 
         var areaNode = document.getElementById("drop-area");
         areaNode.classList.toggle("over");
@@ -1131,9 +1133,10 @@ class FlashCard extends Component {
             ].answers[0] = data;
         }
 
-        this.setState({
+        await this.setState({
             sections: sections,
         });
+        window.MathJax.typeset();
     };
 
     handleDragEnter = (event) => {
@@ -1208,9 +1211,12 @@ class FlashCard extends Component {
                                                     }`}
                                                     key={index}
                                                 >
-                                                    <div className="card-body small font-weight-bold-600 py-3">
-                                                        {data.answers[0]}
-                                                    </div>
+                                                    <div
+                                                        className="card-body small font-weight-bold-600 pt-3 pb-0"
+                                                        dangerouslySetInnerHTML={{
+                                                            __html: `<div class="mb-3">${data.answers[0]}</div>`,
+                                                        }}
+                                                    ></div>
                                                 </div>
                                             ) : (
                                                 ""
@@ -1288,6 +1294,7 @@ class FlashCard extends Component {
                                                                 ]
                                                             ].question,
                                                     }}
+                                                    draggable={false}
                                                 ></div>
                                             </div>
                                             {/* Multiple choice question */}
@@ -1336,11 +1343,12 @@ class FlashCard extends Component {
                                                                   }
                                                                   draggable
                                                               >
-                                                                  <div className="card-body small font-weight-bold-600 primary-text py-3">
-                                                                      {
-                                                                          options.content
-                                                                      }
-                                                                  </div>
+                                                                  <div
+                                                                      className="card-body small font-weight-bold-600 primary-text pt-3 pb-0"
+                                                                      dangerouslySetInnerHTML={{
+                                                                          __html: `<div class="mb-3">${options.content}</div>`,
+                                                                      }}
+                                                                  ></div>
                                                               </div>
                                                           );
                                                       }
@@ -1528,10 +1536,10 @@ class FlashCard extends Component {
                             explanation[this.state.activeData].sub_question[
                                 i
                             ].answer = result.data.sub_question[i].answer;
-                            explanation[this.state.activeData].sub_question[
-                                i
-                            ].answers =
-                                result.data.sub_question[i].data.answers;
+                            // explanation[this.state.activeData].sub_question[
+                            //     i
+                            // ].answers =
+                            //     result.data.sub_question[i].data.answers;
                         }
                         this.setState({
                             page_loading: false,
@@ -1870,6 +1878,10 @@ class FlashCard extends Component {
 
     componentDidMount = () => {
         this.loadConceptData();
+        this.setState({
+            practice: [],
+            concepts: [],
+        });
 
         fetch(`${this.url}/student/subject/${this.subjectId}/`, {
             method: "GET",
