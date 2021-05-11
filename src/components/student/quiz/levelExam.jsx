@@ -8,6 +8,103 @@ import "react-awesome-lightbox/build/style.css";
 import fernet from "fernet";
 import { Type1DataFormat } from "../../sharedComponents/dataFormating";
 import { Link } from "react-router-dom";
+import { Modal } from "react-bootstrap";
+
+class QuizCountDown extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            second: 3,
+        };
+        this.timer = 0;
+    }
+
+    componentDidMount = () => {
+        this.timer = setInterval(this.countDown, 1000);
+    };
+
+    countDown = () => {
+        this.setState({
+            second: this.state.second - 1,
+        });
+
+        if (this.state.second === -1) {
+            clearInterval(this.timer);
+            this.props.onHide();
+        }
+    };
+
+    render() {
+        return (
+            <Modal
+                show={this.props.show}
+                onHide={this.props.onHide}
+                size="sm"
+                aria-labelledby="contained-modal-title-vcenter"
+                backdrop="static"
+                keyboard={false}
+                centered
+            >
+                <Modal.Body className="text-center">
+                    <h4 className="primary-text mt-3">Get Ready</h4>
+                    <p className="font-weight-bold-600 mb-4">
+                        Your quiz is going to start in
+                    </p>
+                    <p className="display-4 font-weight-bold-600 primary-text mb-2">
+                        {this.state.second}
+                    </p>
+                    <p className="font-weight-bold-600 mb-3">Seconds</p>
+                </Modal.Body>
+            </Modal>
+        );
+    }
+}
+
+const SuccessDIV = (props) => {
+    console.log(props);
+    return (
+        <div className="w-100 mt-auto">
+            <div className="row justify-content-center">
+                <div className="col-lg-3 col-md-5">
+                    <div className="card card-body text-center border border-success success-bg p-1">
+                        <p className="small font-weight-bold-600 align-items-center mb-1">
+                            <i className="fas fa-check-circle mr-1"></i> Right
+                            answer!
+                        </p>
+                        <p className="small mb-1">
+                            {props.level.points_per_question} Points
+                        </p>
+                        <p className="small mb-1">
+                            Bonus Points {props.bonus_points}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const DangerDIV = (props) => {
+    return (
+        <div className="w-100 mt-auto">
+            <div className="row justify-content-center">
+                <div className="col-lg-3 col-md-5">
+                    <div className="card card-body text-center border border-danger danger-bg p-1">
+                        <p className="small font-weight-bold-600 align-items-center mb-1">
+                            <i className="fas fa-times-circle mr-1"></i> Wrong
+                            answer!
+                        </p>
+                        <p className="small mb-0">
+                            {props.quiz.negative_points === true
+                                ? `-${props.level.points_per_question} Points`
+                                : `0 Points`}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 class QuizLevelExam extends Component {
     constructor(props) {
@@ -41,8 +138,10 @@ class QuizLevelExam extends Component {
             showSuccessAlert: false,
             page_loading: true,
 
+            showCountdownModal: false,
             isAnswerSubmitted: false,
             showQuestionReview: false,
+            showOptions: false,
         };
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
@@ -95,11 +194,11 @@ class QuizLevelExam extends Component {
                             currentLevel = index;
                         }
                     });
+                    // result.data.negative_points = true;
                     this.setState(
                         {
                             quiz: result.data,
                             currentLevel: currentLevel,
-                            // total_points: result.data.scored_points,
                             level: level,
                         },
                         () => {
@@ -154,7 +253,7 @@ class QuizLevelExam extends Component {
                             page_loading: false,
                         },
                         () => {
-                            this.startTimer();
+                            // this.startTimer();
                             this.loopAnswerSection();
                         }
                     );
@@ -172,6 +271,10 @@ class QuizLevelExam extends Component {
     };
 
     componentDidMount = () => {
+        this.setState({
+            showCountdownModal: true,
+        });
+
         fetch(`${this.url}/student/subject/${this.subjectId}/`, {
             method: "GET",
             headers: this.headers,
@@ -237,9 +340,45 @@ class QuizLevelExam extends Component {
             }
         }
         if (type === "checkbox") {
-            if (sections[index].answer.includes(event)) {
+            if (event.target.checked) {
+                sections[index].answer.push(event.target.value);
+                this.setState(
+                    {
+                        answer: sections,
+                    },
+                    () => {
+                        sections[index].isCorrect = this.equalsIgnoreOrder(
+                            answer,
+                            sections[index].answer
+                        );
+                        this.setState(
+                            {
+                                answer: sections,
+                            },
+                            () => {
+                                // Pagination and submitting of data
+                                if (
+                                    this.state.question[
+                                        this.state.currentQuestion
+                                    ].content.mcq_answers ===
+                                    sections[index].answer.length
+                                ) {
+                                    if (
+                                        this.state.currentQuestion + 1 ===
+                                        this.state.question.length
+                                    ) {
+                                        this.handleSubmit();
+                                    } else {
+                                        this.handleNext();
+                                    }
+                                }
+                            }
+                        );
+                    }
+                );
+            } else {
                 sections[index].answer.splice(
-                    sections[index].answer.indexOf(event),
+                    sections[index].answer.indexOf(event.target.value),
                     1
                 );
                 this.setState(
@@ -251,64 +390,55 @@ class QuizLevelExam extends Component {
                             answer,
                             sections[index].answer
                         );
-                        this.setState({
-                            answer: sections,
-                        });
-                    }
-                );
-            } else {
-                sections[index].answer.push(event);
-                this.setState(
-                    {
-                        answer: sections,
-                    },
-                    () => {
-                        sections[index].isCorrect = this.equalsIgnoreOrder(
-                            answer,
-                            sections[index].answer
+                        this.setState(
+                            {
+                                answer: sections,
+                            },
+                            () => {
+                                // Pagination and submitting of data
+                                if (
+                                    this.state.question[
+                                        this.state.currentQuestion
+                                    ].content.mcq_answers ===
+                                    sections[index].answer.length
+                                ) {
+                                    if (
+                                        this.state.currentQuestion + 1 ===
+                                        this.state.question.length
+                                    ) {
+                                        this.handleSubmit();
+                                    } else {
+                                        this.handleNext();
+                                    }
+                                }
+                            }
                         );
-                        this.setState({
-                            answer: sections,
-                        });
                     }
                 );
             }
         } else if (type === "radio") {
-            sections[index].answer[0] = event;
-            if (answer.includes(event)) {
+            sections[index].answer[0] = event.target.value;
+            if (answer.includes(event.target.value)) {
                 sections[index].isCorrect = true;
             } else {
                 sections[index].isCorrect = false;
             }
-            this.setState({
-                answer: sections,
-            });
-        }
-
-        // Pagination and submitting of data
-        if (
-            this.state.question[this.state.currentQuestion].content
-                .mcq_answers > 0
-        ) {
-            if (
-                this.state.question[this.state.currentQuestion].content
-                    .mcq_answers === sections[index].answer.length
-            ) {
-                if (
-                    this.state.currentQuestion + 1 ===
-                    this.state.question.length
-                ) {
-                    this.handleSubmit();
-                } else {
-                    this.handleNext();
+            this.setState(
+                {
+                    answer: sections,
+                },
+                () => {
+                    // Pagination and submitting of data
+                    if (
+                        this.state.currentQuestion + 1 ===
+                        this.state.question.length
+                    ) {
+                        this.handleSubmit();
+                    } else {
+                        this.handleNext();
+                    }
                 }
-            }
-        } else {
-            if (this.state.currentQuestion + 1 === this.state.question.length) {
-                this.handleSubmit();
-            } else {
-                this.handleNext();
-            }
+            );
         }
     };
 
@@ -316,7 +446,7 @@ class QuizLevelExam extends Component {
         let sections = [...this.state.answer];
         let question = [...this.state.question];
         let answer = [];
-        sections[index].answer[0] = event;
+        sections[index].answer[0] = event.target.value;
         for (
             let i = 0;
             i < question[index].content.boolean_question.length;
@@ -328,21 +458,27 @@ class QuizLevelExam extends Component {
                 );
             }
         }
-        if (answer.includes(event)) {
+        if (answer.includes(event.target.value)) {
             sections[index].isCorrect = true;
         } else {
             sections[index].isCorrect = false;
         }
-        this.setState({
-            answer: sections,
-        });
-
-        // Pagination and submitting of data
-        if (this.state.currentQuestion + 1 === this.state.question.length) {
-            this.handleSubmit();
-        } else {
-            this.handleNext();
-        }
+        this.setState(
+            {
+                answer: sections,
+            },
+            () => {
+                // Pagination and submitting of data
+                if (
+                    this.state.currentQuestion + 1 ===
+                    this.state.question.length
+                ) {
+                    this.handleSubmit();
+                } else {
+                    this.handleNext();
+                }
+            }
+        );
     };
 
     // ---------- Bonus points, Correct & Wrong answer ----------
@@ -360,75 +496,40 @@ class QuizLevelExam extends Component {
                 wrong_answer++;
             }
         }
-        this.setState(
-            {
-                correct_answer: correct_answer,
-                wrong_answer: wrong_answer,
-            },
-            () => this.handleTotalPoints()
-        );
+        this.setState({
+            correct_answer: correct_answer,
+            wrong_answer: wrong_answer,
+        });
     };
 
     handleBonusPoints = () => {
+        clearInterval(this.timer);
         const remaining_seconds = this.state.seconds;
         let bonus_points = this.state.bonus_points;
+        let scored_points = this.state.scored_points;
         let total_points = this.state.total_points;
         const section = [...this.state.answer];
         const level = this.state.level;
         if (section[this.state.currentQuestion].isCorrect === true) {
-            bonus_points +=
-                (remaining_seconds / level.required_time_for_bonus) *
-                level.bonus_points;
-            total_points +=
-                (remaining_seconds / level.required_time_for_bonus) *
-                level.bonus_points;
+            console.log(remaining_seconds);
+            scored_points += level.points_per_question;
+            total_points += level.points_per_question;
+            if (level.bonus_points !== 0) {
+                total_points +=
+                    (remaining_seconds / level.required_time_for_bonus) *
+                    level.bonus_points;
+                bonus_points +=
+                    (remaining_seconds / level.required_time_for_bonus) *
+                    level.bonus_points;
+            }
+        } else {
+            if (this.state.quiz.negative_points === true) {
+                scored_points -= 10;
+                total_points -= 10;
+            }
         }
         this.setState({
             bonus_points: bonus_points,
-            total_points: total_points,
-        });
-    };
-
-    handleTotalPoints = () => {
-        let total_points = this.state.total_points;
-        let scored_points = this.state.scored_points;
-        const correct_answer = this.state.correct_answer;
-        const wrong_answer = this.state.wrong_answer;
-
-        scored_points += correct_answer * this.state.level.points_per_question;
-        total_points += correct_answer * this.state.level.points_per_question;
-        this.setState(
-            {
-                scored_points: scored_points,
-                total_points: total_points,
-            },
-            () => {
-                // if negative_points is enabled, subtract the points from the scored_points
-                if (wrong_answer !== 0) {
-                    if (this.state.quiz.negative_points === true) {
-                        if (total_points > 0) {
-                            scored_points -=
-                                wrong_answer *
-                                this.state.level.points_per_question;
-                            total_points -=
-                                wrong_answer *
-                                this.state.level.points_per_question;
-                        }
-                    }
-                    this.setState({
-                        scored_points: scored_points > 0 ? scored_points : 0,
-                        total_points:
-                            total_points > 0
-                                ? total_points > this.state.level.max_points
-                                    ? this.state.level.max_points
-                                    : total_points
-                                : 0,
-                    });
-                }
-            }
-        );
-
-        this.setState({
             scored_points: scored_points,
             total_points: total_points,
         });
@@ -437,65 +538,66 @@ class QuizLevelExam extends Component {
     // ---------- Submit the exam ----------
 
     handleSubmit = async () => {
-        clearInterval(this.timer);
-        await this.handleBonusPoints();
+        this.handleBonusPoints();
         this.handleCorrectWrongAnswer();
-        this.setState({
-            // page_loading: true,
-            isAnswerSubmitted: true,
-        });
 
-        let body = {
-            level_id: this.state.level.level_id,
-            level_complexity: this.state.level.complexity,
-            total_points: this.state.total_points,
-        };
-        // let secret = new fernet.Secret(
-        //     "4Fy2fTI1oyK9McR5mRunLmfynGdzOdxiRQRNqhUY70k="
-        // );
-        // let token = new fernet.Token({
-        //     secret: secret,
-        //     time: Date.parse(1),
-        //     iv: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
-        // });
+        setTimeout(() => {
+            this.setState({
+                page_loading: true,
+            });
 
-        console.log(body);
+            let body = {
+                level_id: this.state.level.level_id,
+                level_complexity: this.state.level.complexity,
+                total_points:
+                    this.state.total_points > 0 ? this.state.total_points : 0,
+            };
+            let secret = new fernet.Secret(
+                "4Fy2fTI1oyK9McR5mRunLmfynGdzOdxiRQRNqhUY70k="
+            );
+            let token = new fernet.Token({
+                secret: secret,
+                time: Date.parse(1),
+                iv: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+            });
+            // console.log(body)
 
-        // fetch(
-        //     `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/${this.quizId}/levels/`,
-        //     {
-        //         method: "POST",
-        //         headers: this.headers,
-        //         body: JSON.stringify({
-        //             quiz_data: token.encode(JSON.stringify(body)),
-        //         }),
-        //     }
-        // )
-        //     .then((res) => res.json())
-        //     .then((result) => {
-        //         console.log(result);
-        //         if (result.sts === true) {
-        //             this.setState(
-        //                 {
-        //                     successMsg: result.msg,
-        //                     showSuccessAlert: true,
-        //                     page_loading: false,
-        //                 },
-        //                 () => {
-        //                     this.setState({
-        //                         isAnswerSubmitted: true,
-        //                     });
-        //                 }
-        //             );
-        //         } else {
-        //             this.setState({
-        //                 errorMsg: result.msg,
-        //                 showErrorAlert: true,
-        //                 page_loading: false,
-        //             });
-        //         }
-        //     })
-        //     .catch((err) => console.log(err));
+            fetch(
+                `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/${this.quizId}/levels/`,
+                {
+                    method: "POST",
+                    headers: this.headers,
+                    body: JSON.stringify({
+                        quiz_data: token.encode(JSON.stringify(body)),
+                    }),
+                }
+            )
+                .then((res) => res.json())
+                .then((result) => {
+                    console.log(result);
+                    if (result.sts === true) {
+                        this.setState(
+                            {
+                                successMsg: result.msg,
+                                showSuccessAlert: true,
+                                page_loading: false,
+                            },
+                            () => {
+                                this.setState({
+                                    isAnswerSubmitted: true,
+                                });
+                            }
+                        );
+                    } else {
+                        this.setState({
+                            errorMsg: result.msg,
+                            showErrorAlert: true,
+                            page_loading: false,
+                        });
+                    }
+                })
+                .catch((err) => console.log(err));
+        }, 1000);
     };
 
     // ---------- Navigation and Timer ----------
@@ -517,23 +619,33 @@ class QuizLevelExam extends Component {
         return obj;
     }
 
-    handleNext = async () => {
-        clearInterval(this.timer);
+    handleNext = () => {
         this.handleBonusPoints();
-        const level = this.state.level;
-        await this.setState({
-            currentQuestion: this.state.currentQuestion + 1,
-            seconds: level.time_per_question,
-        });
-        window.MathJax.typeset();
+        setTimeout(async () => {
+            const level = this.state.level;
+            await this.setState({
+                currentQuestion: this.state.currentQuestion + 1,
+                seconds: level.time_per_question,
+                showOptions: false,
+            });
+            window.MathJax.typeset();
+        }, 1000);
     };
 
     startTimer = () => {
+        this.setState({
+            showCountdownModal: false,
+        });
         if (
             this.state.isAnswerSubmitted === false &&
             this.state.showQuestionReview === false
         ) {
-            this.timer = setInterval(this.questionCountDown, 1000);
+            setTimeout(() => {
+                this.timer = setInterval(this.questionCountDown, 1000);
+                this.setState({
+                    showOptions: true,
+                });
+            }, 2000);
         }
     };
 
@@ -543,7 +655,12 @@ class QuizLevelExam extends Component {
                 this.state.isAnswerSubmitted === false &&
                 this.state.showQuestionReview === false
             ) {
-                this.timer = setInterval(this.questionCountDown, 1000);
+                setTimeout(() => {
+                    this.timer = setInterval(this.questionCountDown, 1000);
+                    this.setState({
+                        showOptions: true,
+                    });
+                }, 2000);
             }
         }
     };
@@ -553,6 +670,7 @@ class QuizLevelExam extends Component {
             await this.setState({
                 currentQuestion: this.state.currentQuestion + 1,
                 seconds: this.state.level.time_per_question,
+                showOptions: false,
             });
         }
         window.MathJax.typeset();
@@ -569,7 +687,7 @@ class QuizLevelExam extends Component {
             if (this.state.currentQuestion + 1 === this.state.question.length) {
                 this.handleSubmit();
             } else {
-                clearInterval(this.timer);
+                this.handleBonusPoints();
                 this.nextQuestion();
             }
         }
@@ -621,11 +739,159 @@ class QuizLevelExam extends Component {
 
     // ----- Render question -----
 
+    colorMCQ = (data, index, answerSection, option) => {
+        let color = "bg-white";
+
+        if (data[index].content) {
+            if (data[index].content.mcq_answers) {
+                if (data[index].content.mcq_answers > 1) {
+                    if (answerSection.answer) {
+                        if (answerSection.answer.length !== 0) {
+                            if (
+                                data[index].content.mcq_answers ===
+                                answerSection.answer.length
+                            ) {
+                                if (
+                                    answerSection.answer.includes(
+                                        option.content
+                                    )
+                                ) {
+                                    if (answerSection.isCorrect === true) {
+                                        color = "success-bg";
+                                    } else {
+                                        color = "danger-bg";
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    if (answerSection.answer) {
+                        if (answerSection.answer.length !== 0) {
+                            if (answerSection.answer.includes(option.content)) {
+                                if (answerSection.isCorrect === true) {
+                                    color = "success-bg";
+                                } else {
+                                    color = "danger-bg";
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return color;
+    };
+
+    toastRender = (data, index, answerSection) => {
+        if (data[index].content) {
+            if (data[index].content.mcq === true) {
+                if (data[index].content.mcq_answers) {
+                    if (data[index].content.mcq_answers > 1) {
+                        if (answerSection.answer) {
+                            if (answerSection.answer.length !== 0) {
+                                if (
+                                    data[index].content.mcq_answers ===
+                                    answerSection.answer.length
+                                ) {
+                                    if (answerSection.isCorrect === true) {
+                                        return (
+                                            <SuccessDIV
+                                                quiz={this.state.quiz}
+                                                level={this.state.level}
+                                                bonus_points={
+                                                    this.state.level
+                                                        .bonus_points !== 0
+                                                        ? (this.state.seconds /
+                                                              this.state.level
+                                                                  .required_time_for_bonus) *
+                                                          this.state.level
+                                                              .bonus_points
+                                                        : 0
+                                                }
+                                            />
+                                        );
+                                    } else {
+                                        return (
+                                            <DangerDIV
+                                                quiz={this.state.quiz}
+                                                level={this.state.level}
+                                            />
+                                        );
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        if (answerSection.answer) {
+                            if (answerSection.answer.length !== 0) {
+                                if (answerSection.isCorrect === true) {
+                                    return (
+                                        <SuccessDIV
+                                            quiz={this.state.quiz}
+                                            level={this.state.level}
+                                            bonus_points={
+                                                this.state.level
+                                                    .bonus_points !== 0
+                                                    ? (this.state.seconds /
+                                                          this.state.level
+                                                              .required_time_for_bonus) *
+                                                      this.state.level
+                                                          .bonus_points
+                                                    : 0
+                                            }
+                                        />
+                                    );
+                                } else {
+                                    return (
+                                        <DangerDIV
+                                            quiz={this.state.quiz}
+                                            level={this.state.level}
+                                        />
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                if (answerSection.answer) {
+                    if (answerSection.answer.length !== 0) {
+                        if (answerSection.isCorrect === true) {
+                            return (
+                                <SuccessDIV
+                                    quiz={this.state.quiz}
+                                    level={this.state.level}
+                                    bonus_points={
+                                        this.state.level.bonus_points !== 0
+                                            ? (this.state.seconds /
+                                                  this.state.level
+                                                      .required_time_for_bonus) *
+                                              this.state.level.bonus_points
+                                            : 0
+                                    }
+                                />
+                            );
+                        } else {
+                            return (
+                                <DangerDIV
+                                    quiz={this.state.quiz}
+                                    level={this.state.level}
+                                />
+                            );
+                        }
+                    }
+                }
+            }
+        }
+    };
+
     questionRender = (data, index, answerSection) => {
         return (
             <div className="card card-body shadow-sm">
                 <div
-                    className="light-bg p-3 d-flex flex-column align-items-start justify-content-center"
+                    className="light-bg p-3 d-flex flex-column align-items-start"
                     style={{ minHeight: "70vh" }}
                 >
                     <div className="w-100">
@@ -639,15 +905,13 @@ class QuizLevelExam extends Component {
                             </div>
                             <div className="col-lg-4 order-1 order-lg-2 mb-3 mb-lg-0">
                                 <h4 className="text-center primary-text mb-0">
-                                    {this.state.level.level_name || ""}
+                                    Question: {this.state.currentQuestion + 1} /{" "}
+                                    {data.length}
                                 </h4>
                             </div>
                             <div className="col-lg-4 col-sm-6 order-3 text-right">
                                 <div className="d-inline primary-bg px-4 py-2 rounded-pill text-white">
-                                    Total questions:{" "}
-                                    {this.state.question.length <= 9
-                                        ? `0${this.state.question.length}`
-                                        : this.state.question.length}
+                                    Points Scored: {this.state.total_points}
                                 </div>
                             </div>
                         </div>
@@ -671,7 +935,16 @@ class QuizLevelExam extends Component {
                                     ></div>
                                 </div>
                                 {/* <!----- Options starts here -----> */}
-                                <div className="row">
+                                <div
+                                    className="row"
+                                    style={{
+                                        visibility: `${
+                                            this.state.showOptions === true
+                                                ? "visible"
+                                                : "hidden"
+                                        }`,
+                                    }}
+                                >
                                     {/* ----- MCQ ----- */}
                                     {data[index].content.mcq === true
                                         ? data[index].content.options.map(
@@ -682,20 +955,13 @@ class QuizLevelExam extends Component {
                                                           key={option_index}
                                                       >
                                                           <div
-                                                              className="card card-body shadow-sm small font-weight-bold-600 pt-3 pb-0"
-                                                              onClick={() =>
-                                                                  this.handleMCQ(
-                                                                      option.content,
-                                                                      index,
-                                                                      data[
-                                                                          index
-                                                                      ].content
-                                                                          .mcq_answers >
-                                                                          1
-                                                                          ? "checkbox"
-                                                                          : "radio"
-                                                                  )
-                                                              }
+                                                              className={`card card-body shadow-sm small font-weight-bold-600 pt-3 pb-0 
+                                                              ${this.colorMCQ(
+                                                                  data,
+                                                                  index,
+                                                                  answerSection,
+                                                                  option
+                                                              )}`}
                                                           >
                                                               {data[index]
                                                                   .content
@@ -728,8 +994,28 @@ class QuizLevelExam extends Component {
                                                                                       : false
                                                                               }
                                                                               onChange={(
-                                                                                  e
-                                                                              ) => {}}
+                                                                                  event
+                                                                              ) => {
+                                                                                  this.handleMCQ(
+                                                                                      event,
+                                                                                      index,
+                                                                                      "checkbox"
+                                                                                  );
+                                                                              }}
+                                                                              disabled={
+                                                                                  answerSection.answer
+                                                                                      ? answerSection
+                                                                                            .answer
+                                                                                            .length ===
+                                                                                        data[
+                                                                                            index
+                                                                                        ]
+                                                                                            .content
+                                                                                            .mcq_answers
+                                                                                          ? true
+                                                                                          : false
+                                                                                      : false
+                                                                              }
                                                                           />
                                                                           <label
                                                                               className="custom-control-label"
@@ -764,8 +1050,24 @@ class QuizLevelExam extends Component {
                                                                                       : false
                                                                               }
                                                                               onChange={(
-                                                                                  e
-                                                                              ) => {}}
+                                                                                  event
+                                                                              ) => {
+                                                                                  this.handleMCQ(
+                                                                                      event,
+                                                                                      index,
+                                                                                      "radio"
+                                                                                  );
+                                                                              }}
+                                                                              disabled={
+                                                                                  answerSection.answer
+                                                                                      ? answerSection
+                                                                                            .answer
+                                                                                            .length !==
+                                                                                        0
+                                                                                          ? true
+                                                                                          : false
+                                                                                      : false
+                                                                              }
                                                                           />
                                                                           <label
                                                                               className="custom-control-label"
@@ -796,13 +1098,23 @@ class QuizLevelExam extends Component {
                                                           key={boolean_index}
                                                       >
                                                           <div
-                                                              className="card card-body shadow-sm small font-weight-bold-600 p-3"
-                                                              onClick={() =>
-                                                                  this.handleBoolean(
-                                                                      option.content,
-                                                                      index
-                                                                  )
-                                                              }
+                                                              className={`card card-body shadow-sm small font-weight-bold-600 p-3 ${
+                                                                  answerSection.answer
+                                                                      ? answerSection
+                                                                            .answer
+                                                                            .length !==
+                                                                        0
+                                                                          ? answerSection.answer.includes(
+                                                                                option.content
+                                                                            )
+                                                                              ? answerSection.isCorrect ===
+                                                                                true
+                                                                                  ? "success-bg"
+                                                                                  : "danger-bg"
+                                                                              : ""
+                                                                          : ""
+                                                                      : ""
+                                                              }`}
                                                           >
                                                               <div className="custom-control custom-radio">
                                                                   <input
@@ -828,8 +1140,23 @@ class QuizLevelExam extends Component {
                                                                               : false
                                                                       }
                                                                       onChange={(
-                                                                          e
-                                                                      ) => {}}
+                                                                          event
+                                                                      ) =>
+                                                                          this.handleBoolean(
+                                                                              event,
+                                                                              index
+                                                                          )
+                                                                      }
+                                                                      disabled={
+                                                                          answerSection.answer
+                                                                              ? answerSection
+                                                                                    .answer
+                                                                                    .length !==
+                                                                                0
+                                                                                  ? true
+                                                                                  : false
+                                                                              : false
+                                                                      }
                                                                   />
                                                                   <label
                                                                       className="custom-control-label"
@@ -868,32 +1195,8 @@ class QuizLevelExam extends Component {
                                 : ""}
                         </div>
                     </div>
-                    {/* <div className="mt-auto w-100">
-                        {this.state.currentQuestion + 1 ===
-                        this.state.question.length ? (
-                            <div className="row justify-content-center">
-                                <div className="col-md-6">
-                                    <button
-                                        className="btn btn-primary btn-block shadow-none rounded-pill"
-                                        onClick={this.handleSubmit}
-                                    >
-                                        Submit
-                                    </button>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="text-right">
-                                <button
-                                    className="btn btn-primary btn-sm shadow-none rounded-pill px-3"
-                                    onClick={this.handleNext}
-                                >
-                                    Next{" "}
-                                    <i className="fas fa-arrow-right fa-sm ml-1"></i>
-                                </button>
-                            </div>
-                        )}
-                    </div> */}
-                    {/* <!----- Question ends here -----> */}
+
+                    {this.toastRender(data, index, answerSection)}
                 </div>
             </div>
         );
@@ -909,11 +1212,12 @@ class QuizLevelExam extends Component {
                     style={{ minHeight: "70vh" }}
                 >
                     <div className="w-100">
+                        {/* ----- Level name ----- */}
                         <div className="d-flex justify-content-center">
                             <div className="d-inline">
                                 <div
                                     className="card card-body bg-danger p-2"
-                                    style={{ border: "6px solid gold" }}
+                                    style={{ border: "6px solid #ffa88b" }}
                                 >
                                     <h5 className="text-white mb-0">
                                         {this.state.level.level_name || ""}
@@ -921,25 +1225,42 @@ class QuizLevelExam extends Component {
                                 </div>
                             </div>
                         </div>
+                        {/* ----- Score card ----- */}
                         <div className="row justify-content-center mb-4">
-                            <div className="col-md-4">
+                            <div className="col-lg-4 col-md-6">
                                 <div
                                     className="card card-body bg-danger"
-                                    style={{ border: "6px solid gold" }}
+                                    style={{ border: "6px solid #ffa88b" }}
                                 >
-                                    <p className="font-weight-bold-600 text-white text-center">
-                                        Points scored: {this.state.total_points}
+                                    <p className="h1 text-center mb-1 tomato-text">
+                                        {this.state.scored_points > 0
+                                            ? this.state.scored_points
+                                            : 0}
                                     </p>
-                                    <p className="font-weight-bold-600 text-white text-center">
+                                    <p className="text-center text-white font-weight-bold-600 small mb-1">
+                                        Points Scored
+                                    </p>
+                                    <p className="h5 text-white text-center mb-2">
+                                        Bonus Points:{" "}
+                                        {this.state.total_points > 0
+                                            ? this.state.total_points -
+                                              this.state.scored_points
+                                            : 0}
+                                    </p>
+
+                                    <div className="dropdown-divider"></div>
+
+                                    <p className="font-weight-bold-600 small text-white text-center mb-1">
                                         Correct answers:{" "}
                                         {this.state.correct_answer}
                                     </p>
-                                    <p className="font-weight-bold-600 text-white text-center mb-0">
+                                    <p className="font-weight-bold-600 small text-white text-center mb-0">
                                         Wrong answers: {this.state.wrong_answer}
                                     </p>
                                 </div>
                             </div>
                         </div>
+                        {/* ----- Buttons ----- */}
                         <div className="row justify-content-center">
                             <div className="col-lg-3 col-md-4 d-flex justify-content-around">
                                 <div
@@ -955,7 +1276,7 @@ class QuizLevelExam extends Component {
                                     }}
                                 >
                                     <button className="btn btn-danger shadow-none">
-                                        <i className="fas fa-file-alt"></i>
+                                        <i className="fas fa-eye"></i>
                                     </button>
                                     <p className="font-weight-bold-600 text-danger mb-0">
                                         Review
@@ -992,7 +1313,13 @@ class QuizLevelExam extends Component {
                     className="light-bg p-3 d-flex flex-column align-items-start justify-content-center"
                     style={{ minHeight: "70vh" }}
                 >
+                    <p className="text-center primary-text h5 w-100 mb-4">
+                        Question: {this.state.currentQuestion + 1} /{" "}
+                        {data.length}
+                    </p>
+
                     {/* ---------- Question ---------- */}
+
                     <div className="d-flex align-items-start w-100">
                         <button className="btn bg-white btn-sm shadow-sm mr-1 px-3 font-weight-bold-600 rounded-lg">
                             {index <= 8 ? `0${index + 1}` : index + 1}
@@ -1038,11 +1365,13 @@ class QuizLevelExam extends Component {
                                                                   ? "success-bg"
                                                                   : ""
                                                           }`}
-                                                          dangerouslySetInnerHTML={{
-                                                              __html:
-                                                                  option.content,
-                                                          }}
-                                                      ></div>
+                                                      >
+                                                          <div
+                                                              dangerouslySetInnerHTML={{
+                                                                  __html: `<div class="mb-3">${option.content}</div>`,
+                                                              }}
+                                                          ></div>
+                                                      </div>
                                                   </div>
                                               );
                                           }
@@ -1151,7 +1480,7 @@ class QuizLevelExam extends Component {
                     name={this.state.subject_name}
                     chapter_name={`${this.state.chapter_name} - ${
                         this.state.quiz.quiz_name || ""
-                    }`}
+                    } - ${this.state.level.level_name || ""}`}
                     goBack={this.props.history.goBack}
                 />
 
@@ -1172,6 +1501,16 @@ class QuizLevelExam extends Component {
                         });
                     }}
                 />
+
+                {/* ----- Quiz countdown modal ----- */}
+                {this.state.showCountdownModal ? (
+                    <QuizCountDown
+                        show={this.state.showCountdownModal}
+                        onHide={this.startTimer}
+                    />
+                ) : (
+                    ""
+                )}
 
                 {/* ----- Image lightbox ----- */}
                 {this.state.isLightBoxOpen ? (
