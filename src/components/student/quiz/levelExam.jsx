@@ -10,17 +10,30 @@ import { Type1DataFormat } from "../../sharedComponents/dataFormating";
 import { Link } from "react-router-dom";
 import { Modal } from "react-bootstrap";
 
+import Sound from "react-sound";
+import CorrectSound from "../../../assets/correct-answer.wav";
+import WrongSound from "../../../assets/wrong-answer.wav";
+import CountDownSound from "../../../assets/simple-countdown.wav";
+import BGSound from "../../../assets/background-music.mp3";
+
 class QuizCountDown extends Component {
     constructor(props) {
         super(props);
         this.state = {
             second: 3,
+            isPlaying: true,
         };
         this.timer = 0;
     }
 
     componentDidMount = () => {
         this.timer = setInterval(this.countDown, 1000);
+    };
+
+    componentWillUnmount = () => {
+        this.setState({
+            isPlaying: false,
+        });
     };
 
     countDown = () => {
@@ -54,6 +67,16 @@ class QuizCountDown extends Component {
                         {this.state.second}
                     </p>
                     <p className="font-weight-bold-600 mb-3">Seconds</p>
+
+                    <Sound
+                        url={CountDownSound}
+                        playStatus={
+                            this.state.isPlaying
+                                ? Sound.status.PLAYING
+                                : Sound.status.STOPPED
+                        }
+                        volume={30}
+                    />
                 </Modal.Body>
             </Modal>
         );
@@ -61,49 +84,160 @@ class QuizCountDown extends Component {
 }
 
 const SuccessDIV = (props) => {
-    console.log(props);
     return (
-        <div className="w-100 mt-auto">
-            <div className="row justify-content-center">
-                <div className="col-lg-3 col-md-5">
-                    <div className="card card-body text-center border border-success success-bg p-1">
-                        <p className="small font-weight-bold-600 align-items-center mb-1">
-                            <i className="fas fa-check-circle mr-1"></i> Right
-                            answer!
-                        </p>
-                        <p className="small mb-1">
-                            {props.level.points_per_question} Points
-                        </p>
-                        <p className="small mb-1">
-                            Bonus Points {props.bonus_points}
-                        </p>
+        <>
+            <Sound
+                url={CorrectSound}
+                playStatus={Sound.status.PLAYING}
+                volume={30}
+            />
+            <div className="w-100 mt-auto">
+                <div className="row justify-content-center">
+                    <div className="col-lg-3 col-md-5">
+                        <div className="card card-body text-center border border-success success-bg p-1">
+                            <p className="small font-weight-bold-600 align-items-center mb-0">
+                                <i className="fas fa-check-circle mr-1"></i>{" "}
+                                Right answer!
+                            </p>
+                            <p className="small mb-0">
+                                {props.level.points_per_question} Points
+                            </p>
+                            <p className="small mb-0">
+                                Bonus Points {props.bonus_points}
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 
 const DangerDIV = (props) => {
     return (
-        <div className="w-100 mt-auto">
-            <div className="row justify-content-center">
-                <div className="col-lg-3 col-md-5">
-                    <div className="card card-body text-center border border-danger danger-bg p-1">
-                        <p className="small font-weight-bold-600 align-items-center mb-1">
-                            <i className="fas fa-times-circle mr-1"></i> Wrong
-                            answer!
-                        </p>
-                        <p className="small mb-0">
-                            {props.quiz.negative_points === true
-                                ? `-${props.level.points_per_question} Points`
-                                : `0 Points`}
-                        </p>
+        <>
+            <Sound
+                url={WrongSound}
+                playStatus={Sound.status.PLAYING}
+                volume={30}
+            />
+            <div className="w-100 mt-auto">
+                <div className="row justify-content-center">
+                    <div className="col-lg-3 col-md-5">
+                        <div className="card card-body text-center border border-danger danger-bg p-1">
+                            <p className="small font-weight-bold-600 align-items-center mb-0">
+                                <i className="fas fa-times-circle mr-1"></i>{" "}
+                                Wrong answer!
+                            </p>
+                            <p className="small mb-0">
+                                {props.quiz.negative_points === true
+                                    ? `-${props.level.points_per_question} Points`
+                                    : `0 Points`}
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     );
+};
+
+const ToastRender = (props) => {
+    let bonus =
+        props.level.bonus_points !== 0 &&
+        props.level.required_time_for_bonus !== 0
+            ? (props.seconds / props.level.required_time_for_bonus) *
+              props.level.bonus_points
+            : 0;
+
+    if (props.data[props.index].content) {
+        if (props.data[props.index].content.mcq === true) {
+            if (props.data[props.index].content.mcq_answers) {
+                if (props.data[props.index].content.mcq_answers > 1) {
+                    if (props.answerSection.answer) {
+                        if (props.answerSection.answer.length !== 0) {
+                            if (
+                                props.data[props.index].content.mcq_answers ===
+                                props.answerSection.answer.length
+                            ) {
+                                if (props.answerSection.isCorrect === true) {
+                                    return (
+                                        <SuccessDIV
+                                            quiz={props.quiz}
+                                            level={props.level}
+                                            bonus_points={bonus}
+                                        />
+                                    );
+                                } else {
+                                    return (
+                                        <DangerDIV
+                                            quiz={props.quiz}
+                                            level={props.level}
+                                        />
+                                    );
+                                }
+                            }
+                        } else {
+                            return (
+                                <DangerDIV
+                                    quiz={props.quiz}
+                                    level={props.level}
+                                />
+                            );
+                        }
+                    }
+                } else {
+                    if (props.answerSection.answer) {
+                        if (props.answerSection.answer.length !== 0) {
+                            if (props.answerSection.isCorrect === true) {
+                                return (
+                                    <SuccessDIV
+                                        quiz={props.quiz}
+                                        level={props.level}
+                                        bonus_points={bonus}
+                                    />
+                                );
+                            } else {
+                                return (
+                                    <DangerDIV
+                                        quiz={props.quiz}
+                                        level={props.level}
+                                    />
+                                );
+                            }
+                        } else {
+                            return (
+                                <DangerDIV
+                                    quiz={props.quiz}
+                                    level={props.level}
+                                />
+                            );
+                        }
+                    }
+                }
+            }
+        } else {
+            if (props.answerSection.answer) {
+                if (props.answerSection.answer.length !== 0) {
+                    if (props.answerSection.isCorrect === true) {
+                        return (
+                            <SuccessDIV
+                                quiz={props.quiz}
+                                level={props.level}
+                                bonus_points={bonus}
+                            />
+                        );
+                    } else {
+                        return (
+                            <DangerDIV quiz={props.quiz} level={props.level} />
+                        );
+                    }
+                } else {
+                    return <DangerDIV quiz={props.quiz} level={props.level} />;
+                }
+            }
+        }
+    }
 };
 
 class QuizLevelExam extends Component {
@@ -129,7 +263,7 @@ class QuizLevelExam extends Component {
             startIndex: 0,
             isLightBoxOpen: false,
 
-            time: {},
+            time: { h: 0, m: 0, s: 0 },
             seconds: 0,
 
             errorMsg: "",
@@ -142,6 +276,8 @@ class QuizLevelExam extends Component {
             isAnswerSubmitted: false,
             showQuestionReview: false,
             showOptions: false,
+            showToast: false,
+            isPlaying: false,
         };
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
@@ -502,7 +638,7 @@ class QuizLevelExam extends Component {
         });
     };
 
-    handleBonusPoints = () => {
+    handlePoints = () => {
         clearInterval(this.timer);
         const remaining_seconds = this.state.seconds;
         let bonus_points = this.state.bonus_points;
@@ -514,7 +650,10 @@ class QuizLevelExam extends Component {
             console.log(remaining_seconds);
             scored_points += level.points_per_question;
             total_points += level.points_per_question;
-            if (level.bonus_points !== 0) {
+            if (
+                level.bonus_points !== 0 &&
+                level.required_time_for_bonus !== 0
+            ) {
                 total_points +=
                     (remaining_seconds / level.required_time_for_bonus) *
                     level.bonus_points;
@@ -524,8 +663,8 @@ class QuizLevelExam extends Component {
             }
         } else {
             if (this.state.quiz.negative_points === true) {
-                scored_points -= 10;
-                total_points -= 10;
+                scored_points -= level.points_per_question;
+                total_points -= level.points_per_question;
             }
         }
         this.setState({
@@ -538,8 +677,11 @@ class QuizLevelExam extends Component {
     // ---------- Submit the exam ----------
 
     handleSubmit = async () => {
-        this.handleBonusPoints();
+        this.handlePoints();
         this.handleCorrectWrongAnswer();
+        this.setState({
+            showToast: true,
+        });
 
         setTimeout(() => {
             this.setState({
@@ -560,7 +702,7 @@ class QuizLevelExam extends Component {
                 time: Date.parse(1),
                 iv: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
             });
-            // console.log(body)
+            // console.log(body);
 
             fetch(
                 `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/${this.quizId}/levels/`,
@@ -585,6 +727,7 @@ class QuizLevelExam extends Component {
                             () => {
                                 this.setState({
                                     isAnswerSubmitted: true,
+                                    showToast: false,
                                 });
                             }
                         );
@@ -620,13 +763,17 @@ class QuizLevelExam extends Component {
     }
 
     handleNext = () => {
-        this.handleBonusPoints();
+        this.handlePoints();
+        this.setState({
+            showToast: true,
+        });
         setTimeout(async () => {
             const level = this.state.level;
             await this.setState({
                 currentQuestion: this.state.currentQuestion + 1,
                 seconds: level.time_per_question,
                 showOptions: false,
+                showToast: false,
             });
             window.MathJax.typeset();
         }, 1000);
@@ -635,6 +782,7 @@ class QuizLevelExam extends Component {
     startTimer = () => {
         this.setState({
             showCountdownModal: false,
+            isPlaying: true,
         });
         if (
             this.state.isAnswerSubmitted === false &&
@@ -665,15 +813,21 @@ class QuizLevelExam extends Component {
         }
     };
 
-    nextQuestion = async () => {
+    nextQuestion = () => {
         if (this.state.currentQuestion + 1 < this.state.question.length) {
-            await this.setState({
-                currentQuestion: this.state.currentQuestion + 1,
-                seconds: this.state.level.time_per_question,
-                showOptions: false,
+            this.setState({
+                showToast: true,
             });
+            setTimeout(async () => {
+                await this.setState({
+                    currentQuestion: this.state.currentQuestion + 1,
+                    seconds: this.state.level.time_per_question,
+                    showOptions: false,
+                    showToast: false,
+                });
+                window.MathJax.typeset();
+            }, 1000);
         }
-        window.MathJax.typeset();
     };
 
     questionCountDown = async () => {
@@ -687,7 +841,7 @@ class QuizLevelExam extends Component {
             if (this.state.currentQuestion + 1 === this.state.question.length) {
                 this.handleSubmit();
             } else {
-                this.handleBonusPoints();
+                this.handlePoints();
                 this.nextQuestion();
             }
         }
@@ -741,6 +895,13 @@ class QuizLevelExam extends Component {
 
     colorMCQ = (data, index, answerSection, option) => {
         let color = "bg-white";
+        let question = [...this.state.question];
+        let answer = [];
+        for (let i = 0; i < question[index].content.options.length; i++) {
+            if (question[index].content.options[i].correct === true) {
+                answer.push(question[index].content.options[i].content);
+            }
+        }
 
         if (data[index].content) {
             if (data[index].content.mcq_answers) {
@@ -752,15 +913,21 @@ class QuizLevelExam extends Component {
                                 answerSection.answer.length
                             ) {
                                 if (
+                                    answer.includes(option.content) &&
                                     answerSection.answer.includes(
                                         option.content
                                     )
                                 ) {
-                                    if (answerSection.isCorrect === true) {
-                                        color = "success-bg";
-                                    } else {
-                                        color = "danger-bg";
-                                    }
+                                    color = "success-bg";
+                                } else if (
+                                    !answer.includes(option.content) &&
+                                    answerSection.answer.includes(
+                                        option.content
+                                    )
+                                ) {
+                                    color = "danger-bg";
+                                } else {
+                                    color = "bg-white";
                                 }
                             }
                         }
@@ -782,109 +949,6 @@ class QuizLevelExam extends Component {
         }
 
         return color;
-    };
-
-    toastRender = (data, index, answerSection) => {
-        if (data[index].content) {
-            if (data[index].content.mcq === true) {
-                if (data[index].content.mcq_answers) {
-                    if (data[index].content.mcq_answers > 1) {
-                        if (answerSection.answer) {
-                            if (answerSection.answer.length !== 0) {
-                                if (
-                                    data[index].content.mcq_answers ===
-                                    answerSection.answer.length
-                                ) {
-                                    if (answerSection.isCorrect === true) {
-                                        return (
-                                            <SuccessDIV
-                                                quiz={this.state.quiz}
-                                                level={this.state.level}
-                                                bonus_points={
-                                                    this.state.level
-                                                        .bonus_points !== 0
-                                                        ? (this.state.seconds /
-                                                              this.state.level
-                                                                  .required_time_for_bonus) *
-                                                          this.state.level
-                                                              .bonus_points
-                                                        : 0
-                                                }
-                                            />
-                                        );
-                                    } else {
-                                        return (
-                                            <DangerDIV
-                                                quiz={this.state.quiz}
-                                                level={this.state.level}
-                                            />
-                                        );
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        if (answerSection.answer) {
-                            if (answerSection.answer.length !== 0) {
-                                if (answerSection.isCorrect === true) {
-                                    return (
-                                        <SuccessDIV
-                                            quiz={this.state.quiz}
-                                            level={this.state.level}
-                                            bonus_points={
-                                                this.state.level
-                                                    .bonus_points !== 0
-                                                    ? (this.state.seconds /
-                                                          this.state.level
-                                                              .required_time_for_bonus) *
-                                                      this.state.level
-                                                          .bonus_points
-                                                    : 0
-                                            }
-                                        />
-                                    );
-                                } else {
-                                    return (
-                                        <DangerDIV
-                                            quiz={this.state.quiz}
-                                            level={this.state.level}
-                                        />
-                                    );
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-                if (answerSection.answer) {
-                    if (answerSection.answer.length !== 0) {
-                        if (answerSection.isCorrect === true) {
-                            return (
-                                <SuccessDIV
-                                    quiz={this.state.quiz}
-                                    level={this.state.level}
-                                    bonus_points={
-                                        this.state.level.bonus_points !== 0
-                                            ? (this.state.seconds /
-                                                  this.state.level
-                                                      .required_time_for_bonus) *
-                                              this.state.level.bonus_points
-                                            : 0
-                                    }
-                                />
-                            );
-                        } else {
-                            return (
-                                <DangerDIV
-                                    quiz={this.state.quiz}
-                                    level={this.state.level}
-                                />
-                            );
-                        }
-                    }
-                }
-            }
-        }
     };
 
     questionRender = (data, index, answerSection) => {
@@ -1003,17 +1067,11 @@ class QuizLevelExam extends Component {
                                                                                   );
                                                                               }}
                                                                               disabled={
-                                                                                  answerSection.answer
-                                                                                      ? answerSection
-                                                                                            .answer
-                                                                                            .length ===
-                                                                                        data[
-                                                                                            index
-                                                                                        ]
-                                                                                            .content
-                                                                                            .mcq_answers
-                                                                                          ? true
-                                                                                          : false
+                                                                                  this
+                                                                                      .state
+                                                                                      .showToast ===
+                                                                                  true
+                                                                                      ? true
                                                                                       : false
                                                                               }
                                                                           />
@@ -1059,13 +1117,11 @@ class QuizLevelExam extends Component {
                                                                                   );
                                                                               }}
                                                                               disabled={
-                                                                                  answerSection.answer
-                                                                                      ? answerSection
-                                                                                            .answer
-                                                                                            .length !==
-                                                                                        0
-                                                                                          ? true
-                                                                                          : false
+                                                                                  this
+                                                                                      .state
+                                                                                      .showToast ===
+                                                                                  true
+                                                                                      ? true
                                                                                       : false
                                                                               }
                                                                           />
@@ -1148,13 +1204,11 @@ class QuizLevelExam extends Component {
                                                                           )
                                                                       }
                                                                       disabled={
-                                                                          answerSection.answer
-                                                                              ? answerSection
-                                                                                    .answer
-                                                                                    .length !==
-                                                                                0
-                                                                                  ? true
-                                                                                  : false
+                                                                          this
+                                                                              .state
+                                                                              .showToast ===
+                                                                          true
+                                                                              ? true
                                                                               : false
                                                                       }
                                                                   />
@@ -1180,7 +1234,17 @@ class QuizLevelExam extends Component {
                                 {data[index].content.mcq_answers !==
                                 undefined ? (
                                     data[index].content.mcq_answers > 1 ? (
-                                        <div className="small">
+                                        <div
+                                            className="small"
+                                            style={{
+                                                visibility: `${
+                                                    this.state.showOptions ===
+                                                    true
+                                                        ? "visible"
+                                                        : "hidden"
+                                                }`,
+                                            }}
+                                        >
                                             <b>Note:</b>{" "}
                                             {data[index].content.mcq_answers}{" "}
                                             answers are correct
@@ -1196,8 +1260,30 @@ class QuizLevelExam extends Component {
                         </div>
                     </div>
 
-                    {this.toastRender(data, index, answerSection)}
+                    {/* ----- Toast Message ----- */}
+                    {this.state.showToast === true ? (
+                        <ToastRender
+                            data={data}
+                            index={index}
+                            answerSection={answerSection}
+                            level={this.state.level}
+                            quiz={this.state.quiz}
+                            seconds={this.state.seconds}
+                        />
+                    ) : (
+                        ""
+                    )}
                 </div>
+                <Sound
+                    url={BGSound}
+                    playStatus={
+                        this.state.isPlaying
+                            ? Sound.status.PLAYING
+                            : Sound.status.STOPPED
+                    }
+                    volume={20}
+                    loop={true}
+                />
             </div>
         );
     };
@@ -1240,11 +1326,17 @@ class QuizLevelExam extends Component {
                                     <p className="text-center text-white font-weight-bold-600 small mb-1">
                                         Points Scored
                                     </p>
-                                    <p className="h5 text-white text-center mb-2">
+                                    <p className="h6 text-white text-center mb-2">
                                         Bonus Points:{" "}
                                         {this.state.total_points > 0
                                             ? this.state.total_points -
                                               this.state.scored_points
+                                            : 0}
+                                    </p>
+                                    <p className="h5 text-white text-center mb-2">
+                                        Total Points:{" "}
+                                        {this.state.total_points > 0
+                                            ? this.state.total_points
                                             : 0}
                                     </p>
 
