@@ -21,21 +21,17 @@ class QuizCountDown extends Component {
         super(props);
         this.state = {
             second: 3,
-            // isPlaying: true,
+            isPlaying: true,
         };
         this.timer = 0;
-        this.audio = new Audio(CountDownSound);
-        this.audio.volume = 0.3;
     }
 
     componentDidMount = () => {
         this.timer = setInterval(this.countDown, 1000);
-        this.audio.play();
     };
 
     componentWillUnmount = () => {
         clearInterval(this.timer);
-        this.audio.pause();
     };
 
     countDown = () => {
@@ -70,11 +66,11 @@ class QuizCountDown extends Component {
                     </p>
                     <p className="font-weight-bold-600 mb-3">Seconds</p>
 
-                    {/* <Sound
+                    <Sound
                         url={CountDownSound}
                         playStatus={Sound.status.PLAYING}
                         volume={30}
-                    /> */}
+                    />
                 </Modal.Body>
             </Modal>
         );
@@ -275,7 +271,7 @@ class QuizLevelExam extends Component {
             showQuestionReview: false,
             showOptions: false,
             showToast: false,
-            // isPlaying: false,
+            isPlaying: false,
         };
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
@@ -289,9 +285,6 @@ class QuizLevelExam extends Component {
             Authorization: this.authToken,
         };
         this.timer = 0;
-        this.bgAudio = new Audio(BGSound);
-        this.bgAudio.volume = 0.2;
-        this.bgAudio.loop = true;
     }
 
     // creates section structure for exam submission
@@ -450,7 +443,6 @@ class QuizLevelExam extends Component {
 
     componentWillUnmount = () => {
         clearInterval(this.timer);
-        this.bgAudio.pause();
     };
 
     // ---------- handle option selection ----------
@@ -685,7 +677,7 @@ class QuizLevelExam extends Component {
 
         setTimeout(() => {
             this.setState({
-                // page_loading: true,
+                page_loading: true,
             });
 
             let body = {
@@ -694,52 +686,52 @@ class QuizLevelExam extends Component {
                 total_points:
                     this.state.total_points > 0 ? this.state.total_points : 0,
             };
-            // let secret = new fernet.Secret(
-            //     "4Fy2fTI1oyK9McR5mRunLmfynGdzOdxiRQRNqhUY70k="
-            // );
-            // let token = new fernet.Token({
-            //     secret: secret,
-            //     time: Date.parse(1),
-            //     iv: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
-            // });
-            console.log(body);
+            let secret = new fernet.Secret(
+                "4Fy2fTI1oyK9McR5mRunLmfynGdzOdxiRQRNqhUY70k="
+            );
+            let token = new fernet.Token({
+                secret: secret,
+                time: Date.parse(1),
+                iv: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+            });
+            // console.log(body);
 
-            // fetch(
-            //     `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/${this.quizId}/levels/`,
-            //     {
-            //         method: "POST",
-            //         headers: this.headers,
-            //         body: JSON.stringify({
-            //             quiz_data: token.encode(JSON.stringify(body)),
-            //         }),
-            //     }
-            // )
-            //     .then((res) => res.json())
-            //     .then((result) => {
-            //         console.log(result);
-            //         if (result.sts === true) {
-            //             this.setState(
-            //                 {
-            //                     successMsg: result.msg,
-            //                     showSuccessAlert: true,
-            //                     page_loading: false,
-            //                 },
-            //                 () => {
-            //                     this.setState({
-            //                         isAnswerSubmitted: true,
-            //                         showToast: false,
-            //                     });
-            //                 }
-            //             );
-            //         } else {
-            //             this.setState({
-            //                 errorMsg: result.msg,
-            //                 showErrorAlert: true,
-            //                 page_loading: false,
-            //             });
-            //         }
-            //     })
-            //     .catch((err) => console.log(err));
+            fetch(
+                `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/${this.quizId}/levels/`,
+                {
+                    method: "POST",
+                    headers: this.headers,
+                    body: JSON.stringify({
+                        quiz_data: token.encode(JSON.stringify(body)),
+                    }),
+                }
+            )
+                .then((res) => res.json())
+                .then((result) => {
+                    console.log(result);
+                    if (result.sts === true) {
+                        this.setState(
+                            {
+                                successMsg: result.msg,
+                                showSuccessAlert: true,
+                                page_loading: false,
+                            },
+                            () => {
+                                this.setState({
+                                    isAnswerSubmitted: true,
+                                    showToast: false,
+                                });
+                            }
+                        );
+                    } else {
+                        this.setState({
+                            errorMsg: result.msg,
+                            showErrorAlert: true,
+                            page_loading: false,
+                        });
+                    }
+                })
+                .catch((err) => console.log(err));
         }, 1000);
     };
 
@@ -780,10 +772,9 @@ class QuizLevelExam extends Component {
     };
 
     startTimer = () => {
-        this.bgAudio.play();
         this.setState({
             showCountdownModal: false,
-            // isPlaying: true,
+            isPlaying: true,
         });
         if (
             this.state.isAnswerSubmitted === false &&
@@ -1275,7 +1266,7 @@ class QuizLevelExam extends Component {
                         ""
                     )}
                 </div>
-                {/* <Sound
+                <Sound
                     url={BGSound}
                     playStatus={
                         this.state.isPlaying
@@ -1284,7 +1275,7 @@ class QuizLevelExam extends Component {
                     }
                     volume={20}
                     loop={true}
-                /> */}
+                />
             </div>
         );
     };
