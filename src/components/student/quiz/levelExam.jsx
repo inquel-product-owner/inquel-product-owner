@@ -21,7 +21,6 @@ class QuizCountDown extends Component {
         super(props);
         this.state = {
             second: 3,
-            isPlaying: true,
         };
         this.timer = 0;
     }
@@ -70,6 +69,7 @@ class QuizCountDown extends Component {
                         url={CountDownSound}
                         playStatus={Sound.status.PLAYING}
                         volume={30}
+            autoLoad={true}
                     />
                 </Modal.Body>
             </Modal>
