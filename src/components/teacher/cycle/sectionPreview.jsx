@@ -441,8 +441,7 @@ class CycleTestAutoQA extends Component {
                                                                                               <div className="card-body small font-weight-bold-600 pt-3 pb-0">
                                                                                                   <div
                                                                                                       dangerouslySetInnerHTML={{
-                                                                                                          __html:
-                                                                                                              options.content,
+                                                                                                          __html: `<div class="mb-3">${options.content}</div>`,
                                                                                                       }}
                                                                                                   ></div>
                                                                                               </div>
@@ -700,8 +699,7 @@ class CycleTestAutoQA extends Component {
                                                                                             <div className="card-body small font-weight-bold-600 pt-3 pb-0">
                                                                                                 <div
                                                                                                     dangerouslySetInnerHTML={{
-                                                                                                        __html:
-                                                                                                            options.content,
+                                                                                                        __html: `<div class="mb-3">${options.content}</div>`,
                                                                                                     }}
                                                                                                 ></div>
                                                                                             </div>

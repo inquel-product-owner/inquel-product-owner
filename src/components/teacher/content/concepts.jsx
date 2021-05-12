@@ -152,170 +152,28 @@ class Concepts extends Component {
                 if (result.sts === true) {
                     let data = [];
                     let keyboards = [];
-                    let imgArr = [];
-                    let audioArr = [];
                     let response = result.data.results;
                     if (response.length !== 0) {
-                        for (let i = 0; i < response.length; i++) {
-                            imgArr = [];
-                            audioArr = [];
-                            if (response[i].files.length !== 0) {
-                                // image
-                                imgArr.push({
-                                    title:
-                                        response[i].files[0]
-                                            .concepts_image_1_title || "",
-                                    file_name: "",
-                                    image: null,
-                                    path:
-                                        response[i].files[0].concepts_image_1 ||
-                                        "",
-                                });
-                                imgArr.push({
-                                    title:
-                                        response[i].files[0]
-                                            .concepts_image_2_title || "",
-                                    file_name: "",
-                                    image: null,
-                                    path:
-                                        response[i].files[0].concepts_image_2 ||
-                                        "",
-                                });
-                                imgArr.push({
-                                    title:
-                                        response[i].files[0]
-                                            .concepts_image_3_title || "",
-                                    file_name: "",
-                                    image: null,
-                                    path:
-                                        response[i].files[0].concepts_image_3 ||
-                                        "",
-                                });
-                                imgArr.push({
-                                    title:
-                                        response[i].files[0]
-                                            .concepts_image_4_title || "",
-                                    file_name: "",
-                                    image: null,
-                                    path:
-                                        response[i].files[0].concepts_image_4 ||
-                                        "",
-                                });
-
-                                // audio
-                                audioArr.push({
-                                    title:
-                                        response[i].files[0]
-                                            .concepts_audio_1_title || "",
-                                    file_name: "",
-                                    audio: null,
-                                    path:
-                                        response[i].files[0].concepts_audio_1 ||
-                                        "",
-                                });
-                                audioArr.push({
-                                    title:
-                                        response[i].files[0]
-                                            .concepts_audio_2_title || "",
-                                    file_name: "",
-                                    audio: null,
-                                    path:
-                                        response[i].files[0].concepts_audio_2 ||
-                                        "",
-                                });
-                            }
-
-                            // video
-                            var path = "";
-                            if (response[i].files.length !== 0) {
-                                if (response[i].files[0].paste_video_url) {
-                                    path = response[i].files[0].paste_video_url;
-                                }
-                                if (response[i].files[0].concepts_video_1) {
-                                    path =
-                                        response[i].files[0].concepts_video_1;
+                        let conceptData = this.loopConceptData(
+                            data,
+                            keyboards,
+                            response
+                        );
+                        this.setState(
+                            {
+                                concepts: conceptData.concepts,
+                                keyboards: conceptData.keyboards,
+                            },
+                            () => {
+                                if (result.data.next !== null) {
+                                    this.loadNextConceptData(result.data.next);
+                                } else {
+                                    this.setState({
+                                        page_loading: false,
+                                    });
                                 }
                             }
-
-                            data.push({
-                                chapter_id: this.props.match.params.chapterId,
-                                topic_num: this.props.match.params.topicNum,
-                                concepts_random_id:
-                                    response[i].concepts_random_id,
-                                is_file_uploaded:
-                                    response[i].files.length !== 0
-                                        ? true
-                                        : false,
-                                content: {
-                                    terms: response[i].terms,
-                                    definition: response[i].definition,
-                                    images:
-                                        imgArr.length === 0 ? [
-                                            { title: "", file_name: "", image: null, path: "" },
-                                            { title: "", file_name: "", image: null, path: "" },
-                                            { title: "", file_name: "", image: null, path: "" },
-                                            { title: "", file_name: "", image: null, path: "" },
-                                        ] : imgArr,
-                                    video: {
-                                        title:
-                                            response[i].files.length !== 0 &&
-                                            response[i].files[0]
-                                                .concepts_video_1_title
-                                                ? response[i].files[0]
-                                                      .concepts_video_1_title
-                                                : "",
-                                        file_name: "",
-                                        video: null,
-                                        path: path,
-                                        url: "",
-                                    },
-                                    audio:
-                                        audioArr.length === 0
-                                            ? [
-                                                { title: "", file_name: "", audio: null, path: "" },
-                                                { title: "", file_name: "", audio: null, path: "" },
-                                            ]
-                                            : audioArr,
-                                },
-                                settings: {
-                                    virtual_keyboard:
-                                        response[i].settings.virtual_keyboard,
-                                    limited: response[i].settings.limited,
-                                },
-                            });
-
-                            // Keyboards
-                            let boards = {
-                                all: false,
-                                chemistry: false,
-                                physics: false,
-                                maths: false,
-                            };
-                            let virtual_keyboard =
-                                response[i].settings.virtual_keyboard;
-                            for (let j = 0; j < virtual_keyboard.length; j++) {
-                                if (virtual_keyboard[j] === "All") {
-                                    boards.all = true;
-                                    boards.chemistry = true;
-                                    boards.maths = true;
-                                    boards.physics = true;
-                                } else if (
-                                    virtual_keyboard[j] === "Chemistry"
-                                ) {
-                                    boards.chemistry = true;
-                                } else if (virtual_keyboard[j] === "Physics") {
-                                    boards.physics = true;
-                                } else if (virtual_keyboard[j] === "Maths") {
-                                    boards.maths = true;
-                                }
-                            }
-                            keyboards.push(boards);
-                        }
-                        this.setState({
-                            concepts: data,
-                            keyboards: keyboards,
-                            page_loading: false,
-                        });
+                        );
                     } else {
                         this.setState({
                             page_loading: false,
@@ -335,11 +193,229 @@ class Concepts extends Component {
         window.MathJax.typeset();
     };
 
+    loadNextConceptData = async (path) => {
+        await fetch(path, {
+            headers: this.headers,
+            method: "GET",
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    let data = [...this.state.concepts];
+                    let keyboards = [...this.state.keyboards];
+                    let response = result.data.results;
+                    if (response.length !== 0) {
+                        let conceptData = this.loopConceptData(
+                            data,
+                            keyboards,
+                            response
+                        );
+                        this.setState(
+                            {
+                                concepts: conceptData.concepts,
+                                keyboards: conceptData.keyboards,
+                            },
+                            () => {
+                                if (result.data.next !== null) {
+                                    this.loadNextConceptData(result.data.next);
+                                } else {
+                                    this.setState({
+                                        page_loading: false,
+                                    });
+                                }
+                            }
+                        );
+                    } else {
+                        this.setState({
+                            page_loading: false,
+                        });
+                    }
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+        window.MathJax.typeset();
+    };
+
+    loopConceptData = (data, keyboards, response) => {
+        let imgArr = [];
+        let audioArr = [];
+        for (let i = 0; i < response.length; i++) {
+            imgArr = [];
+            audioArr = [];
+            if (response[i].files.length !== 0) {
+                // image
+                imgArr.push({
+                    title: response[i].files[0].concepts_image_1_title || "",
+                    file_name: "",
+                    image: null,
+                    path: response[i].files[0].concepts_image_1 || "",
+                });
+                imgArr.push({
+                    title: response[i].files[0].concepts_image_2_title || "",
+                    file_name: "",
+                    image: null,
+                    path: response[i].files[0].concepts_image_2 || "",
+                });
+                imgArr.push({
+                    title: response[i].files[0].concepts_image_3_title || "",
+                    file_name: "",
+                    image: null,
+                    path: response[i].files[0].concepts_image_3 || "",
+                });
+                imgArr.push({
+                    title: response[i].files[0].concepts_image_4_title || "",
+                    file_name: "",
+                    image: null,
+                    path: response[i].files[0].concepts_image_4 || "",
+                });
+
+                // audio
+                audioArr.push({
+                    title: response[i].files[0].concepts_audio_1_title || "",
+                    file_name: "",
+                    audio: null,
+                    path: response[i].files[0].concepts_audio_1 || "",
+                });
+                audioArr.push({
+                    title: response[i].files[0].concepts_audio_2_title || "",
+                    file_name: "",
+                    audio: null,
+                    path: response[i].files[0].concepts_audio_2 || "",
+                });
+            }
+
+            // video
+            var path = "";
+            if (response[i].files.length !== 0) {
+                if (response[i].files[0].paste_video_url) {
+                    path = response[i].files[0].paste_video_url;
+                }
+                if (response[i].files[0].concepts_video_1) {
+                    path = response[i].files[0].concepts_video_1;
+                }
+            }
+
+            data.push({
+                chapter_id: this.props.match.params.chapterId,
+                topic_num: this.props.match.params.topicNum,
+                concepts_random_id: response[i].concepts_random_id,
+                is_file_uploaded: response[i].files.length !== 0 ? true : false,
+                content: {
+                    terms: response[i].terms,
+                    definition: response[i].definition,
+                    images:
+                        imgArr.length === 0
+                            ? [
+                                  {
+                                      title: "",
+                                      file_name: "",
+                                      image: null,
+                                      path: "",
+                                  },
+                                  {
+                                      title: "",
+                                      file_name: "",
+                                      image: null,
+                                      path: "",
+                                  },
+                                  {
+                                      title: "",
+                                      file_name: "",
+                                      image: null,
+                                      path: "",
+                                  },
+                                  {
+                                      title: "",
+                                      file_name: "",
+                                      image: null,
+                                      path: "",
+                                  },
+                              ]
+                            : imgArr,
+                    video: {
+                        title:
+                            response[i].files.length !== 0 &&
+                            response[i].files[0].concepts_video_1_title
+                                ? response[i].files[0].concepts_video_1_title
+                                : "",
+                        file_name: "",
+                        video: null,
+                        path: path,
+                        url: "",
+                    },
+                    audio:
+                        audioArr.length === 0
+                            ? [
+                                  {
+                                      title: "",
+                                      file_name: "",
+                                      audio: null,
+                                      path: "",
+                                  },
+                                  {
+                                      title: "",
+                                      file_name: "",
+                                      audio: null,
+                                      path: "",
+                                  },
+                              ]
+                            : audioArr,
+                },
+                settings: {
+                    virtual_keyboard: response[i].settings.virtual_keyboard,
+                    limited: response[i].settings.limited,
+                },
+            });
+
+            // Keyboards
+            let boards = {
+                all: false,
+                chemistry: false,
+                physics: false,
+                maths: false,
+            };
+            let virtual_keyboard = response[i].settings.virtual_keyboard;
+            for (let j = 0; j < virtual_keyboard.length; j++) {
+                if (virtual_keyboard[j] === "All") {
+                    boards.all = true;
+                    boards.chemistry = true;
+                    boards.maths = true;
+                    boards.physics = true;
+                } else if (virtual_keyboard[j] === "Chemistry") {
+                    boards.chemistry = true;
+                } else if (virtual_keyboard[j] === "Physics") {
+                    boards.physics = true;
+                } else if (virtual_keyboard[j] === "Maths") {
+                    boards.maths = true;
+                }
+            }
+            keyboards.push(boards);
+        }
+
+        return {
+            concepts: data,
+            keyboards: keyboards,
+        };
+    };
+
+    // -------------------------- Lifecycle --------------------------
+
     componentDidMount = () => {
         document.title = `${this.props.topic_name} Concepts - Teacher | IQLabs`;
 
         this.loadConceptData();
     };
+
+    // -------------------------- Data submission --------------------------
 
     handleSubmit = () => {
         this.setState({
@@ -1389,10 +1465,30 @@ class Concepts extends Component {
                                 terms: "<p>Terms goes here</p>",
                                 definition: "<p>Definition goes here</p>",
                                 images: [
-                                    { title: "", file_name: "", image: null, path: "" },
-                                    { title: "", file_name: "", image: null, path: "" },
-                                    { title: "", file_name: "", image: null, path: "" },
-                                    { title: "", file_name: "", image: null, path: "" },
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        image: null,
+                                        path: "",
+                                    },
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        image: null,
+                                        path: "",
+                                    },
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        image: null,
+                                        path: "",
+                                    },
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        image: null,
+                                        path: "",
+                                    },
                                 ],
                                 video: {
                                     title: "",
@@ -1402,8 +1498,18 @@ class Concepts extends Component {
                                     url: "",
                                 },
                                 audio: [
-                                    { title: "", file_name: "", audio: null, path: "" },
-                                    { title: "", file_name: "", audio: null, path: "" },
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        audio: null,
+                                        path: "",
+                                    },
+                                    {
+                                        title: "",
+                                        file_name: "",
+                                        audio: null,
+                                        path: "",
+                                    },
                                 ],
                             },
                             settings: {
@@ -1462,10 +1568,30 @@ class Concepts extends Component {
                             terms: "<p>Terms goes here</p>",
                             definition: "<p>Definition goes here</p>",
                             images: [
-                                { title: "", file_name: "", image: null, path: "" },
-                                { title: "", file_name: "", image: null, path: "" },
-                                { title: "", file_name: "", image: null, path: "" },
-                                { title: "", file_name: "", image: null, path: "" },
+                                {
+                                    title: "",
+                                    file_name: "",
+                                    image: null,
+                                    path: "",
+                                },
+                                {
+                                    title: "",
+                                    file_name: "",
+                                    image: null,
+                                    path: "",
+                                },
+                                {
+                                    title: "",
+                                    file_name: "",
+                                    image: null,
+                                    path: "",
+                                },
+                                {
+                                    title: "",
+                                    file_name: "",
+                                    image: null,
+                                    path: "",
+                                },
                             ],
                             video: {
                                 title: "",
@@ -1475,8 +1601,18 @@ class Concepts extends Component {
                                 url: "",
                             },
                             audio: [
-                                { title: "", file_name: "", audio: null, path: "" },
-                                { title: "", file_name: "", audio: null, path: "" },
+                                {
+                                    title: "",
+                                    file_name: "",
+                                    audio: null,
+                                    path: "",
+                                },
+                                {
+                                    title: "",
+                                    file_name: "",
+                                    audio: null,
+                                    path: "",
+                                },
                             ],
                         },
                         settings: {

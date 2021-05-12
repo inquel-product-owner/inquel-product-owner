@@ -57,11 +57,11 @@ const TopicListRender = (props) => {
                 }
             >
                 <div className="row align-items-center">
-                    <div className="col-md-4 mb-2 mb-md-0">
+                    <div className="col-md-5 mb-2 mb-md-0">
                         <div className="row align-items-center">
-                            {props.topics.child.length !== 0 ? (
-                                <div className="col-1">
-                                    <span>
+                            <div className="col-1">
+                                {props.topics.child.length !== 0 ? (
+                                    <div>
                                         <i
                                             className={`fas fa-chevron-circle-down ${
                                                 props.topicEventKey[
@@ -73,16 +73,16 @@ const TopicListRender = (props) => {
                                                     : "fa-rotate-270"
                                             }`}
                                         ></i>
-                                    </span>
-                                </div>
-                            ) : (
-                                ""
-                            )}
-                            <div className="col-11 d-flex small font-weight-bold-600">
+                                    </div>
+                                ) : (
+                                    ""
+                                )}
+                            </div>
+                            <div className="col-10 d-flex small font-weight-bold-600">
                                 <div className="mr-3">
                                     {props.topics.topic_num}
                                 </div>
-                                <div>
+                                <div className="w-100">
                                     <Link
                                         to={`${props.url}/chapter/${props.chapter.chapter_id}/${props.topics.topic_num}/learn`}
                                         className="primary-text"
@@ -95,7 +95,7 @@ const TopicListRender = (props) => {
                         </div>
                     </div>
 
-                    <div className="col-md-8 small primary-text font-weight-bold-600">
+                    <div className="col-md-7 small primary-text font-weight-bold-600">
                         <div className="row align-items-center">
                             <div className="col-md-2 mb-2 mb-md-0"></div>
                             <div className="col-md-2 mb-2 mb-md-0"></div>
@@ -224,6 +224,7 @@ const ChapterListRender = (props) => {
                 className="pinkrange-bg shadow-sm mb-2"
                 style={{
                     borderRadius: "8px",
+                    cursor: "default",
                 }}
                 onClick={() =>
                     props.toggleCollapse(
@@ -234,7 +235,7 @@ const ChapterListRender = (props) => {
                 }
             >
                 <div className="row align-items-center">
-                    <div className="col-md-4 mb-2 mb-md-0">
+                    <div className="col-md-5 mb-2 mb-md-0">
                         <div className="row align-items-center">
                             <div className="col-1">
                                 <span>
@@ -260,7 +261,7 @@ const ChapterListRender = (props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="col-md-8 small primary-text font-weight-bold-600">
+                    <div className="col-md-7 small primary-text font-weight-bold-600">
                         <div className="row align-items-center justify-content-end">
                             <div className="col-md-2 mb-2 mb-md-0">
                                 {props.chapter.weightage}
@@ -472,7 +473,7 @@ class Subject extends Component {
             all_chapters: [],
             semester_chapters: [],
 
-            chapterEventKey: "chapter-0",
+            chapterEventKey: "",
             topicEventKey: [],
 
             errorMsg: "",
@@ -688,7 +689,16 @@ class Subject extends Component {
                         );
                         // Gets all chapter id from the chapters list
                         all_chapters.push(result.data.chapters[i].chapter_id);
+                        // Topic event key
                         topicKey.push([]);
+                        if (
+                            this.state.topicEventKey.length !== 0 &&
+                            this.state.topicEventKey[i] !== undefined
+                        ) {
+                            if (this.state.topicEventKey[i].length !== 0) {
+                                topicKey[i] = this.state.topicEventKey[i];
+                            }
+                        }
                     }
                     for (let i = 0; i < result.data.semesters.length; i++) {
                         // Gets all chapter id from the semester list
@@ -1065,10 +1075,10 @@ class Subject extends Component {
                         <div className="card shadow-sm">
                             <div className="card-header secondary-bg primary-text font-weight-bold">
                                 <div className="row align-items-center">
-                                    <div className="col-md-4 mb-2 mb-md-0">
+                                    <div className="col-md-5 mb-2 mb-md-0">
                                         Chapter
                                     </div>
-                                    <div className="col-md-8 small primary-text font-weight-bold">
+                                    <div className="col-md-7 small primary-text font-weight-bold">
                                         <div className="row justify-content-end">
                                             <div className="col-md-2 mb-2 mb-md-0">
                                                 Weightage
@@ -1091,7 +1101,7 @@ class Subject extends Component {
                                 </div>
                             </div>
                             <div className="card-body">
-                                <Accordion defaultActiveKey="chapter-0">
+                                <Accordion defaultActiveKey="">
                                     {this.state.subjectItems.length !== 0
                                         ? this.state.subjectItems.semesters.map(
                                               (semester, semester_index) => {

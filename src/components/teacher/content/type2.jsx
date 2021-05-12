@@ -174,7 +174,7 @@ class Type2 extends Component {
         this.loadMCQData();
     };
 
-    // -------------------------- Form submission --------------------------
+    // -------------------------- Question data loading --------------------------
 
     loadMCQData = async () => {
         await fetch(
@@ -189,270 +189,29 @@ class Type2 extends Component {
                 console.log(result);
                 if (result.sts === true) {
                     let data = [];
-                    let sub_question = [];
                     let keyboards = [];
-                    let images = [];
-                    let audio = [];
                     let response = result.data.results;
                     if (response.length !== 0) {
-                        for (let i = 0; i < response.length; i++) {
-                            images = [];
-                            audio = [];
-                            sub_question = [];
-                            if (
-                                Object.entries(response[i].files).length !== 0
-                            ) {
-                                // image
-                                images.push({
-                                    title:
-                                        response[i].files.type2_image_1_title ||
-                                        "",
-                                    file_name: "",
-                                    image: null,
-                                    path: response[i].files.type2_image_1 || "",
-                                });
-                                images.push({
-                                    title:
-                                        response[i].files.type2_image_2_title ||
-                                        "",
-                                    file_name: "",
-                                    image: null,
-                                    path: response[i].files.type2_image_2 || "",
-                                });
-                                images.push({
-                                    title:
-                                        response[i].files.type2_image_3_title ||
-                                        "",
-                                    file_name: "",
-                                    image: null,
-                                    path: response[i].files.type2_image_3 || "",
-                                });
-                                images.push({
-                                    title:
-                                        response[i].files.type2_image_4_title ||
-                                        "",
-                                    file_name: "",
-                                    image: null,
-                                    path: response[i].files.type2_image_4 || "",
-                                });
-
-                                // audio
-                                audio.push({
-                                    title:
-                                        response[i].files.type2_audio_1_title ||
-                                        "",
-                                    file_name: "",
-                                    audio: null,
-                                    path: response[i].files.type2_audio_1 || "",
-                                });
-                                audio.push({
-                                    title:
-                                        response[i].files.type2_audio_2_title ||
-                                        "",
-                                    file_name: "",
-                                    audio: null,
-                                    path: response[i].files.type2_audio_2 || "",
-                                });
-                            }
-
-                            // video
-                            var path = "";
-                            if (
-                                Object.entries(response[i].files).length !== 0
-                            ) {
-                                if (response[i].files.paste_video_url) {
-                                    path = response[i].files.paste_video_url;
-                                }
-                                if (response[i].files.type2_video_1) {
-                                    path = response[i].files.type2_video_1;
+                        let questionData = this.loopQuestionData(
+                            data,
+                            keyboards,
+                            response
+                        );
+                        this.setState(
+                            {
+                                questions: questionData.question,
+                                keyboards: questionData.keyboards,
+                            },
+                            () => {
+                                if (result.data.next !== null) {
+                                    this.loadNextMCQData(result.data.next);
+                                } else {
+                                    this.setState({
+                                        page_loading: false,
+                                    });
                                 }
                             }
-
-                            // Sub question
-                            for (
-                                let k = 0;
-                                k < response[i].sub_question.length;
-                                k++
-                            ) {
-                                sub_question.push({
-                                    sub_question_id:
-                                        response[i].sub_question[k]
-                                            .sub_question_id,
-                                    question:
-                                        response[i].sub_question[k].question,
-                                    mcq: response[i].sub_question[k].mcq,
-                                    fill_in:
-                                        response[i].sub_question[k].fill_in,
-                                    fillin_answer:
-                                        response[i].sub_question[k]
-                                            .fillin_answer.length !== 0
-                                            ? response[i].sub_question[k]
-                                                  .fillin_answer
-                                            : [""],
-                                    options:
-                                        response[i].sub_question[k].options
-                                            .length !== 0
-                                            ? response[i].sub_question[k]
-                                                  .options
-                                            : [
-                                                  {
-                                                      correct: false,
-                                                      content: "",
-                                                  },
-                                                  {
-                                                      correct: false,
-                                                      content: "",
-                                                  },
-                                                  {
-                                                      correct: false,
-                                                      content: "",
-                                                  },
-                                                  {
-                                                      correct: false,
-                                                      content: "",
-                                                  },
-                                              ],
-                                    marks: response[i].sub_question[
-                                        k
-                                    ].marks.toString(),
-                                    negative_marks: response[i].sub_question[
-                                        k
-                                    ].negative_marks.toString(),
-                                });
-                            }
-
-                            // Main question
-                            data.push({
-                                question_random_id:
-                                    response[i].question_random_id,
-                                question: response[i].question,
-                                explanation: response[i].explanation,
-                                is_file_uploaded:
-                                    Object.entries(response[i].files).length !==
-                                    0
-                                        ? true
-                                        : false,
-                                mcq:
-                                    response[i].sub_question[0].mcq !==
-                                    undefined
-                                        ? response[i].sub_question[0].mcq
-                                        : false,
-                                fill_in:
-                                    response[i].sub_question[0].fill_in !==
-                                    undefined
-                                        ? response[i].sub_question[0].fill_in
-                                        : false,
-                                sub_question: sub_question,
-                                content: {
-                                    images:
-                                        images.length === 0
-                                            ? [
-                                                  {
-                                                      title: "",
-                                                      file_name: "",
-                                                      image: null,
-                                                      path: "",
-                                                  },
-                                                  {
-                                                      title: "",
-                                                      file_name: "",
-                                                      image: null,
-                                                      path: "",
-                                                  },
-                                                  {
-                                                      title: "",
-                                                      file_name: "",
-                                                      image: null,
-                                                      path: "",
-                                                  },
-                                                  {
-                                                      title: "",
-                                                      file_name: "",
-                                                      image: null,
-                                                      path: "",
-                                                  },
-                                              ]
-                                            : images,
-                                    video: {
-                                        title:
-                                            Object.entries(response[i].files)
-                                                .length !== 0 &&
-                                            response[i].files
-                                                .type2_video_1_title
-                                                ? response[i].files
-                                                      .type2_video_1_title
-                                                : "",
-                                        file_name: "",
-                                        video: null,
-                                        path: path,
-                                        url: "",
-                                    },
-                                    audio:
-                                        audio.length === 0
-                                            ? [
-                                                  {
-                                                      title: "",
-                                                      file_name: "",
-                                                      audio: null,
-                                                      path: "",
-                                                  },
-                                                  {
-                                                      title: "",
-                                                      file_name: "",
-                                                      audio: null,
-                                                      path: "",
-                                                  },
-                                              ]
-                                            : audio,
-                                },
-                                properties: {
-                                    complexity:
-                                        response[i].properties.complexity,
-                                    priority: response[i].properties.priority,
-                                    theme: response[i].properties.theme,
-                                    test: response[i].properties.test,
-                                    semester: response[i].properties.semester,
-                                    learn: response[i].properties.learn,
-                                },
-                                settings: {
-                                    virtual_keyboard:
-                                        response[i].settings.virtual_keyboard,
-                                    limited: response[i].settings.limited,
-                                },
-                            });
-
-                            // Keyboards
-                            let boards = {
-                                all: false,
-                                chemistry: false,
-                                physics: false,
-                                maths: false,
-                            };
-                            let virtual_keyboard =
-                                response[i].settings.virtual_keyboard;
-                            for (let j = 0; j < virtual_keyboard.length; j++) {
-                                if (virtual_keyboard[j] === "All") {
-                                    boards.all = true;
-                                    boards.chemistry = true;
-                                    boards.maths = true;
-                                    boards.physics = true;
-                                } else if (
-                                    virtual_keyboard[j] === "Chemistry"
-                                ) {
-                                    boards.chemistry = true;
-                                } else if (virtual_keyboard[j] === "Physics") {
-                                    boards.physics = true;
-                                } else if (virtual_keyboard[j] === "Maths") {
-                                    boards.maths = true;
-                                }
-                            }
-                            keyboards.push(boards);
-                        }
-                        this.setState({
-                            questions: data,
-                            keyboards: keyboards,
-                            page_loading: false,
-                        });
+                        );
                     } else {
                         this.setState({
                             page_loading: false,
@@ -471,6 +230,283 @@ class Type2 extends Component {
             });
         window.MathJax.typeset();
     };
+
+    loadNextMCQData = async (path) => {
+        await fetch(path, {
+            headers: this.headers,
+            method: "GET",
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    let data = [...this.state.questions];
+                    let keyboards = [...this.state.keyboards];
+                    let response = result.data.results;
+                    if (response.length !== 0) {
+                        let questionData = this.loopQuestionData(
+                            data,
+                            keyboards,
+                            response
+                        );
+                        this.setState(
+                            {
+                                questions: questionData.question,
+                                keyboards: questionData.keyboards,
+                            },
+                            () => {
+                                if (result.data.next !== null) {
+                                    this.loadNextMCQData(result.data.next);
+                                } else {
+                                    this.setState({
+                                        page_loading: false,
+                                    });
+                                }
+                            }
+                        );
+                    } else {
+                        this.setState({
+                            page_loading: false,
+                        });
+                    }
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+        window.MathJax.typeset();
+    };
+
+    loopQuestionData = (data, keyboards, response) => {
+        let images = [];
+        let audio = [];
+        let sub_question = [];
+        for (let i = 0; i < response.length; i++) {
+            images = [];
+            audio = [];
+            sub_question = [];
+            if (Object.entries(response[i].files).length !== 0) {
+                // image
+                images.push({
+                    title: response[i].files.type2_image_1_title || "",
+                    file_name: "",
+                    image: null,
+                    path: response[i].files.type2_image_1 || "",
+                });
+                images.push({
+                    title: response[i].files.type2_image_2_title || "",
+                    file_name: "",
+                    image: null,
+                    path: response[i].files.type2_image_2 || "",
+                });
+                images.push({
+                    title: response[i].files.type2_image_3_title || "",
+                    file_name: "",
+                    image: null,
+                    path: response[i].files.type2_image_3 || "",
+                });
+                images.push({
+                    title: response[i].files.type2_image_4_title || "",
+                    file_name: "",
+                    image: null,
+                    path: response[i].files.type2_image_4 || "",
+                });
+
+                // audio
+                audio.push({
+                    title: response[i].files.type2_audio_1_title || "",
+                    file_name: "",
+                    audio: null,
+                    path: response[i].files.type2_audio_1 || "",
+                });
+                audio.push({
+                    title: response[i].files.type2_audio_2_title || "",
+                    file_name: "",
+                    audio: null,
+                    path: response[i].files.type2_audio_2 || "",
+                });
+            }
+
+            // video
+            var path = "";
+            if (Object.entries(response[i].files).length !== 0) {
+                if (response[i].files.paste_video_url) {
+                    path = response[i].files.paste_video_url;
+                }
+                if (response[i].files.type2_video_1) {
+                    path = response[i].files.type2_video_1;
+                }
+            }
+
+            // Sub question
+            for (let k = 0; k < response[i].sub_question.length; k++) {
+                sub_question.push({
+                    sub_question_id:
+                        response[i].sub_question[k].sub_question_id,
+                    question: response[i].sub_question[k].question,
+                    mcq: response[i].sub_question[k].mcq,
+                    fill_in: response[i].sub_question[k].fill_in,
+                    fillin_answer:
+                        response[i].sub_question[k].fillin_answer.length !== 0
+                            ? response[i].sub_question[k].fillin_answer
+                            : [""],
+                    options:
+                        response[i].sub_question[k].options.length !== 0
+                            ? response[i].sub_question[k].options
+                            : [
+                                  {
+                                      correct: false,
+                                      content: "",
+                                  },
+                                  {
+                                      correct: false,
+                                      content: "",
+                                  },
+                                  {
+                                      correct: false,
+                                      content: "",
+                                  },
+                                  {
+                                      correct: false,
+                                      content: "",
+                                  },
+                              ],
+                    marks: response[i].sub_question[k].marks.toString(),
+                    negative_marks: response[i].sub_question[
+                        k
+                    ].negative_marks.toString(),
+                });
+            }
+
+            // Main question
+            data.push({
+                question_random_id: response[i].question_random_id,
+                question: response[i].question,
+                explanation: response[i].explanation,
+                is_file_uploaded:
+                    Object.entries(response[i].files).length !== 0
+                        ? true
+                        : false,
+                mcq:
+                    response[i].sub_question[0].mcq !== undefined
+                        ? response[i].sub_question[0].mcq
+                        : false,
+                fill_in:
+                    response[i].sub_question[0].fill_in !== undefined
+                        ? response[i].sub_question[0].fill_in
+                        : false,
+                sub_question: sub_question,
+                content: {
+                    images:
+                        images.length === 0
+                            ? [
+                                  {
+                                      title: "",
+                                      file_name: "",
+                                      image: null,
+                                      path: "",
+                                  },
+                                  {
+                                      title: "",
+                                      file_name: "",
+                                      image: null,
+                                      path: "",
+                                  },
+                                  {
+                                      title: "",
+                                      file_name: "",
+                                      image: null,
+                                      path: "",
+                                  },
+                                  {
+                                      title: "",
+                                      file_name: "",
+                                      image: null,
+                                      path: "",
+                                  },
+                              ]
+                            : images,
+                    video: {
+                        title:
+                            Object.entries(response[i].files).length !== 0 &&
+                            response[i].files.type2_video_1_title
+                                ? response[i].files.type2_video_1_title
+                                : "",
+                        file_name: "",
+                        video: null,
+                        path: path,
+                        url: "",
+                    },
+                    audio:
+                        audio.length === 0
+                            ? [
+                                  {
+                                      title: "",
+                                      file_name: "",
+                                      audio: null,
+                                      path: "",
+                                  },
+                                  {
+                                      title: "",
+                                      file_name: "",
+                                      audio: null,
+                                      path: "",
+                                  },
+                              ]
+                            : audio,
+                },
+                properties: {
+                    complexity: response[i].properties.complexity,
+                    priority: response[i].properties.priority,
+                    theme: response[i].properties.theme,
+                    test: response[i].properties.test,
+                    semester: response[i].properties.semester,
+                    learn: response[i].properties.learn,
+                },
+                settings: {
+                    virtual_keyboard: response[i].settings.virtual_keyboard,
+                    limited: response[i].settings.limited,
+                },
+            });
+
+            // Keyboards
+            let boards = {
+                all: false,
+                chemistry: false,
+                physics: false,
+                maths: false,
+            };
+            let virtual_keyboard = response[i].settings.virtual_keyboard;
+            for (let j = 0; j < virtual_keyboard.length; j++) {
+                if (virtual_keyboard[j] === "All") {
+                    boards.all = true;
+                    boards.chemistry = true;
+                    boards.maths = true;
+                    boards.physics = true;
+                } else if (virtual_keyboard[j] === "Chemistry") {
+                    boards.chemistry = true;
+                } else if (virtual_keyboard[j] === "Physics") {
+                    boards.physics = true;
+                } else if (virtual_keyboard[j] === "Maths") {
+                    boards.maths = true;
+                }
+            }
+            keyboards.push(boards);
+        }
+
+        return {
+            question: data,
+            keyboards: keyboards,
+        };
+    };
+
+    // -------------------------- Lifecycle --------------------------
 
     componentDidMount = () => {
         document.title = `${this.props.topic_name} Type 2 - Teacher | IQLabs`;
@@ -501,6 +537,8 @@ class Type2 extends Component {
 
         this.loadMCQData();
     };
+
+    // -------------------------- Data submission --------------------------
 
     handleSubmit = () => {
         this.setState({
@@ -2756,7 +2794,7 @@ class Type2 extends Component {
                                                                                                                             __html:
                                                                                                                                 options.content !==
                                                                                                                                 ""
-                                                                                                                                    ? options.content
+                                                                                                                                    ? `<div class="mb-3">${options.content}</div>`
                                                                                                                                     : `<p class="text-muted">Option 0${
                                                                                                                                           index +
                                                                                                                                           1
