@@ -30,12 +30,6 @@ class QuizCountDown extends Component {
         this.timer = setInterval(this.countDown, 1000);
     };
 
-    componentWillUnmount = () => {
-        this.setState({
-            isPlaying: false,
-        });
-    };
-
     countDown = () => {
         this.setState({
             second: this.state.second - 1,
@@ -70,11 +64,7 @@ class QuizCountDown extends Component {
 
                     <Sound
                         url={CountDownSound}
-                        playStatus={
-                            this.state.isPlaying
-                                ? Sound.status.PLAYING
-                                : Sound.status.STOPPED
-                        }
+                        playStatus={Sound.status.PLAYING}
                         volume={30}
                     />
                 </Modal.Body>
@@ -330,7 +320,6 @@ class QuizLevelExam extends Component {
                             currentLevel = index;
                         }
                     });
-                    // result.data.negative_points = true;
                     this.setState(
                         {
                             quiz: result.data,
@@ -389,7 +378,6 @@ class QuizLevelExam extends Component {
                             page_loading: false,
                         },
                         () => {
-                            // this.startTimer();
                             this.loopAnswerSection();
                         }
                     );
