@@ -81,7 +81,7 @@ class Match extends Component {
         this.loadMatchData();
     };
 
-    // -------------------------- Form submission --------------------------
+    // -------------------------- Load match data --------------------------
 
     loadMatchData = async () => {
         await fetch(
@@ -105,10 +105,20 @@ class Match extends Component {
                                 match_definition: response[i].match_definition,
                             });
                         }
-                        this.setState({
-                            match: data,
-                            page_loading: false,
-                        });
+                        this.setState(
+                            {
+                                match: data,
+                            },
+                            () => {
+                                if (result.data.next !== null) {
+                                    this.loadNextMatchData(result.data.next);
+                                } else {
+                                    this.setState({
+                                        page_loading: false,
+                                    });
+                                }
+                            }
+                        );
                     } else {
                         this.setState({
                             page_loading: false,
@@ -128,11 +138,67 @@ class Match extends Component {
         window.MathJax.typeset();
     };
 
+    loadNextMatchData = async (path) => {
+        await fetch(path, {
+            headers: this.headers,
+            method: "GET",
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    let data = [...this.state.match];
+                    let response = result.data.results;
+                    if (response.length !== 0) {
+                        for (let i = 0; i < response.length; i++) {
+                            data.push({
+                                match_id: response[i].match_id,
+                                match_terms: response[i].match_terms,
+                                match_definition: response[i].match_definition,
+                            });
+                        }
+                        this.setState(
+                            {
+                                match: data,
+                            },
+                            () => {
+                                if (result.data.next !== null) {
+                                    this.loadNextMatchData(result.data.next);
+                                } else {
+                                    this.setState({
+                                        page_loading: false,
+                                    });
+                                }
+                            }
+                        );
+                    } else {
+                        this.setState({
+                            page_loading: false,
+                        });
+                    }
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+        window.MathJax.typeset();
+    };
+
+    // -------------------------- Lifecycle --------------------------
+
     componentDidMount = () => {
         document.title = `${this.props.topic_name} Match - Teacher | IQLabs`;
 
         this.loadMatchData();
     };
+
+    // -------------------------- Data submission --------------------------
 
     handleSubmit = () => {
         this.setState({
