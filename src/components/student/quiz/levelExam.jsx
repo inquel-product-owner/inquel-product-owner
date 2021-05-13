@@ -23,16 +23,10 @@ class QuizCountDown extends Component {
             second: 3,
         };
         this.timer = 0;
-        // this.audio = new Audio(CountDownSound);
-        // this.audio.autoplay = true;
-        // this.audio.volume = 0.3;
-        // this.audio.muted = true
     }
 
     componentDidMount = () => {
         this.timer = setInterval(this.countDown, 1000);
-        // this.audio.play();
-        // this.audio.muted = false
     };
 
     componentWillUnmount = () => {
