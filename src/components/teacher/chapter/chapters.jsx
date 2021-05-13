@@ -1387,7 +1387,8 @@ class Chapters extends Component {
                         </button>
                         {this.state.permissions !== undefined ? (
                             this.state.permissions.quiz !== undefined ? (
-                                this.state.permissions.quiz !== false ? (
+                                this.state.permissions.quiz === true &&
+                                this.state.permissions.type_1_q === true ? (
                                     <button
                                         className="btn btn-tomato btn-block shadow-sm"
                                         onClick={this.toggleQuiz_CreateModal}

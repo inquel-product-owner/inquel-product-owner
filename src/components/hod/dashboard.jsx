@@ -166,6 +166,7 @@ class Dashboard extends Component {
             subjectItems: [],
             selectedSubject: [],
             selectedGroup: [],
+            permissions: {},
 
             activeGroupPage: 1,
             totalGroupCount: 0,
@@ -346,6 +347,13 @@ class Dashboard extends Component {
         });
     };
 
+    // Gets permission from the header navbar
+    handlePermissions = (data) => {
+        this.setState({
+            permissions: data,
+        });
+    };
+
     handleGroupPageChange(pageNumber) {
         this.setState(
             { activeGroupPage: pageNumber, page_loading: true },
@@ -368,9 +376,13 @@ class Dashboard extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="Dashboard" togglenav={this.toggleSideNav} />
+                <Header
+                    name="Dashboard"
+                    togglenav={this.toggleSideNav}
+                    permissions={this.handlePermissions}
+                />
 
-                {/* ALert message */}
+                {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
                     successMsg={this.state.successMsg}
@@ -471,7 +483,7 @@ class Dashboard extends Component {
                     }`}
                 >
                     <div className="container-fluid">
-                        {/* Welcome */}
+                        {/* ----- Welcome ----- */}
                         <div className="card shadow-sm mb-4">
                             <div className="card-body text-center p-4">
                                 <h3 className="primary-text mb-0">
@@ -480,7 +492,7 @@ class Dashboard extends Component {
                             </div>
                         </div>
 
-                        {/* Group card */}
+                        {/* ----- Group card ----- */}
                         <div className="card shadow-sm mb-4">
                             <div className="card-header">
                                 <div className="row align-items-center">
@@ -527,171 +539,209 @@ class Dashboard extends Component {
                             </div>
                         </div>
 
-                        {/* Subject card */}
-                        <div className="card shadow-sm mb-4">
-                            <div className="card-header">
-                                <div className="row align-items-center">
-                                    <div className="col-md-3">
-                                        <h5>Subjects</h5>
-                                    </div>
-                                    <div className="col-md-9 text-right">
-                                        <button
-                                            className="btn btn-primary btn-sm shadow-none mr-1"
-                                            onClick={this.handleSubjectAdd}
-                                        >
-                                            Add new
-                                        </button>
-                                        <button
-                                            className="btn btn-primary btn-sm shadow-none mr-1"
-                                            onClick={() =>
-                                                this.handleDelete("subject")
+                        {Object.entries(this.state.permissions).length !== 0 ? (
+                            this.state.permissions.config_course === true ? (
+                                <>
+                                    {/* ----- Subject card ----- */}
+                                    <div className="card shadow-sm mb-4">
+                                        <div className="card-header">
+                                            <div className="row align-items-center">
+                                                <div className="col-md-3">
+                                                    <h5>Subjects</h5>
+                                                </div>
+                                                <div className="col-md-9 text-right">
+                                                    <button
+                                                        className="btn btn-primary btn-sm shadow-none mr-1"
+                                                        onClick={
+                                                            this
+                                                                .handleSubjectAdd
+                                                        }
+                                                    >
+                                                        Add new
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-primary btn-sm shadow-none mr-1"
+                                                        onClick={() =>
+                                                            this.handleDelete(
+                                                                "subject"
+                                                            )
+                                                        }
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-primary btn-sm shadow-none mr-1"
+                                                        onClick={
+                                                            this.handleEnable
+                                                        }
+                                                    >
+                                                        Enable
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-primary btn-sm shadow-none"
+                                                        onClick={
+                                                            this.handleDisable
+                                                        }
+                                                    >
+                                                        Disable
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <SubjectTable
+                                            subjectItems={
+                                                this.state.subjectItems
                                             }
-                                        >
-                                            Delete
-                                        </button>
-                                        <button
-                                            className="btn btn-primary btn-sm shadow-none mr-1"
-                                            onClick={this.handleEnable}
-                                        >
-                                            Enable
-                                        </button>
-                                        <button
-                                            className="btn btn-primary btn-sm shadow-none"
-                                            onClick={this.handleDisable}
-                                        >
-                                            Disable
-                                        </button>
+                                            path="hod"
+                                            status={true}
+                                            handleSubjectId={
+                                                this.handleSubjectId
+                                            }
+                                        />
+                                        <div className="card-body p-3">
+                                            {this.state.totalSubjectCount >
+                                            paginationCount ? (
+                                                <Paginations
+                                                    activePage={
+                                                        this.state
+                                                            .activeSubjectPage
+                                                    }
+                                                    totalItemsCount={
+                                                        this.state
+                                                            .totalSubjectCount
+                                                    }
+                                                    onChange={this.handleSubjectPageChange.bind(
+                                                        this
+                                                    )}
+                                                />
+                                            ) : null}
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                            <SubjectTable
-                                subjectItems={this.state.subjectItems}
-                                path="hod"
-                                status={true}
-                                handleSubjectId={this.handleSubjectId}
-                            />
-                            <div className="card-body p-3">
-                                {this.state.totalSubjectCount >
-                                paginationCount ? (
-                                    <Paginations
-                                        activePage={
-                                            this.state.activeSubjectPage
-                                        }
-                                        totalItemsCount={
-                                            this.state.totalSubjectCount
-                                        }
-                                        onChange={this.handleSubjectPageChange.bind(
-                                            this
-                                        )}
-                                    />
-                                ) : null}
-                            </div>
-                        </div>
 
-                        {/* Course card */}
-                        <div className="card shadow-sm mb-4">
-                            <div className="card-header">
-                                <div className="row align-items-center">
-                                    <div className="col-md-3">
-                                        <h5>Course</h5>
-                                    </div>
-                                    <div className="col-md-9 text-right">
-                                        <button className="btn btn-primary btn-sm shadow-none mr-1">
-                                            Add new
-                                        </button>
-                                        <button className="btn btn-primary btn-sm shadow-none mr-1">
-                                            Delete
-                                        </button>
-                                        <button className="btn btn-primary btn-sm shadow-none mr-1">
-                                            Enable
-                                        </button>
-                                        <button className="btn btn-primary btn-sm shadow-none">
-                                            Disable
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="card-body">
-                                <div className="row justify-content-center">
-                                    <div className="col-md-11">
-                                        <div className="row">
-                                            <div className="col-md-4 mb-3">
-                                                <Link
-                                                    to="/hod"
-                                                    style={{
-                                                        textDecoration: "none",
-                                                    }}
-                                                >
-                                                    <div
-                                                        className="card"
-                                                        style={{
-                                                            cursor: "pointer",
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={courseimg}
-                                                            className="card-img-top"
-                                                            alt="Course"
-                                                        />
-                                                        <div className="card-body primary-bg text-white text-center p-2">
-                                                            Course 01
-                                                        </div>
-                                                    </div>
-                                                </Link>
+                                    {/* ----- Course card ----- */}
+                                    <div className="card shadow-sm mb-4">
+                                        <div className="card-header">
+                                            <div className="row align-items-center">
+                                                <div className="col-md-3">
+                                                    <h5>Course</h5>
+                                                </div>
+                                                <div className="col-md-9 text-right">
+                                                    <button className="btn btn-primary btn-sm shadow-none mr-1">
+                                                        Delete
+                                                    </button>
+                                                    <button className="btn btn-primary btn-sm shadow-none mr-1">
+                                                        Enable
+                                                    </button>
+                                                    <button className="btn btn-primary btn-sm shadow-none">
+                                                        Disable
+                                                    </button>
+                                                </div>
                                             </div>
-                                            <div className="col-md-4 mb-3">
-                                                <Link
-                                                    to="/hod"
-                                                    style={{
-                                                        textDecoration: "none",
-                                                    }}
-                                                >
-                                                    <div
-                                                        className="card"
-                                                        style={{
-                                                            cursor: "pointer",
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={courseimg}
-                                                            className="card-img-top"
-                                                            alt="Course"
-                                                        />
-                                                        <div className="card-body primary-bg text-white text-center p-2">
-                                                            Course 02
+                                        </div>
+                                        <div className="card-body">
+                                            <div className="row justify-content-center">
+                                                <div className="col-md-11">
+                                                    <div className="row">
+                                                        <div className="col-md-4 mb-3">
+                                                            <Link
+                                                                to="/hod"
+                                                                style={{
+                                                                    textDecoration:
+                                                                        "none",
+                                                                }}
+                                                            >
+                                                                <div
+                                                                    className="card"
+                                                                    style={{
+                                                                        cursor:
+                                                                            "pointer",
+                                                                    }}
+                                                                >
+                                                                    <img
+                                                                        src={
+                                                                            courseimg
+                                                                        }
+                                                                        className="card-img-top"
+                                                                        alt="Course"
+                                                                    />
+                                                                    <div className="card-body primary-bg text-white text-center p-2">
+                                                                        Course
+                                                                        01
+                                                                    </div>
+                                                                </div>
+                                                            </Link>
+                                                        </div>
+                                                        <div className="col-md-4 mb-3">
+                                                            <Link
+                                                                to="/hod"
+                                                                style={{
+                                                                    textDecoration:
+                                                                        "none",
+                                                                }}
+                                                            >
+                                                                <div
+                                                                    className="card"
+                                                                    style={{
+                                                                        cursor:
+                                                                            "pointer",
+                                                                    }}
+                                                                >
+                                                                    <img
+                                                                        src={
+                                                                            courseimg
+                                                                        }
+                                                                        className="card-img-top"
+                                                                        alt="Course"
+                                                                    />
+                                                                    <div className="card-body primary-bg text-white text-center p-2">
+                                                                        Course
+                                                                        02
+                                                                    </div>
+                                                                </div>
+                                                            </Link>
+                                                        </div>
+                                                        <div className="col-md-4 mb-3">
+                                                            <Link
+                                                                to="/hod"
+                                                                style={{
+                                                                    textDecoration:
+                                                                        "none",
+                                                                }}
+                                                            >
+                                                                <div
+                                                                    className="card"
+                                                                    style={{
+                                                                        cursor:
+                                                                            "pointer",
+                                                                    }}
+                                                                >
+                                                                    <img
+                                                                        src={
+                                                                            courseimg
+                                                                        }
+                                                                        className="card-img-top"
+                                                                        alt="Course"
+                                                                    />
+                                                                    <div className="card-body primary-bg text-white text-center p-2">
+                                                                        Course
+                                                                        03
+                                                                    </div>
+                                                                </div>
+                                                            </Link>
                                                         </div>
                                                     </div>
-                                                </Link>
-                                            </div>
-                                            <div className="col-md-4 mb-3">
-                                                <Link
-                                                    to="/hod"
-                                                    style={{
-                                                        textDecoration: "none",
-                                                    }}
-                                                >
-                                                    <div
-                                                        className="card"
-                                                        style={{
-                                                            cursor: "pointer",
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={courseimg}
-                                                            className="card-img-top"
-                                                            alt="Course"
-                                                        />
-                                                        <div className="card-body primary-bg text-white text-center p-2">
-                                                            Course 03
-                                                        </div>
-                                                    </div>
-                                                </Link>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
+                                </>
+                            ) : (
+                                ""
+                            )
+                        ) : (
+                            ""
+                        )}
+
                         {/* Loading component */}
                         {this.state.page_loading ? <Loading /> : ""}
                     </div>

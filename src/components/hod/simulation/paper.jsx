@@ -1,0 +1,625 @@
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import Header from "../navbar";
+import SideNav from "../sidenav";
+import { Link } from "react-router-dom";
+import { Dropdown } from "react-bootstrap";
+import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
+import Loading from "../../sharedComponents/loader";
+import AlertBox from "../../sharedComponents/alert";
+
+const mapStateToProps = (state) => ({
+    subject_name: state.subject_name,
+    simulation_name: state.simulation_name,
+});
+
+class SimulationPaper extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            showSideNav: false,
+            papers: [],
+            simulationData: [
+                {
+                    paper_id: "",
+                    paper_name: "",
+                    paper_type: "",
+                    duration: "",
+                },
+            ],
+
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            page_loading: true,
+        };
+        this.subjectId = this.props.match.params.subjectId;
+        this.simulationId = this.props.match.params.simulationId;
+        this.url = baseUrl + hodUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
+    }
+
+    toggleSideNav = () => {
+        this.setState({
+            showSideNav: !this.state.showSideNav,
+        });
+    };
+
+    loadSimulationData = () => {
+        fetch(
+            `${this.url}/hod/subject/${this.subjectId}/simulation/${this.simulationId}/`,
+            {
+                method: "GET",
+                headers: this.headers,
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    if (result.data.length !== 0) {
+                        this.setState({
+                            simulationData: result.data,
+                            page_loading: false,
+                        });
+                    } else {
+                        this.setState({
+                            page_loading: false,
+                        });
+                    }
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    loadFilterData = () => {
+        fetch(`${this.url}/hod/subject/${this.subjectId}/simulation/filters/`, {
+            method: "GET",
+            headers: this.headers,
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                this.setState({
+                    papers: result.data.paper_type,
+                    page_loading: false,
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    componentDidMount = () => {
+        this.loadFilterData();
+        this.loadSimulationData();
+    };
+
+    handleInput = (index, event, type) => {
+        let simulation = [...this.state.simulationData];
+        if (type === "name") {
+            simulation[index].paper_name = event.target.value;
+        } else if (type === "paper") {
+            simulation[index].paper_type = event.target.value;
+        } else if (type === "duration") {
+            simulation[index].duration = event.target.value;
+        }
+
+        this.setState({
+            simulationData: simulation,
+        });
+    };
+
+    handleSubmit = (index, event) => {
+        event.preventDefault();
+
+        this.setState({
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            page_loading: true,
+        });
+
+        const simulation = [...this.state.simulationData];
+
+        if (simulation[index].paper_name === "") {
+            this.setState({
+                errorMsg: "Enter the simulation exam paper name",
+                showErrorAlert: true,
+                page_loading: false,
+            });
+        } else if (simulation[index].paper_type === "") {
+            this.setState({
+                errorMsg: "Select a paper type",
+                showErrorAlert: true,
+                page_loading: false,
+            });
+        } else if (simulation[index].duration === "") {
+            this.setState({
+                errorMsg: "Enter the duration",
+                showErrorAlert: true,
+                page_loading: false,
+            });
+        } else {
+            if (simulation[index].paper_id === "") {
+                this.handlePOST(simulation, index);
+            } else {
+                this.handlePATCH(simulation, index);
+            }
+        }
+    };
+
+    handlePOST = (simulation, index) => {
+        fetch(
+            `${this.url}/hod/subject/${this.subjectId}/simulation/${this.simulationId}/`,
+            {
+                method: "POST",
+                headers: this.headers,
+                body: JSON.stringify({
+                    paper_name: simulation[index].paper_name,
+                    paper_type: simulation[index].paper_type,
+                    duration: Number(simulation[index].duration),
+                }),
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState(
+                        {
+                            successMsg: result.msg,
+                            showSuccessAlert: true,
+                            page_loading: true,
+                        },
+                        () => {
+                            this.loadSimulationData();
+                        }
+                    );
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    handlePATCH = (simulation, index) => {
+        fetch(
+            `${this.url}/hod/subject/${this.subjectId}/simulation/${this.simulationId}/`,
+            {
+                method: "PATCH",
+                headers: this.headers,
+                body: JSON.stringify({
+                    paper_id: simulation[index].paper_id,
+                    paper_name: simulation[index].paper_name,
+                    paper_type: simulation[index].paper_type,
+                    duration: Number(simulation[index].duration),
+                }),
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    this.setState(
+                        {
+                            successMsg: result.msg,
+                            showSuccessAlert: true,
+                            page_loading: true,
+                        },
+                        () => {
+                            this.loadSimulationData();
+                        }
+                    );
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    handleAdd = () => {
+        let simulation = [...this.state.simulationData];
+        simulation.push({
+            paper_id: "",
+            paper_name: "",
+            paper_type: "",
+            duration: "",
+        });
+        this.setState({
+            simulationData: simulation,
+        });
+    };
+
+    handleDelete = (index, paper_id) => {
+        this.setState({
+            showSuccessAlert: false,
+            showErrorAlert: false,
+            page_loading: true,
+        });
+
+        if (paper_id !== "") {
+            fetch(
+                `${this.url}/hod/subject/${this.subjectId}/simulation/${this.simulationId}/`,
+                {
+                    method: "DELETE",
+                    headers: this.headers,
+                    body: JSON.stringify({
+                        paper_id: paper_id,
+                    }),
+                }
+            )
+                .then((res) => res.json())
+                .then((result) => {
+                    if (result.sts === true) {
+                        this.setState({
+                            successMsg: result.msg,
+                            showSuccessAlert: true,
+                        });
+
+                        const simulation = [...this.state.simulationData];
+                        simulation.splice(index, 1);
+                        this.setState(
+                            {
+                                simulationData: simulation,
+                            },
+                            () => {
+                                if (this.state.simulationData.length === 0) {
+                                    simulation.push({
+                                        paper_id: "",
+                                        paper_name: "",
+                                        paper_type: "",
+                                        duration: "",
+                                    });
+                                    this.setState({
+                                        simulationData: simulation,
+                                    });
+                                }
+                                this.loadSimulationData();
+                            }
+                        );
+                    } else {
+                        this.setState({
+                            errorMsg: result.detail
+                                ? result.detail
+                                : result.msg,
+                            showErrorAlert: true,
+                            page_loading: false,
+                        });
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        } else {
+            const simulation = [...this.state.simulationData];
+            simulation.splice(index, 1);
+            this.setState(
+                {
+                    simulationData: simulation,
+                    page_loading: false,
+                },
+                () => {
+                    if (this.state.simulationData.length === 0) {
+                        simulation.push({
+                            paper_id: "",
+                            paper_name: "",
+                            paper_type: "",
+                            duration: "",
+                        });
+                        this.setState({
+                            simulationData: simulation,
+                        });
+                    }
+                }
+            );
+        }
+    };
+
+    render() {
+        document.title = `${this.props.simulation_name} - HOD | IQLabs`;
+        return (
+            <div className="wrapper">
+                {/* Navbar */}
+                <Header
+                    name={this.props.subject_name}
+                    togglenav={this.toggleSideNav}
+                />
+
+                {/* Alert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
+                />
+
+                {/* Sidebar */}
+                <SideNav
+                    shownav={this.state.showSideNav}
+                    activeLink="dashboard"
+                />
+
+                <div
+                    className={`section content ${
+                        this.state.showSideNav ? "active" : ""
+                    }`}
+                >
+                    <div className="container-fluid">
+                        {/* Back button */}
+                        <button
+                            className="btn btn-primary-invert btn-sm mb-3"
+                            onClick={this.props.history.goBack}
+                        >
+                            <i className="fas fa-chevron-left fa-sm"></i> Back
+                        </button>
+
+                        {/* ----- Breadcrumb ----- */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb mb-3">
+                                <li className="breadcrumb-item">
+                                    <Link to="/hod">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item">
+                                    <Link
+                                        to="#"
+                                        onClick={this.props.history.goBack}
+                                    >
+                                        {this.props.subject_name}
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    {this.props.simulation_name}
+                                </li>
+                            </ol>
+                        </nav>
+
+                        <div className="card shadow-sm mb-2">
+                            <div className="table-responsive">
+                                <table className="table">
+                                    <thead className="primary-bg text-white">
+                                        <tr>
+                                            <th scope="col">
+                                                Simulation Exams
+                                            </th>
+                                            <th scope="col">Papers</th>
+                                            <th scope="col">Time Duration</th>
+                                            <th scope="col"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {this.state.simulationData.length !== 0
+                                            ? this.state.simulationData.map(
+                                                  (item, index) => {
+                                                      return (
+                                                          <tr key={index}>
+                                                              <td>
+                                                                  <input
+                                                                      type="text"
+                                                                      className="form-control form-control-sm border-secondary"
+                                                                      placeholder={`Simulation exam paper ${
+                                                                          index +
+                                                                          1
+                                                                      }`}
+                                                                      value={
+                                                                          item.paper_name
+                                                                      }
+                                                                      onChange={(
+                                                                          event
+                                                                      ) =>
+                                                                          this.handleInput(
+                                                                              index,
+                                                                              event,
+                                                                              "name"
+                                                                          )
+                                                                      }
+                                                                      autoFocus
+                                                                      required
+                                                                  />
+                                                              </td>
+                                                              <td>
+                                                                  <select
+                                                                      name="type"
+                                                                      id="type"
+                                                                      className="form-control form-control-sm border-secondary"
+                                                                      onChange={(
+                                                                          event
+                                                                      ) =>
+                                                                          this.handleInput(
+                                                                              index,
+                                                                              event,
+                                                                              "paper"
+                                                                          )
+                                                                      }
+                                                                      value={
+                                                                          item.paper_type
+                                                                      }
+                                                                      required
+                                                                  >
+                                                                      <option value="">
+                                                                          Select
+                                                                          paper
+                                                                      </option>
+                                                                      {this
+                                                                          .state
+                                                                          .papers
+                                                                          .length !==
+                                                                      0
+                                                                          ? this.state.papers.map(
+                                                                                (
+                                                                                    data,
+                                                                                    index
+                                                                                ) => {
+                                                                                    return (
+                                                                                        <option
+                                                                                            value={
+                                                                                                data
+                                                                                            }
+                                                                                            key={
+                                                                                                index
+                                                                                            }
+                                                                                        >
+                                                                                            {
+                                                                                                data
+                                                                                            }
+                                                                                        </option>
+                                                                                    );
+                                                                                }
+                                                                            )
+                                                                          : null}
+                                                                  </select>
+                                                              </td>
+                                                              <td>
+                                                                  <div
+                                                                      className="input-group input-group-sm border-secondary rounded-lg"
+                                                                      style={{
+                                                                          overflow:
+                                                                              "hidden",
+                                                                      }}
+                                                                  >
+                                                                      <input
+                                                                          className="form-control form-control-sm"
+                                                                          type="text"
+                                                                          value={
+                                                                              item.time_duration
+                                                                          }
+                                                                          onChange={(
+                                                                              event
+                                                                          ) =>
+                                                                              this.handleInput(
+                                                                                  index,
+                                                                                  event,
+                                                                                  "duration"
+                                                                              )
+                                                                          }
+                                                                          placeholder="Duration (Minutes)"
+                                                                      />
+                                                                      <div className="input-group-prepend">
+                                                                          <span className="input-group-text border-0">
+                                                                              Minutes
+                                                                          </span>
+                                                                      </div>
+                                                                  </div>
+                                                              </td>
+                                                              <td className="d-flex justify-content-end">
+                                                                  {item.paper_id !==
+                                                                  "" ? (
+                                                                      <button
+                                                                          className="btn btn-primary-invert btn-sm shadow-sm"
+                                                                          onClick={() => {
+                                                                              this.sectionRedirect(
+                                                                                  item.paper_id
+                                                                              );
+                                                                          }}
+                                                                      >
+                                                                          Add +
+                                                                      </button>
+                                                                  ) : null}
+
+                                                                  <Dropdown>
+                                                                      <Dropdown.Toggle
+                                                                          variant="white"
+                                                                          className="btn btn-link btn-sm shadow-none caret-off ml-2"
+                                                                      >
+                                                                          <i className="fas fa-ellipsis-v"></i>
+                                                                      </Dropdown.Toggle>
+
+                                                                      <Dropdown.Menu
+                                                                          className={`${
+                                                                              this
+                                                                                  .state
+                                                                                  .simulationData
+                                                                                  .length <=
+                                                                              2
+                                                                                  ? "position-fixed"
+                                                                                  : "position-absolute"
+                                                                          }`}
+                                                                      >
+                                                                          <Dropdown.Item
+                                                                              onClick={(
+                                                                                  event
+                                                                              ) =>
+                                                                                  this.handleSubmit(
+                                                                                      index,
+                                                                                      event
+                                                                                  )
+                                                                              }
+                                                                          >
+                                                                              <i className="far fa-save fa-sm mr-1"></i>{" "}
+                                                                              Save
+                                                                          </Dropdown.Item>
+                                                                          <Dropdown.Item
+                                                                              onClick={() =>
+                                                                                  this.handleDelete(
+                                                                                      index,
+                                                                                      item.paper_id
+                                                                                  )
+                                                                              }
+                                                                          >
+                                                                              <i className="far fa-trash-alt fa-sm mr-1"></i>{" "}
+                                                                              Delete
+                                                                          </Dropdown.Item>
+                                                                      </Dropdown.Menu>
+                                                                  </Dropdown>
+                                                              </td>
+                                                          </tr>
+                                                      );
+                                                  }
+                                              )
+                                            : ""}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <button
+                            className="btn btn-light bg-white btn-block shadow-sm shadow-none"
+                            onClick={this.handleAdd}
+                        >
+                            Add +
+                        </button>
+                        {/* Loading component */}
+                        {this.state.page_loading ? <Loading /> : ""}
+                    </div>
+                </div>
+            </div>
+        );
+    }
+}
+
+export default connect(mapStateToProps)(SimulationPaper);

@@ -7,6 +7,7 @@ let data = {
     quiz_name: "Quiz",
     semester_name: "Semester",
     section_name: "Section",
+    simulation_name: "Simulation",
 };
 
 const reducer = (state = data, action) => {
@@ -27,6 +28,8 @@ const reducer = (state = data, action) => {
             return { ...state, semester_name: action.payload };
         case "SECTION":
             return { ...state, section_name: action.payload };
+        case "SIMULATION":
+            return { ...state, simulation_name: action.payload };
         default:
             return state;
     }
