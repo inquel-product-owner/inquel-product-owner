@@ -15,7 +15,6 @@ import CorrectSound from "../../../assets/correct-answer.wav";
 import WrongSound from "../../../assets/wrong-answer.wav";
 import CountDownSound from "../../../assets/simple-countdown.wav";
 import BGSound from "../../../assets/background-music.mp3";
-import { Howl } from "howler";
 
 class QuizCountDown extends Component {
     constructor(props) {
@@ -24,21 +23,10 @@ class QuizCountDown extends Component {
             second: 3,
         };
         this.timer = 0;
-        // this.audio = new Audio(CountDownSound);
-        // this.audio.autoplay = true;
-        // this.audio.volume = 0.3;
-        // this.audio.muted = true;
-        this.music = new Howl({
-            src: [CountDownSound],
-            volume: 0.3
-        });
     }
 
     componentDidMount = () => {
         this.timer = setInterval(this.countDown, 1000);
-        // this.audio.play();
-        // this.audio.muted = false;
-        this.music.play();
     };
 
     componentWillUnmount = () => {
@@ -296,6 +284,8 @@ class QuizLevelExam extends Component {
             Authorization: this.authToken,
         };
         this.timer = 0;
+        this.audio = new Audio(CorrectSound);
+        this.audio.volume = 0.3;
     }
 
     // creates section structure for exam submission
@@ -509,6 +499,7 @@ class QuizLevelExam extends Component {
                                         this.handleSubmit();
                                     } else {
                                         this.handleNext();
+                                        this.playSound();
                                     }
                                 }
                             }
@@ -548,6 +539,7 @@ class QuizLevelExam extends Component {
                                         this.handleSubmit();
                                     } else {
                                         this.handleNext();
+                                        this.playSound();
                                     }
                                 }
                             }
@@ -575,6 +567,7 @@ class QuizLevelExam extends Component {
                         this.handleSubmit();
                     } else {
                         this.handleNext();
+                        this.playSound();
                     }
                 }
             );
@@ -615,6 +608,7 @@ class QuizLevelExam extends Component {
                     this.handleSubmit();
                 } else {
                     this.handleNext();
+                    this.playSound();
                 }
             }
         );
@@ -952,6 +946,64 @@ class QuizLevelExam extends Component {
         }
 
         return color;
+    };
+
+    playSound = () => {
+        const data = this.state.question;
+        const index = this.state.currentQuestion;
+        const answerSection =
+            this.state.answer[this.state.currentQuestion] !== undefined
+                ? this.state.answer[this.state.currentQuestion]
+                : [];
+
+        if (data[index].content) {
+            if (data[index].content.mcq === true) {
+                if (data[index].content.mcq_answers) {
+                    if (data[index].content.mcq_answers > 1) {
+                        if (answerSection.answer) {
+                            if (answerSection.answer.length !== 0) {
+                                if (
+                                    data[index].content.mcq_answers ===
+                                    answerSection.answer.length
+                                ) {
+                                    if (answerSection.isCorrect === true) {
+                                        this.audio.play();
+                                    } else {
+                                        this.audio.play();
+                                    }
+                                }
+                            } else {
+                                this.audio.play();
+                            }
+                        }
+                    } else {
+                        if (answerSection.answer) {
+                            if (answerSection.answer.length !== 0) {
+                                if (answerSection.isCorrect === true) {
+                                    this.audio.play();
+                                } else {
+                                    this.audio.play();
+                                }
+                            } else {
+                                this.audio.play();
+                            }
+                        }
+                    }
+                }
+            } else {
+                if (answerSection.answer) {
+                    if (answerSection.answer.length !== 0) {
+                        if (answerSection.isCorrect === true) {
+                            this.audio.play();
+                        } else {
+                            this.audio.play();
+                        }
+                    } else {
+                        this.audio.play();
+                    }
+                }
+            }
+        }
     };
 
     questionRender = (data, index, answerSection) => {
