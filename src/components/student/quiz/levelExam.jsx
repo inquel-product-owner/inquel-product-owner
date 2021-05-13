@@ -65,11 +65,11 @@ class QuizCountDown extends Component {
                     </p>
                     <p className="font-weight-bold-600 mb-3">Seconds</p>
 
-                    {/* <Sound
+                    <Sound
                         url={CountDownSound}
                         playStatus={Sound.status.PLAYING}
                         volume={30}
-                    /> */}
+                    />
                 </Modal.Body>
             </Modal>
         );
@@ -79,11 +79,11 @@ class QuizCountDown extends Component {
 const SuccessDIV = (props) => {
     return (
         <>
-            {/* <Sound
+            <Sound
                 url={CorrectSound}
                 playStatus={Sound.status.PLAYING}
                 volume={30}
-            /> */}
+            />
             <div className="w-100 mt-auto">
                 <div className="row justify-content-center">
                     <div className="col-lg-3 col-md-5">
@@ -109,11 +109,11 @@ const SuccessDIV = (props) => {
 const DangerDIV = (props) => {
     return (
         <>
-            {/* <Sound
+            <Sound
                 url={WrongSound}
                 playStatus={Sound.status.PLAYING}
                 volume={30}
-            /> */}
+            />
             <div className="w-100 mt-auto">
                 <div className="row justify-content-center">
                     <div className="col-lg-3 col-md-5">
@@ -284,8 +284,6 @@ class QuizLevelExam extends Component {
             Authorization: this.authToken,
         };
         this.timer = 0;
-        this.audio = new Audio(CorrectSound);
-        this.audio.volume = 0.3;
     }
 
     // creates section structure for exam submission
@@ -499,7 +497,6 @@ class QuizLevelExam extends Component {
                                         this.handleSubmit();
                                     } else {
                                         this.handleNext();
-                                        this.playSound();
                                     }
                                 }
                             }
@@ -539,7 +536,6 @@ class QuizLevelExam extends Component {
                                         this.handleSubmit();
                                     } else {
                                         this.handleNext();
-                                        this.playSound();
                                     }
                                 }
                             }
@@ -567,7 +563,6 @@ class QuizLevelExam extends Component {
                         this.handleSubmit();
                     } else {
                         this.handleNext();
-                        this.playSound();
                     }
                 }
             );
@@ -608,7 +603,6 @@ class QuizLevelExam extends Component {
                     this.handleSubmit();
                 } else {
                     this.handleNext();
-                    this.playSound();
                 }
             }
         );
@@ -691,52 +685,52 @@ class QuizLevelExam extends Component {
                 total_points:
                     this.state.total_points > 0 ? this.state.total_points : 0,
             };
-            // let secret = new fernet.Secret(
-            //     "4Fy2fTI1oyK9McR5mRunLmfynGdzOdxiRQRNqhUY70k="
-            // );
-            // let token = new fernet.Token({
-            //     secret: secret,
-            //     time: Date.parse(1),
-            //     iv: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
-            // });
-            console.log(body);
+            let secret = new fernet.Secret(
+                "4Fy2fTI1oyK9McR5mRunLmfynGdzOdxiRQRNqhUY70k="
+            );
+            let token = new fernet.Token({
+                secret: secret,
+                time: Date.parse(1),
+                iv: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+            });
+            // console.log(body);
 
-            // fetch(
-            //     `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/${this.quizId}/levels/`,
-            //     {
-            //         method: "POST",
-            //         headers: this.headers,
-            //         body: JSON.stringify({
-            //             quiz_data: token.encode(JSON.stringify(body)),
-            //         }),
-            //     }
-            // )
-            //     .then((res) => res.json())
-            //     .then((result) => {
-            //         console.log(result);
-            //         if (result.sts === true) {
-            //             this.setState(
-            //                 {
-            //                     successMsg: result.msg,
-            //                     showSuccessAlert: true,
-            //                     page_loading: false,
-            //                 },
-            //                 () => {
-            //                     this.setState({
-            //                         isAnswerSubmitted: true,
-            //                         showToast: false,
-            //                     });
-            //                 }
-            //             );
-            //         } else {
-            //             this.setState({
-            //                 errorMsg: result.msg,
-            //                 showErrorAlert: true,
-            //                 page_loading: false,
-            //             });
-            //         }
-            //     })
-            //     .catch((err) => console.log(err));
+            fetch(
+                `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/${this.quizId}/levels/`,
+                {
+                    method: "POST",
+                    headers: this.headers,
+                    body: JSON.stringify({
+                        quiz_data: token.encode(JSON.stringify(body)),
+                    }),
+                }
+            )
+                .then((res) => res.json())
+                .then((result) => {
+                    console.log(result);
+                    if (result.sts === true) {
+                        this.setState(
+                            {
+                                successMsg: result.msg,
+                                showSuccessAlert: true,
+                                page_loading: false,
+                            },
+                            () => {
+                                this.setState({
+                                    isAnswerSubmitted: true,
+                                    showToast: false,
+                                });
+                            }
+                        );
+                    } else {
+                        this.setState({
+                            errorMsg: result.msg,
+                            showErrorAlert: true,
+                            page_loading: false,
+                        });
+                    }
+                })
+                .catch((err) => console.log(err));
         }, 1000);
     };
 
@@ -946,64 +940,6 @@ class QuizLevelExam extends Component {
         }
 
         return color;
-    };
-
-    playSound = () => {
-        const data = this.state.question;
-        const index = this.state.currentQuestion;
-        const answerSection =
-            this.state.answer[this.state.currentQuestion] !== undefined
-                ? this.state.answer[this.state.currentQuestion]
-                : [];
-
-        if (data[index].content) {
-            if (data[index].content.mcq === true) {
-                if (data[index].content.mcq_answers) {
-                    if (data[index].content.mcq_answers > 1) {
-                        if (answerSection.answer) {
-                            if (answerSection.answer.length !== 0) {
-                                if (
-                                    data[index].content.mcq_answers ===
-                                    answerSection.answer.length
-                                ) {
-                                    if (answerSection.isCorrect === true) {
-                                        this.audio.play();
-                                    } else {
-                                        this.audio.play();
-                                    }
-                                }
-                            } else {
-                                this.audio.play();
-                            }
-                        }
-                    } else {
-                        if (answerSection.answer) {
-                            if (answerSection.answer.length !== 0) {
-                                if (answerSection.isCorrect === true) {
-                                    this.audio.play();
-                                } else {
-                                    this.audio.play();
-                                }
-                            } else {
-                                this.audio.play();
-                            }
-                        }
-                    }
-                }
-            } else {
-                if (answerSection.answer) {
-                    if (answerSection.answer.length !== 0) {
-                        if (answerSection.isCorrect === true) {
-                            this.audio.play();
-                        } else {
-                            this.audio.play();
-                        }
-                    } else {
-                        this.audio.play();
-                    }
-                }
-            }
-        }
     };
 
     questionRender = (data, index, answerSection) => {
@@ -1329,7 +1265,7 @@ class QuizLevelExam extends Component {
                         ""
                     )}
                 </div>
-                {/* <Sound
+                <Sound
                     url={BGSound}
                     playStatus={
                         this.state.isPlaying
@@ -1338,7 +1274,7 @@ class QuizLevelExam extends Component {
                     }
                     volume={20}
                     loop={true}
-                /> */}
+                />
             </div>
         );
     };
