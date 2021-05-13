@@ -69,7 +69,6 @@ class QuizCountDown extends Component {
                         url={CountDownSound}
                         playStatus={Sound.status.PLAYING}
                         volume={30}
-            autoLoad={true}
                     />
                 </Modal.Body>
             </Modal>
