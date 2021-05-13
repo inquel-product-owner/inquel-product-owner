@@ -32,7 +32,7 @@ class QuizCountDown extends Component {
     componentDidMount = () => {
         this.timer = setInterval(this.countDown, 1000);
         this.audio.play();
-        // this.audio.muted = false
+        this.audio.muted = false
     };
 
     componentWillUnmount = () => {
