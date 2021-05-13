@@ -26,12 +26,13 @@ class QuizCountDown extends Component {
         this.audio = new Audio(CountDownSound);
         this.audio.autoplay = true;
         this.audio.volume = 0.3;
-        this.audio.load();
+        this.audio.muted = true
     }
 
     componentDidMount = () => {
         this.timer = setInterval(this.countDown, 1000);
         this.audio.play();
+        // this.audio.muted = false
     };
 
     componentWillUnmount = () => {
@@ -690,52 +691,52 @@ class QuizLevelExam extends Component {
                 total_points:
                     this.state.total_points > 0 ? this.state.total_points : 0,
             };
-            let secret = new fernet.Secret(
-                "4Fy2fTI1oyK9McR5mRunLmfynGdzOdxiRQRNqhUY70k="
-            );
-            let token = new fernet.Token({
-                secret: secret,
-                time: Date.parse(1),
-                iv: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
-            });
-            // console.log(body);
+            // let secret = new fernet.Secret(
+            //     "4Fy2fTI1oyK9McR5mRunLmfynGdzOdxiRQRNqhUY70k="
+            // );
+            // let token = new fernet.Token({
+            //     secret: secret,
+            //     time: Date.parse(1),
+            //     iv: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+            // });
+            console.log(body);
 
-            fetch(
-                `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/${this.quizId}/levels/`,
-                {
-                    method: "POST",
-                    headers: this.headers,
-                    body: JSON.stringify({
-                        quiz_data: token.encode(JSON.stringify(body)),
-                    }),
-                }
-            )
-                .then((res) => res.json())
-                .then((result) => {
-                    console.log(result);
-                    if (result.sts === true) {
-                        this.setState(
-                            {
-                                successMsg: result.msg,
-                                showSuccessAlert: true,
-                                page_loading: false,
-                            },
-                            () => {
-                                this.setState({
-                                    isAnswerSubmitted: true,
-                                    showToast: false,
-                                });
-                            }
-                        );
-                    } else {
-                        this.setState({
-                            errorMsg: result.msg,
-                            showErrorAlert: true,
-                            page_loading: false,
-                        });
-                    }
-                })
-                .catch((err) => console.log(err));
+            // fetch(
+            //     `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/${this.quizId}/levels/`,
+            //     {
+            //         method: "POST",
+            //         headers: this.headers,
+            //         body: JSON.stringify({
+            //             quiz_data: token.encode(JSON.stringify(body)),
+            //         }),
+            //     }
+            // )
+            //     .then((res) => res.json())
+            //     .then((result) => {
+            //         console.log(result);
+            //         if (result.sts === true) {
+            //             this.setState(
+            //                 {
+            //                     successMsg: result.msg,
+            //                     showSuccessAlert: true,
+            //                     page_loading: false,
+            //                 },
+            //                 () => {
+            //                     this.setState({
+            //                         isAnswerSubmitted: true,
+            //                         showToast: false,
+            //                     });
+            //                 }
+            //             );
+            //         } else {
+            //             this.setState({
+            //                 errorMsg: result.msg,
+            //                 showErrorAlert: true,
+            //                 page_loading: false,
+            //             });
+            //         }
+            //     })
+            //     .catch((err) => console.log(err));
         }, 1000);
     };
 
