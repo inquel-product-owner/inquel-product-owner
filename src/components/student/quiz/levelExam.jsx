@@ -30,7 +30,6 @@ class QuizCountDown extends Component {
         // this.audio.muted = true;
         this.music = new Howl({
             src: [CountDownSound],
-            html5: true,
             volume: 0.3
         });
     }
