@@ -15,6 +15,7 @@ import CorrectSound from "../../../assets/correct-answer.wav";
 import WrongSound from "../../../assets/wrong-answer.wav";
 import CountDownSound from "../../../assets/simple-countdown.wav";
 import BGSound from "../../../assets/background-music.mp3";
+import { Howl } from "howler";
 
 class QuizCountDown extends Component {
     constructor(props) {
