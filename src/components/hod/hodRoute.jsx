@@ -21,6 +21,8 @@ import CourseScorecard from "./courseScorecard";
 import Subject from "./subject";
 import SubjectConfiguration from "./subjectConfiguration";
 
+import SimulationPaper from "./simulation/paper";
+
 import EmailVerification from "./emailVerification";
 import errorPage from "../404";
 import teacherRoutes from "../teacher/teacherRoute";
@@ -40,7 +42,7 @@ const hodRoutes = (
             }
         />
 
-        {/* ---------- Group routings ---------- */}
+        {/* ---------- Group ---------- */}
 
         <Route
             exact
@@ -139,7 +141,7 @@ const hodRoutes = (
             }
         />
 
-        {/* ---------- Independent subject routings ---------- */}
+        {/* ---------- Independent subject ---------- */}
 
         <Route
             exact
@@ -178,7 +180,22 @@ const hodRoutes = (
             }
         />
 
-        {/* ---------- Profile routings ---------- */}
+        {/* ---------- Simulation exam ---------- */}
+
+        <Route
+            exact
+            path="/hod/subject/:subjectId/simulation/:simulationId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <SimulationPaper {...props} />
+                )
+            }
+        />
+
+        {/* ---------- Profile ---------- */}
 
         <Route
             exact
@@ -217,7 +234,7 @@ const hodRoutes = (
             }
         />
 
-        {/* ---------- Account & Login routings ---------- */}
+        {/* ---------- Account & Login ---------- */}
 
         <Route
             exact

@@ -246,7 +246,7 @@ class GroupSubject extends Component {
                                                       );
                                                   }
                                               )
-                                            : ""}
+                                            : null}
                                     </tbody>
                                 </table>
                             </div>

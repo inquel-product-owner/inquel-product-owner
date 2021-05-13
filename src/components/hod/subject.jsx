@@ -1,12 +1,22 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+import store from "../../redux/store";
+import { connect } from "react-redux";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import Select from "react-select";
-import { Modal, Alert, Spinner } from "react-bootstrap";
+import { Modal, Alert, Spinner, Dropdown } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
 import Loading from "../sharedComponents/loader";
 import AlertBox from "../sharedComponents/alert";
+import {
+    ContentDeleteModal,
+    ContentUpdateModal,
+} from "../sharedComponents/contentManagementModal";
+
+const mapStateToProps = (state) => ({
+    subject_name: state.subject_name,
+});
 
 class ChapterModal extends Component {
     constructor(props) {
@@ -395,6 +405,139 @@ class ChapterReassignModal extends Component {
     }
 }
 
+class SimulationModal extends Component {
+    constructor() {
+        super();
+        this.state = {
+            simulation_exam_name: "",
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: false,
+        };
+        this.url = baseUrl + hodUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
+    }
+
+    handleSubmit = (event) => {
+        event.preventDefault();
+        this.setState({
+            showLoader: true,
+        });
+
+        fetch(`${this.url}/hod/subject/${this.props.subjectId}/simulation/`, {
+            headers: this.headers,
+            method: "POST",
+            body: JSON.stringify({
+                simulation_exam_name: this.state.simulation_exam_name,
+            }),
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        showLoader: false,
+                    });
+                    this.props.formSubmission();
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    handleInput = (event) => {
+        this.setState({
+            simulation_exam_name: event.target.value,
+        });
+    };
+
+    render() {
+        return (
+            <Modal
+                show={this.props.show}
+                onHide={this.props.onHide}
+                size="md"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Header closeButton>Create Simulation Exam</Modal.Header>
+                <form onSubmit={this.handleSubmit} autoComplete="off">
+                    <Modal.Body>
+                        <Alert
+                            variant="danger"
+                            show={this.state.showErrorAlert}
+                            onClose={() => {
+                                this.setState({
+                                    showErrorAlert: false,
+                                });
+                            }}
+                            dismissible
+                        >
+                            {this.state.errorMsg}
+                        </Alert>
+                        <Alert
+                            variant="success"
+                            show={this.state.showSuccessAlert}
+                            onClose={() => {
+                                this.setState({
+                                    showSuccessAlert: false,
+                                });
+                            }}
+                            dismissible
+                        >
+                            {this.state.successMsg}
+                        </Alert>
+
+                        <label htmlFor="simulation">Simulation name</label>
+                        <input
+                            type="text"
+                            name="simulation"
+                            id="simulation"
+                            className="form-control borders"
+                            onChange={this.handleInput}
+                            placeholder="Enter..."
+                            required
+                        />
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <button className="btn btn-primary btn-block shadow-none">
+                            {this.state.showLoader ? (
+                                <Spinner
+                                    as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    aria-hidden="true"
+                                    className="mr-2"
+                                />
+                            ) : (
+                                ""
+                            )}
+                            Add
+                        </button>
+                    </Modal.Footer>
+                </form>
+            </Modal>
+        );
+    }
+}
+
 class Subject extends Component {
     constructor(props) {
         super(props);
@@ -402,9 +545,17 @@ class Subject extends Component {
             showSideNav: false,
             showModal: false,
             showReassignModal: false,
+            showSimulationModal: false,
+            showSimulationUpdateModal: false,
+            showSimulationDeleteModal: false,
+
             subjectItems: [],
             chapterData: [],
             chapter_id: "",
+
+            simulation: [],
+            selectedSimulation: {},
+            permissions: {},
 
             errorMsg: "",
             successMsg: "",
@@ -439,6 +590,26 @@ class Subject extends Component {
         });
     };
 
+    toggleSimulationModal = (type, data) => {
+        if (type === "ADD") {
+            this.setState({
+                showSimulationModal: !this.state.showSimulationModal,
+            });
+        } else if (type === "UPDATE") {
+            this.setState({
+                showSimulationUpdateModal: !this.state
+                    .showSimulationUpdateModal,
+                selectedSimulation: data,
+            });
+        } else if (type === "DELETE") {
+            this.setState({
+                showSimulationDeleteModal: !this.state
+                    .showSimulationDeleteModal,
+                selectedSimulation: data,
+            });
+        }
+    };
+
     loadSubjectData = () => {
         fetch(`${this.url}/hod/subjects/${this.subjectId}/chapters/`, {
             headers: this.headers,
@@ -466,8 +637,35 @@ class Subject extends Component {
             });
     };
 
+    loadSimulationData = () => {
+        fetch(`${this.url}/hod/subject/${this.subjectId}/simulation/`, {
+            headers: this.headers,
+            method: "GET",
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        simulation: result.data,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     componentDidMount = () => {
         this.loadSubjectData();
+        this.loadSimulationData();
     };
 
     formSubmission = () => {
@@ -480,18 +678,37 @@ class Subject extends Component {
         this.loadSubjectData();
     };
 
+    simulationFormSubmission = () => {
+        setTimeout(() => {
+            this.setState({
+                showSimulationModal: false,
+                showSimulationUpdateModal: false,
+                showSimulationDeleteModal: false,
+            });
+        }, 1000);
+        this.loadSimulationData();
+    };
+
+    // Gets permission from the header navbar
+    handlePermissions = (data) => {
+        this.setState({
+            permissions: data,
+        });
+    };
+
+    dispatchSimulation = (data) => {
+        store.dispatch({ type: "SIMULATION", payload: data });
+    };
+
     render() {
-        document.title =
-            this.state.subjectItems.length !== 0
-                ? this.state.subjectItems.subject_name +
-                  " Subject - HOD | IQLabs"
-                : "Subject - HOD | IQLabs";
+        document.title = `${this.props.subject_name} - HOD | IQLabs`;
         return (
             <div className="wrapper">
                 {/* Navbar */}
                 <Header
-                    name={this.state.subjectItems.subject_name}
+                    name={this.props.subject_name}
                     togglenav={this.toggleSideNav}
+                    permissions={this.handlePermissions}
                 />
 
                 {/* ALert message */}
@@ -539,6 +756,53 @@ class Subject extends Component {
                     />
                 ) : null}
 
+                {/* Simulation create modal */}
+                {this.state.showSimulationModal ? (
+                    <SimulationModal
+                        show={this.state.showSimulationModal}
+                        onHide={() => this.toggleSimulationModal("ADD")}
+                        formSubmission={this.simulationFormSubmission}
+                        subjectId={this.subjectId}
+                    />
+                ) : null}
+
+                {/* Simulation update modal */}
+                {this.state.showSimulationUpdateModal ? (
+                    <ContentUpdateModal
+                        show={this.state.showSimulationUpdateModal}
+                        onHide={() => this.toggleSimulationModal("UPDATE")}
+                        formSubmission={this.simulationFormSubmission}
+                        url={`${this.url}/hod/subject/${this.subjectId}/simulation/`}
+                        type="Simulation exam"
+                        name={this.state.selectedSimulation.simulation_name}
+                        data={{
+                            simulation_id: this.state.selectedSimulation
+                                .simulation_id,
+                        }}
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Simulation Delete modal */}
+                {this.state.showSimulationDeleteModal ? (
+                    <ContentDeleteModal
+                        show={this.state.showSimulationDeleteModal}
+                        onHide={() => this.toggleSimulationModal("DELETE")}
+                        formSubmission={this.simulationFormSubmission}
+                        url={`${this.url}/hod/subject/${this.subjectId}/simulation/`}
+                        type="Simulation exam"
+                        name={this.state.selectedSimulation.simulation_name}
+                        data={{
+                            simulation_id: this.state.selectedSimulation
+                                .simulation_id,
+                        }}
+                        toggleModal={() => this.toggleSimulationModal("DELETE")}
+                    />
+                ) : (
+                    ""
+                )}
+
                 <div
                     className={`section content ${
                         this.state.showSideNav ? "active" : ""
@@ -565,21 +829,37 @@ class Subject extends Component {
                                         </li>
                                         <li className="breadcrumb-item active">
                                             <span>Subject:</span>
-                                            {
-                                                this.state.subjectItems
-                                                    .subject_name
-                                            }
+                                            {this.props.subject_name}
                                         </li>
                                     </ol>
                                 </nav>
                             </div>
-                            <div className="col-md-6 text-center text-md-right">
+                            <div className="col-md-6 text-right">
                                 <button
                                     className="btn btn-primary btn-sm shadow-none mr-2"
                                     onClick={this.toggleModal}
                                 >
-                                    Add New
+                                    Add Chapter
                                 </button>
+                                {Object.entries(this.state.permissions)
+                                    .length !== 0 ? (
+                                    this.state.permissions.sim_exam === true ? (
+                                        <button
+                                            className="btn btn-primary btn-sm shadow-none mr-2"
+                                            onClick={() =>
+                                                this.toggleSimulationModal(
+                                                    "ADD"
+                                                )
+                                            }
+                                        >
+                                            Add Simulation Exam
+                                        </button>
+                                    ) : (
+                                        ""
+                                    )
+                                ) : (
+                                    ""
+                                )}
                                 <Link to={`${this.props.match.url}/configure`}>
                                     <button className="btn btn-primary btn-sm shadow-none">
                                         Configure Course
@@ -601,7 +881,12 @@ class Subject extends Component {
                                                 Teacher assigned
                                             </th>
                                             <th scope="col"></th>
-                                            <th scope="col">View</th>
+                                            <th
+                                                scope="col"
+                                                className="text-right"
+                                            >
+                                                Action
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -674,7 +959,7 @@ class Subject extends Component {
                                                                       Re assign
                                                                   </button>
                                                               </td>
-                                                              <td>
+                                                              <td className="text-right">
                                                                   <button className="btn btn-primary-invert btn-sm shadow-sm">
                                                                       <i className="far fa-eye"></i>
                                                                   </button>
@@ -683,7 +968,88 @@ class Subject extends Component {
                                                       );
                                                   }
                                               )
-                                            : ""}
+                                            : null}
+
+                                        {/* ----- Simulation exam ----- */}
+                                        {this.state.simulation.length !== 0
+                                            ? this.state.simulation.map(
+                                                  (item, index) => {
+                                                      return (
+                                                          <tr key={index}>
+                                                              <td>
+                                                                  {
+                                                                      item.simulation_name
+                                                                  }
+                                                              </td>
+                                                              <td></td>
+                                                              <td></td>
+                                                              <td></td>
+                                                              <td className="d-flex justify-content-end">
+                                                                  <Link
+                                                                      to={`${this.props.match.url}/simulation/${item.simulation_id}`}
+                                                                  >
+                                                                      <button
+                                                                          className="btn btn-primary-invert btn-sm shadow-sm"
+                                                                          onClick={() =>
+                                                                              this.dispatchSimulation(
+                                                                                  item.simulation_name
+                                                                              )
+                                                                          }
+                                                                      >
+                                                                          View /
+                                                                          Edit
+                                                                      </button>
+                                                                  </Link>
+
+                                                                  <Dropdown>
+                                                                      <Dropdown.Toggle
+                                                                          variant="white"
+                                                                          className="btn btn-link btn-sm shadow-none caret-off ml-2"
+                                                                      >
+                                                                          <i className="fas fa-ellipsis-v"></i>
+                                                                      </Dropdown.Toggle>
+
+                                                                      <Dropdown.Menu
+                                                                          className={`${
+                                                                              this
+                                                                                  .state
+                                                                                  .simulation
+                                                                                  .length <=
+                                                                              2
+                                                                                  ? "position-fixed"
+                                                                                  : "position-absolute"
+                                                                          }`}
+                                                                      >
+                                                                          <Dropdown.Item
+                                                                              onClick={() =>
+                                                                                  this.toggleSimulationModal(
+                                                                                      "UPDATE",
+                                                                                      item
+                                                                                  )
+                                                                              }
+                                                                          >
+                                                                              <i className="far fa-edit fa-sm mr-1"></i>{" "}
+                                                                              Edit
+                                                                          </Dropdown.Item>
+                                                                          <Dropdown.Item
+                                                                              onClick={() =>
+                                                                                  this.toggleSimulationModal(
+                                                                                      "DELETE",
+                                                                                      item
+                                                                                  )
+                                                                              }
+                                                                          >
+                                                                              <i className="far fa-trash-alt fa-sm mr-1"></i>{" "}
+                                                                              Delete
+                                                                          </Dropdown.Item>
+                                                                      </Dropdown.Menu>
+                                                                  </Dropdown>
+                                                              </td>
+                                                          </tr>
+                                                      );
+                                                  }
+                                              )
+                                            : null}
                                     </tbody>
                                 </table>
                             </div>
@@ -697,4 +1063,4 @@ class Subject extends Component {
     }
 }
 
-export default Subject;
+export default connect(mapStateToProps)(Subject);

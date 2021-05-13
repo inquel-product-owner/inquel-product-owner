@@ -30,6 +30,9 @@ class Header extends Component {
                     this.setState({
                         data: result.data,
                     });
+                    if (this.props.permissions) {
+                        this.props.permissions(result.data.permissions);
+                    }
                 }
             })
             .catch((err) => {
