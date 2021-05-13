@@ -23,10 +23,15 @@ class QuizCountDown extends Component {
             second: 3,
         };
         this.timer = 0;
+        this.audio = new Audio(CountDownSound);
+        this.audio.autoplay = true;
+        this.audio.volume = 0.3;
+        this.audio.load();
     }
 
     componentDidMount = () => {
         this.timer = setInterval(this.countDown, 1000);
+        this.audio.play();
     };
 
     componentWillUnmount = () => {
@@ -65,11 +70,11 @@ class QuizCountDown extends Component {
                     </p>
                     <p className="font-weight-bold-600 mb-3">Seconds</p>
 
-                    <Sound
+                    {/* <Sound
                         url={CountDownSound}
                         playStatus={Sound.status.PLAYING}
                         volume={30}
-                    />
+                    /> */}
                 </Modal.Body>
             </Modal>
         );
@@ -79,11 +84,11 @@ class QuizCountDown extends Component {
 const SuccessDIV = (props) => {
     return (
         <>
-            <Sound
+            {/* <Sound
                 url={CorrectSound}
                 playStatus={Sound.status.PLAYING}
                 volume={30}
-            />
+            /> */}
             <div className="w-100 mt-auto">
                 <div className="row justify-content-center">
                     <div className="col-lg-3 col-md-5">
@@ -109,11 +114,11 @@ const SuccessDIV = (props) => {
 const DangerDIV = (props) => {
     return (
         <>
-            <Sound
+            {/* <Sound
                 url={WrongSound}
                 playStatus={Sound.status.PLAYING}
                 volume={30}
-            />
+            /> */}
             <div className="w-100 mt-auto">
                 <div className="row justify-content-center">
                     <div className="col-lg-3 col-md-5">
@@ -1265,7 +1270,7 @@ class QuizLevelExam extends Component {
                         ""
                     )}
                 </div>
-                <Sound
+                {/* <Sound
                     url={BGSound}
                     playStatus={
                         this.state.isPlaying
@@ -1274,7 +1279,7 @@ class QuizLevelExam extends Component {
                     }
                     volume={20}
                     loop={true}
-                />
+                /> */}
             </div>
         );
     };
