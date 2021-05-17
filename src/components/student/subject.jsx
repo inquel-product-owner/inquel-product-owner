@@ -78,7 +78,7 @@ const TopicListRender = (props) => {
                                     ""
                                 )}
                             </div>
-                            <div className="col-10 d-flex small font-weight-bold-600">
+                            <div className="col-10 d-flex small font-weight-bold-600 pl-1">
                                 <div className="mr-3">
                                     {props.topics.topic_num}
                                 </div>
@@ -251,13 +251,13 @@ const ChapterListRender = (props) => {
                                     ></i>
                                 </span>
                             </div>
-                            <div className="col-1 small font-weight-bold-600">
-                                {props.all_chapters.indexOf(
-                                    props.chapter.chapter_id
-                                ) + 1}
-                            </div>
-                            <div className="col-8 small font-weight-bold-600">
-                                {props.chapter.chapter_name}
+                            <div className="col-11 d-flex small font-weight-bold-600 pl-1">
+                                <div className="mr-3">
+                                    {props.all_chapters.indexOf(
+                                        props.chapter.chapter_id
+                                    ) + 1}
+                                </div>
+                                <div className="w-100">{props.chapter.chapter_name}</div>
                             </div>
                         </div>
                     </div>
@@ -763,8 +763,8 @@ class Subject extends Component {
                 topics[chapter_index][i].topic_num === topic_num &&
                 topics[chapter_index][i].topic_name === topic_name
             ) {
-                topics[chapter_index][i].isCompleted = !topics[chapter_index][i]
-                    .isCompleted;
+                topics[chapter_index][i].isCompleted =
+                    !topics[chapter_index][i].isCompleted;
             }
             temp[topics[chapter_index][i].topic_num] =
                 topics[chapter_index][i].isCompleted;

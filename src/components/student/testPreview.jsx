@@ -314,21 +314,22 @@ class TestPreview extends Component {
                                                 "dd/mm/yyyy"
                                             )}
                                         </div>
-                                        <div className="col-md-2">
+                                        <div className="col-md-3">
                                             <span className="font-weight-bold-600">
                                                 Submitted On:
                                             </span>{" "}
                                             {dateFormat(
                                                 this.result.data
                                                     .submission_time,
-                                                "dd/mm/yyyy"
+                                                "dd/mm/yyyy hh:MM"
                                             )}
                                         </div>
                                         <div className="col-md-2">
                                             <span className="font-weight-bold-600">
                                                 Scored Marks:
                                             </span>{" "}
-                                            0
+                                            {this.result.data
+                                                    .obtained_test_marks}
                                         </div>
                                     </div>
                                 </div>

@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import store from "../../../redux/store";
 import Header from "../navbar";
 import SideNav from "../sidenav";
 import { Link } from "react-router-dom";
@@ -24,7 +25,8 @@ class SimulationPaper extends Component {
                     paper_id: "",
                     paper_name: "",
                     paper_type: "",
-                    duration: "",
+                    total_marks: "",
+                    time_duration: "",
                 },
             ],
 
@@ -114,8 +116,10 @@ class SimulationPaper extends Component {
             simulation[index].paper_name = event.target.value;
         } else if (type === "paper") {
             simulation[index].paper_type = event.target.value;
+        } else if (type === "marks") {
+            simulation[index].total_marks = event.target.value;
         } else if (type === "duration") {
-            simulation[index].duration = event.target.value;
+            simulation[index].time_duration = event.target.value;
         }
 
         this.setState({
@@ -146,7 +150,13 @@ class SimulationPaper extends Component {
                 showErrorAlert: true,
                 page_loading: false,
             });
-        } else if (simulation[index].duration === "") {
+        } else if (simulation[index].total_marks === "") {
+            this.setState({
+                errorMsg: "Enter total marks",
+                showErrorAlert: true,
+                page_loading: false,
+            });
+        } else if (simulation[index].time_duration === "") {
             this.setState({
                 errorMsg: "Enter the duration",
                 showErrorAlert: true,
@@ -170,7 +180,8 @@ class SimulationPaper extends Component {
                 body: JSON.stringify({
                     paper_name: simulation[index].paper_name,
                     paper_type: simulation[index].paper_type,
-                    duration: Number(simulation[index].duration),
+                    total_marks: Number(simulation[index].total_marks),
+                    duration: Number(simulation[index].time_duration),
                 }),
             }
         )
@@ -211,7 +222,8 @@ class SimulationPaper extends Component {
                     paper_id: simulation[index].paper_id,
                     paper_name: simulation[index].paper_name,
                     paper_type: simulation[index].paper_type,
-                    duration: Number(simulation[index].duration),
+                    total_marks: Number(simulation[index].total_marks),
+                    duration: Number(simulation[index].time_duration),
                 }),
             }
         )
@@ -247,7 +259,8 @@ class SimulationPaper extends Component {
             paper_id: "",
             paper_name: "",
             paper_type: "",
-            duration: "",
+            total_marks: "",
+            time_duration: "",
         });
         this.setState({
             simulationData: simulation,
@@ -292,7 +305,8 @@ class SimulationPaper extends Component {
                                         paper_id: "",
                                         paper_name: "",
                                         paper_type: "",
-                                        duration: "",
+                                        total_marks: "",
+                                        time_duration: "",
                                     });
                                     this.setState({
                                         simulationData: simulation,
@@ -328,7 +342,8 @@ class SimulationPaper extends Component {
                             paper_id: "",
                             paper_name: "",
                             paper_type: "",
-                            duration: "",
+                            total_marks: "",
+                            time_duration: "",
                         });
                         this.setState({
                             simulationData: simulation,
@@ -337,6 +352,10 @@ class SimulationPaper extends Component {
                 }
             );
         }
+    };
+
+    dispatchPaper = (data) => {
+        store.dispatch({ type: "PAPER", payload: data });
     };
 
     render() {
@@ -409,8 +428,14 @@ class SimulationPaper extends Component {
                             </ol>
                         </nav>
 
-                        <div className="card shadow-sm mb-2">
-                            <div className="table-responsive">
+                        <div
+                            className="card shadow-sm mb-2"
+                            style={{ overflowX: "auto" }}
+                        >
+                            <div
+                                className="table-responsive"
+                                style={{ minWidth: "1000px" }}
+                            >
                                 <table className="table">
                                     <thead className="primary-bg text-white">
                                         <tr>
@@ -418,6 +443,7 @@ class SimulationPaper extends Component {
                                                 Simulation Exams
                                             </th>
                                             <th scope="col">Papers</th>
+                                            <th scope="col">Total Marks</th>
                                             <th scope="col">Time Duration</th>
                                             <th scope="col"></th>
                                         </tr>
@@ -505,6 +531,25 @@ class SimulationPaper extends Component {
                                                                   </select>
                                                               </td>
                                                               <td>
+                                                                  <input
+                                                                      className="form-control form-control-sm border-secondary"
+                                                                      type="text"
+                                                                      value={
+                                                                          item.total_marks
+                                                                      }
+                                                                      onChange={(
+                                                                          event
+                                                                      ) =>
+                                                                          this.handleInput(
+                                                                              index,
+                                                                              event,
+                                                                              "marks"
+                                                                          )
+                                                                      }
+                                                                      placeholder="Enter total marks"
+                                                                  />
+                                                              </td>
+                                                              <td>
                                                                   <div
                                                                       className="input-group input-group-sm border-secondary rounded-lg"
                                                                       style={{
@@ -539,16 +584,21 @@ class SimulationPaper extends Component {
                                                               <td className="d-flex justify-content-end">
                                                                   {item.paper_id !==
                                                                   "" ? (
-                                                                      <button
-                                                                          className="btn btn-primary-invert btn-sm shadow-sm"
-                                                                          onClick={() => {
-                                                                              this.sectionRedirect(
-                                                                                  item.paper_id
-                                                                              );
-                                                                          }}
+                                                                      <Link
+                                                                          to={`${this.props.match.url}/paper/${item.paper_id}`}
                                                                       >
-                                                                          Add +
-                                                                      </button>
+                                                                          <button
+                                                                              className="btn btn-primary-invert btn-sm shadow-sm"
+                                                                              onClick={() =>
+                                                                                  this.dispatchPaper(
+                                                                                      item.paper_name
+                                                                                  )
+                                                                              }
+                                                                          >
+                                                                              Add
+                                                                              +
+                                                                          </button>
+                                                                      </Link>
                                                                   ) : null}
 
                                                                   <Dropdown>

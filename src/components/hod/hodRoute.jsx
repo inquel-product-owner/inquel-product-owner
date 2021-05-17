@@ -22,6 +22,9 @@ import Subject from "./subject";
 import SubjectConfiguration from "./subjectConfiguration";
 
 import SimulationPaper from "./simulation/paper";
+import SimulationSection from "./simulation/section";
+import SimulationType1 from "./simulation/type1";
+import SimulationType2 from "./simulation/type2";
 
 import EmailVerification from "./emailVerification";
 import errorPage from "../404";
@@ -191,6 +194,42 @@ const hodRoutes = (
                     <Redirect to="/hod/login" />
                 ) : (
                     <SimulationPaper {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/hod/subject/:subjectId/simulation/:simulationId/paper/:paperId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <SimulationSection {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/hod/subject/:subjectId/simulation/:simulationId/paper/:paperId/section/:sectionId/type1"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <SimulationType1 {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/hod/subject/:subjectId/simulation/:simulationId/paper/:paperId/section/:sectionId/type2"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <SimulationType2 {...props} />
                 )
             }
         />

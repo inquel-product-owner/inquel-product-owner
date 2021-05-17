@@ -2,77 +2,64 @@ import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import Header from "../shared/navbar";
-import SideNav from "../shared/sidenav";
+import Header from "../navbar";
+import SideNav from "../sidenav";
+import Select from "react-select";
 import CKeditor, { OptionEditor } from "../../sharedComponents/CKeditor";
 import ReactSwitch from "../../sharedComponents/switchComponent";
-import { Accordion, Card } from "react-bootstrap";
-import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
+import { Accordion, Card, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import Loading from "../../sharedComponents/loader";
 import AlertBox from "../../sharedComponents/alert";
-import FileModal from "../shared/fileExplorer";
 import { ContentDeleteModal } from "../../sharedComponents/contentManagementModal";
-import TemplateUpload from "../shared/templateUpload";
+import Lightbox from "react-awesome-lightbox";
+import "react-awesome-lightbox/build/style.css";
 
 const mapStateToProps = (state) => ({
-    group_name: state.group_name,
     subject_name: state.subject_name,
-    chapter_name: state.chapter_name,
-    topic_name: state.topic_name,
+    simulation_name: state.simulation_name,
+    paper_name: state.paper_name,
+    section_name: state.section_name,
 });
 
-class Type2 extends Component {
+class SimulationType2 extends Component {
     constructor(props) {
         super(props);
         this.state = {
             showSideNav: false,
-            showModal: false,
-            showTemplateUploadModal: false,
+            showMCQDelete_Modal: false,
+            showSubMCQDelete_Modal: false,
 
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
-
             page_loading: true,
             btnDisabled: false,
-            showMCQDelete_Modal: false,
-            showSubMCQDelete_Modal: false,
 
             showMainEdit_option: false,
             contentCollapsed: true,
             filesCollapsed: true,
             propertiesCollapsed: true,
-            settingsCollapsed: true,
 
             showSubEdit_option: false,
             subContentCollapsed: true,
             showVirtual_keyboard: true,
 
-            themeData: [],
-            complexityData: [],
-
             activeQuestion: "",
             activeSubQuestion: "",
-            selectedImage: "",
-            selectedVideo: "",
-            selectedAudio: "",
             selectedQuestion: "",
             selectedSubQuestion: "",
+            selectedImageData: [],
+            startIndex: 0,
+            isLightBoxOpen: false,
 
-            keyboards: [
-                {
-                    all: false,
-                    chemistry: false,
-                    physics: false,
-                    maths: false,
-                },
-            ],
+            chapterData: [],
             questions: [
                 {
                     question_random_id: "",
                     question: "<p>Main Question goes here</p>",
-                    explanation: "<p>Explanation goes here</p>",
+                    pair_question_id: "NOPAIR",
                     is_file_uploaded: false,
                     mcq: true,
                     fill_in: false,
@@ -100,46 +87,27 @@ class Type2 extends Component {
                             { title: "", file_name: "", image: null, path: "" },
                             { title: "", file_name: "", image: null, path: "" },
                         ],
-                        video: {
-                            title: "",
-                            file_name: "",
-                            video: null,
-                            path: "",
-                            url: "",
-                        },
-                        audio: [
-                            { title: "", file_name: "", audio: null, path: "" },
-                            { title: "", file_name: "", audio: null, path: "" },
-                        ],
                     },
                     properties: {
-                        complexity: "",
-                        priority: "",
-                        theme: "",
-                        test: [false, false, false, false, false],
-                        semester: [false, false, false, false, false],
-                        learn: false,
-                    },
-                    settings: {
-                        virtual_keyboard: [],
-                        limited: false,
+                        chapter_id: "",
                     },
                 },
             ],
         };
         this.option_limit = 6;
         this.sub_question_limit = 10;
-        this.groupId = this.props.match.params.groupId;
         this.subjectId = this.props.match.params.subjectId;
-        this.chapterId = this.props.match.params.chapterId;
-        this.topicNum = this.props.match.params.topicNum;
-        this.url = baseUrl + teacherUrl;
+        this.simulationId = this.props.match.params.simulationId;
+        this.paperId = this.props.match.params.paperId;
+        this.sectionId = this.props.match.params.sectionId;
+        this.url = baseUrl + hodUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
             Accept: "application/json",
             "Content-Type": "application/json",
             Authorization: this.authToken,
         };
+        this.section = JSON.parse(localStorage.getItem("section"));
     }
 
     toggleSideNav = () => {
@@ -148,36 +116,11 @@ class Type2 extends Component {
         });
     };
 
-    toggleModal = (image, video, audio) => {
-        this.setState({
-            showModal: !this.state.showModal,
-            selectedImage: image,
-            selectedVideo: video,
-            selectedAudio: audio,
-        });
-    };
-
-    // -------------------------- Template uploading --------------------------
-
-    toggleTemplateModal = () => {
-        this.setState({
-            showTemplateUploadModal: !this.state.showTemplateUploadModal,
-        });
-    };
-
-    templateFormSubmission = (data) => {
-        this.setState({
-            showTemplateUploadModal: false,
-            page_loading: true,
-        });
-        this.loadMCQData();
-    };
-
     // -------------------------- Question data loading --------------------------
 
     loadMCQData = async () => {
         await fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/?topic_num=${this.topicNum}`,
+            `${this.url}/hod/subject/${this.subjectId}/simulation/${this.simulationId}/paper/${this.paperId}/type_two/?section_id=${this.sectionId}`,
             {
                 headers: this.headers,
                 method: "GET",
@@ -188,29 +131,36 @@ class Type2 extends Component {
                 console.log(result);
                 if (result.sts === true) {
                     let data = [];
-                    let keyboards = [];
-                    let response = result.data.results;
+                    let response = result.data;
                     if (response.length !== 0) {
                         let questionData = this.loopQuestionData(
                             data,
-                            keyboards,
                             response
                         );
-                        this.setState(
-                            {
-                                questions: questionData.question,
-                                keyboards: questionData.keyboards,
-                            },
-                            () => {
-                                if (result.data.next !== null) {
-                                    this.loadNextMCQData(result.data.next);
-                                } else {
-                                    this.setState({
-                                        page_loading: false,
-                                    });
+
+                        let question = questionData.question;
+                        let temp = [];
+
+                        for (let i = 0; i < question.length; i++) {
+                            question[i]["index"] = i + 1;
+                            temp.push(question[i]);
+                            for (let j = 0; j < question.length; j++) {
+                                if (
+                                    question[i].question_random_id ===
+                                    question[j].pair_question_id
+                                ) {
+                                    temp[temp.length - 1].index = `${i + 1}A`;
+                                    question[j]["index"] = `${i + 1}B`;
+                                    temp.push(question[j]);
+                                    question.splice(j, 1);
                                 }
                             }
-                        );
+                        }
+
+                        this.setState({
+                            questions: temp,
+                            page_loading: false,
+                        });
                     } else {
                         this.setState({
                             page_loading: false,
@@ -230,65 +180,11 @@ class Type2 extends Component {
         window.MathJax.typeset();
     };
 
-    loadNextMCQData = async (path) => {
-        await fetch(path, {
-            headers: this.headers,
-            method: "GET",
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    let data = [...this.state.questions];
-                    let keyboards = [...this.state.keyboards];
-                    let response = result.data.results;
-                    if (response.length !== 0) {
-                        let questionData = this.loopQuestionData(
-                            data,
-                            keyboards,
-                            response
-                        );
-                        this.setState(
-                            {
-                                questions: questionData.question,
-                                keyboards: questionData.keyboards,
-                            },
-                            () => {
-                                if (result.data.next !== null) {
-                                    this.loadNextMCQData(result.data.next);
-                                } else {
-                                    this.setState({
-                                        page_loading: false,
-                                    });
-                                }
-                            }
-                        );
-                    } else {
-                        this.setState({
-                            page_loading: false,
-                        });
-                    }
-                } else {
-                    this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-        window.MathJax.typeset();
-    };
-
-    loopQuestionData = (data, keyboards, response) => {
+    loopQuestionData = (data, response) => {
         let images = [];
-        let audio = [];
         let sub_question = [];
         for (let i = 0; i < response.length; i++) {
             images = [];
-            audio = [];
             sub_question = [];
             if (Object.entries(response[i].files).length !== 0) {
                 // image
@@ -316,31 +212,6 @@ class Type2 extends Component {
                     image: null,
                     path: response[i].files.type2_image_4 || "",
                 });
-
-                // audio
-                audio.push({
-                    title: response[i].files.type2_audio_1_title || "",
-                    file_name: "",
-                    audio: null,
-                    path: response[i].files.type2_audio_1 || "",
-                });
-                audio.push({
-                    title: response[i].files.type2_audio_2_title || "",
-                    file_name: "",
-                    audio: null,
-                    path: response[i].files.type2_audio_2 || "",
-                });
-            }
-
-            // video
-            var path = "";
-            if (Object.entries(response[i].files).length !== 0) {
-                if (response[i].files.paste_video_url) {
-                    path = response[i].files.paste_video_url;
-                }
-                if (response[i].files.type2_video_1) {
-                    path = response[i].files.type2_video_1;
-                }
             }
 
             // Sub question
@@ -377,9 +248,8 @@ class Type2 extends Component {
                                   },
                               ],
                     marks: response[i].sub_question[k].marks.toString(),
-                    negative_marks: response[i].sub_question[
-                        k
-                    ].negative_marks.toString(),
+                    negative_marks:
+                        response[i].sub_question[k].negative_marks.toString(),
                 });
             }
 
@@ -387,7 +257,7 @@ class Type2 extends Component {
             data.push({
                 question_random_id: response[i].question_random_id,
                 question: response[i].question,
-                explanation: response[i].explanation,
+                pair_question_id: response[i].pair_question_id,
                 is_file_uploaded:
                     Object.entries(response[i].files).length !== 0
                         ? true
@@ -431,96 +301,36 @@ class Type2 extends Component {
                                   },
                               ]
                             : images,
-                    video: {
-                        title:
-                            Object.entries(response[i].files).length !== 0 &&
-                            response[i].files.type2_video_1_title
-                                ? response[i].files.type2_video_1_title
-                                : "",
-                        file_name: "",
-                        video: null,
-                        path: path,
-                        url: "",
-                    },
-                    audio:
-                        audio.length === 0
-                            ? [
-                                  {
-                                      title: "",
-                                      file_name: "",
-                                      audio: null,
-                                      path: "",
-                                  },
-                                  {
-                                      title: "",
-                                      file_name: "",
-                                      audio: null,
-                                      path: "",
-                                  },
-                              ]
-                            : audio,
                 },
                 properties: {
-                    complexity: response[i].properties.complexity,
-                    priority: response[i].properties.priority,
-                    theme: response[i].properties.theme,
-                    test: response[i].properties.test,
-                    semester: response[i].properties.semester,
-                    learn: response[i].properties.learn,
-                },
-                settings: {
-                    virtual_keyboard: response[i].settings.virtual_keyboard,
-                    limited: response[i].settings.limited,
+                    chapter_id: response[i].properties.chapter_id,
                 },
             });
-
-            // Keyboards
-            let boards = {
-                all: false,
-                chemistry: false,
-                physics: false,
-                maths: false,
-            };
-            let virtual_keyboard = response[i].settings.virtual_keyboard;
-            for (let j = 0; j < virtual_keyboard.length; j++) {
-                if (virtual_keyboard[j] === "All") {
-                    boards.all = true;
-                    boards.chemistry = true;
-                    boards.maths = true;
-                    boards.physics = true;
-                } else if (virtual_keyboard[j] === "Chemistry") {
-                    boards.chemistry = true;
-                } else if (virtual_keyboard[j] === "Physics") {
-                    boards.physics = true;
-                } else if (virtual_keyboard[j] === "Maths") {
-                    boards.maths = true;
-                }
-            }
-            keyboards.push(boards);
         }
 
         return {
             question: data,
-            keyboards: keyboards,
         };
     };
 
     // -------------------------- Lifecycle --------------------------
 
     componentDidMount = () => {
-        document.title = `${this.props.topic_name} Type 2 - Teacher | IQLabs`;
+        document.title = `${this.props.section_name} Type 2 - HOD | IQLabs`;
 
-        fetch(`${this.url}/teacher/status/data/?theme=1&complexity=1`, {
-            headers: this.headers,
-            method: "GET",
-        })
+        fetch(
+            `${this.url}/hod/subject/${this.subjectId}/simulation/${this.simulationId}/paper/${this.paperId}/filters/`,
+            {
+                headers: this.headers,
+                method: "GET",
+            }
+        )
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
                 if (result.sts === true) {
                     this.setState({
-                        themeData: result.data.theme,
-                        complexityData: result.data.complexity,
+                        chapterData: result.data.chapter_data,
                     });
                 } else {
                     this.setState({
@@ -535,6 +345,10 @@ class Type2 extends Component {
             });
 
         this.loadMCQData();
+
+        if (!localStorage.getItem("section")) {
+            this.props.history.goBack();
+        }
     };
 
     // -------------------------- Data submission --------------------------
@@ -547,105 +361,6 @@ class Type2 extends Component {
         });
 
         const data = [...this.state.questions];
-        let form_data = new FormData();
-
-        form_data.append(
-            "main_question",
-            JSON.stringify({
-                main_question: {
-                    question: data[this.state.activeQuestion].question,
-                    explanation: data[this.state.activeQuestion].explanation,
-                    properties: {
-                        complexity:
-                            data[this.state.activeQuestion].properties
-                                .complexity,
-                        priority:
-                            data[this.state.activeQuestion].properties.priority,
-                        theme: data[this.state.activeQuestion].properties.theme,
-                        test: data[this.state.activeQuestion].properties.test,
-                        semester:
-                            data[this.state.activeQuestion].properties.semester,
-                        learn: data[this.state.activeQuestion].properties.learn,
-                    },
-                    settings: {
-                        virtual_keyboard:
-                            data[this.state.activeQuestion].settings
-                                .virtual_keyboard,
-                        limited:
-                            data[this.state.activeQuestion].settings.limited,
-                    },
-                },
-            })
-        );
-        form_data.append(
-            "sub_question",
-            JSON.stringify({
-                sub_question: data[this.state.activeQuestion].sub_question,
-            })
-        );
-
-        // Video
-        if (data[this.state.activeQuestion].content.video.url !== "") {
-            form_data.append(
-                "video_url",
-                data[this.state.activeQuestion].content.video.url
-            );
-        }
-
-        if (data[this.state.activeQuestion].content.video.video !== null) {
-            form_data.append(
-                "type2_video_1_title",
-                data[this.state.activeQuestion].content.video.title
-            );
-            form_data.append(
-                "type2_video_1",
-                data[this.state.activeQuestion].content.video.video
-            );
-        }
-
-        // Image
-        for (
-            let i = 0;
-            i < data[this.state.activeQuestion].content.images.length;
-            i++
-        ) {
-            if (
-                data[this.state.activeQuestion].content.images[i].image !== null
-            ) {
-                form_data.append(
-                    `type2_image_${i + 1}_title`,
-                    data[this.state.activeQuestion].content.images[i].title
-                );
-                form_data.append(
-                    `type2_image_${i + 1}`,
-                    data[this.state.activeQuestion].content.images[i].image
-                );
-            } else {
-                continue;
-            }
-        }
-
-        // Audio
-        for (
-            let i = 0;
-            i < data[this.state.activeQuestion].content.audio.length;
-            i++
-        ) {
-            if (
-                data[this.state.activeQuestion].content.audio[i].audio !== null
-            ) {
-                form_data.append(
-                    `type2_audio_${i + 1}_title`,
-                    data[this.state.activeQuestion].content.audio[i].title
-                );
-                form_data.append(
-                    `type2_audio_${i + 1}`,
-                    data[this.state.activeQuestion].content.audio[i].audio
-                );
-            } else {
-                continue;
-            }
-        }
 
         if (data[this.state.activeQuestion].question === "") {
             this.setState({
@@ -653,33 +368,65 @@ class Type2 extends Component {
                 showErrorAlert: true,
                 page_loading: false,
             });
-        } else if (data[this.state.activeQuestion].explanation === "") {
-            this.setState({
-                errorMsg: "Explanation is required",
-                showErrorAlert: true,
-                page_loading: false,
-            });
         } else if (
-            data[this.state.activeQuestion].properties.complexity === ""
+            data[this.state.activeQuestion].properties.chapter_id === ""
         ) {
             this.setState({
-                errorMsg: "Complexity is required",
-                showErrorAlert: true,
-                page_loading: false,
-            });
-        } else if (data[this.state.activeQuestion].properties.priority === "") {
-            this.setState({
-                errorMsg: "Priority is required",
-                showErrorAlert: true,
-                page_loading: false,
-            });
-        } else if (data[this.state.activeQuestion].properties.theme === "") {
-            this.setState({
-                errorMsg: "Theme is required",
+                errorMsg: "Select chapter property",
                 showErrorAlert: true,
                 page_loading: false,
             });
         } else {
+            let form_data = new FormData();
+
+            form_data.append(
+                "main_question",
+                JSON.stringify({
+                    main_question: {
+                        question: data[this.state.activeQuestion].question,
+                        properties: {
+                            chapter_id:
+                                data[this.state.activeQuestion].properties
+                                    .chapter_id,
+                        },
+                    },
+                })
+            );
+            form_data.append(
+                "sub_question",
+                JSON.stringify({
+                    sub_question: data[this.state.activeQuestion].sub_question,
+                })
+            );
+
+            form_data.append("section_id", this.sectionId);
+            form_data.append(
+                "pair_question_id",
+                data[this.state.activeQuestion].pair_question_id
+            );
+
+            // Image
+            for (
+                let i = 0;
+                i < data[this.state.activeQuestion].content.images.length;
+                i++
+            ) {
+                if (
+                    data[this.state.activeQuestion].content.images[i].image !==
+                    null
+                ) {
+                    form_data.append(
+                        `type2_image_${i + 1}_title`,
+                        data[this.state.activeQuestion].content.images[i].title
+                    );
+                    form_data.append(
+                        `type2_image_${i + 1}`,
+                        data[this.state.activeQuestion].content.images[i].image
+                    );
+                } else {
+                    continue;
+                }
+            }
             if (data[this.state.activeQuestion].question_random_id === "") {
                 this.handlePOST(form_data);
             } else {
@@ -696,11 +443,10 @@ class Type2 extends Component {
                 Authorization: this.authToken,
             },
         };
-        data.append("topic_num", this.topicNum);
 
         axios
             .post(
-                `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/`,
+                `${this.url}/hod/subject/${this.subjectId}/simulation/${this.simulationId}/paper/${this.paperId}/type_two/`,
                 data,
                 options
             )
@@ -721,7 +467,6 @@ class Type2 extends Component {
                                 filesCollapsed: true,
                                 subContentCollapsed: true,
                                 propertiesCollapsed: true,
-                                settingsCollapsed: true,
                                 activeQuestion: "",
                                 activeSubQuestion: "",
                             });
@@ -776,7 +521,7 @@ class Type2 extends Component {
 
         axios
             .put(
-                `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/`,
+                `${this.url}/hod/subject/${this.subjectId}/simulation/${this.simulationId}/paper/${this.paperId}/type_two/`,
                 data,
                 options
             )
@@ -797,7 +542,6 @@ class Type2 extends Component {
                                 filesCollapsed: true,
                                 subContentCollapsed: true,
                                 propertiesCollapsed: true,
-                                settingsCollapsed: true,
                                 activeQuestion: "",
                                 activeSubQuestion: "",
                             });
@@ -858,38 +602,25 @@ class Type2 extends Component {
         window.MathJax.typeset();
     };
 
-    handleExplanation = async (evt) => {
-        const values = [...this.state.questions];
-        values[this.state.activeQuestion].explanation = evt.editor.getData();
-        await this.setState({
-            questions: values,
-        });
-        window.MathJax.typeset();
-    };
-
     // -------------------------- Options --------------------------
 
     handleOptions_mcq = () => {
         const values = [...this.state.questions];
         // main_question
-        values[this.state.activeQuestion].mcq = !values[
-            this.state.activeQuestion
-        ].mcq;
-        values[this.state.activeQuestion].fill_in = !values[
-            this.state.activeQuestion
-        ].fill_in;
+        values[this.state.activeQuestion].mcq =
+            !values[this.state.activeQuestion].mcq;
+        values[this.state.activeQuestion].fill_in =
+            !values[this.state.activeQuestion].fill_in;
         for (
             let i = 0;
             i < values[this.state.activeQuestion].sub_question.length;
             i++
         ) {
             // sub_question
-            values[this.state.activeQuestion].sub_question[i].mcq = !values[
-                this.state.activeQuestion
-            ].sub_question[i].mcq;
-            values[this.state.activeQuestion].sub_question[i].fill_in = !values[
-                this.state.activeQuestion
-            ].sub_question[i].fill_in;
+            values[this.state.activeQuestion].sub_question[i].mcq =
+                !values[this.state.activeQuestion].sub_question[i].mcq;
+            values[this.state.activeQuestion].sub_question[i].fill_in =
+                !values[this.state.activeQuestion].sub_question[i].fill_in;
         }
         this.setState({
             questions: values,
@@ -899,24 +630,20 @@ class Type2 extends Component {
     handleOptions_fillin = () => {
         const values = [...this.state.questions];
         // main_question
-        values[this.state.activeQuestion].fill_in = !values[
-            this.state.activeQuestion
-        ].fill_in;
-        values[this.state.activeQuestion].mcq = !values[
-            this.state.activeQuestion
-        ].mcq;
+        values[this.state.activeQuestion].fill_in =
+            !values[this.state.activeQuestion].fill_in;
+        values[this.state.activeQuestion].mcq =
+            !values[this.state.activeQuestion].mcq;
         for (
             let i = 0;
             i < values[this.state.activeQuestion].sub_question.length;
             i++
         ) {
             // sub_question
-            values[this.state.activeQuestion].sub_question[i].fill_in = !values[
-                this.state.activeQuestion
-            ].sub_question[i].fill_in;
-            values[this.state.activeQuestion].sub_question[i].mcq = !values[
-                this.state.activeQuestion
-            ].sub_question[i].mcq;
+            values[this.state.activeQuestion].sub_question[i].fill_in =
+                !values[this.state.activeQuestion].sub_question[i].fill_in;
+            values[this.state.activeQuestion].sub_question[i].mcq =
+                !values[this.state.activeQuestion].sub_question[i].mcq;
         }
         this.setState({
             questions: values,
@@ -944,9 +671,10 @@ class Type2 extends Component {
             }
             values[this.state.activeQuestion].sub_question[
                 this.state.activeSubQuestion
-            ].options[index].correct = !values[this.state.activeQuestion]
-                .sub_question[this.state.activeSubQuestion].options[index]
-                .correct;
+            ].options[index].correct =
+                !values[this.state.activeQuestion].sub_question[
+                    this.state.activeSubQuestion
+                ].options[index].correct;
             this.setState({
                 questions: values,
             });
@@ -1079,6 +807,7 @@ class Type2 extends Component {
             values[this.state.activeQuestion].content.images[index].path !== ""
         ) {
             let body = {
+                section_id: this.sectionId,
                 question_random_id:
                     values[this.state.activeQuestion].question_random_id,
             };
@@ -1087,7 +816,7 @@ class Type2 extends Component {
                 "title";
 
             fetch(
-                `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/`,
+                `${this.url}/hod/subject/${this.subjectId}/simulation/${this.simulationId}/paper/${this.paperId}/type_two/`,
                 {
                     method: "DELETE",
                     headers: this.headers,
@@ -1154,9 +883,8 @@ class Type2 extends Component {
         } else {
             values[this.state.activeQuestion].content.images[index].file_name =
                 event.target.files[0].name;
-            values[this.state.activeQuestion].content.images[
-                index
-            ].path = URL.createObjectURL(event.target.files[0]);
+            values[this.state.activeQuestion].content.images[index].path =
+                URL.createObjectURL(event.target.files[0]);
             values[this.state.activeQuestion].content.images[index].image =
                 event.target.files[0];
             this.setState({
@@ -1182,403 +910,26 @@ class Type2 extends Component {
         }
     };
 
-    // -------------------------- Video --------------------------
-
-    handleVideoTitle = (event) => {
-        const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.video.title =
-            event.target.value;
-        this.setState({
-            questions: values,
-        });
-    };
-
-    handleVideoFile = (event) => {
-        this.setState({
-            showErrorAlert: false,
-        });
-
-        let values = [...this.state.questions];
-        const file = event.target.files[0].name.toLowerCase();
-        if (!file.match(/\.(mpeg|flv|avi|mov|mp4|mkv)$/)) {
-            this.setState({
-                errorMsg: "Please select valid video file",
-                showErrorAlert: true,
-                btnDisabled: true,
-            });
-        } else {
-            values[this.state.activeQuestion].content.video.file_name =
-                event.target.files[0].name;
-            values[
-                this.state.activeQuestion
-            ].content.video.path = URL.createObjectURL(event.target.files[0]);
-            values[this.state.activeQuestion].content.video.video =
-                event.target.files[0];
-            values[this.state.activeQuestion].content.video.url = "";
-            this.setState({
-                questions: values,
-                btnDisabled: false,
-                showErrorAlert: false,
-            });
-        }
-    };
-
-    handleVideoUrl = (event) => {
-        const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.video.url =
-            event.target.value;
-        values[this.state.activeQuestion].content.video.file_name = "";
-        values[this.state.activeQuestion].content.video.video = null;
-        values[this.state.activeQuestion].content.video.path = "";
-        this.setState({
-            questions: values,
-        });
-    };
-
-    clearVideo = () => {
-        const values = [...this.state.questions];
-
-        if (
-            values[this.state.activeQuestion].question_random_id !== "" &&
-            values[this.state.activeQuestion].is_file_uploaded === true &&
-            values[this.state.activeQuestion].content.video.file_name === "" &&
-            values[this.state.activeQuestion].content.video.path !== ""
-        ) {
-            fetch(
-                `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/`,
-                {
-                    method: "DELETE",
-                    headers: this.headers,
-                    body: JSON.stringify({
-                        question_random_id:
-                            values[this.state.activeQuestion]
-                                .question_random_id,
-                        type2_video_1_title:
-                            values[this.state.activeQuestion].content.video
-                                .title || "title",
-                    }),
-                }
-            )
-                .then((res) => res.json())
-                .then((result) => {
-                    console.log(result);
-                    if (result.sts === true) {
-                        this.setState({
-                            successMsg: result.msg,
-                            showSuccessAlert: true,
-                        });
-                        values[this.state.activeQuestion].content.video.title =
-                            "";
-                        values[
-                            this.state.activeQuestion
-                        ].content.video.file_name = "";
-                        values[
-                            this.state.activeQuestion
-                        ].content.video.video = null;
-                        values[this.state.activeQuestion].content.video.path =
-                            "";
-                        values[this.state.activeQuestion].content.video.url =
-                            "";
-                        this.setState({
-                            questions: values,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.detail
-                                ? result.detail
-                                : result.msg,
-                            showErrorAlert: true,
-                        });
-                    }
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-        } else {
-            values[this.state.activeQuestion].content.video.title = "";
-            values[this.state.activeQuestion].content.video.file_name = "";
-            values[this.state.activeQuestion].content.video.video = null;
-            values[this.state.activeQuestion].content.video.path = "";
-            values[this.state.activeQuestion].content.video.url = "";
-            this.setState({
-                questions: values,
-            });
-        }
-    };
-
-    // -------------------------- Audio --------------------------
-
-    handleAudioTitle = (index, event) => {
-        const values = [...this.state.questions];
-        values[this.state.activeQuestion].content.audio[index].title =
-            event.target.value;
-        this.setState({
-            questions: values,
-        });
-    };
-
-    handleDeleteAudio = (index) => {
-        const values = [...this.state.questions];
-
-        this.setState({
-            showSuccessAlert: false,
-            showErrorAlert: false,
-        });
-
-        if (
-            values[this.state.activeQuestion].question_random_id !== "" &&
-            values[this.state.activeQuestion].is_file_uploaded === true &&
-            values[this.state.activeQuestion].content.audio[index].file_name ===
-                "" &&
-            values[this.state.activeQuestion].content.audio[index].path !== ""
-        ) {
-            let body = {
-                question_random_id:
-                    values[this.state.activeQuestion].question_random_id,
-            };
-            body[`type2_audio_${index + 1}_title`] =
-                values[this.state.activeQuestion].content.audio[index].title ||
-                "title";
-
-            fetch(
-                `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/`,
-                {
-                    method: "DELETE",
-                    headers: this.headers,
-                    body: JSON.stringify(body),
-                }
-            )
-                .then((res) => res.json())
-                .then((result) => {
-                    console.log(result);
-                    if (result.sts === true) {
-                        this.setState({
-                            successMsg: result.msg,
-                            showSuccessAlert: true,
-                        });
-                        values[this.state.activeQuestion].content.audio[
-                            index
-                        ] = {
-                            title: "",
-                            file_name: "",
-                            audio: null,
-                            path: "",
-                        };
-                        this.setState({
-                            questions: values,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.detail
-                                ? result.detail
-                                : result.msg,
-                            showErrorAlert: true,
-                        });
-                    }
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-        } else {
-            values[this.state.activeQuestion].content.audio[index] = {
-                title: "",
-                file_name: "",
-                audio: null,
-                path: "",
-            };
-            this.setState({
-                questions: values,
-            });
-        }
-    };
-
-    handleAudioFile = (index, event) => {
-        this.setState({
-            showErrorAlert: false,
-        });
-
-        const values = [...this.state.questions];
-        const file = event.target.files[0].name.toLowerCase();
-        if (!file.match(/\.(wav|mp3)$/)) {
-            this.setState({
-                errorMsg: "Please select valid audio file",
-                showErrorAlert: true,
-                btnDisabled: true,
-            });
-        } else {
-            values[this.state.activeQuestion].content.audio[index].file_name =
-                event.target.files[0].name;
-            values[this.state.activeQuestion].content.audio[
-                index
-            ].path = URL.createObjectURL(event.target.files[0]);
-            values[this.state.activeQuestion].content.audio[index].audio =
-                event.target.files[0];
-            this.setState({
-                questions: values,
-                btnDisabled: false,
-                showErrorAlert: false,
-            });
-        }
-    };
-
-    clearAudios = () => {
-        const values = [...this.state.questions];
-        this.setState({
-            showErrorAlert: false,
-            showSuccessAlert: false,
-        });
-        for (
-            let i = 0;
-            i < values[this.state.activeQuestion].content.audio.length;
-            i++
-        ) {
-            this.handleDeleteAudio(i);
-        }
-    };
-
     // -------------------------- Properties --------------------------
 
-    handleProperties = (event, type) => {
-        const values = [...this.state.questions];
-        if (type === "marks") {
-            values[this.state.activeQuestion].sub_question[
-                this.state.activeSubQuestion
-            ].marks = event.target.value.toString();
-        } else if (type === "negative_marks") {
-            values[this.state.activeQuestion].sub_question[
-                this.state.activeSubQuestion
-            ].negative_marks = event.target.value.toString();
-        } else if (type === "complexity") {
-            values[this.state.activeQuestion].properties.complexity =
-                event.target.value;
-        } else if (type === "priority") {
-            values[this.state.activeQuestion].properties.priority =
-                event.target.value;
-        } else {
-            values[this.state.activeQuestion].properties.theme =
-                event.target.value;
-        }
+    handleProperties = (event) => {
+        let values = [...this.state.questions];
+        values[this.state.activeQuestion].properties.chapter_id = event.value;
+
         this.setState({
             questions: values,
         });
     };
 
-    handleAttemptSequence = (index, type) => {
-        const values = [...this.state.questions];
-        if (type === "test") {
-            values[this.state.activeQuestion].properties.test[index] = !values[
-                this.state.activeQuestion
-            ].properties.test[index];
-        } else if (type === "semester") {
-            values[this.state.activeQuestion].properties.semester[
-                index
-            ] = !values[this.state.activeQuestion].properties.semester[index];
-        }
+    handleMarks = (event) => {
+        let values = [...this.state.questions];
+        values[this.state.activeQuestion].sub_question[
+            this.state.activeSubQuestion
+        ].marks = event.target.value.toString();
+
         this.setState({
             questions: values,
         });
-    };
-
-    handleLearn = () => {
-        const values = [...this.state.questions];
-        values[this.state.activeQuestion].properties.learn = !values[
-            this.state.activeQuestion
-        ].properties.learn;
-        this.setState({
-            questions: values,
-        });
-    };
-
-    // -------------------------- Settings --------------------------
-
-    handleVirtualKeyboard = () => {
-        this.setState({
-            showVirtual_keyboard: !this.state.showVirtual_keyboard,
-        });
-    };
-
-    handleLimited = () => {
-        const values = [...this.state.questions];
-        values[this.state.activeQuestion].settings.limited = !values[
-            this.state.activeQuestion
-        ].settings.limited;
-        this.setState({
-            questions: values,
-        });
-    };
-
-    handleKeyboardOptions = (event, type) => {
-        const values = [...this.state.questions];
-        const keyboards = [...this.state.keyboards];
-        if (event.target.checked) {
-            values[this.state.activeQuestion].settings.virtual_keyboard.push(
-                type
-            );
-            this.setState({
-                questions: values,
-            });
-        } else {
-            values[this.state.activeQuestion].settings.virtual_keyboard.splice(
-                values[
-                    this.state.activeQuestion
-                ].settings.virtual_keyboard.indexOf(type),
-                1
-            );
-            this.setState({
-                questions: values,
-            });
-        }
-        if (type === "Chemistry") {
-            keyboards[this.state.activeQuestion].chemistry = !keyboards[
-                this.state.activeQuestion
-            ].chemistry;
-            this.setState({
-                keyboards: keyboards,
-            });
-        } else if (type === "Physics") {
-            keyboards[this.state.activeQuestion].physics = !keyboards[
-                this.state.activeQuestion
-            ].physics;
-            this.setState({
-                keyboards: keyboards,
-            });
-        } else {
-            keyboards[this.state.activeQuestion].maths = !keyboards[
-                this.state.activeQuestion
-            ].maths;
-            this.setState({
-                keyboards: keyboards,
-            });
-        }
-    };
-
-    handleSelectAll = (event, type) => {
-        const values = [...this.state.questions];
-        const keyboards = [...this.state.keyboards];
-        if (event.target.checked) {
-            values[this.state.activeQuestion].settings.virtual_keyboard = [];
-            values[this.state.activeQuestion].settings.virtual_keyboard.push(
-                type
-            );
-            keyboards[this.state.activeQuestion].all = true;
-            keyboards[this.state.activeQuestion].physics = true;
-            keyboards[this.state.activeQuestion].chemistry = true;
-            keyboards[this.state.activeQuestion].maths = true;
-            this.setState({
-                questions: values,
-                keyboards: keyboards,
-            });
-        } else {
-            values[this.state.activeQuestion].settings.virtual_keyboard = [];
-            keyboards[this.state.activeQuestion].all = false;
-            keyboards[this.state.activeQuestion].physics = false;
-            keyboards[this.state.activeQuestion].chemistry = false;
-            keyboards[this.state.activeQuestion].maths = false;
-            this.setState({
-                questions: values,
-                keyboards: keyboards,
-            });
-        }
     };
 
     // -------------------------- Collapse --------------------------
@@ -1588,7 +939,6 @@ class Type2 extends Component {
             contentCollapsed: true,
             filesCollapsed: true,
             propertiesCollapsed: true,
-            settingsCollapsed: true,
         });
         if (component === "content") {
             this.setState({
@@ -1602,10 +952,6 @@ class Type2 extends Component {
             this.setState({
                 propertiesCollapsed: !this.state.propertiesCollapsed,
             });
-        } else {
-            this.setState({
-                settingsCollapsed: !this.state.settingsCollapsed,
-            });
         }
     };
 
@@ -1613,17 +959,10 @@ class Type2 extends Component {
 
     handleAddMainQuestion = () => {
         const values = [...this.state.questions];
-        const keyboards = [...this.state.keyboards];
-        keyboards.push({
-            all: false,
-            chemistry: false,
-            physics: false,
-            maths: false,
-        });
         values.push({
             question_random_id: "",
             question: "<p>Main Question goes here</p>",
-            explanation: "<p>Explanation goes here</p>",
+            pair_question_id: "NOPAIR",
             is_file_uploaded: false,
             mcq: true,
             fill_in: false,
@@ -1651,34 +990,13 @@ class Type2 extends Component {
                     { title: "", file_name: "", image: null, path: "" },
                     { title: "", file_name: "", image: null, path: "" },
                 ],
-                video: {
-                    title: "",
-                    file_name: "",
-                    video: null,
-                    path: "",
-                    url: "",
-                },
-                audio: [
-                    { title: "", file_name: "", audio: null, path: "" },
-                    { title: "", file_name: "", audio: null, path: "" },
-                ],
             },
             properties: {
-                complexity: "",
-                priority: "",
-                theme: "",
-                test: [false, false, false, false, false],
-                semester: [false, false, false, false, false],
-                learn: false,
-            },
-            settings: {
-                virtual_keyboard: [],
-                limited: false,
+                chapter_id: "",
             },
         });
         this.setState({
             questions: values,
-            keyboards: keyboards,
             activeQuestion: values.length - 1,
         });
     };
@@ -1711,22 +1029,7 @@ class Type2 extends Component {
 
     copyQuestions = async (index) => {
         const values = [...this.state.questions];
-        const keyboards = [...this.state.keyboards];
 
-        keyboards.splice(index + 1, 0, {
-            all: keyboards[index].all,
-            chemistry: keyboards[index].chemistry,
-            physics: keyboards[index].physics,
-            maths: keyboards[index].maths,
-        });
-        const test = [];
-        for (let i = 0; i < values[index].properties.test.length; i++) {
-            test[i] = values[index].properties.test[i];
-        }
-        const semester = [];
-        for (let i = 0; i < values[index].properties.semester.length; i++) {
-            semester[i] = values[index].properties.semester[i];
-        }
         const sub_question = [];
         for (let i = 0; i < values[index].sub_question.length; i++) {
             const options = [];
@@ -1762,7 +1065,7 @@ class Type2 extends Component {
         values.splice(index + 1, 0, {
             question_random_id: "",
             question: values[index].question,
-            explanation: values[index].explanation,
+            pair_question_id: "NOPAIR",
             is_file_uploaded: false,
             mcq: values[index].mcq,
             fill_in: values[index].fill_in,
@@ -1774,34 +1077,13 @@ class Type2 extends Component {
                     { title: "", file_name: "", image: null, path: "" },
                     { title: "", file_name: "", image: null, path: "" },
                 ],
-                video: {
-                    title: "",
-                    file_name: "",
-                    video: null,
-                    path: "",
-                    url: "",
-                },
-                audio: [
-                    { title: "", file_name: "", audio: null, path: "" },
-                    { title: "", file_name: "", audio: null, path: "" },
-                ],
             },
             properties: {
-                complexity: values[index].properties.complexity,
-                priority: values[index].properties.priority,
-                theme: values[index].properties.theme,
-                test: test,
-                semester: semester,
-                learn: values[index].properties.learn,
-            },
-            settings: {
-                virtual_keyboard: values[index].settings.virtual_keyboard,
-                limited: values[index].settings.limited,
+                chapter_id: values[index].properties.chapter_id,
             },
         });
         await this.setState({
             questions: values,
-            keyboards: keyboards,
             activeQuestion: index + 1,
         });
         window.MathJax.typeset();
@@ -1866,7 +1148,6 @@ class Type2 extends Component {
             filesCollapsed: true,
             subContentCollapsed: true,
             propertiesCollapsed: true,
-            settingsCollapsed: true,
         });
     };
 
@@ -1882,7 +1163,6 @@ class Type2 extends Component {
             filesCollapsed: true,
             subContentCollapsed: true,
             propertiesCollapsed: true,
-            settingsCollapsed: true,
         });
     };
 
@@ -1890,7 +1170,6 @@ class Type2 extends Component {
 
     deleteQuestion = (index) => {
         const values = [...this.state.questions];
-        const keyboards = [...this.state.keyboards];
         this.setState({
             showMainEdit_option: false,
             showSubEdit_option: false,
@@ -1898,7 +1177,6 @@ class Type2 extends Component {
             filesCollapsed: true,
             subContentCollapsed: true,
             propertiesCollapsed: true,
-            settingsCollapsed: true,
             activeQuestion: index,
         });
 
@@ -1908,26 +1186,18 @@ class Type2 extends Component {
                 showMCQDelete_Modal: !this.state.showMCQDelete_Modal,
             });
         } else {
-            keyboards.splice(index, 1);
             values.splice(index, 1);
             this.setState(
                 {
                     questions: values,
-                    keyboards: keyboards,
                     activeQuestion: "",
                 },
                 () => {
                     if (values.length === 0) {
-                        keyboards.push({
-                            all: false,
-                            chemistry: false,
-                            physics: false,
-                            maths: false,
-                        });
                         values.push({
                             question_random_id: "",
                             question: "<p>Main Question goes here</p>",
-                            explanation: "<p>Explanation goes here</p>",
+                            pair_question_id: "NOPAIR",
                             is_file_uploaded: false,
                             mcq: true,
                             fill_in: false,
@@ -1975,44 +1245,13 @@ class Type2 extends Component {
                                         path: "",
                                     },
                                 ],
-                                video: {
-                                    title: "",
-                                    file_name: "",
-                                    video: null,
-                                    path: "",
-                                    url: "",
-                                },
-                                audio: [
-                                    {
-                                        title: "",
-                                        file_name: "",
-                                        audio: null,
-                                        path: "",
-                                    },
-                                    {
-                                        title: "",
-                                        file_name: "",
-                                        audio: null,
-                                        path: "",
-                                    },
-                                ],
                             },
                             properties: {
-                                complexity: "",
-                                priority: "",
-                                theme: "",
-                                test: [false, false, false, false, false],
-                                semester: [false, false, false, false, false],
-                                learn: false,
-                            },
-                            settings: {
-                                virtual_keyboard: [],
-                                limited: false,
+                                chapter_id: "",
                             },
                         });
                         this.setState({
                             questions: values,
-                            keyboards: keyboards,
                         });
                     }
                 }
@@ -2028,29 +1267,20 @@ class Type2 extends Component {
 
     handleMCQ_Deletion = () => {
         const values = [...this.state.questions];
-        const keyboards = [...this.state.keyboards];
 
-        keyboards.splice(this.state.activeQuestion, 1);
         values.splice(this.state.activeQuestion, 1);
 
         this.setState(
             {
                 questions: values,
-                keyboards: keyboards,
                 activeQuestion: "",
             },
             () => {
                 if (values.length === 0) {
-                    keyboards.push({
-                        all: false,
-                        chemistry: false,
-                        physics: false,
-                        maths: false,
-                    });
                     values.push({
                         question_random_id: "",
                         question: "<p>Main Question goes here</p>",
-                        explanation: "<p>Explanation goes here</p>",
+                        pair_question_id: "NOPAIR",
                         is_file_uploaded: false,
                         mcq: true,
                         fill_in: false,
@@ -2098,44 +1328,13 @@ class Type2 extends Component {
                                     path: "",
                                 },
                             ],
-                            video: {
-                                title: "",
-                                file_name: "",
-                                video: null,
-                                path: "",
-                                url: "",
-                            },
-                            audio: [
-                                {
-                                    title: "",
-                                    file_name: "",
-                                    audio: null,
-                                    path: "",
-                                },
-                                {
-                                    title: "",
-                                    file_name: "",
-                                    audio: null,
-                                    path: "",
-                                },
-                            ],
                         },
                         properties: {
-                            complexity: "",
-                            priority: "",
-                            theme: "",
-                            test: [false, false, false, false, false],
-                            semester: [false, false, false, false, false],
-                            learn: false,
-                        },
-                        settings: {
-                            virtual_keyboard: [],
-                            limited: false,
+                            chapter_id: "",
                         },
                     });
                     this.setState({
                         questions: values,
-                        keyboards: keyboards,
                     });
                 }
             }
@@ -2160,7 +1359,6 @@ class Type2 extends Component {
             filesCollapsed: true,
             subContentCollapsed: true,
             propertiesCollapsed: true,
-            settingsCollapsed: true,
             activeQuestion: main_index,
             activeSubQuestion: sub_index,
         });
@@ -2260,68 +1458,85 @@ class Type2 extends Component {
         );
     };
 
-    // -------------------------- Publishing the question --------------------------
+    // -------------------------- Pairing question --------------------------
 
-    handlePublish = () => {
-        this.setState({
-            showSuccessAlert: false,
-            showErrorAlert: false,
-            page_loading: true,
+    handlePair = (question, index) => {
+        let values = [...this.state.questions];
+        values.splice(index + 1, 0, {
+            question_random_id: "",
+            question: "<p>Main Question goes here</p>",
+            pair_question_id: question.question_random_id,
+            is_file_uploaded: false,
+            mcq: true,
+            fill_in: false,
+            sub_question: [
+                {
+                    sub_question_id: "",
+                    question: "<p>Sub question goes here</p>",
+                    mcq: true,
+                    fill_in: false,
+                    fillin_answer: [""],
+                    options: [
+                        { correct: false, content: "" },
+                        { correct: false, content: "" },
+                        { correct: false, content: "" },
+                        { correct: false, content: "" },
+                    ],
+                    marks: "",
+                    negative_marks: "0",
+                },
+            ],
+            content: {
+                images: [
+                    { title: "", file_name: "", image: null, path: "" },
+                    { title: "", file_name: "", image: null, path: "" },
+                    { title: "", file_name: "", image: null, path: "" },
+                    { title: "", file_name: "", image: null, path: "" },
+                ],
+            },
+            properties: {
+                chapter_id: "",
+            },
         });
+        this.setState({
+            questions: values,
+            activeQuestion: index + 1,
+        });
+    };
 
-        const questions = [...this.state.questions];
-        let id = [];
-        for (let i = 0; i < questions.length; i++) {
-            if (questions[i].question_random_id !== "") {
-                id.push(questions[i].question_random_id);
+    // -------------------------- Image preview --------------------------
+
+    changeImage = (images, path) => {
+        let imageArr = [];
+        let index = 0;
+        this.setState({
+            selectedImageData: [],
+            startIndex: 0,
+        });
+        for (let i = 0; i < images.length; i++) {
+            if (images[i].path !== "") {
+                imageArr.push({
+                    url: images[i].path,
+                    title: images[i].title,
+                });
+            }
+        }
+        for (let i = 0; i < imageArr.length; i++) {
+            if (imageArr[i].url === path) {
+                index = i;
             } else {
                 continue;
             }
         }
-
-        if (id.length !== 0) {
-            fetch(
-                `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/publish/`,
-                {
-                    headers: this.headers,
-                    method: "POST",
-                    body: JSON.stringify({
-                        question_random_ids: id,
-                    }),
-                }
-            )
-                .then((res) => res.json())
-                .then((result) => {
-                    console.log(result);
-                    if (result.sts === true) {
-                        this.setState({
-                            successMsg: result.msg,
-                            showSuccessAlert: true,
-                            page_loading: false,
-                        });
-                    } else {
-                        this.setState({
-                            errorMsg: result.detail
-                                ? result.detail
-                                : result.msg,
-                            showErrorAlert: true,
-                            page_loading: false,
-                        });
-                    }
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-        } else {
-            this.setState({
-                page_loading: false,
-            });
-        }
+        this.setState({
+            selectedImageData: imageArr,
+            startIndex: index,
+            isLightBoxOpen: true,
+        });
     };
 
     render() {
         let data = [...this.state.questions];
-        let boards = [...this.state.keyboards];
         return (
             <div className="wrapper">
                 {/* Navbar */}
@@ -2330,7 +1545,7 @@ class Type2 extends Component {
                     togglenav={this.toggleSideNav}
                 />
 
-                {/* ALert message */}
+                {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
                     successMsg={this.state.successMsg}
@@ -2354,16 +1569,32 @@ class Type2 extends Component {
                     activeLink="dashboard"
                 />
 
+                {/* Image lightbox */}
+                {this.state.isLightBoxOpen ? (
+                    <Lightbox
+                        images={this.state.selectedImageData}
+                        startIndex={this.state.startIndex}
+                        onClose={() => {
+                            this.setState({
+                                isLightBoxOpen: false,
+                            });
+                        }}
+                    />
+                ) : (
+                    ""
+                )}
+
                 {/* MCQ Deletion Modal */}
                 {this.state.showMCQDelete_Modal ? (
                     <ContentDeleteModal
                         show={this.state.showMCQDelete_Modal}
                         onHide={this.toggleDeleteModal}
                         formSubmission={this.handleMCQ_Deletion}
-                        url={`${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/`}
+                        url={`${this.url}/hod/subject/${this.subjectId}/simulation/${this.simulationId}/paper/${this.paperId}/type_two/`}
                         type="question"
                         name=""
                         data={{
+                            section_id: this.sectionId,
                             question_random_id: this.state.selectedQuestion,
                         }}
                         toggleModal={this.toggleDeleteModal}
@@ -2376,40 +1607,15 @@ class Type2 extends Component {
                         show={this.state.showSubMCQDelete_Modal}
                         onHide={this.toggleSubDeleteModal}
                         formSubmission={this.handleSubMCQ_Deletion}
-                        url={`${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/`}
+                        url={`${this.url}/hod/subject/${this.subjectId}/simulation/${this.simulationId}/paper/${this.paperId}/type_two/`}
                         type="sub question"
                         name=""
                         data={{
+                            section_id: this.sectionId,
                             question_random_id: this.state.selectedQuestion,
                             sub_question_id: this.state.selectedSubQuestion,
                         }}
                         toggleModal={this.toggleSubDeleteModal}
-                    />
-                ) : null}
-
-                {/* File viewing Modal */}
-                {this.state.showModal ? (
-                    <FileModal
-                        show={this.state.showModal}
-                        onHide={this.toggleModal}
-                        image={this.state.selectedImage}
-                        video={this.state.selectedVideo}
-                        audio={this.state.selectedAudio}
-                    />
-                ) : null}
-
-                {/* Template uploading Modal */}
-                {this.state.showTemplateUploadModal ? (
-                    <TemplateUpload
-                        show={this.state.showTemplateUploadModal}
-                        onHide={this.toggleTemplateModal}
-                        formSubmission={this.templateFormSubmission}
-                        toggleModal={this.toggleTemplateModal}
-                        url={`${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/upload/`}
-                        type="type_2"
-                        subjectId={this.subjectId}
-                        chapterId={this.chapterId}
-                        topic_num={this.topicNum}
                     />
                 ) : null}
 
@@ -2442,39 +1648,24 @@ class Type2 extends Component {
                                 <nav aria-label="breadcrumb">
                                     <ol className="breadcrumb mb-3">
                                         <li className="breadcrumb-item">
-                                            <Link to="/teacher">
+                                            <Link to="/hod">
                                                 <i className="fas fa-home fa-sm"></i>
                                             </Link>
                                         </li>
-                                        {this.groupId !== undefined ? (
-                                            <>
-                                                <li className="breadcrumb-item">
-                                                    <Link
-                                                        to={`/teacher/group/${this.groupId}`}
-                                                    >
-                                                        {this.props.group_name}
-                                                    </Link>
-                                                </li>
-                                                <li className="breadcrumb-item">
-                                                    <Link
-                                                        to={`/teacher/group/${this.groupId}/subject/${this.subjectId}`}
-                                                    >
-                                                        {
-                                                            this.props
-                                                                .subject_name
-                                                        }
-                                                    </Link>
-                                                </li>
-                                            </>
-                                        ) : (
-                                            <li className="breadcrumb-item">
-                                                <Link
-                                                    to={`/teacher/subject/${this.subjectId}`}
-                                                >
-                                                    {this.props.subject_name}
-                                                </Link>
-                                            </li>
-                                        )}
+                                        <li className="breadcrumb-item">
+                                            <Link
+                                                to={`/hod/subject/${this.subjectId}`}
+                                            >
+                                                {this.props.subject_name}
+                                            </Link>
+                                        </li>
+                                        <li className="breadcrumb-item">
+                                            <Link
+                                                to={`/hod/subject/${this.subjectId}/simulation/${this.simulationId}`}
+                                            >
+                                                {this.props.simulation_name}
+                                            </Link>
+                                        </li>
                                         <li className="breadcrumb-item">
                                             <Link
                                                 to="#"
@@ -2482,48 +1673,19 @@ class Type2 extends Component {
                                                     this.props.history.goBack
                                                 }
                                             >
-                                                {this.props.chapter_name}
+                                                {this.props.paper_name}
                                             </Link>
                                         </li>
                                         <li className="breadcrumb-item active">
-                                            Type 2
+                                            {this.props.section_name}
                                         </li>
                                     </ol>
                                 </nav>
 
                                 {/* ----- Header area ----- */}
-                                <div className="row align-items-center mb-4">
-                                    <div className="col-md-6">
-                                        <h5 className="primary-text mb-0">
-                                            {`Type 2 - ${this.props.topic_name}`}
-                                        </h5>
-                                    </div>
-                                    <div className="col-md-6">
-                                        <div className="d-flex flex-wrap justify-content-end">
-                                            <button
-                                                className="btn btn-primary btn-sm shadow-none mr-1"
-                                                onClick={this.handlePublish}
-                                            >
-                                                Publish
-                                            </button>
-                                            <a
-                                                href="https://iqlabs-media-type1.s3.us-east-2.amazonaws.com/media/TypeTwo/Templates/TeacherTypeTwoTemplate.xlsx"
-                                                className="btn btn-primary btn-sm shadow-none mr-1"
-                                                download
-                                            >
-                                                Download template
-                                            </a>
-                                            <button
-                                                className="btn btn-primary btn-sm shadow-none"
-                                                onClick={
-                                                    this.toggleTemplateModal
-                                                }
-                                            >
-                                                Upload template
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
+                                <h5 className="primary-text mb-4">
+                                    Type 2 - {this.section.category}
+                                </h5>
 
                                 {/* -------------------- Main question -------------------- */}
                                 {this.state.questions.map(
@@ -2539,55 +1701,118 @@ class Type2 extends Component {
                                                                     type="button"
                                                                     className="btn btn-light bg-white btn-block shadow-sm mr-2"
                                                                 >
-                                                                    {q_index <=
-                                                                    8
-                                                                        ? `0${
-                                                                              q_index +
-                                                                              1
-                                                                          }`
-                                                                        : q_index +
-                                                                          1}
+                                                                    {question.index ? (
+                                                                        question.index
+                                                                    ) : (
+                                                                        <i className="fas fa-ellipsis-h"></i>
+                                                                    )}
                                                                 </button>
                                                             </div>
                                                             <div className="col-md-12 col-3 mb-1">
-                                                                <button
-                                                                    type="button"
-                                                                    className="btn btn-light bg-white btn-block shadow-sm mr-2"
-                                                                    onClick={() =>
-                                                                        this.editQuestion(
-                                                                            q_index
-                                                                        )
+                                                                <OverlayTrigger
+                                                                    key="right"
+                                                                    placement="right"
+                                                                    overlay={
+                                                                        <Tooltip id="tooltip">
+                                                                            Edit
+                                                                        </Tooltip>
                                                                     }
                                                                 >
-                                                                    <i className="far fa-edit fa-sm"></i>
-                                                                </button>
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn btn-light bg-white btn-block shadow-sm mr-2"
+                                                                        onClick={() =>
+                                                                            this.editQuestion(
+                                                                                q_index
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <i className="far fa-edit fa-sm"></i>
+                                                                    </button>
+                                                                </OverlayTrigger>
                                                             </div>
                                                             <div className="col-md-12 col-3 mb-1">
-                                                                <button
-                                                                    type="button"
-                                                                    className="btn btn-light bg-white btn-block shadow-sm mr-1"
-                                                                    onClick={() =>
-                                                                        this.copyQuestions(
-                                                                            q_index
-                                                                        )
+                                                                <OverlayTrigger
+                                                                    key="right"
+                                                                    placement="right"
+                                                                    overlay={
+                                                                        <Tooltip id="tooltip">
+                                                                            Copy
+                                                                        </Tooltip>
                                                                     }
                                                                 >
-                                                                    <i className="far fa-copy fa-sm"></i>
-                                                                </button>
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn btn-light bg-white btn-block shadow-sm mr-1"
+                                                                        onClick={() =>
+                                                                            this.copyQuestions(
+                                                                                q_index
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <i className="far fa-copy fa-sm"></i>
+                                                                    </button>
+                                                                </OverlayTrigger>
                                                             </div>
-                                                            <div className="col-md-12 col-3">
-                                                                <button
-                                                                    type="button"
-                                                                    className="btn btn-light bg-white btn-block shadow-sm"
-                                                                    onClick={() =>
-                                                                        this.deleteQuestion(
-                                                                            q_index
-                                                                        )
+                                                            <div className="col-md-12 col-3 mb-1">
+                                                                <OverlayTrigger
+                                                                    key="right"
+                                                                    placement="right"
+                                                                    overlay={
+                                                                        <Tooltip id="tooltip">
+                                                                            Delete
+                                                                        </Tooltip>
                                                                     }
                                                                 >
-                                                                    <i className="far fa-trash-alt fa-sm"></i>
-                                                                </button>
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn btn-light bg-white btn-block shadow-sm"
+                                                                        onClick={() =>
+                                                                            this.deleteQuestion(
+                                                                                q_index
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <i className="far fa-trash-alt fa-sm"></i>
+                                                                    </button>
+                                                                </OverlayTrigger>
                                                             </div>
+                                                            {question.pair_question_id ===
+                                                            "NOPAIR" ? (
+                                                                <div className="col-md-12 col-3">
+                                                                    <OverlayTrigger
+                                                                        key="right"
+                                                                        placement="right"
+                                                                        overlay={
+                                                                            <Tooltip id="tooltip">
+                                                                                Pair
+                                                                                question
+                                                                            </Tooltip>
+                                                                        }
+                                                                    >
+                                                                        <button
+                                                                            type="button"
+                                                                            className="btn btn-light bg-white btn-block shadow-sm"
+                                                                            onClick={() =>
+                                                                                this.handlePair(
+                                                                                    question,
+                                                                                    q_index
+                                                                                )
+                                                                            }
+                                                                            disabled={
+                                                                                question.question_random_id ===
+                                                                                ""
+                                                                                    ? true
+                                                                                    : false
+                                                                            }
+                                                                        >
+                                                                            <i className="fas fa-plus fa-sm"></i>
+                                                                        </button>
+                                                                    </OverlayTrigger>
+                                                                </div>
+                                                            ) : (
+                                                                ""
+                                                            )}
                                                         </div>
                                                     </div>
 
@@ -2607,39 +1832,72 @@ class Type2 extends Component {
                                                             }}
                                                         >
                                                             <div className="card-body">
-                                                                <div className="row">
+                                                                <div className="d-flex">
                                                                     {/* Questions */}
-                                                                    <div className="col-11 pr-md-0">
+                                                                    <div className="w-100">
                                                                         <div
                                                                             className="pb-2"
                                                                             dangerouslySetInnerHTML={{
-                                                                                __html:
-                                                                                    question.question,
+                                                                                __html: question.question,
                                                                             }}
                                                                         ></div>
                                                                     </div>
 
-                                                                    {/* File modal button */}
-                                                                    <div className="col-1 pl-0 text-right">
-                                                                        <button
-                                                                            className="btn btn-light bg-white shadow-sm"
-                                                                            onClick={() =>
-                                                                                this.toggleModal(
-                                                                                    question
-                                                                                        .content
-                                                                                        .images,
-                                                                                    question
-                                                                                        .content
-                                                                                        .video,
-                                                                                    question
-                                                                                        .content
-                                                                                        .audio
-                                                                                )
-                                                                            }
-                                                                        >
-                                                                            <i className="far fa-folder-open"></i>
-                                                                        </button>
-                                                                    </div>
+                                                                    {/* ----- image preview ----- */}
+                                                                    {question
+                                                                        .content
+                                                                        .images[0]
+                                                                        .path !==
+                                                                        "" ||
+                                                                    question
+                                                                        .content
+                                                                        .images[1]
+                                                                        .path !==
+                                                                        "" ||
+                                                                    question
+                                                                        .content
+                                                                        .images[2]
+                                                                        .path !==
+                                                                        "" ||
+                                                                    question
+                                                                        .content
+                                                                        .images[3]
+                                                                        .path !==
+                                                                        "" ? (
+                                                                        <div className="ml-3">
+                                                                            {question.content.images.map(
+                                                                                (
+                                                                                    images,
+                                                                                    index
+                                                                                ) => {
+                                                                                    return images.path !==
+                                                                                        "" ? (
+                                                                                        <div
+                                                                                            key={
+                                                                                                index
+                                                                                            }
+                                                                                            className="card preview-img-circle shadow-sm"
+                                                                                            style={{
+                                                                                                backgroundImage: `url(${images.path})`,
+                                                                                            }}
+                                                                                            onClick={() =>
+                                                                                                this.changeImage(
+                                                                                                    question
+                                                                                                        .content
+                                                                                                        .images,
+                                                                                                    images.path
+                                                                                                )
+                                                                                            }
+                                                                                        ></div>
+                                                                                    ) : (
+                                                                                        ""
+                                                                                    );
+                                                                                }
+                                                                            )}
+                                                                        </div>
+                                                                    ) : (
+                                                                        ""
+                                                                    )}
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -2686,56 +1944,89 @@ class Type2 extends Component {
                                                                                     type="button"
                                                                                     className="btn btn-light bg-white btn-block shadow-sm mr-2"
                                                                                 >
-                                                                                    {`${
-                                                                                        q_index +
-                                                                                        1
-                                                                                    }.${
-                                                                                        sub_index +
-                                                                                        1
-                                                                                    }`}
+                                                                                    {question.index ? (
+                                                                                        `${
+                                                                                            question.index
+                                                                                        }.${
+                                                                                            sub_index +
+                                                                                            1
+                                                                                        }`
+                                                                                    ) : (
+                                                                                        <i className="fas fa-ellipsis-h"></i>
+                                                                                    )}
                                                                                 </button>
                                                                             </div>
                                                                             <div className="col-md-12 col-3 mb-1">
-                                                                                <button
-                                                                                    type="button"
-                                                                                    className="btn btn-light bg-white btn-block shadow-sm mr-2"
-                                                                                    onClick={() =>
-                                                                                        this.editSubQuestion(
-                                                                                            q_index,
-                                                                                            sub_index
-                                                                                        )
+                                                                                <OverlayTrigger
+                                                                                    key="right"
+                                                                                    placement="right"
+                                                                                    overlay={
+                                                                                        <Tooltip id="tooltip">
+                                                                                            Edit
+                                                                                        </Tooltip>
                                                                                     }
                                                                                 >
-                                                                                    <i className="far fa-edit fa-sm"></i>
-                                                                                </button>
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        className="btn btn-light bg-white btn-block shadow-sm mr-2"
+                                                                                        onClick={() =>
+                                                                                            this.editSubQuestion(
+                                                                                                q_index,
+                                                                                                sub_index
+                                                                                            )
+                                                                                        }
+                                                                                    >
+                                                                                        <i className="far fa-edit fa-sm"></i>
+                                                                                    </button>
+                                                                                </OverlayTrigger>
                                                                             </div>
                                                                             <div className="col-md-12 col-3 mb-1">
-                                                                                <button
-                                                                                    type="button"
-                                                                                    className="btn btn-light bg-white btn-block shadow-sm mr-1"
-                                                                                    onClick={() =>
-                                                                                        this.copySubQuestions(
-                                                                                            q_index,
-                                                                                            sub_index
-                                                                                        )
+                                                                                <OverlayTrigger
+                                                                                    key="right"
+                                                                                    placement="right"
+                                                                                    overlay={
+                                                                                        <Tooltip id="tooltip">
+                                                                                            Copy
+                                                                                        </Tooltip>
                                                                                     }
                                                                                 >
-                                                                                    <i className="far fa-copy fa-sm"></i>
-                                                                                </button>
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        className="btn btn-light bg-white btn-block shadow-sm mr-1"
+                                                                                        onClick={() =>
+                                                                                            this.copySubQuestions(
+                                                                                                q_index,
+                                                                                                sub_index
+                                                                                            )
+                                                                                        }
+                                                                                    >
+                                                                                        <i className="far fa-copy fa-sm"></i>
+                                                                                    </button>
+                                                                                </OverlayTrigger>
                                                                             </div>
                                                                             <div className="col-md-12 col-3">
-                                                                                <button
-                                                                                    type="button"
-                                                                                    className="btn btn-light bg-white btn-block shadow-sm"
-                                                                                    onClick={() =>
-                                                                                        this.deleteSubQuestion(
-                                                                                            q_index,
-                                                                                            sub_index
-                                                                                        )
+                                                                                <OverlayTrigger
+                                                                                    key="right"
+                                                                                    placement="right"
+                                                                                    overlay={
+                                                                                        <Tooltip id="tooltip">
+                                                                                            Delete
+                                                                                        </Tooltip>
                                                                                     }
                                                                                 >
-                                                                                    <i className="far fa-trash-alt fa-sm"></i>
-                                                                                </button>
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        className="btn btn-light bg-white btn-block shadow-sm"
+                                                                                        onClick={() =>
+                                                                                            this.deleteSubQuestion(
+                                                                                                q_index,
+                                                                                                sub_index
+                                                                                            )
+                                                                                        }
+                                                                                    >
+                                                                                        <i className="far fa-trash-alt fa-sm"></i>
+                                                                                    </button>
+                                                                                </OverlayTrigger>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -2760,8 +2051,7 @@ class Type2 extends Component {
                                                                                 <div
                                                                                     className="pb-2"
                                                                                     dangerouslySetInnerHTML={{
-                                                                                        __html:
-                                                                                            sub_question.question,
+                                                                                        __html: sub_question.question,
                                                                                     }}
                                                                                 ></div>
 
@@ -2854,10 +2144,8 @@ class Type2 extends Component {
                                                                                 <div
                                                                                     className="secondary-bg primary-text font-weight-bold px-2 py-1 position-absolute rounded-lg shadow-sm"
                                                                                     style={{
-                                                                                        bottom:
-                                                                                            "5px",
-                                                                                        right:
-                                                                                            "5px",
+                                                                                        bottom: "5px",
+                                                                                        right: "5px",
                                                                                         fontSize:
                                                                                             "10px",
                                                                                     }}
@@ -2868,10 +2156,8 @@ class Type2 extends Component {
                                                                                 <div
                                                                                     className="secondary-bg primary-text font-weight-bold px-2 py-1 position-absolute rounded-lg shadow-sm"
                                                                                     style={{
-                                                                                        bottom:
-                                                                                            "5px",
-                                                                                        right:
-                                                                                            "5px",
+                                                                                        bottom: "5px",
+                                                                                        right: "5px",
                                                                                         fontSize:
                                                                                             "10px",
                                                                                     }}
@@ -2897,6 +2183,17 @@ class Type2 extends Component {
                                 <button
                                     className="btn btn-primary btn-block shadow-none"
                                     onClick={this.handleAddMainQuestion}
+                                    disabled={
+                                        this.state.questions.length !== 0
+                                            ? this.section.total_questions ===
+                                              this.state.questions[
+                                                  this.state.questions.length -
+                                                      1
+                                              ].index
+                                                ? true
+                                                : false
+                                            : false
+                                    }
                                 >
                                     Add +
                                 </button>
@@ -2923,7 +2220,6 @@ class Type2 extends Component {
                                                     filesCollapsed: true,
                                                     subContentCollapsed: true,
                                                     propertiesCollapsed: true,
-                                                    settingsCollapsed: true,
                                                     activeQuestion: "",
                                                     activeSubQuestion: "",
                                                 });
@@ -2977,26 +2273,6 @@ class Type2 extends Component {
                                                             onChange={
                                                                 this
                                                                     .onEditorChange
-                                                            }
-                                                        />
-                                                    </div>
-
-                                                    {/* ---------- Explanation ---------- */}
-
-                                                    <div className="form-group">
-                                                        <label>
-                                                            Explanation
-                                                        </label>
-                                                        <CKeditor
-                                                            data={
-                                                                data[
-                                                                    this.state
-                                                                        .activeQuestion
-                                                                ].explanation
-                                                            }
-                                                            onChange={
-                                                                this
-                                                                    .handleExplanation
                                                             }
                                                         />
                                                     </div>
@@ -3068,7 +2344,7 @@ class Type2 extends Component {
                                                 style={{ cursor: "default" }}
                                             >
                                                 <div className="d-flex justify-content-between align-items-center">
-                                                    Image | Video | Audio
+                                                    Image
                                                     {this.state
                                                         .filesCollapsed ? (
                                                         <i className="fas fa-angle-right "></i>
@@ -3210,296 +2486,6 @@ class Type2 extends Component {
                                                             .jpg .jpeg .webp
                                                         </small>
                                                     </div>
-
-                                                    {/* ---------- Video ---------- */}
-
-                                                    <div className="form-group">
-                                                        <div className="row align-items-center mb-2">
-                                                            <div className="col-md-6">
-                                                                <p className="mb-0">
-                                                                    Video
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-md-6 text-right">
-                                                                <button
-                                                                    className="btn btn-link btn-sm shadow-none"
-                                                                    onClick={
-                                                                        this
-                                                                            .clearVideo
-                                                                    }
-                                                                >
-                                                                    Clear
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                        <input
-                                                            type="text"
-                                                            name="video"
-                                                            id="video"
-                                                            placeholder="Video title"
-                                                            className="form-control form-control-sm border-secondary mb-1"
-                                                            onChange={
-                                                                this
-                                                                    .handleVideoTitle
-                                                            }
-                                                            value={
-                                                                data[
-                                                                    this.state
-                                                                        .activeQuestion
-                                                                ].content.video
-                                                                    .title
-                                                            }
-                                                            autoComplete="off"
-                                                        />
-                                                        <div className="custom-file mb-2">
-                                                            <input
-                                                                type="file"
-                                                                className="custom-file-input"
-                                                                id="video"
-                                                                accept="video/*"
-                                                                aria-describedby="inputGroupFileAddon01"
-                                                                onChange={(
-                                                                    event
-                                                                ) =>
-                                                                    this.handleVideoFile(
-                                                                        event
-                                                                    )
-                                                                }
-                                                                disabled={
-                                                                    data[
-                                                                        this
-                                                                            .state
-                                                                            .activeQuestion
-                                                                    ].content
-                                                                        .video
-                                                                        .file_name !==
-                                                                        "" ||
-                                                                    data[
-                                                                        this
-                                                                            .state
-                                                                            .activeQuestion
-                                                                    ].content
-                                                                        .video
-                                                                        .path !==
-                                                                        "" ||
-                                                                    data[
-                                                                        this
-                                                                            .state
-                                                                            .activeQuestion
-                                                                    ].content
-                                                                        .video
-                                                                        .url !==
-                                                                        ""
-                                                                        ? true
-                                                                        : false
-                                                                }
-                                                            />
-                                                            <label
-                                                                className="custom-file-label"
-                                                                htmlFor="video"
-                                                            >
-                                                                {data[
-                                                                    this.state
-                                                                        .activeQuestion
-                                                                ].content.video
-                                                                    .file_name ===
-                                                                ""
-                                                                    ? "Choose file"
-                                                                    : data[
-                                                                          this
-                                                                              .state
-                                                                              .activeQuestion
-                                                                      ].content
-                                                                          .video
-                                                                          .file_name}
-                                                            </label>
-                                                        </div>
-                                                        <small
-                                                            className="form-text text-muted mb-2"
-                                                            style={{
-                                                                marginTop:
-                                                                    "-8px",
-                                                            }}
-                                                        >
-                                                            Select only .mpeg
-                                                            .flv .avi .mov .mp4
-                                                            .mkv
-                                                        </small>
-
-                                                        <p className="text-center small font-weight-bold mb-2">
-                                                            Or
-                                                        </p>
-                                                        <input
-                                                            type="url"
-                                                            name="video"
-                                                            placeholder="Paste URL"
-                                                            className="form-control form-control-sm border-secondary mb-1"
-                                                            onChange={(event) =>
-                                                                this.handleVideoUrl(
-                                                                    event
-                                                                )
-                                                            }
-                                                            value={
-                                                                data[
-                                                                    this.state
-                                                                        .activeQuestion
-                                                                ].content.video
-                                                                    .url
-                                                            }
-                                                            disabled={
-                                                                data[
-                                                                    this.state
-                                                                        .activeQuestion
-                                                                ].content.video
-                                                                    .file_name !==
-                                                                    "" ||
-                                                                data[
-                                                                    this.state
-                                                                        .activeQuestion
-                                                                ].content.video
-                                                                    .path !== ""
-                                                                    ? true
-                                                                    : false
-                                                            }
-                                                            autoComplete="off"
-                                                        />
-                                                        <small className="form-text text-muted mb-2">
-                                                            Only https supported
-                                                            video
-                                                        </small>
-                                                    </div>
-
-                                                    {/* ---------- Audio ---------- */}
-
-                                                    <div className="form-group">
-                                                        <div className="row align-items-center mb-2">
-                                                            <div className="col-md-6">
-                                                                <p className="mb-0">
-                                                                    Audio
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-md-6 text-right">
-                                                                <button
-                                                                    className="btn btn-link btn-sm shadow-none"
-                                                                    onClick={
-                                                                        this
-                                                                            .clearAudios
-                                                                    }
-                                                                >
-                                                                    Clear
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                        {data[
-                                                            this.state
-                                                                .activeQuestion
-                                                        ].content.audio.map(
-                                                            (
-                                                                options,
-                                                                audio_index
-                                                            ) => (
-                                                                <Fragment
-                                                                    key={
-                                                                        audio_index
-                                                                    }
-                                                                >
-                                                                    <div
-                                                                        className="input-group border-secondary mb-1"
-                                                                        style={{
-                                                                            borderRadius:
-                                                                                "6px",
-                                                                        }}
-                                                                    >
-                                                                        <input
-                                                                            type="text"
-                                                                            className="form-control form-control-sm"
-                                                                            id={`audio${audio_index}`}
-                                                                            name="audio"
-                                                                            placeholder={`Audio title 0${
-                                                                                audio_index +
-                                                                                1
-                                                                            }`}
-                                                                            value={
-                                                                                options.title
-                                                                            }
-                                                                            onChange={(
-                                                                                event
-                                                                            ) =>
-                                                                                this.handleAudioTitle(
-                                                                                    audio_index,
-                                                                                    event
-                                                                                )
-                                                                            }
-                                                                            autoComplete="off"
-                                                                        />
-                                                                        <div className="input-group-append">
-                                                                            <div
-                                                                                className="btn-group"
-                                                                                role="group"
-                                                                                aria-label="Basic example"
-                                                                            >
-                                                                                <button
-                                                                                    type="button"
-                                                                                    className="btn btn-light btn-sm shadow-none"
-                                                                                    onClick={() =>
-                                                                                        this.handleDeleteAudio(
-                                                                                            audio_index
-                                                                                        )
-                                                                                    }
-                                                                                >
-                                                                                    <i className="fas fa-times fa-sm"></i>
-                                                                                </button>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="custom-file mb-2">
-                                                                        <input
-                                                                            type="file"
-                                                                            className="custom-file-input"
-                                                                            id={`audio${audio_index}`}
-                                                                            accept="audio/*"
-                                                                            aria-describedby="inputGroupFileAddon01"
-                                                                            onChange={(
-                                                                                event
-                                                                            ) =>
-                                                                                this.handleAudioFile(
-                                                                                    audio_index,
-                                                                                    event
-                                                                                )
-                                                                            }
-                                                                            disabled={
-                                                                                options.file_name !==
-                                                                                    "" ||
-                                                                                options.path !==
-                                                                                    ""
-                                                                                    ? true
-                                                                                    : false
-                                                                            }
-                                                                        />
-                                                                        <label
-                                                                            className="custom-file-label"
-                                                                            htmlFor={`audio${audio_index}`}
-                                                                        >
-                                                                            {options.file_name ===
-                                                                            ""
-                                                                                ? "Choose file"
-                                                                                : options.file_name}
-                                                                        </label>
-                                                                    </div>
-                                                                </Fragment>
-                                                            )
-                                                        )}
-                                                        <small
-                                                            className="form-text text-muted mb-2"
-                                                            style={{
-                                                                marginTop:
-                                                                    "-8px",
-                                                            }}
-                                                        >
-                                                            Select only .wav
-                                                            .mp3
-                                                        </small>
-                                                    </div>
                                                 </Card.Body>
                                             </Accordion.Collapse>
                                         </Card>
@@ -3531,448 +2517,52 @@ class Type2 extends Component {
 
                                             <Accordion.Collapse eventKey="2">
                                                 <Card.Body className="p-3">
-                                                    {/* ---------- Complexity ---------- */}
-                                                    <div className="form-group row align-items-center">
-                                                        <div className="col-4 small">
-                                                            Complexity
-                                                        </div>
-                                                        <div className="col-8">
-                                                            <select
-                                                                name="complexity"
-                                                                id="complexity"
-                                                                className="form-control form-control-sm border-secondary"
-                                                                onChange={(
-                                                                    event
-                                                                ) =>
-                                                                    this.handleProperties(
-                                                                        event,
-                                                                        "complexity"
-                                                                    )
-                                                                }
-                                                                value={
-                                                                    data[
-                                                                        this
-                                                                            .state
-                                                                            .activeQuestion
-                                                                    ].properties
-                                                                        .complexity
-                                                                }
-                                                            >
-                                                                <option value="">
-                                                                    Select
-                                                                    option
-                                                                </option>
-                                                                {this.state.complexityData.map(
-                                                                    (
-                                                                        option,
-                                                                        index
-                                                                    ) => {
-                                                                        return (
-                                                                            <option
-                                                                                value={
-                                                                                    option
-                                                                                }
-                                                                                key={
-                                                                                    index
-                                                                                }
-                                                                            >
-                                                                                {
-                                                                                    option
-                                                                                }
-                                                                            </option>
-                                                                        );
-                                                                    }
-                                                                )}
-                                                            </select>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* ---------- Priority ---------- */}
-                                                    <div className="form-group row align-items-center">
-                                                        <div className="col-4 small">
-                                                            Priority
-                                                        </div>
-                                                        <div className="col-8">
-                                                            <input
-                                                                type="text"
-                                                                className="form-control form-control-sm border-secondary"
-                                                                value={
-                                                                    data[
-                                                                        this
-                                                                            .state
-                                                                            .activeQuestion
-                                                                    ].properties
-                                                                        .priority
-                                                                }
-                                                                onChange={(
-                                                                    event
-                                                                ) =>
-                                                                    this.handleProperties(
-                                                                        event,
-                                                                        "priority"
-                                                                    )
-                                                                }
-                                                                autoComplete="off"
-                                                            />
-                                                        </div>
-                                                    </div>
-
-                                                    {/* ---------- Theme ---------- */}
-                                                    <div className="form-group row align-items-center">
-                                                        <div className="col-4 small">
-                                                            Theme
-                                                        </div>
-                                                        <div className="col-8">
-                                                            <select
-                                                                name="theme"
-                                                                id="theme"
-                                                                className="form-control form-control-sm border-secondary"
-                                                                onChange={(
-                                                                    event
-                                                                ) =>
-                                                                    this.handleProperties(
-                                                                        event,
-                                                                        "theme"
-                                                                    )
-                                                                }
-                                                                value={
-                                                                    data[
-                                                                        this
-                                                                            .state
-                                                                            .activeQuestion
-                                                                    ].properties
-                                                                        .theme
-                                                                }
-                                                            >
-                                                                <option value="">
-                                                                    Select
-                                                                    option
-                                                                </option>
-                                                                {this.state.themeData.map(
-                                                                    (
-                                                                        option,
-                                                                        index
-                                                                    ) => {
-                                                                        return (
-                                                                            <option
-                                                                                value={
-                                                                                    option
-                                                                                }
-                                                                                key={
-                                                                                    index
-                                                                                }
-                                                                            >
-                                                                                {
-                                                                                    option
-                                                                                }
-                                                                            </option>
-                                                                        );
-                                                                    }
-                                                                )}
-                                                            </select>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* ---------- Attempt sequence ---------- */}
-                                                    <div className="form-group ">
-                                                        <p className="mb-2">
-                                                            Attempt Sequence
-                                                        </p>
-                                                        <div className="row align-items-center">
-                                                            <div className="col-7 pr-0">
-                                                                <div className="card bg-light card-body p-2">
-                                                                    <div className="card card-body bg-white p-1 px-2 mb-2">
-                                                                        <div className="d-flex justify-content-between">
-                                                                            {data[
-                                                                                this
-                                                                                    .state
-                                                                                    .activeQuestion
-                                                                            ].properties.test.map(
-                                                                                (
-                                                                                    options,
-                                                                                    index
-                                                                                ) => {
-                                                                                    return (
-                                                                                        <input
-                                                                                            type="checkbox"
-                                                                                            key={
-                                                                                                index
-                                                                                            }
-                                                                                            checked={
-                                                                                                options
-                                                                                            }
-                                                                                            onChange={() =>
-                                                                                                this.handleAttemptSequence(
-                                                                                                    index,
-                                                                                                    "test"
-                                                                                                )
-                                                                                            }
-                                                                                        />
-                                                                                    );
-                                                                                }
-                                                                            )}
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="card card-body bg-white p-1 px-2">
-                                                                        <div className="d-flex justify-content-between">
-                                                                            {data[
-                                                                                this
-                                                                                    .state
-                                                                                    .activeQuestion
-                                                                            ].properties.semester.map(
-                                                                                (
-                                                                                    options,
-                                                                                    index
-                                                                                ) => {
-                                                                                    return (
-                                                                                        <input
-                                                                                            type="checkbox"
-                                                                                            key={
-                                                                                                index
-                                                                                            }
-                                                                                            checked={
-                                                                                                options
-                                                                                            }
-                                                                                            onChange={() =>
-                                                                                                this.handleAttemptSequence(
-                                                                                                    index,
-                                                                                                    "semester"
-                                                                                                )
-                                                                                            }
-                                                                                        />
-                                                                                    );
-                                                                                }
-                                                                            )}
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div className="col-5 pl-0">
-                                                                <div className="card card-body p-2">
-                                                                    <div className="card-body p-1 px-2 mb-1 small">
-                                                                        Test
-                                                                    </div>
-                                                                    <div className="card-body p-1 px-2 small">
-                                                                        Semester
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="form-group">
-                                                        <div className="row">
-                                                            <div className="col-md-6">
-                                                                <div className="d-flex align-items-center">
-                                                                    <span className="mr-4">
-                                                                        Learn
-                                                                    </span>
-                                                                    <ReactSwitch
-                                                                        onChange={
-                                                                            this
-                                                                                .handleLearn
-                                                                        }
-                                                                        checked={
-                                                                            data[
-                                                                                this
-                                                                                    .state
-                                                                                    .activeQuestion
-                                                                            ]
-                                                                                .properties
-                                                                                .learn
-                                                                        }
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </Card.Body>
-                                            </Accordion.Collapse>
-                                        </Card>
-
-                                        {/* ---------- Settings ---------- */}
-                                        <Card className="shadow-sm mb-2">
-                                            <Accordion.Toggle
-                                                as={Card.Body}
-                                                variant="link"
-                                                eventKey="3"
-                                                className="text-dark"
-                                                onClick={this.toggleCollapse}
-                                                style={{ cursor: "default" }}
-                                            >
-                                                <div className="d-flex justify-content-between align-items-center">
-                                                    Settings
-                                                    {this.state
-                                                        .settingsCollapsed ? (
-                                                        <i className="fas fa-angle-right "></i>
-                                                    ) : (
-                                                        <i className="fas fa-angle-down "></i>
-                                                    )}
-                                                </div>
-                                            </Accordion.Toggle>
-
-                                            <Accordion.Collapse eventKey="3">
-                                                <Card.Body className="p-3">
-                                                    {/* ---------- Virtual keyboard ---------- */}
-                                                    <div className="form-group">
-                                                        <div className="d-flex justify-content-between align-items-center">
-                                                            <span>
-                                                                Virtual Keyboard
-                                                            </span>
-                                                            <ReactSwitch
-                                                                onChange={
-                                                                    this
-                                                                        .handleVirtualKeyboard
-                                                                }
-                                                                checked={
-                                                                    this.state
-                                                                        .showVirtual_keyboard
-                                                                }
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    {this.state
-                                                        .showVirtual_keyboard ? (
-                                                        <div className="form-group">
-                                                            <div className="d-flex justify-content-between align-items-center mb-2">
-                                                                All
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={
-                                                                        boards[
-                                                                            this
-                                                                                .state
-                                                                                .activeQuestion
-                                                                        ].all
-                                                                    }
-                                                                    onChange={(
-                                                                        event
-                                                                    ) =>
-                                                                        this.handleSelectAll(
-                                                                            event,
-                                                                            "All"
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </div>
-                                                            <div className="d-flex justify-content-between align-items-center mb-2">
-                                                                Chemistry
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={
-                                                                        boards[
-                                                                            this
-                                                                                .state
-                                                                                .activeQuestion
-                                                                        ]
-                                                                            .chemistry
-                                                                    }
-                                                                    disabled={
-                                                                        boards[
-                                                                            this
-                                                                                .state
-                                                                                .activeQuestion
-                                                                        ].all
-                                                                    }
-                                                                    onChange={(
-                                                                        event
-                                                                    ) =>
-                                                                        this.handleKeyboardOptions(
-                                                                            event,
-                                                                            "Chemistry"
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </div>
-                                                            <div className="d-flex justify-content-between align-items-center mb-2">
-                                                                Maths
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={
-                                                                        boards[
-                                                                            this
-                                                                                .state
-                                                                                .activeQuestion
-                                                                        ].maths
-                                                                    }
-                                                                    disabled={
-                                                                        boards[
-                                                                            this
-                                                                                .state
-                                                                                .activeQuestion
-                                                                        ].all
-                                                                    }
-                                                                    onChange={(
-                                                                        event
-                                                                    ) =>
-                                                                        this.handleKeyboardOptions(
-                                                                            event,
-                                                                            "Maths"
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </div>
-                                                            <div className="d-flex justify-content-between align-items-center">
-                                                                Physics
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={
-                                                                        boards[
-                                                                            this
-                                                                                .state
-                                                                                .activeQuestion
-                                                                        ]
-                                                                            .physics
-                                                                    }
-                                                                    disabled={
-                                                                        boards[
-                                                                            this
-                                                                                .state
-                                                                                .activeQuestion
-                                                                        ].all
-                                                                    }
-                                                                    onChange={(
-                                                                        event
-                                                                    ) =>
-                                                                        this.handleKeyboardOptions(
-                                                                            event,
-                                                                            "Physics"
-                                                                        )
-                                                                    }
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    ) : (
-                                                        ""
-                                                    )}
-
-                                                    {/* ---------- Limited ---------- */}
-                                                    <div className="form-group">
-                                                        <div className="row">
-                                                            <div className="col-md-6">
-                                                                <div className="d-flex align-items-center">
-                                                                    <span className="mr-4">
-                                                                        Limited
-                                                                    </span>
-                                                                    <ReactSwitch
-                                                                        onChange={
-                                                                            this
-                                                                                .handleLimited
-                                                                        }
-                                                                        checked={
-                                                                            data[
-                                                                                this
-                                                                                    .state
-                                                                                    .activeQuestion
-                                                                            ]
-                                                                                .settings
-                                                                                .limited
-                                                                        }
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                                    {/* ---------- Chapter selection ---------- */}
+                                                    <Select
+                                                        className="basic-single border-secondary"
+                                                        placeholder={`${
+                                                            data[
+                                                                this.state
+                                                                    .activeQuestion
+                                                            ].properties
+                                                                .chapter_id ===
+                                                            ""
+                                                                ? "Select chapter"
+                                                                : this.state.chapterData.map(
+                                                                      (
+                                                                          list
+                                                                      ) => {
+                                                                          return data[
+                                                                              this
+                                                                                  .state
+                                                                                  .activeQuestion
+                                                                          ]
+                                                                              .properties
+                                                                              .chapter_id ===
+                                                                              list.chapter_id
+                                                                              ? list.chapter_name
+                                                                              : "Select chapter";
+                                                                      }
+                                                                  )
+                                                        }`}
+                                                        isSearchable={true}
+                                                        name="chapter"
+                                                        id="chapter"
+                                                        options={this.state.chapterData.map(
+                                                            (list) => {
+                                                                return {
+                                                                    value: list.chapter_id,
+                                                                    label: list.chapter_name,
+                                                                };
+                                                            }
+                                                        )}
+                                                        onChange={(event) =>
+                                                            this.handleProperties(
+                                                                event
+                                                            )
+                                                        }
+                                                        required
+                                                    />
                                                 </Card.Body>
                                             </Accordion.Collapse>
                                         </Card>
@@ -4003,7 +2593,6 @@ class Type2 extends Component {
                                                     filesCollapsed: true,
                                                     subContentCollapsed: true,
                                                     propertiesCollapsed: true,
-                                                    settingsCollapsed: true,
                                                     activeQuestion: "",
                                                     activeSubQuestion: "",
                                                 });
@@ -4142,8 +2731,7 @@ class Type2 extends Component {
                                                                                         )
                                                                                     }
                                                                                     style={{
-                                                                                        cursor:
-                                                                                            "pointer",
+                                                                                        cursor: "pointer",
                                                                                     }}
                                                                                 >
                                                                                     <i className="fas fa-check-circle"></i>
@@ -4304,9 +2892,8 @@ class Type2 extends Component {
                                                                 onChange={(
                                                                     event
                                                                 ) =>
-                                                                    this.handleProperties(
-                                                                        event,
-                                                                        "marks"
+                                                                    this.handleMarks(
+                                                                        event
                                                                     )
                                                                 }
                                                                 autoComplete="off"
@@ -4366,4 +2953,4 @@ class Type2 extends Component {
     }
 }
 
-export default connect(mapStateToProps)(Type2);
+export default connect(mapStateToProps)(SimulationType2);
