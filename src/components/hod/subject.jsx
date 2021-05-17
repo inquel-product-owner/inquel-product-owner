@@ -549,7 +549,6 @@ class Subject extends Component {
             showSimulationUpdateModal: false,
             showSimulationDeleteModal: false,
 
-            subjectItems: [],
             chapterData: [],
             chapter_id: "",
 
@@ -620,7 +619,6 @@ class Subject extends Component {
                 console.log(result);
                 if (result.sts === true) {
                     this.setState({
-                        subjectItems: result.data,
                         chapterData: result.data.chapters,
                         page_loading: false,
                     });
