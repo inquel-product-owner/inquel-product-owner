@@ -24,7 +24,7 @@ import SubjectConfiguration from "./subjectConfiguration";
 import SimulationPaper from "./simulation/paper";
 import SimulationSection from "./simulation/section";
 import SimulationType1 from "./simulation/type1";
-// import SimulationType2 from "./simulation/type2";
+import SimulationType2 from "./simulation/type2";
 
 import EmailVerification from "./emailVerification";
 import errorPage from "../404";
@@ -221,7 +221,7 @@ const hodRoutes = (
                 )
             }
         />
-        {/* <Route
+        <Route
             exact
             path="/hod/subject/:subjectId/simulation/:simulationId/paper/:paperId/section/:sectionId/type2"
             render={(props) =>
@@ -232,7 +232,7 @@ const hodRoutes = (
                     <SimulationType2 {...props} />
                 )
             }
-        /> */}
+        />
 
         {/* ---------- Profile ---------- */}
 

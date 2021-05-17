@@ -28,7 +28,6 @@ class SimulationType1 extends Component {
             showSideNav: false,
             showMCQDelete_Modal: false,
 
-            alertMsg: "",
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
@@ -1573,16 +1572,13 @@ class SimulationType1 extends Component {
                                                             <div className="d-flex">
                                                                 {/* Questions & options */}
                                                                 <div className="w-100">
-                                                                    <div className="form-group">
-                                                                        <div className="card form-shadow">
-                                                                            <div
-                                                                                className="card-body py-2"
-                                                                                dangerouslySetInnerHTML={{
-                                                                                    __html: question.question,
-                                                                                }}
-                                                                            ></div>
-                                                                        </div>
-                                                                    </div>
+                                                                    <div
+                                                                        className="pb-2"
+                                                                        dangerouslySetInnerHTML={{
+                                                                            __html: question.question,
+                                                                        }}
+                                                                    ></div>
+
                                                                     {this
                                                                         .section
                                                                         .category ===
@@ -1777,6 +1773,17 @@ class SimulationType1 extends Component {
                                 <button
                                     className="btn btn-primary btn-block shadow-none"
                                     onClick={this.handleAdd}
+                                    disabled={
+                                        this.state.questions.length !== 0
+                                            ? this.section.total_questions ===
+                                              this.state.questions[
+                                                  this.state.questions.length -
+                                                      1
+                                              ].index
+                                                ? true
+                                                : false
+                                            : false
+                                    }
                                 >
                                     Add +
                                 </button>
@@ -2104,7 +2111,7 @@ class SimulationType1 extends Component {
                                             </Accordion.Collapse>
                                         </Card>
 
-                                        {/* ---------- Image | Video | Audio ---------- */}
+                                        {/* ---------- Image ---------- */}
                                         <Card className="shadow-sm mb-2">
                                             <Accordion.Toggle
                                                 as={Card.Body}

@@ -29,7 +29,6 @@ class Type2 extends Component {
             showModal: false,
             showTemplateUploadModal: false,
 
-            alertMsg: "",
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
