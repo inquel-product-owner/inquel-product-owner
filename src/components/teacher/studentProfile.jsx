@@ -10,7 +10,7 @@ import Loading from "../sharedComponents/loader";
 import AlertBox from "../sharedComponents/alert";
 
 const mapStateToProps = (state) => ({
-    group_name: state.group_name,
+    group_name: state.content.group_name,
 });
 
 class StudentProfile extends Component {

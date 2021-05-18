@@ -15,7 +15,7 @@ import {
 } from "../sharedComponents/contentManagementModal";
 
 const mapStateToProps = (state) => ({
-    subject_name: state.subject_name,
+    subject_name: state.content.subject_name,
 });
 
 class ChapterModal extends Component {

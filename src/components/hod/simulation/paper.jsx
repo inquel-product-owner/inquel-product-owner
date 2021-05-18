@@ -10,8 +10,8 @@ import Loading from "../../sharedComponents/loader";
 import AlertBox from "../../sharedComponents/alert";
 
 const mapStateToProps = (state) => ({
-    subject_name: state.subject_name,
-    simulation_name: state.simulation_name,
+    subject_name: state.content.subject_name,
+    simulation_name: state.content.simulation_name,
 });
 
 class SimulationPaper extends Component {

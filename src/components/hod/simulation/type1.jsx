@@ -15,10 +15,10 @@ import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
 
 const mapStateToProps = (state) => ({
-    subject_name: state.subject_name,
-    simulation_name: state.simulation_name,
-    paper_name: state.paper_name,
-    section_name: state.section_name,
+    subject_name: state.content.subject_name,
+    simulation_name: state.content.simulation_name,
+    paper_name: state.content.paper_name,
+    section_name: state.content.section_name,
 });
 
 class SimulationType1 extends Component {

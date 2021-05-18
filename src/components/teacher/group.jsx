@@ -12,7 +12,7 @@ import CarouselCard from "../sharedComponents/owlCarousel";
 import AlertBox from "../sharedComponents/alert";
 
 const mapStateToProps = (state) => ({
-    group_name: state.group_name,
+    group_name: state.content.group_name,
 });
 
 class Group extends Component {

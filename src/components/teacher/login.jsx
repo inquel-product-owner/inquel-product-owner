@@ -2,8 +2,14 @@ import React, { Component } from "react";
 import { Navbar, Alert, Spinner } from "react-bootstrap";
 import logo from "../../assets/IQ_Labs_V5.png";
 import { Link, Redirect } from "react-router-dom";
-import { baseUrl, accountsUrl, adminPathUrl } from "../../shared/baseUrl.js";
+import {
+    baseUrl,
+    accountsUrl,
+    adminPathUrl,
+    teacherUrl,
+} from "../../shared/baseUrl.js";
 import { ForgotPasswordModal } from "../sharedComponents/forgotPassword";
+import store from "../../redux/store";
 
 class TeacherLogin extends Component {
     constructor(props) {
@@ -11,6 +17,7 @@ class TeacherLogin extends Component {
         this.state = {
             username: "",
             password: "",
+
             errorMsg: "",
             showLoader: false,
             showErrorAlert: false,
@@ -26,12 +33,8 @@ class TeacherLogin extends Component {
         };
     }
 
-    changeUsername = (event) => {
-        this.setState({ username: event.target.value });
-    };
-
-    changePassword = (event) => {
-        this.setState({ password: event.target.value });
+    handleInput = (event) => {
+        this.setState({ [event.target.name]: event.target.value });
     };
 
     showPassword = () => {
@@ -44,6 +47,38 @@ class TeacherLogin extends Component {
         this.setState({
             showModal: !this.state.showModal,
         });
+    };
+
+    loadProfileData = (result) => {
+        fetch(`${baseUrl + teacherUrl}/teacher/profile/`, {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization: `Token ${result.token}`,
+            },
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    store.dispatch({ type: "PROFILE", payload: result.data });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    setLocalStorage = (result) => {
+        localStorage.clear();
+
+        localStorage.setItem("Authorization", `Token ${result.token}`);
+        localStorage.setItem("is_teacher", result.is_teacher);
+
+        this.setState({
+            showLoader: false,
+        });
+        this.loadProfileData(result);
     };
 
     handleSubmit = (event) => {
@@ -78,21 +113,7 @@ class TeacherLogin extends Component {
                             .then((res) => res.json())
                             .then((results) => {
                                 if (results.sts === true) {
-                                    console.log(results);
-
-                                    localStorage.clear();
-
-                                    localStorage.setItem(
-                                        "Authorization",
-                                        `Token ${result.token}`
-                                    );
-                                    localStorage.setItem(
-                                        "is_teacher",
-                                        result.is_teacher
-                                    );
-                                    this.setState({
-                                        showLoader: false,
-                                    });
+                                    this.setLocalStorage(result);
                                 }
                             })
                             .catch((err) => {
@@ -115,35 +136,14 @@ class TeacherLogin extends Component {
                             .then((res) => res.json())
                             .then((results) => {
                                 if (results.sts === true) {
-                                    console.log(results);
-
-                                    localStorage.clear();
-
-                                    localStorage.setItem(
-                                        "Authorization",
-                                        `Token ${result.token}`
-                                    );
-                                    localStorage.setItem(
-                                        "is_teacher",
-                                        result.is_teacher
-                                    );
-                                    this.setState({
-                                        showLoader: false,
-                                    });
+                                    this.setLocalStorage(result);
                                 }
                             })
                             .catch((err) => {
                                 console.log(err);
                             });
                     } else {
-                        localStorage.setItem(
-                            "Authorization",
-                            `Token ${result.token}`
-                        );
-                        localStorage.setItem("is_teacher", result.is_teacher);
-                        this.setState({
-                            showLoader: false,
-                        });
+                        this.setLocalStorage(result);
                     }
                 }
                 if (!result.sts && result.msg) {
@@ -232,9 +232,7 @@ class TeacherLogin extends Component {
                                                     name="username"
                                                     id="username"
                                                     className="form-control form-shadow form-control-lg"
-                                                    onChange={
-                                                        this.changeUsername
-                                                    }
+                                                    onChange={this.handleInput}
                                                     value={this.state.username}
                                                     placeholder="Username"
                                                     autoFocus
@@ -262,7 +260,7 @@ class TeacherLogin extends Component {
                                                         id="password"
                                                         className="form-control form-control-lg"
                                                         onChange={
-                                                            this.changePassword
+                                                            this.handleInput
                                                         }
                                                         value={
                                                             this.state.password

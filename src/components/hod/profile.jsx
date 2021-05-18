@@ -9,6 +9,12 @@ import Loading from "../sharedComponents/loader";
 import userpic from "../../assets/user-v1.png";
 import AlertBox from "../sharedComponents/alert";
 import dateFormat from "dateformat";
+import { connect } from "react-redux";
+import store from "../../redux/store";
+
+const mapStateToProps = (state) => ({
+    profileData: state.user.profile,
+});
 
 class ImageUploadModal extends Component {
     constructor(props) {
@@ -118,7 +124,10 @@ class ImageUploadModal extends Component {
                 }
                 // If image upload type is watermark then perform watermark image Submission
             } else if (this.props.imageUploadType === "watermark") {
-                if (this.props.watermark_image === null || this.props.watermark_image === '') {
+                if (
+                    this.props.watermark_image === null ||
+                    this.props.watermark_image === ""
+                ) {
                     axios
                         .post(
                             `${this.url}/hod/profile/watermark/`,
@@ -267,7 +276,7 @@ class Profile extends Component {
         this.state = {
             showSideNav: false,
             showModal: false,
-            hodItems: [],
+            hodItems: this.props.profileData,
             showEditOption: false,
             imageUploadType: "",
 
@@ -276,7 +285,7 @@ class Profile extends Component {
             showErrorAlert: false,
             showSuccessAlert: false,
             showLoader: false,
-            page_loading: true,
+            page_loading: false,
         };
         this.url = baseUrl + hodUrl;
         this.authToken = localStorage.getItem("Authorization");
@@ -329,8 +338,8 @@ class Profile extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
+                    store.dispatch({ type: "PROFILE", payload: result.data });
                     this.setState({
                         hodItems: result.data,
                         page_loading: false,
@@ -350,8 +359,6 @@ class Profile extends Component {
 
     componentDidMount = () => {
         document.title = "My Profile - HOD | IQLabs";
-
-        this.loadHodData();
     };
 
     handleSubmit = (event) => {
@@ -1436,4 +1443,4 @@ class Profile extends Component {
     }
 }
 
-export default Profile;
+export default connect(mapStateToProps)(Profile);

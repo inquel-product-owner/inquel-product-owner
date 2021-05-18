@@ -1,10 +1,16 @@
 import React, { Component } from "react";
 import { Alert, Spinner } from "react-bootstrap";
 import { Link, Redirect } from "react-router-dom";
-import { baseUrl, accountsUrl, adminPathUrl } from "../../shared/baseUrl.js";
+import {
+    baseUrl,
+    accountsUrl,
+    adminPathUrl,
+    studentUrl,
+} from "../../shared/baseUrl.js";
 import Footer from "./shared/footer";
 import AccountNavbar from "./shared/accountNavbar";
 import { ForgotPasswordModal } from "../sharedComponents/forgotPassword";
+import store from "../../redux/store";
 
 class StudentLogin extends Component {
     constructor(props) {
@@ -12,6 +18,7 @@ class StudentLogin extends Component {
         this.state = {
             username: "",
             password: "",
+
             errorMsg: "",
             showLoader: false,
             showErrorAlert: false,
@@ -28,12 +35,8 @@ class StudentLogin extends Component {
         };
     }
 
-    changeUsername = (event) => {
-        this.setState({ username: event.target.value });
-    };
-
-    changePassword = (event) => {
-        this.setState({ password: event.target.value });
+    handleInput = (event) => {
+        this.setState({ [event.target.name]: event.target.value });
     };
 
     showPassword = () => {
@@ -46,6 +49,38 @@ class StudentLogin extends Component {
         this.setState({
             showModal: !this.state.showModal,
         });
+    };
+
+    loadProfileData = (result) => {
+        fetch(`${baseUrl + studentUrl}/student/profile/`, {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization: `Token ${result.token}`,
+            },
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    store.dispatch({ type: "PROFILE", payload: result.data });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    setLocalStorage = (result) => {
+        localStorage.clear();
+
+        localStorage.setItem("Authorization", `Token ${result.token}`);
+        localStorage.setItem("is_student", result.is_student);
+
+        this.setState({
+            showLoader: false,
+        });
+        this.loadProfileData(result);
     };
 
     handleSubmit = (event) => {
@@ -80,21 +115,7 @@ class StudentLogin extends Component {
                             .then((res) => res.json())
                             .then((results) => {
                                 if (results.sts === true) {
-                                    console.log(results);
-
-                                    localStorage.clear();
-
-                                    localStorage.setItem(
-                                        "Authorization",
-                                        `Token ${result.token}`
-                                    );
-                                    localStorage.setItem(
-                                        "is_student",
-                                        result.is_student
-                                    );
-                                    this.setState({
-                                        showLoader: false,
-                                    });
+                                    this.setLocalStorage(result);
                                 }
                             })
                             .catch((err) => {
@@ -117,35 +138,14 @@ class StudentLogin extends Component {
                             .then((res) => res.json())
                             .then((results) => {
                                 if (results.sts === true) {
-                                    console.log(results);
-
-                                    localStorage.clear();
-
-                                    localStorage.setItem(
-                                        "Authorization",
-                                        `Token ${result.token}`
-                                    );
-                                    localStorage.setItem(
-                                        "is_student",
-                                        result.is_student
-                                    );
-                                    this.setState({
-                                        showLoader: false,
-                                    });
+                                    this.setLocalStorage(result);
                                 }
                             })
                             .catch((err) => {
                                 console.log(err);
                             });
                     } else {
-                        localStorage.setItem(
-                            "Authorization",
-                            `Token ${result.token}`
-                        );
-                        localStorage.setItem("is_student", result.is_student);
-                        this.setState({
-                            showLoader: false,
-                        });
+                        this.setLocalStorage(result);
                     }
                 }
                 if (!result.sts && result.msg) {
@@ -232,12 +232,10 @@ class StudentLogin extends Component {
                                                 </label>
                                                 <input
                                                     type="text"
-                                                    name="student_username"
+                                                    name="username"
                                                     id="username"
                                                     className="form-control form-shadow form-control-lg"
-                                                    onChange={
-                                                        this.changeUsername
-                                                    }
+                                                    onChange={this.handleInput}
                                                     value={this.state.username}
                                                     placeholder="Username"
                                                     autoFocus
@@ -261,11 +259,11 @@ class StudentLogin extends Component {
                                                                 ? "text"
                                                                 : "password"
                                                         }
-                                                        name="student_password"
+                                                        name="password"
                                                         id="password"
                                                         className="form-control form-control-lg"
                                                         onChange={
-                                                            this.changePassword
+                                                            this.handleInput
                                                         }
                                                         value={
                                                             this.state.password

@@ -5,24 +5,29 @@ import logo from "../../assets/IQ_Labs_V5.png";
 import userpic from "../../assets/user-v1.png";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
 import { AdminLogout } from "../sharedComponents/handleLogout";
+import { connect } from "react-redux";
+import store from "../../redux/store";
+
+const mapStateToProps = (state) => ({
+    data: state.user.profile,
+});
 
 class Header extends Component {
     constructor(props) {
         super(props);
         this.state = { isLoggedOut: false };
+        this.url = baseUrl + adminPathUrl;
+        this.authToken = localStorage.getItem("Inquel-Auth");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Inquel-Auth": this.authToken,
+        };
     }
 
     handleLogout = () => {
-        var url = baseUrl + adminPathUrl;
-        var authToken = localStorage.getItem("Inquel-Auth");
-        var headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            "Inquel-Auth": authToken,
-        };
-
-        fetch(`${url}/logout/`, {
-            headers: headers,
+        fetch(`${this.url}/logout/`, {
+            headers: this.headers,
             method: "POST",
         })
             .then((res) => res.json())
@@ -31,6 +36,7 @@ class Header extends Component {
                 this.setState({
                     isLoggedOut: true,
                 });
+                store.dispatch({ type: "PROFILE", payload: null });
                 console.log(result);
             })
             .catch((err) => {
@@ -81,12 +87,24 @@ class Header extends Component {
                                     id="dropdown-basic"
                                 >
                                     <img
-                                        src={userpic}
+                                        src={
+                                            this.props.data !== null
+                                                ? this.props.data
+                                                      .profile_link &&
+                                                  this.props.data
+                                                      .profile_link !== null
+                                                    ? this.props.data
+                                                          .profile_link
+                                                    : userpic
+                                                : userpic
+                                        }
                                         alt="User pic"
                                         width="25"
                                         className="profile-pic mr-1 mb-1"
                                     />{" "}
-                                    {localStorage.getItem("Username")}
+                                    {this.props.data !== null
+                                        ? this.props.data.username
+                                        : ""}
                                 </Dropdown.Toggle>
 
                                 <Dropdown.Menu>
@@ -104,4 +122,4 @@ class Header extends Component {
     }
 }
 
-export default Header;
+export default connect(mapStateToProps)(Header);

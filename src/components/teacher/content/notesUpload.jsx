@@ -13,10 +13,10 @@ import AlertBox from "../../sharedComponents/alert";
 import { ContentDeleteModal } from "../../sharedComponents/contentManagementModal";
 
 const mapStateToProps = (state) => ({
-    group_name: state.group_name,
-    subject_name: state.subject_name,
-    chapter_name: state.chapter_name,
-    topic_name: state.topic_name,
+    group_name: state.content.group_name,
+    subject_name: state.content.subject_name,
+    chapter_name: state.content.chapter_name,
+    topic_name: state.content.topic_name,
 });
 
 class NotesUpload extends Component {

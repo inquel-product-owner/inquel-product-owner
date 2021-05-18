@@ -3,6 +3,7 @@ import { Navbar, Spinner, Alert } from "react-bootstrap";
 import logo from "../../assets/IQ_Labs_V5.png";
 import { Link, Redirect } from "react-router-dom";
 import { baseUrl, adminPathUrl, accountsUrl } from "../../shared/baseUrl.js";
+import store from "../../redux/store";
 
 class Login extends Component {
     constructor(props) {
@@ -10,12 +11,13 @@ class Login extends Component {
         this.state = {
             username: "",
             password: "",
+
             errorMsg: "",
             showLoader: false,
             showErrorAlert: false,
             showPassword: false,
         };
-        this.url = baseUrl + accountsUrl;
+        this.url = baseUrl + adminPathUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
             Accept: "application/json",
@@ -24,18 +26,48 @@ class Login extends Component {
         };
     }
 
-    changeUsername = (event) => {
-        this.setState({ username: event.target.value });
-    };
-
-    changePassword = (event) => {
-        this.setState({ password: event.target.value });
+    handleInput = (event) => {
+        this.setState({ [event.target.name]: event.target.value });
     };
 
     showPassword = () => {
         this.setState({
             showPassword: !this.state.showPassword,
         });
+    };
+
+    loadProfileData = (result) => {
+        fetch(`${this.url}/profile/`, {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                "Inquel-Auth": `Token ${result.token}`,
+            },
+        })
+            .then((res) => res.json())
+            .then((results) => {
+                if (results.sts === true) {
+                    let data =
+                        Object.entries(results.data).length !== 0
+                            ? results.data
+                            : { username: result.username };
+                    store.dispatch({ type: "PROFILE", payload: data });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    setLocalStorage = (result) => {
+        localStorage.clear();
+        localStorage.setItem("Inquel-Auth", `Token ${result.token}`);
+
+        this.setState({
+            showLoader: false,
+        });
+        this.loadProfileData(result);
     };
 
     handleSubmit = (event) => {
@@ -45,8 +77,8 @@ class Login extends Component {
             showLoader: true,
             showErrorAlert: false,
         });
-        var url = `${baseUrl}${adminPathUrl}/login/`;
-        fetch(url, {
+
+        fetch(`${this.url}/login/`, {
             headers: {
                 Accept: "application/json",
                 "Content-Type": "application/json",
@@ -61,42 +93,21 @@ class Login extends Component {
             .then((result) => {
                 if (result.sts === true) {
                     if (localStorage.getItem("Authorization")) {
-                        fetch(`${this.url}/logout/`, {
+                        fetch(`${baseUrl + accountsUrl}/logout/`, {
                             headers: this.headers,
                             method: "POST",
                         })
                             .then((res) => res.json())
                             .then((results) => {
                                 if (results.sts === true) {
-                                    console.log(results);
-
-                                    localStorage.clear();
-
-                                    localStorage.setItem(
-                                        "Inquel-Auth",
-                                        `Token ${result.token}`
-                                    );
-                                    localStorage.setItem(
-                                        "Username",
-                                        result.username
-                                    );
-                                    this.setState({
-                                        showLoader: false,
-                                    });
+                                    this.setLocalStorage(result);
                                 }
                             })
                             .catch((err) => {
                                 console.log(err);
                             });
                     } else {
-                        localStorage.setItem(
-                            "Inquel-Auth",
-                            `Token ${result.token}`
-                        );
-                        localStorage.setItem("Username", result.username);
-                        this.setState({
-                            showLoader: false,
-                        });
+                        this.setLocalStorage(result);
                     }
                 }
                 if (!result.sts && result.msg) {
@@ -161,12 +172,10 @@ class Login extends Component {
                                                 </label>
                                                 <input
                                                     type="text"
-                                                    name="admin_username"
+                                                    name="username"
                                                     id="username"
                                                     className="form-control form-shadow form-control-lg"
-                                                    onChange={
-                                                        this.changeUsername
-                                                    }
+                                                    onChange={this.handleInput}
                                                     value={this.state.username}
                                                     placeholder="Username"
                                                     autoFocus
@@ -191,11 +200,11 @@ class Login extends Component {
                                                                 ? "text"
                                                                 : "password"
                                                         }
-                                                        name="admin_password"
+                                                        name="password"
                                                         id="password"
                                                         className="form-control form-control-lg"
                                                         onChange={
-                                                            this.changePassword
+                                                            this.handleInput
                                                         }
                                                         value={
                                                             this.state.password

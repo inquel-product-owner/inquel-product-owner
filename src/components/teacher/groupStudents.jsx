@@ -17,7 +17,7 @@ import {
 } from "../sharedComponents/userManagementModal";
 
 const mapStateToProps = (state) => ({
-    group_name: state.group_name,
+    group_name: state.content.group_name,
 });
 
 class GroupStudents extends Component {

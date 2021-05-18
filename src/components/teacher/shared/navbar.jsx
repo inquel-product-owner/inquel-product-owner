@@ -3,14 +3,20 @@ import { Navbar, Nav, Dropdown } from "react-bootstrap";
 import { Link, Redirect } from "react-router-dom";
 import logo from "../../../assets/IQ_Labs_V5.png";
 import userpic from "../../../assets/user-v1.png";
-import { baseUrl, accountsUrl, teacherUrl } from "../../../shared/baseUrl";
+import { baseUrl, accountsUrl } from "../../../shared/baseUrl";
 import { Logout } from "../../sharedComponents/handleLogout";
+import { connect } from "react-redux";
+import store from "../../../redux/store";
+
+const mapStateToProps = (state) => ({
+    data: state.user.profile,
+});
 
 class Header extends Component {
     constructor(props) {
         super(props);
-        this.state = { data: [], isLoggedOut: false };
-        this.url = baseUrl + teacherUrl;
+        this.state = { isLoggedOut: false };
+        this.url = baseUrl + accountsUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
             Accept: "application/json",
@@ -19,35 +25,9 @@ class Header extends Component {
         };
     }
 
-    componentDidMount = () => {
-        fetch(`${this.url}/teacher/profile/`, {
-            method: "GET",
-            headers: this.headers,
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                if (result.sts === true) {
-                    this.setState({
-                        data: result.data,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
-
     handleLogout = () => {
-        var url = baseUrl + accountsUrl;
-        var authToken = localStorage.getItem("Authorization");
-        var headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: authToken,
-        };
-
-        fetch(`${url}/logout/`, {
-            headers: headers,
+        fetch(`${this.url}/logout/`, {
+            headers: this.headers,
             method: "POST",
         })
             .then((res) => res.json())
@@ -56,6 +36,7 @@ class Header extends Component {
                 this.setState({
                     isLoggedOut: true,
                 });
+                store.dispatch({ type: "PROFILE", payload: null });
                 console.log(result);
             })
             .catch((err) => {
@@ -109,10 +90,12 @@ class Header extends Component {
                                 >
                                     <img
                                         src={
-                                            this.state.data.length !== 0
-                                                ? this.state.data
+                                            this.props.data !== null
+                                                ? this.props.data
+                                                      .profile_link &&
+                                                  this.props.data
                                                       .profile_link !== null
-                                                    ? this.state.data
+                                                    ? this.props.data
                                                           .profile_link
                                                     : userpic
                                                 : userpic
@@ -121,8 +104,8 @@ class Header extends Component {
                                         width="25"
                                         className="profile-pic mr-1 mb-1"
                                     />{" "}
-                                    {this.state.data.length !== 0
-                                        ? this.state.data.username
+                                    {this.props.data !== null
+                                        ? this.props.data.username
                                         : ""}
                                 </Dropdown.Toggle>
 
@@ -149,4 +132,4 @@ class Header extends Component {
     }
 }
 
-export default Header;
+export default connect(mapStateToProps)(Header);
