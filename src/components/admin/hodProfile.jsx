@@ -8,7 +8,7 @@ import { paginationCount } from "../../shared/globalValues.js";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import Loading from "../sharedComponents/loader";
-import GroupTable from "../table/groupTable";
+import GroupTable from "../table/group";
 import Paginations from "../sharedComponents/pagination";
 import ReactSwitch from "../sharedComponents/switchComponent";
 import dateFormat from "dateformat";

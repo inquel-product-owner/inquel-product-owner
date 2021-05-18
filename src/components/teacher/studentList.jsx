@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import { paginationCount } from "../../shared/globalValues.js";
 import Loading from "../sharedComponents/loader";
-import StudentTable from "../table/studentTable";
+import StudentTable from "../table/student";
 import Paginations from "../sharedComponents/pagination";
 import AlertBox from "../sharedComponents/alert";
 import {

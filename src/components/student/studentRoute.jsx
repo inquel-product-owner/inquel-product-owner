@@ -33,6 +33,8 @@ import StudentLogin from "./login";
 import StudentRegister from "./register";
 import Profile from "./profile";
 
+import StudyPlanner from "./study-planner/";
+
 const studentRoutes = (
     <Switch>
         <Route
@@ -323,6 +325,21 @@ const studentRoutes = (
                     <Redirect to="/student/login" />
                 ) : (
                     <Leaderboard {...props} />
+                )
+            }
+        />
+
+        {/* --------------- Study Planner --------------- */}
+
+        <Route
+            exact
+            path="/student/study-planner"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_student") ? (
+                    <Redirect to="/student/login" />
+                ) : (
+                    <StudyPlanner {...props} />
                 )
             }
         />

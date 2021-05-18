@@ -6,8 +6,8 @@ import { Tabs, Tab, Dropdown, Modal, Spinner, Alert } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
 import { paginationCount } from "../../shared/globalValues.js";
 import Loading from "../sharedComponents/loader";
-import TeacherTable from "../table/teacherTable";
-import StudentTable from "../table/studentTable";
+import TeacherTable from "../table/teacher";
+import StudentTable from "../table/student";
 import Paginations from "../sharedComponents/pagination";
 import AlertBox from "../sharedComponents/alert";
 import {

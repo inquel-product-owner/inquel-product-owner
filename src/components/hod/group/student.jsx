@@ -7,7 +7,7 @@ import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import { paginationCount } from "../../../shared/globalValues.js";
 import Loading from "../../sharedComponents/loader";
 import Paginations from "../../sharedComponents/pagination";
-import StudentTable from "../../table/studentTable";
+import StudentTable from "../../table/student";
 import AlertBox from "../../sharedComponents/alert";
 import { UserRemoveModal } from "../../sharedComponents/userManagementModal";
 

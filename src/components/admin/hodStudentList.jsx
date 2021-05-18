@@ -6,7 +6,7 @@ import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
 import { paginationCount } from "../../shared/globalValues.js";
 import Loading from "../sharedComponents/loader";
 import Paginations from "../sharedComponents/pagination";
-import StudentTable from "../table/studentTable";
+import StudentTable from "../table/student";
 import { Badge } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import AlertBox from "../sharedComponents/alert";

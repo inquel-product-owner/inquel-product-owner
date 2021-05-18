@@ -7,8 +7,8 @@ import { Badge } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../shared/baseUrl";
 import { paginationCount } from "../../shared/globalValues.js";
 import Loading from "../sharedComponents/loader";
-import GroupTable from "../table/groupTable";
-import SubjectTable from "../table/subjectTable";
+import GroupTable from "../table/group";
+import SubjectTable from "../table/subject";
 import Paginations from "../sharedComponents/pagination";
 import AlertBox from "../sharedComponents/alert";
 
