@@ -7,7 +7,7 @@ import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import { paginationCount } from "../../shared/globalValues.js";
 import Loading from "../sharedComponents/loader";
 import Paginations from "../sharedComponents/pagination";
-import SubjectTable from "../table/subjectTable";
+import SubjectTable from "../table/subject";
 import CarouselCard from "../sharedComponents/owlCarousel";
 import AlertBox from "../sharedComponents/alert";
 

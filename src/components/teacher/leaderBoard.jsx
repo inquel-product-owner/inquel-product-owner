@@ -4,7 +4,7 @@ import Header from "./shared/navbar";
 import { Link } from "react-router-dom";
 import { Tabs, Tab } from "react-bootstrap";
 import Loading from "../sharedComponents/loader";
-import LeaderboardTable from "../table/leaderboardTable";
+import LeaderboardTable from "../table/leaderboard";
 import Paginations from "../sharedComponents/pagination";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import { paginationCount } from "../../shared/globalValues.js";

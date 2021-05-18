@@ -8,7 +8,9 @@ class SideNav extends Component {
         return (
             <div
                 id="sidebar"
-                className={`text-center light-bg ${this.props.shownav ? "active" : ""}`}
+                className={`text-center light-bg ${
+                    this.props.shownav ? "active" : ""
+                }`}
             >
                 <div style={{ height: "80%" }}>
                     <Link to="/student">
@@ -24,38 +26,6 @@ class SideNav extends Component {
                             >
                                 <i
                                     className="fas fa-home"
-                                    style={{ marginLeft: "-1.5px" }}
-                                ></i>
-                            </button>
-                        </OverlayTrigger>
-                    </Link>
-                    <Link to="/student">
-                        <OverlayTrigger
-                            key="right"
-                            placement="right"
-                            overlay={<Tooltip id="tooltip">Test results</Tooltip>}
-                        >
-                            <button
-                                className={`btn sidebar-btn ${
-                                    active === "profiles" ? "active" : ""
-                                } btn-sm mb-3`}
-                            >
-                                <i
-                                    className="far fa-file-alt"
-                                    style={{ marginLeft: "-1.5px" }}
-                                ></i>
-                            </button>
-                        </OverlayTrigger>
-                    </Link>
-                    <Link to="/student">
-                        <OverlayTrigger
-                            key="right"
-                            placement="right"
-                            overlay={<Tooltip id="tooltip">Clipboard</Tooltip>}
-                        >
-                            <button className="btn sidebar-btn btn-sm mb-3">
-                                <i
-                                    className="far fa-clipboard"
                                     style={{ marginLeft: "-1.5px" }}
                                 ></i>
                             </button>
@@ -81,8 +51,31 @@ class SideNav extends Component {
                             </button>
                         </OverlayTrigger>
                     </Link>
+                    <Link to="/student/study-planner">
+                        <OverlayTrigger
+                            key="right"
+                            placement="right"
+                            overlay={
+                                <Tooltip id="tooltip">Study Planner</Tooltip>
+                            }
+                        >
+                            <button
+                                className={`btn sidebar-btn ${
+                                    active === "calendar" ? "active" : ""
+                                } btn-sm mb-3`}
+                            >
+                                <i
+                                    className="far fa-calendar-alt"
+                                ></i>
+                            </button>
+                        </OverlayTrigger>
+                    </Link>
                 </div>
-                <div className="d-flex flex-column justify-content-end" style={{ height: "20%" }}>
+
+                <div
+                    className="d-flex flex-column justify-content-end"
+                    style={{ height: "20%" }}
+                >
                     <Link to="/student">
                         <OverlayTrigger
                             key="right"

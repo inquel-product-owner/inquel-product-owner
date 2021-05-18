@@ -4,8 +4,8 @@ import SideNav from "./shared/sidenav";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import { paginationCount } from "../../shared/globalValues.js";
 import Loading from "../sharedComponents/loader";
-import GroupTable from "../table/groupTable";
-import SubjectTable from "../table/subjectTable";
+import GroupTable from "../table/group";
+import SubjectTable from "../table/subject";
 import Paginations from "../sharedComponents/pagination";
 import AlertBox from "../sharedComponents/alert";
 
