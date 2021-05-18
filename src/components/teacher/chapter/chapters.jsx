@@ -22,9 +22,9 @@ import {
 } from "./contentManagementModal";
 
 const mapStateToProps = (state) => ({
-    group_name: state.group_name,
-    subject_name: state.subject_name,
-    chapter_name: state.chapter_name,
+    group_name: state.content.group_name,
+    subject_name: state.content.subject_name,
+    chapter_name: state.content.chapter_name,
 });
 
 class Chapters extends Component {

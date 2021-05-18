@@ -11,10 +11,10 @@ import AlertBox from "../../sharedComponents/alert";
 import ScoreCardTable from "../shared/scorecard";
 
 const mapStateToProps = (state) => ({
-    group_name: state.group_name,
-    subject_name: state.subject_name,
-    chapter_name: state.chapter_name,
-    cycle_name: state.cycle_name,
+    group_name: state.content.group_name,
+    subject_name: state.content.subject_name,
+    chapter_name: state.content.chapter_name,
+    cycle_name: state.content.cycle_name,
 });
 
 class Scorecard extends Component {

@@ -18,7 +18,7 @@ import {
 } from "./contentManagementModal";
 
 const mapStateToProps = (state) => ({
-    subject_name: state.subject_name,
+    subject_name: state.content.subject_name,
 });
 
 class IndependentSubject extends Component {

@@ -104,10 +104,6 @@ class HODTable extends Component {
         this.toolbarOptions = ["Search"];
     }
 
-    showConsole = () => {
-        console.log("I'm triggered");
-    };
-
     onQueryCellInfo(args) {
         if (args.column.field === "is_active") {
             if (args.cell.textContent === "Active") {

@@ -11,7 +11,7 @@ let data = {
     paper_name: "Paper",
 };
 
-const reducer = (state = data, action) => {
+const contentReducer = (state = data, action) => {
     switch (action.type) {
         case "GROUP":
             return { ...state, group_name: action.payload };
@@ -38,4 +38,4 @@ const reducer = (state = data, action) => {
     }
 };
 
-export default reducer;
+export default contentReducer;

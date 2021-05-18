@@ -11,6 +11,12 @@ import userpic from "../../assets/user-v1.png";
 import AlertBox from "../sharedComponents/alert";
 import dateFormat from "dateformat";
 import { country } from "../../shared/countries.js";
+import { connect } from "react-redux";
+import store from "../../redux/store";
+
+const mapStateToProps = (state) => ({
+    profileData: state.user.profile,
+});
 
 class ImageUploadModal extends Component {
     constructor(props) {
@@ -201,9 +207,10 @@ class Profile extends Component {
         this.state = {
             showSideNav: false,
             showModal: false,
-            teacherItems: [],
+            teacherItems: this.props.profileData,
             showEditOption: false,
-            page_loading: true,
+
+            page_loading: false,
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
@@ -271,6 +278,7 @@ class Profile extends Component {
             .then((result) => {
                 console.log(result);
                 if (result.sts === true) {
+                    store.dispatch({ type: "PROFILE", payload: result.data });
                     this.setState({
                         teacherItems: result.data,
                         page_loading: false,
@@ -290,8 +298,6 @@ class Profile extends Component {
 
     componentDidMount = () => {
         document.title = "My Profile - Teacher | IQLabs";
-
-        this.loadTeacherData();
     };
 
     handleSubmit = (event) => {
@@ -1018,4 +1024,4 @@ class Profile extends Component {
     }
 }
 
-export default Profile;
+export default connect(mapStateToProps)(Profile);

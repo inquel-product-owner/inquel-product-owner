@@ -1,5 +1,6 @@
-import { createStore } from "redux";
-import reducer from "../reducer";
+import { combineReducers, createStore } from "redux";
+import contentReducer from "../reducer/content";
+import userReducer from "../reducer/user";
 
 function saveToLocalStorage(state) {
     try {
@@ -23,8 +24,13 @@ function loadFromLocalStorage() {
 
 const persistedState = loadFromLocalStorage();
 
+const rootReducer = combineReducers({
+    content: contentReducer,
+    user: userReducer,
+});
+
 const store = createStore(
-    reducer,
+    rootReducer,
     persistedState,
     window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 );

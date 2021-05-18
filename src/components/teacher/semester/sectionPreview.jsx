@@ -11,9 +11,9 @@ import "react-awesome-lightbox/build/style.css";
 import { dataFormat } from "../../sharedComponents/dataFormating";
 
 const mapStateToProps = (state) => ({
-    group_name: state.group_name,
-    subject_name: state.subject_name,
-    semester_name: state.semester_name,
+    group_name: state.content.group_name,
+    subject_name: state.content.subject_name,
+    semester_name: state.content.semester_name,
 });
 
 class SemesterAutoQA extends Component {
