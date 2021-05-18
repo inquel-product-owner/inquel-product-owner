@@ -423,6 +423,42 @@ class SemesterDirect extends Component {
         }
     };
 
+    handlePublish = () => {
+        this.setState({
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            page_loading: true,
+        });
+
+        fetch(
+            `${this.url}/teacher/subject/${this.subjectId}/semester/publish/`,
+            {
+                method: "POST",
+                headers: this.headers,
+                body: JSON.stringify({
+                    semester_id: this.semesterId,
+                }),
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => console.log(err));
+    };
+
     onDocumentLoadSuccess = ({ numPages }) => {
         this.setState({ numPages });
     };
@@ -518,6 +554,15 @@ class SemesterDirect extends Component {
                                         Evaluate Student
                                     </button>
                                 </Link>
+                                <button
+                                    className="btn btn-primary btn-sm shadow-none ml-1"
+                                    onClick={this.handlePublish}
+                                    disabled={
+                                        this.state.isFileUploaded ? false : true
+                                    }
+                                >
+                                    Publish
+                                </button>
                             </div>
                         </div>
 
