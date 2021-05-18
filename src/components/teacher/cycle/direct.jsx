@@ -426,6 +426,40 @@ class CyleTestDirect extends Component {
         }
     };
 
+    handlePublish = () => {
+        this.setState({
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            page_loading: true,
+        });
+
+        fetch(`${this.url}/teacher/subject/${this.subjectId}/cycle/publish/`, {
+            method: "POST",
+            headers: this.headers,
+            body: JSON.stringify({
+                chapter_id: this.chapterId,
+                cycle_test_id: this.cycle_testId,
+            }),
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => console.log(err));
+    };
+
     onDocumentLoadSuccess = ({ numPages }) => {
         this.setState({ numPages });
     };
@@ -528,6 +562,15 @@ class CyleTestDirect extends Component {
                                         Evaluate Student
                                     </button>
                                 </Link>
+                                <button
+                                    className="btn btn-primary btn-sm shadow-none ml-1"
+                                    onClick={this.handlePublish}
+                                    disabled={
+                                        this.state.isFileUploaded ? false : true
+                                    }
+                                >
+                                    Publish
+                                </button>
                             </div>
                         </div>
 

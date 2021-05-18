@@ -1021,6 +1021,40 @@ class CycleTestAuto extends Component {
         }
     };
 
+    handlePublish = () => {
+        this.setState({
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            page_loading: true,
+        });
+
+        fetch(`${this.url}/teacher/subject/${this.subjectId}/cycle/publish/`, {
+            method: "POST",
+            headers: this.headers,
+            body: JSON.stringify({
+                chapter_id: this.chapterId,
+                cycle_test_id: this.cycle_testId,
+            }),
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => console.log(err));
+    };
+
     render() {
         document.title = `${this.props.cycle_name} - Teacher | IQLabs`;
         return (
@@ -1031,7 +1065,7 @@ class CycleTestAuto extends Component {
                     togglenav={this.toggleSideNav}
                 />
 
-                {/* ALert message */}
+                {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
                     successMsg={this.state.successMsg}
@@ -1133,9 +1167,9 @@ class CycleTestAuto extends Component {
 
                         {/* Header configuration */}
                         <div className="row align-items-center mb-3">
-                            <div className="col-md-8">
+                            <div className="col-md-6">
                                 <div className="row align-items-center">
-                                    <div className="col-md-4">
+                                    <div className="col-md-6">
                                         <input
                                             type="number"
                                             name="duration"
@@ -1149,7 +1183,7 @@ class CycleTestAuto extends Component {
                                             required
                                         />
                                     </div>
-                                    <div className="col-md-4">
+                                    <div className="col-md-6">
                                         <Select
                                             className="basic-single form-shadow"
                                             placeholder={
@@ -1178,18 +1212,42 @@ class CycleTestAuto extends Component {
                                     </div>
                                 </div>
                             </div>
-                            <div className="col-md-4 text-right">
+                            <div className="col-md-6 text-right">
                                 <button
                                     className="btn btn-primary btn-sm shadow-none"
                                     onClick={this.toggleModal}
                                 >
                                     Score Configuration
                                 </button>
+                                {this.groupId !== undefined ? (
+                                    <button
+                                        className="btn btn-primary btn-sm shadow-none ml-1"
+                                        onClick={this.handlePublish}
+                                        disabled={
+                                            this.state.sections.length !== 0
+                                                ? this.state.sections[0]
+                                                      .section_id === ""
+                                                    ? true
+                                                    : false
+                                                : true
+                                        }
+                                    >
+                                        Publish
+                                    </button>
+                                ) : (
+                                    ""
+                                )}
                             </div>
                         </div>
 
-                        <div className="card shadow-sm">
-                            <div className="table-responsive">
+                        <div
+                            className="card shadow-sm mb-2"
+                            style={{ overflowX: "auto" }}
+                        >
+                            <div
+                                className="table-responsive"
+                                style={{ minWidth: "1000px" }}
+                            >
                                 <table className="table">
                                     <thead className="primary-bg text-white">
                                         <tr>
@@ -1582,16 +1640,14 @@ class CycleTestAuto extends Component {
                                     </tbody>
                                 </table>
                             </div>
-
-                            <div className="card-body">
-                                <button
-                                    className="btn btn-light btn-block shadow-sm shadow-none"
-                                    onClick={this.addSection}
-                                >
-                                    Add Section +
-                                </button>
-                            </div>
                         </div>
+
+                        <button
+                            className="btn btn-light bg-white btn-block shadow-sm shadow-none"
+                            onClick={this.addSection}
+                        >
+                            Add Section +
+                        </button>
                         {/* Loading component */}
                         {this.state.page_loading ? <Loading /> : ""}
                     </div>
