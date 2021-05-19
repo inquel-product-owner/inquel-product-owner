@@ -1219,24 +1219,20 @@ class CycleTestAuto extends Component {
                                 >
                                     Score Configuration
                                 </button>
-                                {this.groupId !== undefined ? (
-                                    <button
-                                        className="btn btn-primary btn-sm shadow-none ml-1"
-                                        onClick={this.handlePublish}
-                                        disabled={
-                                            this.state.sections.length !== 0
-                                                ? this.state.sections[0]
-                                                      .section_id === ""
-                                                    ? true
-                                                    : false
-                                                : true
-                                        }
-                                    >
-                                        Publish
-                                    </button>
-                                ) : (
-                                    ""
-                                )}
+                                <button
+                                    className="btn btn-primary btn-sm shadow-none ml-1"
+                                    onClick={this.handlePublish}
+                                    disabled={
+                                        this.state.sections.length !== 0
+                                            ? this.state.sections[0]
+                                                  .section_id === ""
+                                                ? true
+                                                : false
+                                            : true
+                                    }
+                                >
+                                    Publish
+                                </button>
                             </div>
                         </div>
 
