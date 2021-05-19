@@ -25,6 +25,12 @@ class Header extends Component {
         };
     }
 
+    componentDidMount = () => {
+        if (this.props.permissions) {
+            this.props.permissions(this.props.data.permissions);
+        }
+    };
+
     handleLogout = () => {
         fetch(`${this.url}/logout/`, {
             headers: this.headers,
