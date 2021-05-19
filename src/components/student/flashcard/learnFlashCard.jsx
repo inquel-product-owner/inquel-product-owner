@@ -97,10 +97,6 @@ class FlashCard extends Component {
             totalSubQuestion: [],
             currentSubQuestionIndex: [],
 
-            next: null,
-            previous: null,
-            type2_next: null,
-            type2_previous: null,
             isFullscreenEnabled: false,
             isLightBoxOpen: false,
 
@@ -277,8 +273,8 @@ class FlashCard extends Component {
                             onClick={(e) => {
                                 e.stopPropagation();
                                 this.setState({
-                                    isFullscreenEnabled: !this.state
-                                        .isFullscreenEnabled,
+                                    isFullscreenEnabled:
+                                        !this.state.isFullscreenEnabled,
                                 });
                             }}
                         >
@@ -337,8 +333,8 @@ class FlashCard extends Component {
                             onClick={(e) => {
                                 e.stopPropagation();
                                 this.setState({
-                                    isFullscreenEnabled: !this.state
-                                        .isFullscreenEnabled,
+                                    isFullscreenEnabled:
+                                        !this.state.isFullscreenEnabled,
                                 });
                             }}
                         >
@@ -693,8 +689,7 @@ class FlashCard extends Component {
                                             <p
                                                 className="small"
                                                 dangerouslySetInnerHTML={{
-                                                    __html:
-                                                        explanation.explanation,
+                                                    __html: explanation.explanation,
                                                 }}
                                             ></p>
                                         </div>
@@ -1285,14 +1280,13 @@ class FlashCard extends Component {
                                             <div className="card secondary-bg py-2 px-3 mb-2">
                                                 <div
                                                     dangerouslySetInnerHTML={{
-                                                        __html:
-                                                            data[index]
-                                                                .sub_question[
-                                                                this.state
-                                                                    .currentSubQuestionIndex[
-                                                                    index
-                                                                ]
-                                                            ].question,
+                                                        __html: data[index]
+                                                            .sub_question[
+                                                            this.state
+                                                                .currentSubQuestionIndex[
+                                                                index
+                                                            ]
+                                                        ].question,
                                                     }}
                                                     draggable={false}
                                                 ></div>
@@ -1322,8 +1316,7 @@ class FlashCard extends Component {
                                                                   }
                                                                   id={`option-${option_index}`}
                                                                   style={{
-                                                                      cursor:
-                                                                          "move",
+                                                                      cursor: "move",
                                                                   }}
                                                                   onDragStart={(
                                                                       e
@@ -1670,8 +1663,6 @@ class FlashCard extends Component {
                             match: this.chunk(this.shuffleMatch(data), 6),
                             activeData: 0,
                             totalItems: result.data.count,
-                            previous: result.data.previous,
-                            next: result.data.next,
                             page_loading: false,
                         },
                         () => {
@@ -2016,11 +2007,8 @@ class FlashCard extends Component {
         this.setState({
             activeTab: type,
             activeData: 0,
+            totalItems: 0,
             page_loading: true,
-            next: null,
-            previous: null,
-            type2_next: null,
-            type2_previous: null,
             isSlideshowPlaying: false,
         });
         if (type === "concept") {

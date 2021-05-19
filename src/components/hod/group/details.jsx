@@ -5,8 +5,14 @@ import { Link } from "react-router-dom";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import Loading from "../../sharedComponents/loader";
 import AlertBox from "../../sharedComponents/alert";
+import { connect } from "react-redux";
+import { waterMark } from "../../sharedComponents/watermark";
 
-class GroupDetails extends Component {
+const mapStateToProps = (state) => ({
+    data: state.user.profile,
+});
+
+class HODGroupDetails extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -99,6 +105,7 @@ class GroupDetails extends Component {
                     className={`section content ${
                         this.state.showSideNav ? "active" : ""
                     }`}
+                    style={waterMark(this.props.data)}
                 >
                     <div className="container-fluid">
                         {/* Back button */}
@@ -223,4 +230,4 @@ class GroupDetails extends Component {
     }
 }
 
-export default GroupDetails;
+export default connect(mapStateToProps)(HODGroupDetails);

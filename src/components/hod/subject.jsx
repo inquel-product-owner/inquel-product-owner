@@ -16,6 +16,7 @@ import {
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
+    data: state.user.profile,
 });
 
 class ChapterModal extends Component {
@@ -538,7 +539,7 @@ class SimulationModal extends Component {
     }
 }
 
-class Subject extends Component {
+class HODSubject extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -554,7 +555,7 @@ class Subject extends Component {
 
             simulation: [],
             selectedSimulation: {},
-            permissions: {},
+            permissions: this.props.data.permissions,
 
             errorMsg: "",
             successMsg: "",
@@ -596,14 +597,14 @@ class Subject extends Component {
             });
         } else if (type === "UPDATE") {
             this.setState({
-                showSimulationUpdateModal: !this.state
-                    .showSimulationUpdateModal,
+                showSimulationUpdateModal:
+                    !this.state.showSimulationUpdateModal,
                 selectedSimulation: data,
             });
         } else if (type === "DELETE") {
             this.setState({
-                showSimulationDeleteModal: !this.state
-                    .showSimulationDeleteModal,
+                showSimulationDeleteModal:
+                    !this.state.showSimulationDeleteModal,
                 selectedSimulation: data,
             });
         }
@@ -687,13 +688,6 @@ class Subject extends Component {
         this.loadSimulationData();
     };
 
-    // Gets permission from the header navbar
-    handlePermissions = (data) => {
-        this.setState({
-            permissions: data,
-        });
-    };
-
     dispatchSimulation = (data) => {
         store.dispatch({ type: "SIMULATION", payload: data });
     };
@@ -706,7 +700,6 @@ class Subject extends Component {
                 <Header
                     name={this.props.subject_name}
                     togglenav={this.toggleSideNav}
-                    permissions={this.handlePermissions}
                 />
 
                 {/* ALert message */}
@@ -774,8 +767,8 @@ class Subject extends Component {
                         type="Simulation exam"
                         name={this.state.selectedSimulation.simulation_name}
                         data={{
-                            simulation_id: this.state.selectedSimulation
-                                .simulation_id,
+                            simulation_id:
+                                this.state.selectedSimulation.simulation_id,
                         }}
                     />
                 ) : (
@@ -792,8 +785,8 @@ class Subject extends Component {
                         type="Simulation exam"
                         name={this.state.selectedSimulation.simulation_name}
                         data={{
-                            simulation_id: this.state.selectedSimulation
-                                .simulation_id,
+                            simulation_id:
+                                this.state.selectedSimulation.simulation_id,
                         }}
                         toggleModal={() => this.toggleSimulationModal("DELETE")}
                     />
@@ -1061,4 +1054,4 @@ class Subject extends Component {
     }
 }
 
-export default connect(mapStateToProps)(Subject);
+export default connect(mapStateToProps)(HODSubject);

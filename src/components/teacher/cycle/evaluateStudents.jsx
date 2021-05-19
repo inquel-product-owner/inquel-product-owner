@@ -17,7 +17,7 @@ const mapStateToProps = (state) => ({
     cycle_name: state.content.cycle_name,
 });
 
-class CycleDirectEvaluation extends Component {
+class TeacherCycleDirectEvaluation extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -744,4 +744,4 @@ class CycleDirectEvaluation extends Component {
     }
 }
 
-export default connect(mapStateToProps)(CycleDirectEvaluation);
+export default connect(mapStateToProps)(TeacherCycleDirectEvaluation);

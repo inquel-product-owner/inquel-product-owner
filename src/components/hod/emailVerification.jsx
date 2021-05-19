@@ -5,7 +5,7 @@ import { baseUrl, accountsUrl } from "../../shared/baseUrl.js";
 import Loading from "../sharedComponents/loader";
 import logo from "../../assets/IQ_Labs_V5.png";
 
-class EmailVerification extends Component {
+class HODEmailVerification extends Component {
     constructor() {
         super();
         this.state = {
@@ -483,4 +483,4 @@ class EmailVerification extends Component {
     }
 }
 
-export default EmailVerification;
+export default HODEmailVerification;

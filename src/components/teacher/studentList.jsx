@@ -15,7 +15,7 @@ import {
     UserEnableModal,
 } from "../sharedComponents/userManagementModal";
 
-class StudentList extends Component {
+class TeacherStudentList extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -341,4 +341,4 @@ class StudentList extends Component {
     }
 }
 
-export default StudentList;
+export default TeacherStudentList;

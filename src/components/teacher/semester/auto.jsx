@@ -259,7 +259,7 @@ const mapStateToProps = (state) => ({
     semester_name: state.content.semester_name,
 });
 
-class SemesterAuto extends Component {
+class TeacherSemesterAuto extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -1632,4 +1632,4 @@ class SemesterAuto extends Component {
     }
 }
 
-export default connect(mapStateToProps)(SemesterAuto);
+export default connect(mapStateToProps)(TeacherSemesterAuto);

@@ -16,7 +16,7 @@ function EmptyData() {
     );
 }
 
-class HodTeacherList extends Component {
+class AdminHodTeacherList extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -379,4 +379,4 @@ class HodTeacherList extends Component {
     }
 }
 
-export default HodTeacherList;
+export default AdminHodTeacherList;

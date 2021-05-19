@@ -634,7 +634,7 @@ class TeacherDeleteModal extends Component {
     }
 }
 
-class ProfileList extends Component {
+class HODTeacherStudentList extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -1189,4 +1189,4 @@ class ProfileList extends Component {
     }
 }
 
-export default ProfileList;
+export default HODTeacherStudentList;

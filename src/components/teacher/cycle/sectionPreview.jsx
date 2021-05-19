@@ -17,7 +17,7 @@ const mapStateToProps = (state) => ({
     cycle_name: state.content.cycle_name,
 });
 
-class CycleTestAutoQA extends Component {
+class TeacherCycleTestAutoQA extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -897,4 +897,4 @@ class CycleTestAutoQA extends Component {
     }
 }
 
-export default connect(mapStateToProps)(CycleTestAutoQA);
+export default connect(mapStateToProps)(TeacherCycleTestAutoQA);

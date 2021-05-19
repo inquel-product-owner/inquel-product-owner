@@ -156,7 +156,7 @@ class SubjectModal extends Component {
     }
 }
 
-class Dashboard extends Component {
+class HODDashboard extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -748,4 +748,4 @@ class Dashboard extends Component {
     }
 }
 
-export default connect(mapStateToProps)(Dashboard);
+export default connect(mapStateToProps)(HODDashboard);

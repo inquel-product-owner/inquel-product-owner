@@ -3,7 +3,7 @@ import { Button, Table } from "react-bootstrap";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 
-class SubjectConfiguration extends Component {
+class HODSubjectConfiguration extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -320,4 +320,4 @@ class SubjectConfiguration extends Component {
     }
 }
 
-export default SubjectConfiguration;
+export default HODSubjectConfiguration;

@@ -8,7 +8,7 @@ import Loading from "../sharedComponents/loader";
 import { Badge } from "react-bootstrap";
 import AlertBox from "../sharedComponents/alert";
 
-class StudentProfile extends Component {
+class AdminStudentProfile extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -376,4 +376,4 @@ class StudentProfile extends Component {
     }
 }
 
-export default StudentProfile;
+export default AdminStudentProfile;

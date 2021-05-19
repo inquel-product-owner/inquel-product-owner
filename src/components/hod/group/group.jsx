@@ -15,6 +15,12 @@ import {
     ContentEnableModal,
     MultiContentDeleteModal,
 } from "../../sharedComponents/contentManagementModal";
+import { connect } from "react-redux";
+import { waterMark } from "../../sharedComponents/watermark";
+
+const mapStateToProps = (state) => ({
+    data: state.user.profile,
+});
 
 class SubjectModal extends Component {
     constructor() {
@@ -209,7 +215,7 @@ class SubjectModal extends Component {
     }
 }
 
-class Group extends Component {
+class HODGroup extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -444,6 +450,7 @@ class Group extends Component {
                     className={`section content ${
                         this.state.showSideNav ? "active" : ""
                     }`}
+                    style={waterMark(this.props.data)}
                 >
                     <div className="container-fluid">
                         {/* Back button */}
@@ -557,4 +564,4 @@ class Group extends Component {
     }
 }
 
-export default Group;
+export default connect(mapStateToProps)(HODGroup);

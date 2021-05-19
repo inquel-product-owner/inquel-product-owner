@@ -21,7 +21,7 @@ const mapStateToProps = (state) => ({
     section_name: state.content.section_name,
 });
 
-class SimulationType1 extends Component {
+class HODSimulationType1 extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -2361,4 +2361,4 @@ class SimulationType1 extends Component {
     }
 }
 
-export default connect(mapStateToProps)(SimulationType1);
+export default connect(mapStateToProps)(HODSimulationType1);

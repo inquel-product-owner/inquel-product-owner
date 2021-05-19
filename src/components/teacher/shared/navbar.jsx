@@ -55,77 +55,92 @@ class Header extends Component {
                     collapseOnSelect
                     expand="md"
                     variant="light"
-                    className="shadow-sm fixed-top bg-white"
+                    className="shadow-sm fixed-top bg-white justify-content-center"
                 >
-                    <Navbar.Brand className="d-flex mr-0">
-                        <button
-                            className="btn btn-outline-secondary btn-sm d-block d-md-none mr-2"
-                            onClick={this.props.togglenav}
-                        >
-                            <i className="fas fa-bars"></i>
-                        </button>
-                        <Link to="/">
-                            <img src={logo} alt="Logo" />
-                        </Link>
-                    </Navbar.Brand>
-                    <div className="mx-auto">
-                        <h5 className="mb-0 primary-text font-weight-bold">
-                            {this.props.name}
-                        </h5>
-                    </div>
-                    <Navbar.Toggle aria-controls="responsive-navbar-nav" />
-                    <Navbar.Collapse
-                        id="responsive-navbar-nav"
-                        style={{ flexGrow: "0" }}
-                    >
-                        <Nav className="ml-auto">
-                            <Nav.Link href="/">
-                                <i className="far fa-bell mr-md-3 mr-0 mt-0 mt-md-2"></i>
-                            </Nav.Link>
-                            <Dropdown>
-                                <Dropdown.Toggle
-                                    variant="light"
-                                    className="bg-white border-0 nav-link shadow-none"
-                                    id="dropdown-basic"
+                    <div className="row align-items-center w-100">
+                        <div className="col-4 pl-0">
+                            <Navbar.Brand className="d-flex mr-0">
+                                <button
+                                    className="btn btn-outline-secondary btn-sm d-block d-md-none mr-2"
+                                    onClick={this.props.togglenav}
                                 >
-                                    <img
-                                        src={
-                                            this.props.data !== null
-                                                ? this.props.data
-                                                      .profile_link &&
-                                                  this.props.data
-                                                      .profile_link !== null
-                                                    ? this.props.data
-                                                          .profile_link
-                                                    : userpic
-                                                : userpic
-                                        }
-                                        alt="User pic"
-                                        width="25"
-                                        className="profile-pic mr-1 mb-1"
-                                    />{" "}
-                                    {this.props.data !== null
-                                        ? this.props.data.username
-                                        : ""}
-                                </Dropdown.Toggle>
+                                    <i className="fas fa-bars"></i>
+                                </button>
+                                <Link to="/">
+                                    <img src={logo} alt="Logo" />
+                                </Link>
+                            </Navbar.Brand>
+                        </div>
 
-                                <Dropdown.Menu>
-                                    <Dropdown.Item
-                                        as={Link}
-                                        to="/teacher/profile"
-                                    >
-                                        <i className="fas fa-user mr-2"></i> My
-                                        Profile
-                                    </Dropdown.Item>
-                                    <Dropdown.Divider />
-                                    <Dropdown.Item onClick={this.handleLogout}>
-                                        <i className="fas fa-sign-out-alt mr-2"></i>{" "}
-                                        Logout
-                                    </Dropdown.Item>
-                                </Dropdown.Menu>
-                            </Dropdown>
-                        </Nav>
-                    </Navbar.Collapse>
+                        <div className="col-4 d-none d-md-block">
+                            <h5 className="primary-text text-center font-weight-bold-600 mb-0 text-truncate">
+                                {this.props.name}
+                            </h5>
+                        </div>
+
+                        <Navbar.Toggle
+                            aria-controls="responsive-navbar-nav"
+                            className="ml-auto"
+                        />
+
+                        <div className="col-md-4 px-0">
+                            <Navbar.Collapse
+                                id="responsive-navbar-nav"
+                                style={{ flexGrow: "0" }}
+                            >
+                                <Nav className="ml-auto">
+                                    <Nav.Link href="/">
+                                        <i className="far fa-bell mr-md-3 mr-0 mt-0 mt-md-2"></i>
+                                    </Nav.Link>
+                                    <Dropdown>
+                                        <Dropdown.Toggle
+                                            variant="light"
+                                            className="bg-white border-0 nav-link shadow-none"
+                                            id="dropdown-basic"
+                                        >
+                                            <img
+                                                src={
+                                                    this.props.data !== null
+                                                        ? this.props.data
+                                                              .profile_link &&
+                                                          this.props.data
+                                                              .profile_link !==
+                                                              null
+                                                            ? this.props.data
+                                                                  .profile_link
+                                                            : userpic
+                                                        : userpic
+                                                }
+                                                alt="User pic"
+                                                width="25"
+                                                className="profile-pic mr-1 mb-1"
+                                            />{" "}
+                                            {this.props.data !== null
+                                                ? this.props.data.username
+                                                : ""}
+                                        </Dropdown.Toggle>
+
+                                        <Dropdown.Menu>
+                                            <Dropdown.Item
+                                                as={Link}
+                                                to="/teacher/profile"
+                                            >
+                                                <i className="fas fa-user mr-2"></i>{" "}
+                                                My Profile
+                                            </Dropdown.Item>
+                                            <Dropdown.Divider />
+                                            <Dropdown.Item
+                                                onClick={this.handleLogout}
+                                            >
+                                                <i className="fas fa-sign-out-alt mr-2"></i>{" "}
+                                                Logout
+                                            </Dropdown.Item>
+                                        </Dropdown.Menu>
+                                    </Dropdown>
+                                </Nav>
+                            </Navbar.Collapse>
+                        </div>
+                    </div>
                 </Navbar>
             </>
         );

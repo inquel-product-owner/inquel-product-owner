@@ -332,7 +332,7 @@ class GroupModal extends Component {
     }
 }
 
-class GroupConfiguration extends Component {
+class HODGroupConfiguration extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -556,4 +556,4 @@ class GroupConfiguration extends Component {
     }
 }
 
-export default GroupConfiguration;
+export default HODGroupConfiguration;

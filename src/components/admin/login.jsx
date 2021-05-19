@@ -5,7 +5,7 @@ import { Link, Redirect } from "react-router-dom";
 import { baseUrl, adminPathUrl, accountsUrl } from "../../shared/baseUrl.js";
 import store from "../../redux/store";
 
-class Login extends Component {
+class AdminLogin extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -301,4 +301,4 @@ class Login extends Component {
     }
 }
 
-export default Login;
+export default AdminLogin;

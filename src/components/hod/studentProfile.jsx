@@ -8,7 +8,7 @@ import { baseUrl, hodUrl } from "../../shared/baseUrl";
 import Loading from "../sharedComponents/loader";
 import AlertBox from "../sharedComponents/alert";
 
-class StudentProfile extends Component {
+class HODStudentProfile extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -369,4 +369,4 @@ class StudentProfile extends Component {
     }
 }
 
-export default StudentProfile;
+export default HODStudentProfile;

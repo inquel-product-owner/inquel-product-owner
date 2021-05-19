@@ -1,13 +1,11 @@
-import React from 'react';
-import Spinner from '../../assets/Rolling.gif';
+import React from "react";
+import Spinner from "../../assets/Rolling.gif";
 
 function Loading() {
-    return(
-
+    return (
         <div className="fp-container">
             <img src={Spinner} className="fp-loader" alt="loading" />
         </div>
-
     );
 }
 

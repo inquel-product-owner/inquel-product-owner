@@ -177,7 +177,7 @@ class ContentAdding extends Component {
     }
 }
 
-class MasterData extends Component {
+class AdminMasterData extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -916,4 +916,4 @@ class MasterData extends Component {
     }
 }
 
-export default MasterData;
+export default AdminMasterData;

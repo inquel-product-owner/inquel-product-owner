@@ -17,7 +17,7 @@ const mapStateToProps = (state) => ({
     semester_name: state.content.semester_name,
 });
 
-class SemesterDirect extends Component {
+class TeacherSemesterDirect extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -750,4 +750,4 @@ class SemesterDirect extends Component {
     }
 }
 
-export default connect(mapStateToProps)(SemesterDirect);
+export default connect(mapStateToProps)(TeacherSemesterDirect);

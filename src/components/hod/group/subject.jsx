@@ -5,8 +5,14 @@ import SideNav from "../sidenav";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import Loading from "../../sharedComponents/loader";
 import AlertBox from "../../sharedComponents/alert";
+import { connect } from "react-redux";
+import { waterMark } from "../../sharedComponents/watermark";
 
-class GroupSubject extends Component {
+const mapStateToProps = (state) => ({
+    data: state.user.profile,
+});
+
+class HODGroupSubject extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -131,6 +137,7 @@ class GroupSubject extends Component {
                     className={`section content ${
                         this.state.showSideNav ? "active" : ""
                     }`}
+                    style={waterMark(this.props.data)}
                 >
                     <div className="container-fluid">
                         {/* Back button */}
@@ -260,4 +267,4 @@ class GroupSubject extends Component {
     }
 }
 
-export default GroupSubject;
+export default connect(mapStateToProps)(HODGroupSubject);

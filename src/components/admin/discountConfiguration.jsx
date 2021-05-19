@@ -3,7 +3,7 @@ import Header from "./navbar";
 import SideNav from "./sidenav";
 import { Link } from "react-router-dom";
 
-class DiscountConfiguration extends Component {
+class AdminDiscountConfiguration extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -141,4 +141,4 @@ class DiscountConfiguration extends Component {
     }
 }
 
-export default DiscountConfiguration;
+export default AdminDiscountConfiguration;

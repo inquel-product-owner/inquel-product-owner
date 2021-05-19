@@ -6,6 +6,12 @@ import SideNav from "../sidenav";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import Loading from "../../sharedComponents/loader";
 import AlertBox from "../../sharedComponents/alert";
+import { connect } from "react-redux";
+import { waterMark } from "../../sharedComponents/watermark";
+
+const mapStateToProps = (state) => ({
+    data: state.user.profile,
+});
 
 function EmptyData() {
     return (
@@ -15,7 +21,7 @@ function EmptyData() {
     );
 }
 
-class GroupTeachers extends Component {
+class HODGroupTeachers extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -117,6 +123,7 @@ class GroupTeachers extends Component {
                     className={`section content ${
                         this.state.showSideNav ? "active" : ""
                     }`}
+                    style={waterMark(this.props.data)}
                 >
                     <div className="container-fluid">
                         {/* Back button */}
@@ -317,4 +324,4 @@ class GroupTeachers extends Component {
     }
 }
 
-export default GroupTeachers;
+export default connect(mapStateToProps)(HODGroupTeachers);

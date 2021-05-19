@@ -12,7 +12,7 @@ import SubjectTable from "../table/subject";
 import Paginations from "../sharedComponents/pagination";
 import AlertBox from "../sharedComponents/alert";
 
-class TeacherProfile extends Component {
+class HODTeacherProfile extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -414,4 +414,4 @@ class TeacherProfile extends Component {
     }
 }
 
-export default TeacherProfile;
+export default HODTeacherProfile;
