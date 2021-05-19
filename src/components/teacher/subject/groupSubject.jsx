@@ -25,7 +25,7 @@ const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
 });
 
-class Subject extends Component {
+class TeacherSubject extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -694,4 +694,4 @@ class Subject extends Component {
     }
 }
 
-export default connect(mapStateToProps)(Subject);
+export default connect(mapStateToProps)(TeacherSubject);

@@ -4,7 +4,7 @@ import SideNav from "./sidenav";
 import { Card, Accordion } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
-class CourseView extends Component {
+class AdminCourseView extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -272,4 +272,4 @@ class CourseView extends Component {
     }
 }
 
-export default CourseView;
+export default AdminCourseView;

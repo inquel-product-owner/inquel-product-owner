@@ -14,7 +14,7 @@ const mapStateToProps = (state) => ({
     simulation_name: state.content.simulation_name,
 });
 
-class SimulationPaper extends Component {
+class HODSimulationPaper extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -672,4 +672,4 @@ class SimulationPaper extends Component {
     }
 }
 
-export default connect(mapStateToProps)(SimulationPaper);
+export default connect(mapStateToProps)(HODSimulationPaper);

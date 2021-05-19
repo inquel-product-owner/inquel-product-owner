@@ -13,7 +13,7 @@ const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
 });
 
-class StudentProfile extends Component {
+class TeacherStudentProfile extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -387,4 +387,4 @@ class StudentProfile extends Component {
     }
 }
 
-export default connect(mapStateToProps)(StudentProfile);
+export default connect(mapStateToProps)(TeacherStudentProfile);

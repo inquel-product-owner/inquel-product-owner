@@ -4,7 +4,7 @@ import SideNav from "./sidenav";
 import { Card, Accordion } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
-class CourseScorecard extends Component {
+class HODCourseScorecard extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -271,4 +271,4 @@ class CourseScorecard extends Component {
     }
 }
 
-export default CourseScorecard;
+export default HODCourseScorecard;

@@ -33,7 +33,7 @@ import StudentLogin from "./login";
 import StudentRegister from "./register";
 import Profile from "./profile";
 
-import StudyPlanner from "./study-planner/";
+import StudyPlanner from "./study-planner";
 
 const studentRoutes = (
     <Switch>

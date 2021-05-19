@@ -8,7 +8,7 @@ import { Badge } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import AlertBox from "../sharedComponents/alert";
 
-class HodStudentProfile extends Component {
+class AdminHodStudentProfile extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -296,4 +296,4 @@ class HodStudentProfile extends Component {
     }
 }
 
-export default HodStudentProfile;
+export default AdminHodStudentProfile;

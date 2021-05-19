@@ -794,7 +794,7 @@ class HODModal extends Component {
     }
 }
 
-class Profiles extends Component {
+class AdminHODAndStudentList extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -1319,4 +1319,4 @@ class Profiles extends Component {
     }
 }
 
-export default Profiles;
+export default AdminHODAndStudentList;

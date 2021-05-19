@@ -14,7 +14,7 @@ import ReactSwitch from "../sharedComponents/switchComponent";
 import dateFormat from "dateformat";
 import AlertBox from "../sharedComponents/alert";
 
-class HodProfile extends Component {
+class AdminHodProfile extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -1341,4 +1341,4 @@ class HodProfile extends Component {
     }
 }
 
-export default HodProfile;
+export default AdminHodProfile;

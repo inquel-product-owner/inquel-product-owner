@@ -18,7 +18,7 @@ const mapStateToProps = (state) => ({
     topic_name: state.content.topic_name,
 });
 
-class Match extends Component {
+class TeacherMatch extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -917,4 +917,4 @@ class Match extends Component {
     }
 }
 
-export default connect(mapStateToProps)(Match);
+export default connect(mapStateToProps)(TeacherMatch);

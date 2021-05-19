@@ -1,16 +1,10 @@
 import React from "react";
 import "./App.css";
-import { BrowserRouter, Switch } from "react-router-dom";
-import mainRoutes from "./components/mainRoute";
+import { BrowserRouter } from "react-router-dom";
+import routes from "./components/route";
 
 function App() {
-    return (
-        <BrowserRouter>
-            <Switch>
-                {mainRoutes}
-            </Switch>
-        </BrowserRouter>
-    );
+    return <BrowserRouter>{routes}</BrowserRouter>;
 }
 
 export default App;

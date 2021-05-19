@@ -261,7 +261,7 @@ class Scorecard extends Component {
     }
 }
 
-class CycleTestAuto extends Component {
+class TeacherCycleTestAuto extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -1653,4 +1653,4 @@ class CycleTestAuto extends Component {
     }
 }
 
-export default connect(mapStateToProps)(CycleTestAuto);
+export default connect(mapStateToProps)(TeacherCycleTestAuto);

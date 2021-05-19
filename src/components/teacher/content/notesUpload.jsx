@@ -19,7 +19,7 @@ const mapStateToProps = (state) => ({
     topic_name: state.content.topic_name,
 });
 
-class NotesUpload extends Component {
+class TeacherNotesUpload extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -557,4 +557,4 @@ class NotesUpload extends Component {
     }
 }
 
-export default connect(mapStateToProps)(NotesUpload);
+export default connect(mapStateToProps)(TeacherNotesUpload);

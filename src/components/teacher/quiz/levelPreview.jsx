@@ -17,7 +17,7 @@ const mapStateToProps = (state) => ({
     quiz_name: state.content.quiz_name,
 });
 
-class LevelPreview extends Component {
+class TeacherLevelPreview extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -587,4 +587,4 @@ class LevelPreview extends Component {
     }
 }
 
-export default connect(mapStateToProps)(LevelPreview);
+export default connect(mapStateToProps)(TeacherLevelPreview);

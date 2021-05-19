@@ -9,7 +9,7 @@ import SubjectTable from "../table/subject";
 import Paginations from "../sharedComponents/pagination";
 import AlertBox from "../sharedComponents/alert";
 
-class Dashboard extends Component {
+class TeacherDashboard extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -230,4 +230,4 @@ class Dashboard extends Component {
     }
 }
 
-export default Dashboard;
+export default TeacherDashboard;

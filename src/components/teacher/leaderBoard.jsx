@@ -9,7 +9,7 @@ import Paginations from "../sharedComponents/pagination";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import { paginationCount } from "../../shared/globalValues.js";
 
-class Leaderboard extends Component {
+class TeacherLeaderboard extends Component {
     constructor() {
         super();
         this.state = {
@@ -161,4 +161,4 @@ class Leaderboard extends Component {
     }
 }
 
-export default Leaderboard;
+export default TeacherLeaderboard;

@@ -15,7 +15,7 @@ const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
 });
 
-class Group extends Component {
+class TeacherGroup extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -243,4 +243,4 @@ class Group extends Component {
     }
 }
 
-export default connect(mapStateToProps)(Group);
+export default connect(mapStateToProps)(TeacherGroup);

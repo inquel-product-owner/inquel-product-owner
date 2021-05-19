@@ -756,15 +756,6 @@ input[type="search"]:focus {
     cursor: zoom-in;
 }
 
-.preview-img-xs {
-    width: 100%;
-    height: 40px;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    cursor: zoom-in;
-}
-
 .preview-img-circle {
     width: 35px;
     height: 35px;
@@ -929,6 +920,8 @@ audio {
     width: 200px;
     overflow: hidden;
 }
+
+/* ----- concept flashcard ----- */
 
 .concept-content-center {
     display: flex;

@@ -17,7 +17,7 @@ const mapStateToProps = (state) => ({
     quiz_name: state.content.quiz_name,
 });
 
-class QuizLevel extends Component {
+class TeacherQuizLevel extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -803,4 +803,4 @@ class QuizLevel extends Component {
     }
 }
 
-export default connect(mapStateToProps)(QuizLevel);
+export default connect(mapStateToProps)(TeacherQuizLevel);

@@ -232,7 +232,7 @@ class ImageUploadModal extends Component {
     }
 }
 
-class Summary extends Component {
+class TeacherSummary extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -699,4 +699,4 @@ class Summary extends Component {
     }
 }
 
-export default connect(mapStateToProps)(Summary);
+export default connect(mapStateToProps)(TeacherSummary);

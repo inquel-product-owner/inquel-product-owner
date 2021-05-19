@@ -235,7 +235,7 @@ class ImageUploadModal extends Component {
     }
 }
 
-class Notes extends Component {
+class TeacherNotes extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -733,4 +733,4 @@ class Notes extends Component {
     }
 }
 
-export default connect(mapStateToProps)(Notes);
+export default connect(mapStateToProps)(TeacherNotes);

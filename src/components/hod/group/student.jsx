@@ -10,6 +10,12 @@ import Paginations from "../../sharedComponents/pagination";
 import StudentTable from "../../table/student";
 import AlertBox from "../../sharedComponents/alert";
 import { UserRemoveModal } from "../../sharedComponents/userManagementModal";
+import { connect } from "react-redux";
+import { waterMark } from "../../sharedComponents/watermark";
+
+const mapStateToProps = (state) => ({
+    data: state.user.profile,
+});
 
 class StudentAssignModal extends Component {
     constructor(props) {
@@ -233,7 +239,7 @@ class StudentAssignModal extends Component {
     }
 }
 
-class GroupStudents extends Component {
+class HODGroupStudents extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -442,6 +448,7 @@ class GroupStudents extends Component {
                     className={`section content ${
                         this.state.showSideNav ? "active" : ""
                     }`}
+                    style={waterMark(this.props.data)}
                 >
                     <div className="container-fluid">
                         {/* Back button */}
@@ -549,4 +556,4 @@ class GroupStudents extends Component {
     }
 }
 
-export default GroupStudents;
+export default connect(mapStateToProps)(HODGroupStudents);

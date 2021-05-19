@@ -18,7 +18,7 @@ const mapStateToProps = (state) => ({
     cycle_name: state.content.cycle_name,
 });
 
-class CyleTestDirect extends Component {
+class TeacherCyleTestDirect extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -756,4 +756,4 @@ class CyleTestDirect extends Component {
     }
 }
 
-export default connect(mapStateToProps)(CyleTestDirect);
+export default connect(mapStateToProps)(TeacherCyleTestDirect);

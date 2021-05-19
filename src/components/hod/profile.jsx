@@ -270,7 +270,7 @@ class ImageUploadModal extends Component {
     }
 }
 
-class Profile extends Component {
+class HODProfile extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -1443,4 +1443,4 @@ class Profile extends Component {
     }
 }
 
-export default connect(mapStateToProps)(Profile);
+export default connect(mapStateToProps)(HODProfile);
