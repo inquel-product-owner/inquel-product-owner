@@ -27,7 +27,13 @@ class Header extends Component {
 
     componentDidMount = () => {
         if (this.props.permissions) {
-            this.props.permissions(this.props.data.permissions);
+            let data =
+                this.props.data !== null
+                    ? this.props.data.permissions
+                        ? this.props.data.permissions
+                        : ""
+                    : "";
+            this.props.permissions(data);
         }
     };
 
