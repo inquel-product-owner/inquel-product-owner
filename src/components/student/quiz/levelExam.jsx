@@ -281,6 +281,7 @@ class QuizLevelExam extends Component {
         this.audio = new Audio(BGSound);
         this.audio.muted = true;
         this.audio.volume = 0.3;
+        this.audio.crossOrigin = 'anonymous'
     }
 
     // creates section structure for exam submission
@@ -717,9 +718,10 @@ class QuizLevelExam extends Component {
                             () => {
                                 this.setState({
                                     isAnswerSubmitted: true,
+                                    isPlaying: false,
                                     showToast: false,
                                 });
-                                this.handleBGSound();
+                                this.audio.pause();
                             }
                         );
                     } else {
