@@ -10,7 +10,7 @@ import { Type1DataFormat } from "../../sharedComponents/dataFormating";
 import { Link } from "react-router-dom";
 import { Modal } from "react-bootstrap";
 
-// import Sound from "react-sound";
+import Sound from "react-sound";
 // import CorrectSound from "../../../assets/correct-answer.wav";
 // import WrongSound from "../../../assets/wrong-answer.wav";
 // import CountDownSound from "../../../assets/simple-countdown.wav";
@@ -278,10 +278,10 @@ class QuizLevelExam extends Component {
             Authorization: this.authToken,
         };
         this.timer = 0;
-        this.audio = new Audio(BGSound);
-        this.audio.muted = true;
-        this.audio.volume = 0.3;
-        this.audio.crossOrigin = 'anonymous'
+        // this.audio = new Audio(BGSound);
+        // this.audio.muted = true;
+        // this.audio.volume = 0.3;
+        // this.audio.crossOrigin = 'anonymous'
     }
 
     // creates section structure for exam submission
@@ -721,7 +721,7 @@ class QuizLevelExam extends Component {
                                     isPlaying: false,
                                     showToast: false,
                                 });
-                                this.audio.pause();
+                                // this.audio.pause();
                             }
                         );
                     } else {
@@ -946,15 +946,15 @@ class QuizLevelExam extends Component {
     handleBGSound = () => {
         if (!this.state.isPlaying) {
             // this.audio.muted = false;
-            this.audio.play();
+            // this.audio.play();
             this.setState({
-                isPlaying: !this.state.isPlaying,
+                isPlaying: true,
             });
         } else {
             // this.audio.muted = true;
-            this.audio.pause();
+            // this.audio.pause();
             this.setState({
-                isPlaying: !this.state.isPlaying,
+                isPlaying: false,
             });
         }
     };
@@ -1282,7 +1282,7 @@ class QuizLevelExam extends Component {
                         ""
                     )}
                 </div>
-                {/* <Sound
+                <Sound
                     url={BGSound}
                     playStatus={
                         this.state.isPlaying
@@ -1291,7 +1291,7 @@ class QuizLevelExam extends Component {
                     }
                     volume={20}
                     loop={true}
-                /> */}
+                />
             </div>
         );
     };
