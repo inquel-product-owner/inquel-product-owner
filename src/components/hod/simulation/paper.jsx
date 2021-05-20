@@ -429,7 +429,7 @@ class HODSimulationPaper extends Component {
                         </nav>
 
                         <div
-                            className="card shadow-sm mb-2"
+                            className="card shadow-sm mb-3"
                             style={{ overflowX: "auto" }}
                         >
                             <div

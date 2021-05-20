@@ -1237,7 +1237,7 @@ class TeacherCycleTestAuto extends Component {
                         </div>
 
                         <div
-                            className="card shadow-sm mb-2"
+                            className="card shadow-sm mb-3"
                             style={{ overflowX: "auto" }}
                         >
                             <div

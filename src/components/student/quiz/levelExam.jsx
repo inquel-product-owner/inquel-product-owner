@@ -10,10 +10,10 @@ import { Type1DataFormat } from "../../sharedComponents/dataFormating";
 import { Link } from "react-router-dom";
 import { Modal } from "react-bootstrap";
 
-import Sound from "react-sound";
-import CorrectSound from "../../../assets/correct-answer.wav";
-import WrongSound from "../../../assets/wrong-answer.wav";
-import CountDownSound from "../../../assets/simple-countdown.wav";
+// import Sound from "react-sound";
+// import CorrectSound from "../../../assets/correct-answer.wav";
+// import WrongSound from "../../../assets/wrong-answer.wav";
+// import CountDownSound from "../../../assets/simple-countdown.wav";
 import BGSound from "../../../assets/background-music.mp3";
 
 class QuizCountDown extends Component {
@@ -64,12 +64,6 @@ class QuizCountDown extends Component {
                         {this.state.second}
                     </p>
                     <p className="font-weight-bold-600 mb-3">Seconds</p>
-
-                    <Sound
-                        url={CountDownSound}
-                        playStatus={Sound.status.PLAYING}
-                        volume={30}
-                    />
                 </Modal.Body>
             </Modal>
         );
@@ -79,11 +73,11 @@ class QuizCountDown extends Component {
 const SuccessDIV = (props) => {
     return (
         <>
-            <Sound
+            {/* <Sound
                 url={CorrectSound}
                 playStatus={Sound.status.PLAYING}
                 volume={30}
-            />
+            /> */}
             <div className="w-100 mt-auto">
                 <div className="row justify-content-center">
                     <div className="col-lg-3 col-md-5">
@@ -109,11 +103,11 @@ const SuccessDIV = (props) => {
 const DangerDIV = (props) => {
     return (
         <>
-            <Sound
+            {/* <Sound
                 url={WrongSound}
                 playStatus={Sound.status.PLAYING}
                 volume={30}
-            />
+            /> */}
             <div className="w-100 mt-auto">
                 <div className="row justify-content-center">
                     <div className="col-lg-3 col-md-5">
@@ -284,6 +278,9 @@ class QuizLevelExam extends Component {
             Authorization: this.authToken,
         };
         this.timer = 0;
+        this.audio = new Audio(BGSound);
+        this.audio.muted = true;
+        this.audio.volume = 0.3;
     }
 
     // creates section structure for exam submission
@@ -442,6 +439,8 @@ class QuizLevelExam extends Component {
 
     componentWillUnmount = () => {
         clearInterval(this.timer);
+        this.audio.pause();
+        this.audio.muted = true;
     };
 
     // ---------- handle option selection ----------
@@ -720,6 +719,7 @@ class QuizLevelExam extends Component {
                                     isAnswerSubmitted: true,
                                     showToast: false,
                                 });
+                                this.handleBGSound();
                             }
                         );
                     } else {
@@ -773,7 +773,6 @@ class QuizLevelExam extends Component {
     startTimer = () => {
         this.setState({
             showCountdownModal: false,
-            isPlaying: true,
         });
         if (
             this.state.isAnswerSubmitted === false &&
@@ -940,6 +939,22 @@ class QuizLevelExam extends Component {
         }
 
         return color;
+    };
+
+    handleBGSound = () => {
+        if (!this.state.isPlaying) {
+            this.audio.muted = false;
+            this.audio.play();
+            this.setState({
+                isPlaying: !this.state.isPlaying,
+            });
+        } else {
+            this.audio.muted = true;
+            this.audio.pause();
+            this.setState({
+                isPlaying: !this.state.isPlaying,
+            });
+        }
     };
 
     questionRender = (data, index, answerSection) => {
@@ -1265,7 +1280,7 @@ class QuizLevelExam extends Component {
                         ""
                     )}
                 </div>
-                <Sound
+                {/* <Sound
                     url={BGSound}
                     playStatus={
                         this.state.isPlaying
@@ -1274,7 +1289,7 @@ class QuizLevelExam extends Component {
                     }
                     volume={20}
                     loop={true}
-                />
+                /> */}
             </div>
         );
     };
@@ -1393,9 +1408,24 @@ class QuizLevelExam extends Component {
         return (
             <div className="card card-body shadow-sm">
                 <div
-                    className="light-bg p-3 d-flex flex-column align-items-start justify-content-center"
+                    className="light-bg p-3 d-flex flex-column align-items-start justify-content-center position-relative"
                     style={{ minHeight: "70vh" }}
                 >
+                    <button
+                        className="btn btn-link btn-sm shadow-none position-absolute"
+                        style={{ top: "10px", left: "10px" }}
+                        onClick={async () => {
+                            await this.setState({
+                                isAnswerSubmitted: true,
+                                showQuestionReview: false,
+                                currentQuestion: 0,
+                            });
+                            window.MathJax.typeset();
+                        }}
+                    >
+                        <i className="fas fa-chevron-left fa-sm mr-1"></i>Back
+                    </button>
+
                     <p className="text-center primary-text h5 w-100 mb-4">
                         Question: {this.state.currentQuestion + 1} /{" "}
                         {data.length}
@@ -1611,7 +1641,7 @@ class QuizLevelExam extends Component {
                 )}
 
                 {/* <!----- Main content starts here -----> */}
-                <div className="exam-section">
+                <div className="exam-section position-relative">
                     <div className="container">
                         {this.state.isAnswerSubmitted === false &&
                         this.state.showQuestionReview === false
@@ -1638,6 +1668,28 @@ class QuizLevelExam extends Component {
                                 : ""
                             : ""}
                     </div>
+
+                    {this.state.isAnswerSubmitted === false &&
+                    this.state.showQuestionReview === false ? (
+                        <button
+                            className="btn pinkrange-bg btn-sm shadow-none position-absolute"
+                            style={{
+                                top: "25px",
+                                right: 0,
+                                borderTopRightRadius: 0,
+                                borderBottomRightRadius: 0,
+                            }}
+                            onClick={this.handleBGSound}
+                        >
+                            {this.state.isPlaying ? (
+                                <i className="fas fa-volume-up"></i>
+                            ) : (
+                                <i className="fas fa-volume-mute"></i>
+                            )}
+                        </button>
+                    ) : (
+                        ""
+                    )}
                 </div>
                 {/* <!----- Main content ends here -----> */}
 

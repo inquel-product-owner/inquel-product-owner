@@ -51,36 +51,35 @@ class StudentLogin extends Component {
         });
     };
 
-    loadProfileData = (result) => {
+    loadProfileData = (data) => {
         fetch(`${baseUrl + studentUrl}/student/profile/`, {
             method: "GET",
             headers: {
                 Accept: "application/json",
                 "Content-Type": "application/json",
-                Authorization: `Token ${result.token}`,
+                Authorization: `Token ${data.token}`,
             },
         })
             .then((res) => res.json())
             .then((result) => {
                 if (result.sts === true) {
                     store.dispatch({ type: "PROFILE", payload: result.data });
+                    localStorage.clear();
+
+                    localStorage.setItem(
+                        "Authorization",
+                        `Token ${data.token}`
+                    );
+                    localStorage.setItem("is_student", data.is_student);
+                    
+                    this.setState({
+                        showLoader: false,
+                    });
                 }
             })
             .catch((err) => {
                 console.log(err);
             });
-    };
-
-    setLocalStorage = (result) => {
-        localStorage.clear();
-
-        localStorage.setItem("Authorization", `Token ${result.token}`);
-        localStorage.setItem("is_student", result.is_student);
-
-        this.setState({
-            showLoader: false,
-        });
-        this.loadProfileData(result);
     };
 
     handleSubmit = (event) => {
@@ -115,7 +114,7 @@ class StudentLogin extends Component {
                             .then((res) => res.json())
                             .then((results) => {
                                 if (results.sts === true) {
-                                    this.setLocalStorage(result);
+                                    this.loadProfileData(result);
                                 }
                             })
                             .catch((err) => {
@@ -138,14 +137,14 @@ class StudentLogin extends Component {
                             .then((res) => res.json())
                             .then((results) => {
                                 if (results.sts === true) {
-                                    this.setLocalStorage(result);
+                                    this.loadProfileData(result);
                                 }
                             })
                             .catch((err) => {
                                 console.log(err);
                             });
                     } else {
-                        this.setLocalStorage(result);
+                        this.loadProfileData(result);
                     }
                 }
                 if (!result.sts && result.msg) {
