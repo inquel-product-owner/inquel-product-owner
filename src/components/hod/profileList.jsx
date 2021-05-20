@@ -22,6 +22,8 @@ class AddStudentModal extends Component {
         super();
         this.state = {
             email: [""],
+            terms_and_condition: false,
+
             errorMsg: [],
             successMsg: "",
             showErrorAlert: false,
@@ -51,6 +53,7 @@ class AddStudentModal extends Component {
             method: "POST",
             body: JSON.stringify({
                 students: this.state.email,
+                terms_and_condition: this.state.terms_and_condition,
             }),
         })
             .then((res) => res.json())
@@ -92,6 +95,14 @@ class AddStudentModal extends Component {
         this.setState({
             email: values,
         });
+    };
+
+    handleCheck = (event) => {
+        if (event.target.checked) {
+            this.setState({
+                terms_and_condition: true,
+            });
+        }
     };
 
     handleAddFields = () => {
@@ -214,6 +225,33 @@ class AddStudentModal extends Component {
                                         </div>
                                     </div>
                                 </div>
+                                <div className="custom-control custom-checkbox">
+                                    <input
+                                        type="checkbox"
+                                        className="custom-control-input"
+                                        id="customCheck1"
+                                        name="terms_and_condition"
+                                        onChange={this.handleCheck}
+                                        disabled={
+                                            this.state.terms_and_condition
+                                                ? true
+                                                : false
+                                        }
+                                        required
+                                    />
+                                    <label
+                                        className="custom-control-label"
+                                        for="customCheck1"
+                                    >
+                                        I agree to the{" "}
+                                        <Link
+                                            to="/"
+                                            className="primary-text font-weight-bold-600"
+                                        >
+                                            Terms and Conditions
+                                        </Link>
+                                    </label>
+                                </div>
                             </Fragment>
                         ))}
                     </Modal.Body>
@@ -221,6 +259,9 @@ class AddStudentModal extends Component {
                         <button
                             type="submit"
                             className="btn btn-primary btn-block shadow-none"
+                            disabled={
+                                this.state.terms_and_condition ? false : true
+                            }
                         >
                             {this.state.showLoader ? (
                                 <Spinner
@@ -251,6 +292,8 @@ class AddTeacherModal extends Component {
             email: "",
             username: "",
             password: "",
+            terms_and_condition: false,
+
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
@@ -283,6 +326,7 @@ class AddTeacherModal extends Component {
                 username: this.state.username,
                 email: this.state.email,
                 password: this.state.password,
+                terms_and_condition: this.state.terms_and_condition,
             }),
         })
             .then((res) => res.json())
@@ -335,6 +379,14 @@ class AddTeacherModal extends Component {
         this.setState({
             [name]: value,
         });
+    };
+
+    handleCheck = (event) => {
+        if (event.target.checked) {
+            this.setState({
+                terms_and_condition: true,
+            });
+        }
     };
 
     showPassword = () => {
@@ -439,11 +491,41 @@ class AddTeacherModal extends Component {
                                 </div>
                             </div>
                         </div>
+                        <div className="custom-control custom-checkbox">
+                            <input
+                                type="checkbox"
+                                className="custom-control-input"
+                                id="customCheck1"
+                                name="terms_and_condition"
+                                onChange={this.handleCheck}
+                                disabled={
+                                    this.state.terms_and_condition
+                                        ? true
+                                        : false
+                                }
+                                required
+                            />
+                            <label
+                                className="custom-control-label"
+                                for="customCheck1"
+                            >
+                                I agree to the{" "}
+                                <Link
+                                    to="/"
+                                    className="primary-text font-weight-bold-600"
+                                >
+                                    Terms and Conditions
+                                </Link>
+                            </label>
+                        </div>
                     </Modal.Body>
                     <Modal.Footer>
                         <button
                             type="submit"
                             className="btn btn-primary btn-block shadow-none"
+                            disabled={
+                                this.state.terms_and_condition ? false : true
+                            }
                         >
                             {this.state.showLoader ? (
                                 <Spinner

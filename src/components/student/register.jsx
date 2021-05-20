@@ -19,6 +19,7 @@ class StudentRegister extends Component {
             username: "",
             password: "",
             confirm_password: "",
+            terms_and_condition: false,
 
             errorMsg: "",
             successMsg: "",
@@ -77,6 +78,13 @@ class StudentRegister extends Component {
                 showErrorAlert: true,
                 showLoader: false,
             });
+        } else if (this.state.terms_and_condition === false) {
+            this.setState({
+                errorMsg:
+                    "Please indicate that you have read and agree to the Terms and Conditions",
+                showErrorAlert: true,
+                showLoader: false,
+            });
         } else {
             fetch(`${this.url}/register/`, {
                 headers: {
@@ -91,6 +99,7 @@ class StudentRegister extends Component {
                     email: this.state.email,
                     phone_num: this.state.country_code + this.state.phone_num,
                     password: this.state.password,
+                    terms_and_condition: this.state.terms_and_condition,
                 }),
             })
                 .then((res) => res.json())
@@ -127,6 +136,14 @@ class StudentRegister extends Component {
 
     componentDidMount = () => {
         document.title = "Register - Student | IQLabs";
+    };
+
+    handleCheck = (event) => {
+        if (event.target.checked) {
+            this.setState({
+                terms_and_condition: true,
+            });
+        }
     };
 
     renderValue = (data) => {
@@ -225,6 +242,7 @@ class StudentRegister extends Component {
                                                     required
                                                 />
                                             </div>
+
                                             <div className="form-group">
                                                 <label htmlFor="lastname">
                                                     Lastname
@@ -240,6 +258,7 @@ class StudentRegister extends Component {
                                                     required
                                                 />
                                             </div>
+
                                             <div className="form-group">
                                                 <label htmlFor="username">
                                                     Username
@@ -255,6 +274,7 @@ class StudentRegister extends Component {
                                                     required
                                                 />
                                             </div>
+
                                             <div className="form-group">
                                                 <label htmlFor="email">
                                                     Email
@@ -270,6 +290,7 @@ class StudentRegister extends Component {
                                                     required
                                                 />
                                             </div>
+
                                             <div className="form-group">
                                                 <label htmlFor="phone">
                                                     Phone Number
@@ -280,14 +301,16 @@ class StudentRegister extends Component {
                                                     >
                                                         <Select
                                                             className="basic-single border-right"
-                                                            defaultValue={{label:this.renderPlaceholder(),value:'+91'}}
+                                                            defaultValue={{
+                                                                label: this.renderPlaceholder(),
+                                                                value: "+91",
+                                                            }}
                                                             isSearchable={false}
                                                             name="country_code"
                                                             options={country.map(
                                                                 (list) => {
                                                                     return {
-                                                                        value:
-                                                                            list.dialCode,
+                                                                        value: list.dialCode,
                                                                         label: this.renderValue(
                                                                             list
                                                                         ),
@@ -320,6 +343,7 @@ class StudentRegister extends Component {
                                                     </div>
                                                 </div>
                                             </div>
+
                                             <div className="form-group">
                                                 <label htmlFor="password">
                                                     Password
@@ -394,7 +418,8 @@ class StudentRegister extends Component {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="form-group mb-4">
+
+                                            <div className="form-group">
                                                 <label htmlFor="confirm_password">
                                                     Confirm Password
                                                     <OverlayTrigger
@@ -469,10 +494,50 @@ class StudentRegister extends Component {
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            <div className="form-group">
+                                                <div className="custom-control custom-checkbox">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="custom-control-input"
+                                                        id="customCheck1"
+                                                        name="terms_and_condition"
+                                                        onChange={
+                                                            this.handleCheck
+                                                        }
+                                                        disabled={
+                                                            this.state
+                                                                .terms_and_condition
+                                                                ? true
+                                                                : false
+                                                        }
+                                                        required
+                                                    />
+                                                    <label
+                                                        className="custom-control-label"
+                                                        for="customCheck1"
+                                                    >
+                                                        I agree to the{" "}
+                                                        <Link
+                                                            to="/"
+                                                            className="primary-text font-weight-bold-600"
+                                                        >
+                                                            Terms and Conditions
+                                                        </Link>
+                                                    </label>
+                                                </div>
+                                            </div>
+
                                             <div className="form-group">
                                                 <button
                                                     type="submit"
-                                                    className="btn btn-primary btn-block"
+                                                    className="btn btn-primary btn-block shadow-none"
+                                                    disabled={
+                                                        this.state
+                                                            .terms_and_condition
+                                                            ? false
+                                                            : true
+                                                    }
                                                 >
                                                     {this.state.showLoader ? (
                                                         <Spinner
@@ -492,25 +557,11 @@ class StudentRegister extends Component {
                                                 </button>
                                             </div>
                                         </form>
-                                        <p className="small text-center">
-                                            By Signing up, you agree to Inquel's{" "}
-                                            <Link
-                                                to="/"
-                                                className="primary-text font-weight-bold"
-                                            >
-                                                Privacy Policy
-                                            </Link>{" "}
-                                            and{" "}
-                                            <Link
-                                                to="/"
-                                                className="primary-text font-weight-bold"
-                                            >
-                                                Tems of Use
-                                            </Link>
-                                        </p>
+
                                         <p className="small primary-text text-center mb-2">
                                             Other SignUp
                                         </p>
+
                                         <div className="d-flex justify-content-center mb-3">
                                             <button className="btn btn-primary btn-sm mr-3">
                                                 <i className="fab fa-google"></i>
@@ -519,6 +570,7 @@ class StudentRegister extends Component {
                                                 <i className="fab fa-facebook"></i>
                                             </button>
                                         </div>
+
                                         <p className="text-center small mb-0">
                                             Click here to{" "}
                                             <Link
