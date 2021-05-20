@@ -15,7 +15,7 @@ import ReactHowler from "react-howler";
 // import CorrectSound from "../../../assets/correct-answer.wav";
 // import WrongSound from "../../../assets/wrong-answer.wav";
 // import CountDownSound from "../../../assets/simple-countdown.wav";
-import BGSound from "./background-music.mp3";
+// import BGSound from "./background-music.mp3";
 
 class QuizCountDown extends Component {
     constructor(props) {
@@ -1649,10 +1649,10 @@ class QuizLevelExam extends Component {
                 )}
 
                 <ReactHowler
-                    src={BGSound}
+                    src={`/background-music.mp3`}
                     playing={this.state.isPlaying}
                     loop={true}
-                    volume="0.3"
+                    volume={0.3}
                 />
 
                 {/* <!----- Main content starts here -----> */}
