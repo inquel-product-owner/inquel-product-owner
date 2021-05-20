@@ -61,6 +61,7 @@ class TeacherChapters extends Component {
             chapterIndex: 1,
             activeTopic: "",
             ancestor: "",
+            topicEventKey: [],
 
             cycle_test: [],
             quiz: [],
@@ -120,8 +121,8 @@ class TeacherChapters extends Component {
             });
         } else {
             this.setState({
-                showIndependentCycle_TestModal: !this.state
-                    .showIndependentCycle_TestModal,
+                showIndependentCycle_TestModal:
+                    !this.state.showIndependentCycle_TestModal,
             });
         }
     };
@@ -135,8 +136,8 @@ class TeacherChapters extends Component {
         } else {
             this.setState({
                 selectedCycleData: data,
-                showIndependentCycle_EditModal: !this.state
-                    .showIndependentCycle_EditModal,
+                showIndependentCycle_EditModal:
+                    !this.state.showIndependentCycle_EditModal,
             });
         }
     };
@@ -465,23 +466,56 @@ class TeacherChapters extends Component {
 
     topicRender = (data, index, topic_id) => {
         const nestedTopics = (data.child || []).map((topic, index) => {
-            return this.topicRender(topic, index, topic_id);
+            return (
+                <Accordion key={index}>
+                    {this.topicRender(topic, index, topic_id)}
+                </Accordion>
+            );
         });
 
         return (
-            <div key={index}>
-                <Card.Header
-                    className="small light-bg shadow-sm mb-2"
+            <>
+                <Accordion.Toggle
+                    as={Card.Header}
+                    eventKey={`topic-${index}-${data.topic_num}`}
+                    className="light-bg shadow-sm py-2 mb-2"
                     style={{
-                        borderBottomLeftRadius: "8px",
-                        borderBottomRightRadius: "8px",
+                        borderRadius: "8px",
                     }}
+                    onClick={() =>
+                        data.child.length !== 0
+                            ? this.toggleTopicCollapse(
+                                  `topic-${index}-${data.topic_num}`
+                              )
+                            : ""
+                    }
                 >
                     <div className="row align-items-center">
-                        <div className="col-md-4 mb-2 mb-md-0 font-weight-bold-600">
-                            <div className="d-flex">
-                                <div className="mr-3">{data.topic_num}</div>
-                                <div>{data.topic_name}</div>
+                        <div className="col-md-4 mb-2 mb-md-0">
+                            <div className="row align-items-center">
+                                <div className="col-1">
+                                    {data.child.length !== 0 ? (
+                                        <div>
+                                            <i
+                                                className={`fas fa-chevron-circle-down ${
+                                                    this.state.topicEventKey.includes(
+                                                        `topic-${index}-${data.topic_num}`
+                                                    )
+                                                        ? "fa-rotate-360"
+                                                        : "fa-rotate-270"
+                                                }`}
+                                            ></i>
+                                        </div>
+                                    ) : (
+                                        ""
+                                    )}
+                                </div>
+                                <div className="col-10 d-flex small font-weight-bold-600 pl-2">
+                                    <div className="mr-3">{data.topic_num}</div>
+                                    <div className="w-100">
+                                        {data.topic_name}
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -604,13 +638,14 @@ class TeacherChapters extends Component {
                                         name="next_topic"
                                         className="form-control form-control-sm border-secondary"
                                         value={data.next_topic}
-                                        onChange={(event) =>
+                                        onChange={(event) => {
                                             this.handleNextTopic(
                                                 event,
                                                 data.topic_num,
                                                 topic_id
-                                            )
-                                        }
+                                            );
+                                        }}
+                                        onClick={(e) => e.stopPropagation()}
                                     >
                                         <option value="">Select...</option>
                                         {this.state.next_topic !== undefined
@@ -631,7 +666,9 @@ class TeacherChapters extends Component {
                                             : ""}
                                     </select>
 
-                                    <Dropdown>
+                                    <Dropdown
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
                                         <Dropdown.Toggle
                                             variant="white"
                                             className="btn btn-link btn-sm shadow-none caret-off ml-2"
@@ -677,10 +714,29 @@ class TeacherChapters extends Component {
                             </div>
                         </div>
                     </div>
-                </Card.Header>
-                <div className="ml-md-3">{nestedTopics}</div>
-            </div>
+                </Accordion.Toggle>
+
+                <Accordion.Collapse
+                    eventKey={`topic-${index}-${data.topic_num}`}
+                    className="ml-2"
+                >
+                    <div>{nestedTopics}</div>
+                </Accordion.Collapse>
+            </>
         );
+    };
+
+    toggleTopicCollapse = (key) => {
+        let topicEventKey = this.state.topicEventKey;
+        if (topicEventKey.includes(key)) {
+            topicEventKey.splice(topicEventKey.indexOf(key), 1);
+        } else {
+            topicEventKey.push(key);
+        }
+
+        this.setState({
+            topicEventKey: topicEventKey,
+        });
     };
 
     dispatchTopic = (data) => {
@@ -814,10 +870,10 @@ class TeacherChapters extends Component {
                         name={this.state.selectedCycleData.cycle_test_name}
                         data={{
                             chapter_id: this.state.chapterId,
-                            cycle_test_id: this.state.selectedCycleData
-                                .cycle_test_id,
-                            cycle_test_name: this.state.selectedCycleData
-                                .cycle_test_name,
+                            cycle_test_id:
+                                this.state.selectedCycleData.cycle_test_id,
+                            cycle_test_name:
+                                this.state.selectedCycleData.cycle_test_name,
                         }}
                     />
                 ) : (
@@ -835,8 +891,8 @@ class TeacherChapters extends Component {
                         name={this.state.selectedCycleData.cycle_test_name}
                         data={{
                             chapter_id: this.state.chapterId,
-                            cycle_test_id: this.state.selectedCycleData
-                                .cycle_test_id,
+                            cycle_test_id:
+                                this.state.selectedCycleData.cycle_test_id,
                         }}
                         toggleModal={this.toggleCycle_DeleteModal}
                     />
@@ -1032,8 +1088,8 @@ class TeacherChapters extends Component {
                                             style={{ borderRadius: "8px" }}
                                             onClick={() => {
                                                 this.setState({
-                                                    collapsed: !this.state
-                                                        .collapsed,
+                                                    collapsed:
+                                                        !this.state.collapsed,
                                                 });
                                             }}
                                         >
@@ -1053,17 +1109,19 @@ class TeacherChapters extends Component {
                                                                 ></i>
                                                             </span>
                                                         </div>
-                                                        <div className="col-1 small font-weight-bold">
-                                                            {
-                                                                this.state
-                                                                    .chapterIndex
-                                                            }
-                                                        </div>
-                                                        <div className="col-8 small font-weight-bold">
-                                                            {
-                                                                this.props
-                                                                    .chapter_name
-                                                            }
+                                                        <div className="col-11 d-flex small font-weight-bold">
+                                                            <div className="mr-3">
+                                                                {
+                                                                    this.state
+                                                                        .chapterIndex
+                                                                }
+                                                            </div>
+                                                            <div>
+                                                                {
+                                                                    this.props
+                                                                        .chapter_name
+                                                                }
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1078,12 +1136,21 @@ class TeacherChapters extends Component {
                                                     .length !== 0
                                                     ? this.state.chapters.chapter_structure.map(
                                                           (data, index) => {
-                                                              return this.topicRender(
-                                                                  data,
-                                                                  index,
-                                                                  this.state
-                                                                      .chapters
-                                                                      .topic_id
+                                                              return (
+                                                                  <Accordion
+                                                                      key={
+                                                                          index
+                                                                      }
+                                                                  >
+                                                                      {this.topicRender(
+                                                                          data,
+                                                                          index,
+                                                                          this
+                                                                              .state
+                                                                              .chapters
+                                                                              .topic_id
+                                                                      )}
+                                                                  </Accordion>
                                                               );
                                                           }
                                                       )

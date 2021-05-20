@@ -8,6 +8,11 @@ import CarouselCard from "../sharedComponents/owlCarousel";
 import Footer from "./shared/footer";
 import Loading from "../sharedComponents/loader";
 import AlertBox from "../sharedComponents/alert";
+import { connect } from "react-redux";
+
+const mapStateToProps = (state) => ({
+    profile: state.user.profile,
+});
 
 class Dashboard extends Component {
     constructor(props) {
@@ -39,29 +44,35 @@ class Dashboard extends Component {
     componentDidMount = () => {
         document.title = "Dashboard - Student | IQLabs";
 
-        fetch(`${this.url}/student/group/`, {
-            method: "GET",
-            headers: this.headers,
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    this.setState({
-                        groupData: result.data,
-                        page_loading: false,
+        if (this.props.profile !== null) {
+            if (this.props.profile.is_independent_student === false) {
+                fetch(`${this.url}/student/group/`, {
+                    method: "GET",
+                    headers: this.headers,
+                })
+                    .then((res) => res.json())
+                    .then((result) => {
+                        console.log(result);
+                        if (result.sts === true) {
+                            this.setState({
+                                groupData: result.data,
+                                page_loading: false,
+                            });
+                        } else {
+                            this.setState({
+                                errorMsg: result.detail
+                                    ? result.detail
+                                    : result.msg,
+                                showErrorAlert: true,
+                                page_loading: false,
+                            });
+                        }
+                    })
+                    .catch((err) => {
+                        console.log(err);
                     });
-                } else {
-                    this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+            }
+        }
     };
 
     render() {
@@ -229,51 +240,67 @@ class Dashboard extends Component {
                         </div>
 
                         {/* Group section */}
-                        <div className="card shadow-sm mb-4">
-                            <div className="card-header">
-                                <h5>Group</h5>
-                            </div>
-                            <div className="card-body">
-                                {this.state.groupData !== "" ? (
-                                    <div className="table-responsive">
-                                        <table className="table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Group name</th>
-                                                    <th>Group description</th>
-                                                    <th>View</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>
-                                                        {
-                                                            this.state.groupData
-                                                                .group_name
-                                                        }
-                                                    </td>
-                                                    <td>
-                                                        {
-                                                            this.state.groupData
-                                                                .group_description
-                                                        }
-                                                    </td>
-                                                    <td>
-                                                        <Link
-                                                            to={`/student/group/${this.state.groupData.id}`}
-                                                        >
-                                                            <button className="btn btn-primary btn-sm shadow-none">
-                                                                <i className="fas fa-eye"></i>
-                                                            </button>
-                                                        </Link>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                        {this.props.profile !== null ? (
+                            this.props.profile.is_independent_student ===
+                            false ? (
+                                <div className="card shadow-sm mb-4">
+                                    <div className="card-header">
+                                        <h5>Group</h5>
                                     </div>
-                                ) : "No data to display..."}
-                            </div>
-                        </div>
+                                    <div className="card-body">
+                                        {this.state.groupData !== "" ? (
+                                            <div className="table-responsive">
+                                                <table className="table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Group name</th>
+                                                            <th>
+                                                                Group
+                                                                description
+                                                            </th>
+                                                            <th>View</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                {
+                                                                    this.state
+                                                                        .groupData
+                                                                        .group_name
+                                                                }
+                                                            </td>
+                                                            <td>
+                                                                {
+                                                                    this.state
+                                                                        .groupData
+                                                                        .group_description
+                                                                }
+                                                            </td>
+                                                            <td>
+                                                                <Link
+                                                                    to={`/student/group/${this.state.groupData.id}`}
+                                                                >
+                                                                    <button className="btn btn-primary btn-sm shadow-none">
+                                                                        <i className="fas fa-eye"></i>
+                                                                    </button>
+                                                                </Link>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        ) : (
+                                            "No data to display..."
+                                        )}
+                                    </div>
+                                </div>
+                            ) : (
+                                ""
+                            )
+                        ) : (
+                            ""
+                        )}
 
                         {/* Courses */}
                         <div className="card shadow-sm mb-4">
@@ -481,4 +508,4 @@ class Dashboard extends Component {
     }
 }
 
-export default Dashboard;
+export default connect(mapStateToProps)(Dashboard);

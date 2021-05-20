@@ -49,36 +49,35 @@ class TeacherLogin extends Component {
         });
     };
 
-    loadProfileData = (result) => {
+    loadProfileData = (data) => {
         fetch(`${baseUrl + teacherUrl}/teacher/profile/`, {
             method: "GET",
             headers: {
                 Accept: "application/json",
                 "Content-Type": "application/json",
-                Authorization: `Token ${result.token}`,
+                Authorization: `Token ${data.token}`,
             },
         })
             .then((res) => res.json())
             .then((result) => {
                 if (result.sts === true) {
                     store.dispatch({ type: "PROFILE", payload: result.data });
+                    localStorage.clear();
+
+                    localStorage.setItem(
+                        "Authorization",
+                        `Token ${data.token}`
+                    );
+                    localStorage.setItem("is_teacher", data.is_teacher);
+
+                    this.setState({
+                        showLoader: false,
+                    });
                 }
             })
             .catch((err) => {
                 console.log(err);
             });
-    };
-
-    setLocalStorage = (result) => {
-        localStorage.clear();
-
-        localStorage.setItem("Authorization", `Token ${result.token}`);
-        localStorage.setItem("is_teacher", result.is_teacher);
-
-        this.setState({
-            showLoader: false,
-        });
-        this.loadProfileData(result);
     };
 
     handleSubmit = (event) => {
@@ -113,7 +112,7 @@ class TeacherLogin extends Component {
                             .then((res) => res.json())
                             .then((results) => {
                                 if (results.sts === true) {
-                                    this.setLocalStorage(result);
+                                    this.loadProfileData(result);
                                 }
                             })
                             .catch((err) => {
@@ -136,14 +135,14 @@ class TeacherLogin extends Component {
                             .then((res) => res.json())
                             .then((results) => {
                                 if (results.sts === true) {
-                                    this.setLocalStorage(result);
+                                    this.loadProfileData(result);
                                 }
                             })
                             .catch((err) => {
                                 console.log(err);
                             });
                     } else {
-                        this.setLocalStorage(result);
+                        this.loadProfileData(result);
                     }
                 }
                 if (!result.sts && result.msg) {
