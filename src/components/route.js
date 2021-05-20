@@ -7,7 +7,7 @@ import LandingPage from "./landingPage";
 
 import AdminDashboard from "./admin/dashboard";
 import AdminLogin from "./admin/login";
-import AdminHODAndStudentList from "./admin/profiles";
+import AdminHODAndStudentList from "./admin/profileList";
 import AdminStudentProfile from "./admin/studentProfile";
 
 import AdminHodProfile from "./admin/hodProfile";
