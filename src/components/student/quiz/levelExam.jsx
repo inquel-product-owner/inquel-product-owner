@@ -11,12 +11,6 @@ import { Link } from "react-router-dom";
 import { Modal } from "react-bootstrap";
 import ReactHowler from "react-howler";
 
-// import Sound from "react-sound";
-// import CorrectSound from "../../../assets/correct-answer.wav";
-// import WrongSound from "../../../assets/wrong-answer.wav";
-// import CountDownSound from "../../../assets/simple-countdown.wav";
-// import BGSound from "./background-music.mp3";
-
 class QuizCountDown extends Component {
     constructor(props) {
         super(props);
@@ -73,60 +67,46 @@ class QuizCountDown extends Component {
 
 const SuccessDIV = (props) => {
     return (
-        <>
-            {/* <Sound
-                url={CorrectSound}
-                playStatus={Sound.status.PLAYING}
-                volume={30}
-            /> */}
-            <div className="w-100 mt-auto">
-                <div className="row justify-content-center">
-                    <div className="col-lg-3 col-md-5">
-                        <div className="card card-body text-center border border-success success-bg p-1">
-                            <p className="small font-weight-bold-600 align-items-center mb-0">
-                                <i className="fas fa-check-circle mr-1"></i>{" "}
-                                Right answer!
-                            </p>
-                            <p className="small mb-0">
-                                {props.level.points_per_question} Points
-                            </p>
-                            <p className="small mb-0">
-                                Bonus Points {props.bonus_points}
-                            </p>
-                        </div>
+        <div className="w-100 mt-auto">
+            <div className="row justify-content-center">
+                <div className="col-lg-3 col-md-5">
+                    <div className="card card-body text-center border border-success success-bg p-1">
+                        <p className="small font-weight-bold-600 align-items-center mb-0">
+                            <i className="fas fa-check-circle mr-1"></i> Right
+                            answer!
+                        </p>
+                        <p className="small mb-0">
+                            {props.level.points_per_question} Points
+                        </p>
+                        <p className="small mb-0">
+                            Bonus Points {props.bonus_points}
+                        </p>
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 
 const DangerDIV = (props) => {
     return (
-        <>
-            {/* <Sound
-                url={WrongSound}
-                playStatus={Sound.status.PLAYING}
-                volume={30}
-            /> */}
-            <div className="w-100 mt-auto">
-                <div className="row justify-content-center">
-                    <div className="col-lg-3 col-md-5">
-                        <div className="card card-body text-center border border-danger danger-bg p-1">
-                            <p className="small font-weight-bold-600 align-items-center mb-0">
-                                <i className="fas fa-times-circle mr-1"></i>{" "}
-                                Wrong answer!
-                            </p>
-                            <p className="small mb-0">
-                                {props.quiz.negative_points === true
-                                    ? `-${props.level.points_per_question} Points`
-                                    : `0 Points`}
-                            </p>
-                        </div>
+        <div className="w-100 mt-auto">
+            <div className="row justify-content-center">
+                <div className="col-lg-3 col-md-5">
+                    <div className="card card-body text-center border border-danger danger-bg p-1">
+                        <p className="small font-weight-bold-600 align-items-center mb-0">
+                            <i className="fas fa-times-circle mr-1"></i> Wrong
+                            answer!
+                        </p>
+                        <p className="small mb-0">
+                            {props.quiz.negative_points === true
+                                ? `-${props.level.points_per_question} Points`
+                                : `0 Points`}
+                        </p>
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 
@@ -279,11 +259,6 @@ class QuizLevelExam extends Component {
             Authorization: this.authToken,
         };
         this.timer = 0;
-        // this.audio = new Audio(BGSound);
-        // this.audio.muted = true;
-        // this.audio.volume = 0.3;
-        // this.audio.crossOrigin = "anonymous";
-        // this.audio.autoplay = true;
     }
 
     // creates section structure for exam submission
@@ -442,8 +417,6 @@ class QuizLevelExam extends Component {
 
     componentWillUnmount = () => {
         clearInterval(this.timer);
-        // this.audio.pause();
-        // this.audio.muted = true;
     };
 
     // ---------- handle option selection ----------
@@ -723,7 +696,6 @@ class QuizLevelExam extends Component {
                                     isPlaying: false,
                                     showToast: false,
                                 });
-                                // this.audio.pause();
                             }
                         );
                     } else {
@@ -777,6 +749,7 @@ class QuizLevelExam extends Component {
     startTimer = () => {
         this.setState({
             showCountdownModal: false,
+            isPlaying: true,
         });
         if (
             this.state.isAnswerSubmitted === false &&
@@ -946,20 +919,6 @@ class QuizLevelExam extends Component {
     };
 
     handleBGSound = () => {
-        if (!this.state.isPlaying) {
-            // this.audio.muted = false;
-            // this.audio.play();
-            // this.setState({
-            //     isPlaying: true,
-            // });
-        } else {
-            // this.audio.muted = true;
-            // this.audio.pause();
-            // this.setState({
-            //     isPlaying: false,
-            // });
-        }
-
         this.setState({
             isPlaying: !this.state.isPlaying,
         });
@@ -1649,7 +1608,7 @@ class QuizLevelExam extends Component {
                 )}
 
                 <ReactHowler
-                    src={`/background-music.mp3`}
+                    src="https://iqlabs-media-type1.s3.us-east-2.amazonaws.com/media/app_data/background-music.mp3"
                     playing={this.state.isPlaying}
                     loop={true}
                     volume={0.3}
@@ -1684,22 +1643,27 @@ class QuizLevelExam extends Component {
                             : ""}
                     </div>
 
-                    <button
-                        className="btn pinkrange-bg btn-sm shadow-none position-absolute"
-                        style={{
-                            top: "25px",
-                            right: 0,
-                            borderTopRightRadius: 0,
-                            borderBottomRightRadius: 0,
-                        }}
-                        onClick={this.handleBGSound}
-                    >
-                        {this.state.isPlaying ? (
-                            <i className="fas fa-volume-up"></i>
-                        ) : (
-                            <i className="fas fa-volume-mute"></i>
-                        )}
-                    </button>
+                    {this.state.isAnswerSubmitted === false &&
+                    this.state.showQuestionReview === false ? (
+                        <button
+                            className="btn pinkrange-bg btn-sm shadow-none position-absolute"
+                            style={{
+                                top: "25px",
+                                right: 0,
+                                borderTopRightRadius: 0,
+                                borderBottomRightRadius: 0,
+                            }}
+                            onClick={this.handleBGSound}
+                        >
+                            {this.state.isPlaying ? (
+                                <i className="fas fa-volume-up"></i>
+                            ) : (
+                                <i className="fas fa-volume-mute"></i>
+                            )}
+                        </button>
+                    ) : (
+                        ""
+                    )}
                 </div>
                 {/* <!----- Main content ends here -----> */}
 
