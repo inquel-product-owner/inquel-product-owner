@@ -9,6 +9,7 @@ import fernet from "fernet";
 import { Type1DataFormat } from "../../sharedComponents/dataFormating";
 import { Link } from "react-router-dom";
 import { Modal } from "react-bootstrap";
+import ReactHowler from "react-howler";
 
 // import Sound from "react-sound";
 // import CorrectSound from "../../../assets/correct-answer.wav";
@@ -278,11 +279,11 @@ class QuizLevelExam extends Component {
             Authorization: this.authToken,
         };
         this.timer = 0;
-        this.audio = new Audio(BGSound);
-        this.audio.muted = true;
-        this.audio.volume = 0.3;
-        this.audio.crossOrigin = "anonymous";
-        this.audio.autoplay = true;
+        // this.audio = new Audio(BGSound);
+        // this.audio.muted = true;
+        // this.audio.volume = 0.3;
+        // this.audio.crossOrigin = "anonymous";
+        // this.audio.autoplay = true;
     }
 
     // creates section structure for exam submission
@@ -441,8 +442,8 @@ class QuizLevelExam extends Component {
 
     componentWillUnmount = () => {
         clearInterval(this.timer);
-        this.audio.pause();
-        this.audio.muted = true;
+        // this.audio.pause();
+        // this.audio.muted = true;
     };
 
     // ---------- handle option selection ----------
@@ -722,7 +723,7 @@ class QuizLevelExam extends Component {
                                     isPlaying: false,
                                     showToast: false,
                                 });
-                                this.audio.pause();
+                                // this.audio.pause();
                             }
                         );
                     } else {
@@ -945,19 +946,23 @@ class QuizLevelExam extends Component {
     };
 
     handleBGSound = () => {
-        if (!this.state.isPlaying) {
-            this.audio.muted = false;
-            // this.audio.play();
-            this.setState({
-                isPlaying: true,
-            });
-        } else {
-            this.audio.muted = true;
-            // this.audio.pause();
-            this.setState({
-                isPlaying: false,
-            });
-        }
+        // if (!this.state.isPlaying) {
+        //     this.audio.muted = false;
+        //     this.audio.play();
+        //     this.setState({
+        //         isPlaying: true,
+        //     });
+        // } else {
+        //     this.audio.muted = true;
+        //     this.audio.pause();
+        //     this.setState({
+        //         isPlaying: false,
+        //     });
+        // }
+
+        this.setState({
+            isPlaying: !this.state.isPlaying,
+        });
     };
 
     questionRender = (data, index, answerSection) => {
@@ -1643,6 +1648,8 @@ class QuizLevelExam extends Component {
                     ""
                 )}
 
+                <ReactHowler src={BGSound} playing={this.state.isPlaying} />
+
                 {/* <!----- Main content starts here -----> */}
                 <div className="exam-section position-relative">
                     <div className="container">
@@ -1672,27 +1679,22 @@ class QuizLevelExam extends Component {
                             : ""}
                     </div>
 
-                    {this.state.isAnswerSubmitted === false &&
-                    this.state.showQuestionReview === false ? (
-                        <button
-                            className="btn pinkrange-bg btn-sm shadow-none position-absolute"
-                            style={{
-                                top: "25px",
-                                right: 0,
-                                borderTopRightRadius: 0,
-                                borderBottomRightRadius: 0,
-                            }}
-                            onClick={this.handleBGSound}
-                        >
-                            {this.state.isPlaying ? (
-                                <i className="fas fa-volume-up"></i>
-                            ) : (
-                                <i className="fas fa-volume-mute"></i>
-                            )}
-                        </button>
-                    ) : (
-                        ""
-                    )}
+                    <button
+                        className="btn pinkrange-bg btn-sm shadow-none position-absolute"
+                        style={{
+                            top: "25px",
+                            right: 0,
+                            borderTopRightRadius: 0,
+                            borderBottomRightRadius: 0,
+                        }}
+                        onClick={this.handleBGSound}
+                    >
+                        {this.state.isPlaying ? (
+                            <i className="fas fa-volume-up"></i>
+                        ) : (
+                            <i className="fas fa-volume-mute"></i>
+                        )}
+                    </button>
                 </div>
                 {/* <!----- Main content ends here -----> */}
 
