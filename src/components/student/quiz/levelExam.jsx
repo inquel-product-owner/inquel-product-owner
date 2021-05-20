@@ -945,13 +945,13 @@ class QuizLevelExam extends Component {
 
     handleBGSound = () => {
         if (!this.state.isPlaying) {
-            this.audio.muted = false;
+            // this.audio.muted = false;
             this.audio.play();
             this.setState({
                 isPlaying: !this.state.isPlaying,
             });
         } else {
-            this.audio.muted = true;
+            // this.audio.muted = true;
             this.audio.pause();
             this.setState({
                 isPlaying: !this.state.isPlaying,
