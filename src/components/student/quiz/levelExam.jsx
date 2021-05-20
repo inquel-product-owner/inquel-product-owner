@@ -15,7 +15,7 @@ import ReactHowler from "react-howler";
 // import CorrectSound from "../../../assets/correct-answer.wav";
 // import WrongSound from "../../../assets/wrong-answer.wav";
 // import CountDownSound from "../../../assets/simple-countdown.wav";
-import BGSound from "../../../assets/background-music.mp3";
+// import BGSound from "../../../assets/background-music.mp3";
 
 class QuizCountDown extends Component {
     constructor(props) {
@@ -946,19 +946,19 @@ class QuizLevelExam extends Component {
     };
 
     handleBGSound = () => {
-        // if (!this.state.isPlaying) {
-        //     this.audio.muted = false;
-        //     this.audio.play();
-        //     this.setState({
-        //         isPlaying: true,
-        //     });
-        // } else {
-        //     this.audio.muted = true;
-        //     this.audio.pause();
-        //     this.setState({
-        //         isPlaying: false,
-        //     });
-        // }
+        if (!this.state.isPlaying) {
+            // this.audio.muted = false;
+            // this.audio.play();
+            // this.setState({
+            //     isPlaying: true,
+            // });
+        } else {
+            // this.audio.muted = true;
+            // this.audio.pause();
+            // this.setState({
+            //     isPlaying: false,
+            // });
+        }
 
         this.setState({
             isPlaying: !this.state.isPlaying,
@@ -1648,7 +1648,7 @@ class QuizLevelExam extends Component {
                     ""
                 )}
 
-                <ReactHowler src={BGSound} playing={this.state.isPlaying} />
+                <ReactHowler src='http://goldfirestudios.com/proj/howlerjs/sound.ogg' playing={this.state.isPlaying} />
 
                 {/* <!----- Main content starts here -----> */}
                 <div className="exam-section position-relative">
