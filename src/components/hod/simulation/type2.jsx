@@ -2,8 +2,8 @@ import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import Header from "../navbar";
-import SideNav from "../sidenav";
+import Header from "../shared/navbar";
+import SideNav from "../shared/sidenav";
 import Select from "react-select";
 import CKeditor, { OptionEditor } from "../../sharedComponents/CKeditor";
 import ReactSwitch from "../../sharedComponents/switchComponent";
@@ -2183,17 +2183,6 @@ class HODSimulationType2 extends Component {
                                 <button
                                     className="btn btn-primary btn-block shadow-none"
                                     onClick={this.handleAddMainQuestion}
-                                    disabled={
-                                        this.state.questions.length !== 0
-                                            ? this.section.total_questions ===
-                                              this.state.questions[
-                                                  this.state.questions.length -
-                                                      1
-                                              ].index
-                                                ? true
-                                                : false
-                                            : false
-                                    }
                                 >
                                     Add +
                                 </button>

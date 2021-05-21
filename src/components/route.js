@@ -26,20 +26,20 @@ import HODDashboard from "./hod/dashboard";
 import HODProfile from "./hod/profile";
 
 import HODGroup from "./hod/group/group";
+import HODGroupSubject from "./hod/group/subject";
 import HODGroupConfiguration from "./hod/group/configuration";
 import HODGroupDetails from "./hod/group/details";
 import HODGroupStudents from "./hod/group/student";
 import HODGroupStudentProfile from "./hod/group/studentProfile";
 import HODGroupTeachers from "./hod/group/teacher";
-import HODGroupSubject from "./hod/group/subject";
 
 import HODTeacherStudentList from "./hod/profileList";
 import HODStudentProfile from "./hod/studentProfile";
 import HODTeacherProfile from "./hod/teacherProfile";
 
-import HODCourseScorecard from "./hod/courseScorecard";
 import HODSubject from "./hod/subject";
-import HODSubjectConfiguration from "./hod/subjectConfiguration";
+import HODCourseScorecard from "./hod/courseScorecard";
+import HODCourseConfig from "./hod/course/configuration";
 
 import HODSimulationPaper from "./hod/simulation/paper";
 import HODSimulationSection from "./hod/simulation/section";
@@ -348,18 +348,6 @@ const routes = (
                 )
             }
         />
-        <Route
-            exact
-            path="/hod/group/:groupId/subject/:subjectId/configure"
-            render={(props) =>
-                !localStorage.getItem("Authorization") ||
-                !localStorage.getItem("is_hod") ? (
-                    <Redirect to="/hod/login" />
-                ) : (
-                    <HODSubjectConfiguration {...props} />
-                )
-            }
-        />
 
         {/* ---------- Independent subject ---------- */}
 
@@ -387,15 +375,18 @@ const routes = (
                 )
             }
         />
+
+        {/* ---------- Course configuration ---------- */}
+
         <Route
             exact
-            path="/hod/subject/:subjectId/configure"
+            path="/hod/subject/:subjectId/course"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_hod") ? (
                     <Redirect to="/hod/login" />
                 ) : (
-                    <HODSubjectConfiguration {...props} />
+                    <HODCourseConfig {...props} />
                 )
             }
         />

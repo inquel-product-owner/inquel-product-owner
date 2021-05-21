@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import store from "../../redux/store";
 import { connect } from "react-redux";
-import Header from "./navbar";
-import SideNav from "./sidenav";
+import Header from "./shared/navbar";
+import SideNav from "./shared/sidenav";
 import Select from "react-select";
 import { Modal, Alert, Spinner, Dropdown } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
@@ -13,11 +13,212 @@ import {
     ContentDeleteModal,
     ContentUpdateModal,
 } from "../sharedComponents/contentManagementModal";
+import ScoreCardTable from "./shared/scorecard";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
     data: state.user.profile,
 });
+
+class Scorecard extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            scorecard: [],
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: false,
+            page_loading: true,
+        };
+        this.subjectId = this.props.subjectId;
+        this.chapterId = this.props.chapterId;
+        this.url = baseUrl + hodUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
+    }
+
+    loadScoreCard = () => {
+        fetch(`${this.url}/hod/subjects/${this.subjectId}/scorecard/`, {
+            method: "GET",
+            headers: this.headers,
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        scorecard: result.data.score_card_config,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    componentDidMount = () => {
+        this.loadScoreCard();
+    };
+
+    handleData = (event, category, type, index) => {
+        let scorecard = this.state.scorecard;
+
+        if (type === "remarks") {
+            var temp = Object.entries(scorecard);
+            for (let i = 0; i < Object.keys(scorecard).length; i++) {
+                if (temp[i][0] === category) {
+                    temp[i][0] = event.target.value;
+                } else {
+                    continue;
+                }
+            }
+            scorecard = Object.fromEntries(temp);
+        } else if (type === "range") {
+            scorecard[category][type][index] = Number(event.target.value);
+        } else if (type === "retake" || type === "reduction_duration") {
+            scorecard[category][type] = `${event.target.value.trim()} week`;
+        } else if (type === "reduction") {
+            scorecard[category][type] = `${event.target.value.trim()}%`;
+        } else {
+            scorecard[category][type] = event.target.value;
+        }
+
+        this.setState({
+            scorecard: scorecard,
+        });
+    };
+
+    handleSubmit = () => {
+        this.setState({
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: true,
+        });
+
+        fetch(`${this.url}/hod/subjects/${this.subjectId}/scorecard/`, {
+            method: "POST",
+            headers: this.headers,
+            body: JSON.stringify({
+                score_card_config: this.state.scorecard,
+            }),
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        showLoader: false,
+                    });
+                    this.props.formSubmission();
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    render() {
+        return (
+            <Modal
+                show={this.props.show}
+                onHide={this.props.onHide}
+                size="xl"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Header closeButton className="align-items-center">
+                    Scorecard Configuration
+                    {this.state.page_loading ? (
+                        <Spinner
+                            as="span"
+                            animation="border"
+                            size="sm"
+                            role="status"
+                            aria-hidden="true"
+                            className="ml-3 mb-0"
+                        />
+                    ) : (
+                        ""
+                    )}
+                </Modal.Header>
+                <Modal.Body>
+                    <Alert
+                        variant="danger"
+                        show={this.state.showErrorAlert}
+                        onClose={() => {
+                            this.setState({
+                                showErrorAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.errorMsg}
+                    </Alert>
+                    <Alert
+                        variant="success"
+                        show={this.state.showSuccessAlert}
+                        onClose={() => {
+                            this.setState({
+                                showSuccessAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.successMsg}
+                    </Alert>
+
+                    {/* <!----- Scorecard Table -----> */}
+
+                    <ScoreCardTable
+                        scorecard={this.state.scorecard}
+                        handleData={this.handleData}
+                    />
+                </Modal.Body>
+                <Modal.Footer className="text-right">
+                    <button
+                        className="btn btn-primary btn-sm shadow-none"
+                        onClick={this.handleSubmit}
+                    >
+                        {this.state.showLoader ? (
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                                className="mr-2"
+                            />
+                        ) : (
+                            ""
+                        )}
+                        Save & Close
+                    </button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
+}
 
 class ChapterModal extends Component {
     constructor(props) {
@@ -549,6 +750,7 @@ class HODSubject extends Component {
             showSimulationModal: false,
             showSimulationUpdateModal: false,
             showSimulationDeleteModal: false,
+            showScorecardModal: false,
 
             chapterData: [],
             chapter_id: "",
@@ -608,6 +810,12 @@ class HODSubject extends Component {
                 selectedSimulation: data,
             });
         }
+    };
+
+    toggleScorecardModal = () => {
+        this.setState({
+            showScorecardModal: !this.state.showScorecardModal,
+        });
     };
 
     loadSubjectData = () => {
@@ -702,7 +910,7 @@ class HODSubject extends Component {
                     togglenav={this.toggleSideNav}
                 />
 
-                {/* ALert message */}
+                {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
                     successMsg={this.state.successMsg}
@@ -794,6 +1002,18 @@ class HODSubject extends Component {
                     ""
                 )}
 
+                {/* Scorecard modal */}
+                {this.state.showScorecardModal ? (
+                    <Scorecard
+                        show={this.state.showScorecardModal}
+                        onHide={this.toggleScorecardModal}
+                        subjectId={this.subjectId}
+                        chapterId={this.chapterId}
+                    />
+                ) : (
+                    ""
+                )}
+
                 <div
                     className={`section content ${
                         this.state.showSideNav ? "active" : ""
@@ -827,7 +1047,7 @@ class HODSubject extends Component {
                             </div>
                             <div className="col-md-6 text-right">
                                 <button
-                                    className="btn btn-primary btn-sm shadow-none mr-2"
+                                    className="btn btn-primary btn-sm shadow-none mr-1"
                                     onClick={this.toggleModal}
                                 >
                                     Add Chapter
@@ -836,14 +1056,14 @@ class HODSubject extends Component {
                                     .length !== 0 ? (
                                     this.state.permissions.sim_exam === true ? (
                                         <button
-                                            className="btn btn-primary btn-sm shadow-none mr-2"
+                                            className="btn btn-primary btn-sm shadow-none mr-1"
                                             onClick={() =>
                                                 this.toggleSimulationModal(
                                                     "ADD"
                                                 )
                                             }
                                         >
-                                            Add Simulation Exam
+                                            Add Simulation
                                         </button>
                                     ) : (
                                         ""
@@ -851,7 +1071,13 @@ class HODSubject extends Component {
                                 ) : (
                                     ""
                                 )}
-                                <Link to={`${this.props.match.url}/configure`}>
+                                <button
+                                    className="btn btn-primary btn-sm shadow-none mr-1"
+                                    onClick={this.toggleScorecardModal}
+                                >
+                                    Scorecard
+                                </button>
+                                <Link to={`${this.props.match.url}/course`}>
                                     <button className="btn btn-primary btn-sm shadow-none">
                                         Configure Course
                                     </button>

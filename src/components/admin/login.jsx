@@ -1,9 +1,8 @@
 import React, { Component } from "react";
 import { Navbar, Spinner, Alert } from "react-bootstrap";
-import logo from "../../assets/IQ_Labs_V5.png";
+import logo from "../../assets/Iq-labs-01.svg";
 import { Link, Redirect } from "react-router-dom";
 import { baseUrl, adminPathUrl, accountsUrl } from "../../shared/baseUrl.js";
-import store from "../../redux/store";
 
 class AdminLogin extends Component {
     constructor(props) {
@@ -36,36 +35,13 @@ class AdminLogin extends Component {
         });
     };
 
-    loadProfileData = (data) => {
-        fetch(`${this.url}/profile/`, {
-            method: "GET",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-                "Inquel-Auth": `Token ${data.token}`,
-            },
-        })
-            .then((res) => res.json())
-            .then((results) => {
-                if (results.sts === true) {
-                    store.dispatch({
-                        type: "PROFILE",
-                        payload:
-                            Object.entries(results.data).length !== 0
-                                ? results.data
-                                : { username: data.username },
-                    });
-                    localStorage.clear();
-                    localStorage.setItem("Inquel-Auth", `Token ${data.token}`);
+    setLocalStorage = (data) => {
+        localStorage.clear();
+        localStorage.setItem("Inquel-Auth", `Token ${data.token}`);
 
-                    this.setState({
-                        showLoader: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+        this.setState({
+            showLoader: false,
+        });
     };
 
     handleSubmit = (event) => {
@@ -98,14 +74,14 @@ class AdminLogin extends Component {
                             .then((res) => res.json())
                             .then((results) => {
                                 if (results.sts === true) {
-                                    this.loadProfileData(result);
+                                    this.setLocalStorage(result);
                                 }
                             })
                             .catch((err) => {
                                 console.log(err);
                             });
                     } else {
-                        this.loadProfileData(result);
+                        this.setLocalStorage(result);
                     }
                 }
                 if (!result.sts && result.msg) {

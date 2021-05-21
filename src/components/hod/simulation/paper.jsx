@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import store from "../../../redux/store";
-import Header from "../navbar";
-import SideNav from "../sidenav";
+import Header from "../shared/navbar";
+import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
@@ -354,6 +354,39 @@ class HODSimulationPaper extends Component {
         }
     };
 
+    handlePublish = () => {
+        this.setState({
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            page_loading: true,
+        });
+
+        fetch(`${this.url}/hod/subject/${this.subjectId}/simulation/publish/`, {
+            method: "POST",
+            headers: this.headers,
+            body: JSON.stringify({
+                simulation_id: this.simulationId,
+            }),
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => console.log(err));
+    };
+
     dispatchPaper = (data) => {
         store.dispatch({ type: "PAPER", payload: data });
     };
@@ -407,26 +440,48 @@ class HODSimulationPaper extends Component {
                         </button>
 
                         {/* ----- Breadcrumb ----- */}
-                        <nav aria-label="breadcrumb">
-                            <ol className="breadcrumb mb-3">
-                                <li className="breadcrumb-item">
-                                    <Link to="/hod">
-                                        <i className="fas fa-home fa-sm"></i>
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item">
-                                    <Link
-                                        to="#"
-                                        onClick={this.props.history.goBack}
-                                    >
-                                        {this.props.subject_name}
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item active">
-                                    {this.props.simulation_name}
-                                </li>
-                            </ol>
-                        </nav>
+                        <div className="row align-items-center mb-3">
+                            <div className="col-md-6">
+                                <nav aria-label="breadcrumb">
+                                    <ol className="breadcrumb">
+                                        <li className="breadcrumb-item">
+                                            <Link to="/hod">
+                                                <i className="fas fa-home fa-sm"></i>
+                                            </Link>
+                                        </li>
+                                        <li className="breadcrumb-item">
+                                            <Link
+                                                to="#"
+                                                onClick={
+                                                    this.props.history.goBack
+                                                }
+                                            >
+                                                {this.props.subject_name}
+                                            </Link>
+                                        </li>
+                                        <li className="breadcrumb-item active">
+                                            {this.props.simulation_name}
+                                        </li>
+                                    </ol>
+                                </nav>
+                            </div>
+                            <div className="col-md-6 text-right">
+                                <button
+                                    className="btn btn-primary btn-sm shadow-none"
+                                    onClick={this.handlePublish}
+                                    disabled={
+                                        this.state.simulationData.length !== 0
+                                            ? this.state.simulationData[0]
+                                                  .paper_id === ""
+                                                ? true
+                                                : false
+                                            : true
+                                    }
+                                >
+                                    Publish
+                                </button>
+                            </div>
+                        </div>
 
                         <div
                             className="card shadow-sm mb-3"
@@ -661,7 +716,7 @@ class HODSimulationPaper extends Component {
                             className="btn btn-light bg-white btn-block shadow-sm shadow-none"
                             onClick={this.handleAdd}
                         >
-                            Add +
+                            Add Paper +
                         </button>
                         {/* Loading component */}
                         {this.state.page_loading ? <Loading /> : ""}

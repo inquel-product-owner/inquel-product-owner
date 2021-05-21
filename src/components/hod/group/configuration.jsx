@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Modal, Alert, Spinner } from "react-bootstrap";
-import Header from "../navbar";
-import SideNav from "../sidenav";
+import Header from "../shared/navbar";
+import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import { paginationCount } from "../../../shared/globalValues.js";

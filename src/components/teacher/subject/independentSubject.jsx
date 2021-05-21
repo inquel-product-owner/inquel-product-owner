@@ -14,7 +14,6 @@ import {
     ChapterEditModal,
     IndependentSemesterModal,
     IndependentSemesterEditModal,
-    Scorecard,
 } from "./contentManagementModal";
 
 const mapStateToProps = (state) => ({
@@ -26,10 +25,7 @@ class TeacherIndependentSubject extends Component {
         super(props);
         this.state = {
             showSideNav: false,
-            showScorecardModal: false,
-
             showChapter_EditModal: false,
-
             showSemesterModal: false,
             showSemester_EditModal: false,
             showSemester_DeleteModal: false,
@@ -37,7 +33,6 @@ class TeacherIndependentSubject extends Component {
             subjectItems: [],
             semesterItems: [],
             chapter_id: [],
-            scorecard: [],
             permissions: {},
 
             selectedChapter: "",
@@ -120,7 +115,6 @@ class TeacherIndependentSubject extends Component {
                 if (result.sts === true) {
                     this.setState({
                         subjectItems: result.data.results,
-                        scorecard: result.data.score_card_config,
                         permissions: result.data.permissions,
                         page_loading: false,
                     });
@@ -191,21 +185,6 @@ class TeacherIndependentSubject extends Component {
             });
         }, 1000);
         this.loadSemesterData();
-    };
-
-    toggleScorecardModal = () => {
-        this.setState({
-            showScorecardModal: !this.state.showScorecardModal,
-        });
-    };
-
-    scorecardFormSubmission = () => {
-        setTimeout(() => {
-            this.setState({
-                showScorecardModal: !this.state.showScorecardModal,
-            });
-        }, 1000);
-        this.loadChapterData();
     };
 
     dispatchChapter = (data) => {
@@ -299,23 +278,10 @@ class TeacherIndependentSubject extends Component {
                         type="Semester"
                         name={this.state.selectedSemester.semester_name}
                         data={{
-                            semester_id: this.state.selectedSemester
-                                .semester_id,
+                            semester_id:
+                                this.state.selectedSemester.semester_id,
                         }}
                         toggleModal={this.toggleSemester_DeleteModal}
-                    />
-                ) : (
-                    ""
-                )}
-
-                {/* ----- Scorecard modal ----- */}
-                {this.state.showScorecardModal ? (
-                    <Scorecard
-                        show={this.state.showScorecardModal}
-                        onHide={this.toggleScorecardModal}
-                        subjectId={this.subjectId}
-                        formSubmission={this.scorecardFormSubmission}
-                        scorecard={this.state.scorecard}
                     />
                 ) : (
                     ""
@@ -336,32 +302,20 @@ class TeacherIndependentSubject extends Component {
                         </button>
 
                         {/* Header area */}
-                        <div className="row align-items-center mb-3">
-                            <div className="col-md-6">
-                                {/* ----- Breadcrumb ----- */}
-                                <nav aria-label="breadcrumb">
-                                    <ol className="breadcrumb">
-                                        <li className="breadcrumb-item">
-                                            <Link to="/teacher">
-                                                <i className="fas fa-home fa-sm"></i>
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item active">
-                                            <span>Subject:</span>
-                                            {this.props.subject_name}
-                                        </li>
-                                    </ol>
-                                </nav>
-                            </div>
-                            <div className="col-md-6 text-right">
-                                <button
-                                    className="btn btn-primary btn-sm shadow-none"
-                                    onClick={this.toggleScorecardModal}
-                                >
-                                    Subject score config
-                                </button>
-                            </div>
-                        </div>
+                        {/* ----- Breadcrumb ----- */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb mb-3">
+                                <li className="breadcrumb-item">
+                                    <Link to="/teacher">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    <span>Subject:</span>
+                                    {this.props.subject_name}
+                                </li>
+                            </ol>
+                        </nav>
 
                         <div className="card shadow-sm mb-3">
                             <div className="table-responsive">

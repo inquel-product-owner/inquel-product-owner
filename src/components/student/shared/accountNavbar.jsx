@@ -1,5 +1,5 @@
 import React from "react";
-import logo from "../../../assets/IQ_Labs_V5.png";
+import logo from "../../../assets/Iq-labs-01.svg";
 import { Navbar, Nav, Dropdown } from "react-bootstrap";
 import { Link } from "react-router-dom";
 

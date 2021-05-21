@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Navbar, Nav, Dropdown } from "react-bootstrap";
 import { Link, Redirect } from "react-router-dom";
-import logo from "../../assets/IQ_Labs_V5.png";
+import logo from "../../assets/Iq-labs-01.svg";
 import userpic from "../../assets/user-v1.png";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
 import { AdminLogout } from "../sharedComponents/handleLogout";
@@ -24,6 +24,34 @@ class Header extends Component {
             "Inquel-Auth": this.authToken,
         };
     }
+
+    loadProfileData = () => {
+        fetch(`${baseUrl + adminPathUrl}/hod/profile/`, {
+            method: "GET",
+            headers: this.headers,
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    store.dispatch({
+                        type: "PROFILE",
+                        payload:
+                            Object.entries(result.data).length !== 0
+                                ? result.data
+                                : { username: "inquel_admin" },
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    componentDidMount = () => {
+        if (this.props.data === null) {
+            this.loadProfileData();
+        }
+    };
 
     handleLogout = () => {
         fetch(`${this.url}/logout/`, {

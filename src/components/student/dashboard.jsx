@@ -44,35 +44,25 @@ class Dashboard extends Component {
     componentDidMount = () => {
         document.title = "Dashboard - Student | IQLabs";
 
-        if (this.props.profile !== null) {
-            if (this.props.profile.is_independent_student === false) {
-                fetch(`${this.url}/student/group/`, {
-                    method: "GET",
-                    headers: this.headers,
-                })
-                    .then((res) => res.json())
-                    .then((result) => {
-                        console.log(result);
-                        if (result.sts === true) {
-                            this.setState({
-                                groupData: result.data,
-                                page_loading: false,
-                            });
-                        } else {
-                            this.setState({
-                                errorMsg: result.detail
-                                    ? result.detail
-                                    : result.msg,
-                                showErrorAlert: true,
-                                page_loading: false,
-                            });
-                        }
-                    })
-                    .catch((err) => {
-                        console.log(err);
+        fetch(`${this.url}/student/group/`, {
+            method: "GET",
+            headers: this.headers,
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        groupData: result.data,
+                        page_loading: false,
                     });
-            }
-        }
+                } else {
+                    console.log(result.msg);
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     };
 
     render() {
@@ -87,7 +77,7 @@ class Dashboard extends Component {
                     activeLink="dashboard"
                 />
 
-                {/* ALert message */}
+                {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
                     successMsg={this.state.successMsg}

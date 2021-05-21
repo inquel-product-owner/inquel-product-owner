@@ -1,15 +1,9 @@
 import React, { Component } from "react";
 import { Navbar, Alert, Spinner } from "react-bootstrap";
-import logo from "../../assets/IQ_Labs_V5.png";
+import logo from "../../assets/Iq-labs-01.svg";
 import { Link, Redirect } from "react-router-dom";
-import {
-    baseUrl,
-    accountsUrl,
-    adminPathUrl,
-    hodUrl,
-} from "../../shared/baseUrl.js";
+import { baseUrl, accountsUrl, adminPathUrl } from "../../shared/baseUrl.js";
 import { ForgotPasswordModal } from "../sharedComponents/forgotPassword";
-import store from "../../redux/store";
 
 class HODLogin extends Component {
     constructor(props) {
@@ -49,35 +43,15 @@ class HODLogin extends Component {
         });
     };
 
-    loadProfileData = (data) => {
-        fetch(`${baseUrl + hodUrl}/hod/profile/`, {
-            method: "GET",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-                Authorization: `Token ${data.token}`,
-            },
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                if (result.sts === true) {
-                    store.dispatch({ type: "PROFILE", payload: result.data });
-                    localStorage.clear();
+    setLocalStorage = (data) => {
+        localStorage.clear();
 
-                    localStorage.setItem(
-                        "Authorization",
-                        `Token ${data.token}`
-                    );
-                    localStorage.setItem("is_hod", data.is_hod);
+        localStorage.setItem("Authorization", `Token ${data.token}`);
+        localStorage.setItem("is_hod", data.is_hod);
 
-                    this.setState({
-                        showLoader: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+        this.setState({
+            showLoader: false,
+        });
     };
 
     handleSubmit = (event) => {
@@ -112,7 +86,7 @@ class HODLogin extends Component {
                             .then((res) => res.json())
                             .then((results) => {
                                 if (results.sts === true) {
-                                    this.loadProfileData(result);
+                                    this.setLocalStorage(result);
                                 }
                             })
                             .catch((err) => {
@@ -135,14 +109,14 @@ class HODLogin extends Component {
                             .then((res) => res.json())
                             .then((results) => {
                                 if (results.sts === true) {
-                                    this.loadProfileData(result);
+                                    this.setLocalStorage(result);
                                 }
                             })
                             .catch((err) => {
                                 console.log(err);
                             });
                     } else {
-                        this.loadProfileData(result);
+                        this.setLocalStorage(result);
                     }
                 } else {
                     this.setState({

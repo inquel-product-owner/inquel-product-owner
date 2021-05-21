@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import store from "../../../redux/store";
-import Header from "../navbar";
-import SideNav from "../sidenav";
+import Header from "../shared/navbar";
+import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
@@ -506,13 +506,9 @@ class HODSimulationSection extends Component {
                                             <th scope="col">Question Type</th>
                                             <th scope="col">Category</th>
                                             <th scope="col">Total Questions</th>
+                                            <th scope="col">Any Questions</th>
                                             <th scope="col">Marks</th>
-                                            <th
-                                                scope="col"
-                                                className="text-right"
-                                            >
-                                                Action
-                                            </th>
+                                            <th scope="col">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -700,6 +696,26 @@ class HODSimulationSection extends Component {
                                                                       className="form-control form-control-sm border-secondary"
                                                                       type="text"
                                                                       value={
+                                                                          section.any_questions ||
+                                                                          ""
+                                                                      }
+                                                                      onChange={(
+                                                                          event
+                                                                      ) =>
+                                                                          this.handleInput(
+                                                                              index,
+                                                                              event,
+                                                                              "any_questions"
+                                                                          )
+                                                                      }
+                                                                      placeholder="Enter any questions"
+                                                                  />
+                                                              </td>
+                                                              <td>
+                                                                  <input
+                                                                      className="form-control form-control-sm border-secondary"
+                                                                      type="text"
+                                                                      value={
                                                                           section.marks
                                                                       }
                                                                       onChange={(
@@ -740,12 +756,13 @@ class HODSimulationSection extends Component {
                                                                                   );
                                                                                   localStorage.setItem(
                                                                                       "section",
-                                                                                      JSON.stringify(section)
+                                                                                      JSON.stringify(
+                                                                                          section
+                                                                                      )
                                                                                   );
                                                                               }}
                                                                           >
-                                                                              Add
-                                                                              +
+                                                                              Add+
                                                                           </button>
                                                                       </Link>
                                                                   ) : null}

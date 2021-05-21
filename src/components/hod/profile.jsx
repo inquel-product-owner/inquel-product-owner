@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import axios from "axios";
-import Header from "./navbar";
-import SideNav from "./sidenav";
+import Header from "./shared/navbar";
+import SideNav from "./shared/sidenav";
 import { Link } from "react-router-dom";
 import { Spinner, Modal, Alert } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";

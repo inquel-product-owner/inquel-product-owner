@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import { Navbar, Nav, Dropdown } from "react-bootstrap";
 import { Link, Redirect } from "react-router-dom";
-import logo from "../../../assets/IQ_Labs_V5.png";
+import logo from "../../../assets/Iq-labs-01.svg";
 import userpic from "../../../assets/user-v1.png";
-import { baseUrl, accountsUrl } from "../../../shared/baseUrl";
+import { baseUrl, accountsUrl, teacherUrl } from "../../../shared/baseUrl";
 import { Logout } from "../../sharedComponents/handleLogout";
 import { connect } from "react-redux";
 import store from "../../../redux/store";
@@ -24,6 +24,28 @@ class Header extends Component {
             Authorization: this.authToken,
         };
     }
+
+    loadProfileData = () => {
+        fetch(`${baseUrl + teacherUrl}/teacher/profile/`, {
+            method: "GET",
+            headers: this.headers,
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    store.dispatch({ type: "PROFILE", payload: result.data });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    componentDidMount = () => {
+        if (this.props.data === null) {
+            this.loadProfileData();
+        }
+    };
 
     handleLogout = () => {
         fetch(`${this.url}/logout/`, {
