@@ -3,7 +3,7 @@ import { Redirect, Link } from "react-router-dom";
 import { Alert, Spinner, Navbar, Modal } from "react-bootstrap";
 import { baseUrl, accountsUrl } from "../../shared/baseUrl.js";
 import Loading from "./loader";
-import logo from "../../assets/IQ_Labs_V5.png";
+import logo from "../../assets/Iq-labs-01.svg";
 
 export function ForgotPasswordModal(props) {
     const [email, setEmail] = useState("");

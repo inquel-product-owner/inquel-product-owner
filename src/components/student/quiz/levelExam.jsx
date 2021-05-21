@@ -1247,16 +1247,6 @@ class QuizLevelExam extends Component {
                         ""
                     )}
                 </div>
-                {/* <Sound
-                    url={BGSound}
-                    playStatus={
-                        this.state.isPlaying
-                            ? Sound.status.PLAYING
-                            : Sound.status.STOPPED
-                    }
-                    volume={20}
-                    loop={true}
-                /> */}
             </div>
         );
     };
@@ -1609,6 +1599,7 @@ class QuizLevelExam extends Component {
 
                 <ReactHowler
                     src="https://iqlabs-media-type1.s3.us-east-2.amazonaws.com/media/app_data/background-music.mp3"
+                    preload={true}
                     playing={this.state.isPlaying}
                     loop={true}
                     volume={0.3}

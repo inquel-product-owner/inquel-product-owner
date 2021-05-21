@@ -1,14 +1,29 @@
 import React, { Component } from "react";
 import { Button, Table } from "react-bootstrap";
-import Header from "./navbar";
-import SideNav from "./sidenav";
+import Header from "../shared/navbar";
+import SideNav from "../shared/sidenav";
+import { Link } from "react-router-dom";
+import { connect } from "react-redux";
+import Loading from "../../sharedComponents/loader";
+import AlertBox from "../../sharedComponents/alert";
 
-class HODSubjectConfiguration extends Component {
+const mapStateToProps = (state) => ({
+    subject_name: state.content.subject_name,
+    data: state.user.profile,
+});
+
+class HODCourseConfig extends Component {
     constructor(props) {
         super(props);
         this.state = {
             showSideNav: false,
-            subjectItem: []
+            subjectItem: [],
+
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            page_loading: false, // make it true
         };
     }
 
@@ -19,17 +34,38 @@ class HODSubjectConfiguration extends Component {
     };
 
     render() {
-        document.title =
-            this.state.subjectItem.length !== 0
-                ? this.state.subjectItem.subject_name + " Configure - HOD | IQLabs"
-                : "Subject Configure - HOD | IQLabs";
+        document.title = `${this.props.subject_name} : Course configuration - HOD | IQLabs`;
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="Subject Name" togglenav={this.toggleSideNav} />
+                <Header
+                    name={this.props.subject_name}
+                    togglenav={this.toggleSideNav}
+                />
+
+                {/* Alert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
+                />
 
                 {/* Sidebar */}
-                <SideNav shownav={this.state.showSideNav} activeLink="dashboard" />
+                <SideNav
+                    shownav={this.state.showSideNav}
+                    activeLink="dashboard"
+                />
 
                 <div
                     className={`section content ${
@@ -44,12 +80,31 @@ class HODSubjectConfiguration extends Component {
                         >
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
-                        
+
+                        {/* Breadcrumb */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb mb-3">
+                                <li className="breadcrumb-item">
+                                    <Link to="/hod">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item">
+                                    <Link
+                                        to="#"
+                                        onClick={this.props.history.goBack}
+                                    >
+                                        {this.props.subject_name}
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    Course configuration
+                                </li>
+                            </ol>
+                        </nav>
+
                         <div className="row">
                             <div className="col-md-4">
-                                <h5 className="primary-text mb-3">
-                                    Subject: Mathematics | 10th Class
-                                </h5>
                                 <div className="card shadow-sm mb-3">
                                     <div className="card-header">
                                         Item Ready For Course Creation
@@ -313,6 +368,8 @@ class HODSubjectConfiguration extends Component {
                                 </div>
                             </div>
                         </div>
+                        {/* Loading component */}
+                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
             </div>
@@ -320,4 +377,4 @@ class HODSubjectConfiguration extends Component {
     }
 }
 
-export default HODSubjectConfiguration;
+export default connect(mapStateToProps)(HODCourseConfig);

@@ -18,13 +18,13 @@ body {
 }
 
 .navbar-brand img {
-    width: 100px;
+    width: 140px;
     height: auto;
 }
 
 @media screen and (max-width: 425px) {
     .navbar-brand img {
-        width: 50px;
+        width: 70px;
     }
 }
 
@@ -440,8 +440,8 @@ input[type="search"]:focus {
 /* Section */
 
 .section {
-    padding-top: 5.5rem;
-    padding-bottom: 4rem;
+    padding-top: 5rem;
+    padding-bottom: 2rem;
     min-height: 100vh;
 }
 
@@ -470,7 +470,7 @@ input[type="search"]:focus {
     transition: all 0.3s;
     margin-left: 0;
     overflow-y: auto;
-    padding-top: 5.5rem;
+    padding-top: 5rem;
 }
 
 #sidebar.active {
