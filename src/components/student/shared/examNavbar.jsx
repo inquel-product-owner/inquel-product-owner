@@ -19,7 +19,7 @@ class Header extends Component {
                         style={{ width: "100%" }}
                     >
                         <div className="col-4 pl-0">
-                            <p className="small font-weight-bold-600 primary-text mb-0">
+                            <p className="small font-weight-bold-600 primary-text text-truncate mb-0">
                                 {this.props.chapter_name}
                             </p>
                         </div>

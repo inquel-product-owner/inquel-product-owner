@@ -251,7 +251,7 @@ class TestResult extends Component {
                     goBack={this.props.history.goBack}
                 />
 
-                {/* ALert message */}
+                {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
                     successMsg={this.state.successMsg}
@@ -281,7 +281,7 @@ class TestResult extends Component {
                                         ATTEMPTS & PAPERS
                                     </div>
                                     <div className="col-md-2 text-right">
-                                        <button className="btn btn-primary btn-sm">
+                                        <button className="btn btn-primary btn-sm shadow-none">
                                             Generate marks
                                         </button>
                                     </div>
