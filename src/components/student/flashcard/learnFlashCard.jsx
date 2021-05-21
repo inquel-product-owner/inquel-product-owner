@@ -462,6 +462,7 @@ class FlashCard extends Component {
                         this.setState({
                             page_loading: false,
                         });
+                        this.loopSectionStructure();
                     }
                 } else {
                     this.setState({
@@ -2008,6 +2009,12 @@ class FlashCard extends Component {
             activeTab: type,
             activeData: 0,
             totalItems: 0,
+            concepts: [],
+            currentSubQuestionIndex: [],
+            explanation: [],
+            practice: [],
+            sections: [],
+            totalSubQuestion: [],
             page_loading: true,
             isSlideshowPlaying: false,
         });
