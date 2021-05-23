@@ -7,6 +7,11 @@ import SideNav from "../shared/sidenav";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl";
 import Loading from "../../sharedComponents/loader";
 import AlertBox from "../../sharedComponents/alert";
+import { connect } from "react-redux";
+
+const mapStateToProps = (state) => ({
+    group_name: state.content.group_name,
+});
 
 class HODGroupStudentProfile extends Component {
     constructor(props) {
@@ -70,9 +75,9 @@ class HODGroupStudentProfile extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header name="Student Profile" togglenav={this.toggleSideNav} />
+                <Header name={this.props.group_name} togglenav={this.toggleSideNav} />
 
-                {/* ALert message */}
+                {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
                     successMsg={this.state.successMsg}
@@ -120,7 +125,7 @@ class HODGroupStudentProfile extends Component {
                                 </li>
                                 <li className="breadcrumb-item">
                                     <Link to={`/hod/group/${this.groupId}`}>
-                                        Group
+                                        {this.props.group_name}
                                     </Link>
                                 </li>
                                 <li className="breadcrumb-item">
@@ -128,7 +133,7 @@ class HODGroupStudentProfile extends Component {
                                         to="#"
                                         onClick={this.props.history.goBack}
                                     >
-                                        Student
+                                        Students
                                     </Link>
                                 </li>
                                 <li className="breadcrumb-item active">
@@ -375,4 +380,4 @@ class HODGroupStudentProfile extends Component {
     }
 }
 
-export default HODGroupStudentProfile;
+export default connect(mapStateToProps)(HODGroupStudentProfile);

@@ -442,7 +442,7 @@ class HODGroupConfiguration extends Component {
                 {/* Navbar */}
                 <Header name="Groups" togglenav={this.toggleSideNav} />
 
-                {/* ALert message */}
+                {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
                     successMsg={this.state.successMsg}
@@ -514,7 +514,7 @@ class HODGroupConfiguration extends Component {
                             </div>
                             <div className="col-6 text-right">
                                 <button
-                                    className="btn btn-primary btn-sm"
+                                    className="btn btn-primary btn-sm shadow-none"
                                     onClick={this.toggleModal}
                                 >
                                     Add new

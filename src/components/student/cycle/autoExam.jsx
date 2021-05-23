@@ -146,14 +146,13 @@ class CycleAutoExam extends Component {
                                                 .type1_image_1
                                         ) {
                                             images.push({
-                                                title:
-                                                    data.questions[i].files[0]
-                                                        .type1_image_1_title,
+                                                title: data.questions[i]
+                                                    .files[0]
+                                                    .type1_image_1_title,
                                                 file_name: "",
                                                 image: null,
-                                                path:
-                                                    data.questions[i].files[0]
-                                                        .type1_image_1,
+                                                path: data.questions[i].files[0]
+                                                    .type1_image_1,
                                             });
                                         }
                                         if (
@@ -161,14 +160,13 @@ class CycleAutoExam extends Component {
                                                 .type1_image_2
                                         ) {
                                             images.push({
-                                                title:
-                                                    data.questions[i].files[0]
-                                                        .type1_image_2_title,
+                                                title: data.questions[i]
+                                                    .files[0]
+                                                    .type1_image_2_title,
                                                 file_name: "",
                                                 image: null,
-                                                path:
-                                                    data.questions[i].files[0]
-                                                        .type1_image_2,
+                                                path: data.questions[i].files[0]
+                                                    .type1_image_2,
                                             });
                                         }
                                         if (
@@ -176,14 +174,13 @@ class CycleAutoExam extends Component {
                                                 .type1_image_3
                                         ) {
                                             images.push({
-                                                title:
-                                                    data.questions[i].files[0]
-                                                        .type1_image_3_title,
+                                                title: data.questions[i]
+                                                    .files[0]
+                                                    .type1_image_3_title,
                                                 file_name: "",
                                                 image: null,
-                                                path:
-                                                    data.questions[i].files[0]
-                                                        .type1_image_3,
+                                                path: data.questions[i].files[0]
+                                                    .type1_image_3,
                                             });
                                         }
                                         if (
@@ -191,14 +188,13 @@ class CycleAutoExam extends Component {
                                                 .type1_image_4
                                         ) {
                                             images.push({
-                                                title:
-                                                    data.questions[i].files[0]
-                                                        .type1_image_4_title,
+                                                title: data.questions[i]
+                                                    .files[0]
+                                                    .type1_image_4_title,
                                                 file_name: "",
                                                 image: null,
-                                                path:
-                                                    data.questions[i].files[0]
-                                                        .type1_image_4,
+                                                path: data.questions[i].files[0]
+                                                    .type1_image_4,
                                             });
                                         }
                                     }
@@ -283,14 +279,13 @@ class CycleAutoExam extends Component {
                                                     .type2_image_1
                                             ) {
                                                 images.push({
-                                                    title:
-                                                        data.questions[i].files
-                                                            .type2_image_1_title,
+                                                    title: data.questions[i]
+                                                        .files
+                                                        .type2_image_1_title,
                                                     file_name: "",
                                                     image: null,
-                                                    path:
-                                                        data.questions[i].files
-                                                            .type2_image_1,
+                                                    path: data.questions[i]
+                                                        .files.type2_image_1,
                                                 });
                                             }
                                             if (
@@ -298,14 +293,13 @@ class CycleAutoExam extends Component {
                                                     .type2_image_2
                                             ) {
                                                 images.push({
-                                                    title:
-                                                        data.questions[i].files
-                                                            .type2_image_2_title,
+                                                    title: data.questions[i]
+                                                        .files
+                                                        .type2_image_2_title,
                                                     file_name: "",
                                                     image: null,
-                                                    path:
-                                                        data.questions[i].files
-                                                            .type2_image_2,
+                                                    path: data.questions[i]
+                                                        .files.type2_image_2,
                                                 });
                                             }
                                             if (
@@ -313,14 +307,13 @@ class CycleAutoExam extends Component {
                                                     .type2_image_3
                                             ) {
                                                 images.push({
-                                                    title:
-                                                        data.questions[i].files
-                                                            .type2_image_3_title,
+                                                    title: data.questions[i]
+                                                        .files
+                                                        .type2_image_3_title,
                                                     file_name: "",
                                                     image: null,
-                                                    path:
-                                                        data.questions[i].files
-                                                            .type2_image_3,
+                                                    path: data.questions[i]
+                                                        .files.type2_image_3,
                                                 });
                                             }
                                             if (
@@ -328,14 +321,13 @@ class CycleAutoExam extends Component {
                                                     .type2_image_4
                                             ) {
                                                 images.push({
-                                                    title:
-                                                        data.questions[i].files
-                                                            .type2_image_4_title,
+                                                    title: data.questions[i]
+                                                        .files
+                                                        .type2_image_4_title,
                                                     file_name: "",
                                                     image: null,
-                                                    path:
-                                                        data.questions[i].files
-                                                            .type2_image_4,
+                                                    path: data.questions[i]
+                                                        .files.type2_image_4,
                                                 });
                                             }
                                         }
@@ -652,9 +644,8 @@ class CycleAutoExam extends Component {
             });
             localStorage.setItem("data", JSON.stringify(sections));
         } else {
-            sections[this.state.currentSectionIndex].questions[
-                index
-            ].answer = [];
+            sections[this.state.currentSectionIndex].questions[index].answer =
+                [];
             this.setState({
                 answerSection: sections,
             });
@@ -664,9 +655,8 @@ class CycleAutoExam extends Component {
 
     handleBoolean = (event, index) => {
         let sections = [...this.state.answerSection];
-        sections[this.state.currentSectionIndex].questions[
-            index
-        ].answer[0] = event;
+        sections[this.state.currentSectionIndex].questions[index].answer[0] =
+            event;
         this.setState({
             answerSection: sections,
         });
@@ -1130,6 +1120,9 @@ class CycleAutoExam extends Component {
                                             false ? (
                                                 <div
                                                     id="drop-here"
+                                                    style={{
+                                                        userSelect: "none",
+                                                    }}
                                                     draggable={false}
                                                 >
                                                     <i className="fas fa-arrows-alt mr-2"></i>{" "}
@@ -1187,16 +1180,14 @@ class CycleAutoExam extends Component {
                                                 <div className="card secondary-bg py-2 px-3 mb-2">
                                                     <div
                                                         dangerouslySetInnerHTML={{
-                                                            __html:
-                                                                data
-                                                                    .sub_question[
+                                                            __html: data
+                                                                .sub_question[
+                                                                this.state
+                                                                    .currentSubQuestionIndex[
                                                                     this.state
-                                                                        .currentSubQuestionIndex[
-                                                                        this
-                                                                            .state
-                                                                            .currentSectionIndex
-                                                                    ][index]
-                                                                ].question,
+                                                                        .currentSectionIndex
+                                                                ][index]
+                                                            ].question,
                                                         }}
                                                     ></div>
                                                 </div>
@@ -1227,8 +1218,7 @@ class CycleAutoExam extends Component {
                                                                       }
                                                                       id={`option-${option_index}`}
                                                                       style={{
-                                                                          cursor:
-                                                                              "move",
+                                                                          cursor: "move",
                                                                       }}
                                                                       onDragStart={(
                                                                           e
@@ -1432,7 +1422,7 @@ class CycleAutoExam extends Component {
                     goBack={this.props.history.goBack}
                 />
 
-                {/* ALert message */}
+                {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
                     successMsg={this.state.successMsg}

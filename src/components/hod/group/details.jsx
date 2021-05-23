@@ -9,7 +9,8 @@ import { connect } from "react-redux";
 import { waterMark } from "../../sharedComponents/watermark";
 
 const mapStateToProps = (state) => ({
-    data: state.user.profile,
+    profile: state.user.profile,
+    group_name: state.content.group_name,
 });
 
 class HODGroupDetails extends Component {
@@ -68,16 +69,16 @@ class HODGroupDetails extends Component {
     };
 
     render() {
-        document.title = "Group Details - HOD | IQLabs";
+        document.title = `${this.props.group_name} Details - HOD | IQLabs`;
         return (
             <div className="wrapper">
                 {/* Navbar */}
                 <Header
-                    name={this.state.groupItem.group_name}
+                    name={this.props.group_name}
                     togglenav={this.toggleSideNav}
                 />
 
-                {/* ALert message */}
+                {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
                     successMsg={this.state.successMsg}
@@ -105,7 +106,7 @@ class HODGroupDetails extends Component {
                     className={`section content ${
                         this.state.showSideNav ? "active" : ""
                     }`}
-                    style={waterMark(this.props.data)}
+                    style={waterMark(this.props.profile)}
                 >
                     <div className="container-fluid">
                         {/* Back button */}
@@ -129,7 +130,7 @@ class HODGroupDetails extends Component {
                                         to="#"
                                         onClick={this.props.history.goBack}
                                     >
-                                        Group
+                                        {this.props.group_name}
                                     </Link>
                                 </li>
                                 <li className="breadcrumb-item active">

@@ -389,7 +389,7 @@ class Profile extends Component {
                 {/* Navbar */}
                 <Header name="My Profile" togglenav={this.toggleSideNav} />
 
-                {/* ALert message */}
+                {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
                     successMsg={this.state.successMsg}

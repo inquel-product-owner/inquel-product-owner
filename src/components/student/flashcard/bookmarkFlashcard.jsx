@@ -166,8 +166,8 @@ class FavouritesFlashcard extends Component {
                             onClick={(e) => {
                                 e.stopPropagation();
                                 this.setState({
-                                    isFullscreenEnabled: !this.state
-                                        .isFullscreenEnabled,
+                                    isFullscreenEnabled:
+                                        !this.state.isFullscreenEnabled,
                                 });
                             }}
                         >
@@ -226,8 +226,8 @@ class FavouritesFlashcard extends Component {
                             onClick={(e) => {
                                 e.stopPropagation();
                                 this.setState({
-                                    isFullscreenEnabled: !this.state
-                                        .isFullscreenEnabled,
+                                    isFullscreenEnabled:
+                                        !this.state.isFullscreenEnabled,
                                 });
                             }}
                         >
@@ -449,8 +449,7 @@ class FavouritesFlashcard extends Component {
                                             <p
                                                 className="small"
                                                 dangerouslySetInnerHTML={{
-                                                    __html:
-                                                        explanation.explanation,
+                                                    __html: explanation.explanation,
                                                 }}
                                             ></p>
                                         </div>
@@ -945,7 +944,11 @@ class FavouritesFlashcard extends Component {
                                 onDragLeave={(e) => this.handleDragLeave(e)}
                             >
                                 {isAnswerAvailable === false ? (
-                                    <div id="drop-here" draggable={false}>
+                                    <div
+                                        id="drop-here"
+                                        style={{ userSelect: "none" }}
+                                        draggable={false}
+                                    >
                                         <i className="fas fa-arrows-alt mr-2"></i>{" "}
                                         Drop answer here...
                                     </div>
@@ -1041,14 +1044,13 @@ class FavouritesFlashcard extends Component {
                                             <div className="card secondary-bg py-2 px-3 mb-2">
                                                 <div
                                                     dangerouslySetInnerHTML={{
-                                                        __html:
-                                                            data[index]
-                                                                .sub_question[
-                                                                this.state
-                                                                    .currentSubQuestionIndex[
-                                                                    index
-                                                                ]
-                                                            ].question,
+                                                        __html: data[index]
+                                                            .sub_question[
+                                                            this.state
+                                                                .currentSubQuestionIndex[
+                                                                index
+                                                            ]
+                                                        ].question,
                                                     }}
                                                     draggable={false}
                                                 ></div>
@@ -1078,8 +1080,7 @@ class FavouritesFlashcard extends Component {
                                                                   }
                                                                   id={`option-${option_index}`}
                                                                   style={{
-                                                                      cursor:
-                                                                          "move",
+                                                                      cursor: "move",
                                                                   }}
                                                                   onDragStart={(
                                                                       e

@@ -1185,7 +1185,11 @@ class FlashCard extends Component {
                                 onDragLeave={(e) => this.handleDragLeave(e)}
                             >
                                 {isAnswerAvailable === false ? (
-                                    <div id="drop-here" draggable={false}>
+                                    <div
+                                        id="drop-here"
+                                        style={{ userSelect: "none" }}
+                                        draggable={false}
+                                    >
                                         <i className="fas fa-arrows-alt mr-2"></i>{" "}
                                         Drop answer here...
                                     </div>

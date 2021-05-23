@@ -136,7 +136,7 @@ class Group extends Component {
                     activeLink="dashboard"
                 />
 
-                {/* ALert message */}
+                {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
                     successMsg={this.state.successMsg}

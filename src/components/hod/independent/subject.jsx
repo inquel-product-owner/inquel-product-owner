@@ -1,23 +1,23 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import store from "../../redux/store";
+import store from "../../../redux/store";
 import { connect } from "react-redux";
-import Header from "./shared/navbar";
-import SideNav from "./shared/sidenav";
+import Header from "../shared/navbar";
+import SideNav from "../shared/sidenav";
 import Select from "react-select";
 import { Modal, Alert, Spinner, Dropdown } from "react-bootstrap";
-import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
-import Loading from "../sharedComponents/loader";
-import AlertBox from "../sharedComponents/alert";
+import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
+import Loading from "../../sharedComponents/loader";
+import AlertBox from "../../sharedComponents/alert";
 import {
     ContentDeleteModal,
     ContentUpdateModal,
-} from "../sharedComponents/contentManagementModal";
-import ScoreCardTable from "./shared/scorecard";
+} from "../../sharedComponents/contentManagementModal";
+import ScoreCardTable from "../../sharedComponents/scorecard";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
-    data: state.user.profile,
+    profile: state.user.profile,
 });
 
 class Scorecard extends Component {
@@ -212,7 +212,7 @@ class Scorecard extends Component {
                         ) : (
                             ""
                         )}
-                        Save & Close
+                        Save
                     </button>
                 </Modal.Footer>
             </Modal>
@@ -754,10 +754,10 @@ class HODSubject extends Component {
 
             chapterData: [],
             chapter_id: "",
-
+            semesters: [],
             simulation: [],
             selectedSimulation: {},
-            permissions: this.props.data.permissions,
+            permissions: this.props.profile.permissions,
 
             errorMsg: "",
             successMsg: "",
@@ -829,6 +829,7 @@ class HODSubject extends Component {
                 if (result.sts === true) {
                     this.setState({
                         chapterData: result.data.chapters,
+                        semesters: result.data.semesters,
                         page_loading: false,
                     });
                 } else {
@@ -1107,6 +1108,7 @@ class HODSubject extends Component {
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        {/* Chapter list */}
                                         {this.state.chapterData.length !== 0
                                             ? this.state.chapterData.map(
                                                   (list, index) => {
@@ -1177,17 +1179,51 @@ class HODSubject extends Component {
                                                                   </button>
                                                               </td>
                                                               <td className="text-right">
-                                                                  <button className="btn btn-primary-invert btn-sm shadow-sm">
-                                                                      <i className="far fa-eye"></i>
-                                                                  </button>
+                                                                  <Link
+                                                                      to={`${this.props.match.url}/chapter/${list.chapter_id}`}
+                                                                  >
+                                                                      <button
+                                                                          className="btn btn-primary-invert btn-sm shadow-sm"
+                                                                          onClick={() => {
+                                                                              store.dispatch(
+                                                                                  {
+                                                                                      type: "CHAPTER",
+                                                                                      payload:
+                                                                                          list.chapter_name,
+                                                                                  }
+                                                                              );
+                                                                          }}
+                                                                      >
+                                                                          <i className="far fa-eye"></i>
+                                                                      </button>
+                                                                  </Link>
                                                               </td>
                                                           </tr>
                                                       );
                                                   }
                                               )
                                             : null}
-
-                                        {/* ----- Simulation exam ----- */}
+                                        {/* Semester list */}
+                                        {this.state.semesters.length !== 0
+                                            ? this.state.semesters.map(
+                                                  (list, index) => {
+                                                      return (
+                                                          <tr key={index}>
+                                                              <td>
+                                                                  {
+                                                                      list.semester_name
+                                                                  }
+                                                              </td>
+                                                              <td></td>
+                                                              <td></td>
+                                                              <td></td>
+                                                              <td></td>
+                                                          </tr>
+                                                      );
+                                                  }
+                                              )
+                                            : null}
+                                        {/* ----- Simulation list ----- */}
                                         {this.state.simulation.length !== 0
                                             ? this.state.simulation.map(
                                                   (item, index) => {

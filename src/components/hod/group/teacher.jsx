@@ -10,7 +10,8 @@ import { connect } from "react-redux";
 import { waterMark } from "../../sharedComponents/watermark";
 
 const mapStateToProps = (state) => ({
-    data: state.user.profile,
+    profile: state.user.profile,
+    group_name: state.content.group_name,
 });
 
 function EmptyData() {
@@ -26,7 +27,6 @@ class HODGroupTeachers extends Component {
         super(props);
         this.state = {
             showSideNav: false,
-            groupItem: [],
             teacherItems: [],
 
             errorMsg: "",
@@ -52,29 +52,21 @@ class HODGroupTeachers extends Component {
     };
 
     componentDidMount = () => {
-        Promise.all([
-            fetch(`${this.url}/hod/group/${this.groupId}/`, {
-                headers: this.headers,
-                method: "GET",
-            }).then((res) => res.json()),
-            fetch(`${this.url}/hod/group/${this.groupId}/teacher/`, {
-                headers: this.headers,
-                method: "GET",
-            }).then((res) => res.json()),
-        ])
+        fetch(`${this.url}/hod/group/${this.groupId}/teacher/`, {
+            headers: this.headers,
+            method: "GET",
+        })
+            .then((res) => res.json())
             .then((result) => {
                 console.log(result);
-                if (result[1].sts === true) {
+                if (result.sts === true) {
                     this.setState({
-                        groupItem: result[0].data,
-                        teacherItems: result[1].data.results,
+                        teacherItems: result.data.results,
                         page_loading: false,
                     });
                 } else {
                     this.setState({
-                        errorMsg: result[1].detail
-                            ? result[1].detail
-                            : result[1].msg,
+                        errorMsg: result.detail ? result.detail : result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -86,16 +78,16 @@ class HODGroupTeachers extends Component {
     };
 
     render() {
-        document.title = "Group Teachers - HOD | IQLabs";
+        document.title = `${this.props.group_name} Teachers - HOD | IQLabs`;
         return (
             <div className="wrapper">
                 {/* Navbar */}
                 <Header
-                    name={this.state.groupItem.group_name}
+                    name={this.props.group_name}
                     togglenav={this.toggleSideNav}
                 />
 
-                {/* ALert message */}
+                {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
                     successMsg={this.state.successMsg}
@@ -123,7 +115,7 @@ class HODGroupTeachers extends Component {
                     className={`section content ${
                         this.state.showSideNav ? "active" : ""
                     }`}
-                    style={waterMark(this.props.data)}
+                    style={waterMark(this.props.profile)}
                 >
                     <div className="container-fluid">
                         {/* Back button */}
@@ -147,7 +139,7 @@ class HODGroupTeachers extends Component {
                                         to="#"
                                         onClick={this.props.history.goBack}
                                     >
-                                        Group
+                                        {this.props.group_name}
                                     </Link>
                                 </li>
                                 <li className="breadcrumb-item active">
