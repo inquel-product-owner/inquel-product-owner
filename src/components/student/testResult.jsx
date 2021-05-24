@@ -86,6 +86,7 @@ function CycleTestAttempts(props) {
                         className="fas fa-circle fa-lg mx-3"
                         style={{
                             color: colorCondition(props.attempt),
+                            fontSize: "25px",
                         }}
                     ></i>
                 </Link>
@@ -94,6 +95,7 @@ function CycleTestAttempts(props) {
                     className="fas fa-circle fa-lg mx-3"
                     style={{
                         color: "grey",
+                        fontSize: "25px",
                     }}
                 ></i>
             )}
@@ -147,6 +149,7 @@ function SemesterAttempts(props) {
                         className="fas fa-circle fa-lg mx-3"
                         style={{
                             color: colorCondition(props.attempt),
+                            fontSize: "25px",
                         }}
                     ></i>
                 </Link>
@@ -155,6 +158,7 @@ function SemesterAttempts(props) {
                     className="fas fa-circle fa-lg mx-3"
                     style={{
                         color: "grey",
+                        fontSize: "25px",
                     }}
                 ></i>
             )}

@@ -14,7 +14,8 @@ import { connect } from "react-redux";
 import { waterMark } from "../../sharedComponents/watermark";
 
 const mapStateToProps = (state) => ({
-    data: state.user.profile,
+    profile: state.user.profile,
+    group_name: state.content.group_name,
 });
 
 class StudentAssignModal extends Component {
@@ -246,7 +247,6 @@ class HODGroupStudents extends Component {
             showSideNav: false,
             showStudentModal: false,
             showStudent_RemoveModal: false,
-            groupItem: [],
             studentItem: [],
             selectedStudent: [],
             activeStudentPage: 1,
@@ -311,29 +311,6 @@ class HODGroupStudents extends Component {
     };
 
     componentDidMount = () => {
-        fetch(`${this.url}/hod/group/${this.groupId}/`, {
-            headers: this.headers,
-            method: "GET",
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    this.setState({
-                        groupItem: result.data,
-                    });
-                } else {
-                    this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-
         this.loadStudentData();
     };
 
@@ -382,16 +359,16 @@ class HODGroupStudents extends Component {
     }
 
     render() {
-        document.title = "Group Students - HOD | IQLabs";
+        document.title = `${this.props.group_name} Students - HOD | IQLabs`;
         return (
             <div className="wrapper">
                 {/* Navbar */}
                 <Header
-                    name={this.state.groupItem.group_name}
+                    name={this.props.group_name}
                     togglenav={this.toggleSideNav}
                 />
 
-                {/* ALert message */}
+                {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
                     successMsg={this.state.successMsg}
@@ -427,7 +404,7 @@ class HODGroupStudents extends Component {
                     ""
                 )}
 
-                {/* Student Remoing Modal */}
+                {/* Student Removing Modal */}
                 {this.state.showStudent_RemoveModal ? (
                     <UserRemoveModal
                         show={this.state.showStudent_RemoveModal}
@@ -448,7 +425,7 @@ class HODGroupStudents extends Component {
                     className={`section content ${
                         this.state.showSideNav ? "active" : ""
                     }`}
-                    style={waterMark(this.props.data)}
+                    style={waterMark(this.props.profile)}
                 >
                     <div className="container-fluid">
                         {/* Back button */}
@@ -462,6 +439,7 @@ class HODGroupStudents extends Component {
                         {/* Filter area */}
                         <div className="row align-items-center">
                             <div className="col-md-6">
+                                {/* Breadcrumb */}
                                 <nav aria-label="breadcrumb">
                                     <ol className="breadcrumb">
                                         <li className="breadcrumb-item">
@@ -476,7 +454,7 @@ class HODGroupStudents extends Component {
                                                     this.props.history.goBack
                                                 }
                                             >
-                                                Group
+                                                {this.props.group_name}
                                             </Link>
                                         </li>
                                         <li className="breadcrumb-item active">

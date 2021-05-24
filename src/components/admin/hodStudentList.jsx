@@ -126,7 +126,7 @@ class AdminHodStudentList extends Component {
                     activeLink="profiles"
                 />
 
-                {/* ALert message */}
+                {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
                     successMsg={this.state.successMsg}

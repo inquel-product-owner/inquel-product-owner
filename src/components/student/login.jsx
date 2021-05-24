@@ -5,6 +5,7 @@ import { baseUrl, accountsUrl, adminPathUrl } from "../../shared/baseUrl.js";
 import Footer from "./shared/footer";
 import AccountNavbar from "./shared/accountNavbar";
 import { ForgotPasswordModal } from "../sharedComponents/forgotPassword";
+import store from "../../redux/store";
 
 class StudentLogin extends Component {
     constructor(props) {
@@ -47,7 +48,7 @@ class StudentLogin extends Component {
 
     setLocalStorage = (data) => {
         localStorage.clear();
-
+        store.dispatch({ type: "PROFILE", payload: null });
         localStorage.setItem("Authorization", `Token ${data.token}`);
         localStorage.setItem("is_student", data.is_student);
 

@@ -7,6 +7,11 @@ import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
 import Loading from "../sharedComponents/loader";
 import AlertBox from "../sharedComponents/alert";
 import Slider from "react-slick";
+import { connect } from "react-redux";
+
+const mapStateToProps = (state) => ({
+    group_name: state.content.group_name,
+});
 
 class Group extends Component {
     constructor(props) {
@@ -14,12 +19,12 @@ class Group extends Component {
         this.state = {
             showSideNav: false,
             subjectItems: [],
-            groupData: "",
-            page_loading: true,
+
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
+            page_loading: true,
         };
         this.url = baseUrl + studentUrl;
         this.authToken = localStorage.getItem("Authorization");
@@ -47,30 +52,6 @@ class Group extends Component {
                 if (result.sts === true) {
                     this.setState({
                         subjectItems: result.data,
-                        page_loading: false,
-                    });
-                } else {
-                    this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-
-        fetch(`${this.url}/student/group/`, {
-            method: "GET",
-            headers: this.headers,
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    this.setState({
-                        groupData: result.data,
                         page_loading: false,
                     });
                 } else {
@@ -121,12 +102,12 @@ class Group extends Component {
                 },
             ],
         };
-        document.title = `${this.state.groupData.group_name} - Student | IQLabs`;
+        document.title = `${this.props.group_name} - Student | IQLabs`;
         return (
             <div className="wrapper">
                 {/* Navbar */}
                 <Header
-                    name={this.state.groupData.group_name}
+                    name={this.props.group_name}
                     togglenav={this.toggleSideNav}
                 />
 
@@ -136,7 +117,7 @@ class Group extends Component {
                     activeLink="dashboard"
                 />
 
-                {/* ALert message */}
+                {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
                     successMsg={this.state.successMsg}
@@ -180,8 +161,7 @@ class Group extends Component {
                                     <span className="font-weight-bold-600">
                                         Group:{" "}
                                     </span>
-                                    {this.state.groupData.group_name}
-                                    {}
+                                    {this.props.group_name}
                                 </li>
                             </ol>
                         </nav>
@@ -213,8 +193,7 @@ class Group extends Component {
                                                                 style={{
                                                                     position:
                                                                         "absolute",
-                                                                    right:
-                                                                        "5px",
+                                                                    right: "5px",
                                                                 }}
                                                             >
                                                                 <button className="btn btn-primary-invert btn-sm">
@@ -228,8 +207,7 @@ class Group extends Component {
                                                                 <div
                                                                     className="card-body primary-bg text-white p-2"
                                                                     style={{
-                                                                        cursor:
-                                                                            "pointer",
+                                                                        cursor: "pointer",
                                                                     }}
                                                                 >
                                                                     <div className="row">
@@ -265,4 +243,4 @@ class Group extends Component {
     }
 }
 
-export default Group;
+export default connect(mapStateToProps)(Group);

@@ -342,6 +342,7 @@ class TeacherChapters extends Component {
                 {
                     chapterId: this.props.match.params.chapterId,
                     chapters: chapters,
+                    topicEventKey: [],
                     page_loading: true,
                 },
                 () => {
@@ -405,6 +406,7 @@ class TeacherChapters extends Component {
             {
                 chapterId: event.value,
                 chapters: chapters,
+                topicEventKey: [],
                 page_loading: true,
             },
             () => {
@@ -464,6 +466,25 @@ class TeacherChapters extends Component {
         }
     };
 
+    permissionsDisable = (type) => {
+        let state = false;
+
+        if (
+            this.state.permissions &&
+            Object.entries(this.state.permissions).length !== 0
+        ) {
+            if (this.state.permissions[type]) {
+                if (this.state.permissions[type] === true) {
+                    state = false;
+                } else {
+                    state = true;
+                }
+            }
+        }
+
+        return state;
+    };
+
     topicRender = (data, index, topic_id) => {
         const nestedTopics = (data.child || []).map((topic, index) => {
             return (
@@ -477,7 +498,7 @@ class TeacherChapters extends Component {
             <>
                 <Accordion.Toggle
                     as={Card.Header}
-                    eventKey={`topic-${index}-${data.topic_num}`}
+                    eventKey={`topic-${data.topic_num}`}
                     className="light-bg shadow-sm py-2 mb-2"
                     style={{
                         borderRadius: "8px",
@@ -485,7 +506,7 @@ class TeacherChapters extends Component {
                     onClick={() =>
                         data.child.length !== 0
                             ? this.toggleTopicCollapse(
-                                  `topic-${index}-${data.topic_num}`
+                                  `topic-${data.topic_num}`
                               )
                             : ""
                     }
@@ -499,7 +520,7 @@ class TeacherChapters extends Component {
                                             <i
                                                 className={`fas fa-chevron-circle-down ${
                                                     this.state.topicEventKey.includes(
-                                                        `topic-${index}-${data.topic_num}`
+                                                        `topic-${data.topic_num}`
                                                     )
                                                         ? "fa-rotate-360"
                                                         : "fa-rotate-270"
@@ -562,12 +583,9 @@ class TeacherChapters extends Component {
                                                     data.topic_name
                                                 )
                                             }
-                                            disabled={
-                                                this.state.permissions.match ===
-                                                true
-                                                    ? false
-                                                    : true
-                                            }
+                                            disabled={this.permissionsDisable(
+                                                "match"
+                                            )}
                                         >
                                             View / Edit
                                         </button>
@@ -600,12 +618,9 @@ class TeacherChapters extends Component {
                                                     data.topic_name
                                                 )
                                             }
-                                            disabled={
-                                                this.state.permissions
-                                                    .type_1_q === true
-                                                    ? false
-                                                    : true
-                                            }
+                                            disabled={this.permissionsDisable(
+                                                "type_1_q"
+                                            )}
                                         >
                                             View / Edit
                                         </button>
@@ -622,12 +637,9 @@ class TeacherChapters extends Component {
                                                     data.topic_name
                                                 )
                                             }
-                                            disabled={
-                                                this.state.permissions
-                                                    .type_2_q === true
-                                                    ? false
-                                                    : true
-                                            }
+                                            disabled={this.permissionsDisable(
+                                                "type_2_q"
+                                            )}
                                         >
                                             View / Edit
                                         </button>
@@ -717,7 +729,7 @@ class TeacherChapters extends Component {
                 </Accordion.Toggle>
 
                 <Accordion.Collapse
-                    eventKey={`topic-${index}-${data.topic_num}`}
+                    eventKey={`topic-${data.topic_num}`}
                     className="ml-2"
                 >
                     <div>{nestedTopics}</div>
@@ -737,6 +749,42 @@ class TeacherChapters extends Component {
         this.setState({
             topicEventKey: topicEventKey,
         });
+    };
+
+    handlePublish = () => {
+        this.setState({
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            page_loading: true,
+        });
+
+        fetch(
+            `${this.url}/teacher/subject/${this.subjectId}/chapter/publish/`,
+            {
+                method: "POST",
+                headers: this.headers,
+                body: JSON.stringify({
+                    chapter_id: this.state.chapterId,
+                }),
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => console.log(err));
     };
 
     dispatchTopic = (data) => {
@@ -765,7 +813,7 @@ class TeacherChapters extends Component {
                     }}
                 />
 
-                {/* ALert message */}
+                {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
                     successMsg={this.state.successMsg}
@@ -1025,7 +1073,7 @@ class TeacherChapters extends Component {
                             </ol>
                         </nav>
 
-                        <div className="row mb-3">
+                        <div className="row align-items-center mb-3">
                             <div className="col-md-4">
                                 <Select
                                     className="basic-single form-shadow"
@@ -1045,12 +1093,24 @@ class TeacherChapters extends Component {
                                     required
                                 />
                             </div>
+                            {this.groupId === undefined ? (
+                                <div className="col-md-8 text-right">
+                                    <button
+                                        className="btn btn-primary btn-sm shadow-none"
+                                        onClick={this.handlePublish}
+                                    >
+                                        Publish
+                                    </button>
+                                </div>
+                            ) : (
+                                ""
+                            )}
                         </div>
 
                         {/* Course details */}
                         <div className="card shadow-sm mb-3">
                             <div className="card-header secondary-bg primary-text font-weight-bold">
-                                <div className="row">
+                                <div className="row align-items-center">
                                     <div className="col-md-4 mb-2 mb-md-0">
                                         Topic structure
                                     </div>

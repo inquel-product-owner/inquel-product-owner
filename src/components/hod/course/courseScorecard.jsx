@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import Header from "./shared/navbar";
-import SideNav from "./shared/sidenav";
+import Header from "../shared/navbar";
+import SideNav from "../shared/sidenav";
 import { Card, Accordion } from "react-bootstrap";
 import { Link } from "react-router-dom";
 

@@ -9,7 +9,9 @@ import { connect } from "react-redux";
 import { waterMark } from "../../sharedComponents/watermark";
 
 const mapStateToProps = (state) => ({
-    data: state.user.profile,
+    profile: state.user.profile,
+    group_name: state.content.group_name,
+    subject_name: state.content.subject_name,
 });
 
 class HODGroupSubject extends Component {
@@ -17,9 +19,8 @@ class HODGroupSubject extends Component {
         super(props);
         this.state = {
             showSideNav: false,
-            groupItem: [],
-            subjectItems: [],
-            chapterData: [],
+            chapters: [],
+            semesters: [],
 
             errorMsg: "",
             successMsg: "",
@@ -54,8 +55,8 @@ class HODGroupSubject extends Component {
                 console.log(result);
                 if (result.sts === true) {
                     this.setState({
-                        subjectItems: result.data,
-                        chapterData: result.data.chapters,
+                        chapters: result.data.chapters,
+                        semesters: result.data.semesters,
                         page_loading: false,
                     });
                 } else {
@@ -72,44 +73,20 @@ class HODGroupSubject extends Component {
     };
 
     componentDidMount = () => {
-        fetch(`${this.url}/hod/group/${this.groupId}/`, {
-            headers: this.headers,
-            method: "GET",
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    this.setState({
-                        groupItem: result.data,
-                    });
-                } else {
-                    this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-
         this.loadSubjectData();
     };
 
     render() {
-        document.title =
-            this.state.subjectItems.subject_name + " Subject - HOD | IQLabs";
+        document.title = this.props.subject_name + " - HOD | IQLabs";
         return (
             <div className="wrapper">
                 {/* Navbar */}
                 <Header
-                    name={this.state.groupItem.group_name}
+                    name={this.props.group_name}
                     togglenav={this.toggleSideNav}
                 />
 
-                {/* ALert message */}
+                {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
                     successMsg={this.state.successMsg}
@@ -137,7 +114,7 @@ class HODGroupSubject extends Component {
                     className={`section content ${
                         this.state.showSideNav ? "active" : ""
                     }`}
-                    style={waterMark(this.props.data)}
+                    style={waterMark(this.props.profile)}
                 >
                     <div className="container-fluid">
                         {/* Back button */}
@@ -161,12 +138,12 @@ class HODGroupSubject extends Component {
                                         to="#"
                                         onClick={this.props.history.goBack}
                                     >
-                                        Group
+                                        {this.props.group_name}
                                     </Link>
                                 </li>
                                 <li className="breadcrumb-item active">
                                     <span>Subject:</span>
-                                    {this.state.subjectItems.subject_name}
+                                    {this.props.subject_name}
                                 </li>
                             </ol>
                         </nav>
@@ -183,12 +160,11 @@ class HODGroupSubject extends Component {
                                             <th scope="col">
                                                 Teacher assigned
                                             </th>
-                                            <th scope="col">View</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {this.state.chapterData.length !== 0
-                                            ? this.state.chapterData.map(
+                                        {this.state.chapters.length !== 0
+                                            ? this.state.chapters.map(
                                                   (list, index) => {
                                                       return (
                                                           <tr key={index}>
@@ -244,11 +220,24 @@ class HODGroupSubject extends Component {
                                                                           .full_name
                                                                   }
                                                               </td>
+                                                          </tr>
+                                                      );
+                                                  }
+                                              )
+                                            : null}
+                                        {/* Semester list */}
+                                        {this.state.semesters.length !== 0
+                                            ? this.state.semesters.map(
+                                                  (list, index) => {
+                                                      return (
+                                                          <tr key={index}>
                                                               <td>
-                                                                  <button className="btn btn-primary-invert btn-sm shadow-sm">
-                                                                      <i className="far fa-eye"></i>
-                                                                  </button>
+                                                                  {
+                                                                      list.semester_name
+                                                                  }
                                                               </td>
+                                                              <td></td>
+                                                              <td></td>
                                                           </tr>
                                                       );
                                                   }

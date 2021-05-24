@@ -37,8 +37,10 @@ import HODTeacherStudentList from "./hod/profileList";
 import HODStudentProfile from "./hod/studentProfile";
 import HODTeacherProfile from "./hod/teacherProfile";
 
-import HODSubject from "./hod/subject";
-import HODCourseScorecard from "./hod/courseScorecard";
+import HODSubject from "./hod/independent/subject";
+import HODChapter from "./hod/independent/chapter";
+
+import HODCourseScorecard from "./hod/course/courseScorecard";
 import HODCourseConfig from "./hod/course/configuration";
 
 import HODSimulationPaper from "./hod/simulation/paper";
@@ -375,12 +377,24 @@ const routes = (
                 )
             }
         />
+        <Route
+            exact
+            path="/hod/subject/:subjectId/chapter/:chapterId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <HODChapter {...props} />
+                )
+            }
+        />
 
         {/* ---------- Course configuration ---------- */}
 
         <Route
             exact
-            path="/hod/subject/:subjectId/course"
+            path="/hod/subject/:subjectId/course/create"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_hod") ? (

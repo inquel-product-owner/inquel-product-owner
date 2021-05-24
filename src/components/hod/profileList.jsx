@@ -983,7 +983,7 @@ class HODTeacherStudentList extends Component {
                     togglenav={this.toggleSideNav}
                 />
 
-                {/* ALert message */}
+                {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
                     successMsg={this.state.successMsg}

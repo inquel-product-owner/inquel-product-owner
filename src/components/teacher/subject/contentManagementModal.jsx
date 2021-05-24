@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Modal, Alert, Spinner, Dropdown } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
 import ReactSwitch from "../../sharedComponents/switchComponent";
-import ScoreCardTable from "../shared/scorecard.jsx";
+import ScoreCardTable from "../../sharedComponents/scorecard";
 
 export function ChapterList(props) {
     return (

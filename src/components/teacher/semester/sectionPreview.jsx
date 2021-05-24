@@ -8,7 +8,7 @@ import Loading from "../../sharedComponents/loader";
 import AlertBox from "../../sharedComponents/alert";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
-import { dataFormat } from "../../sharedComponents/dataFormating";
+import { DataFormat } from "../../sharedComponents/dataFormating";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
@@ -81,7 +81,7 @@ class TeacherSemesterAutoQA extends Component {
                 let currentSubQuestionIndex = [];
                 if (result.sts === true) {
                     if (result.data.results.length !== 0) {
-                        let values = dataFormat(result);
+                        let values = DataFormat(result);
                         data = values.result;
                         type = values.type;
                         totalSubQuestion = values.total;
@@ -236,7 +236,7 @@ class TeacherSemesterAutoQA extends Component {
                     togglenav={this.toggleSideNav}
                 />
 
-                {/* ALert message */}
+                {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
                     successMsg={this.state.successMsg}
@@ -390,8 +390,7 @@ class TeacherSemesterAutoQA extends Component {
                                                               <div
                                                                   className="pb-2"
                                                                   dangerouslySetInnerHTML={{
-                                                                      __html:
-                                                                          data.question,
+                                                                      __html: data.question,
                                                                   }}
                                                               ></div>
                                                               {data.content
@@ -606,8 +605,7 @@ class TeacherSemesterAutoQA extends Component {
                                                           <div className="col-md-6">
                                                               <div
                                                                   dangerouslySetInnerHTML={{
-                                                                      __html:
-                                                                          data.question,
+                                                                      __html: data.question,
                                                                   }}
                                                               ></div>
                                                           </div>
@@ -632,16 +630,15 @@ class TeacherSemesterAutoQA extends Component {
                                                                       <div className="card secondary-bg py-2 px-3 mb-2">
                                                                           <div
                                                                               dangerouslySetInnerHTML={{
-                                                                                  __html:
-                                                                                      data
-                                                                                          .sub_question[
-                                                                                          this
-                                                                                              .state
-                                                                                              .currentSubQuestionIndex[
-                                                                                              q_index
-                                                                                          ]
+                                                                                  __html: data
+                                                                                      .sub_question[
+                                                                                      this
+                                                                                          .state
+                                                                                          .currentSubQuestionIndex[
+                                                                                          q_index
                                                                                       ]
-                                                                                          .question,
+                                                                                  ]
+                                                                                      .question,
                                                                               }}
                                                                           ></div>
                                                                       </div>
@@ -838,33 +835,57 @@ class TeacherSemesterAutoQA extends Component {
                         {/* Navigation */}
                         <div className="row">
                             <div className="col-6">
-                                <button
-                                    className="btn btn-primary btn-sm shadow-none"
-                                    onClick={this.handlePrev}
-                                    disabled={
-                                        this.state.currentSectionIndex > 0
-                                            ? false
-                                            : true
-                                    }
-                                >
-                                    <i className="fas fa-angle-left mr-1"></i>{" "}
-                                    Previous
-                                </button>
+                                {this.state.currentSectionIndex !== 0 ? (
+                                    <button
+                                        className="btn btn-primary btn-sm shadow-none"
+                                        onClick={this.handlePrev}
+                                        disabled={
+                                            this.state.currentSectionIndex > 0
+                                                ? false
+                                                : true
+                                        }
+                                    >
+                                        <i className="fas fa-angle-left mr-1"></i>{" "}
+                                        {this.state.sectionData[
+                                            this.state.currentSectionIndex - 1
+                                        ] !== undefined
+                                            ? this.state.sectionData[
+                                                  this.state
+                                                      .currentSectionIndex - 1
+                                              ].section_description
+                                            : ""}
+                                    </button>
+                                ) : (
+                                    ""
+                                )}
                             </div>
                             <div className="col-6 text-right">
-                                <button
-                                    className="btn btn-primary btn-sm shadow-none"
-                                    onClick={this.handleNext}
-                                    disabled={
-                                        this.state.currentSectionIndex + 1 >=
-                                        this.state.totalSection
-                                            ? true
-                                            : false
-                                    }
-                                >
-                                    Next
-                                    <i className="fas fa-angle-right ml-2"></i>
-                                </button>
+                                {this.state.currentSectionIndex + 1 >=
+                                this.state.totalSection ? (
+                                    ""
+                                ) : (
+                                    <button
+                                        className="btn btn-primary btn-sm shadow-none"
+                                        onClick={this.handleNext}
+                                        disabled={
+                                            this.state.currentSectionIndex +
+                                                1 >=
+                                            this.state.totalSection
+                                                ? true
+                                                : false
+                                        }
+                                    >
+                                        {this.state.sectionData[
+                                            this.state.currentSectionIndex + 1
+                                        ] !== undefined
+                                            ? this.state.sectionData[
+                                                  this.state
+                                                      .currentSectionIndex + 1
+                                              ].section_description
+                                            : ""}
+                                        <i className="fas fa-angle-right ml-2"></i>
+                                    </button>
+                                )}
                             </div>
                         </div>
                         {/* Loading component */}

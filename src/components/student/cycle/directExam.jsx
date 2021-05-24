@@ -325,7 +325,7 @@ class CycleDirectExam extends Component {
                     goBack={this.props.history.goBack}
                 />
 
-                {/* ALert message */}
+                {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
                     successMsg={this.state.successMsg}

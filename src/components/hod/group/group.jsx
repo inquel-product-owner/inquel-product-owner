@@ -19,7 +19,8 @@ import { connect } from "react-redux";
 import { waterMark } from "../../sharedComponents/watermark";
 
 const mapStateToProps = (state) => ({
-    data: state.user.profile,
+    profile: state.user.profile,
+    group_name: state.content.group_name,
 });
 
 class SubjectModal extends Component {
@@ -225,7 +226,6 @@ class HODGroup extends Component {
             showSubject_DisableModal: false,
             showSubject_EnableModal: false,
 
-            groupItems: [],
             subjectItems: [],
             selectedSubject: [],
             activeSubjectPage: 1,
@@ -269,7 +269,6 @@ class HODGroup extends Component {
                 console.log(result);
                 if (result.sts === true) {
                     this.setState({
-                        groupItems: result.data,
                         subjectItems: result.data.subjects,
                         totalSubjectCount: result.data.subjects.length,
                         page_loading: false,
@@ -350,19 +349,16 @@ class HODGroup extends Component {
     }
 
     render() {
-        document.title =
-            this.state.groupItems.length !== 0
-                ? this.state.groupItems.group_name + " - HOD | IQLabs"
-                : "Group - HOD | IQLabs";
+        document.title = `${this.props.group_name} - HOD | IQLabs`;
         return (
             <div className="wrapper">
                 {/* Navbar */}
                 <Header
-                    name={this.state.groupItems.group_name}
+                    name={this.props.group_name}
                     togglenav={this.toggleSideNav}
                 />
 
-                {/* ALert message */}
+                {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
                     successMsg={this.state.successMsg}
@@ -450,7 +446,7 @@ class HODGroup extends Component {
                     className={`section content ${
                         this.state.showSideNav ? "active" : ""
                     }`}
-                    style={waterMark(this.props.data)}
+                    style={waterMark(this.props.profile)}
                 >
                     <div className="container-fluid">
                         {/* Back button */}
@@ -473,9 +469,7 @@ class HODGroup extends Component {
                                         </li>
                                         <li className="breadcrumb-item active">
                                             <span>Group:</span>
-                                            {
-                                                this.state.groupItems.group_name
-                                            } - {this.state.groupItems.level}
+                                            {this.props.group_name}
                                         </li>
                                     </ol>
                                 </nav>
@@ -493,7 +487,7 @@ class HODGroup extends Component {
                                 </Link>
                                 <Link to={`${this.props.match.url}/details`}>
                                     <button className="btn btn-primary btn-sm shadow-none">
-                                        Configuration
+                                        Details
                                     </button>
                                 </Link>
                             </div>

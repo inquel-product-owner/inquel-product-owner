@@ -8,7 +8,7 @@ import { Modal, Alert, Spinner, Dropdown } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
 import Loading from "../../sharedComponents/loader";
 import AlertBox from "../../sharedComponents/alert";
-import ScoreCardTable from "../shared/scorecard";
+import ScoreCardTable from "../../sharedComponents/scorecard";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
