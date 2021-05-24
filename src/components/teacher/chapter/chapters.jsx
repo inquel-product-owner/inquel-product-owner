@@ -342,6 +342,7 @@ class TeacherChapters extends Component {
                 {
                     chapterId: this.props.match.params.chapterId,
                     chapters: chapters,
+                    topicEventKey: [],
                     page_loading: true,
                 },
                 () => {
@@ -405,6 +406,7 @@ class TeacherChapters extends Component {
             {
                 chapterId: event.value,
                 chapters: chapters,
+                topicEventKey: [],
                 page_loading: true,
             },
             () => {
@@ -496,7 +498,7 @@ class TeacherChapters extends Component {
             <>
                 <Accordion.Toggle
                     as={Card.Header}
-                    eventKey={`topic-${index}-${data.topic_num}`}
+                    eventKey={`topic-${data.topic_num}`}
                     className="light-bg shadow-sm py-2 mb-2"
                     style={{
                         borderRadius: "8px",
@@ -504,7 +506,7 @@ class TeacherChapters extends Component {
                     onClick={() =>
                         data.child.length !== 0
                             ? this.toggleTopicCollapse(
-                                  `topic-${index}-${data.topic_num}`
+                                  `topic-${data.topic_num}`
                               )
                             : ""
                     }
@@ -518,7 +520,7 @@ class TeacherChapters extends Component {
                                             <i
                                                 className={`fas fa-chevron-circle-down ${
                                                     this.state.topicEventKey.includes(
-                                                        `topic-${index}-${data.topic_num}`
+                                                        `topic-${data.topic_num}`
                                                     )
                                                         ? "fa-rotate-360"
                                                         : "fa-rotate-270"
@@ -727,7 +729,7 @@ class TeacherChapters extends Component {
                 </Accordion.Toggle>
 
                 <Accordion.Collapse
-                    eventKey={`topic-${index}-${data.topic_num}`}
+                    eventKey={`topic-${data.topic_num}`}
                     className="ml-2"
                 >
                     <div>{nestedTopics}</div>
@@ -1108,7 +1110,7 @@ class TeacherChapters extends Component {
                         {/* Course details */}
                         <div className="card shadow-sm mb-3">
                             <div className="card-header secondary-bg primary-text font-weight-bold">
-                                <div className="row">
+                                <div className="row align-items-center">
                                     <div className="col-md-4 mb-2 mb-md-0">
                                         Topic structure
                                     </div>

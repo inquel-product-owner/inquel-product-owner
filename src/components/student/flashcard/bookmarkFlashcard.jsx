@@ -12,7 +12,7 @@ import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
 import {
     ConceptFormat,
-    dataFormat,
+    DataFormat,
 } from "../../sharedComponents/dataFormating";
 
 class VideoModal extends Component {
@@ -251,7 +251,7 @@ class FavouritesFlashcard extends Component {
                 results: JSON.parse(sessionStorage.getItem("data")),
             },
         };
-        let response = dataFormat(result);
+        let response = DataFormat(result);
         let totalSubQuestion = [];
         let currentSubQuestionIndex = [];
         response.result.forEach((question) => {

@@ -394,7 +394,7 @@ const routes = (
 
         <Route
             exact
-            path="/hod/subject/:subjectId/course"
+            path="/hod/subject/:subjectId/course/create"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_hod") ? (

@@ -819,7 +819,7 @@ class HODSubject extends Component {
     };
 
     loadSubjectData = () => {
-        fetch(`${this.url}/hod/subjects/${this.subjectId}/chapters/`, {
+        fetch(`${this.url}/hod/subject/${this.subjectId}/`, {
             headers: this.headers,
             method: "GET",
         })
@@ -1078,7 +1078,9 @@ class HODSubject extends Component {
                                 >
                                     Scorecard
                                 </button>
-                                <Link to={`${this.props.match.url}/course`}>
+                                <Link
+                                    to={`${this.props.match.url}/course/create`}
+                                >
                                     <button className="btn btn-primary btn-sm shadow-none">
                                         Configure Course
                                     </button>
@@ -1217,7 +1219,26 @@ class HODSubject extends Component {
                                                               <td></td>
                                                               <td></td>
                                                               <td></td>
-                                                              <td></td>
+                                                              <td className="text-right">
+                                                                  <Link
+                                                                      to={`${this.props.match.url}/semester/${list.semester_id}`}
+                                                                  >
+                                                                      <button
+                                                                          className="btn btn-primary-invert btn-sm shadow-sm"
+                                                                          onClick={() => {
+                                                                              store.dispatch(
+                                                                                  {
+                                                                                      type: "SEMESTER",
+                                                                                      payload:
+                                                                                          list.semester_name,
+                                                                                  }
+                                                                              );
+                                                                          }}
+                                                                      >
+                                                                          <i className="far fa-eye"></i>
+                                                                      </button>
+                                                                  </Link>
+                                                              </td>
                                                           </tr>
                                                       );
                                                   }

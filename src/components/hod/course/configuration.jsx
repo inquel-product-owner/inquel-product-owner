@@ -78,12 +78,13 @@ class Scorecard extends Component {
             }, 1000);
         } else {
             fetch(
-                `${this.url}/hod/subjects/${this.subjectId}/course/${this.props.course_id}/score_card/`,
+                `${this.url}/hod/course/${this.props.course_id}/score_card/`,
                 {
                     method: "PUT",
                     headers: this.headers,
                     body: JSON.stringify({
                         score_card_config: this.state.scorecard,
+                        subject_id: this.props.subjectId,
                     }),
                 }
             )
@@ -255,16 +256,14 @@ class QuickPassModal extends Component {
     };
 
     handlePUT = (body) => {
-        fetch(
-            `${this.url}/hod/subject/${this.props.subjectId}/course/${this.props.course_id}/quick_pass/`,
-            {
-                headers: this.headers,
-                method: "PUT",
-                body: JSON.stringify({
-                    quick_pass_tips: body,
-                }),
-            }
-        )
+        fetch(`${this.url}/hod/course/${this.props.course_id}/quick_pass/`, {
+            headers: this.headers,
+            method: "PUT",
+            body: JSON.stringify({
+                quick_pass_tips: body,
+                subject_id: this.props.subjectId,
+            }),
+        })
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
@@ -765,6 +764,7 @@ class HODCourseConfig extends Component {
 
         let data = this.state.courseData;
         let body = data;
+        body["subject_id"] = this.subjectId;
 
         if (data.course_name === "") {
             this.setState({
@@ -797,7 +797,7 @@ class HODCourseConfig extends Component {
     };
 
     handlePOST = (body) => {
-        fetch(`${this.url}/hod/subject/${this.subjectId}/course/`, {
+        fetch(`${this.url}/hod/course/`, {
             method: "POST",
             headers: this.headers,
             body: JSON.stringify(body),
@@ -823,14 +823,11 @@ class HODCourseConfig extends Component {
     };
 
     handlePUT = (body) => {
-        fetch(
-            `${this.url}/hod/subject/${this.subjectId}/course/${this.state.course_id}/`,
-            {
-                method: "PUT",
-                headers: this.headers,
-                body: JSON.stringify(body),
-            }
-        )
+        fetch(`${this.url}/hod/course/${this.state.course_id}/`, {
+            method: "PUT",
+            headers: this.headers,
+            body: JSON.stringify(body),
+        })
             .then((res) => res.json())
             .then((result) => {
                 if (result.sts === true) {

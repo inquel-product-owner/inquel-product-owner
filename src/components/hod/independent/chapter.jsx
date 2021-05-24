@@ -22,42 +22,15 @@ class HODChapter extends Component {
             showSideNav: false,
             collapsed: false,
 
-            showTopicModal: false,
-            showTopic_EditModal: false,
-            showTopic_DeleteModal: false,
-
-            showCycle_TestModal: false,
-            showCycle_EditModal: false,
-            showCycle_DeleteModal: false,
-
-            showIndependentCycle_TestModal: false,
-            showIndependentCycle_EditModal: false,
-
-            showQuiz_CreateModal: false,
-            showQuiz_EditModal: false,
-            showQuiz_DeleteModal: false,
-
             chapterList: [],
             chapterId: this.props.match.params.chapterId,
-            chapterName: "",
-            chapters: {
-                topic_id: "",
-                chapter_id: this.props.match.params.chapterId,
-                chapter_structure: [],
-            },
-            permissions: {},
+            chapters: [],
             chapterIndex: 1,
-            activeTopic: "",
-            ancestor: "",
             topicEventKey: [],
 
             cycle_test: [],
             quiz: [],
-            selectedCycleData: [],
-            selectedTopicData: [],
-            selectedQuizData: [],
-            next_topic: [],
-            is_independent: false,
+            teacher_name: "",
 
             errorMsg: "",
             successMsg: "",
@@ -98,10 +71,8 @@ class HODChapter extends Component {
                     });
                     this.setState({
                         chapters: result.data.chapter_structure,
-                        chapterName:
-                            result.data.chapter_name !== undefined
-                                ? result.data.chapter_name
-                                : this.props.chapter_name,
+                        cycle_test: result.data.cycle_tests,
+                        quiz: result.data.quiz,
                         page_loading: false,
                     });
                 } else {
@@ -120,18 +91,21 @@ class HODChapter extends Component {
     getChapterIndex = () => {
         const chapters = [...this.state.chapterList];
         let index = 0;
+        let teacher = "";
         for (let i = 0; i < chapters.length; i++) {
             if (chapters[i].chapter_id === this.state.chapterId) {
                 index = i + 1;
+                teacher = chapters[i].teacher.full_name;
             }
         }
         this.setState({
             chapterIndex: index,
+            teacher_name: teacher,
         });
     };
 
     componentDidMount = async () => {
-        await fetch(`${this.url}/hod/subjects/${this.subjectId}/chapters/`, {
+        await fetch(`${this.url}/hod/subject/${this.subjectId}/`, {
             headers: this.headers,
             method: "GET",
         })
@@ -211,7 +185,7 @@ class HODChapter extends Component {
                 <Accordion.Toggle
                     as={Card.Header}
                     eventKey={`topic-${index}-${data.topic_num}`}
-                    className="light-bg shadow-sm py-2 mb-2"
+                    className="bg-light shadow-sm border py-2 mb-2"
                     style={{
                         borderRadius: "8px",
                     }}
@@ -224,7 +198,7 @@ class HODChapter extends Component {
                     }
                 >
                     <div className="row align-items-center">
-                        <div className="col-md-4 mb-2 mb-md-0">
+                        <div className="col-4">
                             <div className="row align-items-center">
                                 <div className="col-1">
                                     {data.child.length !== 0 ? (
@@ -252,100 +226,86 @@ class HODChapter extends Component {
                             </div>
                         </div>
 
-                        <div className="col-md-8">
+                        <div className="col-8">
                             <div className="row align-items-center">
-                                <div className="col-md-2 mb-2 mb-md-0"></div>
-                                <div className="col-md-2 mb-2 mb-md-0">
-                                    <Link
-                                        to={`${this.props.match.url}/${data.topic_num}/notes/upload`}
-                                    >
-                                        <button
-                                            className="btn btn-sm btn-primary shadow-none mr-2"
-                                            onClick={() =>
-                                                this.dispatchTopic(
-                                                    data.topic_name
-                                                )
-                                            }
-                                        >
-                                            <i className="fas fa-file-upload fa-sm"></i>
-                                        </button>
-                                    </Link>
+                                <div className="col-2"></div>
+                                <div className="col-2">
                                     <Link
                                         to={`${this.props.match.url}/${data.topic_num}/notes`}
                                     >
                                         <button
-                                            className="btn btn-sm btn-primary shadow-none"
+                                            className="btn btn-secondary shadow-none mr-2"
                                             onClick={() =>
                                                 this.dispatchTopic(
                                                     data.topic_name
                                                 )
                                             }
                                         >
-                                            <i className="fas fa-file-medical fa-sm"></i>
+                                            <i className="fas fa-eye"></i>
                                         </button>
                                     </Link>
                                 </div>
-                                <div className="col-md-2 mb-2 mb-md-0">
+                                <div className="col-2">
                                     <Link
                                         to={`${this.props.match.url}/${data.topic_num}/match`}
                                     >
                                         <button
-                                            className="btn btn-primary btn-sm shadow-none"
+                                            className="btn btn-secondary shadow-none"
                                             onClick={() =>
                                                 this.dispatchTopic(
                                                     data.topic_name
                                                 )
                                             }
                                         >
-                                            View / Edit
+                                            <i className="fas fa-eye"></i>
                                         </button>
                                     </Link>
                                 </div>
-                                <div className="col-md-2 mb-2 mb-md-0">
+                                <div className="col-2">
                                     <Link
                                         to={`${this.props.match.url}/${data.topic_num}/concepts`}
                                     >
                                         <button
-                                            className="btn btn-primary btn-sm shadow-none"
+                                            className="btn btn-secondary shadow-none"
                                             onClick={() =>
                                                 this.dispatchTopic(
                                                     data.topic_name
                                                 )
                                             }
                                         >
-                                            View / Edit
+                                            <i className="fas fa-eye"></i>
                                         </button>
                                     </Link>
                                 </div>
-                                <div className="col-md-2 mb-2 mb-md-0">
+                                <div className="col-2">
                                     <Link
                                         to={`${this.props.match.url}/${data.topic_num}/type1`}
                                     >
                                         <button
-                                            className="btn btn-primary btn-sm shadow-none"
+                                            className="btn btn-secondary shadow-none"
                                             onClick={() =>
                                                 this.dispatchTopic(
                                                     data.topic_name
                                                 )
                                             }
                                         >
-                                            View / Edit
+                                            <i className="fas fa-eye"></i>
                                         </button>
                                     </Link>
                                 </div>
-                                <div className="col-md-2 mb-2 mb-md-0">
+                                <div className="col-2">
                                     <Link
                                         to={`${this.props.match.url}/${data.topic_num}/type2`}
                                     >
                                         <button
-                                            className="btn btn-primary btn-sm shadow-none"
+                                            className="btn btn-secondary shadow-none"
                                             onClick={() =>
                                                 this.dispatchTopic(
                                                     data.topic_name
                                                 )
                                             }
                                         >
-                                            View / Edit
+                                            <i className="fas fa-eye"></i>
                                         </button>
                                     </Link>
                                 </div>
@@ -475,30 +435,44 @@ class HODChapter extends Component {
                         </button>
 
                         {/* ----- Breadcrumb ----- */}
-                        <nav aria-label="breadcrumb">
-                            <ol className="breadcrumb mb-3">
-                                <li className="breadcrumb-item">
-                                    <Link to="/hod">
-                                        <i className="fas fa-home fa-sm"></i>
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item">
-                                    <Link
-                                        to="#"
-                                        onClick={this.props.history.goBack}
-                                    >
-                                        {this.props.subject_name}
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item active">
-                                    <span>Chapter:</span>
-                                    {this.state.chapterName}
-                                </li>
-                            </ol>
-                        </nav>
+                        <div className="row align-items-center mb-3">
+                            <div className="col-md-6 col-10">
+                                <nav aria-label="breadcrumb">
+                                    <ol className="breadcrumb">
+                                        <li className="breadcrumb-item">
+                                            <Link to="/hod">
+                                                <i className="fas fa-home fa-sm"></i>
+                                            </Link>
+                                        </li>
+                                        <li className="breadcrumb-item">
+                                            <Link
+                                                to="#"
+                                                onClick={
+                                                    this.props.history.goBack
+                                                }
+                                            >
+                                                {this.props.subject_name}
+                                            </Link>
+                                        </li>
+                                        <li className="breadcrumb-item text-truncate active">
+                                            <span>Chapter:</span>
+                                            {this.props.chapter_name}
+                                        </li>
+                                    </ol>
+                                </nav>
+                            </div>
+                            <div className="col-md-6 col-2 text-right">
+                                <button
+                                    className="btn btn-primary btn-sm shadow-none"
+                                    onClick={this.handlePublish}
+                                >
+                                    Approve
+                                </button>
+                            </div>
+                        </div>
 
                         <div className="row align-items-center mb-3">
-                            <div className="col-md-4">
+                            <div className="col-md-4 mb-2 mb-md-0">
                                 <Select
                                     className="basic-single form-shadow"
                                     placeholder={this.props.chapter_name}
@@ -517,218 +491,213 @@ class HODChapter extends Component {
                                     required
                                 />
                             </div>
-                            {this.groupId === undefined ? (
-                                <div className="col-md-8 text-right">
-                                    <button
-                                        className="btn btn-primary btn-sm shadow-none"
-                                        onClick={this.handlePublish}
-                                    >
-                                        Publish
-                                    </button>
+                            <div className="col-md-8 d-flex align-items-center justify-content-start justify-content-md-end">
+                                <div className="mr-2 primary-text font-weight-bold-600">
+                                    Assigned to:
                                 </div>
-                            ) : (
-                                ""
-                            )}
+                                <div className="p-2 bg-white shadow-sm rounded-lg small font-weight-bold-600">
+                                    {this.state.teacher_name}
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Course details */}
-                        <div className="card shadow-sm mb-3">
-                            <div className="card-header secondary-bg primary-text font-weight-bold">
-                                <div className="row">
-                                    <div className="col-md-4 mb-2 mb-md-0">
-                                        Topic structure
-                                    </div>
-                                    <div className="col-md-8 small primary-text font-weight-bold">
-                                        <div className="row justify-content-end">
-                                            <div className="col-md-2 mb-2 mb-md-0">
-                                                Summary
-                                            </div>
-                                            <div className="col-md-2 mb-2 mb-md-0">
-                                                Notes
-                                            </div>
-                                            <div className="col-md-2 mb-2 mb-md-0">
-                                                Match
-                                            </div>
-                                            <div className="col-md-2 mb-2 mb-md-0">
-                                                Concept
-                                            </div>
-                                            <div className="col-md-2 mb-2 mb-md-0">
-                                                Type 1 Q
-                                            </div>
-                                            <div className="col-md-2 mb-2 mb-md-0">
-                                                Type 2 Q
+                        <div
+                            className="card shadow-sm"
+                            style={{ overflow: "auto" }}
+                        >
+                            {/* Course details */}
+                            <div style={{ minWidth: "1100px" }}>
+                                <div className="card-header tomato-bg primary-text font-weight-bold">
+                                    <div className="row align-items-center">
+                                        <div className="col-4">
+                                            Topic structure
+                                        </div>
+                                        <div className="col-8 small primary-text font-weight-bold">
+                                            <div className="row justify-content-end">
+                                                <div className="col-2">
+                                                    Summary
+                                                </div>
+                                                <div className="col-2">
+                                                    Notes
+                                                </div>
+                                                <div className="col-2">
+                                                    Match
+                                                </div>
+                                                <div className="col-2">
+                                                    Concept
+                                                </div>
+                                                <div className="col-2">
+                                                    Type 1 Q
+                                                </div>
+                                                <div className="col-2">
+                                                    Type 2 Q
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="card-body">
-                                <Accordion defaultActiveKey="0">
-                                    <Card>
-                                        <Accordion.Toggle
-                                            as={Card.Header}
-                                            eventKey="0"
-                                            className="secondary-bg shadow-sm mb-2 py-3"
-                                            style={{ borderRadius: "8px" }}
-                                            onClick={() => {
-                                                this.setState({
-                                                    collapsed:
-                                                        !this.state.collapsed,
-                                                });
-                                            }}
-                                        >
-                                            <div className="row align-items-center">
-                                                <div className="col-md-4 mb-2 mb-md-0">
-                                                    <div className="row align-items-center">
-                                                        <div className="col-1">
-                                                            <span>
-                                                                <i
-                                                                    className={`fas fa-chevron-circle-down ${
-                                                                        this
-                                                                            .state
-                                                                            .collapsed
-                                                                            ? "fa-rotate-270"
-                                                                            : ""
-                                                                    }`}
-                                                                ></i>
-                                                            </span>
-                                                        </div>
-                                                        <div className="col-11 d-flex small font-weight-bold">
-                                                            <div className="mr-3">
-                                                                {
-                                                                    this.state
-                                                                        .chapterIndex
-                                                                }
-                                                            </div>
-                                                            <div>
-                                                                {
-                                                                    this.props
-                                                                        .chapter_name
-                                                                }
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </Accordion.Toggle>
-
-                                        <Accordion.Collapse eventKey="0">
-                                            <Card>
-                                                {/* ----- Topic list ----- */}
-                                                {this.state.chapters
-                                                    .chapter_structure
-                                                    .length !== 0
-                                                    ? this.state.chapters.chapter_structure.map(
-                                                          (data, index) => {
-                                                              return (
-                                                                  <Accordion
-                                                                      key={
-                                                                          index
-                                                                      }
-                                                                  >
-                                                                      {this.topicRender(
-                                                                          data,
-                                                                          index,
-                                                                          this
-                                                                              .state
-                                                                              .chapters
-                                                                              .topic_id
-                                                                      )}
-                                                                  </Accordion>
-                                                              );
-                                                          }
-                                                      )
-                                                    : null}
-
-                                                {/* ----- Cycle test list ----- */}
-                                                {this.state.cycle_test
-                                                    .length !== 0
-                                                    ? this.state.cycle_test.map(
-                                                          (data, index) => {
-                                                              return (
-                                                                  <div
-                                                                      className="card card-header shadow-sm light-bg mb-2"
-                                                                      key={
-                                                                          index
-                                                                      }
-                                                                  >
-                                                                      <div className="row align-items-center">
-                                                                          <div className="col-md-6">
-                                                                              <p className="small primary-text font-weight-bold-600 mb-0">
-                                                                                  {
-                                                                                      data.cycle_test_name
-                                                                                  }
-                                                                              </p>
-                                                                          </div>
-                                                                          <div className="col-md-6 d-flex align-items-center justify-content-end">
-                                                                              <Link
-                                                                                  to={`${this.props.match.url}/cycle/${data.cycle_test_id}`}
-                                                                              >
-                                                                                  <button
-                                                                                      className="btn btn-primary btn-sm shadow-none"
-                                                                                      onClick={() =>
-                                                                                          this.dispatchCycle(
-                                                                                              data.cycle_test_name
-                                                                                          )
-                                                                                      }
-                                                                                  >
-                                                                                      Auto
-                                                                                  </button>
-                                                                              </Link>
-                                                                          </div>
-                                                                      </div>
-                                                                  </div>
-                                                              );
-                                                          }
-                                                      )
-                                                    : null}
-
-                                                {/* ----- Quiz list ----- */}
-                                                {Object.entries(this.state.quiz)
-                                                    .length !== 0 ? (
-                                                    <div className="card card-header shadow-sm light-bg mb-2">
+                                <div className="card-body p-3">
+                                    <Accordion defaultActiveKey="0">
+                                        <Card className="bg-transparent">
+                                            <Accordion.Toggle
+                                                as={Card.Header}
+                                                eventKey="0"
+                                                className="secondary-bg shadow-sm mb-2 py-2"
+                                                style={{ borderRadius: "8px" }}
+                                                onClick={() => {
+                                                    this.setState({
+                                                        collapsed:
+                                                            !this.state
+                                                                .collapsed,
+                                                    });
+                                                }}
+                                            >
+                                                <div className="row align-items-center">
+                                                    <div className="col-4">
                                                         <div className="row align-items-center">
-                                                            <div className="col-md-6">
-                                                                <p className="small primary-text font-weight-bold-600 mb-0">
+                                                            <div className="col-1">
+                                                                <span>
+                                                                    <i
+                                                                        className={`fas fa-chevron-circle-down ${
+                                                                            this
+                                                                                .state
+                                                                                .collapsed
+                                                                                ? "fa-rotate-270"
+                                                                                : ""
+                                                                        }`}
+                                                                    ></i>
+                                                                </span>
+                                                            </div>
+                                                            <div className="col-11 d-flex small font-weight-bold">
+                                                                <div className="mr-3">
                                                                     {
                                                                         this
                                                                             .state
-                                                                            .quiz
-                                                                            .quiz_name
+                                                                            .chapterIndex
                                                                     }
-                                                                </p>
+                                                                </div>
+                                                                <div>
+                                                                    {
+                                                                        this
+                                                                            .props
+                                                                            .chapter_name
+                                                                    }
+                                                                </div>
                                                             </div>
-                                                            <div className="col-md-6 d-flex align-items-center justify-content-end">
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="col-8">
+                                                        <div className="row align-items-center">
+                                                            <div className="col-2">
                                                                 <Link
-                                                                    to={`${this.props.match.url}/quiz/${this.state.quiz.quiz_id}`}
+                                                                    to={`${this.props.match.url}/summary`}
                                                                 >
-                                                                    <button
-                                                                        className="btn btn-primary btn-sm shadow-none"
-                                                                        onClick={() =>
-                                                                            this.dispatchQuiz(
-                                                                                this
-                                                                                    .state
-                                                                                    .quiz
-                                                                                    .quiz_name
-                                                                            )
-                                                                        }
-                                                                    >
-                                                                        View /
-                                                                        Edit
+                                                                    <button className="btn btn-secondary shadow-none">
+                                                                        <i className="fas fa-eye"></i>
                                                                     </button>
                                                                 </Link>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                ) : (
-                                                    ""
-                                                )}
-                                            </Card>
-                                        </Accordion.Collapse>
-                                    </Card>
-                                </Accordion>
+                                                </div>
+                                            </Accordion.Toggle>
+
+                                            <Accordion.Collapse eventKey="0">
+                                                <Card className="bg-transparent">
+                                                    {/* ----- Topic list ----- */}
+                                                    {this.state.chapters
+                                                        .length !== 0
+                                                        ? this.state.chapters.map(
+                                                              (data, index) => {
+                                                                  return (
+                                                                      <Accordion
+                                                                          key={
+                                                                              index
+                                                                          }
+                                                                      >
+                                                                          {this.topicRender(
+                                                                              data,
+                                                                              index
+                                                                          )}
+                                                                      </Accordion>
+                                                                  );
+                                                              }
+                                                          )
+                                                        : null}
+
+                                                    {/* ----- Cycle test list ----- */}
+                                                    {this.state.cycle_test
+                                                        .length !== 0
+                                                        ? this.state.cycle_test.map(
+                                                              (data, index) => {
+                                                                  return (
+                                                                      <div
+                                                                          className="card card-header bg-light border shadow-sm mb-2"
+                                                                          style={{
+                                                                              padding:
+                                                                                  "12px",
+                                                                          }}
+                                                                          key={
+                                                                              index
+                                                                          }
+                                                                      >
+                                                                          <Link
+                                                                              to={`${this.props.match.url}/cycle/${data.cycle_test_id}`}
+                                                                          >
+                                                                              <p className="small primary-text text-center font-weight-bold-600 mb-0">
+                                                                                  {
+                                                                                      data.cycle_test_name
+                                                                                  }
+                                                                              </p>
+                                                                          </Link>
+                                                                      </div>
+                                                                  );
+                                                              }
+                                                          )
+                                                        : null}
+
+                                                    {/* ----- Quiz list ----- */}
+                                                    {this.state.quiz.length !==
+                                                    0
+                                                        ? this.state.quiz.map(
+                                                              (
+                                                                  data,
+                                                                  quiz_index
+                                                              ) => {
+                                                                  return (
+                                                                      <div
+                                                                          className="card card-header bg-light border shadow-sm mb-2"
+                                                                          style={{
+                                                                              padding:
+                                                                                  "12px",
+                                                                          }}
+                                                                          key={
+                                                                              quiz_index
+                                                                          }
+                                                                      >
+                                                                          <Link
+                                                                              to={`${this.props.match.url}/quiz/${data.quiz_id}`}
+                                                                          >
+                                                                              <p className="small primary-text text-center font-weight-bold-600 mb-0">
+                                                                                  {
+                                                                                      data.quiz_name
+                                                                                  }
+                                                                              </p>
+                                                                          </Link>
+                                                                      </div>
+                                                                  );
+                                                              }
+                                                          )
+                                                        : ""}
+                                                </Card>
+                                            </Accordion.Collapse>
+                                        </Card>
+                                    </Accordion>
+                                </div>
                             </div>
                         </div>
+
                         {/* Loading component */}
                         {this.state.page_loading ? <Loading /> : ""}
                     </div>

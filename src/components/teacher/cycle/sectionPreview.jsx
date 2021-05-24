@@ -8,7 +8,7 @@ import Loading from "../../sharedComponents/loader";
 import AlertBox from "../../sharedComponents/alert";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
-import { dataFormat } from "../../sharedComponents/dataFormating";
+import { DataFormat } from "../../sharedComponents/dataFormating";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
@@ -83,7 +83,7 @@ class TeacherCycleTestAutoQA extends Component {
                 let currentSubQuestionIndex = [];
                 if (result.sts === true) {
                     if (result.data.results.length !== 0) {
-                        let values = dataFormat(result);
+                        let values = DataFormat(result);
                         data = values.result;
                         type = values.type;
                         totalSubQuestion = values.total;

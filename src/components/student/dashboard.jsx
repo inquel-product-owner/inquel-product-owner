@@ -9,6 +9,7 @@ import Footer from "./shared/footer";
 import Loading from "../sharedComponents/loader";
 import AlertBox from "../sharedComponents/alert";
 import { connect } from "react-redux";
+import store from "../../redux/store";
 
 const mapStateToProps = (state) => ({
     profile: state.user.profile,
@@ -271,7 +272,21 @@ class Dashboard extends Component {
                                                                 <Link
                                                                     to={`/student/group/${this.state.groupData.id}`}
                                                                 >
-                                                                    <button className="btn btn-primary btn-sm shadow-none">
+                                                                    <button
+                                                                        className="btn btn-primary btn-sm shadow-none"
+                                                                        onClick={() => {
+                                                                            store.dispatch(
+                                                                                {
+                                                                                    type: "GROUP",
+                                                                                    payload:
+                                                                                        this
+                                                                                            .state
+                                                                                            .groupData
+                                                                                            .group_name,
+                                                                                }
+                                                                            );
+                                                                        }}
+                                                                    >
                                                                         <i className="fas fa-eye"></i>
                                                                     </button>
                                                                 </Link>

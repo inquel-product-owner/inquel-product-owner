@@ -17,6 +17,7 @@ import {
     MultiContentDeleteModal,
 } from "../sharedComponents/contentManagementModal";
 import { connect } from "react-redux";
+import Slider from "react-slick";
 
 const mapStateToProps = (state) => ({
     data: state.user.profile,
@@ -169,6 +170,7 @@ class HODDashboard extends Component {
 
             groupItems: [],
             subjectItems: [],
+            courseItems: [],
             selectedSubject: [],
             selectedGroup: [],
 
@@ -232,13 +234,10 @@ class HODDashboard extends Component {
     };
 
     loadSubjectData = () => {
-        fetch(
-            `${this.url}/hod/subjects/?page=${this.state.activeSubjectPage}`,
-            {
-                headers: this.headers,
-                method: "GET",
-            }
-        )
+        fetch(`${this.url}/hod/subject/?page=${this.state.activeSubjectPage}`, {
+            headers: this.headers,
+            method: "GET",
+        })
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
@@ -261,11 +260,38 @@ class HODDashboard extends Component {
             });
     };
 
+    loadCourseData = () => {
+        fetch(`${this.url}/hod/course/`, {
+            headers: this.headers,
+            method: "GET",
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        courseItems: result.data,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
     componentDidMount = () => {
         document.title = "Dashboard - HOD | IQLabs";
 
         this.loadGroupData();
         this.loadSubjectData();
+        this.loadCourseData();
     };
 
     handleDelete = (type) => {
@@ -370,6 +396,40 @@ class HODDashboard extends Component {
     }
 
     render() {
+        var settings = {
+            dots: true,
+            infinite: false,
+            speed: 500,
+            slidesToShow: 4,
+            slidesToScroll: 4,
+            initialSlide: 0,
+            responsive: [
+                {
+                    breakpoint: 1024,
+                    settings: {
+                        slidesToShow: 2,
+                        slidesToScroll: 2,
+                        dots: true,
+                    },
+                },
+                {
+                    breakpoint: 600,
+                    settings: {
+                        slidesToShow: 1,
+                        slidesToScroll: 1,
+                        dots: false,
+                    },
+                },
+                {
+                    breakpoint: 480,
+                    settings: {
+                        slidesToShow: 1,
+                        slidesToScroll: 1,
+                        dots: false,
+                    },
+                },
+            ],
+        };
         return (
             <div className="wrapper">
                 {/* Navbar */}
@@ -616,116 +676,59 @@ class HODDashboard extends Component {
                                         </div>
 
                                         {/* ----- Course card ----- */}
-                                        <div className="card shadow-sm mb-4">
+                                        <div className="card shadow-sm">
                                             <div className="card-header">
-                                                <div className="row align-items-center">
-                                                    <div className="col-md-3">
-                                                        <h5>Course</h5>
-                                                    </div>
-                                                    <div className="col-md-9 text-right">
-                                                        <button className="btn btn-primary btn-sm shadow-none mr-1">
-                                                            Delete
-                                                        </button>
-                                                        <button className="btn btn-primary btn-sm shadow-none mr-1">
-                                                            Enable
-                                                        </button>
-                                                        <button className="btn btn-primary btn-sm shadow-none">
-                                                            Disable
-                                                        </button>
-                                                    </div>
-                                                </div>
+                                                <h5>Course</h5>
                                             </div>
                                             <div className="card-body">
-                                                <div className="row justify-content-center">
-                                                    <div className="col-md-11">
-                                                        <div className="row">
-                                                            <div className="col-md-4 mb-3">
-                                                                <Link
-                                                                    to="/hod"
-                                                                    style={{
-                                                                        textDecoration:
-                                                                            "none",
-                                                                    }}
-                                                                >
+                                                {this.state.courseItems.length >
+                                                0 ? (
+                                                    <Slider {...settings}>
+                                                        {this.state.courseItems.map(
+                                                            (data, index) => {
+                                                                return (
                                                                     <div
-                                                                        className="card"
-                                                                        style={{
-                                                                            cursor: "pointer",
-                                                                        }}
+                                                                        className="px-3"
+                                                                        data-index={
+                                                                            index
+                                                                        }
+                                                                        key={
+                                                                            index
+                                                                        }
                                                                     >
-                                                                        <img
-                                                                            src={
-                                                                                courseimg
-                                                                            }
-                                                                            className="card-img-top"
-                                                                            alt="Course"
-                                                                        />
-                                                                        <div className="card-body primary-bg text-white text-center p-2">
-                                                                            Course
-                                                                            01
+                                                                        <div className="card">
+                                                                            <img
+                                                                                src={
+                                                                                    data.course_thumbnail_url ===
+                                                                                    null
+                                                                                        ? courseimg
+                                                                                        : data.course_thumbnail_url
+                                                                                }
+                                                                                className="card-img-top"
+                                                                                alt="Course"
+                                                                            />
+                                                                            <Link
+                                                                                to={`/hod/course/${data.course_id}`}
+                                                                                className="text-decoration-none"
+                                                                            >
+                                                                                <div
+                                                                                    className="card-body primary-bg text-white p-2"
+                                                                                    style={{
+                                                                                        cursor: "pointer",
+                                                                                    }}
+                                                                                >
+                                                                                    {
+                                                                                        data.course_name
+                                                                                    }
+                                                                                </div>
+                                                                            </Link>
                                                                         </div>
                                                                     </div>
-                                                                </Link>
-                                                            </div>
-                                                            <div className="col-md-4 mb-3">
-                                                                <Link
-                                                                    to="/hod"
-                                                                    style={{
-                                                                        textDecoration:
-                                                                            "none",
-                                                                    }}
-                                                                >
-                                                                    <div
-                                                                        className="card"
-                                                                        style={{
-                                                                            cursor: "pointer",
-                                                                        }}
-                                                                    >
-                                                                        <img
-                                                                            src={
-                                                                                courseimg
-                                                                            }
-                                                                            className="card-img-top"
-                                                                            alt="Course"
-                                                                        />
-                                                                        <div className="card-body primary-bg text-white text-center p-2">
-                                                                            Course
-                                                                            02
-                                                                        </div>
-                                                                    </div>
-                                                                </Link>
-                                                            </div>
-                                                            <div className="col-md-4 mb-3">
-                                                                <Link
-                                                                    to="/hod"
-                                                                    style={{
-                                                                        textDecoration:
-                                                                            "none",
-                                                                    }}
-                                                                >
-                                                                    <div
-                                                                        className="card"
-                                                                        style={{
-                                                                            cursor: "pointer",
-                                                                        }}
-                                                                    >
-                                                                        <img
-                                                                            src={
-                                                                                courseimg
-                                                                            }
-                                                                            className="card-img-top"
-                                                                            alt="Course"
-                                                                        />
-                                                                        <div className="card-body primary-bg text-white text-center p-2">
-                                                                            Course
-                                                                            03
-                                                                        </div>
-                                                                    </div>
-                                                                </Link>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                                );
+                                                            }
+                                                        )}
+                                                    </Slider>
+                                                ) : null}
                                             </div>
                                         </div>
                                     </>

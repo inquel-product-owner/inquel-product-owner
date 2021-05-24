@@ -421,7 +421,7 @@ export function Type2DataFormat(result) {
     };
 }
 
-export function dataFormat(result) {
+export function DataFormat(result) {
     let data = [];
     let images = [];
     let audio = [];
