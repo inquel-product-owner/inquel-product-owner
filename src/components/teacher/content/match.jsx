@@ -26,7 +26,6 @@ class TeacherMatch extends Component {
             showDeleteModal: false,
             showTemplateUploadModal: false,
 
-            alertMsg: "",
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,

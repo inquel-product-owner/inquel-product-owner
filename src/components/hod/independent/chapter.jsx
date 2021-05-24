@@ -15,7 +15,7 @@ const mapStateToProps = (state) => ({
     chapter_name: state.content.chapter_name,
 });
 
-class HODChapter extends Component {
+class HODSubjectChapter extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -229,28 +229,13 @@ class HODChapter extends Component {
                         <div className="col-8">
                             <div className="row align-items-center">
                                 <div className="col-2"></div>
-                                <div className="col-2">
-                                    <Link
-                                        to={`${this.props.match.url}/${data.topic_num}/notes`}
-                                    >
-                                        <button
-                                            className="btn btn-secondary shadow-none mr-2"
-                                            onClick={() =>
-                                                this.dispatchTopic(
-                                                    data.topic_name
-                                                )
-                                            }
-                                        >
-                                            <i className="fas fa-eye"></i>
-                                        </button>
-                                    </Link>
-                                </div>
+                                <div className="col-2"></div>
                                 <div className="col-2">
                                     <Link
                                         to={`${this.props.match.url}/${data.topic_num}/match`}
                                     >
                                         <button
-                                            className="btn btn-secondary shadow-none"
+                                            className="btn btn-primary shadow-none"
                                             onClick={() =>
                                                 this.dispatchTopic(
                                                     data.topic_name
@@ -266,7 +251,7 @@ class HODChapter extends Component {
                                         to={`${this.props.match.url}/${data.topic_num}/concepts`}
                                     >
                                         <button
-                                            className="btn btn-secondary shadow-none"
+                                            className="btn btn-primary shadow-none"
                                             onClick={() =>
                                                 this.dispatchTopic(
                                                     data.topic_name
@@ -279,10 +264,10 @@ class HODChapter extends Component {
                                 </div>
                                 <div className="col-2">
                                     <Link
-                                        to={`${this.props.match.url}/${data.topic_num}/type1`}
+                                        to={`${this.props.match.url}/${data.topic_num}/typeone`}
                                     >
                                         <button
-                                            className="btn btn-secondary shadow-none"
+                                            className="btn btn-primary shadow-none"
                                             onClick={() =>
                                                 this.dispatchTopic(
                                                     data.topic_name
@@ -295,10 +280,10 @@ class HODChapter extends Component {
                                 </div>
                                 <div className="col-2">
                                     <Link
-                                        to={`${this.props.match.url}/${data.topic_num}/type2`}
+                                        to={`${this.props.match.url}/${data.topic_num}/typetwo`}
                                     >
                                         <button
-                                            className="btn btn-secondary shadow-none"
+                                            className="btn btn-primary shadow-none"
                                             onClick={() =>
                                                 this.dispatchTopic(
                                                     data.topic_name
@@ -593,7 +578,16 @@ class HODChapter extends Component {
                                                                 <Link
                                                                     to={`${this.props.match.url}/summary`}
                                                                 >
-                                                                    <button className="btn btn-secondary shadow-none">
+                                                                    <button className="btn btn-primary shadow-none">
+                                                                        <i className="fas fa-eye"></i>
+                                                                    </button>
+                                                                </Link>
+                                                            </div>
+                                                            <div className="col-2">
+                                                                <Link
+                                                                    to={`${this.props.match.url}/notes`}
+                                                                >
+                                                                    <button className="btn btn-primary shadow-none">
                                                                         <i className="fas fa-eye"></i>
                                                                     </button>
                                                                 </Link>
@@ -707,4 +701,4 @@ class HODChapter extends Component {
     }
 }
 
-export default connect(mapStateToProps)(HODChapter);
+export default connect(mapStateToProps)(HODSubjectChapter);

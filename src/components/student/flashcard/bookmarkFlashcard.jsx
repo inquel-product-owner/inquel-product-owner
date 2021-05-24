@@ -1744,6 +1744,7 @@ class FavouritesFlashcard extends Component {
                                                   return audio.path !== "" ? (
                                                       <OverlayTrigger
                                                           trigger="click"
+                                                          rootClose
                                                           key={`popover${audio_index}`}
                                                           placement="bottom"
                                                           overlay={
@@ -1771,6 +1772,7 @@ class FavouritesFlashcard extends Component {
                                                                               audio.path
                                                                           }
                                                                           controls
+                                                                          autoPlay
                                                                           controlsList="nodownload"
                                                                       ></audio>
                                                                   </Popover.Content>

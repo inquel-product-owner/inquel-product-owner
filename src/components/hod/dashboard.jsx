@@ -270,7 +270,7 @@ class HODDashboard extends Component {
                 console.log(result);
                 if (result.sts === true) {
                     this.setState({
-                        courseItems: result.data,
+                        courseItems: result.data || [],
                         page_loading: false,
                     });
                 } else {
@@ -681,8 +681,8 @@ class HODDashboard extends Component {
                                                 <h5>Course</h5>
                                             </div>
                                             <div className="card-body">
-                                                {this.state.courseItems.length >
-                                                0 ? (
+                                                {this.state.courseItems
+                                                    .length !== 0 ? (
                                                     <Slider {...settings}>
                                                         {this.state.courseItems.map(
                                                             (data, index) => {

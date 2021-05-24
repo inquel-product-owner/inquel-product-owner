@@ -38,7 +38,13 @@ import HODStudentProfile from "./hod/studentProfile";
 import HODTeacherProfile from "./hod/teacherProfile";
 
 import HODSubject from "./hod/independent/subject";
-import HODChapter from "./hod/independent/chapter";
+import HODSubjectChapter from "./hod/independent/chapter";
+import HODSubjectSummary from "./hod/independent/summary";
+import HODSubjectNotes from "./hod/independent/notes";
+import HODSubjectMatch from "./hod/independent/match";
+import HODSubjectConcepts from "./hod/independent/concepts";
+import HODSubjectTypeOne from "./hod/independent/type1";
+import HODSubjectTypeTwo from "./hod/independent/type2";
 
 import HODCourseScorecard from "./hod/course/courseScorecard";
 import HODCourseConfig from "./hod/course/configuration";
@@ -355,18 +361,6 @@ const routes = (
 
         <Route
             exact
-            path="/hod/course/:courseId"
-            render={(props) =>
-                !localStorage.getItem("Authorization") ||
-                !localStorage.getItem("is_hod") ? (
-                    <Redirect to="/hod/login" />
-                ) : (
-                    <HODCourseScorecard {...props} />
-                )
-            }
-        />
-        <Route
-            exact
             path="/hod/subject/:subjectId"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
@@ -385,13 +379,97 @@ const routes = (
                 !localStorage.getItem("is_hod") ? (
                     <Redirect to="/hod/login" />
                 ) : (
-                    <HODChapter {...props} />
+                    <HODSubjectChapter {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/hod/subject/:subjectId/chapter/:chapterId/summary"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <HODSubjectSummary {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/hod/subject/:subjectId/chapter/:chapterId/notes"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <HODSubjectNotes {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/hod/subject/:subjectId/chapter/:chapterId/:topicNum/match"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <HODSubjectMatch {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/hod/subject/:subjectId/chapter/:chapterId/:topicNum/concepts"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <HODSubjectConcepts {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/hod/subject/:subjectId/chapter/:chapterId/:topicNum/typeone"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <HODSubjectTypeOne {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/hod/subject/:subjectId/chapter/:chapterId/:topicNum/typetwo"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <HODSubjectTypeTwo {...props} />
                 )
             }
         />
 
-        {/* ---------- Course configuration ---------- */}
+        {/* ---------- Course ---------- */}
 
+        <Route
+            exact
+            path="/hod/course/:courseId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <HODCourseScorecard {...props} />
+                )
+            }
+        />
         <Route
             exact
             path="/hod/subject/:subjectId/course/create"
