@@ -352,11 +352,11 @@ class FlashCard extends Component {
 
     // ---------- loads practice data ----------
 
-    loadPracticeData = async (type1_path) => {
+    loadPracticeData = async (path) => {
         var apiURL =
-            type1_path === undefined || type1_path === null
+            path === undefined || path === null
                 ? `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/typeone/learn/?topic_num=${this.topicNum}`
-                : type1_path;
+                : path;
         await fetch(apiURL, {
             method: "GET",
             headers: this.headers,
@@ -1632,7 +1632,7 @@ class FlashCard extends Component {
                 console.log(result);
                 if (result.sts === true) {
                     let response = result.data.results;
-                    let data = [];
+                    let data = [...this.state.match];
                     // combines both terms and definition as a single object
                     if (
                         response.match_terms.length !== 0 &&
@@ -1665,19 +1665,35 @@ class FlashCard extends Component {
                     this.setState(
                         {
                             // chunk the array and shuffling it
-                            match: this.chunk(this.shuffleMatch(data), 6),
+                            match: data,
                             activeData: 0,
-                            totalItems: result.data.count,
-                            page_loading: false,
+                            totalItems: data.length,
                         },
                         () => {
-                            // prepare first set of data in shuffle
-                            this.setState({
-                                match_temp: this.chunk(
-                                    this.divideMatch(this.state.match),
-                                    3
-                                ),
-                            });
+                            if (result.data.next !== null) {
+                                this.loadMatchData(result.data.next);
+                            } else {
+                                this.setState(
+                                    {
+                                        match: this.chunk(
+                                            this.shuffleMatch(data),
+                                            6
+                                        ),
+                                        page_loading: false,
+                                    },
+                                    () => {
+                                        // prepare first set of data in shuffle
+                                        this.setState({
+                                            match_temp: this.chunk(
+                                                this.divideMatch(
+                                                    this.state.match
+                                                ),
+                                                3
+                                            ),
+                                        });
+                                    }
+                                );
+                            }
                         }
                     );
                 } else {
@@ -1806,7 +1822,18 @@ class FlashCard extends Component {
                                 page_loading: true,
                             },
                             () => {
-                                this.loadMatchData();
+                                this.setState(
+                                    {
+                                        match: [],
+                                        match_terms: { id: [], type: [] },
+                                        match_ids: [],
+                                        match_temp: [],
+                                        match_color: "match-active-bg",
+                                    },
+                                    () => {
+                                        this.loadMatchData();
+                                    }
+                                );
                             }
                         );
                     }}
@@ -2513,6 +2540,7 @@ class FlashCard extends Component {
                                                   return audio.path !== "" ? (
                                                       <OverlayTrigger
                                                           trigger="click"
+                                                          rootClose
                                                           key={`popover${audio_index}`}
                                                           placement="bottom"
                                                           overlay={
@@ -2539,6 +2567,7 @@ class FlashCard extends Component {
                                                                           src={
                                                                               audio.path
                                                                           }
+                                                                          autoPlay
                                                                           controls
                                                                           controlsList="nodownload"
                                                                       ></audio>

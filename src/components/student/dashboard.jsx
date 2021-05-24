@@ -58,6 +58,9 @@ class Dashboard extends Component {
                         page_loading: false,
                     });
                 } else {
+                    this.setState({
+                        page_loading: false,
+                    });
                     console.log(result.msg);
                 }
             })

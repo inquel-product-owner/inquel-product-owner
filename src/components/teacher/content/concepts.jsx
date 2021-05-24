@@ -6,7 +6,7 @@ import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import CKeditor from "../../sharedComponents/CKeditor";
 import ReactSwitch from "../../sharedComponents/switchComponent";
-import { Accordion, Card, Spinner } from "react-bootstrap";
+import { Accordion, Card } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
 import ReactCardFlip from "react-card-flip";
 import Loading from "../../sharedComponents/loader";
@@ -34,8 +34,6 @@ class TeacherConcepts extends Component {
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
-            showPublishLoader: false,
-
             page_loading: true,
             btnDisabled: false,
             showConceptDelete_Modal: false,
@@ -793,9 +791,8 @@ class TeacherConcepts extends Component {
 
     handleDefinition = async (evt) => {
         const values = [...this.state.concepts];
-        values[
-            this.state.activeConcept
-        ].content.definition = evt.editor.getData();
+        values[this.state.activeConcept].content.definition =
+            evt.editor.getData();
         await this.setState({
             concepts: values,
         });
@@ -854,14 +851,13 @@ class TeacherConcepts extends Component {
                             successMsg: result.msg,
                             showSuccessAlert: true,
                         });
-                        values[this.state.activeConcept].content.images[
-                            index
-                        ] = {
-                            title: "",
-                            file_name: "",
-                            image: null,
-                            path: "",
-                        };
+                        values[this.state.activeConcept].content.images[index] =
+                            {
+                                title: "",
+                                file_name: "",
+                                image: null,
+                                path: "",
+                            };
                         this.setState({
                             concepts: values,
                         });
@@ -906,9 +902,8 @@ class TeacherConcepts extends Component {
         } else {
             values[this.state.activeConcept].content.images[index].file_name =
                 event.target.files[0].name;
-            values[this.state.activeConcept].content.images[
-                index
-            ].path = URL.createObjectURL(event.target.files[0]);
+            values[this.state.activeConcept].content.images[index].path =
+                URL.createObjectURL(event.target.files[0]);
             values[this.state.activeConcept].content.images[index].image =
                 event.target.files[0];
             this.setState({
@@ -961,9 +956,8 @@ class TeacherConcepts extends Component {
         } else {
             values[this.state.activeConcept].content.video.file_name =
                 event.target.files[0].name;
-            values[
-                this.state.activeConcept
-            ].content.video.path = URL.createObjectURL(event.target.files[0]);
+            values[this.state.activeConcept].content.video.path =
+                URL.createObjectURL(event.target.files[0]);
             values[this.state.activeConcept].content.video.video =
                 event.target.files[0];
             values[this.state.activeConcept].content.video.url = "";
@@ -1025,9 +1019,8 @@ class TeacherConcepts extends Component {
                         values[
                             this.state.activeConcept
                         ].content.video.file_name = "";
-                        values[
-                            this.state.activeConcept
-                        ].content.video.video = null;
+                        values[this.state.activeConcept].content.video.video =
+                            null;
                         values[this.state.activeConcept].content.video.path =
                             "";
                         values[this.state.activeConcept].content.video.url = "";
@@ -1110,14 +1103,13 @@ class TeacherConcepts extends Component {
                             successMsg: result.msg,
                             showSuccessAlert: true,
                         });
-                        values[this.state.activeConcept].content.audio[
-                            index
-                        ] = {
-                            title: "",
-                            file_name: "",
-                            audio: null,
-                            path: "",
-                        };
+                        values[this.state.activeConcept].content.audio[index] =
+                            {
+                                title: "",
+                                file_name: "",
+                                audio: null,
+                                path: "",
+                            };
                         this.setState({
                             concepts: values,
                         });
@@ -1162,9 +1154,8 @@ class TeacherConcepts extends Component {
         } else {
             values[this.state.activeConcept].content.audio[index].file_name =
                 event.target.files[0].name;
-            values[this.state.activeConcept].content.audio[
-                index
-            ].path = URL.createObjectURL(event.target.files[0]);
+            values[this.state.activeConcept].content.audio[index].path =
+                URL.createObjectURL(event.target.files[0]);
             values[this.state.activeConcept].content.audio[index].audio =
                 event.target.files[0];
             this.setState({
@@ -1200,9 +1191,8 @@ class TeacherConcepts extends Component {
 
     handleLimited = () => {
         const values = [...this.state.concepts];
-        values[this.state.activeConcept].settings.limited = !values[
-            this.state.activeConcept
-        ].settings.limited;
+        values[this.state.activeConcept].settings.limited =
+            !values[this.state.activeConcept].settings.limited;
         this.setState({
             concepts: values,
         });
@@ -1230,23 +1220,20 @@ class TeacherConcepts extends Component {
             });
         }
         if (type === "Chemistry") {
-            keyboards[this.state.activeConcept].chemistry = !keyboards[
-                this.state.activeConcept
-            ].chemistry;
+            keyboards[this.state.activeConcept].chemistry =
+                !keyboards[this.state.activeConcept].chemistry;
             this.setState({
                 keyboards: keyboards,
             });
         } else if (type === "Physics") {
-            keyboards[this.state.activeConcept].physics = !keyboards[
-                this.state.activeConcept
-            ].physics;
+            keyboards[this.state.activeConcept].physics =
+                !keyboards[this.state.activeConcept].physics;
             this.setState({
                 keyboards: keyboards,
             });
         } else {
-            keyboards[this.state.activeConcept].maths = !keyboards[
-                this.state.activeConcept
-            ].maths;
+            keyboards[this.state.activeConcept].maths =
+                !keyboards[this.state.activeConcept].maths;
             this.setState({
                 keyboards: keyboards,
             });
@@ -1647,7 +1634,7 @@ class TeacherConcepts extends Component {
         this.setState({
             showSuccessAlert: false,
             showErrorAlert: false,
-            showPublishLoader: true,
+            page_loading: true,
         });
 
         const concepts = [...this.state.concepts];
@@ -1680,7 +1667,7 @@ class TeacherConcepts extends Component {
                         this.setState({
                             successMsg: result.msg,
                             showSuccessAlert: true,
-                            showPublishLoader: false,
+                            page_loading: false,
                         });
                     } else {
                         this.setState({
@@ -1688,7 +1675,7 @@ class TeacherConcepts extends Component {
                                 ? result.detail
                                 : result.msg,
                             showErrorAlert: true,
-                            showPublishLoader: false,
+                            page_loading: false,
                         });
                     }
                 })
@@ -1697,7 +1684,7 @@ class TeacherConcepts extends Component {
                 });
         } else {
             this.setState({
-                showPublishLoader: false,
+                page_loading: false,
             });
         }
     };
@@ -1879,19 +1866,6 @@ class TeacherConcepts extends Component {
                                                 className="btn btn-primary btn-sm shadow-none mr-1"
                                                 onClick={this.handlePublish}
                                             >
-                                                {this.state
-                                                    .showPublishLoader ? (
-                                                    <Spinner
-                                                        as="span"
-                                                        animation="border"
-                                                        size="sm"
-                                                        role="status"
-                                                        aria-hidden="true"
-                                                        className="mr-2"
-                                                    />
-                                                ) : (
-                                                    ""
-                                                )}
                                                 Publish
                                             </button>
                                             <a
@@ -1994,34 +1968,34 @@ class TeacherConcepts extends Component {
                                                                 ? "border-primary"
                                                                 : ""
                                                         }`}
+                                                        onClick={() =>
+                                                            this.handleFlip(
+                                                                c_index
+                                                            )
+                                                        }
+                                                        style={{
+                                                            minHeight: "120px",
+                                                        }}
                                                     >
                                                         <div className="card-body">
                                                             <div className="row">
                                                                 {/* term */}
                                                                 <div className="col-md-11 pr-md-0">
-                                                                    {/* Front-view */}
-                                                                    <div className="card">
-                                                                        <div
-                                                                            className="card-body"
-                                                                            onClick={() =>
-                                                                                this.handleFlip(
-                                                                                    c_index
-                                                                                )
-                                                                            }
-                                                                            dangerouslySetInnerHTML={{
-                                                                                __html:
-                                                                                    concept
-                                                                                        .content
-                                                                                        .terms,
-                                                                            }}
-                                                                        ></div>
-                                                                    </div>
+                                                                    <div
+                                                                        dangerouslySetInnerHTML={{
+                                                                            __html: concept
+                                                                                .content
+                                                                                .terms,
+                                                                        }}
+                                                                    ></div>
                                                                 </div>
                                                                 {/* File modal button */}
                                                                 <div className="col-1 pl-0 text-right">
                                                                     <button
                                                                         className="btn btn-light bg-white shadow-sm"
-                                                                        onClick={() =>
+                                                                        onClick={(
+                                                                            e
+                                                                        ) => {
                                                                             this.toggleModal(
                                                                                 concept
                                                                                     .content
@@ -2032,8 +2006,9 @@ class TeacherConcepts extends Component {
                                                                                 concept
                                                                                     .content
                                                                                     .audio
-                                                                            )
-                                                                        }
+                                                                            );
+                                                                            e.stopPropagation();
+                                                                        }}
                                                                     >
                                                                         <i className="far fa-folder-open"></i>
                                                                     </button>
@@ -2049,34 +2024,34 @@ class TeacherConcepts extends Component {
                                                                 ? "border-primary"
                                                                 : ""
                                                         }`}
+                                                        onClick={() =>
+                                                            this.handleFlip(
+                                                                c_index
+                                                            )
+                                                        }
+                                                        style={{
+                                                            minHeight: "120px",
+                                                        }}
                                                     >
                                                         <div className="card-body">
                                                             <div className="row">
                                                                 {/* definition */}
                                                                 <div className="col-md-11 pr-md-0">
-                                                                    {/* Back-view */}
-                                                                    <div className="card">
-                                                                        <div
-                                                                            className="card-body"
-                                                                            onClick={() =>
-                                                                                this.handleFlip(
-                                                                                    c_index
-                                                                                )
-                                                                            }
-                                                                            dangerouslySetInnerHTML={{
-                                                                                __html:
-                                                                                    concept
-                                                                                        .content
-                                                                                        .definition,
-                                                                            }}
-                                                                        ></div>
-                                                                    </div>
+                                                                    <div
+                                                                        dangerouslySetInnerHTML={{
+                                                                            __html: concept
+                                                                                .content
+                                                                                .definition,
+                                                                        }}
+                                                                    ></div>
                                                                 </div>
                                                                 {/* File modal button */}
                                                                 <div className="col-1 pl-0 text-right">
                                                                     <button
                                                                         className="btn btn-light bg-white shadow-sm"
-                                                                        onClick={() =>
+                                                                        onClick={(
+                                                                            e
+                                                                        ) => {
                                                                             this.toggleModal(
                                                                                 concept
                                                                                     .content
@@ -2087,8 +2062,9 @@ class TeacherConcepts extends Component {
                                                                                 concept
                                                                                     .content
                                                                                     .audio
-                                                                            )
-                                                                        }
+                                                                            );
+                                                                            e.stopPropagation();
+                                                                        }}
                                                                     >
                                                                         <i className="far fa-folder-open"></i>
                                                                     </button>
