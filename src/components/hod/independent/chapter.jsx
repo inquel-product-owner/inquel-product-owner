@@ -105,6 +105,8 @@ class HODSubjectChapter extends Component {
     };
 
     componentDidMount = async () => {
+        document.title = `${this.props.chapter_name} - HOD | IQLabs`;
+        
         await fetch(`${this.url}/hod/subject/${this.subjectId}/`, {
             headers: this.headers,
             method: "GET",
@@ -368,7 +370,6 @@ class HODSubjectChapter extends Component {
     };
 
     render() {
-        document.title = `${this.props.chapter_name} - HOD | IQLabs`;
         return (
             <div className="wrapper">
                 {/* Navbar */}

@@ -8,6 +8,7 @@ import ReactCardFlip from "react-card-flip";
 import Loading from "../../sharedComponents/loader";
 import AlertBox from "../../sharedComponents/alert";
 import FileModal from "../shared/fileExplorer";
+import { ConceptFormat } from "../../sharedComponents/dataFormating";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
@@ -64,59 +65,14 @@ class HODSubjectConcepts extends Component {
 
     // -------------------------- Load concept data --------------------------
 
-    loadConceptData = async () => {
-        await fetch(
-            `${this.url}/hod/subject/${this.subjectId}/chapter/${this.chapterId}/${this.topicNum}/concepts/`,
-            {
-                method: "GET",
-                headers: this.headers,
-            }
-        )
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    let data = [];
-                    let response = result.data.results;
-                    if (response.length !== 0) {
-                        let conceptData = this.loopConceptData(data, response);
-                        this.setState(
-                            {
-                                concepts: conceptData.concepts,
-                            },
-                            () => {
-                                if (result.data.next !== null) {
-                                    this.loadNextConceptData(result.data.next);
-                                } else {
-                                    this.setState({
-                                        page_loading: false,
-                                    });
-                                }
-                            }
-                        );
-                    } else {
-                        this.setState({
-                            page_loading: false,
-                        });
-                    }
-                } else {
-                    this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-        window.MathJax.typeset();
-    };
-
-    loadNextConceptData = async (path) => {
-        await fetch(path, {
-            headers: this.headers,
+    loadConceptData = async (path) => {
+        var apiURL =
+            path === undefined || path === null
+                ? `${this.url}/hod/subject/${this.subjectId}/chapter/${this.chapterId}/${this.topicNum}/concepts/`
+                : path;
+        await fetch(apiURL, {
             method: "GET",
+            headers: this.headers,
         })
             .then((res) => res.json())
             .then((result) => {
@@ -125,14 +81,16 @@ class HODSubjectConcepts extends Component {
                     let data = [...this.state.concepts];
                     let response = result.data.results;
                     if (response.length !== 0) {
-                        let conceptData = this.loopConceptData(data, response);
+                        let conceptData = ConceptFormat(result);
+                        data.push(...conceptData.result);
+
                         this.setState(
                             {
-                                concepts: conceptData.concepts,
+                                concepts: data,
                             },
                             () => {
                                 if (result.data.next !== null) {
-                                    this.loadNextConceptData(result.data.next);
+                                    this.loadConceptData(result.data.next);
                                 } else {
                                     this.setState({
                                         page_loading: false,
@@ -158,106 +116,6 @@ class HODSubjectConcepts extends Component {
             });
         window.MathJax.typeset();
     };
-
-    loopConceptData = (data, response) => {
-        let imgArr = [];
-        let audioArr = [];
-        for (let i = 0; i < response.length; i++) {
-            imgArr = [];
-            audioArr = [];
-            if (response[i].files && response[i].files.length !== 0) {
-                // image
-                if (response[i].files[0].concepts_image_1) {
-                    imgArr.push({
-                        title: response[i].files[0].concepts_image_1_title,
-                        file_name: "",
-                        image: null,
-                        path: response[i].files[0].concepts_image_1,
-                    });
-                }
-                if (response[i].files[0].concepts_image_2) {
-                    imgArr.push({
-                        title: response[i].files[0].concepts_image_2_title,
-                        file_name: "",
-                        image: null,
-                        path: response[i].files[0].concepts_image_2,
-                    });
-                }
-                if (response[i].files[0].concepts_image_3) {
-                    imgArr.push({
-                        title: response[i].files[0].concepts_image_3_title,
-                        file_name: "",
-                        image: null,
-                        path: response[i].files[0].concepts_image_3,
-                    });
-                }
-                if (response[i].files[0].concepts_image_4) {
-                    imgArr.push({
-                        title: response[i].files[0].concepts_image_4_title,
-                        file_name: "",
-                        image: null,
-                        path: response[i].files[0].concepts_image_4,
-                    });
-                }
-
-                // audio
-                if (response[i].files[0].concepts_audio_1) {
-                    audioArr.push({
-                        title: response[i].files[0].concepts_audio_1_title,
-                        file_name: "",
-                        audio: null,
-                        path: response[i].files[0].concepts_audio_1,
-                    });
-                }
-                if (response[i].files[0].concepts_audio_2) {
-                    audioArr.push({
-                        title: response[i].files[0].concepts_audio_2_title,
-                        file_name: "",
-                        audio: null,
-                        path: response[i].files[0].concepts_audio_2,
-                    });
-                }
-            }
-
-            // video
-            var path = "";
-            if (response[i].files && response[i].files.length !== 0) {
-                if (response[i].files[0].paste_video_url) {
-                    path = response[i].files[0].paste_video_url;
-                }
-                if (response[i].files[0].concepts_video_1) {
-                    path = response[i].files[0].concepts_video_1;
-                }
-            }
-
-            data.push({
-                concepts_random_id: response[i].concepts_random_id,
-                content: {
-                    terms: response[i].terms,
-                    definition: response[i].definition,
-                    images: imgArr.length === 0 ? [] : imgArr,
-                    video: {
-                        title:
-                            response[i].files.length !== 0 &&
-                            response[i].files[0].concepts_video_1_title
-                                ? response[i].files[0].concepts_video_1_title
-                                : "",
-                        file_name: "",
-                        video: null,
-                        path: path,
-                        url: "",
-                    },
-                    audio: audioArr.length === 0 ? [] : audioArr,
-                },
-            });
-        }
-
-        return {
-            concepts: data,
-        };
-    };
-
-    // -------------------------- Lifecycle --------------------------
 
     componentDidMount = () => {
         document.title = `${this.props.topic_name} : Concepts - HOD | IQLabs`;

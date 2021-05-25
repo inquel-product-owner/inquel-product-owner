@@ -64,38 +64,59 @@ class TeacherSemesterAutoQA extends Component {
     };
 
     // loads question & answer
-    loadQAData = async () => {
-        await fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/semester/${this.semesterId}/auto/${this.state.sectionId}/?attempt_number=${this.attempt}`,
-            {
-                method: "GET",
-                headers: this.headers,
-            }
-        )
+    loadQAData = async (path) => {
+        var apiURL =
+            path === undefined || path === null
+                ? `${this.url}/teacher/subject/${this.subjectId}/semester/${this.semesterId}/auto/${this.state.sectionId}/?attempt_number=${this.attempt}`
+                : path;
+        await fetch(apiURL, {
+            method: "GET",
+            headers: this.headers,
+        })
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
-                let data = [];
                 let type = "";
-                let totalSubQuestion = [];
-                let currentSubQuestionIndex = [];
+                let data = [...this.state.data];
+                let totalSubQuestion = [...this.state.totalSubQuestion];
+                let currentSubQuestionIndex = [
+                    ...this.state.currentSubQuestionIndex,
+                ];
                 if (result.sts === true) {
                     if (result.data.results.length !== 0) {
                         let values = DataFormat(result);
-                        data = values.result;
                         type = values.type;
-                        totalSubQuestion = values.total;
-                        currentSubQuestionIndex = values.current;
+                        data.push(...values.result);
+                        totalSubQuestion.push(...values.total);
+                        currentSubQuestionIndex.push(...values.current);
+
+                        this.setState(
+                            {
+                                data: data,
+                                type: type,
+                                duration:
+                                    result.duration !== undefined
+                                        ? result.duration
+                                        : 0,
+                                totalSubQuestion: totalSubQuestion,
+                                currentSubQuestionIndex:
+                                    currentSubQuestionIndex,
+                            },
+                            () => {
+                                if (result.data.next !== null) {
+                                    this.loadQAData(result.data.next);
+                                } else {
+                                    this.setState({
+                                        page_loading: false,
+                                    });
+                                }
+                            }
+                        );
+                    } else {
+                        this.setState({
+                            page_loading: false,
+                        });
                     }
-                    this.setState({
-                        data: data,
-                        type: type,
-                        duration:
-                            result.duration !== undefined ? result.duration : 0,
-                        totalSubQuestion: totalSubQuestion,
-                        currentSubQuestionIndex: currentSubQuestionIndex,
-                        page_loading: false,
-                    });
                 } else {
                     this.setState({
                         errorMsg: result.detail ? result.detail : result.msg,
@@ -155,8 +176,6 @@ class TeacherSemesterAutoQA extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.props.semester_name} : ${this.props.section_name} - Teacher | IQLabs`;
-
         this.loadQAData();
         this.loadSectionData();
     };
@@ -181,12 +200,17 @@ class TeacherSemesterAutoQA extends Component {
     };
 
     // ---------- Navigation ----------
+
     handlePrev = () => {
-        const data = this.state.sectionData;
+        const section = this.state.sectionData;
         this.setState(
             {
-                sectionId: data[this.state.currentSectionIndex - 1].section_id,
+                sectionId:
+                    section[this.state.currentSectionIndex - 1].section_id,
                 currentSectionIndex: this.state.currentSectionIndex - 1,
+                data: [],
+                totalSubQuestion: [],
+                currentSubQuestionIndex: [],
                 page_loading: true,
             },
             () => {
@@ -196,11 +220,15 @@ class TeacherSemesterAutoQA extends Component {
     };
 
     handleNext = () => {
-        const data = this.state.sectionData;
+        const section = this.state.sectionData;
         this.setState(
             {
-                sectionId: data[this.state.currentSectionIndex + 1].section_id,
+                sectionId:
+                    section[this.state.currentSectionIndex + 1].section_id,
                 currentSectionIndex: this.state.currentSectionIndex + 1,
+                data: [],
+                totalSubQuestion: [],
+                currentSubQuestionIndex: [],
                 page_loading: true,
             },
             () => {
@@ -228,6 +256,12 @@ class TeacherSemesterAutoQA extends Component {
     };
 
     render() {
+        document.title = `${this.props.semester_name} : ${
+            this.state.sectionData.length !== 0
+                ? this.state.sectionData[this.state.currentSectionIndex]
+                      .section_description
+                : ""
+        } - Teacher | IQLabs`;
         return (
             <div className="wrapper">
                 {/* Navbar */}

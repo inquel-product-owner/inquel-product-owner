@@ -872,6 +872,8 @@ class HODSubject extends Component {
     };
 
     componentDidMount = () => {
+        document.title = `${this.props.subject_name} - HOD | IQLabs`;
+        
         this.loadSubjectData();
         this.loadSimulationData();
     };
@@ -902,7 +904,6 @@ class HODSubject extends Component {
     };
 
     render() {
-        document.title = `${this.props.subject_name} - HOD | IQLabs`;
         return (
             <div className="wrapper">
                 {/* Navbar */}

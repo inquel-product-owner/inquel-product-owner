@@ -8,7 +8,7 @@ import Loading from "../../sharedComponents/loader";
 import AlertBox from "../../sharedComponents/alert";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
-import { DataFormat } from "../../sharedComponents/dataFormating";
+import { Type1DataFormat } from "../../sharedComponents/dataFormating";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
@@ -62,27 +62,43 @@ class TeacherLevelPreview extends Component {
     };
 
     // loads question & answer
-    loadQAData = async () => {
-        await fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/${this.quizId}/level/${this.state.levelId}/?attempt_name=${this.attempt}`,
-            {
-                method: "GET",
-                headers: this.headers,
-            }
-        )
+    loadQAData = async (path) => {
+        var apiURL =
+            path === undefined || path === null
+                ? `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/${this.quizId}/level/${this.state.levelId}/?attempt_name=${this.attempt}`
+                : path;
+        await fetch(apiURL, {
+            method: "GET",
+            headers: this.headers,
+        })
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
-                let data = [];
+                let data = [...this.state.data];
                 if (result.sts === true) {
                     if (result.data.results.length !== 0) {
-                        let values = DataFormat(result);
-                        data = values.result;
+                        let values = Type1DataFormat(result);
+                        data.push(...values.result);
+
+                        this.setState(
+                            {
+                                data: data,
+                            },
+                            () => {
+                                if (result.data.next !== null) {
+                                    this.loadQAData(result.data.next);
+                                } else {
+                                    this.setState({
+                                        page_loading: false,
+                                    });
+                                }
+                            }
+                        );
+                    } else {
+                        this.setState({
+                            page_loading: false,
+                        });
                     }
-                    this.setState({
-                        data: data,
-                        page_loading: false,
-                    });
                 } else {
                     this.setState({
                         errorMsg: result.detail ? result.detail : result.msg,
@@ -164,12 +180,14 @@ class TeacherLevelPreview extends Component {
     };
 
     // ---------- Navigation ----------
+
     handlePrev = () => {
         const data = this.state.levels;
         this.setState(
             {
                 levelId: data[this.state.currentLevelIndex - 1].level_id,
                 currentLevelIndex: this.state.currentLevelIndex - 1,
+                data: [],
                 page_loading: true,
             },
             () => {
@@ -184,6 +202,7 @@ class TeacherLevelPreview extends Component {
             {
                 levelId: data[this.state.currentLevelIndex + 1].level_id,
                 currentLevelIndex: this.state.currentLevelIndex + 1,
+                data: [],
                 page_loading: true,
             },
             () => {
@@ -367,8 +386,7 @@ class TeacherLevelPreview extends Component {
                                                           <div
                                                               className="pb-2"
                                                               dangerouslySetInnerHTML={{
-                                                                  __html:
-                                                                      data.question,
+                                                                  __html: data.question,
                                                               }}
                                                           ></div>
                                                           {data.content.mcq ? (

@@ -132,6 +132,8 @@ class HODSimulationSection extends Component {
     };
 
     componentDidMount = () => {
+        document.title = `${this.props.paper_name} - HOD | IQLabs`;
+        
         this.loadFilterData();
         this.loadSectionData();
     };
@@ -415,7 +417,6 @@ class HODSimulationSection extends Component {
     };
 
     render() {
-        document.title = `${this.props.paper_name} - HOD | IQLabs`;
         return (
             <div className="wrapper">
                 {/* Navbar */}

@@ -480,6 +480,8 @@ class HODCourseConfig extends Component {
     };
 
     componentDidMount = () => {
+        document.title = `${this.props.subject_name} : Course configuration - HOD | IQLabs`;
+        
         this.loadContentData();
         this.loadConfigData();
     };
@@ -848,7 +850,6 @@ class HODCourseConfig extends Component {
     };
 
     render() {
-        document.title = `${this.props.subject_name} : Course configuration - HOD | IQLabs`;
         const data = this.state.courseData;
         return (
             <div className="wrapper">
