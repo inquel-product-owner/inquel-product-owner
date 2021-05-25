@@ -25,21 +25,15 @@ _:-ms-fullscreen,
     background-color: #0078d6;
 }
 
-/* #Emptext {
-    top: -12px;
-    left: 41px;
-    position: relative;
-} */
 .empimg {
-    height: auto;
-    width: 30px;
-    border-radius: 50%;
-    margin-right: 5px;
+    margin-right: 8px;
 }
 
 .empimg .profile-pic {
-    height: auto;
+    height: 26px;
     width: 26px;
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 #overviewgrid.e-rtl #Emptext {

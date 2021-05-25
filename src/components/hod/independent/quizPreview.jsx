@@ -3,35 +3,36 @@ import { connect } from "react-redux";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
-import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
+import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import Loading from "../../sharedComponents/loader";
 import AlertBox from "../../sharedComponents/alert";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
 import { Type1DataFormat } from "../../sharedComponents/dataFormating";
+import Select from "react-select";
 
 const mapStateToProps = (state) => ({
-    group_name: state.content.group_name,
     subject_name: state.content.subject_name,
     chapter_name: state.content.chapter_name,
     quiz_name: state.content.quiz_name,
 });
 
-class TeacherLevelPreview extends Component {
+class HODSubjectQuizPreview extends Component {
     constructor(props) {
         super(props);
         this.state = {
             showSideNav: false,
             data: [],
-            levelId: this.props.match.params.levelId,
+            levels: [],
+            attempts: [],
+            levelId: "",
+            selectedAttempt: "",
+            totalLevels: 0,
+            currentLevelIndex: 0,
 
             selectedImageData: [],
             startIndex: 0,
             isLightBoxOpen: false,
-
-            levels: [],
-            totalLevels: 0,
-            currentLevelIndex: 0,
 
             errorMsg: "",
             successMsg: "",
@@ -39,14 +40,10 @@ class TeacherLevelPreview extends Component {
             showSuccessAlert: false,
             page_loading: true,
         };
-        this.groupId = this.props.match.params.groupId;
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
         this.quizId = this.props.match.params.quizId;
-        this.attempt = new URLSearchParams(this.props.location.search).get(
-            "attempt"
-        );
-        this.url = baseUrl + teacherUrl;
+        this.url = baseUrl + hodUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
             Accept: "application/json",
@@ -65,7 +62,7 @@ class TeacherLevelPreview extends Component {
     loadQAData = async (path) => {
         var apiURL =
             path === undefined || path === null
-                ? `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/${this.quizId}/level/${this.state.levelId}/?attempt_name=${this.attempt}`
+                ? `${this.url}/hod/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/${this.quizId}/${this.state.levelId}/?attempt_name=${this.state.selectedAttempt}`
                 : path;
         await fetch(apiURL, {
             method: "GET",
@@ -115,7 +112,7 @@ class TeacherLevelPreview extends Component {
 
     loadLevelData = () => {
         fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/?attempt_name=${this.attempt}`,
+            `${this.url}/hod/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/${this.quizId}/attempt/`,
             {
                 method: "GET",
                 headers: this.headers,
@@ -125,23 +122,18 @@ class TeacherLevelPreview extends Component {
             .then((result) => {
                 console.log(result);
                 if (result.sts === true) {
-                    let currentIndex = "";
-                    for (let i = 0; i < result.data.levels.length; i++) {
-                        if (
-                            result.data.levels[i].level_id ===
-                            this.state.levelId
-                        ) {
-                            currentIndex = i;
-                        } else {
-                            continue;
+                    this.setState(
+                        {
+                            levels: result.data.levels,
+                            attempts: result.data.attempts,
+                            levelId: result.data.levels[0].level_id,
+                            selectedAttempt: result.data.attempts[0].name,
+                            totalLevels: result.data.levels.length,
+                        },
+                        () => {
+                            this.loadQAData();
                         }
-                    }
-                    this.setState({
-                        levels: result.data.levels,
-                        totalLevels: result.data.levels.length,
-                        currentLevelIndex: currentIndex,
-                        page_loading: false,
-                    });
+                    );
                 } else {
                     this.setState({
                         errorMsg: result.detail ? result.detail : result.msg,
@@ -156,7 +148,8 @@ class TeacherLevelPreview extends Component {
     };
 
     componentDidMount = () => {
-        this.loadQAData();
+        document.title = `${this.props.quiz_name} - HOD | IQLabs`;
+
         this.loadLevelData();
     };
 
@@ -212,11 +205,6 @@ class TeacherLevelPreview extends Component {
     };
 
     render() {
-        document.title = `${this.props.quiz_name} : ${
-            this.state.levels.length !== 0
-                ? this.state.levels[this.state.currentLevelIndex].level_name
-                : ""
-        } - Teacher | IQLabs`;
         return (
             <div className="wrapper">
                 {/* Navbar */}
@@ -278,64 +266,77 @@ class TeacherLevelPreview extends Component {
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
 
-                        {/* ----- Breadcrumb ----- */}
-                        <nav aria-label="breadcrumb">
-                            <ol className="breadcrumb mb-3">
-                                <li className="breadcrumb-item">
-                                    <Link to="/teacher">
-                                        <i className="fas fa-home fa-sm"></i>
-                                    </Link>
-                                </li>
-                                {this.groupId !== undefined ? (
-                                    <>
+                        <div className="row align-items-center mb-3">
+                            <div className="col-lg-8 mb-2 mb-lg-0">
+                                {/* ----- Breadcrumb ----- */}
+                                <nav aria-label="breadcrumb">
+                                    <ol className="breadcrumb">
                                         <li className="breadcrumb-item">
-                                            <Link
-                                                to={`/teacher/group/${this.groupId}`}
-                                            >
-                                                {this.props.group_name}
+                                            <Link to="/hod">
+                                                <i className="fas fa-home fa-sm"></i>
                                             </Link>
                                         </li>
                                         <li className="breadcrumb-item">
                                             <Link
-                                                to={`/teacher/group/${this.groupId}/subject/${this.subjectId}`}
+                                                to={`/hod/subject/${this.subjectId}`}
                                             >
                                                 {this.props.subject_name}
                                             </Link>
                                         </li>
-                                    </>
-                                ) : (
-                                    <li className="breadcrumb-item">
-                                        <Link
-                                            to={`/teacher/subject/${this.subjectId}`}
-                                        >
-                                            {this.props.subject_name}
-                                        </Link>
-                                    </li>
-                                )}
-                                <li className="breadcrumb-item">
-                                    <Link
-                                        to={`/teacher/group/${this.groupId}/subject/${this.subjectId}/chapter/${this.chapterId}`}
-                                    >
-                                        {this.props.chapter_name}
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item">
-                                    <Link
-                                        to="#"
-                                        onClick={this.props.history.goBack}
-                                    >
-                                        {this.props.quiz_name}
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item active">
-                                    {this.state.levels.length !== 0
-                                        ? this.state.levels[
-                                              this.state.currentLevelIndex
-                                          ].level_name
-                                        : ""}
-                                </li>
-                            </ol>
-                        </nav>
+                                        <li className="breadcrumb-item">
+                                            <Link
+                                                to="#"
+                                                onClick={
+                                                    this.props.history.goBack
+                                                }
+                                            >
+                                                {this.props.chapter_name}
+                                            </Link>
+                                        </li>
+                                        <li className="breadcrumb-item active">
+                                            {this.props.quiz_name}
+                                        </li>
+                                    </ol>
+                                </nav>
+                            </div>
+                            <div className="col-lg-4">
+                                <Select
+                                    className="basic-single form-shadow"
+                                    placeholder="Select attempt"
+                                    isSearchable={true}
+                                    name="attempt"
+                                    value={
+                                        this.state.attempts.length !== 0
+                                            ? this.state.attempts.map(
+                                                  (data) => {
+                                                      return data.name ===
+                                                          this.state
+                                                              .selectedAttempt
+                                                          ? {
+                                                                value: data.name,
+                                                                label: data.name,
+                                                            }
+                                                          : "";
+                                                  }
+                                              )
+                                            : ""
+                                    }
+                                    onChange={(event) => {
+                                        this.setState(
+                                            {
+                                                selectedAttempt: event.value,
+                                                data: [],
+                                                totalSubQuestion: [],
+                                                currentSubQuestionIndex: [],
+                                                page_loading: true,
+                                            },
+                                            () => this.loadQAData()
+                                        );
+                                    }}
+                                    required
+                                />
+                            </div>
+                        </div>
 
                         {/* ----- Header configuration ----- */}
                         <div className="card primary-bg text-white small mb-4">
@@ -349,7 +350,7 @@ class TeacherLevelPreview extends Component {
                                             : ""}
                                     </div>
                                     <div className="col-lg-2">
-                                        {this.attempt}
+                                        {this.state.selectedAttempt}
                                     </div>
                                     <div className="col-lg-2">
                                         {this.state.data.length} Questions
@@ -553,17 +554,7 @@ class TeacherLevelPreview extends Component {
                                     disabled={
                                         this.state.currentLevelIndex === 0
                                             ? true
-                                            : this.state.levels[
-                                                  this.state.currentLevelIndex -
-                                                      1
-                                              ]
-                                            ? this.state.levels[
-                                                  this.state.currentLevelIndex -
-                                                      1
-                                              ].questions
-                                                ? false
-                                                : true
-                                            : true
+                                            : false
                                     }
                                 >
                                     <i className="fas fa-angle-left mr-1"></i>{" "}
@@ -578,17 +569,7 @@ class TeacherLevelPreview extends Component {
                                         this.state.currentLevelIndex + 1 >=
                                         this.state.totalLevels
                                             ? true
-                                            : this.state.levels[
-                                                  this.state.currentLevelIndex +
-                                                      1
-                                              ]
-                                            ? this.state.levels[
-                                                  this.state.currentLevelIndex +
-                                                      1
-                                              ].questions
-                                                ? false
-                                                : true
-                                            : true
+                                            : false
                                     }
                                 >
                                     Next
@@ -605,4 +586,4 @@ class TeacherLevelPreview extends Component {
     }
 }
 
-export default connect(mapStateToProps)(TeacherLevelPreview);
+export default connect(mapStateToProps)(HODSubjectQuizPreview);

@@ -231,7 +231,7 @@ class HODSubjectConcepts extends Component {
                                       >
                                           {/* ---------- Side buttons ---------- */}
                                           <div
-                                              className="bg-white rounded-lg shadow-sm text-nowrap mr-2"
+                                              className="bg-white small font-weight-bold-600 rounded-lg shadow-sm text-nowrap mr-2"
                                               style={{
                                                   paddingTop: "8px",
                                                   paddingBottom: "8px",

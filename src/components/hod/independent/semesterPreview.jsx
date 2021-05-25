@@ -3,20 +3,20 @@ import { connect } from "react-redux";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
-import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
+import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import Loading from "../../sharedComponents/loader";
 import AlertBox from "../../sharedComponents/alert";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
 import { DataFormat } from "../../sharedComponents/dataFormating";
+import Select from "react-select";
 
 const mapStateToProps = (state) => ({
-    group_name: state.content.group_name,
     subject_name: state.content.subject_name,
     semester_name: state.content.semester_name,
 });
 
-class TeacherSemesterAutoQA extends Component {
+class HODSubjectSemesterPreview extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -24,13 +24,15 @@ class TeacherSemesterAutoQA extends Component {
             data: [],
             type: "",
             duration: "",
-            sectionId: this.props.match.params.sectionId,
+            sections: [],
+            attempts: [],
+            sectionId: "",
+            selectedAttempt: "",
 
             selectedImageData: [],
             startIndex: 0,
             isLightBoxOpen: false,
 
-            sectionData: [],
             totalSection: 0,
             currentSectionIndex: 0,
             totalSubQuestion: [],
@@ -42,13 +44,9 @@ class TeacherSemesterAutoQA extends Component {
             showSuccessAlert: false,
             page_loading: true,
         };
-        this.groupId = this.props.match.params.groupId;
         this.subjectId = this.props.match.params.subjectId;
         this.semesterId = this.props.match.params.semesterId;
-        this.attempt = new URLSearchParams(this.props.location.search).get(
-            "attempt"
-        );
-        this.url = baseUrl + teacherUrl;
+        this.url = baseUrl + hodUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
             Accept: "application/json",
@@ -67,7 +65,7 @@ class TeacherSemesterAutoQA extends Component {
     loadQAData = async (path) => {
         var apiURL =
             path === undefined || path === null
-                ? `${this.url}/teacher/subject/${this.subjectId}/semester/${this.semesterId}/auto/${this.state.sectionId}/?attempt_number=${this.attempt}`
+                ? `${this.url}/hod/subject/${this.subjectId}/semester/${this.semesterId}/${this.state.sectionId}/?attempt_number=${this.state.selectedAttempt}`
                 : path;
         await fetch(apiURL, {
             method: "GET",
@@ -133,7 +131,7 @@ class TeacherSemesterAutoQA extends Component {
 
     loadSectionData = () => {
         fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/semester/${this.semesterId}/auto/`,
+            `${this.url}/hod/subject/${this.subjectId}/semester/${this.semesterId}/attempt/`,
             {
                 method: "GET",
                 headers: this.headers,
@@ -143,25 +141,18 @@ class TeacherSemesterAutoQA extends Component {
             .then((result) => {
                 console.log(result);
                 if (result.sts === true) {
-                    let currentIndex = "";
-                    let data = [];
-                    for (let i = 0; i < result.data.auto_test.length; i++) {
-                        data.push(result.data.auto_test[i]);
-                        if (
-                            result.data.auto_test[i].section_id ===
-                            this.state.sectionId
-                        ) {
-                            currentIndex = i;
-                        } else {
-                            continue;
+                    this.setState(
+                        {
+                            sections: result.data.sections,
+                            attempts: result.data.attempts,
+                            sectionId: result.data.sections[0].section_id,
+                            selectedAttempt: result.data.attempts[0].name,
+                            totalSection: result.data.sections.length,
+                        },
+                        () => {
+                            this.loadQAData();
                         }
-                    }
-                    this.setState({
-                        sectionData: data,
-                        totalSection: result.data.auto_test.length,
-                        currentSectionIndex: currentIndex,
-                        page_loading: false,
-                    });
+                    );
                 } else {
                     this.setState({
                         errorMsg: result.detail ? result.detail : result.msg,
@@ -176,7 +167,8 @@ class TeacherSemesterAutoQA extends Component {
     };
 
     componentDidMount = () => {
-        this.loadQAData();
+        document.title = `${this.props.semester_name} - HOD | IQLabs`;
+
         this.loadSectionData();
     };
 
@@ -202,7 +194,7 @@ class TeacherSemesterAutoQA extends Component {
     // ---------- Navigation ----------
 
     handlePrev = () => {
-        const section = this.state.sectionData;
+        const section = this.state.sections;
         this.setState(
             {
                 sectionId:
@@ -220,7 +212,7 @@ class TeacherSemesterAutoQA extends Component {
     };
 
     handleNext = () => {
-        const section = this.state.sectionData;
+        const section = this.state.sections;
         this.setState(
             {
                 sectionId:
@@ -256,12 +248,6 @@ class TeacherSemesterAutoQA extends Component {
     };
 
     render() {
-        document.title = `${this.props.semester_name} : ${
-            this.state.sectionData.length !== 0
-                ? this.state.sectionData[this.state.currentSectionIndex]
-                      .section_description
-                : ""
-        } - Teacher | IQLabs`;
         return (
             <div className="wrapper">
                 {/* Navbar */}
@@ -323,61 +309,86 @@ class TeacherSemesterAutoQA extends Component {
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
 
-                        {/* ----- Breadcrumb ----- */}
-                        <nav aria-label="breadcrumb">
-                            <ol className="breadcrumb mb-3">
-                                <li className="breadcrumb-item">
-                                    <Link to="/teacher">
-                                        <i className="fas fa-home fa-sm"></i>
-                                    </Link>
-                                </li>
-                                {this.groupId !== undefined ? (
-                                    <li className="breadcrumb-item">
-                                        <Link
-                                            to={`/teacher/group/${this.groupId}`}
-                                        >
-                                            {this.props.group_name}
-                                        </Link>
-                                    </li>
-                                ) : (
-                                    ""
-                                )}
-                                <li className="breadcrumb-item">
-                                    <Link
-                                        to={`/teacher/group/${this.groupId}/subject/${this.subjectId}`}
-                                    >
-                                        {this.props.subject_name}
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item">
-                                    <Link
-                                        to="#"
-                                        onClick={this.props.history.goBack}
-                                    >
-                                        {this.props.semester_name}
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item active">
-                                    Section
-                                </li>
-                            </ol>
-                        </nav>
+                        <div className="row align-items-center mb-3">
+                            <div className="col-lg-8 mb-2 mb-lg-0">
+                                {/* ----- Breadcrumb ----- */}
+                                <nav aria-label="breadcrumb">
+                                    <ol className="breadcrumb">
+                                        <li className="breadcrumb-item">
+                                            <Link to="/hod">
+                                                <i className="fas fa-home fa-sm"></i>
+                                            </Link>
+                                        </li>
+                                        <li className="breadcrumb-item">
+                                            <Link
+                                                to="#"
+                                                onClick={
+                                                    this.props.history.goBack
+                                                }
+                                            >
+                                                {this.props.subject_name}
+                                            </Link>
+                                        </li>
+                                        <li className="breadcrumb-item active">
+                                            {this.props.semester_name}
+                                        </li>
+                                    </ol>
+                                </nav>
+                            </div>
+                            <div className="col-lg-4">
+                                <Select
+                                    className="basic-single form-shadow"
+                                    placeholder="Select attempt"
+                                    isSearchable={true}
+                                    name="attempt"
+                                    value={
+                                        this.state.attempts.length !== 0
+                                            ? this.state.attempts.map(
+                                                  (data) => {
+                                                      return data.name ===
+                                                          this.state
+                                                              .selectedAttempt
+                                                          ? {
+                                                                value: data.name,
+                                                                label: data.name,
+                                                            }
+                                                          : "";
+                                                  }
+                                              )
+                                            : ""
+                                    }
+                                    onChange={(event) => {
+                                        this.setState(
+                                            {
+                                                selectedAttempt: event.value,
+                                                data: [],
+                                                totalSubQuestion: [],
+                                                currentSubQuestionIndex: [],
+                                                page_loading: true,
+                                            },
+                                            () => this.loadQAData()
+                                        );
+                                    }}
+                                    required
+                                />
+                            </div>
+                        </div>
 
                         {/* Header */}
                         <div className="card primary-bg text-white small mb-4">
                             <div className="card-body">
                                 <div className="row">
                                     <div className="col-lg-7 col-md-5">
-                                        {this.state.sectionData.length !== 0
-                                            ? this.state.sectionData[
+                                        {this.state.sections.length !== 0
+                                            ? this.state.sections[
                                                   this.state.currentSectionIndex
-                                              ].section_description
+                                              ].section_name
                                             : ""}
                                     </div>
                                     <div className="col-lg-5 col-md-7">
                                         <div className="row">
                                             <div className="col-4">
-                                                {this.attempt}
+                                                {this.state.selectedAttempt}
                                             </div>
                                             <div className="col-4">
                                                 {this.state.data.length !== 0
@@ -880,13 +891,13 @@ class TeacherSemesterAutoQA extends Component {
                                         }
                                     >
                                         <i className="fas fa-angle-left mr-1"></i>{" "}
-                                        {this.state.sectionData[
+                                        {this.state.sections[
                                             this.state.currentSectionIndex - 1
                                         ] !== undefined
-                                            ? this.state.sectionData[
+                                            ? this.state.sections[
                                                   this.state
                                                       .currentSectionIndex - 1
-                                              ].section_description
+                                              ].section_name
                                             : ""}
                                     </button>
                                 ) : (
@@ -909,13 +920,13 @@ class TeacherSemesterAutoQA extends Component {
                                                 : false
                                         }
                                     >
-                                        {this.state.sectionData[
+                                        {this.state.sections[
                                             this.state.currentSectionIndex + 1
                                         ] !== undefined
-                                            ? this.state.sectionData[
+                                            ? this.state.sections[
                                                   this.state
                                                       .currentSectionIndex + 1
-                                              ].section_description
+                                              ].section_name
                                             : ""}
                                         <i className="fas fa-angle-right ml-2"></i>
                                     </button>
@@ -931,4 +942,4 @@ class TeacherSemesterAutoQA extends Component {
     }
 }
 
-export default connect(mapStateToProps)(TeacherSemesterAutoQA);
+export default connect(mapStateToProps)(HODSubjectSemesterPreview);

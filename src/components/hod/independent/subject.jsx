@@ -873,7 +873,7 @@ class HODSubject extends Component {
 
     componentDidMount = () => {
         document.title = `${this.props.subject_name} - HOD | IQLabs`;
-        
+
         this.loadSubjectData();
         this.loadSimulationData();
     };
@@ -1080,7 +1080,7 @@ class HODSubject extends Component {
                                     Scorecard
                                 </button>
                                 <Link
-                                    to={`${this.props.match.url}/course/create`}
+                                    to={`${this.props.match.url}/course`}
                                 >
                                     <button className="btn btn-primary btn-sm shadow-none">
                                         Configure Course

@@ -51,21 +51,19 @@ function nameTemplate(props) {
                             ? props.profile_link
                             : userimage
                     }
-                    alt={props.full_name}
-                    width="23"
+                    alt={props.full_name ? props.full_name : props.username}
                     className="profile-pic"
                 />
             </div>
-            <span id="Emptext">{props.full_name}</span>
+            <span id="Emptext">
+                {props.full_name ? props.full_name : props.username}
+            </span>
         </div>
     );
 }
 
 function dateTemplate(props) {
-    return dateFormat(
-        props.date_joined,
-        "dd/mm/yyyy"
-    );
+    return dateFormat(props.date_joined, "dd/mm/yyyy");
 }
 
 class StudentTable extends Component {

@@ -1,6 +1,7 @@
 let data = {
     group_name: "Group",
     subject_name: "Subject",
+    course_name: "Course",
     chapter_name: "Chapter",
     topic_name: "Topic",
     cycle_name: "Cycle",
@@ -17,6 +18,8 @@ const contentReducer = (state = data, action) => {
             return { ...state, group_name: action.payload };
         case "SUBJECT":
             return { ...state, subject_name: action.payload };
+        case "COURSE":
+            return { ...state, course_name: action.payload };
         case "CHAPTER":
             return { ...state, chapter_name: action.payload };
         case "TOPIC":
