@@ -1196,6 +1196,18 @@ const routes = (
                 )
             }
         />
+        <Route
+            exact
+            path="/teacher/subject/:subjectId/chapter/:chapterId/quiz/:quizId/level/:levelId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_teacher") ? (
+                    <Redirect to="/teacher/login" />
+                ) : (
+                    <TeacherLevelPreview {...props} />
+                )
+            }
+        />
 
         {/* --------------- Student list & Profile --------------- */}
 

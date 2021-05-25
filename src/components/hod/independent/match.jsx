@@ -46,83 +46,12 @@ class HODSubjectMatch extends Component {
 
     // -------------------------- Load match data --------------------------
 
-    loadMatchData = async () => {
-        await fetch(
-            `${this.url}/hod/subject/${this.subjectId}/chapter/${this.chapterId}/${this.topicNum}/match/`,
-            {
-                headers: this.headers,
-                method: "GET",
-            }
-        )
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    let data = [];
-                    let response = result.data.results;
-                    if (
-                        response.match_terms.length !== 0 &&
-                        response.match_definition.length !== 0
-                    ) {
-                        // combines both terms and definition as a single object
-                        for (let i = 0; i < response.match_terms.length; i++) {
-                            for (
-                                let j = 0;
-                                j < response.match_definition.length;
-                                j++
-                            ) {
-                                if (
-                                    response.match_terms[i].match_id ===
-                                    response.match_definition[j].match_id
-                                ) {
-                                    data.push({
-                                        match_id:
-                                            response.match_terms[i].match_id,
-                                        match_terms:
-                                            response.match_terms[i].match_terms,
-                                        match_definition:
-                                            response.match_definition[j]
-                                                .match_definition,
-                                    });
-                                }
-                            }
-                        }
-
-                        this.setState(
-                            {
-                                match: data,
-                            },
-                            () => {
-                                if (result.data.next !== null) {
-                                    this.loadNextMatchData(result.data.next);
-                                } else {
-                                    this.setState({
-                                        page_loading: false,
-                                    });
-                                }
-                            }
-                        );
-                    } else {
-                        this.setState({
-                            page_loading: false,
-                        });
-                    }
-                } else {
-                    this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-        window.MathJax.typeset();
-    };
-
-    loadNextMatchData = async (path) => {
-        await fetch(path, {
+    loadMatchData = async (path) => {
+        var apiURL =
+            path === undefined || path === null
+                ? `${this.url}/hod/subject/${this.subjectId}/chapter/${this.chapterId}/${this.topicNum}/match/`
+                : path;
+        await fetch(apiURL, {
             headers: this.headers,
             method: "GET",
         })
@@ -166,7 +95,7 @@ class HODSubjectMatch extends Component {
                             },
                             () => {
                                 if (result.data.next !== null) {
-                                    this.loadNextMatchData(result.data.next);
+                                    this.loadMatchData(result.data.next);
                                 } else {
                                     this.setState({
                                         page_loading: false,

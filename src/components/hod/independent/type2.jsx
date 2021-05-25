@@ -7,6 +7,7 @@ import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import Loading from "../../sharedComponents/loader";
 import AlertBox from "../../sharedComponents/alert";
 import FileModal from "../shared/fileExplorer";
+import { Type2DataFormat } from "../../sharedComponents/dataFormating";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
@@ -62,60 +63,12 @@ class HODSubjectTypeTwo extends Component {
 
     // -------------------------- Question data loading --------------------------
 
-    loadMCQData = async () => {
-        await fetch(
-            `${this.url}/hod/subject/${this.subjectId}/chapter/${this.chapterId}/${this.topicNum}/type_two/`,
-            {
-                headers: this.headers,
-                method: "GET",
-            }
-        )
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    let data = [];
-                    let response = result.data.results;
-                    if (response.length !== 0) {
-                        let questionData = this.loopQuestionData(
-                            data,
-                            response
-                        );
-                        this.setState(
-                            {
-                                questions: questionData.question,
-                            },
-                            () => {
-                                if (result.data.next !== null) {
-                                    this.loadNextMCQData(result.data.next);
-                                } else {
-                                    this.setState({
-                                        page_loading: false,
-                                    });
-                                }
-                            }
-                        );
-                    } else {
-                        this.setState({
-                            page_loading: false,
-                        });
-                    }
-                } else {
-                    this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-        window.MathJax.typeset();
-    };
-
-    loadNextMCQData = async (path) => {
-        await fetch(path, {
+    loadMCQData = async (path) => {
+        var apiURL =
+            path === undefined || path === null
+                ? `${this.url}/hod/subject/${this.subjectId}/chapter/${this.chapterId}/${this.topicNum}/type_two/`
+                : path;
+        await fetch(apiURL, {
             headers: this.headers,
             method: "GET",
         })
@@ -126,17 +79,16 @@ class HODSubjectTypeTwo extends Component {
                     let data = [...this.state.questions];
                     let response = result.data.results;
                     if (response.length !== 0) {
-                        let questionData = this.loopQuestionData(
-                            data,
-                            response
-                        );
+                        let questionData = Type2DataFormat(result);
+                        data.push(...questionData.result);
+
                         this.setState(
                             {
-                                questions: questionData.question,
+                                questions: data,
                             },
                             () => {
                                 if (result.data.next !== null) {
-                                    this.loadNextMCQData(result.data.next);
+                                    this.loadMCQData(result.data.next);
                                 } else {
                                     this.setState({
                                         page_loading: false,
@@ -162,145 +114,6 @@ class HODSubjectTypeTwo extends Component {
             });
         window.MathJax.typeset();
     };
-
-    loopQuestionData = (data, response) => {
-        let images = [];
-        let audio = [];
-        let sub_question = [];
-        for (let i = 0; i < response.length; i++) {
-            images = [];
-            audio = [];
-            sub_question = [];
-            if (
-                response[i].files &&
-                Object.entries(response[i].files).length !== 0
-            ) {
-                // image
-                if (response[i].files.type2_image_1) {
-                    images.push({
-                        title: response[i].files.type2_image_1_title,
-                        file_name: "",
-                        image: null,
-                        path: response[i].files.type2_image_1,
-                    });
-                }
-                if (response[i].files.type2_image_2) {
-                    images.push({
-                        title: response[i].files.type2_image_2_title,
-                        file_name: "",
-                        image: null,
-                        path: response[i].files.type2_image_2,
-                    });
-                }
-                if (response[i].files.type2_image_3) {
-                    images.push({
-                        title: response[i].files.type2_image_3_title,
-                        file_name: "",
-                        image: null,
-                        path: response[i].files.type2_image_3,
-                    });
-                }
-                if (response[i].files.type2_image_4) {
-                    images.push({
-                        title: response[i].files.type2_image_4_title,
-                        file_name: "",
-                        image: null,
-                        path: response[i].files.type2_image_4,
-                    });
-                }
-
-                // audio
-                if (response[i].files.type2_audio_1) {
-                    audio.push({
-                        title: response[i].files.type2_audio_1_title,
-                        file_name: "",
-                        audio: null,
-                        path: response[i].files.type2_audio_1,
-                    });
-                }
-                if (response[i].files.type2_audio_2) {
-                    audio.push({
-                        title: response[i].files.type2_audio_2_title,
-                        file_name: "",
-                        audio: null,
-                        path: response[i].files.type2_audio_2,
-                    });
-                }
-            }
-
-            // video
-            var path = "";
-            if (
-                response[i].files &&
-                Object.entries(response[i].files).length !== 0
-            ) {
-                if (response[i].files.paste_video_url) {
-                    path = response[i].files.paste_video_url;
-                }
-                if (response[i].files.type2_video_1) {
-                    path = response[i].files.type2_video_1;
-                }
-            }
-
-            // Sub question
-            for (let k = 0; k < response[i].sub_question.length; k++) {
-                sub_question.push({
-                    sub_question_id:
-                        response[i].sub_question[k].sub_question_id,
-                    question: response[i].sub_question[k].question,
-                    mcq: response[i].sub_question[k].mcq,
-                    fill_in: response[i].sub_question[k].fill_in,
-                    fillin_answer: response[i].sub_question[k].fillin_answer
-                        ? response[i].sub_question[k].fillin_answer.length !== 0
-                            ? response[i].sub_question[k].fillin_answer
-                            : [""]
-                        : [],
-                    options: response[i].sub_question[k].options
-                        ? response[i].sub_question[k].options.length !== 0
-                            ? response[i].sub_question[k].options
-                            : []
-                        : [],
-                });
-            }
-
-            // Main question
-            data.push({
-                question_random_id: response[i].question_random_id,
-                question: response[i].question,
-                explanation: response[i].explanation,
-                mcq:
-                    response[i].sub_question[0].mcq !== undefined
-                        ? response[i].sub_question[0].mcq
-                        : false,
-                fill_in:
-                    response[i].sub_question[0].fill_in !== undefined
-                        ? response[i].sub_question[0].fill_in
-                        : false,
-                sub_question: sub_question,
-                content: {
-                    images: images.length === 0 ? [] : images,
-                    video: {
-                        title:
-                            Object.entries(response[i].files).length !== 0 &&
-                            response[i].files.type2_video_1_title
-                                ? response[i].files.type2_video_1_title
-                                : "",
-                        file_name: "",
-                        video: null,
-                        path: path,
-                        url: "",
-                    },
-                    audio: audio.length === 0 ? [] : audio,
-                },
-            });
-        }
-
-        return {
-            question: data,
-        };
-    };
-
-    // -------------------------- Lifecycle --------------------------
 
     componentDidMount = () => {
         document.title = `${this.props.topic_name} : Type Two - HOD | IQLabs`;

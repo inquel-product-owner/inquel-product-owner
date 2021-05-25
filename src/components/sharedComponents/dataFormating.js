@@ -160,17 +160,7 @@ export function Type1DataFormat(result) {
                               },
                           ],
                 explanation: response[i].explanation,
-                images:
-                    images.length === 0
-                        ? [
-                              {
-                                  title: "",
-                                  file_name: "",
-                                  image: null,
-                                  path: "",
-                              },
-                          ]
-                        : images,
+                images: images.length === 0 ? [] : images,
                 video: {
                     title: videoTitle,
                     file_name: "",
@@ -178,17 +168,7 @@ export function Type1DataFormat(result) {
                     path: videoPath,
                     url: "",
                 },
-                audio:
-                    audio.length === 0
-                        ? [
-                              {
-                                  title: "",
-                                  file_name: "",
-                                  audio: null,
-                                  path: "",
-                              },
-                          ]
-                        : audio,
+                audio: audio.length === 0 ? [] : audio,
             },
             properties: {
                 marks: response[i].properties.marks,
@@ -367,17 +347,7 @@ export function Type2DataFormat(result) {
             personal_notes: response[i].personal_notes || {},
             sub_question: sub_question,
             content: {
-                images:
-                    images.length === 0
-                        ? [
-                              {
-                                  title: "",
-                                  file_name: "",
-                                  image: null,
-                                  path: "",
-                              },
-                          ]
-                        : images,
+                images: images.length === 0 ? [] : images,
                 video: {
                     title: videoTitle,
                     file_name: "",
@@ -385,17 +355,7 @@ export function Type2DataFormat(result) {
                     path: videoPath,
                     url: "",
                 },
-                audio:
-                    audio.length === 0
-                        ? [
-                              {
-                                  title: "",
-                                  file_name: "",
-                                  audio: null,
-                                  path: "",
-                              },
-                          ]
-                        : audio,
+                audio: audio.length === 0 ? [] : audio,
             },
             properties: {
                 complexity: response[i].properties.complexity,
@@ -592,7 +552,10 @@ export function DataFormat(result) {
             currentSubQuestionIndex.push(0);
 
             // Image
-            if (response[i].files && Object.entries(response[i].files).length !== 0) {
+            if (
+                response[i].files &&
+                Object.entries(response[i].files).length !== 0
+            ) {
                 if (response[i].files.type2_image_1) {
                     images.push({
                         title: response[i].files.type2_image_1_title,
@@ -824,17 +787,7 @@ export function ConceptFormat(result) {
             content: {
                 terms: response[i].terms,
                 definition: response[i].definition,
-                images:
-                    images.length === 0
-                        ? [
-                              {
-                                  title: "",
-                                  file_name: "",
-                                  image: null,
-                                  path: "",
-                              },
-                          ]
-                        : images,
+                images: images.length === 0 ? [] : images,
                 video: {
                     title:
                         response[i].files &&
@@ -847,17 +800,7 @@ export function ConceptFormat(result) {
                     path: path,
                     url: "",
                 },
-                audio:
-                    audio.length === 0
-                        ? [
-                              {
-                                  title: "",
-                                  file_name: "",
-                                  audio: null,
-                                  path: "",
-                              },
-                          ]
-                        : audio,
+                audio: audio.length === 0 ? [] : audio,
             },
             settings: {
                 virtual_keyboard: response[i].settings.virtual_keyboard,

@@ -73,11 +73,12 @@ class HODGroupSubject extends Component {
     };
 
     componentDidMount = () => {
+        document.title = this.props.subject_name + " - HOD | IQLabs";
+        
         this.loadSubjectData();
     };
 
     render() {
-        document.title = this.props.subject_name + " - HOD | IQLabs";
         return (
             <div className="wrapper">
                 {/* Navbar */}

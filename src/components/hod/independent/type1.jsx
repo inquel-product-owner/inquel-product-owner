@@ -7,6 +7,7 @@ import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import Loading from "../../sharedComponents/loader";
 import AlertBox from "../../sharedComponents/alert";
 import FileModal from "../shared/fileExplorer";
+import { Type1DataFormat } from "../../sharedComponents/dataFormating";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
@@ -62,60 +63,12 @@ class HODSubjectTypeOne extends Component {
 
     // -------------------------- Question data loading --------------------------
 
-    loadMCQData = async () => {
-        await fetch(
-            `${this.url}/hod/subject/${this.subjectId}/chapter/${this.chapterId}/${this.topicNum}/type_one/`,
-            {
-                headers: this.headers,
-                method: "GET",
-            }
-        )
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    let data = [];
-                    let response = result.data.results;
-                    if (response.length !== 0) {
-                        let questionData = this.loopQuestionData(
-                            data,
-                            response
-                        );
-                        this.setState(
-                            {
-                                questions: questionData.question,
-                            },
-                            () => {
-                                if (result.data.next !== null) {
-                                    this.loadNextMCQData(result.data.next);
-                                } else {
-                                    this.setState({
-                                        page_loading: false,
-                                    });
-                                }
-                            }
-                        );
-                    } else {
-                        this.setState({
-                            page_loading: false,
-                        });
-                    }
-                } else {
-                    this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-        window.MathJax.typeset();
-    };
-
-    loadNextMCQData = async (path) => {
-        await fetch(path, {
+    loadMCQData = async (path) => {
+        var apiURL =
+            path === undefined || path === null
+                ? `${this.url}/hod/subject/${this.subjectId}/chapter/${this.chapterId}/${this.topicNum}/type_one/`
+                : path;
+        await fetch(apiURL, {
             headers: this.headers,
             method: "GET",
         })
@@ -126,17 +79,16 @@ class HODSubjectTypeOne extends Component {
                     let data = [...this.state.questions];
                     let response = result.data.results;
                     if (response.length !== 0) {
-                        let questionData = this.loopQuestionData(
-                            data,
-                            response
-                        );
+                        let questionData = Type1DataFormat(result);
+                        data.push(...questionData.result);
+
                         this.setState(
                             {
-                                questions: questionData.question,
+                                questions: data,
                             },
                             () => {
                                 if (result.data.next !== null) {
-                                    this.loadNextMCQData(result.data.next);
+                                    this.loadMCQData(result.data.next);
                                 } else {
                                     this.setState({
                                         page_loading: false,
@@ -161,122 +113,6 @@ class HODSubjectTypeOne extends Component {
                 console.log(err);
             });
         window.MathJax.typeset();
-    };
-
-    loopQuestionData = (data, response) => {
-        let imgArr = [];
-        let audioArr = [];
-        for (let i = 0; i < response.length; i++) {
-            imgArr = [];
-            audioArr = [];
-            if (response[i].files && response[i].files.length !== 0) {
-                // image
-                if (response[i].files[0].type1_image_1) {
-                    imgArr.push({
-                        title: response[i].files[0].type1_image_1_title,
-                        file_name: "",
-                        image: null,
-                        path: response[i].files[0].type1_image_1,
-                    });
-                }
-                if (response[i].files[0].type1_image_2) {
-                    imgArr.push({
-                        title: response[i].files[0].type1_image_2_title,
-                        file_name: "",
-                        image: null,
-                        path: response[i].files[0].type1_image_2,
-                    });
-                }
-                if (response[i].files[0].type1_image_3) {
-                    imgArr.push({
-                        title: response[i].files[0].type1_image_3_title,
-                        file_name: "",
-                        image: null,
-                        path: response[i].files[0].type1_image_3,
-                    });
-                }
-                if (response[i].files[0].type1_image_4) {
-                    imgArr.push({
-                        title: response[i].files[0].type1_image_4_title,
-                        file_name: "",
-                        image: null,
-                        path: response[i].files[0].type1_image_4,
-                    });
-                }
-
-                // audio
-                if (response[i].files[0].type1_audio_1) {
-                    audioArr.push({
-                        title: response[i].files[0].type1_audio_1_title,
-                        file_name: "",
-                        audio: null,
-                        path: response[i].files[0].type1_audio_1,
-                    });
-                }
-                if (response[i].files[0].type1_audio_2) {
-                    audioArr.push({
-                        title: response[i].files[0].type1_audio_2_title,
-                        file_name: "",
-                        audio: null,
-                        path: response[i].files[0].type1_audio_2,
-                    });
-                }
-            }
-
-            // video
-            var path = "";
-            if (response[i].files && response[i].files.length !== 0) {
-                if (response[i].files[0].paste_video_url) {
-                    path = response[i].files[0].paste_video_url;
-                }
-                if (response[i].files[0].type1_video_1) {
-                    path = response[i].files[0].type1_video_1;
-                }
-            }
-
-            data.push({
-                question: response[i].question,
-                question_random_id: response[i].question_random_id,
-                content: {
-                    mcq: response[i].mcq,
-                    fill_in: response[i].fill_in,
-                    boolean: response[i].boolean,
-                    fillin_answer: response[i].fillin_answer
-                        ? response[i].fillin_answer.length !== 0
-                            ? response[i].fillin_answer
-                            : []
-                        : [],
-                    boolean_question: response[i].boolean_question
-                        ? response[i].boolean_question.length !== 0
-                            ? response[i].boolean_question
-                            : []
-                        : [],
-                    options: response[i].options
-                        ? response[i].options.length !== 0
-                            ? response[i].options
-                            : []
-                        : [],
-                    explanation: response[i].explanation,
-                    images: imgArr.length === 0 ? [] : imgArr,
-                    video: {
-                        title:
-                            response[i].files.length !== 0 &&
-                            response[i].files[0].type1_video_1_title
-                                ? response[i].files[0].type1_video_1_title
-                                : "",
-                        file_name: "",
-                        video: null,
-                        path: path,
-                        url: "",
-                    },
-                    audio: audioArr.length === 0 ? [] : audioArr,
-                },
-            });
-        }
-
-        return {
-            question: data,
-        };
     };
 
     // -------------------------- Lifecycle --------------------------

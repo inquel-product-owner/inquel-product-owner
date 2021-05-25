@@ -52,6 +52,8 @@ class HODGroupTeachers extends Component {
     };
 
     componentDidMount = () => {
+        document.title = `${this.props.group_name} : Teachers - HOD | IQLabs`;
+        
         fetch(`${this.url}/hod/group/${this.groupId}/teacher/`, {
             headers: this.headers,
             method: "GET",
@@ -78,7 +80,6 @@ class HODGroupTeachers extends Component {
     };
 
     render() {
-        document.title = `${this.props.group_name} Teachers - HOD | IQLabs`;
         return (
             <div className="wrapper">
                 {/* Navbar */}

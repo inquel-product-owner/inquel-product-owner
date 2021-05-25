@@ -311,6 +311,8 @@ class HODGroupStudents extends Component {
     };
 
     componentDidMount = () => {
+        document.title = `${this.props.group_name} : Students - HOD | IQLabs`;
+
         this.loadStudentData();
     };
 
@@ -359,7 +361,6 @@ class HODGroupStudents extends Component {
     }
 
     render() {
-        document.title = `${this.props.group_name} Students - HOD | IQLabs`;
         return (
             <div className="wrapper">
                 {/* Navbar */}
