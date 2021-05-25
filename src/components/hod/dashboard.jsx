@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import { Modal, Alert, Spinner } from "react-bootstrap";
+import { Modal, Alert, Spinner, Dropdown } from "react-bootstrap";
 import Header from "./shared/navbar";
 import SideNav from "./shared/sidenav";
 import courseimg from "../../assets/code.jpg";
@@ -18,6 +18,7 @@ import {
 } from "../sharedComponents/contentManagementModal";
 import { connect } from "react-redux";
 import Slider from "react-slick";
+import store from "../../redux/store";
 
 const mapStateToProps = (state) => ({
     data: state.user.profile,
@@ -704,12 +705,55 @@ class HODDashboard extends Component {
                                                                                         ? courseimg
                                                                                         : data.course_thumbnail_url
                                                                                 }
-                                                                                className="card-img-top"
-                                                                                alt="Course"
+                                                                                className="card-img-top card-img-height"
+                                                                                alt={
+                                                                                    data.course_name
+                                                                                }
                                                                             />
+                                                                            <div
+                                                                                className="text-right mt-2"
+                                                                                style={{
+                                                                                    position:
+                                                                                        "absolute",
+                                                                                    right: "7px",
+                                                                                }}
+                                                                            >
+                                                                                <Dropdown>
+                                                                                    <Dropdown.Toggle
+                                                                                        variant="white"
+                                                                                        className="btn btn-outline-light btn-sm shadow-none caret-off"
+                                                                                    >
+                                                                                        <i className="fas fa-ellipsis-v"></i>
+                                                                                    </Dropdown.Toggle>
+
+                                                                                    <Dropdown.Menu>
+                                                                                        <Dropdown.Item>
+                                                                                            <i className="far fa-trash-alt mr-1"></i>{" "}
+                                                                                            Delete
+                                                                                        </Dropdown.Item>
+                                                                                        <Dropdown.Item>
+                                                                                            <i className="far fa-check-circle mr-1"></i>{" "}
+                                                                                            Enable
+                                                                                        </Dropdown.Item>
+                                                                                        <Dropdown.Item>
+                                                                                            <i className="fas fa-ban mr-1"></i>{" "}
+                                                                                            Disable
+                                                                                        </Dropdown.Item>
+                                                                                    </Dropdown.Menu>
+                                                                                </Dropdown>
+                                                                            </div>
                                                                             <Link
                                                                                 to={`/hod/course/${data.course_id}`}
                                                                                 className="text-decoration-none"
+                                                                                onClick={() => {
+                                                                                    store.dispatch(
+                                                                                        {
+                                                                                            type: "COURSE",
+                                                                                            payload:
+                                                                                                data.course_name,
+                                                                                        }
+                                                                                    );
+                                                                                }}
                                                                             >
                                                                                 <div
                                                                                     className="card-body primary-bg text-white p-2"

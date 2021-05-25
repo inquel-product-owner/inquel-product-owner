@@ -13,6 +13,7 @@ const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
     simulation_name: state.content.simulation_name,
     paper_name: state.content.paper_name,
+    profile: state.user.profile,
 });
 
 class HODSimulationSection extends Component {
@@ -133,7 +134,7 @@ class HODSimulationSection extends Component {
 
     componentDidMount = () => {
         document.title = `${this.props.paper_name} - HOD | IQLabs`;
-        
+
         this.loadFilterData();
         this.loadSectionData();
     };
@@ -153,7 +154,6 @@ class HODSimulationSection extends Component {
         });
     };
 
-    // loads category data on selecting question type
     handleType = (index, event) => {
         let section = [...this.state.sections];
         section[index].question_type = event.target.value;
@@ -164,7 +164,6 @@ class HODSimulationSection extends Component {
         });
     };
 
-    // loads marks data on selecting a category
     handleCategory = (index, event) => {
         let section = [...this.state.sections];
         section[index].category = event.target.value;
@@ -584,19 +583,45 @@ class HODSimulationSection extends Component {
                                                                                 ) => {
                                                                                     return key !==
                                                                                         "attempts" ? (
-                                                                                        <option
-                                                                                            value={
-                                                                                                key
-                                                                                            }
-                                                                                            key={
-                                                                                                q_index
-                                                                                            }
-                                                                                        >
-                                                                                            {key ===
-                                                                                            "type_1"
-                                                                                                ? "Type 1"
-                                                                                                : "Type 2"}
-                                                                                        </option>
+                                                                                        key ===
+                                                                                        "type_1" ? (
+                                                                                            this
+                                                                                                .props
+                                                                                                .profile
+                                                                                                .permissions
+                                                                                                .type_1_q ? (
+                                                                                                <option
+                                                                                                    value={
+                                                                                                        key
+                                                                                                    }
+                                                                                                    key={
+                                                                                                        q_index
+                                                                                                    }
+                                                                                                >
+                                                                                                    Type
+                                                                                                    1
+                                                                                                </option>
+                                                                                            ) : null
+                                                                                        ) : key ===
+                                                                                          "type_2" ? (
+                                                                                            this
+                                                                                                .props
+                                                                                                .profile
+                                                                                                .permissions
+                                                                                                .type_2_q ? (
+                                                                                                <option
+                                                                                                    value={
+                                                                                                        key
+                                                                                                    }
+                                                                                                    key={
+                                                                                                        q_index
+                                                                                                    }
+                                                                                                >
+                                                                                                    Type
+                                                                                                    2
+                                                                                                </option>
+                                                                                            ) : null
+                                                                                        ) : null
                                                                                     ) : null;
                                                                                 }
                                                                             )

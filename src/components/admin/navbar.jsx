@@ -26,7 +26,7 @@ class Header extends Component {
     }
 
     loadProfileData = () => {
-        fetch(`${baseUrl + adminPathUrl}/hod/profile/`, {
+        fetch(`${baseUrl + adminPathUrl}/profile/`, {
             method: "GET",
             headers: this.headers,
         })
@@ -139,9 +139,13 @@ class Header extends Component {
                                                             : userpic
                                                         : userpic
                                                 }
-                                                alt="User pic"
-                                                width="25"
-                                                className="profile-pic mr-1 mb-1"
+                                                alt={
+                                                    this.props.data !== null
+                                                        ? this.props.data
+                                                              .username
+                                                        : ""
+                                                }
+                                                className="profile-img-circle mr-1 mb-1"
                                             />{" "}
                                             {this.props.data !== null
                                                 ? this.props.data.username

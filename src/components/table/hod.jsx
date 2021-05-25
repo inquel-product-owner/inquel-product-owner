@@ -51,12 +51,13 @@ function nameTemplate(props) {
                             ? props.profile_link
                             : userimage
                     }
-                    alt="HOD profile"
-                    width="23"
+                    alt={props.full_name ? props.full_name : props.username}
                     className="profile-pic"
                 />
             </div>
-            <span id="Emptext">{props.full_name}</span>
+            <span id="Emptext">
+                {props.full_name ? props.full_name : props.username}
+            </span>
         </div>
     );
 }

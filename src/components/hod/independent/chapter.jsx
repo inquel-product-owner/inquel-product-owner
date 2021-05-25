@@ -105,8 +105,6 @@ class HODSubjectChapter extends Component {
     };
 
     componentDidMount = async () => {
-        document.title = `${this.props.chapter_name} - HOD | IQLabs`;
-        
         await fetch(`${this.url}/hod/subject/${this.subjectId}/`, {
             headers: this.headers,
             method: "GET",
@@ -190,6 +188,7 @@ class HODSubjectChapter extends Component {
                     className="bg-light shadow-sm border py-2 mb-2"
                     style={{
                         borderRadius: "8px",
+                        cursor: "default",
                     }}
                     onClick={() =>
                         data.child.length !== 0
@@ -219,7 +218,7 @@ class HODSubjectChapter extends Component {
                                         ""
                                     )}
                                 </div>
-                                <div className="col-10 d-flex small font-weight-bold-600 pl-2">
+                                <div className="col-10 d-flex small font-weight-bold-600">
                                     <div className="mr-3">{data.topic_num}</div>
                                     <div className="w-100">
                                         {data.topic_name}
@@ -370,6 +369,7 @@ class HODSubjectChapter extends Component {
     };
 
     render() {
+        document.title = `${this.props.chapter_name} - HOD | IQLabs`;
         return (
             <div className="wrapper">
                 {/* Navbar */}
@@ -422,7 +422,7 @@ class HODSubjectChapter extends Component {
 
                         {/* ----- Breadcrumb ----- */}
                         <div className="row align-items-center mb-3">
-                            <div className="col-md-6 col-10">
+                            <div className="col-md-6 col-9">
                                 <nav aria-label="breadcrumb">
                                     <ol className="breadcrumb">
                                         <li className="breadcrumb-item">
@@ -462,11 +462,21 @@ class HODSubjectChapter extends Component {
                                 <Select
                                     className="basic-single form-shadow"
                                     placeholder={this.props.chapter_name}
-                                    value={[]}
                                     isSearchable={true}
                                     name="chapter"
+                                    value={this.state.chapterList.map(
+                                        (list) => {
+                                            return this.props.chapter_name ===
+                                                list.chapter_name
+                                                ? {
+                                                      value: list.chapter_id,
+                                                      label: list.chapter_name,
+                                                  }
+                                                : "";
+                                        }
+                                    )}
                                     options={this.state.chapterList.map(
-                                        function (list) {
+                                        (list) => {
                                             return {
                                                 value: list.chapter_id,
                                                 label: list.chapter_name,
@@ -493,7 +503,7 @@ class HODSubjectChapter extends Component {
                         >
                             {/* Course details */}
                             <div style={{ minWidth: "1100px" }}>
-                                <div className="card-header tomato-bg primary-text font-weight-bold">
+                                <div className="card-header tomato-bg primary-text font-weight-bold-600">
                                     <div className="row align-items-center">
                                         <div className="col-4">
                                             Topic structure
@@ -529,7 +539,10 @@ class HODSubjectChapter extends Component {
                                                 as={Card.Header}
                                                 eventKey="0"
                                                 className="secondary-bg shadow-sm mb-2 py-2"
-                                                style={{ borderRadius: "8px" }}
+                                                style={{
+                                                    borderRadius: "8px",
+                                                    cursor: "default",
+                                                }}
                                                 onClick={() => {
                                                     this.setState({
                                                         collapsed:
@@ -554,7 +567,7 @@ class HODSubjectChapter extends Component {
                                                                     ></i>
                                                                 </span>
                                                             </div>
-                                                            <div className="col-11 d-flex small font-weight-bold">
+                                                            <div className="col-10 d-flex small font-weight-bold">
                                                                 <div className="mr-3">
                                                                     {
                                                                         this
@@ -639,6 +652,16 @@ class HODSubjectChapter extends Component {
                                                                       >
                                                                           <Link
                                                                               to={`${this.props.match.url}/cycle/${data.cycle_test_id}`}
+                                                                              className="text-decoration-none"
+                                                                              onClick={() => {
+                                                                                  store.dispatch(
+                                                                                      {
+                                                                                          type: "CYCLE",
+                                                                                          payload:
+                                                                                              data.cycle_test_name,
+                                                                                      }
+                                                                                  );
+                                                                              }}
                                                                           >
                                                                               <p className="small primary-text text-center font-weight-bold-600 mb-0">
                                                                                   {
@@ -673,6 +696,16 @@ class HODSubjectChapter extends Component {
                                                                       >
                                                                           <Link
                                                                               to={`${this.props.match.url}/quiz/${data.quiz_id}`}
+                                                                              className="text-decoration-none"
+                                                                              onClick={() => {
+                                                                                  store.dispatch(
+                                                                                      {
+                                                                                          type: "QUIZ",
+                                                                                          payload:
+                                                                                              data.quiz_name,
+                                                                                      }
+                                                                                  );
+                                                                              }}
                                                                           >
                                                                               <p className="small primary-text text-center font-weight-bold-600 mb-0">
                                                                                   {

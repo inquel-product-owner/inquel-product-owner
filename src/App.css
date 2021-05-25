@@ -10,7 +10,7 @@ body {
     background-color: #f7f7f7;
 }
 
-/* Navbar */
+/* -=-=-=-=-= Navbar =-=-=-=-=- */
 
 .navbar h5 {
     color: #7c8188;
@@ -28,7 +28,7 @@ body {
     }
 }
 
-/* Background */
+/* -=-=-=-=-= Background =-=-=-=-=- */
 
 .primary-bg {
     background-color: var(--primary) !important;
@@ -68,7 +68,7 @@ body {
     background-color: #ffc14f !important;
 }
 
-/* Text */
+/* -=-=-=-=-= Text =-=-=-=-=- */
 
 .primary-text {
     color: var(--primary) !important;
@@ -98,7 +98,7 @@ body {
     font-weight: 600;
 }
 
-/* Card */
+/* -=-=-=-=-= Card =-=-=-=-=- */
 
 .card {
     border: none;
@@ -118,6 +118,8 @@ body {
 .card-img-top {
     border-top-left-radius: 8px !important;
     border-top-right-radius: 8px !important;
+    height: 30vh;
+    object-fit: cover;
 }
 
 .card-body {
@@ -132,7 +134,7 @@ body {
     border-bottom-right-radius: 8px !important;
 }
 
-/* Button */
+/* -=-=-=-=-= Button =-=-=-=-=- */
 
 .btn-primary {
     background-color: var(--primary);
@@ -220,7 +222,7 @@ body {
     background-color: #ff9673;
 }
 
-/* Shadow */
+/* -=-=-=-=-= Shadow =-=-=-=-=- */
 
 .shadow-none {
     box-shadow: none !important;
@@ -230,7 +232,7 @@ body {
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
 }
 
-/* Form */
+/* -=-=-=-=-= Form =-=-=-=-=- */
 
 .form-control {
     outline: none;
@@ -290,7 +292,7 @@ input[type="search"]:focus {
     overflow: hidden;
 }
 
-/* Table */
+/* -=-=-=-=-= Table =-=-=-=-=- */
 
 .table {
     margin-bottom: 0;
@@ -298,12 +300,6 @@ input[type="search"]:focus {
     border-top-right-radius: 8px !important;
     overflow: hidden;
 }
-
-/* thead {
-    border-top-left-radius: 8px !important;
-    border-top-right-radius: 8px !important;
-    overflow: hidden;
-} */
 
 .table th {
     border-top: none;
@@ -327,7 +323,7 @@ input[type="search"]:focus {
     margin-right: 3px;
 }
 
-/* Nav tabs */
+/* -=-=-=-=-= Nav tabs =-=-=-=-=- */
 
 .nav-tabs {
     border: none;
@@ -380,13 +376,20 @@ input[type="search"]:focus {
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 }
 
-/* Image */
+/* -=-=-=-=-= Image =-=-=-=-=- */
 
 .profile-pic {
     border-radius: 50%;
 }
 
-/* Dropdown */
+.profile-img-circle {
+    height: 26px;
+    width: 26px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+/* -=-=-=-=-= Dropdown =-=-=-=-=- */
 
 .dropdown-menu {
     border: 1px solid var(--primary);
@@ -414,7 +417,7 @@ input[type="search"]:focus {
     display: none;
 }
 
-/* Border */
+/* -=-=-=-=-= Border =-=-=-=-=- */
 
 .borders {
     border: 1px solid var(--secondary) !important;
@@ -428,7 +431,7 @@ input[type="search"]:focus {
     border: 1px solid #ced4da !important;
 }
 
-/* Login */
+/* -=-=-=-=-= Login =-=-=-=-=- */
 
 .login,
 .login .page-row {
@@ -437,7 +440,7 @@ input[type="search"]:focus {
     padding-bottom: 2rem;
 }
 
-/* Section */
+/* -=-=-=-=-= Section =-=-=-=-=- */
 
 .section {
     padding-top: 5rem;
@@ -456,7 +459,7 @@ input[type="search"]:focus {
     width: 100%;
 }
 
-/* SIDEBAR */
+/* -=-=-=-=-= SIDEBAR =-=-=-=-=- */
 
 #sidebar {
     width: 50px;
@@ -506,7 +509,7 @@ input[type="search"]:focus {
     color: var(--primary);
 }
 
-/* MAIN CONTENT */
+/* -=-=-=-=-= MAIN CONTENT =-=-=-=-=- */
 
 .content {
     width: calc(100% - 50px);
@@ -525,7 +528,7 @@ input[type="search"]:focus {
     }
 }
 
-/* Loader */
+/* -=-=-=-=-= Loader =-=-=-=-=- */
 
 .fp-container {
     position: fixed;
@@ -544,7 +547,7 @@ input[type="search"]:focus {
     position: absolute;
 }
 
-/* Alert */
+/* -=-=-=-=-= Alert =-=-=-=-=- */
 
 .alert {
     border: none;
@@ -596,7 +599,7 @@ input[type="search"]:focus {
     text-transform: uppercase;
 }
 
-/* Modal */
+/* -=-=-=-=-= Modal =-=-=-=-=- */
 
 .modal-content {
     border: none;
@@ -620,7 +623,7 @@ input[type="search"]:focus {
     opacity: 0.8;
 }
 
-/* Pagination */
+/* -=-=-=-=-= Pagination =-=-=-=-=- */
 
 .pagination {
     margin-bottom: 0;
@@ -650,14 +653,14 @@ input[type="search"]:focus {
     background-color: #f5f5f5;
 }
 
-/* table-grid */
+/* -=-=-=-=-= table-grid =-=-=-=-=- */
 
 .e-toolbar-items {
     border-top-left-radius: 8px !important;
     border-top-right-radius: 8px !important;
 }
 
-/* carousel */
+/* -=-=-=-=-= carousel =-=-=-=-=- */
 
 .slick-prev {
     left: -15px;
@@ -716,7 +719,7 @@ input[type="search"]:focus {
     margin-left: 0;
 }
 
-/* Accordion */
+/* -=-=-=-=-= Accordion =-=-=-=-=- */
 
 .accordion > .card:not(:last-of-type) {
     border-bottom: 8px;
@@ -735,7 +738,7 @@ input[type="search"]:focus {
     overflow: unset !important;
 }
 
-/* Content edit options */
+/* -=-=-=-=-= Content edit options =-=-=-=-=- */
 
 @media screen and (min-width: 769px) {
     .content-edit {
@@ -749,7 +752,7 @@ input[type="search"]:focus {
 
 .preview-img-sm {
     width: 100%;
-    height: 80px;
+    height: 60px;
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -767,7 +770,7 @@ input[type="search"]:focus {
     border-radius: 50% !important;
 }
 
-/* PDF Preview */
+/* -=-=-=-=-= PDF Preview =-=-=-=-=- */
 
 #ResumeContainer {
     margin: auto;
@@ -789,7 +792,7 @@ input[type="search"]:focus {
     height: auto !important;
 }
 
-/* Breadcrumb */
+/* -=-=-=-=-= Breadcrumb =-=-=-=-=- */
 
 .breadcrumb {
     background-color: transparent;
@@ -821,7 +824,7 @@ input[type="search"]:focus {
     margin-right: 5px;
 }
 
-/* Badge */
+/* -=-=-=-=-= Badge =-=-=-=-=- */
 
 .badge-success {
     background-color: #ccffcc !important;
@@ -839,13 +842,13 @@ input[type="search"]:focus {
     font-size: 12px;
 }
 
-/* ---------- Audio ---------- */
+/* -=-=-=-=-= Audio =-=-=-=-=- */
 
 audio {
     outline: none;
 }
 
-/* ---------- Popover ---------- */
+/* -=-=-=-=-= Popover =-=-=-=-=- */
 
 .popover {
     border: none;
@@ -886,7 +889,7 @@ audio {
     border-bottom-color: var(--pink-orange);
 }
 
-/* ----- drop-area ----- */
+/* -=-=-=-=-= drop-area =-=-=-=-=- */
 
 #drop-area {
     width: 100%;
@@ -906,7 +909,7 @@ audio {
     position: absolute;
     left: 50%;
     top: 50%;
-    transform: translate(-50%,-50%);
+    transform: translate(-50%, -50%);
     color: var(--tomato);
     font-weight: 600;
     font-size: 20px;
@@ -921,11 +924,36 @@ audio {
     overflow: hidden;
 }
 
-/* ----- concept flashcard ----- */
+/* -=-=-=-=-= concept flashcard =-=-=-=-=- */
 
 .concept-content-center {
     display: flex;
     align-items: center;
     justify-content: center;
     flex-flow: row wrap;
+}
+
+/* -=-=-=-=-= fieldset & legend =-=-=-=-=- */
+
+fieldset {
+    padding: 10px;
+    border-radius: 6px;
+}
+
+.primary-fieldset {
+    border: 1.4px solid var(--primary);
+}
+
+legend {
+    display: inline;
+    width: auto;
+    font-size: 15px;
+    padding: 4px 12px;
+    border-radius: 4px;
+}
+
+.primary-legend {
+    background-color: var(--primary);
+    color: white;
+    text-align: center;
 }

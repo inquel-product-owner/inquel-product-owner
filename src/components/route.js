@@ -45,8 +45,11 @@ import HODSubjectMatch from "./hod/independent/match";
 import HODSubjectConcepts from "./hod/independent/concepts";
 import HODSubjectTypeOne from "./hod/independent/type1";
 import HODSubjectTypeTwo from "./hod/independent/type2";
+import HODSubjectCyclePreview from "./hod/independent/cyclePreview";
+import HODSubjectSemesterPreview from "./hod/independent/semesterPreview";
+import HODSubjectQuizPreview from "./hod/independent/quizPreview";
 
-import HODCourseScorecard from "./hod/course/courseScorecard";
+import HODCourse from "./hod/course/course";
 import HODCourseConfig from "./hod/course/configuration";
 
 import HODSimulationPaper from "./hod/simulation/paper";
@@ -455,6 +458,42 @@ const routes = (
                 )
             }
         />
+        <Route
+            exact
+            path="/hod/subject/:subjectId/chapter/:chapterId/cycle/:cycleId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <HODSubjectCyclePreview {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/hod/subject/:subjectId/semester/:semesterId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <HODSubjectSemesterPreview {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/hod/subject/:subjectId/chapter/:chapterId/quiz/:quizId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <HODSubjectQuizPreview {...props} />
+                )
+            }
+        />
 
         {/* ---------- Course ---------- */}
 
@@ -466,13 +505,25 @@ const routes = (
                 !localStorage.getItem("is_hod") ? (
                     <Redirect to="/hod/login" />
                 ) : (
-                    <HODCourseScorecard {...props} />
+                    <HODCourse {...props} />
                 )
             }
         />
         <Route
             exact
-            path="/hod/subject/:subjectId/course/create"
+            path="/hod/subject/:subjectId/course"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <HODCourseConfig {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/hod/course/:courseId/edit"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
                 !localStorage.getItem("is_hod") ? (

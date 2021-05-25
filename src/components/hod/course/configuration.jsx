@@ -11,9 +11,11 @@ import { baseUrl, hodUrl } from "../../../shared/baseUrl";
 import ScoreCardTable from "../../sharedComponents/scorecard";
 import ReactSwitch from "../../sharedComponents/switchComponent";
 import CKeditor from "../../sharedComponents/CKeditor";
+import store from "../../../redux/store";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
+    course_name: state.content.course_name,
 });
 
 class Scorecard extends Component {
@@ -73,9 +75,7 @@ class Scorecard extends Component {
         });
 
         if (this.props.course_id === "") {
-            setTimeout(() => {
-                this.props.handlePOST(this.state.scorecard);
-            }, 1000);
+            this.props.handlePOST(this.state.scorecard);
         } else {
             fetch(
                 `${this.url}/hod/course/${this.props.course_id}/score_card/`,
@@ -246,9 +246,7 @@ class QuickPassModal extends Component {
             };
 
             if (this.props.course_id === "") {
-                setTimeout(() => {
-                    this.props.handlePOST(body);
-                }, 1000);
+                this.props.handlePOST(body);
             } else {
                 this.handlePUT(body);
             }
@@ -347,7 +345,7 @@ class QuickPassModal extends Component {
                 </Modal.Body>
                 <Modal.Footer>
                     <button
-                        className="btn btn-primary shadow-none"
+                        className="btn btn-primary btn-sm shadow-none"
                         onClick={this.handleSubmit}
                     >
                         {this.state.showLoader ? (
@@ -380,7 +378,7 @@ class HODCourseConfig extends Component {
             simulation_exam: [],
             configData: {},
 
-            course_id: "",
+            course_id: this.props.match.params.courseId || "",
             courseData: {
                 course_name: "",
                 board: "",
@@ -394,6 +392,7 @@ class HODCourseConfig extends Component {
                 title: "",
                 content: "",
             },
+            subject_id: "",
 
             chapter_ids: [],
             semester_ids: [],
@@ -428,11 +427,86 @@ class HODCourseConfig extends Component {
 
     // ----- Data loading from the API -----
 
-    loadContentData = () => {
-        fetch(`${this.url}/hod/subject/${this.subjectId}/content/`, {
+    loadCourseData = () => {
+        fetch(`${this.url}/hod/course/${this.state.course_id}/`, {
             method: "GET",
             headers: this.headers,
         })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    let course = this.state.courseData;
+                    course.course_name = result.data.course_name;
+                    course.board = result.data.board;
+                    course.type = result.data.type;
+                    course.limited = result.data.limited;
+                    course.course_structure = result.data.course_structure;
+                    course.simulation_exam = result.data.simulation_exam;
+
+                    let quickpass = this.state.quick_pass_tips;
+                    quickpass.title = result.data.quick_pass_tips.title;
+                    quickpass.content = result.data.quick_pass_tips.content;
+
+                    // setting up course_ids, semester_ids and simulation_ids
+                    let chapter_ids = [];
+                    let semester_ids = [];
+                    let simulation_ids = [];
+                    Object.values(result.data.course_structure).forEach(
+                        (value) => {
+                            if (value.content.length !== 0) {
+                                value.content.forEach((item) => {
+                                    if (item.chapter_id) {
+                                        chapter_ids.push(item.chapter_id);
+                                    } else if (item.semester_id) {
+                                        semester_ids.push(item.semester_id);
+                                    }
+                                });
+                            }
+                        }
+                    );
+                    if (result.data.simulation_exam.length !== 0) {
+                        result.data.simulation_exam.forEach((item) => {
+                            simulation_ids.push(item.simulation_id);
+                        });
+                    }
+
+                    this.setState(
+                        {
+                            courseData: course,
+                            score_card_config: result.data.score_card_config,
+                            quick_pass_tips: quickpass,
+                            subject_id: result.data.subject_id,
+                            chapter_ids: chapter_ids,
+                            semester_ids: semester_ids,
+                            simulation_ids: simulation_ids,
+                        },
+                        () => {
+                            this.loadContentData();
+                            this.loadConfigData();
+                        }
+                    );
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => console.log(err));
+    };
+
+    loadContentData = () => {
+        fetch(
+            `${this.url}/hod/subject/${
+                this.subjectId ? this.subjectId : this.state.subject_id
+            }/content/`,
+            {
+                method: "GET",
+                headers: this.headers,
+            }
+        )
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
@@ -455,19 +529,31 @@ class HODCourseConfig extends Component {
     };
 
     loadConfigData = () => {
-        fetch(`${this.url}/hod/subject/${this.subjectId}/course/filters/`, {
-            method: "GET",
-            headers: this.headers,
-        })
+        fetch(
+            `${this.url}/hod/subject/${
+                this.subjectId ? this.subjectId : this.state.subject_id
+            }/course/filters/`,
+            {
+                method: "GET",
+                headers: this.headers,
+            }
+        )
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         configData: result.data,
-                        score_card_config: result.data.score_card_config,
                         page_loading: false,
                     });
+                    if (
+                        Object.entries(this.state.score_card_config).length ===
+                        0
+                    ) {
+                        this.setState({
+                            score_card_config: result.data.score_card_config,
+                        });
+                    }
                 } else {
                     this.setState({
                         errorMsg: result.msg,
@@ -480,26 +566,38 @@ class HODCourseConfig extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.props.subject_name} : Course configuration - HOD | IQLabs`;
-        
-        this.loadContentData();
-        this.loadConfigData();
+        if (this.subjectId !== undefined) {
+            document.title = `${this.props.subject_name} : Course configuration - HOD | IQLabs`;
+        } else {
+            document.title = `${this.props.course_name} - HOD | IQLabs`;
+        }
+
+        if (this.state.course_id !== "") {
+            this.loadCourseData();
+        } else {
+            this.loadContentData();
+            this.loadConfigData();
+        }
     };
 
     // ----- Data fetching from the users -----
 
     handleQuickPassNotes = (data) => {
-        this.setState({
-            quick_pass_tips: data,
-            showNotesModal: false,
-        });
+        setTimeout(() => {
+            this.setState({
+                quick_pass_tips: data,
+                showNotesModal: false,
+            });
+        }, 1000);
     };
 
     handleScoreConfig = (data) => {
-        this.setState({
-            score_card_config: data,
-            showScorecardModal: false,
-        });
+        setTimeout(() => {
+            this.setState({
+                score_card_config: data,
+                showScorecardModal: false,
+            });
+        }, 1000);
     };
 
     handleInput = (event, type) => {
@@ -766,7 +864,9 @@ class HODCourseConfig extends Component {
 
         let data = this.state.courseData;
         let body = data;
-        body["subject_id"] = this.subjectId;
+        body["subject_id"] = this.subjectId
+            ? this.subjectId
+            : this.state.subject_id;
 
         if (data.course_name === "") {
             this.setState({
@@ -833,11 +933,16 @@ class HODCourseConfig extends Component {
             .then((res) => res.json())
             .then((result) => {
                 if (result.sts === true) {
-                    this.setState({
-                        successMsg: result.msg,
-                        showSuccessAlert: true,
-                        page_loading: false,
-                    });
+                    this.setState(
+                        {
+                            successMsg: result.msg,
+                            showSuccessAlert: true,
+                            page_loading: false,
+                        },
+                        () => {
+                            this.loadCourseData();
+                        }
+                    );
                 } else {
                     this.setState({
                         errorMsg: result.msg,
@@ -855,7 +960,11 @@ class HODCourseConfig extends Component {
             <div className="wrapper">
                 {/* Navbar */}
                 <Header
-                    name={this.props.subject_name}
+                    name={
+                        this.subjectId
+                            ? this.props.subject_name
+                            : this.props.course_name
+                    }
                     togglenav={this.toggleSideNav}
                 />
 
@@ -893,7 +1002,11 @@ class HODCourseConfig extends Component {
                                     !this.state.showScorecardModal,
                             });
                         }}
-                        subjectId={this.subjectId}
+                        subjectId={
+                            this.subjectId
+                                ? this.subjectId
+                                : this.state.subject_id
+                        }
                         course_id={this.state.course_id}
                         scorecard={this.state.score_card_config}
                         handlePOST={this.handleScoreConfig}
@@ -911,7 +1024,11 @@ class HODCourseConfig extends Component {
                                 showNotesModal: false,
                             })
                         }
-                        subjectId={this.subjectId}
+                        subjectId={
+                            this.subjectId
+                                ? this.subjectId
+                                : this.state.subject_id
+                        }
                         course_id={this.state.course_id}
                         data={this.state.quick_pass_tips}
                         handlePOST={this.handleQuickPassNotes}
@@ -928,7 +1045,7 @@ class HODCourseConfig extends Component {
                     <div className="container-fluid">
                         {/* Back button */}
                         <button
-                            className="btn btn-primary-invert btn-sm mb-2"
+                            className="btn btn-primary-invert btn-sm mb-3"
                             onClick={this.props.history.goBack}
                         >
                             <i className="fas fa-chevron-left fa-sm"></i> Back
@@ -945,19 +1062,32 @@ class HODCourseConfig extends Component {
                                                 <i className="fas fa-home fa-sm"></i>
                                             </Link>
                                         </li>
-                                        <li className="breadcrumb-item">
-                                            <Link
-                                                to="#"
-                                                onClick={
-                                                    this.props.history.goBack
-                                                }
-                                            >
-                                                {this.props.subject_name}
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item active">
-                                            Course configuration
-                                        </li>
+                                        {this.subjectId !== undefined ? (
+                                            <>
+                                                <li className="breadcrumb-item">
+                                                    <Link
+                                                        to="#"
+                                                        onClick={
+                                                            this.props.history
+                                                                .goBack
+                                                        }
+                                                    >
+                                                        {
+                                                            this.props
+                                                                .subject_name
+                                                        }
+                                                    </Link>
+                                                </li>
+                                                <li className="breadcrumb-item active">
+                                                    Course configuration
+                                                </li>
+                                            </>
+                                        ) : (
+                                            <li className="breadcrumb-item active">
+                                                <span>Course:</span>
+                                                {this.props.course_name}
+                                            </li>
+                                        )}
                                     </ol>
                                 </nav>
 
@@ -1164,6 +1294,10 @@ class HODCourseConfig extends Component {
                                                     id="course_name"
                                                     className="form-control borders"
                                                     placeholder="Enter course title"
+                                                    value={
+                                                        this.state.courseData
+                                                            .course_name
+                                                    }
                                                     onChange={(event) =>
                                                         this.handleInput(
                                                             event,
@@ -1185,6 +1319,32 @@ class HODCourseConfig extends Component {
                                                     isSearchable={true}
                                                     name="board"
                                                     id="board"
+                                                    value={
+                                                        this.state.configData
+                                                            .board
+                                                            ? Object.entries(
+                                                                  this.state
+                                                                      .configData
+                                                                      .board
+                                                              ).map(
+                                                                  ([
+                                                                      key,
+                                                                      value,
+                                                                  ]) => {
+                                                                      return this
+                                                                          .state
+                                                                          .courseData
+                                                                          .board ===
+                                                                          key
+                                                                          ? {
+                                                                                label: value,
+                                                                                value: key,
+                                                                            }
+                                                                          : "";
+                                                                  }
+                                                              )
+                                                            : ""
+                                                    }
                                                     options={
                                                         this.state.configData
                                                             .board
@@ -1243,6 +1403,10 @@ class HODCourseConfig extends Component {
                                                         style={{
                                                             borderRadius: "4px",
                                                         }}
+                                                        value={
+                                                            this.state
+                                                                .courseData.type
+                                                        }
                                                         onChange={(event) =>
                                                             this.handleInput(
                                                                 event,
@@ -1300,10 +1464,6 @@ class HODCourseConfig extends Component {
                                                                 this.state
                                                                     .courseData
                                                                     .limited
-                                                                    ? this.state
-                                                                          .courseData
-                                                                          .limited
-                                                                    : false
                                                             }
                                                             onChange={(event) =>
                                                                 this.handleInput(
@@ -1549,7 +1709,6 @@ class HODCourseConfig extends Component {
                                                     {/* Simulation list */}
                                                     {data.simulation_exam.map(
                                                         (item, se_index) => {
-                                                            console.log(item);
                                                             return (
                                                                 <div
                                                                     className="row align-items-center mb-1"
@@ -1602,16 +1761,28 @@ class HODCourseConfig extends Component {
                                         >
                                             Save
                                         </button>
-                                        <button
-                                            className="btn btn-primary btn-sm shadow-none"
-                                            disabled={
-                                                this.state.course_id === ""
-                                                    ? true
-                                                    : false
-                                            }
+                                        <Link
+                                            to={`/hod/course/${this.state.course_id}`}
+                                            onClick={() => {
+                                                store.dispatch({
+                                                    type: "COURSE",
+                                                    payload:
+                                                        this.state.courseData
+                                                            .course_name,
+                                                });
+                                            }}
                                         >
-                                            Review
-                                        </button>
+                                            <button
+                                                className="btn btn-primary btn-sm shadow-none"
+                                                disabled={
+                                                    this.state.course_id === ""
+                                                        ? true
+                                                        : false
+                                                }
+                                            >
+                                                Review
+                                            </button>
+                                        </Link>
                                     </div>
                                 </div>
                             </div>
