@@ -5,11 +5,12 @@ import AlertBox from "../../sharedComponents/alert";
 import Loading from "../../sharedComponents/loader";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
-import fernet from "fernet";
 import { Type1DataFormat } from "../../sharedComponents/dataFormating";
 import { Link } from "react-router-dom";
 import { Modal } from "react-bootstrap";
 import ReactHowler from "react-howler";
+import aesjs from "aes-js";
+import base64url from "base64url";
 
 class QuizCountDown extends Component {
     constructor(props) {
@@ -246,6 +247,7 @@ class QuizLevelExam extends Component {
             showOptions: false,
             showToast: false,
             isPlaying: false,
+            iv: "",
         };
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
@@ -321,6 +323,61 @@ class QuizLevelExam extends Component {
             });
     };
 
+    // Handle data encryption
+    handleEncrypt = (data) => {
+        // INIT
+        var key = "4Fy2fTI1oyK9McR5mRunLmfynGdzOdxi";
+        var iv = this.state.iv;
+
+        var keyBytes = aesjs.utils.utf8.toBytes(key);
+        var ivBytes = aesjs.utils.utf8.toBytes(iv);
+
+        function encrypt(msg) {
+            var aesCbc = new aesjs.ModeOfOperation.cbc(keyBytes, ivBytes);
+            var textBytes = aesjs.utils.utf8.toBytes(msg);
+            var padded = aesjs.padding.pkcs7.pad(textBytes);
+            var encryptedBytes = aesCbc.encrypt(padded);
+            var encoded = base64url.encode(encryptedBytes, "utf8");
+            return base64url.toBase64(encoded);
+        }
+
+        return encrypt(data);
+    };
+
+    // Handle data decryption
+    handleDecrypt = (data) => {
+        // INIT
+        var key = "4Fy2fTI1oyK9McR5mRunLmfynGdzOdxi";
+        var iv = data.substring(0, 16);
+        var keyBytes = aesjs.utils.utf8.toBytes(key);
+        var ivBytes = aesjs.utils.utf8.toBytes(iv);
+
+        function decrypt(encrypted) {
+            var aesCbc = new aesjs.ModeOfOperation.cbc(keyBytes, ivBytes);
+            var encryptedBytes = base64url.toBuffer(encrypted);
+            var decryptedBytes = aesCbc.decrypt(encryptedBytes);
+            var decryptedText = aesjs.utils.utf8.fromBytes(decryptedBytes);
+
+            var stringify = decryptedText;
+            var first_curly = 0;
+            var last_curly = 1;
+            for (let i = 0; i < stringify.length; i++) {
+                if (stringify[i] === "}") {
+                    last_curly = i;
+                }
+            }
+            last_curly += 1;
+
+            return JSON.parse(stringify.substring(first_curly, last_curly));
+        }
+
+        this.setState({
+            iv: iv,
+        });
+
+        return decrypt(data.substring(16));
+    };
+
     loadQuestionData = () => {
         fetch(
             `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/${this.quizId}/levels/?level_complexity=${this.state.level.complexity}&level_id=${this.levelId}`,
@@ -333,15 +390,7 @@ class QuizLevelExam extends Component {
             .then((result) => {
                 console.log(result);
                 if (result.sts === true) {
-                    let secret = new fernet.Secret(
-                        "4Fy2fTI1oyK9McR5mRunLmfynGdzOdxiRQRNqhUY70k="
-                    );
-                    let token = new fernet.Token({
-                        secret: secret,
-                        token: result.data,
-                        ttl: 0,
-                    });
-                    let response = JSON.parse(token.decode());
+                    let response = this.handleDecrypt(result.data);
                     let results = {
                         data: {
                             results: response.levels[0].questions,
@@ -613,7 +662,6 @@ class QuizLevelExam extends Component {
         const section = [...this.state.answer];
         const level = this.state.level;
         if (section[this.state.currentQuestion].isCorrect === true) {
-            console.log(remaining_seconds);
             scored_points += level.points_per_question;
             total_points += level.points_per_question;
             if (
@@ -660,15 +708,8 @@ class QuizLevelExam extends Component {
                 total_points:
                     this.state.total_points > 0 ? this.state.total_points : 0,
             };
-            let secret = new fernet.Secret(
-                "4Fy2fTI1oyK9McR5mRunLmfynGdzOdxiRQRNqhUY70k="
-            );
-            let token = new fernet.Token({
-                secret: secret,
-                time: Date.parse(1),
-                iv: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
-            });
-            // console.log(body);
+            let response = this.handleEncrypt(JSON.stringify(body));
+            console.log(body);
 
             fetch(
                 `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/${this.quizId}/levels/`,
@@ -676,7 +717,7 @@ class QuizLevelExam extends Component {
                     method: "POST",
                     headers: this.headers,
                     body: JSON.stringify({
-                        quiz_data: token.encode(JSON.stringify(body)),
+                        quiz_data: `${this.state.iv}${response}`,
                     }),
                 }
             )
@@ -1227,7 +1268,7 @@ class QuizLevelExam extends Component {
                             </div>
 
                             {/* <!----- Image viewer -----> */}
-                            {data[index].content.images[0].path !== ""
+                            {data[index].content.images.length !== 0
                                 ? this.imageRender(data[index])
                                 : ""}
                         </div>
