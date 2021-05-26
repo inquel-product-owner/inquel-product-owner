@@ -10,20 +10,20 @@ import { Document, Page, pdfjs } from "react-pdf";
 import { connect } from "react-redux";
 
 const mapStateToProps = (state) => ({
-    subject_name: state.content.subject_name,
-    chapter_name: state.content.chapter_name,
+    course_name: state.content.course_name,
 });
 
-class HODSubjectNotes extends Component {
+class HODCourseNotes extends Component {
     constructor(props) {
         super(props);
         this.state = {
             showSideNav: false,
-            collapsed: false,
+            chapterEventKey: [],
             topicEventKey: [],
 
-            chapters: [],
+            data: [],
             notesData: "",
+            chapterId: this.props.match.params.chapterId,
             topicName: "",
             topic_num: "",
 
@@ -35,8 +35,7 @@ class HODSubjectNotes extends Component {
             numPages: null,
             pageNumber: 1,
         };
-        this.subjectId = this.props.match.params.subjectId;
-        this.chapterId = this.props.match.params.chapterId;
+        this.courseId = this.props.match.params.courseId;
         this.url = baseUrl + hodUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
@@ -53,23 +52,10 @@ class HODSubjectNotes extends Component {
         });
     };
 
-    toggleTopicCollapse = (key) => {
-        let topicEventKey = this.state.topicEventKey;
-        if (topicEventKey.includes(key)) {
-            topicEventKey.splice(topicEventKey.indexOf(key), 1);
-        } else {
-            topicEventKey.push(key);
-        }
-
-        this.setState({
-            topicEventKey: topicEventKey,
-        });
-    };
-
     // loads notes data
     loadNotesData = async () => {
         await fetch(
-            `${this.url}/hod/subject/${this.subjectId}/chapter/${this.chapterId}/${this.state.topic_num}/notes/`,
+            `${this.url}/hod/course/${this.courseId}/review/chapter/${this.state.chapterId}/${this.state.topic_num}/notes/`,
             {
                 method: "GET",
                 headers: this.headers,
@@ -98,57 +84,51 @@ class HODSubjectNotes extends Component {
     };
 
     componentDidMount = () => {
-        fetch(
-            `${this.url}/hod/subject/${this.subjectId}/chapter/${this.chapterId}/`,
-            {
-                headers: this.headers,
-                method: "GET",
-            }
-        )
+        fetch(`${this.url}/hod/course/${this.courseId}/review/`, {
+            method: "GET",
+            headers: this.headers,
+        })
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
                 if (result.sts === true) {
-                    this.setState(
-                        {
-                            chapterList: result.data.chapters,
-                        },
-                        () => {
-                            let topicName = "";
-                            let topic_num = "";
-                            for (
-                                let i = 0;
-                                i < result.data.chapter_structure.length;
-                                i++
-                            ) {
-                                // extract topic name from the current chapter
-                                if (result.data.chapter_id === this.chapterId) {
-                                    topicName =
-                                        result.data.chapter_structure.length !==
-                                        0
-                                            ? result.data.chapter_structure[0]
+                    let topicName = "";
+                    let topic_num = "";
+                    let topicEventKey = [];
+                    if (result.data.units && result.data.units.length !== 0) {
+                        result.data.units.forEach((data) => {
+                            let temp = [];
+                            if (data.chapters && data.chapters.length !== 0) {
+                                data.chapters.forEach((item) => {
+                                    temp.push([]);
+                                    // extract topic name from the current chapter
+                                    if (
+                                        item.chapter_id === this.state.chapterId
+                                    ) {
+                                        topicName = item.chapter_structure
+                                            ? item.chapter_structure[0]
                                                   .topic_name
                                             : "Topic";
-                                    topic_num =
-                                        result.data.chapter_structure.length !==
-                                        0
-                                            ? result.data.chapter_structure[0]
+                                        topic_num = item.chapter_structure
+                                            ? item.chapter_structure[0]
                                                   .topic_num
                                             : "1.1";
-                                } else {
-                                    continue;
-                                }
+                                    }
+                                });
                             }
-                            this.setState(
-                                {
-                                    chapters: result.data.chapter_structure,
-                                    topicName: topicName,
-                                    topic_num: topic_num,
-                                },
-                                () => {
-                                    this.loadNotesData();
-                                }
-                            );
+                            topicEventKey.push(temp);
+                        });
+                    }
+                    this.setState(
+                        {
+                            data: result.data.units,
+                            topicName: topicName,
+                            topic_num: topic_num,
+                            topicEventKey: topicEventKey,
+                            chapterEventKey: this.state.chapterId,
+                        },
+                        () => {
+                            this.loadNotesData();
                         }
                     );
                 } else {
@@ -162,6 +142,66 @@ class HODSubjectNotes extends Component {
             .catch((err) => {
                 console.log(err);
             });
+    };
+
+    toggleChapterCollapse = (key) => {
+        let chapterEventKey = "";
+        if (this.state.chapterEventKey !== key) {
+            chapterEventKey = key;
+        }
+
+        let topicName = "";
+        let topic_num = "";
+        (this.state.data || []).forEach((unit) => {
+            (unit.chapters || []).forEach((chapter) => {
+                if (chapter.chapter_id === key) {
+                    topicName = chapter.chapter_structure
+                        ? chapter.chapter_structure[0].topic_name
+                        : "Topic";
+                    topic_num = chapter.chapter_structure
+                        ? chapter.chapter_structure[0].topic_num
+                        : "1.1";
+                }
+            });
+        });
+        this.setState(
+            {
+                chapterEventKey: chapterEventKey,
+                chapterId: key,
+                topicName: topicName,
+                topic_num: topic_num,
+            },
+            () => {
+                if (this.state.chapterEventKey === key) {
+                    this.setState({
+                        page_loading: true,
+                    });
+                    this.loadNotesData();
+                }
+            }
+        );
+    };
+
+    toggleTopicCollapse = (key, unit_index, chapter_index) => {
+        let topicEventKey = this.state.topicEventKey;
+        if (
+            topicEventKey.length !== 0 &&
+            topicEventKey[unit_index] &&
+            topicEventKey[unit_index][chapter_index]
+        ) {
+            if (topicEventKey[unit_index][chapter_index].includes(key)) {
+                topicEventKey[unit_index][chapter_index].splice(
+                    topicEventKey[unit_index][chapter_index].indexOf(key),
+                    1
+                );
+            } else {
+                topicEventKey[unit_index][chapter_index].push(key);
+            }
+        }
+
+        this.setState({
+            topicEventKey: topicEventKey,
+        });
     };
 
     // loads data on selecting a topic
@@ -188,10 +228,12 @@ class HODSubjectNotes extends Component {
         this.setState((state) => ({ pageNumber: state.pageNumber + 1 }));
 
     // topic list
-    topic = (data, index) => {
+    topic = (data, index, chapter_index, unit_index) => {
         const nestedTopics = (data.child || []).map((topic, index) => {
             return (
-                <Accordion key={index}>{this.topic(topic, index)}</Accordion>
+                <Accordion key={index}>
+                    {this.topic(topic, index, chapter_index, unit_index)}
+                </Accordion>
             );
         });
 
@@ -201,7 +243,7 @@ class HODSubjectNotes extends Component {
             <>
                 <Accordion.Toggle
                     as={Card.Header}
-                    eventKey={`topic-${data.topic_num}`}
+                    eventKey={`topic-${unit_index}-${chapter_index}-${index}-${data.topic_num}`}
                     className={`${
                         this.state.topic_num === data.topic_num &&
                         this.state.topicName === data.topic_name
@@ -215,7 +257,9 @@ class HODSubjectNotes extends Component {
                     onClick={() =>
                         data.child.length !== 0
                             ? this.toggleTopicCollapse(
-                                  `topic-${data.topic_num}`
+                                  `topic-${unit_index}-${chapter_index}-${index}-${data.topic_num}`,
+                                  unit_index,
+                                  chapter_index
                               )
                             : ""
                     }
@@ -228,8 +272,10 @@ class HODSubjectNotes extends Component {
                                         <span>
                                             <i
                                                 className={`fas fa-chevron-circle-down ${
-                                                    topicEventKey.includes(
-                                                        `topic-${data.topic_num}`
+                                                    topicEventKey[unit_index][
+                                                        chapter_index
+                                                    ].includes(
+                                                        `topic-${unit_index}-${chapter_index}-${index}-${data.topic_num}`
                                                     )
                                                         ? "fa-rotate-360"
                                                         : "fa-rotate-270"
@@ -272,7 +318,7 @@ class HODSubjectNotes extends Component {
                 </Accordion.Toggle>
 
                 <Accordion.Collapse
-                    eventKey={`topic-${data.topic_num}`}
+                    eventKey={`topic-${unit_index}-${chapter_index}-${index}-${data.topic_num}`}
                     className="ml-2"
                 >
                     <div>{nestedTopics}</div>
@@ -287,7 +333,7 @@ class HODSubjectNotes extends Component {
             <div className="wrapper">
                 {/* Navbar */}
                 <Header
-                    name={this.props.subject_name}
+                    name={this.props.course_name}
                     togglenav={this.toggleSideNav}
                 />
 
@@ -333,13 +379,8 @@ class HODSubjectNotes extends Component {
                         <nav aria-label="breadcrumb">
                             <ol className="breadcrumb mb-3">
                                 <li className="breadcrumb-item">
-                                    <Link to="/hod">
+                                    <Link to="/student">
                                         <i className="fas fa-home fa-sm"></i>
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item">
-                                    <Link to={`/hod/subject/${this.subjectId}`}>
-                                        {this.props.subject_name}
                                     </Link>
                                 </li>
                                 <li className="breadcrumb-item">
@@ -347,7 +388,7 @@ class HODSubjectNotes extends Component {
                                         to="#"
                                         onClick={this.props.history.goBack}
                                     >
-                                        {this.props.chapter_name}
+                                        {this.props.course_name}
                                     </Link>
                                 </li>
                                 <li className="breadcrumb-item active">
@@ -361,85 +402,124 @@ class HODSubjectNotes extends Component {
                                 <div className="row">
                                     {/* ----- Chapter list ----- */}
                                     <div className="col-md-3 mb-2 mb-md-0 border-right">
-                                        <div className="card">
-                                            <Accordion defaultActiveKey="0">
-                                                <Card className="mb-1">
-                                                    <Accordion.Toggle
-                                                        as={Card.Header}
-                                                        eventKey="0"
-                                                        className="pinkrange-bg shadow-sm mb-2"
-                                                        style={{
-                                                            borderRadius: "8px",
-                                                            cursor: "default",
-                                                        }}
-                                                        onClick={() =>
-                                                            this.setState({
-                                                                collapsed:
-                                                                    !this.state
-                                                                        .collapsed,
-                                                            })
-                                                        }
-                                                    >
-                                                        <div className="row align-items-center">
-                                                            <div className="col-1">
-                                                                <span>
-                                                                    <i
-                                                                        className={`fas fa-chevron-circle-down ${
-                                                                            this
-                                                                                .state
-                                                                                .collapsed
-                                                                                ? "fa-rotate-270"
-                                                                                : ""
-                                                                        }`}
-                                                                    ></i>
-                                                                </span>
-                                                            </div>
-                                                            <div className="col-10 small font-weight-bold-600">
-                                                                {
-                                                                    this.props
-                                                                        .chapter_name
-                                                                }
-                                                            </div>
-                                                        </div>
-                                                    </Accordion.Toggle>
+                                        <Accordion
+                                            defaultActiveKey={
+                                                this.state.chapterId
+                                            }
+                                        >
+                                            {(this.state.data || []).map(
+                                                (unit, unit_index) => {
+                                                    return (
+                                                        <fieldset
+                                                            className="border-primary mb-2"
+                                                            key={unit_index}
+                                                        >
+                                                            <legend className="primary-bg text-white">
+                                                                {unit.unit_name}
+                                                            </legend>
+                                                            {/* ----- Chapter list ----- */}
+                                                            {(
+                                                                unit.chapters ||
+                                                                []
+                                                            ).map(
+                                                                (
+                                                                    chapter,
+                                                                    chapter_index
+                                                                ) => {
+                                                                    return (
+                                                                        <Card
+                                                                            className="mb-1"
+                                                                            key={
+                                                                                chapter_index
+                                                                            }
+                                                                        >
+                                                                            <Accordion.Toggle
+                                                                                as={
+                                                                                    Card.Header
+                                                                                }
+                                                                                eventKey={
+                                                                                    chapter.chapter_id
+                                                                                }
+                                                                                className="pinkrange-bg shadow-sm mb-2"
+                                                                                style={{
+                                                                                    borderRadius:
+                                                                                        "8px",
+                                                                                    cursor: "default",
+                                                                                }}
+                                                                                onClick={() =>
+                                                                                    this.toggleChapterCollapse(
+                                                                                        chapter.chapter_id
+                                                                                    )
+                                                                                }
+                                                                            >
+                                                                                <div className="row align-items-center">
+                                                                                    <div className="col-1">
+                                                                                        <span>
+                                                                                            <i
+                                                                                                className={`fas fa-chevron-circle-down ${
+                                                                                                    this
+                                                                                                        .state
+                                                                                                        .chapterEventKey ===
+                                                                                                    chapter.chapter_id
+                                                                                                        ? ""
+                                                                                                        : "fa-rotate-270"
+                                                                                                }`}
+                                                                                            ></i>
+                                                                                        </span>
+                                                                                    </div>
+                                                                                    <div className="col-10 small font-weight-bold-600">
+                                                                                        {
+                                                                                            chapter.chapter_name
+                                                                                        }
+                                                                                    </div>
+                                                                                </div>
+                                                                            </Accordion.Toggle>
 
-                                                    <Accordion.Collapse eventKey="0">
-                                                        <Card>
-                                                            {/* ----- Topic list ----- */}
-                                                            {this.state.chapters
-                                                                .length !== 0
-                                                                ? this.state.chapters.map(
-                                                                      (
-                                                                          data,
-                                                                          index
-                                                                      ) => {
-                                                                          return (
-                                                                              <Accordion
-                                                                                  key={
-                                                                                      index
-                                                                                  }
-                                                                              >
-                                                                                  {this.topic(
-                                                                                      data,
-                                                                                      index
-                                                                                  )}
-                                                                              </Accordion>
-                                                                          );
-                                                                      }
-                                                                  )
-                                                                : null}
-                                                        </Card>
-                                                    </Accordion.Collapse>
-                                                </Card>
-                                            </Accordion>
-                                        </div>
+                                                                            <Accordion.Collapse
+                                                                                eventKey={
+                                                                                    chapter.chapter_id
+                                                                                }
+                                                                            >
+                                                                                <Card>
+                                                                                    {chapter.chapter_structure.map(
+                                                                                        (
+                                                                                            topics,
+                                                                                            topic_index
+                                                                                        ) => {
+                                                                                            return (
+                                                                                                <Accordion
+                                                                                                    key={
+                                                                                                        topic_index
+                                                                                                    }
+                                                                                                >
+                                                                                                    {this.topic(
+                                                                                                        topics,
+                                                                                                        topic_index,
+                                                                                                        chapter_index,
+                                                                                                        unit_index
+                                                                                                    )}
+                                                                                                </Accordion>
+                                                                                            );
+                                                                                        }
+                                                                                    )}
+                                                                                </Card>
+                                                                            </Accordion.Collapse>
+                                                                        </Card>
+                                                                    );
+                                                                }
+                                                            )}
+                                                        </fieldset>
+                                                    );
+                                                }
+                                            )}
+                                        </Accordion>
                                     </div>
 
                                     {/* ----- Notes data ----- */}
 
                                     <div className="col-md-9 pl-md-0">
                                         <div className="card">
-                                            <div className="card-body py-0">
+                                            <div className="card-body">
                                                 {this.state.notesData.length !==
                                                 0
                                                     ? this.state.notesData.map(
@@ -546,7 +626,7 @@ class HODSubjectNotes extends Component {
                                                                           index
                                                                       }
                                                                   >
-                                                                      <div className="h5 font-weight-bold-600 mb-3">
+                                                                      <div className="h5 font-weight-bold-600 mb-2">
                                                                           {
                                                                               data.notes_name
                                                                           }
@@ -576,4 +656,4 @@ class HODSubjectNotes extends Component {
     }
 }
 
-export default connect(mapStateToProps)(HODSubjectNotes);
+export default connect(mapStateToProps)(HODCourseNotes);

@@ -13,10 +13,11 @@ import Select from "react-select";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
+    course_name: state.content.course_name,
     semester_name: state.content.semester_name,
 });
 
-class HODSubjectSemesterPreview extends Component {
+class HODSemesterPreview extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -45,6 +46,7 @@ class HODSubjectSemesterPreview extends Component {
             page_loading: true,
         };
         this.subjectId = this.props.match.params.subjectId;
+        this.courseId = this.props.match.params.courseId;
         this.semesterId = this.props.match.params.semesterId;
         this.url = baseUrl + hodUrl;
         this.authToken = localStorage.getItem("Authorization");
@@ -65,7 +67,9 @@ class HODSubjectSemesterPreview extends Component {
     loadQAData = async (path) => {
         var apiURL =
             path === undefined || path === null
-                ? `${this.url}/hod/subject/${this.subjectId}/semester/${this.semesterId}/${this.state.sectionId}/?attempt_number=${this.state.selectedAttempt}`
+                ? this.subjectId
+                    ? `${this.url}/hod/subject/${this.subjectId}/semester/${this.semesterId}/${this.state.sectionId}/?attempt_number=${this.state.selectedAttempt}`
+                    : `${this.url}/hod/course/${this.courseId}/review/semester/${this.semesterId}/${this.state.sectionId}/?attempt_number=${this.state.selectedAttempt}`
                 : path;
         await fetch(apiURL, {
             method: "GET",
@@ -130,13 +134,13 @@ class HODSubjectSemesterPreview extends Component {
     };
 
     loadSectionData = () => {
-        fetch(
-            `${this.url}/hod/subject/${this.subjectId}/semester/${this.semesterId}/attempt/`,
-            {
-                method: "GET",
-                headers: this.headers,
-            }
-        )
+        let apiURL = this.subjectId
+            ? `${this.url}/hod/subject/${this.subjectId}/semester/${this.semesterId}/attempt/`
+            : `${this.url}/hod/course/${this.courseId}/review/semester/${this.semesterId}/attempt/`;
+        fetch(apiURL, {
+            method: "GET",
+            headers: this.headers,
+        })
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
@@ -252,7 +256,11 @@ class HODSubjectSemesterPreview extends Component {
             <div className="wrapper">
                 {/* Navbar */}
                 <Header
-                    name={this.props.subject_name}
+                    name={
+                        this.subjectId
+                            ? this.props.subject_name
+                            : this.props.course_name
+                    }
                     togglenav={this.toggleSideNav}
                 />
 
@@ -319,16 +327,31 @@ class HODSubjectSemesterPreview extends Component {
                                                 <i className="fas fa-home fa-sm"></i>
                                             </Link>
                                         </li>
-                                        <li className="breadcrumb-item">
-                                            <Link
-                                                to="#"
-                                                onClick={
-                                                    this.props.history.goBack
-                                                }
-                                            >
-                                                {this.props.subject_name}
-                                            </Link>
-                                        </li>
+                                        {this.subjectId ? (
+                                            <li className="breadcrumb-item">
+                                                <Link
+                                                    to="#"
+                                                    onClick={
+                                                        this.props.history
+                                                            .goBack
+                                                    }
+                                                >
+                                                    {this.props.subject_name}
+                                                </Link>
+                                            </li>
+                                        ) : (
+                                            <li className="breadcrumb-item">
+                                                <Link
+                                                    to="#"
+                                                    onClick={
+                                                        this.props.history
+                                                            .goBack
+                                                    }
+                                                >
+                                                    {this.props.course_name}
+                                                </Link>
+                                            </li>
+                                        )}
                                         <li className="breadcrumb-item active">
                                             {this.props.semester_name}
                                         </li>
@@ -341,22 +364,25 @@ class HODSubjectSemesterPreview extends Component {
                                     placeholder="Select attempt"
                                     isSearchable={true}
                                     name="attempt"
-                                    value={
-                                        this.state.attempts.length !== 0
-                                            ? this.state.attempts.map(
-                                                  (data) => {
-                                                      return data.name ===
-                                                          this.state
-                                                              .selectedAttempt
-                                                          ? {
-                                                                value: data.name,
-                                                                label: data.name,
-                                                            }
-                                                          : "";
+                                    value={(this.state.attempts || []).map(
+                                        (data) => {
+                                            return data.name ===
+                                                this.state.selectedAttempt
+                                                ? {
+                                                      value: data.name,
+                                                      label: data.name,
                                                   }
-                                              )
-                                            : ""
-                                    }
+                                                : "";
+                                        }
+                                    )}
+                                    options={(this.state.attempts || []).map(
+                                        (data) => {
+                                            return {
+                                                value: data.name,
+                                                label: data.name,
+                                            };
+                                        }
+                                    )}
                                     onChange={(event) => {
                                         this.setState(
                                             {
@@ -942,4 +968,4 @@ class HODSubjectSemesterPreview extends Component {
     }
 }
 
-export default connect(mapStateToProps)(HODSubjectSemesterPreview);
+export default connect(mapStateToProps)(HODSemesterPreview);

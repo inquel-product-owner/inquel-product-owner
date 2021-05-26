@@ -461,7 +461,7 @@ class HODSubjectChapter extends Component {
                             <div className="col-md-4 mb-2 mb-md-0">
                                 <Select
                                     className="basic-single form-shadow"
-                                    placeholder={this.props.chapter_name}
+                                    placeholder="Select chapter"
                                     isSearchable={true}
                                     name="chapter"
                                     value={this.state.chapterList.map(

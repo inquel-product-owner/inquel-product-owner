@@ -1165,26 +1165,28 @@ class TeacherSemesterAuto extends Component {
                                     <div className="col-md-6">
                                         <Select
                                             className="basic-single form-shadow"
-                                            placeholder={
-                                                this.state.selectedAttempt !==
-                                                ""
-                                                    ? this.state.selectedAttempt
-                                                    : "Select attempt"
-                                            }
+                                            placeholder="Select attempt"
                                             isSearchable={true}
                                             name="attempt"
-                                            options={
-                                                this.state.attempts.length !== 0
-                                                    ? this.state.attempts.map(
-                                                          (data, index) => {
-                                                              return {
-                                                                  value: data,
-                                                                  label: data,
-                                                              };
-                                                          }
-                                                      )
-                                                    : ""
-                                            }
+                                            value={(
+                                                this.state.attempts || []
+                                            ).map((data) => {
+                                                return data ===
+                                                    this.state.selectedAttempt
+                                                    ? {
+                                                          value: data,
+                                                          label: data,
+                                                      }
+                                                    : "";
+                                            })}
+                                            options={(
+                                                this.state.attempts || []
+                                            ).map((data) => {
+                                                return {
+                                                    value: data,
+                                                    label: data,
+                                                };
+                                            })}
                                             onChange={this.handleAttempt}
                                             required
                                         />

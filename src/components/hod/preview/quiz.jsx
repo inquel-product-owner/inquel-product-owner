@@ -13,11 +13,12 @@ import Select from "react-select";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
+    course_name: state.content.course_name,
     chapter_name: state.content.chapter_name,
     quiz_name: state.content.quiz_name,
 });
 
-class HODSubjectQuizPreview extends Component {
+class HODQuizPreview extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -41,6 +42,7 @@ class HODSubjectQuizPreview extends Component {
             page_loading: true,
         };
         this.subjectId = this.props.match.params.subjectId;
+        this.courseId = this.props.match.params.courseId;
         this.chapterId = this.props.match.params.chapterId;
         this.quizId = this.props.match.params.quizId;
         this.url = baseUrl + hodUrl;
@@ -62,7 +64,9 @@ class HODSubjectQuizPreview extends Component {
     loadQAData = async (path) => {
         var apiURL =
             path === undefined || path === null
-                ? `${this.url}/hod/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/${this.quizId}/${this.state.levelId}/?attempt_name=${this.state.selectedAttempt}`
+                ? this.subjectId
+                    ? `${this.url}/hod/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/${this.quizId}/${this.state.levelId}/?attempt_name=${this.state.selectedAttempt}`
+                    : `${this.url}/hod/course/${this.courseId}/review/chapter/${this.chapterId}/quiz/${this.quizId}/${this.state.levelId}/?attempt_name=${this.state.selectedAttempt}`
                 : path;
         await fetch(apiURL, {
             method: "GET",
@@ -111,13 +115,13 @@ class HODSubjectQuizPreview extends Component {
     };
 
     loadLevelData = () => {
-        fetch(
-            `${this.url}/hod/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/${this.quizId}/attempt/`,
-            {
-                method: "GET",
-                headers: this.headers,
-            }
-        )
+        let apiURL = this.subjectId
+            ? `${this.url}/hod/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/${this.quizId}/attempt/`
+            : `${this.url}/hod/course/${this.courseId}/review/chapter/${this.chapterId}/quiz/${this.quizId}/attempt/`;
+        fetch(apiURL, {
+            method: "GET",
+            headers: this.headers,
+        })
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
@@ -209,7 +213,11 @@ class HODSubjectQuizPreview extends Component {
             <div className="wrapper">
                 {/* Navbar */}
                 <Header
-                    name={this.props.subject_name}
+                    name={
+                        this.subjectId
+                            ? this.props.subject_name
+                            : this.props.course_name
+                    }
                     togglenav={this.toggleSideNav}
                 />
 
@@ -276,13 +284,23 @@ class HODSubjectQuizPreview extends Component {
                                                 <i className="fas fa-home fa-sm"></i>
                                             </Link>
                                         </li>
-                                        <li className="breadcrumb-item">
-                                            <Link
-                                                to={`/hod/subject/${this.subjectId}`}
-                                            >
-                                                {this.props.subject_name}
-                                            </Link>
-                                        </li>
+                                        {this.subjectId ? (
+                                            <li className="breadcrumb-item">
+                                                <Link
+                                                    to={`/hod/subject/${this.subjectId}`}
+                                                >
+                                                    {this.props.subject_name}
+                                                </Link>
+                                            </li>
+                                        ) : (
+                                            <li className="breadcrumb-item">
+                                                <Link
+                                                    to={`/hod/course/${this.courseId}`}
+                                                >
+                                                    {this.props.course_name}
+                                                </Link>
+                                            </li>
+                                        )}
                                         <li className="breadcrumb-item">
                                             <Link
                                                 to="#"
@@ -305,22 +323,25 @@ class HODSubjectQuizPreview extends Component {
                                     placeholder="Select attempt"
                                     isSearchable={true}
                                     name="attempt"
-                                    value={
-                                        this.state.attempts.length !== 0
-                                            ? this.state.attempts.map(
-                                                  (data) => {
-                                                      return data.name ===
-                                                          this.state
-                                                              .selectedAttempt
-                                                          ? {
-                                                                value: data.name,
-                                                                label: data.name,
-                                                            }
-                                                          : "";
+                                    value={(this.state.attempts || []).map(
+                                        (data) => {
+                                            return data.name ===
+                                                this.state.selectedAttempt
+                                                ? {
+                                                      value: data.name,
+                                                      label: data.name,
                                                   }
-                                              )
-                                            : ""
-                                    }
+                                                : "";
+                                        }
+                                    )}
+                                    options={(this.state.attempts || []).map(
+                                        (data) => {
+                                            return {
+                                                value: data.name,
+                                                label: data.name,
+                                            };
+                                        }
+                                    )}
                                     onChange={(event) => {
                                         this.setState(
                                             {
@@ -586,4 +607,4 @@ class HODSubjectQuizPreview extends Component {
     }
 }
 
-export default connect(mapStateToProps)(HODSubjectQuizPreview);
+export default connect(mapStateToProps)(HODQuizPreview);

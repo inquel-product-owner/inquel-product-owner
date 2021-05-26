@@ -7,6 +7,7 @@ import { connect } from "react-redux";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl";
 import Loading from "../../sharedComponents/loader";
 import AlertBox from "../../sharedComponents/alert";
+import store from "../../../redux/store";
 
 const mapStateToProps = (state) => ({
     course_name: state.content.course_name,
@@ -25,32 +26,27 @@ const UnitListRender = (props) => {
                                   className="primary-fieldset mb-3"
                                   key={unit_index}
                               >
-                                  <legend className="primary-legend">
+                                  <legend className="primary-bg text-white text-center">
                                       {unit.unit_name}
                                   </legend>
-                                  {/* ----- Chapter list ----- */}
-                                  {unit.chapters
-                                      ? unit.chapters.map(
-                                            (chapter, chapter_index) => {
-                                                return (
-                                                    <Accordion
-                                                        key={chapter_index}
-                                                    >
-                                                        <ChapterListRender
-                                                            {...props}
-                                                            chapter={chapter}
-                                                            chapter_index={
-                                                                chapter_index
-                                                            }
-                                                            unit_index={
-                                                                unit_index
-                                                            }
-                                                        />
-                                                    </Accordion>
-                                                );
-                                            }
-                                        )
-                                      : null}
+                                  <Accordion>
+                                      {/* ----- Chapter list ----- */}
+                                      {(unit.chapters || []).map(
+                                          (chapter, chapter_index) => {
+                                              return (
+                                                  <ChapterListRender
+                                                      {...props}
+                                                      key={chapter_index}
+                                                      chapter={chapter}
+                                                      chapter_index={
+                                                          chapter_index
+                                                      }
+                                                      unit_index={unit_index}
+                                                  />
+                                              );
+                                          }
+                                      )}
+                                  </Accordion>
 
                                   {/* ----- Semester list ----- */}
                                   {unit.semesters
@@ -73,7 +69,18 @@ const UnitListRender = (props) => {
                                                                 <Link
                                                                     to={`${props.match.url}/semester/${semester.semester_id}`}
                                                                 >
-                                                                    <button className="btn btn-light btn-sm shadow-none">
+                                                                    <button
+                                                                        className="btn btn-light btn-sm shadow-none"
+                                                                        onClick={() => {
+                                                                            store.dispatch(
+                                                                                {
+                                                                                    type: "SEMESTER",
+                                                                                    payload:
+                                                                                        semester.semester_name,
+                                                                                }
+                                                                            );
+                                                                        }}
+                                                                    >
                                                                         View
                                                                     </button>
                                                                 </Link>
@@ -123,7 +130,16 @@ const UnitListRender = (props) => {
                                                 <Link
                                                     to={`${props.match.url}/simulation/${simulation.simulation_id}`}
                                                 >
-                                                    <button className="btn btn-light btn-sm shadow-none">
+                                                    <button
+                                                        className="btn btn-light btn-sm shadow-none"
+                                                        onClick={() => {
+                                                            store.dispatch({
+                                                                type: "SIMULATION",
+                                                                payload:
+                                                                    simulation.simulation_name,
+                                                            });
+                                                        }}
+                                                    >
                                                         View
                                                     </button>
                                                 </Link>
@@ -145,7 +161,7 @@ const ChapterListRender = (props) => {
         <Card className="mb-1" key={props.chapter_index}>
             <Accordion.Toggle
                 as={Card.Header}
-                eventKey={`chapter-${props.unit_index}-${props.chapter_index}`}
+                eventKey={props.chapter.chapter_id}
                 className="bg-secondary text-white shadow-sm mb-2"
                 style={{
                     borderRadius: "8px",
@@ -153,7 +169,7 @@ const ChapterListRender = (props) => {
                 }}
                 onClick={() =>
                     props.toggleChapterCollapse(
-                        `chapter-${props.unit_index}-${props.chapter_index}`,
+                        props.chapter.chapter_id,
                         props.unit_index
                     )
                 }
@@ -167,9 +183,7 @@ const ChapterListRender = (props) => {
                                         className={`fas fa-chevron-circle-down ${
                                             props.chapterEventKey[
                                                 props.unit_index
-                                            ].includes(
-                                                `chapter-${props.unit_index}-${props.chapter_index}`
-                                            )
+                                            ].includes(props.chapter.chapter_id)
                                                 ? ""
                                                 : "fa-rotate-270"
                                         }`}
@@ -194,6 +208,12 @@ const ChapterListRender = (props) => {
                             <div className="col-3">
                                 <Link
                                     to={`${props.match.url}/chapter/${props.chapter.chapter_id}/summary`}
+                                    onClick={() => {
+                                        store.dispatch({
+                                            type: "CHAPTER",
+                                            payload: props.chapter.chapter_name,
+                                        });
+                                    }}
                                 >
                                     <button className="btn btn-light btn-sm">
                                         <i className="fas fa-eye fa-sm"></i>
@@ -203,6 +223,12 @@ const ChapterListRender = (props) => {
                             <div className="col-3">
                                 <Link
                                     to={`${props.match.url}/chapter/${props.chapter.chapter_id}/notes`}
+                                    onClick={() => {
+                                        store.dispatch({
+                                            type: "CHAPTER",
+                                            payload: props.chapter.chapter_name,
+                                        });
+                                    }}
                                 >
                                     <button className="btn btn-light btn-sm">
                                         <i className="fas fa-eye fa-sm"></i>
@@ -215,9 +241,7 @@ const ChapterListRender = (props) => {
                 </div>
             </Accordion.Toggle>
 
-            <Accordion.Collapse
-                eventKey={`chapter-${props.unit_index}-${props.chapter_index}`}
-            >
+            <Accordion.Collapse eventKey={props.chapter.chapter_id}>
                 <>
                     {/* ----- Topic list ----- */}
                     {props.chapter.chapter_structure
@@ -258,9 +282,25 @@ const ChapterListRender = (props) => {
                                               </div>
                                               <div className="col-6 text-right">
                                                   <Link
-                                                      to={`${props.match.url}/chapter/${props.chapter.chapter_id}/cycle/${cycle.cycle_test_id}/direct`}
+                                                      to={`${props.match.url}/chapter/${props.chapter.chapter_id}/cycle/${cycle.cycle_test_id}`}
                                                   >
-                                                      <button className="btn btn-secondary btn-sm shadow-none">
+                                                      <button
+                                                          className="btn btn-secondary btn-sm shadow-none"
+                                                          onClick={() => {
+                                                              store.dispatch({
+                                                                  type: "CHAPTER",
+                                                                  payload:
+                                                                      props
+                                                                          .chapter
+                                                                          .chapter_name,
+                                                              });
+                                                              store.dispatch({
+                                                                  type: "CYCLE",
+                                                                  payload:
+                                                                      cycle.cycle_test_name,
+                                                              });
+                                                          }}
+                                                      >
                                                           View
                                                       </button>
                                                   </Link>
@@ -295,7 +335,22 @@ const ChapterListRender = (props) => {
                                               <Link
                                                   to={`${props.match.url}/chapter/${props.chapter.chapter_id}/quiz/${quiz.quiz_id}`}
                                               >
-                                                  <button className="btn btn-secondary btn-sm shadow-none">
+                                                  <button
+                                                      className="btn btn-secondary btn-sm shadow-none"
+                                                      onClick={() => {
+                                                          store.dispatch({
+                                                              type: "CHAPTER",
+                                                              payload:
+                                                                  props.chapter
+                                                                      .chapter_name,
+                                                          });
+                                                          store.dispatch({
+                                                              type: "QUIZ",
+                                                              payload:
+                                                                  quiz.quiz_name,
+                                                          });
+                                                      }}
+                                                  >
                                                       View
                                                   </button>
                                               </Link>
@@ -323,6 +378,22 @@ const TopicListRender = (props) => {
             </Accordion>
         );
     });
+
+    function getTopicName(data, topic_num) {
+        let topic_name = "";
+
+        if (Array.isArray(data)) {
+            data.forEach((item) => {
+                if (item.topic_num === topic_num) {
+                    topic_name = item.topic_name;
+                } else if (item.child.length !== 0) {
+                    topic_name = getTopicName(item.child, topic_num);
+                }
+            });
+        }
+
+        return topic_name;
+    }
 
     return (
         <>
@@ -376,7 +447,16 @@ const TopicListRender = (props) => {
                                     <Link
                                         to={`${props.match.url}/chapter/${props.chapter.chapter_id}/${props.topics.topic_num}/learn`}
                                     >
-                                        <button className="btn btn-sm bg-white shadow-none">
+                                        <button
+                                            className="btn btn-sm bg-white shadow-none"
+                                            onClick={() => {
+                                                store.dispatch({
+                                                    type: "TOPIC",
+                                                    payload:
+                                                        props.topics.topic_name,
+                                                });
+                                            }}
+                                        >
                                             {props.topics.topic_name}
                                             <i className="fas fa-external-link-alt fa-xs ml-2"></i>
                                         </button>
@@ -394,11 +474,24 @@ const TopicListRender = (props) => {
                             <div className="col-3">
                                 {props.topics.next_topic ? (
                                     <Link
-                                        to={`${props.url}/chapter/${props.chapter.chapter_id}/${props.topics.next_topic}/learn`}
-                                        className="text-dark"
+                                        to={`${props.match.url}/chapter/${props.chapter.chapter_id}/${props.topics.topic_num}/learn`}
                                     >
-                                        {props.topics.next_topic}
-                                        <i className="fas fa-external-link-alt fa-xs ml-2"></i>
+                                        <button
+                                            className="btn btn-sm bg-white shadow-none"
+                                            onClick={() => {
+                                                store.dispatch({
+                                                    type: "TOPIC",
+                                                    payload: getTopicName(
+                                                        props.chapter
+                                                            .chapter_structure,
+                                                        props.topics.next_topic
+                                                    ),
+                                                });
+                                            }}
+                                        >
+                                            {props.topics.next_topic}
+                                            <i className="fas fa-external-link-alt fa-xs ml-2"></i>
+                                        </button>
                                     </Link>
                                 ) : (
                                     ""
@@ -508,7 +601,7 @@ class HODCourse extends Component {
                     1
                 );
             } else {
-                chapterEventKey[unit_index].push(key);
+                chapterEventKey[unit_index][0] = key;
             }
         }
 
