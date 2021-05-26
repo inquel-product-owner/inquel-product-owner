@@ -1077,10 +1077,20 @@ class TeacherChapters extends Component {
                             <div className="col-md-4">
                                 <Select
                                     className="basic-single form-shadow"
-                                    placeholder={this.props.chapter_name}
-                                    value={[]}
+                                    placeholder='Select chapter'
                                     isSearchable={true}
                                     name="chapter"
+                                    value={this.state.chapterList.map(
+                                        (list) => {
+                                            return this.props.chapter_name ===
+                                                list.chapter_name
+                                                ? {
+                                                      value: list.chapter_id,
+                                                      label: list.chapter_name,
+                                                  }
+                                                : "";
+                                        }
+                                    )}
                                     options={this.state.chapterList.map(
                                         function (list) {
                                             return {

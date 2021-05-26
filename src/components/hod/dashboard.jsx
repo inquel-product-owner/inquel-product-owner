@@ -12,9 +12,12 @@ import SubjectTable from "../table/subject";
 import Paginations from "../sharedComponents/pagination";
 import AlertBox from "../sharedComponents/alert";
 import {
+    ContentDeleteModal,
     ContentDisableModal,
     ContentEnableModal,
     MultiContentDeleteModal,
+    SingleContentDisableModal,
+    SingleContentEnableModal,
 } from "../sharedComponents/contentManagementModal";
 import { connect } from "react-redux";
 import Slider from "react-slick";
@@ -163,17 +166,14 @@ class HODDashboard extends Component {
         super(props);
         this.state = {
             showSideNav: false,
-            subjectModalShow: false,
-            showGroup_DeleteModal: false,
-            showSubject_DeleteModal: false,
-            showSubject_DisableModal: false,
-            showSubject_EnableModal: false,
+            showModal: false,
+            content: "",
+            type: "",
 
             groupItems: [],
             subjectItems: [],
             courseItems: [],
-            selectedSubject: [],
-            selectedGroup: [],
+            selectedData: [],
 
             activeGroupPage: 1,
             totalGroupCount: 0,
@@ -198,12 +198,6 @@ class HODDashboard extends Component {
     toggleSideNav = () => {
         this.setState({
             showSideNav: !this.state.showSideNav,
-        });
-    };
-
-    handleSubjectAdd = () => {
-        this.setState({
-            subjectModalShow: !this.state.subjectModalShow,
         });
     };
 
@@ -295,49 +289,27 @@ class HODDashboard extends Component {
         this.loadCourseData();
     };
 
-    handleDelete = (type) => {
-        if (type === "group") {
+    toggleModal = (content, type) => {
+        this.setState({
+            showModal: !this.state.showModal,
+            content: content,
+            type: type,
+        });
+    };
+
+    formSubmission = () => {
+        setTimeout(() => {
             this.setState({
-                showGroup_DeleteModal: !this.state.showGroup_DeleteModal,
+                showModal: false,
             });
-        } else if (type === "subject") {
-            this.setState({
-                showSubject_DeleteModal: !this.state.showSubject_DeleteModal,
-            });
+        }, 1000);
+        if (this.state.content === "group") {
+            this.loadGroupData();
+        } else if (this.state.content === "subject") {
+            this.loadSubjectData();
+        } else if (this.state.content === "course") {
+            this.loadCourseData();
         }
-    };
-
-    handleDisable = () => {
-        this.setState({
-            showSubject_DisableModal: !this.state.showSubject_DisableModal,
-        });
-    };
-
-    handleEnable = () => {
-        this.setState({
-            showSubject_EnableModal: !this.state.showSubject_EnableModal,
-        });
-    };
-
-    groupFormSubmission = () => {
-        setTimeout(() => {
-            this.setState({
-                showGroup_DeleteModal: false,
-            });
-        }, 1000);
-        this.loadGroupData();
-    };
-
-    subjectFormSubmission = () => {
-        setTimeout(() => {
-            this.setState({
-                subjectModalShow: false,
-                showSubject_DeleteModal: false,
-                showSubject_DisableModal: false,
-                showSubject_EnableModal: false,
-            });
-        }, 1000);
-        this.loadSubjectData();
     };
 
     // Gets group ID from the group table
@@ -355,7 +327,7 @@ class HODDashboard extends Component {
             }
         }
         this.setState({
-            selectedGroup: value,
+            selectedData: value,
         });
     };
 
@@ -374,7 +346,7 @@ class HODDashboard extends Component {
             }
         }
         this.setState({
-            selectedSubject: value,
+            selectedData: value,
         });
     };
 
@@ -461,14 +433,16 @@ class HODDashboard extends Component {
                 />
 
                 {/* Group Delete Modal */}
-                {this.state.showGroup_DeleteModal ? (
+                {this.state.showModal &&
+                this.state.content === "group" &&
+                this.state.type === "DELETE" ? (
                     <MultiContentDeleteModal
-                        show={this.state.showGroup_DeleteModal}
-                        onHide={() => this.handleDelete("group")}
-                        toggleModal={() => this.handleDelete("group")}
-                        formSubmission={this.groupFormSubmission}
+                        show={this.state.showModal}
+                        onHide={() => this.toggleModal("group", "DELETE")}
+                        toggleModal={() => this.toggleModal("group", "DELETE")}
+                        formSubmission={this.formSubmission}
                         url={`${this.url}/hod/create/group/`}
-                        data={this.state.selectedGroup}
+                        data={this.state.selectedData}
                         field="group_ids"
                         type="Group"
                     />
@@ -477,55 +451,128 @@ class HODDashboard extends Component {
                 )}
 
                 {/* Subject create modal */}
-                <SubjectModal
-                    show={this.state.subjectModalShow}
-                    onHide={this.handleSubjectAdd}
-                    formSubmission={this.subjectFormSubmission}
-                />
+                {this.state.showModal &&
+                this.state.content === "subject" &&
+                this.state.type === "ADD" ? (
+                    <SubjectModal
+                        show={this.state.showModal}
+                        onHide={() => this.toggleModal("subject", "ADD")}
+                        formSubmission={this.formSubmission}
+                    />
+                ) : (
+                    ""
+                )}
 
                 {/* Subject Delete Modal */}
-                {this.state.showSubject_DeleteModal ? (
+                {this.state.showModal &&
+                this.state.content === "subject" &&
+                this.state.type === "DELETE" ? (
                     <MultiContentDeleteModal
-                        show={this.state.showSubject_DeleteModal}
-                        onHide={() => this.handleDelete("subject")}
-                        toggleModal={() => this.handleDelete("subject")}
-                        formSubmission={this.subjectFormSubmission}
+                        show={this.state.showModal}
+                        onHide={() => this.toggleModal("subject", "DELETE")}
+                        toggleModal={() =>
+                            this.toggleModal("subject", "DELETE")
+                        }
+                        formSubmission={this.formSubmission}
                         url={`${this.url}/hod/create/subject/`}
-                        data={this.state.selectedSubject}
+                        data={this.state.selectedData}
                         field="subject_ids"
-                        type="Subject"
+                        type="subject"
                     />
                 ) : (
                     ""
                 )}
 
                 {/* Subject Disable Modal */}
-                {this.state.showSubject_DisableModal ? (
+                {this.state.showModal &&
+                this.state.content === "subject" &&
+                this.state.type === "DISABLE" ? (
                     <ContentDisableModal
-                        show={this.state.showSubject_DisableModal}
-                        onHide={this.handleDisable}
-                        toggleModal={this.handleDisable}
-                        formSubmission={this.subjectFormSubmission}
+                        show={this.state.showModal}
+                        onHide={() => this.toggleModal("subject", "DISABLE")}
+                        toggleModal={() =>
+                            this.toggleModal("subject", "DISABLE")
+                        }
+                        formSubmission={this.formSubmission}
                         url={`${this.url}/hod/create/subject/`}
-                        data={this.state.selectedSubject}
+                        data={this.state.selectedData}
                         field="subject_ids"
-                        type="Subject"
+                        type="subject"
                     />
                 ) : (
                     ""
                 )}
 
                 {/* Subject Enable Modal */}
-                {this.state.showSubject_EnableModal ? (
+                {this.state.showModal &&
+                this.state.content === "subject" &&
+                this.state.type === "ENABLE" ? (
                     <ContentEnableModal
-                        show={this.state.showSubject_EnableModal}
-                        onHide={this.handleEnable}
-                        toggleModal={this.handleEnable}
-                        formSubmission={this.subjectFormSubmission}
+                        show={this.state.showModal}
+                        onHide={() => this.toggleModal("subject", "ENABLE")}
+                        toggleModal={() =>
+                            this.toggleModal("subject", "ENABLE")
+                        }
+                        formSubmission={this.formSubmission}
                         url={`${this.url}/hod/create/subject/`}
-                        data={this.state.selectedSubject}
+                        data={this.state.selectedData}
                         field="subject_ids"
-                        type="Subject"
+                        type="subject"
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Course Delete Modal */}
+                {this.state.showModal &&
+                this.state.content === "course" &&
+                this.state.type === "DELETE" ? (
+                    <ContentDeleteModal
+                        show={this.state.showModal}
+                        onHide={() => this.toggleModal("course", "DELETE")}
+                        toggleModal={() => this.toggleModal("course", "DELETE")}
+                        formSubmission={this.formSubmission}
+                        url={`${this.url}/hod/course/${this.state.selectedData.course_id}/`}
+                        name={this.state.selectedData.course_name}
+                        type="course"
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Course Disable Modal */}
+                {this.state.showModal &&
+                this.state.content === "course" &&
+                this.state.type === "DISABLE" ? (
+                    <SingleContentDisableModal
+                        show={this.state.showModal}
+                        onHide={() => this.toggleModal("course", "DISABLE")}
+                        toggleModal={() =>
+                            this.toggleModal("course", "DISABLE")
+                        }
+                        formSubmission={this.formSubmission}
+                        url={`${this.url}/hod/course/${this.state.selectedData.course_id}/status/`}
+                        name={this.state.selectedData.course_name}
+                        type="course"
+                        method="PATCH"
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Course Enable Modal */}
+                {this.state.showModal &&
+                this.state.content === "course" &&
+                this.state.type === "ENABLE" ? (
+                    <SingleContentEnableModal
+                        show={this.state.showModal}
+                        onHide={() => this.toggleModal("course", "ENABLE")}
+                        toggleModal={() => this.toggleModal("course", "ENABLE")}
+                        formSubmission={this.formSubmission}
+                        url={`${this.url}/hod/course/${this.state.selectedData.course_id}/status/`}
+                        name={this.state.selectedData.course_name}
+                        type="course"
+                        method="PATCH"
                     />
                 ) : (
                     ""
@@ -562,7 +609,10 @@ class HODDashboard extends Component {
                                         <button
                                             className="btn btn-primary btn-sm shadow-none"
                                             onClick={() =>
-                                                this.handleDelete("group")
+                                                this.toggleModal(
+                                                    "group",
+                                                    "DELETE"
+                                                )
                                             }
                                         >
                                             Delete
@@ -608,9 +658,11 @@ class HODDashboard extends Component {
                                                     <div className="col-md-9 text-right">
                                                         <button
                                                             className="btn btn-primary btn-sm shadow-none mr-1"
-                                                            onClick={
-                                                                this
-                                                                    .handleSubjectAdd
+                                                            onClick={() =>
+                                                                this.toggleModal(
+                                                                    "subject",
+                                                                    "ADD"
+                                                                )
                                                             }
                                                         >
                                                             Add new
@@ -618,8 +670,9 @@ class HODDashboard extends Component {
                                                         <button
                                                             className="btn btn-primary btn-sm shadow-none mr-1"
                                                             onClick={() =>
-                                                                this.handleDelete(
-                                                                    "subject"
+                                                                this.toggleModal(
+                                                                    "subject",
+                                                                    "DELETE"
                                                                 )
                                                             }
                                                         >
@@ -627,18 +680,22 @@ class HODDashboard extends Component {
                                                         </button>
                                                         <button
                                                             className="btn btn-primary btn-sm shadow-none mr-1"
-                                                            onClick={
-                                                                this
-                                                                    .handleEnable
+                                                            onClick={() =>
+                                                                this.toggleModal(
+                                                                    "subject",
+                                                                    "ENABLE"
+                                                                )
                                                             }
                                                         >
                                                             Enable
                                                         </button>
                                                         <button
                                                             className="btn btn-primary btn-sm shadow-none"
-                                                            onClick={
-                                                                this
-                                                                    .handleDisable
+                                                            onClick={() =>
+                                                                this.toggleModal(
+                                                                    "subject",
+                                                                    "DISABLE"
+                                                                )
                                                             }
                                                         >
                                                             Disable
@@ -705,7 +762,7 @@ class HODDashboard extends Component {
                                                                                         ? courseimg
                                                                                         : data.course_thumbnail_url
                                                                                 }
-                                                                                className="card-img-top card-img-height"
+                                                                                className="card-img-top"
                                                                                 alt={
                                                                                     data.course_name
                                                                                 }
@@ -727,18 +784,61 @@ class HODDashboard extends Component {
                                                                                     </Dropdown.Toggle>
 
                                                                                     <Dropdown.Menu>
-                                                                                        <Dropdown.Item>
+                                                                                        <Dropdown.Item
+                                                                                            onClick={() => {
+                                                                                                this.toggleModal(
+                                                                                                    "course",
+                                                                                                    "DELETE"
+                                                                                                );
+                                                                                                this.setState(
+                                                                                                    {
+                                                                                                        selectedData:
+                                                                                                            data,
+                                                                                                    }
+                                                                                                );
+                                                                                            }}
+                                                                                        >
                                                                                             <i className="far fa-trash-alt mr-1"></i>{" "}
                                                                                             Delete
                                                                                         </Dropdown.Item>
-                                                                                        <Dropdown.Item>
-                                                                                            <i className="far fa-check-circle mr-1"></i>{" "}
-                                                                                            Enable
-                                                                                        </Dropdown.Item>
-                                                                                        <Dropdown.Item>
-                                                                                            <i className="fas fa-ban mr-1"></i>{" "}
-                                                                                            Disable
-                                                                                        </Dropdown.Item>
+                                                                                        {data.is_active ===
+                                                                                        false ? (
+                                                                                            <Dropdown.Item
+                                                                                                onClick={() => {
+                                                                                                    this.toggleModal(
+                                                                                                        "course",
+                                                                                                        "ENABLE"
+                                                                                                    );
+                                                                                                    this.setState(
+                                                                                                        {
+                                                                                                            selectedData:
+                                                                                                                data,
+                                                                                                        }
+                                                                                                    );
+                                                                                                }}
+                                                                                            >
+                                                                                                <i className="far fa-check-circle mr-1"></i>{" "}
+                                                                                                Enable
+                                                                                            </Dropdown.Item>
+                                                                                        ) : (
+                                                                                            <Dropdown.Item
+                                                                                                onClick={() => {
+                                                                                                    this.toggleModal(
+                                                                                                        "course",
+                                                                                                        "DISABLE"
+                                                                                                    );
+                                                                                                    this.setState(
+                                                                                                        {
+                                                                                                            selectedData:
+                                                                                                                data,
+                                                                                                        }
+                                                                                                    );
+                                                                                                }}
+                                                                                            >
+                                                                                                <i className="fas fa-ban mr-1"></i>{" "}
+                                                                                                Disable
+                                                                                            </Dropdown.Item>
+                                                                                        )}
                                                                                     </Dropdown.Menu>
                                                                                 </Dropdown>
                                                                             </div>

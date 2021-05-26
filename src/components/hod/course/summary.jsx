@@ -5,28 +5,34 @@ import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import Loading from "../../sharedComponents/loader";
 import AlertBox from "../../sharedComponents/alert";
-import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
+import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import { Document, Page, pdfjs } from "react-pdf";
+import { connect } from "react-redux";
 
-class Summary extends Component {
+const mapStateToProps = (state) => ({
+    course_name: state.content.course_name,
+});
+
+class HODCourseSummary extends Component {
     constructor(props) {
         super(props);
         this.state = {
             showSideNav: false,
-            subjectItems: [],
+            data: [],
             summaryData: "",
             chapterId: this.props.match.params.chapterId,
             chapter_name: "",
-            page_loading: true,
+
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
+            page_loading: true,
             numPages: null,
             pageNumber: 1,
         };
-        this.subjectId = this.props.match.params.subjectId;
-        this.url = baseUrl + studentUrl;
+        this.courseId = this.props.match.params.courseId;
+        this.url = baseUrl + hodUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
             Accept: "application/json",
@@ -39,7 +45,7 @@ class Summary extends Component {
     // loads summary data
     loadSummaryData = async () => {
         await fetch(
-            `${this.url}/student/subject/${this.subjectId}/chapter/${this.state.chapterId}/summary/`,
+            `${this.url}/hod/course/${this.courseId}/review/chapter/${this.state.chapterId}/summary/`,
             {
                 method: "GET",
                 headers: this.headers,
@@ -77,7 +83,7 @@ class Summary extends Component {
             }
         );
 
-        fetch(`${this.url}/student/subject/${this.subjectId}/`, {
+        fetch(`${this.url}/hod/course/${this.courseId}/review/`, {
             method: "GET",
             headers: this.headers,
         })
@@ -85,22 +91,17 @@ class Summary extends Component {
             .then((result) => {
                 console.log(result);
                 if (result.sts === true) {
-                    this.setState({
-                        subjectItems: result.data,
-                    });
-                    let chapter_name = "";
                     // extract currently selected chapter name
-                    for (let i = 0; i < result.data.chapters.length; i++) {
-                        if (
-                            result.data.chapters[i].chapter_id ===
-                            this.state.chapterId
-                        ) {
-                            chapter_name = result.data.chapters[i].chapter_name;
-                        } else {
-                            continue;
-                        }
-                    }
+                    let chapter_name = "";
+                    result.data.units.forEach((unit) => {
+                        (unit.chapters || []).forEach((chapter) => {
+                            if (chapter.chapter_id === this.state.chapterId) {
+                                chapter_name = chapter.chapter_name;
+                            }
+                        });
+                    });
                     this.setState({
+                        data: result.data.units,
                         chapter_name: chapter_name,
                     });
                 } else {
@@ -140,17 +141,12 @@ class Summary extends Component {
         this.setState((state) => ({ pageNumber: state.pageNumber + 1 }));
 
     render() {
-        document.title = `${this.state.chapter_name} Summary - Student | IQLabs`;
-        const chapter = this.state.subjectItems;
+        document.title = `${this.state.chapter_name} : Summary - HOD | IQLabs`;
         return (
             <div className="wrapper">
                 {/* Navbar */}
                 <Header
-                    name={
-                        this.state.subjectItems.subject_name !== undefined
-                            ? this.state.subjectItems.subject_name
-                            : ""
-                    }
+                    name={this.props.course_name}
                     togglenav={this.toggleSideNav}
                 />
 
@@ -196,7 +192,7 @@ class Summary extends Component {
                         <nav aria-label="breadcrumb">
                             <ol className="breadcrumb mb-3">
                                 <li className="breadcrumb-item">
-                                    <Link to="/student">
+                                    <Link to="/hod">
                                         <i className="fas fa-home fa-sm"></i>
                                     </Link>
                                 </li>
@@ -205,7 +201,7 @@ class Summary extends Component {
                                         to="#"
                                         onClick={this.props.history.goBack}
                                     >
-                                        Course
+                                        {this.props.course_name}
                                     </Link>
                                 </li>
                                 <li className="breadcrumb-item active">
@@ -223,48 +219,70 @@ class Summary extends Component {
                                     <div className="row">
                                         {/* ----- chapter list ----- */}
                                         <div className="col-md-3 mb-2 mb-md-0 border-right">
-                                            <Nav
-                                                variant="pills"
-                                                className="flex-column"
-                                            >
-                                                {chapter.length !== 0
-                                                    ? chapter.chapters
-                                                          .length !== 0
-                                                        ? chapter.chapters.map(
-                                                              (data, index) => {
-                                                                  return (
-                                                                      <Nav.Item
-                                                                          className="bg-light grey-item shadow-sm mb-2"
-                                                                          key={
-                                                                              index
+                                            {this.state.data.length !== 0
+                                                ? this.state.data.map(
+                                                      (unit, unit_index) => {
+                                                          return (
+                                                              <fieldset
+                                                                  className="border-secondary mb-2"
+                                                                  key={
+                                                                      unit_index
+                                                                  }
+                                                              >
+                                                                  <legend className="bg-secondary text-white">
+                                                                      {
+                                                                          unit.unit_name
+                                                                      }
+                                                                  </legend>
+                                                                  {/* ----- Chapter list ----- */}
+                                                                  <Nav
+                                                                      variant="pills"
+                                                                      className="flex-column"
+                                                                  >
+                                                                      {(
+                                                                          unit.chapters ||
+                                                                          []
+                                                                      ).map(
+                                                                          (
+                                                                              chapter,
+                                                                              chapter_index
+                                                                          ) => {
+                                                                              return (
+                                                                                  <Nav.Item
+                                                                                      className="bg-light grey-item shadow-sm mb-2"
+                                                                                      key={
+                                                                                          chapter_index
+                                                                                      }
+                                                                                      onClick={() =>
+                                                                                          this.handleSelect(
+                                                                                              chapter.chapter_id,
+                                                                                              chapter.chapter_name
+                                                                                          )
+                                                                                      }
+                                                                                  >
+                                                                                      <Nav.Link
+                                                                                          eventKey={
+                                                                                              chapter.chapter_id
+                                                                                          }
+                                                                                          style={{
+                                                                                              padding:
+                                                                                                  "12px",
+                                                                                          }}
+                                                                                      >
+                                                                                          {
+                                                                                              chapter.chapter_name
+                                                                                          }
+                                                                                      </Nav.Link>
+                                                                                  </Nav.Item>
+                                                                              );
                                                                           }
-                                                                          onClick={() =>
-                                                                              this.handleSelect(
-                                                                                  data.chapter_id,
-                                                                                  data.chapter_name
-                                                                              )
-                                                                          }
-                                                                      >
-                                                                          <Nav.Link
-                                                                              eventKey={
-                                                                                  data.chapter_id
-                                                                              }
-                                                                              style={{
-                                                                                  padding:
-                                                                                      "12px",
-                                                                              }}
-                                                                          >
-                                                                              {
-                                                                                  data.chapter_name
-                                                                              }
-                                                                          </Nav.Link>
-                                                                      </Nav.Item>
-                                                                  );
-                                                              }
-                                                          )
-                                                        : null
-                                                    : null}
-                                            </Nav>
+                                                                      )}
+                                                                  </Nav>
+                                                              </fieldset>
+                                                          );
+                                                      }
+                                                  )
+                                                : ""}
                                         </div>
 
                                         {/* ----- Summary data ----- */}
@@ -388,15 +406,14 @@ class Summary extends Component {
                                                                                       index
                                                                                   }
                                                                               >
-                                                                                  <div className="h5 font-weight-bold-600 mb-2">
+                                                                                  <div className="h5 font-weight-bold-600 mb-3">
                                                                                       {
                                                                                           data.summary_name
                                                                                       }
                                                                                   </div>
                                                                                   <div
                                                                                       dangerouslySetInnerHTML={{
-                                                                                          __html:
-                                                                                              data.summary_content,
+                                                                                          __html: data.summary_content,
                                                                                       }}
                                                                                   ></div>
                                                                               </div>
@@ -422,4 +439,4 @@ class Summary extends Component {
     }
 }
 
-export default Summary;
+export default connect(mapStateToProps)(HODCourseSummary);

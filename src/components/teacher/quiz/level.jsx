@@ -230,12 +230,10 @@ class TeacherQuizLevel extends Component {
                                 ? "0"
                                 : quiz[index - 1].max_points.toString(),
                         bonus_points: quiz[index].bonus_points.toString(),
-                        time_for_bonus: quiz[
-                            index
-                        ].required_time_for_bonus.toString(),
-                        time_per_question: quiz[
-                            index
-                        ].time_per_question.toString(),
+                        time_for_bonus:
+                            quiz[index].required_time_for_bonus.toString(),
+                        time_per_question:
+                            quiz[index].time_per_question.toString(),
                         negative_points: this.state.negative_points,
                     }),
                 }
@@ -426,28 +424,28 @@ class TeacherQuizLevel extends Component {
                                     <div className="col-md-4 mb-2 mb-md-0">
                                         <Select
                                             className="basic-single form-shadow"
-                                            placeholder={
-                                                this.state.selectedAttempt !==
-                                                ""
-                                                    ? this.state.selectedAttempt
-                                                    : "Select attempt"
-                                            }
+                                            placeholder="Select attempt"
                                             isSearchable={true}
                                             name="attempt"
-                                            options={
-                                                this.state.attempts.length !== 0
-                                                    ? this.state.attempts.map(
-                                                          (data) => {
-                                                              return {
-                                                                  value:
-                                                                      data.name,
-                                                                  label:
-                                                                      data.name,
-                                                              };
-                                                          }
-                                                      )
-                                                    : ""
-                                            }
+                                            value={(
+                                                this.state.attempts || []
+                                            ).map((data) => {
+                                                return data.name ===
+                                                    this.state.selectedAttempt
+                                                    ? {
+                                                          value: data.name,
+                                                          label: data.name,
+                                                      }
+                                                    : "";
+                                            })}
+                                            options={(
+                                                this.state.attempts || []
+                                            ).map((data) => {
+                                                return {
+                                                    value: data.name,
+                                                    label: data.name,
+                                                };
+                                            })}
                                             onChange={this.handleAttempt}
                                             required
                                         />
@@ -777,7 +775,11 @@ class TeacherQuizLevel extends Component {
                                                                                   quiz.level_id
                                                                               );
                                                                           }}
-                                                                          disabled={quiz.questions ? false:true}
+                                                                          disabled={
+                                                                              quiz.questions
+                                                                                  ? false
+                                                                                  : true
+                                                                          }
                                                                       >
                                                                           <i className="far fa-eye fa-sm mr-1"></i>{" "}
                                                                           View

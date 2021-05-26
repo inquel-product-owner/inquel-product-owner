@@ -2289,34 +2289,25 @@ class HODSimulationType1 extends Component {
                                                     {/* ---------- Chapter selection ---------- */}
                                                     <Select
                                                         className="basic-single border-secondary"
-                                                        placeholder={`${
-                                                            data[
-                                                                this.state
-                                                                    .activeQuestion
-                                                            ].properties
-                                                                .chapter_id ===
-                                                            ""
-                                                                ? "Select chapter"
-                                                                : this.state.chapterData.map(
-                                                                      (
-                                                                          list
-                                                                      ) => {
-                                                                          return data[
-                                                                              this
-                                                                                  .state
-                                                                                  .activeQuestion
-                                                                          ]
-                                                                              .properties
-                                                                              .chapter_id ===
-                                                                              list.chapter_id
-                                                                              ? list.chapter_name
-                                                                              : "Select chapter";
-                                                                      }
-                                                                  )
-                                                        }`}
+                                                        placeholder="Select chapter"
                                                         isSearchable={true}
                                                         name="chapter"
                                                         id="chapter"
+                                                        value={this.state.chapterData.map(
+                                                            (list) => {
+                                                                return data[
+                                                                    this.state
+                                                                        .activeQuestion
+                                                                ].properties
+                                                                    .chapter_id ===
+                                                                    list.chapter_id
+                                                                    ? {
+                                                                          value: list.chapter_id,
+                                                                          label: list.chapter_name,
+                                                                      }
+                                                                    : "";
+                                                            }
+                                                        )}
                                                         options={this.state.chapterData.map(
                                                             (list) => {
                                                                 return {

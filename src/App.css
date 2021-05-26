@@ -339,10 +339,13 @@ input[type="search"]:focus {
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 }
 
+.nav-item {
+    border-radius: 8px;
+}
+
 .nav-link {
     color: #4b4b4b;
     cursor: pointer;
-    font-weight: 600;
     font-size: 14px;
     border-radius: 8px !important;
 }
@@ -350,6 +353,7 @@ input[type="search"]:focus {
 .nav-pills .nav-link.active,
 .nav-pills .show > .nav-link {
     color: var(--primary);
+    font-weight: 600;
     background-color: var(--secondary);
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 }
@@ -357,6 +361,7 @@ input[type="search"]:focus {
 .nav-pills .grey-item .nav-link.active,
 .nav-pills .grey-item .show > .nav-link {
     color: black;
+    font-weight: 600;
     background-color: #ddd;
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 }
@@ -950,10 +955,4 @@ legend {
     font-size: 15px;
     padding: 4px 12px;
     border-radius: 4px;
-}
-
-.primary-legend {
-    background-color: var(--primary);
-    color: white;
-    text-align: center;
 }

@@ -45,12 +45,15 @@ import HODSubjectMatch from "./hod/independent/match";
 import HODSubjectConcepts from "./hod/independent/concepts";
 import HODSubjectTypeOne from "./hod/independent/type1";
 import HODSubjectTypeTwo from "./hod/independent/type2";
-import HODSubjectCyclePreview from "./hod/independent/cyclePreview";
-import HODSubjectSemesterPreview from "./hod/independent/semesterPreview";
-import HODSubjectQuizPreview from "./hod/independent/quizPreview";
+
+import HODCyclePreview from "./hod/preview/cycle";
+import HODSemesterPreview from "./hod/preview/semester";
+import HODQuizPreview from "./hod/preview/quiz";
 
 import HODCourse from "./hod/course/course";
 import HODCourseConfig from "./hod/course/configuration";
+import HODCourseSummary from "./hod/course/summary";
+import HODCourseNotes from "./hod/course/notes";
 
 import HODSimulationPaper from "./hod/simulation/paper";
 import HODSimulationSection from "./hod/simulation/section";
@@ -466,7 +469,7 @@ const routes = (
                 !localStorage.getItem("is_hod") ? (
                     <Redirect to="/hod/login" />
                 ) : (
-                    <HODSubjectCyclePreview {...props} />
+                    <HODCyclePreview {...props} />
                 )
             }
         />
@@ -478,7 +481,7 @@ const routes = (
                 !localStorage.getItem("is_hod") ? (
                     <Redirect to="/hod/login" />
                 ) : (
-                    <HODSubjectSemesterPreview {...props} />
+                    <HODSemesterPreview {...props} />
                 )
             }
         />
@@ -490,7 +493,7 @@ const routes = (
                 !localStorage.getItem("is_hod") ? (
                     <Redirect to="/hod/login" />
                 ) : (
-                    <HODSubjectQuizPreview {...props} />
+                    <HODQuizPreview {...props} />
                 )
             }
         />
@@ -530,6 +533,66 @@ const routes = (
                     <Redirect to="/hod/login" />
                 ) : (
                     <HODCourseConfig {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/hod/course/:courseId/chapter/:chapterId/summary"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <HODCourseSummary {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/hod/course/:courseId/chapter/:chapterId/notes"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <HODCourseNotes {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/hod/course/:courseId/chapter/:chapterId/cycle/:cycleId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <HODCyclePreview {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/hod/course/:courseId/semester/:semesterId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <HODSemesterPreview {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/hod/course/:courseId/chapter/:chapterId/quiz/:quizId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <HODQuizPreview {...props} />
                 )
             }
         />

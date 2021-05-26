@@ -526,7 +526,7 @@ class Notes extends Component {
 
                                     <div className="col-md-9 pl-md-0">
                                         <div className="card">
-                                            <div className="card-body">
+                                            <div className="card-body py-0">
                                                 {this.state.notesData.length !==
                                                 0
                                                     ? this.state.notesData.map(

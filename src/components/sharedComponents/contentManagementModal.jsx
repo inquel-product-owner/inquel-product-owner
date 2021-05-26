@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Modal, Spinner, Alert } from "react-bootstrap";
 
-// Content update modal
+// Single Content UPDATE modal
 export class ContentUpdateModal extends Component {
     constructor(props) {
         super(props);
@@ -141,7 +141,9 @@ export class ContentUpdateModal extends Component {
     }
 }
 
-// Content deletion modal
+// ----------------------------------------------------------------------
+
+// Single Content DELETE modal
 export class ContentDeleteModal extends Component {
     constructor(props) {
         super(props);
@@ -167,11 +169,16 @@ export class ContentDeleteModal extends Component {
             showLoader: true,
         });
 
-        fetch(this.props.url, {
+        let headers = {
             method: "DELETE",
             headers: this.headers,
-            body: JSON.stringify(this.props.data),
-        })
+        };
+
+        if (this.props.data) {
+            headers["body"] = JSON.stringify(this.props.data);
+        }
+
+        fetch(this.props.url, headers)
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
@@ -232,6 +239,7 @@ export class ContentDeleteModal extends Component {
                     >
                         {this.state.successMsg}
                     </Alert>
+
                     {this.props.type === "notes" ||
                     this.props.type === "summary" ||
                     this.props.type === "question" ||
@@ -283,7 +291,7 @@ export class ContentDeleteModal extends Component {
     }
 }
 
-// Multi Content deletion modal
+// Multi Content DELETE modal
 export class MultiContentDeleteModal extends Component {
     constructor(props) {
         super(props);
@@ -434,7 +442,145 @@ export class MultiContentDeleteModal extends Component {
     }
 }
 
-// Content disable modal
+// ----------------------------------------------------------------------
+
+// Single Content DISABLE modal
+export class SingleContentDisableModal extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: false,
+        };
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
+    }
+
+    handleDisable = () => {
+        this.setState({
+            showSuccessAlert: false,
+            showErrorAlert: false,
+            showLoader: true,
+        });
+
+        let headers = {
+            method: this.props.method,
+            headers: this.headers,
+        };
+
+        if (this.props.data) {
+            headers["body"] = JSON.stringify(this.props.data);
+        }
+
+        fetch(`${this.props.url}`, headers)
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        showLoader: false,
+                    });
+                    this.props.formSubmission();
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    render() {
+        return (
+            <Modal
+                show={this.props.show}
+                onHide={this.props.onHide}
+                size="md"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Header closeButton>
+                    Disable {this.props.type}
+                </Modal.Header>
+                <Modal.Body>
+                    <Alert
+                        variant="success"
+                        show={this.state.showSuccessAlert}
+                        onClose={() => {
+                            this.setState({
+                                showSuccessAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.successMsg}
+                    </Alert>
+                    <Alert
+                        variant="danger"
+                        show={this.state.showErrorAlert}
+                        onClose={() => {
+                            this.setState({
+                                showErrorAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.errorMsg}
+                    </Alert>
+
+                    <p className="mb-0">
+                        Are you sure that you want to disable{" "}
+                        <span className="font-weight-bold-600">
+                            {this.props.name}
+                        </span>
+                        ?
+                    </p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <button
+                        className="btn btn-link btn-sm shadow-none mr-2"
+                        onClick={this.props.toggleModal}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        className="btn btn-primary btn-sm shadow-none"
+                        onClick={this.handleDisable}
+                    >
+                        {this.state.showLoader ? (
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                                className="mr-2"
+                            />
+                        ) : (
+                            ""
+                        )}
+                        Disable
+                    </button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
+}
+
+// Multi Content DISABLE modal
 export class ContentDisableModal extends Component {
     constructor(props) {
         super(props);
@@ -542,6 +688,7 @@ export class ContentDisableModal extends Component {
                     >
                         {this.state.errorMsg}
                     </Alert>
+
                     <p>
                         Are you sure that you want to disable this{" "}
                         {this.props.type}?
@@ -585,7 +732,145 @@ export class ContentDisableModal extends Component {
     }
 }
 
-// Content enable modal
+// ----------------------------------------------------------------------
+
+// Single Content ENABLE modal
+export class SingleContentEnableModal extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: false,
+        };
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
+    }
+
+    handleEnable = () => {
+        this.setState({
+            showSuccessAlert: false,
+            showErrorAlert: false,
+            showLoader: true,
+        });
+
+        let headers = {
+            method: this.props.method,
+            headers: this.headers,
+        };
+
+        if (this.props.data) {
+            headers["body"] = JSON.stringify(this.props.data);
+        }
+
+        fetch(`${this.props.url}`, headers)
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        showLoader: false,
+                    });
+                    this.props.formSubmission();
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    render() {
+        return (
+            <Modal
+                show={this.props.show}
+                onHide={this.props.onHide}
+                size="md"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Header closeButton>
+                    Enable {this.props.type}
+                </Modal.Header>
+                <Modal.Body>
+                    <Alert
+                        variant="success"
+                        show={this.state.showSuccessAlert}
+                        onClose={() => {
+                            this.setState({
+                                showSuccessAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.successMsg}
+                    </Alert>
+                    <Alert
+                        variant="danger"
+                        show={this.state.showErrorAlert}
+                        onClose={() => {
+                            this.setState({
+                                showErrorAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.errorMsg}
+                    </Alert>
+
+                    <p className="mb-0">
+                        Are you sure that you want to enable{" "}
+                        <span className="font-weight-bold-600">
+                            {this.props.name}
+                        </span>
+                        ?
+                    </p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <button
+                        className="btn btn-link btn-sm shadow-none mr-2"
+                        onClick={this.props.toggleModal}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        className="btn btn-primary btn-sm shadow-none"
+                        onClick={this.handleEnable}
+                    >
+                        {this.state.showLoader ? (
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                                className="mr-2"
+                            />
+                        ) : (
+                            ""
+                        )}
+                        Enable
+                    </button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
+}
+
+// Multi Content ENABLE modal
 export class ContentEnableModal extends Component {
     constructor(props) {
         super(props);
@@ -693,6 +978,7 @@ export class ContentEnableModal extends Component {
                     >
                         {this.state.errorMsg}
                     </Alert>
+
                     <p>
                         Are you sure that you want to enable this{" "}
                         {this.props.type}?
