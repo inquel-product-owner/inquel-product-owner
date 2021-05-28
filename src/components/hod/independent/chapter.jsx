@@ -70,9 +70,9 @@ class HODSubjectChapter extends Component {
                                 : this.props.chapter_name,
                     });
                     this.setState({
-                        chapters: result.data.chapter_structure,
-                        cycle_test: result.data.cycle_tests,
-                        quiz: result.data.quiz,
+                        chapters: result.data.chapter_structure || [],
+                        cycle_test: result.data.cycle_tests || [],
+                        quiz: result.data.quiz || [],
                         page_loading: false,
                     });
                 } else {
@@ -451,6 +451,11 @@ class HODSubjectChapter extends Component {
                                 <button
                                     className="btn btn-primary btn-sm shadow-none"
                                     onClick={this.handlePublish}
+                                    disabled={
+                                        this.state.chapters.length === 0
+                                            ? true
+                                            : false
+                                    }
                                 >
                                     Approve
                                 </button>
@@ -589,22 +594,36 @@ class HODSubjectChapter extends Component {
                                                     <div className="col-8">
                                                         <div className="row align-items-center">
                                                             <div className="col-2">
-                                                                <Link
-                                                                    to={`${this.props.match.url}/summary`}
-                                                                >
-                                                                    <button className="btn btn-primary shadow-none">
-                                                                        <i className="fas fa-eye"></i>
-                                                                    </button>
-                                                                </Link>
+                                                                {this.state
+                                                                    .chapters
+                                                                    .length !==
+                                                                0 ? (
+                                                                    <Link
+                                                                        to={`${this.props.match.url}/summary`}
+                                                                    >
+                                                                        <button className="btn btn-primary shadow-none">
+                                                                            <i className="fas fa-eye"></i>
+                                                                        </button>
+                                                                    </Link>
+                                                                ) : (
+                                                                    ""
+                                                                )}
                                                             </div>
                                                             <div className="col-2">
-                                                                <Link
-                                                                    to={`${this.props.match.url}/notes`}
-                                                                >
-                                                                    <button className="btn btn-primary shadow-none">
-                                                                        <i className="fas fa-eye"></i>
-                                                                    </button>
-                                                                </Link>
+                                                                {this.state
+                                                                    .chapters
+                                                                    .length !==
+                                                                0 ? (
+                                                                    <Link
+                                                                        to={`${this.props.match.url}/notes`}
+                                                                    >
+                                                                        <button className="btn btn-primary shadow-none">
+                                                                            <i className="fas fa-eye"></i>
+                                                                        </button>
+                                                                    </Link>
+                                                                ) : (
+                                                                    ""
+                                                                )}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -614,110 +633,98 @@ class HODSubjectChapter extends Component {
                                             <Accordion.Collapse eventKey="0">
                                                 <Card className="bg-transparent">
                                                     {/* ----- Topic list ----- */}
-                                                    {this.state.chapters
-                                                        .length !== 0
-                                                        ? this.state.chapters.map(
-                                                              (data, index) => {
-                                                                  return (
-                                                                      <Accordion
-                                                                          key={
-                                                                              index
-                                                                          }
-                                                                      >
-                                                                          {this.topicRender(
-                                                                              data,
-                                                                              index
-                                                                          )}
-                                                                      </Accordion>
-                                                                  );
-                                                              }
-                                                          )
-                                                        : null}
+                                                    {(
+                                                        this.state.chapters ||
+                                                        []
+                                                    ).map((data, index) => {
+                                                        return (
+                                                            <Accordion
+                                                                key={index}
+                                                            >
+                                                                {this.topicRender(
+                                                                    data,
+                                                                    index
+                                                                )}
+                                                            </Accordion>
+                                                        );
+                                                    })}
 
                                                     {/* ----- Cycle test list ----- */}
-                                                    {this.state.cycle_test
-                                                        .length !== 0
-                                                        ? this.state.cycle_test.map(
-                                                              (data, index) => {
-                                                                  return (
-                                                                      <div
-                                                                          className="card card-header bg-light border shadow-sm mb-2"
-                                                                          style={{
-                                                                              padding:
-                                                                                  "12px",
-                                                                          }}
-                                                                          key={
-                                                                              index
-                                                                          }
-                                                                      >
-                                                                          <Link
-                                                                              to={`${this.props.match.url}/cycle/${data.cycle_test_id}`}
-                                                                              className="text-decoration-none"
-                                                                              onClick={() => {
-                                                                                  store.dispatch(
-                                                                                      {
-                                                                                          type: "CYCLE",
-                                                                                          payload:
-                                                                                              data.cycle_test_name,
-                                                                                      }
-                                                                                  );
-                                                                              }}
-                                                                          >
-                                                                              <p className="small primary-text text-center font-weight-bold-600 mb-0">
-                                                                                  {
-                                                                                      data.cycle_test_name
-                                                                                  }
-                                                                              </p>
-                                                                          </Link>
-                                                                      </div>
-                                                                  );
-                                                              }
-                                                          )
-                                                        : null}
+                                                    {(
+                                                        this.state.cycle_test ||
+                                                        []
+                                                    ).map((data, index) => {
+                                                        return (
+                                                            <div
+                                                                className="card card-header bg-light border shadow-sm mb-2"
+                                                                style={{
+                                                                    padding:
+                                                                        "12px",
+                                                                }}
+                                                                key={index}
+                                                            >
+                                                                <Link
+                                                                    to={`${this.props.match.url}/cycle/${data.cycle_test_id}`}
+                                                                    className="text-decoration-none"
+                                                                    onClick={() => {
+                                                                        store.dispatch(
+                                                                            {
+                                                                                type: "CYCLE",
+                                                                                payload:
+                                                                                    data.cycle_test_name,
+                                                                            }
+                                                                        );
+                                                                    }}
+                                                                >
+                                                                    <p className="small primary-text text-center font-weight-bold-600 mb-0">
+                                                                        {
+                                                                            data.cycle_test_name
+                                                                        }
+                                                                    </p>
+                                                                </Link>
+                                                            </div>
+                                                        );
+                                                    })}
 
                                                     {/* ----- Quiz list ----- */}
-                                                    {this.state.quiz.length !==
-                                                    0
-                                                        ? this.state.quiz.map(
-                                                              (
-                                                                  data,
-                                                                  quiz_index
-                                                              ) => {
-                                                                  return (
-                                                                      <div
-                                                                          className="card card-header bg-light border shadow-sm mb-2"
-                                                                          style={{
-                                                                              padding:
-                                                                                  "12px",
-                                                                          }}
-                                                                          key={
-                                                                              quiz_index
-                                                                          }
-                                                                      >
-                                                                          <Link
-                                                                              to={`${this.props.match.url}/quiz/${data.quiz_id}`}
-                                                                              className="text-decoration-none"
-                                                                              onClick={() => {
-                                                                                  store.dispatch(
-                                                                                      {
-                                                                                          type: "QUIZ",
-                                                                                          payload:
-                                                                                              data.quiz_name,
-                                                                                      }
-                                                                                  );
-                                                                              }}
-                                                                          >
-                                                                              <p className="small primary-text text-center font-weight-bold-600 mb-0">
-                                                                                  {
-                                                                                      data.quiz_name
-                                                                                  }
-                                                                              </p>
-                                                                          </Link>
-                                                                      </div>
-                                                                  );
-                                                              }
-                                                          )
-                                                        : ""}
+                                                    {(
+                                                        this.state.quiz || []
+                                                    ).map(
+                                                        (data, quiz_index) => {
+                                                            return (
+                                                                <div
+                                                                    className="card card-header bg-light border shadow-sm mb-2"
+                                                                    style={{
+                                                                        padding:
+                                                                            "12px",
+                                                                    }}
+                                                                    key={
+                                                                        quiz_index
+                                                                    }
+                                                                >
+                                                                    <Link
+                                                                        to={`${this.props.match.url}/quiz/${data.quiz_id}`}
+                                                                        className="text-decoration-none"
+                                                                        onClick={() => {
+                                                                            store.dispatch(
+                                                                                {
+                                                                                    type: "QUIZ",
+                                                                                    payload:
+                                                                                        data.quiz_name,
+                                                                                }
+                                                                            );
+                                                                        }}
+                                                                    >
+                                                                        <p className="small primary-text text-center font-weight-bold-600 mb-0">
+                                                                            {
+                                                                                data.quiz_name
+                                                                            }
+                                                                        </p>
+                                                                    </Link>
+                                                                </div>
+                                                            );
+                                                        }
+                                                    )}
                                                 </Card>
                                             </Accordion.Collapse>
                                         </Card>

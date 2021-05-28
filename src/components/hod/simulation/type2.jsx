@@ -1062,7 +1062,7 @@ class HODSimulationType2 extends Component {
                 negative_marks: values[index].sub_question[i].negative_marks,
             };
         }
-        values.splice(index + 1, 0, {
+        values.push({
             question_random_id: "",
             question: values[index].question,
             pair_question_id: "NOPAIR",
@@ -1084,7 +1084,7 @@ class HODSimulationType2 extends Component {
         });
         await this.setState({
             questions: values,
-            activeQuestion: index + 1,
+            activeQuestion: values.length,
         });
         window.MathJax.typeset();
     };
@@ -1116,7 +1116,7 @@ class HODSimulationType2 extends Component {
             fillin[i] =
                 values[main_index].sub_question[sub_index].fillin_answer[i];
         }
-        values[main_index].sub_question.splice(sub_index + 1, 0, {
+        values[main_index].sub_question.push({
             sub_question_id: "",
             question: values[main_index].sub_question[sub_index].question,
             mcq: values[main_index].mcq,
@@ -1130,7 +1130,7 @@ class HODSimulationType2 extends Component {
         await this.setState({
             questions: values,
             activeQuestion: main_index,
-            activeSubQuestion: sub_index + 1,
+            activeSubQuestion: values[main_index].sub_question.length,
         });
         window.MathJax.typeset();
     };

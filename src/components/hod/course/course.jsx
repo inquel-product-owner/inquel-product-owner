@@ -206,34 +206,67 @@ const ChapterListRender = (props) => {
                                 {props.chapter.weightage}
                             </div>
                             <div className="col-3">
-                                <Link
-                                    to={`${props.match.url}/chapter/${props.chapter.chapter_id}/summary`}
-                                    onClick={() => {
-                                        store.dispatch({
-                                            type: "CHAPTER",
-                                            payload: props.chapter.chapter_name,
-                                        });
-                                    }}
-                                >
-                                    <button className="btn btn-light btn-sm">
+                                {props.chapter.chapter_structure ? (
+                                    <Link
+                                        to={`${props.match.url}/chapter/${props.chapter.chapter_id}/summary`}
+                                        onClick={() => {
+                                            store.dispatch({
+                                                type: "CHAPTER",
+                                                payload:
+                                                    props.chapter.chapter_name,
+                                            });
+                                        }}
+                                    >
+                                        <button
+                                            className="btn btn-light btn-sm shadow-none"
+                                            disabled={
+                                                props.chapter.chapter_structure
+                                                    ? false
+                                                    : true
+                                            }
+                                        >
+                                            <i className="fas fa-eye fa-sm"></i>
+                                        </button>
+                                    </Link>
+                                ) : (
+                                    <button
+                                        className="btn btn-light btn-sm shadow-none"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                        }}
+                                        disabled
+                                    >
                                         <i className="fas fa-eye fa-sm"></i>
                                     </button>
-                                </Link>
+                                )}
                             </div>
                             <div className="col-3">
-                                <Link
-                                    to={`${props.match.url}/chapter/${props.chapter.chapter_id}/notes`}
-                                    onClick={() => {
-                                        store.dispatch({
-                                            type: "CHAPTER",
-                                            payload: props.chapter.chapter_name,
-                                        });
-                                    }}
-                                >
-                                    <button className="btn btn-light btn-sm">
+                                {props.chapter.chapter_structure ? (
+                                    <Link
+                                        to={`${props.match.url}/chapter/${props.chapter.chapter_id}/notes`}
+                                        onClick={() => {
+                                            store.dispatch({
+                                                type: "CHAPTER",
+                                                payload:
+                                                    props.chapter.chapter_name,
+                                            });
+                                        }}
+                                    >
+                                        <button className="btn btn-light btn-sm shadow-none">
+                                            <i className="fas fa-eye fa-sm"></i>
+                                        </button>
+                                    </Link>
+                                ) : (
+                                    <button
+                                        className="btn btn-light btn-sm shadow-none"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                        }}
+                                        disabled
+                                    >
                                         <i className="fas fa-eye fa-sm"></i>
                                     </button>
-                                </Link>
+                                )}
                             </div>
                             <div className="col-3"></div>
                         </div>

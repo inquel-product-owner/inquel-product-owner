@@ -87,7 +87,7 @@ class TeacherSummaryUpload extends Component {
             });
         } else if (event.target.files[0].size > 5242880) {
             this.setState({
-                errorMsg: "File sixe exceeds more then 5MB!",
+                errorMsg: "File size exceeds more then 5MB!",
                 showErrorAlert: true,
             });
         } else {
@@ -196,7 +196,7 @@ class TeacherSummaryUpload extends Component {
             });
         } else if (files.file.size > 5000000) {
             this.setState({
-                errorMsg: "File sixe exceeds more then 5MB!",
+                errorMsg: "File size exceeds more then 5MB!",
                 showErrorAlert: true,
             });
         } else {

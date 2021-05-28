@@ -918,6 +918,8 @@ audio {
     color: var(--tomato);
     font-weight: 600;
     font-size: 20px;
+    width: 100%;
+    text-align: center;
 }
 
 .ghost-card {

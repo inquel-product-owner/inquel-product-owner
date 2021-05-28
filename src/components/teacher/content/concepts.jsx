@@ -252,53 +252,53 @@ class TeacherConcepts extends Component {
             if (response[i].files.length !== 0) {
                 // image
                 imgArr.push({
-                    title: response[i].files[0].concepts_image_1_title || "",
+                    title: response[i].files.concepts_image_1_title || "",
                     file_name: "",
                     image: null,
-                    path: response[i].files[0].concepts_image_1 || "",
+                    path: response[i].files.concepts_image_1 || "",
                 });
                 imgArr.push({
-                    title: response[i].files[0].concepts_image_2_title || "",
+                    title: response[i].files.concepts_image_2_title || "",
                     file_name: "",
                     image: null,
-                    path: response[i].files[0].concepts_image_2 || "",
+                    path: response[i].files.concepts_image_2 || "",
                 });
                 imgArr.push({
-                    title: response[i].files[0].concepts_image_3_title || "",
+                    title: response[i].files.concepts_image_3_title || "",
                     file_name: "",
                     image: null,
-                    path: response[i].files[0].concepts_image_3 || "",
+                    path: response[i].files.concepts_image_3 || "",
                 });
                 imgArr.push({
-                    title: response[i].files[0].concepts_image_4_title || "",
+                    title: response[i].files.concepts_image_4_title || "",
                     file_name: "",
                     image: null,
-                    path: response[i].files[0].concepts_image_4 || "",
+                    path: response[i].files.concepts_image_4 || "",
                 });
 
                 // audio
                 audioArr.push({
-                    title: response[i].files[0].concepts_audio_1_title || "",
+                    title: response[i].files.concepts_audio_1_title || "",
                     file_name: "",
                     audio: null,
-                    path: response[i].files[0].concepts_audio_1 || "",
+                    path: response[i].files.concepts_audio_1 || "",
                 });
                 audioArr.push({
-                    title: response[i].files[0].concepts_audio_2_title || "",
+                    title: response[i].files.concepts_audio_2_title || "",
                     file_name: "",
                     audio: null,
-                    path: response[i].files[0].concepts_audio_2 || "",
+                    path: response[i].files.concepts_audio_2 || "",
                 });
             }
 
             // video
             var path = "";
             if (response[i].files.length !== 0) {
-                if (response[i].files[0].paste_video_url) {
-                    path = response[i].files[0].paste_video_url;
+                if (response[i].files.paste_video_url) {
+                    path = response[i].files.paste_video_url;
                 }
-                if (response[i].files[0].concepts_video_1) {
-                    path = response[i].files[0].concepts_video_1;
+                if (response[i].files.concepts_video_1) {
+                    path = response[i].files.concepts_video_1;
                 }
             }
 
@@ -342,8 +342,8 @@ class TeacherConcepts extends Component {
                     video: {
                         title:
                             response[i].files.length !== 0 &&
-                            response[i].files[0].concepts_video_1_title
-                                ? response[i].files[0].concepts_video_1_title
+                            response[i].files.concepts_video_1_title
+                                ? response[i].files.concepts_video_1_title
                                 : "",
                         file_name: "",
                         video: null,

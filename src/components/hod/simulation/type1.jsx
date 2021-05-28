@@ -1015,7 +1015,7 @@ class HODSimulationType1 extends Component {
                 correct: values[index].content.boolean_question[i].correct,
             };
         }
-        values.splice(index + 1, 0, {
+        values.push({
             question: values[index].question,
             question_random_id: "",
             pair_question_id: "NOPAIR",
@@ -1037,7 +1037,7 @@ class HODSimulationType1 extends Component {
         });
         await this.setState({
             questions: values,
-            activeQuestion: index + 1,
+            activeQuestion: values.length,
         });
         window.MathJax.typeset();
     };
