@@ -3,8 +3,8 @@ import Header from "./shared/navbar";
 import SideNav from "./shared/sidenav";
 import { Card, Accordion, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import Loading from "../sharedComponents/loader";
-import AlertBox from "../sharedComponents/alert";
+import Loading from "../shared/loader";
+import AlertBox from "../shared/alert";
 import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
 
 function Lock() {
@@ -257,7 +257,9 @@ const ChapterListRender = (props) => {
                                         props.chapter.chapter_id
                                     ) + 1}
                                 </div>
-                                <div className="w-100">{props.chapter.chapter_name}</div>
+                                <div className="w-100">
+                                    {props.chapter.chapter_name}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1040,7 +1042,7 @@ class Subject extends Component {
                                     to={`${this.props.match.url}/personal-notes`}
                                 >
                                     <button className="btn btn-primary btn-sm shadow-none mr-1">
-                                        My Personal Notes
+                                        Personal Notes
                                     </button>
                                 </Link>
                                 <Link to={`${this.props.match.url}/favourites`}>
@@ -1048,9 +1050,6 @@ class Subject extends Component {
                                         Favourites
                                     </button>
                                 </Link>
-                                <button className="btn btn-primary btn-sm shadow-none mr-1">
-                                    Simulation
-                                </button>
                                 <Link to={`${this.props.match.url}/results`}>
                                     <button className="btn btn-primary btn-sm shadow-none">
                                         Test Analysis

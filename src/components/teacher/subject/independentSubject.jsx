@@ -6,9 +6,9 @@ import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl";
-import Loading from "../../sharedComponents/loader";
-import AlertBox from "../../sharedComponents/alert";
-import { ContentDeleteModal } from "../../sharedComponents/contentManagementModal";
+import Loading from "../../shared/loader";
+import AlertBox from "../../shared/alert";
+import { ContentDeleteModal } from "../../shared/contentManagementModal";
 import {
     ChapterList,
     ChapterEditModal,
@@ -444,12 +444,14 @@ class TeacherIndependentSubject extends Component {
                                 </table>
                             </div>
                         </div>
+                        
                         <button
                             className="btn btn-tomato btn-block shadow-sm"
                             onClick={this.toggleSemesterModal}
                         >
                             Add Semester Exam
                         </button>
+
                         {/* Loading component */}
                         {this.state.page_loading ? <Loading /> : ""}
                     </div>

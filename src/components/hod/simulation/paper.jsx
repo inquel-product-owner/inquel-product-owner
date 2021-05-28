@@ -6,8 +6,8 @@ import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
-import Loading from "../../sharedComponents/loader";
-import AlertBox from "../../sharedComponents/alert";
+import Loading from "../../shared/loader";
+import AlertBox from "../../shared/alert";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
@@ -107,7 +107,7 @@ class HODSimulationPaper extends Component {
 
     componentDidMount = () => {
         document.title = `${this.props.simulation_name} - HOD | IQLabs`;
-        
+
         this.loadFilterData();
         this.loadSimulationData();
     };
@@ -494,7 +494,7 @@ class HODSimulationPaper extends Component {
                             >
                                 <table className="table">
                                     <thead className="primary-bg text-white">
-                                        <tr>
+                                        <tr style={{ whiteSpace: "nowrap" }}>
                                             <th scope="col">
                                                 Simulation Exams
                                             </th>

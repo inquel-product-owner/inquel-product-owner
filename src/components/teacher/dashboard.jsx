@@ -3,11 +3,11 @@ import Header from "./shared/navbar";
 import SideNav from "./shared/sidenav";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import { paginationCount } from "../../shared/globalValues.js";
-import Loading from "../sharedComponents/loader";
+import Loading from "../shared/loader";
 import GroupTable from "../table/group";
 import SubjectTable from "../table/subject";
-import Paginations from "../sharedComponents/pagination";
-import AlertBox from "../sharedComponents/alert";
+import Paginations from "../shared/pagination";
+import AlertBox from "../shared/alert";
 
 class TeacherDashboard extends Component {
     constructor(props) {

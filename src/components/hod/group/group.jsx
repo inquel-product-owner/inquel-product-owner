@@ -6,17 +6,17 @@ import SideNav from "../shared/sidenav";
 import Select from "react-select";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import { paginationCount } from "../../../shared/globalValues.js";
-import Loading from "../../sharedComponents/loader";
+import Loading from "../../shared/loader";
 import SubjectTable from "../../table/subject";
-import Paginations from "../../sharedComponents/pagination";
-import AlertBox from "../../sharedComponents/alert";
+import Paginations from "../../shared/pagination";
+import AlertBox from "../../shared/alert";
 import {
     ContentDisableModal,
     ContentEnableModal,
     MultiContentDeleteModal,
-} from "../../sharedComponents/contentManagementModal";
+} from "../../shared/contentManagementModal";
 import { connect } from "react-redux";
-import { waterMark } from "../../sharedComponents/watermark";
+import { waterMark } from "../../shared/watermark";
 
 const mapStateToProps = (state) => ({
     profile: state.user.profile,

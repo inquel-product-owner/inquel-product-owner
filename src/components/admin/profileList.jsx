@@ -6,18 +6,18 @@ import Select from "react-select";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import HODTable from "../table/hod";
-import Loading from "../sharedComponents/loader";
+import Loading from "../shared/loader";
 import StudentTable from "../table/student";
-import Paginations from "../sharedComponents/pagination";
-import ReactSwitch from "../sharedComponents/switchComponent";
+import Paginations from "../shared/pagination";
+import ReactSwitch from "../shared/switchComponent";
 import dateFormat from "dateformat";
 import { Link } from "react-router-dom";
-import AlertBox from "../sharedComponents/alert";
+import AlertBox from "../shared/alert";
 import {
     UserDeleteModal,
     UserDisableModal,
     UserEnableModal,
-} from "../sharedComponents/userManagementModal";
+} from "../shared/userManagementModal";
 
 class HODModal extends Component {
     constructor(props) {

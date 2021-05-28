@@ -4,7 +4,7 @@ import { Link, Redirect } from "react-router-dom";
 import logo from "../../../assets/Iq-labs-01.svg";
 import userpic from "../../../assets/user-v1.png";
 import { baseUrl, accountsUrl, studentUrl } from "../../../shared/baseUrl";
-import { Logout } from "../../sharedComponents/handleLogout";
+import { Logout } from "../../shared/handleLogout";
 import { connect } from "react-redux";
 import store from "../../../redux/store";
 

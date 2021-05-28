@@ -4,9 +4,9 @@ import profilepic from "../../assets/user-v1.png";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
-import Loading from "../sharedComponents/loader";
+import Loading from "../shared/loader";
 import { Badge } from "react-bootstrap";
-import AlertBox from "../sharedComponents/alert";
+import AlertBox from "../shared/alert";
 
 class AdminStudentProfile extends Component {
     constructor(props) {

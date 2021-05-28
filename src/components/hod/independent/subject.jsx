@@ -7,13 +7,13 @@ import SideNav from "../shared/sidenav";
 import Select from "react-select";
 import { Modal, Alert, Spinner, Dropdown } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
-import Loading from "../../sharedComponents/loader";
-import AlertBox from "../../sharedComponents/alert";
+import Loading from "../../shared/loader";
+import AlertBox from "../../shared/alert";
 import {
     ContentDeleteModal,
     ContentUpdateModal,
-} from "../../sharedComponents/contentManagementModal";
-import ScoreCardTable from "../../sharedComponents/scorecard";
+} from "../../shared/contentManagementModal";
+import ScoreCardTable from "../../shared/scorecard";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,

@@ -5,13 +5,13 @@ import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import { paginationCount } from "../../../shared/globalValues.js";
-import Loading from "../../sharedComponents/loader";
-import Paginations from "../../sharedComponents/pagination";
+import Loading from "../../shared/loader";
+import Paginations from "../../shared/pagination";
 import StudentTable from "../../table/student";
-import AlertBox from "../../sharedComponents/alert";
-import { UserRemoveModal } from "../../sharedComponents/userManagementModal";
+import AlertBox from "../../shared/alert";
+import { UserRemoveModal } from "../../shared/userManagementModal";
 import { connect } from "react-redux";
-import { waterMark } from "../../sharedComponents/watermark";
+import { waterMark } from "../../shared/watermark";
 
 const mapStateToProps = (state) => ({
     profile: state.user.profile,

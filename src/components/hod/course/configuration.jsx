@@ -5,12 +5,12 @@ import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import Select from "react-select";
-import Loading from "../../sharedComponents/loader";
-import AlertBox from "../../sharedComponents/alert";
+import Loading from "../../shared/loader";
+import AlertBox from "../../shared/alert";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl";
-import ScoreCardTable from "../../sharedComponents/scorecard";
-import ReactSwitch from "../../sharedComponents/switchComponent";
-import CKeditor from "../../sharedComponents/CKeditor";
+import ScoreCardTable from "../../shared/scorecard";
+import ReactSwitch from "../../shared/switchComponent";
+import CKeditor from "../../shared/CKeditor";
 import store from "../../../redux/store";
 
 const mapStateToProps = (state) => ({

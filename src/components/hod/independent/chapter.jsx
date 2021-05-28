@@ -6,9 +6,9 @@ import SideNav from "../shared/sidenav";
 import { Card, Accordion } from "react-bootstrap";
 import Select from "react-select";
 import { Link } from "react-router-dom";
-import Loading from "../../sharedComponents/loader";
+import Loading from "../../shared/loader";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
-import AlertBox from "../../sharedComponents/alert";
+import AlertBox from "../../shared/alert";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,

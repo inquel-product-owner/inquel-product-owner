@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Alert, Spinner, Navbar } from "react-bootstrap";
 import { Redirect, Link } from "react-router-dom";
 import { baseUrl, accountsUrl } from "../../shared/baseUrl.js";
-import Loading from "../sharedComponents/loader";
+import Loading from "../shared/loader";
 import logo from "../../assets/Iq-labs-01.svg";
 
 class HODEmailVerification extends Component {

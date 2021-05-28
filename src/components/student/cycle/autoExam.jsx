@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import Header from "../shared/examNavbar";
 import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
-import AlertBox from "../../sharedComponents/alert";
-import Loading from "../../sharedComponents/loader";
+import AlertBox from "../../shared/alert";
+import Loading from "../../shared/loader";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
 
@@ -142,58 +142,54 @@ class CycleAutoExam extends Component {
                                     ) {
                                         // image
                                         if (
-                                            data.questions[i].files[0]
+                                            data.questions[i].files
                                                 .type1_image_1
                                         ) {
                                             images.push({
-                                                title: data.questions[i]
-                                                    .files[0]
+                                                title: data.questions[i].files
                                                     .type1_image_1_title,
                                                 file_name: "",
                                                 image: null,
-                                                path: data.questions[i].files[0]
+                                                path: data.questions[i].files
                                                     .type1_image_1,
                                             });
                                         }
                                         if (
-                                            data.questions[i].files[0]
+                                            data.questions[i].files
                                                 .type1_image_2
                                         ) {
                                             images.push({
-                                                title: data.questions[i]
-                                                    .files[0]
+                                                title: data.questions[i].files
                                                     .type1_image_2_title,
                                                 file_name: "",
                                                 image: null,
-                                                path: data.questions[i].files[0]
+                                                path: data.questions[i].files
                                                     .type1_image_2,
                                             });
                                         }
                                         if (
-                                            data.questions[i].files[0]
+                                            data.questions[i].files
                                                 .type1_image_3
                                         ) {
                                             images.push({
-                                                title: data.questions[i]
-                                                    .files[0]
+                                                title: data.questions[i].files
                                                     .type1_image_3_title,
                                                 file_name: "",
                                                 image: null,
-                                                path: data.questions[i].files[0]
+                                                path: data.questions[i].files
                                                     .type1_image_3,
                                             });
                                         }
                                         if (
-                                            data.questions[i].files[0]
+                                            data.questions[i].files
                                                 .type1_image_4
                                         ) {
                                             images.push({
-                                                title: data.questions[i]
-                                                    .files[0]
+                                                title: data.questions[i].files
                                                     .type1_image_4_title,
                                                 file_name: "",
                                                 image: null,
-                                                path: data.questions[i].files[0]
+                                                path: data.questions[i].files
                                                     .type1_image_4,
                                             });
                                         }
@@ -246,14 +242,7 @@ class CycleAutoExam extends Component {
                                                       ],
                                             images:
                                                 images.length === 0
-                                                    ? [
-                                                          {
-                                                              title: "",
-                                                              file_name: "",
-                                                              image: null,
-                                                              path: "",
-                                                          },
-                                                      ]
+                                                    ? []
                                                     : images,
                                         },
                                     });
@@ -383,14 +372,7 @@ class CycleAutoExam extends Component {
                                         content: {
                                             images:
                                                 images.length === 0
-                                                    ? [
-                                                          {
-                                                              title: "",
-                                                              file_name: "",
-                                                              image: null,
-                                                              path: "",
-                                                          },
-                                                      ]
+                                                    ? []
                                                     : images,
                                         },
                                     });
@@ -663,6 +645,32 @@ class CycleAutoExam extends Component {
         localStorage.setItem("data", JSON.stringify(sections));
     };
 
+    handleEventChange = (event, index) => {
+        let sections = [...this.state.answerSection];
+        if (event.target.checked) {
+            sections[this.state.currentSectionIndex].questions[
+                index
+            ].answer.splice(
+                sections[this.state.currentSectionIndex].questions[
+                    index
+                ].answer.indexOf(event),
+                1
+            );
+            this.setState({
+                answerSection: sections,
+            });
+            localStorage.setItem("data", JSON.stringify(sections));
+        } else {
+            sections[this.state.currentSectionIndex].questions[
+                index
+            ].answer.push(event);
+            this.setState({
+                answerSection: sections,
+            });
+            localStorage.setItem("data", JSON.stringify(sections));
+        }
+    };
+
     // ---------- Drag and drop ----------
 
     handleDragStart = (event, data, index) => {
@@ -892,7 +900,12 @@ class CycleAutoExam extends Component {
                                                                             }
                                                                             onChange={(
                                                                                 e
-                                                                            ) => {}}
+                                                                            ) => {
+                                                                                this.handleEventChange(
+                                                                                    e,
+                                                                                    index
+                                                                                );
+                                                                            }}
                                                                         />
                                                                         <label
                                                                             className="custom-control-label"
@@ -1062,7 +1075,7 @@ class CycleAutoExam extends Component {
                                 ) : null}
                             </div>
                             {/* <!----- Image viewer -----> */}
-                            {data.content.images[0].path !== ""
+                            {data.content.images.length !== 0
                                 ? this.imageRender(data)
                                 : ""}
                         </div>
@@ -1358,7 +1371,7 @@ class CycleAutoExam extends Component {
                                 </div>
                             </div>
                             {/* <!----- Image viewer -----> */}
-                            {data.content.images[0].path !== ""
+                            {data.content.images.length !== 0
                                 ? this.imageRender(data)
                                 : ""}
                         </div>

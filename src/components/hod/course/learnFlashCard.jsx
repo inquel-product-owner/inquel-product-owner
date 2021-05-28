@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import Header from "../shared/examNavbar";
 import ReactCardFlip from "react-card-flip";
-import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
+import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import AlertBox from "../../shared/alert";
 import Loading from "../../shared/loader";
 import { OverlayTrigger, Tooltip, Popover, Modal } from "react-bootstrap";
@@ -14,7 +14,13 @@ import {
     ConceptDataFormat,
     QuestionDataFormat,
 } from "../../shared/dataFormating";
-import PersonalNotes from "./notesModal";
+import { connect } from "react-redux";
+
+const mapStateToProps = (state) => ({
+    course_name: state.content.course_name,
+    chapter_name: state.content.chapter_name,
+    topic_name: state.content.topic_name,
+});
 
 class VideoModal extends Component {
     constructor(props) {
@@ -69,7 +75,7 @@ const NoContentToDisplay = () => {
     );
 };
 
-class FlashCard extends Component {
+class HODCourseFlashCard extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -112,10 +118,10 @@ class FlashCard extends Component {
             seconds: 0,
             isSlideshowPlaying: false,
         };
-        this.subjectId = this.props.match.params.subjectId;
+        this.courseId = this.props.match.params.courseId;
         this.chapterId = this.props.match.params.chapterId;
         this.topicNum = this.props.match.params.topicNum;
-        this.url = baseUrl + studentUrl;
+        this.url = baseUrl + hodUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
             Accept: "application/json",
@@ -130,7 +136,7 @@ class FlashCard extends Component {
     loadConceptData = async (path) => {
         var apiURL =
             path === undefined || path === null
-                ? `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/concepts/?topic_num=${this.topicNum}`
+                ? `${this.url}/hod/course/${this.courseId}/review/chapter/${this.chapterId}/${this.topicNum}/concepts/`
                 : path;
         await fetch(apiURL, {
             method: "GET",
@@ -233,7 +239,7 @@ class FlashCard extends Component {
                     </div>
                 </div>
             </div>
-        ) : data[index] ? (
+        ) : (
             <FullScreen
                 enabled={this.state.isFullscreenEnabled}
                 onChange={(isFullscreenEnabled) =>
@@ -359,8 +365,6 @@ class FlashCard extends Component {
                     </div>
                 </ReactCardFlip>
             </FullScreen>
-        ) : (
-            ""
         );
     };
 
@@ -369,7 +373,7 @@ class FlashCard extends Component {
     loadPracticeData = async (path) => {
         var apiURL =
             path === undefined || path === null
-                ? `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/typeone/learn/?topic_num=${this.topicNum}`
+                ? `${this.url}/hod/course/${this.courseId}/review/chapter/${this.chapterId}/${this.topicNum}/type_one/`
                 : path;
         await fetch(apiURL, {
             method: "GET",
@@ -431,7 +435,7 @@ class FlashCard extends Component {
     loadType2Data = async (path) => {
         var apiURL =
             path === undefined || path === null
-                ? `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/learn/?topic_num=${this.topicNum}`
+                ? `${this.url}/hod/course/${this.courseId}/review/chapter/${this.chapterId}/${this.topicNum}/type_two/`
                 : path;
         await fetch(apiURL, {
             method: "GET",
@@ -669,8 +673,8 @@ class FlashCard extends Component {
                                     {
                                         activeData: 0,
                                         practice: [],
-                                        totalItems: "",
                                         explanation: [],
+                                        totalItems: "",
                                         currentSubQuestionIndex: [],
                                         totalSubQuestion: [],
                                         page_loading: true,
@@ -691,85 +695,118 @@ class FlashCard extends Component {
                 className="card card-body shadow-sm"
                 style={{ minHeight: "70vh" }}
             >
-                {data[index] ? (
-                    data[index].type === "type_1" ? (
-                        // --------------- Type 1 content ---------------
-                        <div className="d-flex">
-                            <div className="w-100">
-                                <div className="d-flex mb-2">
-                                    <p className="font-weight-bold mr-2">
-                                        {index < 9
-                                            ? `0${index + 1}.`
-                                            : `${index + 1}.`}
-                                    </p>
-                                    <div
-                                        className="font-weight-bold-600 w-100"
-                                        dangerouslySetInnerHTML={{
-                                            __html: data[index].question,
-                                        }}
-                                    ></div>
-                                </div>
+                {data[index].type === "type_1" ? (
+                    // --------------- Type 1 content ---------------
+                    <div className="d-flex">
+                        <div className="w-100">
+                            <div className="d-flex mb-2">
+                                <p className="font-weight-bold mr-2">
+                                    {index < 9
+                                        ? `0${index + 1}.`
+                                        : `${index + 1}.`}
+                                </p>
+                                <div
+                                    className="font-weight-bold-600 w-100"
+                                    dangerouslySetInnerHTML={{
+                                        __html: data[index].question,
+                                    }}
+                                ></div>
+                            </div>
 
-                                {/* ---------- Explanation ---------- */}
-                                {explanation.length !== 0 ? (
-                                    explanation.isAnswered === true ? (
-                                        <>
-                                            <div
-                                                className="card card-body bg-light mb-3"
-                                                style={{
-                                                    minHeight: "200px",
+                            {/* ---------- Explanation ---------- */}
+                            {explanation.length !== 0 ? (
+                                explanation.isAnswered === true ? (
+                                    <>
+                                        <div
+                                            className="card card-body bg-light mb-3"
+                                            style={{
+                                                minHeight: "200px",
+                                            }}
+                                        >
+                                            <p className="font-weight-bold-600 mb-2">
+                                                Explanation:
+                                            </p>
+                                            <p
+                                                className="small"
+                                                dangerouslySetInnerHTML={{
+                                                    __html: explanation.explanation,
                                                 }}
-                                            >
-                                                <p className="font-weight-bold-600 mb-2">
-                                                    Explanation:
-                                                </p>
-                                                <p
-                                                    className="small"
-                                                    dangerouslySetInnerHTML={{
-                                                        __html: explanation.explanation,
+                                            ></p>
+                                        </div>
+                                        {/* ----- show answer ----- */}
+                                        <div className="row">
+                                            <div className="col-md-6">
+                                                <div
+                                                    className="card card-body success-bg h-100"
+                                                    style={{
+                                                        minHeight: "100px",
                                                     }}
-                                                ></p>
+                                                >
+                                                    <p className="font-weight-bold-600 mb-2">
+                                                        Correct answer(s):
+                                                    </p>
+                                                    {explanation.answer ===
+                                                    false
+                                                        ? explanation.answers !==
+                                                              undefined &&
+                                                          explanation.answers
+                                                              .length !== 0
+                                                            ? explanation.answers.map(
+                                                                  (
+                                                                      data,
+                                                                      index
+                                                                  ) => {
+                                                                      return (
+                                                                          <p
+                                                                              className="small mb-2"
+                                                                              key={
+                                                                                  index
+                                                                              }
+                                                                              dangerouslySetInnerHTML={{
+                                                                                  __html: data,
+                                                                              }}
+                                                                          ></p>
+                                                                      );
+                                                                  }
+                                                              )
+                                                            : ""
+                                                        : section.length !== 0
+                                                        ? section.answers
+                                                              .length !== 0
+                                                            ? section.answers.map(
+                                                                  (
+                                                                      data,
+                                                                      index
+                                                                  ) => {
+                                                                      return (
+                                                                          <p
+                                                                              className="small mb-2"
+                                                                              key={
+                                                                                  index
+                                                                              }
+                                                                              dangerouslySetInnerHTML={{
+                                                                                  __html: data,
+                                                                              }}
+                                                                          ></p>
+                                                                      );
+                                                                  }
+                                                              )
+                                                            : ""
+                                                        : ""}
+                                                </div>
                                             </div>
-                                            {/* ----- show answer ----- */}
-                                            <div className="row">
+                                            {explanation.answer === false ? (
                                                 <div className="col-md-6">
                                                     <div
-                                                        className="card card-body success-bg h-100"
+                                                        className="card card-body danger-bg h-100"
                                                         style={{
                                                             minHeight: "100px",
                                                         }}
                                                     >
                                                         <p className="font-weight-bold-600 mb-2">
-                                                            Correct answer(s):
+                                                            Your answer(s):
                                                         </p>
-                                                        {explanation.answer ===
-                                                        false
-                                                            ? explanation.answers !==
-                                                                  undefined &&
-                                                              explanation
-                                                                  .answers
-                                                                  .length !== 0
-                                                                ? explanation.answers.map(
-                                                                      (
-                                                                          data,
-                                                                          index
-                                                                      ) => {
-                                                                          return (
-                                                                              <p
-                                                                                  className="small mb-2"
-                                                                                  key={
-                                                                                      index
-                                                                                  }
-                                                                                  dangerouslySetInnerHTML={{
-                                                                                      __html: data,
-                                                                                  }}
-                                                                              ></p>
-                                                                          );
-                                                                      }
-                                                                  )
-                                                                : ""
-                                                            : section.length !==
-                                                              0
+                                                        {section.length !== 0
                                                             ? section.answers
                                                                   .length !== 0
                                                                 ? section.answers.map(
@@ -794,199 +831,89 @@ class FlashCard extends Component {
                                                             : ""}
                                                     </div>
                                                 </div>
-                                                {explanation.answer ===
-                                                false ? (
-                                                    <div className="col-md-6">
-                                                        <div
-                                                            className="card card-body danger-bg h-100"
-                                                            style={{
-                                                                minHeight:
-                                                                    "100px",
-                                                            }}
-                                                        >
-                                                            <p className="font-weight-bold-600 mb-2">
-                                                                Your answer(s):
-                                                            </p>
-                                                            {section.length !==
-                                                            0
-                                                                ? section
-                                                                      .answers
-                                                                      .length !==
-                                                                  0
-                                                                    ? section.answers.map(
-                                                                          (
-                                                                              data,
-                                                                              index
-                                                                          ) => {
-                                                                              return (
-                                                                                  <p
-                                                                                      className="small mb-2"
-                                                                                      key={
-                                                                                          index
-                                                                                      }
-                                                                                      dangerouslySetInnerHTML={{
-                                                                                          __html: data,
-                                                                                      }}
-                                                                                  ></p>
-                                                                              );
-                                                                          }
-                                                                      )
-                                                                    : ""
-                                                                : ""}
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    ""
-                                                )}
-                                            </div>
-                                        </>
-                                    ) : (
-                                        // ---------- MCQ Optins ----------
-                                        <div className="row">
-                                            <div className="col-md-6">
-                                                {data[index].content.mcq ===
-                                                true ? (
-                                                    data[
-                                                        index
-                                                    ].content.options.map(
-                                                        (
-                                                            option,
-                                                            option_index
-                                                        ) => {
-                                                            return (
-                                                                <div
-                                                                    className="card shadow-sm mb-2 bg-light card-body small font-weight-bold-600 pt-3 pb-0"
-                                                                    key={
-                                                                        option_index
-                                                                    }
-                                                                    onClick={() =>
-                                                                        this.handleMCQ(
-                                                                            option.content,
-                                                                            index,
-                                                                            data[
-                                                                                index
-                                                                            ]
-                                                                                .content
-                                                                                .mcq_answers >
-                                                                                1
-                                                                                ? "checkbox"
-                                                                                : "radio"
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    {data[index]
-                                                                        .content
-                                                                        .mcq_answers >
-                                                                    1 ? (
-                                                                        <div className="custom-control custom-checkbox">
-                                                                            <input
-                                                                                type="checkbox"
-                                                                                className="custom-control-input"
-                                                                                id={`option_${option_index}`}
-                                                                                value={
-                                                                                    option.content
-                                                                                }
-                                                                                checked={
-                                                                                    section.length !==
-                                                                                    0
-                                                                                        ? section
-                                                                                              .answers
-                                                                                              .length !==
-                                                                                          0
-                                                                                            ? section.answers.includes(
-                                                                                                  option.content
-                                                                                              )
-                                                                                                ? true
-                                                                                                : false
-                                                                                            : false
-                                                                                        : false
-                                                                                }
-                                                                                onChange={(
-                                                                                    e
-                                                                                ) => {
-                                                                                    this.handleEventChange(
-                                                                                        e,
-                                                                                        index
-                                                                                    );
-                                                                                }}
-                                                                            />
-                                                                            <label
-                                                                                className="custom-control-label"
-                                                                                htmlFor={`option_${option_index}`}
-                                                                                dangerouslySetInnerHTML={{
-                                                                                    __html: `<div class="mb-3">${option.content}</div>`,
-                                                                                }}
-                                                                            ></label>
-                                                                        </div>
-                                                                    ) : (
-                                                                        <div className="custom-control custom-radio">
-                                                                            <input
-                                                                                type="radio"
-                                                                                id={`customRadio${index}-${option_index}`}
-                                                                                name={`customRadio${index}`}
-                                                                                className="custom-control-input"
-                                                                                value={
-                                                                                    option.content
-                                                                                }
-                                                                                checked={
-                                                                                    section.length !==
-                                                                                    0
-                                                                                        ? section
-                                                                                              .answers
-                                                                                              .length !==
-                                                                                          0
-                                                                                            ? section.answers.includes(
-                                                                                                  option.content
-                                                                                              )
-                                                                                                ? true
-                                                                                                : false
-                                                                                            : false
-                                                                                        : false
-                                                                                }
-                                                                                onChange={(
-                                                                                    e
-                                                                                ) => {}}
-                                                                            />
-                                                                            <label
-                                                                                className="custom-control-label"
-                                                                                htmlFor={`customRadio${index}-${option_index}`}
-                                                                                dangerouslySetInnerHTML={{
-                                                                                    __html: `<div class="mb-3">${option.content}</div>`,
-                                                                                }}
-                                                                            ></label>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            );
-                                                        }
-                                                    )
-                                                ) : // ---------- True or False ----------
-                                                data[index].content.boolean ===
-                                                  true ? (
-                                                    data[
-                                                        index
-                                                    ].content.boolean_question.map(
-                                                        (
-                                                            option,
-                                                            boolean_index
-                                                        ) => {
-                                                            return (
-                                                                <div
-                                                                    className="card shadow-sm mb-2 bg-light card-body small font-weight-bold-600 py-3"
-                                                                    key={
-                                                                        boolean_index
-                                                                    }
-                                                                    onClick={() =>
-                                                                        this.handleBoolean(
-                                                                            option.content,
+                                            ) : (
+                                                ""
+                                            )}
+                                        </div>
+                                    </>
+                                ) : (
+                                    // ---------- MCQ Optins ----------
+                                    <div className="row">
+                                        <div className="col-md-6">
+                                            {data[index].content.mcq ===
+                                            true ? (
+                                                data[index].content.options.map(
+                                                    (option, option_index) => {
+                                                        return (
+                                                            <div
+                                                                className="card shadow-sm mb-2 bg-light card-body small font-weight-bold-600 pt-3 pb-0"
+                                                                key={
+                                                                    option_index
+                                                                }
+                                                                onClick={() =>
+                                                                    this.handleMCQ(
+                                                                        option.content,
+                                                                        index,
+                                                                        data[
                                                                             index
-                                                                        )
-                                                                    }
-                                                                >
+                                                                        ]
+                                                                            .content
+                                                                            .mcq_answers >
+                                                                            1
+                                                                            ? "checkbox"
+                                                                            : "radio"
+                                                                    )
+                                                                }
+                                                            >
+                                                                {data[index]
+                                                                    .content
+                                                                    .mcq_answers >
+                                                                1 ? (
+                                                                    <div className="custom-control custom-checkbox">
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            className="custom-control-input"
+                                                                            id={`option_${option_index}`}
+                                                                            value={
+                                                                                option.content
+                                                                            }
+                                                                            checked={
+                                                                                section.length !==
+                                                                                0
+                                                                                    ? section
+                                                                                          .answers
+                                                                                          .length !==
+                                                                                      0
+                                                                                        ? section.answers.includes(
+                                                                                              option.content
+                                                                                          )
+                                                                                            ? true
+                                                                                            : false
+                                                                                        : false
+                                                                                    : false
+                                                                            }
+                                                                            onChange={(
+                                                                                e
+                                                                            ) => {
+                                                                                this.handleEventChange(
+                                                                                    e,
+                                                                                    index
+                                                                                );
+                                                                            }}
+                                                                        />
+                                                                        <label
+                                                                            className="custom-control-label"
+                                                                            htmlFor={`option_${option_index}`}
+                                                                            dangerouslySetInnerHTML={{
+                                                                                __html: `<div class="mb-3">${option.content}</div>`,
+                                                                            }}
+                                                                        ></label>
+                                                                    </div>
+                                                                ) : (
                                                                     <div className="custom-control custom-radio">
                                                                         <input
                                                                             type="radio"
-                                                                            id={`customRadio${index}-${boolean_index}`}
+                                                                            id={`customRadio${index}-${option_index}`}
                                                                             name={`customRadio${index}`}
                                                                             className="custom-control-input"
                                                                             value={
@@ -1013,106 +940,144 @@ class FlashCard extends Component {
                                                                         />
                                                                         <label
                                                                             className="custom-control-label"
-                                                                            htmlFor={`customRadio${index}-${boolean_index}`}
-                                                                        >
-                                                                            {
-                                                                                option.content
-                                                                            }
-                                                                        </label>
+                                                                            htmlFor={`customRadio${index}-${option_index}`}
+                                                                            dangerouslySetInnerHTML={{
+                                                                                __html: `<div class="mb-3">${option.content}</div>`,
+                                                                            }}
+                                                                        ></label>
                                                                     </div>
-                                                                </div>
-                                                            );
-                                                        }
-                                                    )
-                                                ) : // ---------- Fill in answers ----------
-                                                data[index].content.fill_in ===
-                                                  true ? (
-                                                    <input
-                                                        type="text"
-                                                        name="fill_in"
-                                                        className="form-control borders"
-                                                        placeholder="Type your answer here"
-                                                        value={
-                                                            section.length !== 0
-                                                                ? section
-                                                                      .answers
-                                                                      .length !==
-                                                                  0
-                                                                    ? section
-                                                                          .answers[0]
-                                                                    : ""
-                                                                : ""
-                                                        }
-                                                        onChange={(event) =>
-                                                            this.handleFillin(
-                                                                event,
-                                                                index,
-                                                                "type_1"
-                                                            )
-                                                        }
-                                                        autoComplete="off"
-                                                    />
-                                                ) : (
-                                                    ""
-                                                )}
-                                            </div>
-                                        </div>
-                                    )
-                                ) : (
-                                    ""
-                                )}
-
-                                {/* ----- Multiple choice notes ----- */}
-                                {explanation.length !== 0 ? (
-                                    explanation.isAnswered === false ? (
-                                        data[index].content.mcq_answers !==
-                                        undefined ? (
-                                            data[index].content.mcq_answers >
-                                            1 ? (
-                                                <div className="small mt-2">
-                                                    <b>Note:</b>{" "}
-                                                    {
-                                                        data[index].content
-                                                            .mcq_answers
-                                                    }{" "}
-                                                    answers are correct
-                                                </div>
-                                            ) : null
-                                        ) : null
-                                    ) : (
-                                        ""
-                                    )
-                                ) : (
-                                    ""
-                                )}
-
-                                {/* ----- Check button ----- */}
-                                {Object.entries(explanation).length !== 0 ? (
-                                    explanation.isAnswered === false ? (
-                                        section.answers.length !== 0 ? (
-                                            data[index].content.mcq_answers ? (
-                                                data[index].content
-                                                    .mcq_answers ===
-                                                section.answers.length ? (
-                                                    <div className="row mt-4">
-                                                        <div className="col-md-3">
-                                                            <button
-                                                                className="btn btn-primary btn-block btn-sm shadow-none"
-                                                                onClick={() => {
-                                                                    this.handleCheck(
-                                                                        section,
-                                                                        "type_1"
-                                                                    );
-                                                                }}
-                                                            >
-                                                                Check
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    ""
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    }
                                                 )
+                                            ) : // ---------- True or False ----------
+                                            data[index].content.boolean ===
+                                              true ? (
+                                                data[
+                                                    index
+                                                ].content.boolean_question.map(
+                                                    (option, boolean_index) => {
+                                                        return (
+                                                            <div
+                                                                className="card shadow-sm mb-2 bg-light card-body small font-weight-bold-600 py-3"
+                                                                key={
+                                                                    boolean_index
+                                                                }
+                                                                onClick={() =>
+                                                                    this.handleBoolean(
+                                                                        option.content,
+                                                                        index
+                                                                    )
+                                                                }
+                                                            >
+                                                                <div className="custom-control custom-radio">
+                                                                    <input
+                                                                        type="radio"
+                                                                        id={`customRadio${index}-${boolean_index}`}
+                                                                        name={`customRadio${index}`}
+                                                                        className="custom-control-input"
+                                                                        value={
+                                                                            option.content
+                                                                        }
+                                                                        checked={
+                                                                            section.length !==
+                                                                            0
+                                                                                ? section
+                                                                                      .answers
+                                                                                      .length !==
+                                                                                  0
+                                                                                    ? section.answers.includes(
+                                                                                          option.content
+                                                                                      )
+                                                                                        ? true
+                                                                                        : false
+                                                                                    : false
+                                                                                : false
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) => {}}
+                                                                    />
+                                                                    <label
+                                                                        className="custom-control-label"
+                                                                        htmlFor={`customRadio${index}-${boolean_index}`}
+                                                                    >
+                                                                        {
+                                                                            option.content
+                                                                        }
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    }
+                                                )
+                                            ) : // ---------- Fill in answers ----------
+                                            data[index].content.fill_in ===
+                                              true ? (
+                                                <input
+                                                    type="text"
+                                                    name="fill_in"
+                                                    className="form-control borders"
+                                                    placeholder="Type your answer here"
+                                                    value={
+                                                        section.length !== 0
+                                                            ? section.answers
+                                                                  .length !== 0
+                                                                ? section
+                                                                      .answers[0]
+                                                                : ""
+                                                            : ""
+                                                    }
+                                                    onChange={(event) =>
+                                                        this.handleFillin(
+                                                            event,
+                                                            index,
+                                                            "type_1"
+                                                        )
+                                                    }
+                                                    autoComplete="off"
+                                                />
                                             ) : (
+                                                ""
+                                            )}
+                                        </div>
+                                    </div>
+                                )
+                            ) : (
+                                ""
+                            )}
+
+                            {/* ----- Multiple choice notes ----- */}
+                            {explanation.length !== 0 ? (
+                                explanation.isAnswered === false ? (
+                                    data[index].content.mcq_answers !==
+                                    undefined ? (
+                                        data[index].content.mcq_answers > 1 ? (
+                                            <div className="small mt-2">
+                                                <b>Note:</b>{" "}
+                                                {
+                                                    data[index].content
+                                                        .mcq_answers
+                                                }{" "}
+                                                answers are correct
+                                            </div>
+                                        ) : null
+                                    ) : null
+                                ) : (
+                                    ""
+                                )
+                            ) : (
+                                ""
+                            )}
+
+                            {/* ----- Check button ----- */}
+                            {Object.entries(explanation).length !== 0 ? (
+                                explanation.isAnswered === false ? (
+                                    section.answers.length !== 0 ? (
+                                        data[index].content.mcq_answers ? (
+                                            data[index].content.mcq_answers ===
+                                            section.answers.length ? (
                                                 <div className="row mt-4">
                                                     <div className="col-md-3">
                                                         <button
@@ -1128,38 +1093,54 @@ class FlashCard extends Component {
                                                         </button>
                                                     </div>
                                                 </div>
+                                            ) : (
+                                                ""
                                             )
                                         ) : (
-                                            ""
+                                            <div className="row mt-4">
+                                                <div className="col-md-3">
+                                                    <button
+                                                        className="btn btn-primary btn-block btn-sm shadow-none"
+                                                        onClick={() => {
+                                                            this.handleCheck(
+                                                                section,
+                                                                "type_1"
+                                                            );
+                                                        }}
+                                                    >
+                                                        Check
+                                                    </button>
+                                                </div>
+                                            </div>
                                         )
                                     ) : (
                                         ""
                                     )
                                 ) : (
                                     ""
-                                )}
-                            </div>
-                            {/* <!----- Image & Video viewer -----> */}
-                            {data[index] ? (
-                                data[index].content.images.length !== 0 ||
-                                data[index].content.video.path !== "" ? (
-                                    <div className="ml-3">
-                                        {this.imageRender(data[index])}
-                                    </div>
-                                ) : (
-                                    ""
                                 )
                             ) : (
                                 ""
                             )}
-                            {/* <!-- Image viewer ends here --> */}
                         </div>
-                    ) : (
-                        // --------------- Type 2 render function ---------------
-                        this.typeTwoRender(data, index, section, explanation)
-                    )
+                        {/* <!----- Image & Video viewer -----> */}
+                        {data[index] ? (
+                            data[index].content.images.length !== 0 ||
+                            data[index].content.video.path !== "" ? (
+                                <div className="ml-3">
+                                    {this.imageRender(data[index])}
+                                </div>
+                            ) : (
+                                ""
+                            )
+                        ) : (
+                            ""
+                        )}
+                        {/* <!-- Image viewer ends here --> */}
+                    </div>
                 ) : (
-                    ""
+                    // --------------- Type 2 render function ---------------
+                    this.typeTwoRender(data, index, section, explanation)
                 )}
             </div>
         );
@@ -1558,7 +1539,7 @@ class FlashCard extends Component {
 
         if (type === "type_1") {
             await fetch(
-                `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/typeone/learn/`,
+                `${this.url}/hod/course/${this.courseId}/review/chapter/${this.chapterId}/${this.topicNum}/type_one/`,
                 {
                     method: "POST",
                     headers: this.headers,
@@ -1595,7 +1576,7 @@ class FlashCard extends Component {
                 });
         } else if (type === "type_2") {
             await fetch(
-                `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/typetwo/learn/`,
+                `${this.url}/hod/course/${this.courseId}/review/chapter/${this.chapterId}/${this.topicNum}/type_two/`,
                 {
                     method: "POST",
                     headers: this.headers,
@@ -1700,7 +1681,7 @@ class FlashCard extends Component {
     loadMatchData = async (path) => {
         var apiURL =
             path === undefined || path === null
-                ? `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/match/?topic_num=${this.topicNum}`
+                ? `${this.url}/hod/course/${this.courseId}/review/chapter/${this.chapterId}/${this.topicNum}/match/`
                 : path;
         await fetch(apiURL, {
             method: "GET",
@@ -1966,73 +1947,12 @@ class FlashCard extends Component {
 
     // ---------- loads subject information ----------
 
-    loopTopicStructure = (array) => {
-        var topic_name = "";
-        array.forEach((a) => {
-            if (this.topicNum === a.topic_num) {
-                topic_name = a.topic_name;
-            } else if (Array.isArray(a.child) && a.child.length !== 0) {
-                topic_name = this.loopTopicStructure(a.child);
-            }
-        });
-        return topic_name;
-    };
-
     componentDidMount = () => {
         this.loadConceptData();
         this.setState({
             practice: [],
             concepts: [],
         });
-
-        fetch(`${this.url}/student/subject/${this.subjectId}/`, {
-            method: "GET",
-            headers: this.headers,
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    let chapter_name = "";
-                    let topic_name = "";
-                    // extract currently selected chapter name
-                    for (let i = 0; i < result.data.chapters.length; i++) {
-                        if (
-                            result.data.chapters[i].chapter_id ===
-                            this.chapterId
-                        ) {
-                            chapter_name = result.data.chapters[i].chapter_name;
-                            // Extracting topics from the chapter_structure
-                            for (
-                                let j = 0;
-                                j < result.data.chapters[i].topics.length;
-                                j++
-                            ) {
-                                topic_name = this.loopTopicStructure(
-                                    result.data.chapters[i].topics[j]
-                                        .chapter_structure
-                                );
-                            }
-                        } else {
-                            continue;
-                        }
-                    }
-                    this.setState({
-                        subject_name: result.data.subject_name,
-                        chapter_name: chapter_name,
-                        topic_name: topic_name,
-                    });
-                } else {
-                    this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
 
         document.addEventListener("keydown", this.handleKeys);
     };
@@ -2223,61 +2143,6 @@ class FlashCard extends Component {
         });
     };
 
-    // ---------- Bookmark | Favourites ----------
-
-    handleBookmark = (data, index) => {
-        let body = {
-            topic_num: this.topicNum.toString(),
-        };
-        if (data[index] !== undefined) {
-            if (this.state.activeTab === "concept") {
-                body["concept_id"] = data[index].concepts_random_id;
-            } else {
-                body["question_id"] = data[index].question_random_id;
-            }
-            this.setState({
-                showSuccessAlert: false,
-                showErrorAlert: false,
-            });
-
-            fetch(
-                `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/favourites/`,
-                {
-                    method: "POST",
-                    headers: this.headers,
-                    body: JSON.stringify(body),
-                }
-            )
-                .then((res) => res.json())
-                .then((result) => {
-                    console.log(result);
-                    if (result.sts === true) {
-                        this.setState({
-                            successMsg: result.msg,
-                            showSuccessAlert: true,
-                        });
-                        if (this.state.activeTab === "concept") {
-                            data[index].favourite = !data[index].favourite;
-                            this.setState({
-                                concepts: data,
-                            });
-                        } else {
-                            data[index].favourite = !data[index].favourite;
-                            this.setState({
-                                practice: data,
-                            });
-                        }
-                    } else {
-                        this.setState({
-                            errorMsg: result.msg,
-                            showErrorAlert: true,
-                        });
-                    }
-                })
-                .then((err) => console.log(err));
-        }
-    };
-
     // ---------- Slideshow ----------
 
     handleSlideShow = () => {
@@ -2363,44 +2228,8 @@ class FlashCard extends Component {
         }
     };
 
-    // ---------- Personal Notes ----------
-
-    toggleNotesModal = (data, index) => {
-        if (data[index]) {
-            this.setState({
-                showNotesModal: !this.state.showNotesModal,
-            });
-        }
-    };
-
-    formSubmission = () => {
-        setTimeout(() => {
-            this.setState(
-                {
-                    showNotesModal: false,
-                    activeData: this.state.activeData,
-                    totalItems: "",
-                    concepts: [],
-                    currentSubQuestionIndex: [],
-                    explanation: [],
-                    practice: [],
-                    sections: [],
-                    totalSubQuestion: [],
-                    page_loading: true,
-                },
-                () => {
-                    if (this.state.activeTab === "concept") {
-                        this.loadConceptData();
-                    } else {
-                        this.loadPracticeData();
-                    }
-                }
-            );
-        }, 1000);
-    };
-
     render() {
-        document.title = `${this.state.chapter_name} learn - Student | IQLabs`;
+        document.title = `${this.props.topic_name} : learn - HOD | IQLabs`;
         let data = [];
         if (this.state.activeTab === "concept") {
             data =
@@ -2438,8 +2267,8 @@ class FlashCard extends Component {
             <>
                 {/* ----- Navbar ----- */}
                 <Header
-                    name={this.state.subject_name}
-                    chapter_name={`${this.state.chapter_name} - ${this.state.topic_name}`}
+                    name={this.props.course_name}
+                    chapter_name={`${this.props.chapter_name} - ${this.props.topic_name}`}
                     goBack={this.props.history.goBack}
                 />
 
@@ -2482,31 +2311,6 @@ class FlashCard extends Component {
                                 isLightBoxOpen: false,
                             });
                         }}
-                    />
-                ) : (
-                    ""
-                )}
-
-                {/* ----- Personal notes modal ----- */}
-                {this.state.showNotesModal ? (
-                    <PersonalNotes
-                        show={this.state.showNotesModal}
-                        onHide={() =>
-                            this.setState({
-                                showNotesModal: false,
-                            })
-                        }
-                        type={this.state.activeTab}
-                        subjectId={this.subjectId}
-                        chapterId={this.chapterId}
-                        topic_num={this.topicNum}
-                        id={
-                            this.state.activeTab === "concept"
-                                ? data[index].concepts_random_id
-                                : data[index].question_random_id
-                        }
-                        data={data[index].personal_notes}
-                        formSubmission={this.formSubmission}
                     />
                 ) : (
                     ""
@@ -2561,62 +2365,6 @@ class FlashCard extends Component {
                                     </button>
                                 </div>
                                 <div className="col-md-6 text-right">
-                                    {this.state.activeTab !== "match" ? (
-                                        <OverlayTrigger
-                                            key="top6"
-                                            placement="top"
-                                            overlay={
-                                                <Tooltip id="tooltip1">
-                                                    {data[index] !== undefined
-                                                        ? data[index]
-                                                              .favourite !==
-                                                          undefined
-                                                            ? data[index]
-                                                                  .favourite ===
-                                                              true
-                                                                ? "Bookmarked"
-                                                                : `Bookmark this ${
-                                                                      this.state
-                                                                          .activeTab ===
-                                                                      "concept"
-                                                                          ? "concept"
-                                                                          : "question"
-                                                                  }`
-                                                            : "Bookmark"
-                                                        : "Bookmark"}
-                                                </Tooltip>
-                                            }
-                                        >
-                                            <button
-                                                className="btn btn-primary btn-sm rounded-circle mr-3 shadow-none"
-                                                onClick={() => {
-                                                    this.handleBookmark(
-                                                        data,
-                                                        index
-                                                    );
-                                                    this.pauseSlideshow();
-                                                }}
-                                            >
-                                                <i
-                                                    className={`${
-                                                        data[index]
-                                                            ? data[index]
-                                                                  .favourite ===
-                                                              true
-                                                                ? "fas secondary-text"
-                                                                : "far"
-                                                            : "far"
-                                                    } fa-bookmark fa-sm`}
-                                                    style={{
-                                                        marginLeft: "1px",
-                                                        marginRight: "1px",
-                                                    }}
-                                                ></i>
-                                            </button>
-                                        </OverlayTrigger>
-                                    ) : (
-                                        ""
-                                    )}
                                     {data[index] !== undefined &&
                                     data[index].content !== undefined &&
                                     data[index].content.audio !== undefined
@@ -2727,79 +2475,7 @@ class FlashCard extends Component {
                             <div className="col-md-11">
                                 <div className="row align-items-center">
                                     {/* ---------- keyboard & Notes button ---------- */}
-                                    <div className="col-md-4">
-                                        <OverlayTrigger
-                                            key="top6"
-                                            placement="top"
-                                            overlay={
-                                                <Tooltip id="tooltip1">
-                                                    Virtual keyboard
-                                                </Tooltip>
-                                            }
-                                        >
-                                            <button className="btn btn-primary btn-sm rounded-circle shadow-none mr-3">
-                                                <i
-                                                    className="fas fa-keyboard fa-sm"
-                                                    style={{
-                                                        marginBottom: "4px",
-                                                    }}
-                                                ></i>
-                                            </button>
-                                        </OverlayTrigger>
-                                        <OverlayTrigger
-                                            key="top7"
-                                            placement="top"
-                                            overlay={
-                                                <Tooltip id="tooltip1">
-                                                    Personal notes
-                                                </Tooltip>
-                                            }
-                                        >
-                                            <div className="d-inline">
-                                                <button
-                                                    className="btn btn-primary btn-sm rounded-circle shadow-none"
-                                                    onClick={() => {
-                                                        this.toggleNotesModal(
-                                                            data,
-                                                            index
-                                                        );
-                                                        this.pauseSlideshow();
-                                                    }}
-                                                >
-                                                    <i
-                                                        className="fas fa-pencil-ruler fa-sm"
-                                                        style={{
-                                                            marginBottom: "5px",
-                                                            marginLeft: "1px",
-                                                        }}
-                                                    ></i>
-                                                </button>
-                                                {data[index] ? (
-                                                    Object.entries(
-                                                        data[index]
-                                                            .personal_notes
-                                                    ).length !== 0 ? (
-                                                        <span
-                                                            className="position-absolute text-danger"
-                                                            style={{
-                                                                marginTop:
-                                                                    "-6px",
-                                                                marginLeft:
-                                                                    "-5px",
-                                                                fontSize: "8px",
-                                                            }}
-                                                        >
-                                                            <i className="fas fa-circle fa-sm"></i>
-                                                        </span>
-                                                    ) : (
-                                                        ""
-                                                    )
-                                                ) : (
-                                                    ""
-                                                )}
-                                            </div>
-                                        </OverlayTrigger>
-                                    </div>
+                                    <div className="col-md-4"></div>
 
                                     {/* ---------- Pagination ---------- */}
 
@@ -3034,4 +2710,4 @@ class FlashCard extends Component {
     }
 }
 
-export default FlashCard;
+export default connect(mapStateToProps)(HODCourseFlashCard);

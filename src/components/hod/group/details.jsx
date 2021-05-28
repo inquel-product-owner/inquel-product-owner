@@ -3,10 +3,10 @@ import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
-import Loading from "../../sharedComponents/loader";
-import AlertBox from "../../sharedComponents/alert";
+import Loading from "../../shared/loader";
+import AlertBox from "../../shared/alert";
 import { connect } from "react-redux";
-import { waterMark } from "../../sharedComponents/watermark";
+import { waterMark } from "../../shared/watermark";
 
 const mapStateToProps = (state) => ({
     profile: state.user.profile,

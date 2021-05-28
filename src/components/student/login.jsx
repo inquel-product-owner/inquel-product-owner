@@ -4,7 +4,7 @@ import { Link, Redirect } from "react-router-dom";
 import { baseUrl, accountsUrl, adminPathUrl } from "../../shared/baseUrl.js";
 import Footer from "./shared/footer";
 import AccountNavbar from "./shared/accountNavbar";
-import { ForgotPasswordModal } from "../sharedComponents/forgotPassword";
+import { ForgotPasswordModal } from "../shared/forgotPassword";
 import store from "../../redux/store";
 
 class StudentLogin extends Component {

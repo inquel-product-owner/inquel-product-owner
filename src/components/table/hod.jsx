@@ -69,7 +69,7 @@ function dateTemplate(props) {
 function viewTemplate(props) {
     return (
         <Link to={`/admin/hod/${props.id}`}>
-            <button className="btn btn-link btn-sm">
+            <button className="btn btn-link btn-sm shadow-none">
                 <i className="fas fa-eye"></i>
             </button>
         </Link>
@@ -132,7 +132,6 @@ class HODTable extends Component {
 
     rowSelected() {
         if (this.gridInstance) {
-            // const selectedrowindex = this.gridInstance.getSelectedRowIndexes();
             const selectedrecords = this.gridInstance.getSelectedRecords();
             let element = [];
             for (let index = 0; index < selectedrecords.length; index++) {

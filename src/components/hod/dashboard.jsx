@@ -6,11 +6,11 @@ import SideNav from "./shared/sidenav";
 import courseimg from "../../assets/code.jpg";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
 import { paginationCount } from "../../shared/globalValues.js";
-import Loading from "../sharedComponents/loader";
+import Loading from "../shared/loader";
 import GroupTable from "../table/group";
 import SubjectTable from "../table/subject";
-import Paginations from "../sharedComponents/pagination";
-import AlertBox from "../sharedComponents/alert";
+import Paginations from "../shared/pagination";
+import AlertBox from "../shared/alert";
 import {
     ContentDeleteModal,
     ContentDisableModal,
@@ -18,7 +18,7 @@ import {
     MultiContentDeleteModal,
     SingleContentDisableModal,
     SingleContentEnableModal,
-} from "../sharedComponents/contentManagementModal";
+} from "../shared/contentManagementModal";
 import { connect } from "react-redux";
 import Slider from "react-slick";
 import store from "../../redux/store";

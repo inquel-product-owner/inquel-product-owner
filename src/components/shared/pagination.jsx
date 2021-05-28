@@ -1,5 +1,6 @@
 import React from "react";
 import Pagination from "react-js-pagination";
+import { paginationCount } from "../../shared/globalValues";
 
 function Paginations(props) {
     return (
@@ -9,7 +10,7 @@ function Paginations(props) {
             prevPageText={<i className="fas fa-angle-left fa-sm" />}
             nextPageText={<i className="fas fa-angle-right fa-sm" />}
             activePage={props.activePage}
-            itemsCountPerPage={10}
+            itemsCountPerPage={paginationCount}
             totalItemsCount={props.totalItemsCount}
             pageRangeDisplayed={5}
             onChange={props.onChange.bind(this)}

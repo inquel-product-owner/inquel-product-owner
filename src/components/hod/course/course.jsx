@@ -5,8 +5,8 @@ import { Card, Accordion } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl";
-import Loading from "../../sharedComponents/loader";
-import AlertBox from "../../sharedComponents/alert";
+import Loading from "../../shared/loader";
+import AlertBox from "../../shared/alert";
 import store from "../../../redux/store";
 
 const mapStateToProps = (state) => ({
@@ -451,6 +451,12 @@ const TopicListRender = (props) => {
                                             className="btn btn-sm bg-white shadow-none"
                                             onClick={() => {
                                                 store.dispatch({
+                                                    type: "CHAPTER",
+                                                    payload:
+                                                        props.chapter
+                                                            .chapter_name,
+                                                });
+                                                store.dispatch({
                                                     type: "TOPIC",
                                                     payload:
                                                         props.topics.topic_name,
@@ -474,11 +480,17 @@ const TopicListRender = (props) => {
                             <div className="col-3">
                                 {props.topics.next_topic ? (
                                     <Link
-                                        to={`${props.match.url}/chapter/${props.chapter.chapter_id}/${props.topics.topic_num}/learn`}
+                                        to={`${props.match.url}/chapter/${props.chapter.chapter_id}/${props.topics.next_topic}/learn`}
                                     >
                                         <button
                                             className="btn btn-sm bg-white shadow-none"
                                             onClick={() => {
+                                                store.dispatch({
+                                                    type: "CHAPTER",
+                                                    payload:
+                                                        props.chapter
+                                                            .chapter_name,
+                                                });
                                                 store.dispatch({
                                                     type: "TOPIC",
                                                     payload: getTopicName(

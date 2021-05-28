@@ -107,7 +107,7 @@ export class AdminLogout extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            timeout: 1000 * 60 * 15,
+            timeout: 1000 * 60 * 1,
             showModal: false,
             isTimedOut: false,
             isLoggedOut: false,
@@ -125,7 +125,6 @@ export class AdminLogout extends React.Component {
 
     onIdle = () => {
         if (!this.state.isTimedOut && localStorage.getItem("Inquel-Auth")) {
-            this.setState({ showModal: true });
             this.idleTimer.reset();
             this.setState({ isTimedOut: true });
 
@@ -143,8 +142,9 @@ export class AdminLogout extends React.Component {
             })
                 .then((res) => res.json())
                 .then((result) => {
-                    localStorage.clear();
                     console.log(result);
+                    localStorage.clear();
+                    this.setState({ showModal: true });
                 })
                 .catch((err) => {
                     console.log(err);

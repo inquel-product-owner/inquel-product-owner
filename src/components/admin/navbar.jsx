@@ -4,7 +4,7 @@ import { Link, Redirect } from "react-router-dom";
 import logo from "../../assets/Iq-labs-01.svg";
 import userpic from "../../assets/user-v1.png";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
-import { AdminLogout } from "../sharedComponents/handleLogout";
+import { AdminLogout } from "../shared/handleLogout";
 import { connect } from "react-redux";
 import store from "../../redux/store";
 

@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
-import Loading from "../../sharedComponents/loader";
-import AlertBox from "../../sharedComponents/alert";
+import Loading from "../../shared/loader";
+import AlertBox from "../../shared/alert";
 import {
     Inject,
     ScheduleComponent,

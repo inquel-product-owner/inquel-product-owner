@@ -5,15 +5,15 @@ import { Dropdown } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import { paginationCount } from "../../shared/globalValues.js";
-import Loading from "../sharedComponents/loader";
+import Loading from "../shared/loader";
 import StudentTable from "../table/student";
-import Paginations from "../sharedComponents/pagination";
-import AlertBox from "../sharedComponents/alert";
+import Paginations from "../shared/pagination";
+import AlertBox from "../shared/alert";
 import {
     UserDeleteModal,
     UserDisableModal,
     UserEnableModal,
-} from "../sharedComponents/userManagementModal";
+} from "../shared/userManagementModal";
 
 class TeacherStudentList extends Component {
     constructor(props) {

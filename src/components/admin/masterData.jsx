@@ -5,8 +5,8 @@ import { Link } from "react-router-dom";
 import Select from "react-select";
 import { Modal, Spinner, Alert } from "react-bootstrap";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
-import Loading from "../sharedComponents/loader";
-import AlertBox from "../sharedComponents/alert";
+import Loading from "../shared/loader";
+import AlertBox from "../shared/alert";
 
 class ContentAdding extends Component {
     constructor(props) {

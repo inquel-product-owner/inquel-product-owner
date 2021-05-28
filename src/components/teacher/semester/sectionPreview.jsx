@@ -4,11 +4,11 @@ import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
-import Loading from "../../sharedComponents/loader";
-import AlertBox from "../../sharedComponents/alert";
+import Loading from "../../shared/loader";
+import AlertBox from "../../shared/alert";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
-import { DataFormat } from "../../sharedComponents/dataFormating";
+import { QuestionDataFormat } from "../../shared/dataFormating";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
@@ -83,12 +83,17 @@ class TeacherSemesterAutoQA extends Component {
                     ...this.state.currentSubQuestionIndex,
                 ];
                 if (result.sts === true) {
-                    if (result.data.results.length !== 0) {
-                        let values = DataFormat(result);
+                    if (
+                        result.data.results &&
+                        result.data.results.length !== 0
+                    ) {
+                        let values = QuestionDataFormat(result.data.results);
                         type = values.type;
                         data.push(...values.result);
-                        totalSubQuestion.push(...values.total);
-                        currentSubQuestionIndex.push(...values.current);
+                        totalSubQuestion.push(...values.totalSubQuestion);
+                        currentSubQuestionIndex.push(
+                            ...values.currentSubQuestionIndex
+                        );
 
                         this.setState(
                             {
@@ -539,9 +544,8 @@ class TeacherSemesterAutoQA extends Component {
                                                               )}
                                                           </div>
                                                           {/* ----- image preview ----- */}
-                                                          {data.content
-                                                              .images[0]
-                                                              .path !== "" ? (
+                                                          {data.content.images
+                                                              .length !== 0 ? (
                                                               <div className="ml-3">
                                                                   {data.content.images.map(
                                                                       (
@@ -634,7 +638,7 @@ class TeacherSemesterAutoQA extends Component {
                                               {/* ---------- Question preview ---------- */}
                                               <div className="card shadow-sm w-100">
                                                   <div className="card-body d-flex">
-                                                      <div className="row w-100">
+                                                      <div className="row">
                                                           {/* ----- Main Question ----- */}
                                                           <div className="col-md-6">
                                                               <div
@@ -822,8 +826,8 @@ class TeacherSemesterAutoQA extends Component {
                                                           </div>
                                                       </div>
                                                       {/* ----- image preview ----- */}
-                                                      {data.content.images[0]
-                                                          .path !== "" ? (
+                                                      {data.content.images
+                                                          .length !== 0 ? (
                                                           <div className="ml-3">
                                                               {data.content.images.map(
                                                                   (

@@ -5,8 +5,8 @@ import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import Select from "react-select";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
-import AlertBox from "../../sharedComponents/alert";
-import Loading from "../../sharedComponents/loader";
+import AlertBox from "../../shared/alert";
+import Loading from "../../shared/loader";
 import { Document, Page, pdfjs } from "react-pdf";
 import { Spinner } from "react-bootstrap";
 
