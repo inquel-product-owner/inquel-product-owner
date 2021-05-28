@@ -19,9 +19,13 @@ class GroupModal extends Component {
             groupDesc: "",
             level_code: "",
             level_name: "",
+            subject_code: "",
+            subject_name: "",
             valid_from: "",
             valid_to: "",
+
             levelItems: [],
+            subjectItems: {},
 
             errorMsg: "",
             successMsg: "",
@@ -52,6 +56,7 @@ class GroupModal extends Component {
                 if (result.sts === true) {
                     this.setState({
                         levelItems: result.data.LEVELS,
+                        subjectItems: result.data.SUBJECTS,
                     });
                 } else {
                     this.setState({
@@ -99,6 +104,24 @@ class GroupModal extends Component {
         });
     };
 
+    handleSubject = (event) => {
+        let temp = Object.entries(this.state.subjectItems);
+        let code = "";
+        let name = "";
+        for (let i = 0; i < Object.keys(this.state.subjectItems).length; i++) {
+            if (temp[i][0] === event.target.value) {
+                code = temp[i][0];
+                name = temp[i][1];
+            } else {
+                continue;
+            }
+        }
+        this.setState({
+            subject_code: code,
+            subject_name: name,
+        });
+    };
+
     handleSubmit = (event) => {
         event.preventDefault();
         var url = baseUrl + hodUrl;
@@ -123,6 +146,8 @@ class GroupModal extends Component {
                 group_description: this.state.groupDesc,
                 level_code: this.state.level_code,
                 level_name: this.state.level_name,
+                subject_code: this.state.subject_code,
+                subject_name: this.state.subject_name,
                 valid_from: this.state.valid_from,
                 valid_to: this.state.valid_to,
             }),
@@ -279,6 +304,30 @@ class GroupModal extends Component {
                                               );
                                           }
                                       )
+                                    : null}
+                            </select>
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="subject">Subject</label>
+                            <select
+                                name="subject"
+                                id="subject"
+                                onChange={this.handleSubject}
+                                className="form-control borders"
+                                required
+                            >
+                                <option value="">Select subject</option>
+                                {Object.keys(this.state.subjectItems).length !==
+                                0
+                                    ? Object.entries(
+                                          this.state.subjectItems
+                                      ).map(([key, value], index) => {
+                                          return (
+                                              <option value={key} key={index}>
+                                                  {value}
+                                              </option>
+                                          );
+                                      })
                                     : null}
                             </select>
                         </div>

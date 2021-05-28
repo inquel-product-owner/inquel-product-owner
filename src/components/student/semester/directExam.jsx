@@ -132,7 +132,7 @@ class SemesterDirectExam extends Component {
             });
         } else if (event.target.files[0].size > 5242880) {
             this.setState({
-                errorMsg: "File sixe exceeds more then 5MB!",
+                errorMsg: "File size exceeds more then 5MB!",
                 showErrorAlert: true,
                 btnDisabled: true,
             });
@@ -187,7 +187,7 @@ class SemesterDirectExam extends Component {
             });
         } else if (pdf.file.size > 5242880) {
             this.setState({
-                errorMsg: "File sixe exceeds more then 5MB!",
+                errorMsg: "File size exceeds more then 5MB!",
                 showErrorAlert: true,
             });
         } else {

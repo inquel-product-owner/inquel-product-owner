@@ -469,6 +469,7 @@ export function QuestionDataFormat(response) {
                 type: "type_1",
                 question: response[i].question,
                 question_random_id: response[i].question_random_id,
+                pair_question_id: response[i].pair_question_id || "",
                 favourite: response[i].favourite || false,
                 personal_notes: response[i].personal_notes || {},
                 content: {
@@ -634,6 +635,7 @@ export function QuestionDataFormat(response) {
                 type: "type_2",
                 question: response[i].question,
                 question_random_id: response[i].question_random_id,
+                pair_question_id: response[i].pair_question_id || "",
                 favourite: response[i].favourite || false,
                 personal_notes: response[i].personal_notes || {},
                 sub_question: sub_question,
@@ -701,54 +703,54 @@ export function ConceptDataFormat(response) {
         audio = [];
         if (response[i].files && response[i].files.length !== 0) {
             // image
-            if (response[i].files[0].concepts_image_1) {
+            if (response[i].files.concepts_image_1) {
                 images.push({
-                    title: response[i].files[0].concepts_image_1_title,
+                    title: response[i].files.concepts_image_1_title,
                     file_name: "",
                     image: null,
-                    path: response[i].files[0].concepts_image_1,
+                    path: response[i].files.concepts_image_1,
                 });
             }
-            if (response[i].files[0].concepts_image_2) {
+            if (response[i].files.concepts_image_2) {
                 images.push({
-                    title: response[i].files[0].concepts_image_2_title,
+                    title: response[i].files.concepts_image_2_title,
                     file_name: "",
                     image: null,
-                    path: response[i].files[0].concepts_image_2,
+                    path: response[i].files.concepts_image_2,
                 });
             }
-            if (response[i].files[0].concepts_image_3) {
+            if (response[i].files.concepts_image_3) {
                 images.push({
-                    title: response[i].files[0].concepts_image_3_title,
+                    title: response[i].files.concepts_image_3_title,
                     file_name: "",
                     image: null,
-                    path: response[i].files[0].concepts_image_3,
+                    path: response[i].files.concepts_image_3,
                 });
             }
-            if (response[i].files[0].concepts_image_4) {
+            if (response[i].files.concepts_image_4) {
                 images.push({
-                    title: response[i].files[0].concepts_image_4_title,
+                    title: response[i].files.concepts_image_4_title,
                     file_name: "",
                     image: null,
-                    path: response[i].files[0].concepts_image_4,
+                    path: response[i].files.concepts_image_4,
                 });
             }
 
             // audio
-            if (response[i].files[0].concepts_audio_1) {
+            if (response[i].files.concepts_audio_1) {
                 audio.push({
-                    title: response[i].files[0].concepts_audio_1_title,
+                    title: response[i].files.concepts_audio_1_title,
                     file_name: "",
                     audio: null,
-                    path: response[i].files[0].concepts_audio_1,
+                    path: response[i].files.concepts_audio_1,
                 });
             }
-            if (response[i].files[0].concepts_audio_2) {
+            if (response[i].files.concepts_audio_2) {
                 audio.push({
-                    title: response[i].files[0].concepts_audio_2_title,
+                    title: response[i].files.concepts_audio_2_title,
                     file_name: "",
                     audio: null,
-                    path: response[i].files[0].concepts_audio_2,
+                    path: response[i].files.concepts_audio_2,
                 });
             }
         }
@@ -756,11 +758,11 @@ export function ConceptDataFormat(response) {
         // video
         var path = "";
         if (response[i].files && response[i].files.length !== 0) {
-            if (response[i].files[0].paste_video_url) {
-                path = response[i].files[0].paste_video_url;
+            if (response[i].files.paste_video_url) {
+                path = response[i].files.paste_video_url;
             }
-            if (response[i].files[0].concepts_video_1) {
-                path = response[i].files[0].concepts_video_1;
+            if (response[i].files.concepts_video_1) {
+                path = response[i].files.concepts_video_1;
             }
         }
 
@@ -777,8 +779,8 @@ export function ConceptDataFormat(response) {
                     title:
                         response[i].files &&
                         response[i].files.length !== 0 &&
-                        response[i].files[0].concepts_video_1_title
-                            ? response[i].files[0].concepts_video_1_title
+                        response[i].files.concepts_video_1_title
+                            ? response[i].files.concepts_video_1_title
                             : "",
                     file_name: "",
                     video: null,

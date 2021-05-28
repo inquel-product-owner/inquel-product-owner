@@ -12,6 +12,7 @@ import ScoreCardTable from "../../shared/scorecard";
 import ReactSwitch from "../../shared/switchComponent";
 import CKeditor from "../../shared/CKeditor";
 import store from "../../../redux/store";
+import axios from "axios";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
@@ -368,6 +369,418 @@ class QuickPassModal extends Component {
     }
 }
 
+class CourseDetails extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            data: this.props.data,
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: false,
+        };
+        this.url = baseUrl + hodUrl;
+        this.authToken = localStorage.getItem("Authorization");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: this.authToken,
+        };
+    }
+
+    onEditorChange = async (evt) => {
+        let data = this.state.data;
+        data.content = evt.editor.getData();
+        await this.setState({
+            data: data,
+        });
+        window.MathJax.typeset();
+    };
+
+    handleTitle = (event) => {
+        let data = this.state.data;
+        data.title = event.target.value;
+        this.setState({
+            data: data,
+        });
+    };
+
+    handleSubmit = () => {
+        this.setState({
+            showLoader: true,
+            showErrorAlert: false,
+            showSuccessAlert: false,
+        });
+
+        let data = this.state.data;
+        if (data.title === "") {
+            this.setState({
+                errorMsg: "Enter title",
+                showErrorAlert: true,
+                showLoader: false,
+            });
+        } else if (data.content === "") {
+            this.setState({
+                errorMsg: "Enter content",
+                showErrorAlert: true,
+                showLoader: false,
+            });
+        } else {
+            let body = {
+                title: data.title,
+                content: data.content,
+            };
+
+            if (this.props.course_id === "") {
+                this.props.handlePOST(body);
+            } else {
+                this.handlePUT(body);
+            }
+        }
+    };
+
+    handlePUT = (body) => {
+        fetch(`${this.url}/hod/course/${this.props.course_id}/course_detail/`, {
+            headers: this.headers,
+            method: "PUT",
+            body: JSON.stringify({
+                course_detail: body,
+                subject_id: this.props.subjectId,
+            }),
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        showLoader: false,
+                    });
+                    this.props.handlePOST(body);
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
+
+    render() {
+        return (
+            <Modal
+                show={this.props.show}
+                onHide={this.props.onHide}
+                size="xl"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+                scrollable
+                enforceFocus={false}
+            >
+                <Modal.Header closeButton>Course detail</Modal.Header>
+                <Modal.Body>
+                    <Alert
+                        variant="danger"
+                        show={this.state.showErrorAlert}
+                        onClose={() => {
+                            this.setState({
+                                showErrorAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.errorMsg}
+                    </Alert>
+                    <Alert
+                        variant="success"
+                        show={this.state.showSuccessAlert}
+                        onClose={() => {
+                            this.setState({
+                                showSuccessAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.successMsg}
+                    </Alert>
+
+                    <div className="form-group">
+                        <input
+                            type="text"
+                            name="title"
+                            id="title"
+                            value={this.state.data.title}
+                            className="form-control border-secondary"
+                            placeholder="Enter title"
+                            onChange={this.handleTitle}
+                            autoComplete="off"
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <CKeditor
+                            data={this.state.data.content}
+                            onChange={this.onEditorChange}
+                        />
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <button
+                        className="btn btn-primary btn-sm shadow-none"
+                        onClick={this.handleSubmit}
+                    >
+                        {this.state.showLoader ? (
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                                className="mr-2"
+                            />
+                        ) : (
+                            ""
+                        )}
+                        Save & Close
+                    </button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
+}
+
+class ImageUploadModal extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            file: "",
+            name: "",
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: false,
+        };
+        this.url = baseUrl + hodUrl;
+        this.authToken = localStorage.getItem("Authorization");
+    }
+
+    handleFile = (event) => {
+        this.setState({
+            showSuccessAlert: false,
+            showErrorAlert: false,
+        });
+
+        let extension = event.target.files[0].name.split(".");
+        let format = ["jpg", "jpeg", "png", "webp"];
+
+        if (!format.includes(extension[extension.length - 1].toLowerCase())) {
+            this.setState({
+                errorMsg: "Invalid file format!",
+                showErrorAlert: true,
+                showLoader: false,
+            });
+        } else if (event.target.files[0].size > 5242880) {
+            this.setState({
+                errorMsg: "File size exceeds more then 5MB!",
+                showErrorAlert: true,
+                showLoader: false,
+            });
+        } else {
+            this.setState({
+                file: event.target.files[0],
+                name: event.target.files[0].name,
+            });
+        }
+    };
+
+    handleSubmit = () => {
+        this.setState({
+            showSuccessAlert: false,
+            showErrorAlert: false,
+            showLoader: true,
+        });
+
+        const options = {
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "multipart/form-data",
+                Authorization: this.authToken,
+            },
+        };
+
+        if (this.state.file === "") {
+            this.setState({
+                errorMsg: "Upload a file!",
+                showErrorAlert: true,
+                showLoader: false,
+            });
+        } else {
+            let extension = this.state.name.split(".");
+            let format = ["jpg", "jpeg", "png", "webp"];
+
+            if (
+                !format.includes(extension[extension.length - 1].toLowerCase())
+            ) {
+                this.setState({
+                    errorMsg: "Invalid file format!",
+                    showErrorAlert: true,
+                    showLoader: false,
+                });
+            } else if (this.state.file.size > 5242880) {
+                this.setState({
+                    errorMsg: "File size exceeds more then 5MB!",
+                    showErrorAlert: true,
+                    showLoader: false,
+                });
+            } else {
+                let form_data = new FormData();
+                form_data.append("course_image_1", this.state.file);
+
+                axios
+                    .post(
+                        `${this.url}/hod/course/${this.props.course_id}/image/`,
+                        form_data,
+                        options
+                    )
+                    .then((result) => {
+                        console.log(result);
+                        if (result.data.sts === true) {
+                            this.setState({
+                                successMsg: result.data.msg,
+                                showSuccessAlert: true,
+                                showLoader: false,
+                            });
+                        } else {
+                            this.setState({
+                                errorMsg: result.data.detail
+                                    ? result.data.detail
+                                    : result.data.msg,
+                                showErrorAlert: true,
+                                showLoader: false,
+                            });
+                        }
+                    })
+                    .catch((err) => {
+                        console.warn(err);
+                        if (err.response) {
+                            this.setState({
+                                errorMsg: err.response.data.msg,
+                            });
+                        } else if (err.request) {
+                            this.setState({
+                                errorMsg: err.request.data.msg,
+                            });
+                        } else if (err.message) {
+                            this.setState({
+                                errorMsg: err.message.data.msg,
+                            });
+                        }
+                        this.setState({
+                            showErrorAlert: true,
+                            page_loading: false,
+                        });
+                    });
+            }
+        }
+    };
+
+    render() {
+        return (
+            <Modal
+                show={this.props.show}
+                onHide={this.props.onHide}
+                size="md"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Header closeButton>Upload Image</Modal.Header>
+                <Modal.Body>
+                    <Alert
+                        variant="danger"
+                        show={this.state.showErrorAlert}
+                        onClose={() => {
+                            this.setState({
+                                showErrorAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.errorMsg}
+                    </Alert>
+                    <Alert
+                        variant="success"
+                        show={this.state.showSuccessAlert}
+                        onClose={() => {
+                            this.setState({
+                                showSuccessAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.successMsg}
+                    </Alert>
+
+                    <div className="custom-file">
+                        <input
+                            type="file"
+                            className="custom-file-input"
+                            id="file"
+                            accept="image/*"
+                            aria-describedby="inputGroupFileAddon01"
+                            onChange={(event) => this.handleFile(event)}
+                        />
+                        <label className="custom-file-label" htmlFor="file">
+                            {this.state.name === ""
+                                ? "Choose file"
+                                : this.state.name}
+                        </label>
+                    </div>
+                    <small
+                        className="form-text text-muted"
+                        style={{ marginTop: "0px" }}
+                    >
+                        Select only .png .jpg .jpeg .webp format. Max size is
+                        5MB
+                    </small>
+                </Modal.Body>
+                <Modal.Footer>
+                    <button
+                        className="btn btn-link btn-sm shadow-none mr-2"
+                        onClick={this.props.onHide}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        className="btn btn-primary btn-sm shadow-none"
+                        onClick={this.handleSubmit}
+                    >
+                        {this.state.showLoader ? (
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                                className="mr-2"
+                            />
+                        ) : (
+                            ""
+                        )}
+                        Upload
+                    </button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
+}
+
 class HODCourseConfig extends Component {
     constructor(props) {
         super(props);
@@ -392,6 +805,10 @@ class HODCourseConfig extends Component {
                 title: "",
                 content: "",
             },
+            course_detail: {
+                title: "",
+                content: "",
+            },
             subject_id: "",
 
             chapter_ids: [],
@@ -400,6 +817,8 @@ class HODCourseConfig extends Component {
 
             showScorecardModal: false,
             showNotesModal: false,
+            showDetailsModal: false,
+            showImageModal: false,
             showUnitForm: false,
             activeUnit: "",
 
@@ -448,6 +867,10 @@ class HODCourseConfig extends Component {
                     quickpass.title = result.data.quick_pass_tips.title;
                     quickpass.content = result.data.quick_pass_tips.content;
 
+                    let course_detail = this.state.course_detail;
+                    course_detail.title = result.data.course_detail.title;
+                    course_detail.content = result.data.course_detail.content;
+
                     // setting up course_ids, semester_ids and simulation_ids
                     let chapter_ids = [];
                     let semester_ids = [];
@@ -476,6 +899,7 @@ class HODCourseConfig extends Component {
                             courseData: course,
                             score_card_config: result.data.score_card_config,
                             quick_pass_tips: quickpass,
+                            course_detail: course_detail,
                             subject_id: result.data.subject_id,
                             chapter_ids: chapter_ids,
                             semester_ids: semester_ids,
@@ -600,10 +1024,21 @@ class HODCourseConfig extends Component {
         }, 1000);
     };
 
+    handleCourseDetails = (data) => {
+        setTimeout(() => {
+            this.setState({
+                course_detail: data,
+                showDetailsModal: false,
+            });
+        }, 1000);
+    };
+
     handleInput = (event, type) => {
         let data = this.state.courseData;
-        if (type === "title" || type === "type") {
+        if (type === "title") {
             data[event.target.name] = event.target.value;
+        } else if (type === "type") {
+            data.type = event.value;
         } else if (type === "board") {
             data.board = event.value;
         } else if (type === "limited") {
@@ -890,6 +1325,7 @@ class HODCourseConfig extends Component {
             if (this.state.course_id === "") {
                 body["score_card_config"] = this.state.score_card_config;
                 body["quick_pass_tips"] = this.state.quick_pass_tips;
+                body["course_detail"] = this.state.course_detail;
 
                 this.handlePOST(body);
             } else {
@@ -1032,6 +1468,43 @@ class HODCourseConfig extends Component {
                         course_id={this.state.course_id}
                         data={this.state.quick_pass_tips}
                         handlePOST={this.handleQuickPassNotes}
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* ----- Course details modal ----- */}
+                {this.state.showDetailsModal ? (
+                    <CourseDetails
+                        show={this.state.showDetailsModal}
+                        onHide={() =>
+                            this.setState({
+                                showDetailsModal: false,
+                            })
+                        }
+                        subjectId={
+                            this.subjectId
+                                ? this.subjectId
+                                : this.state.subject_id
+                        }
+                        course_id={this.state.course_id}
+                        data={this.state.course_detail}
+                        handlePOST={this.handleCourseDetails}
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* ----- Image upload modal ----- */}
+                {this.state.showImageModal ? (
+                    <ImageUploadModal
+                        show={this.state.showImageModal}
+                        onHide={() =>
+                            this.setState({
+                                showImageModal: false,
+                            })
+                        }
+                        course_id={this.state.course_id}
                     />
                 ) : (
                     ""
@@ -1282,97 +1755,173 @@ class HODCourseConfig extends Component {
                             <div className="col-md-8">
                                 <div className="card card-body shadow-sm">
                                     {/* Course title & board */}
-                                    <div className="row mb-3">
-                                        <div className="col-md-8">
-                                            <div className="d-flex align-items-center">
-                                                <p className="primary-text font-weight-bold-600 text-nowrap mr-2 mb-0">
-                                                    Course Title
-                                                </p>
-                                                <input
-                                                    type="text"
-                                                    name="course_name"
-                                                    id="course_name"
-                                                    className="form-control borders"
-                                                    placeholder="Enter course title"
-                                                    value={
-                                                        this.state.courseData
-                                                            .course_name
-                                                    }
-                                                    onChange={(event) =>
-                                                        this.handleInput(
-                                                            event,
-                                                            "title"
-                                                        )
-                                                    }
-                                                    autoComplete="off"
-                                                />
-                                            </div>
+                                    <div className="form-row mb-3">
+                                        <div className="col-md-6">
+                                            <label
+                                                htmlFor="course_name"
+                                                className="primary-text font-weight-bold-600"
+                                            >
+                                                Course Title
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="course_name"
+                                                id="course_name"
+                                                className="form-control form-control-lg borders"
+                                                placeholder="Enter course title"
+                                                value={
+                                                    this.state.courseData
+                                                        .course_name
+                                                }
+                                                onChange={(event) =>
+                                                    this.handleInput(
+                                                        event,
+                                                        "title"
+                                                    )
+                                                }
+                                                autoComplete="off"
+                                            />
                                         </div>
-                                        <div className="col-md-4">
-                                            <div className="d-flex align-items-center">
-                                                <p className="primary-text font-weight-bold-600 text-nowrap mr-2 mb-0">
-                                                    Board
-                                                </p>
-                                                <Select
-                                                    className="basic-single borders w-100"
-                                                    placeholder="Select board"
-                                                    isSearchable={true}
-                                                    name="board"
-                                                    id="board"
-                                                    value={
-                                                        this.state.configData
-                                                            .board
-                                                            ? Object.entries(
-                                                                  this.state
-                                                                      .configData
-                                                                      .board
-                                                              ).map(
-                                                                  ([
-                                                                      key,
-                                                                      value,
-                                                                  ]) => {
-                                                                      return this
-                                                                          .state
-                                                                          .courseData
-                                                                          .board ===
-                                                                          key
-                                                                          ? {
-                                                                                label: value,
-                                                                                value: key,
-                                                                            }
-                                                                          : "";
-                                                                  }
-                                                              )
-                                                            : ""
-                                                    }
-                                                    options={
-                                                        this.state.configData
-                                                            .board
-                                                            ? Object.entries(
-                                                                  this.state
-                                                                      .configData
-                                                                      .board
-                                                              ).map(
-                                                                  ([
-                                                                      key,
-                                                                      value,
-                                                                  ]) => {
-                                                                      return {
-                                                                          label: value,
-                                                                          value: key,
-                                                                      };
-                                                                  }
-                                                              )
-                                                            : ""
-                                                    }
-                                                    onChange={(event) =>
-                                                        this.handleInput(
-                                                            event,
-                                                            "board"
-                                                        )
-                                                    }
-                                                    required
-                                                />
+                                        <div className="col-md-6">
+                                            <div className="form-row align-items-center">
+                                                <div className="col-6">
+                                                    <label
+                                                        htmlFor="board"
+                                                        className="primary-text font-weight-bold-600"
+                                                    >
+                                                        Board
+                                                    </label>
+                                                    <Select
+                                                        className="basic-single borders w-100"
+                                                        placeholder="Select board"
+                                                        isSearchable={true}
+                                                        name="board"
+                                                        id="board"
+                                                        value={
+                                                            this.state
+                                                                .configData
+                                                                .board
+                                                                ? Object.entries(
+                                                                      this.state
+                                                                          .configData
+                                                                          .board
+                                                                  ).map(
+                                                                      ([
+                                                                          key,
+                                                                          value,
+                                                                      ]) => {
+                                                                          return this
+                                                                              .state
+                                                                              .courseData
+                                                                              .board ===
+                                                                              key
+                                                                              ? {
+                                                                                    label: value,
+                                                                                    value: key,
+                                                                                }
+                                                                              : "";
+                                                                      }
+                                                                  )
+                                                                : ""
+                                                        }
+                                                        options={
+                                                            this.state
+                                                                .configData
+                                                                .board
+                                                                ? Object.entries(
+                                                                      this.state
+                                                                          .configData
+                                                                          .board
+                                                                  ).map(
+                                                                      ([
+                                                                          key,
+                                                                          value,
+                                                                      ]) => {
+                                                                          return {
+                                                                              label: value,
+                                                                              value: key,
+                                                                          };
+                                                                      }
+                                                                  )
+                                                                : ""
+                                                        }
+                                                        onChange={(event) =>
+                                                            this.handleInput(
+                                                                event,
+                                                                "board"
+                                                            )
+                                                        }
+                                                        required
+                                                    />
+                                                </div>
+                                                <div className="col-6">
+                                                    <label
+                                                        htmlFor="type"
+                                                        className="primary-text font-weight-bold-600"
+                                                    >
+                                                        Type
+                                                    </label>
+                                                    <Select
+                                                        className="basic-single borders w-100"
+                                                        placeholder="Select type"
+                                                        isSearchable={true}
+                                                        name="type"
+                                                        id="type"
+                                                        value={
+                                                            this.state
+                                                                .configData.type
+                                                                ? Object.entries(
+                                                                      this.state
+                                                                          .configData
+                                                                          .type
+                                                                  ).map(
+                                                                      ([
+                                                                          key,
+                                                                          value,
+                                                                      ]) => {
+                                                                          return this
+                                                                              .state
+                                                                              .courseData
+                                                                              .type ===
+                                                                              key
+                                                                              ? {
+                                                                                    label: value,
+                                                                                    value: key,
+                                                                                }
+                                                                              : "";
+                                                                      }
+                                                                  )
+                                                                : ""
+                                                        }
+                                                        options={
+                                                            this.state
+                                                                .configData.type
+                                                                ? Object.entries(
+                                                                      this.state
+                                                                          .configData
+                                                                          .type
+                                                                  ).map(
+                                                                      ([
+                                                                          key,
+                                                                          value,
+                                                                      ]) => {
+                                                                          return {
+                                                                              label: value,
+                                                                              value: key,
+                                                                          };
+                                                                      }
+                                                                  )
+                                                                : ""
+                                                        }
+                                                        onChange={(event) =>
+                                                            this.handleInput(
+                                                                event,
+                                                                "type"
+                                                            )
+                                                        }
+                                                        required
+                                                    />
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -1396,59 +1945,16 @@ class HODCourseConfig extends Component {
                                                     </button>
                                                 </div>
                                                 <div className="col-5">
-                                                    <select
-                                                        name="type"
-                                                        id="type"
-                                                        className="form-control form-control-sm primary-bg text-white"
-                                                        style={{
-                                                            borderRadius: "4px",
+                                                    <button
+                                                        className="btn btn-primary btn-sm shadow-none btn-block"
+                                                        onClick={() => {
+                                                            this.setState({
+                                                                showDetailsModal: true,
+                                                            });
                                                         }}
-                                                        value={
-                                                            this.state
-                                                                .courseData.type
-                                                        }
-                                                        onChange={(event) =>
-                                                            this.handleInput(
-                                                                event,
-                                                                "type"
-                                                            )
-                                                        }
                                                     >
-                                                        <option value="">
-                                                            Select type
-                                                        </option>
-                                                        {this.state.configData
-                                                            .type
-                                                            ? Object.entries(
-                                                                  this.state
-                                                                      .configData
-                                                                      .type
-                                                              ).map(
-                                                                  (
-                                                                      [
-                                                                          key,
-                                                                          value,
-                                                                      ],
-                                                                      index
-                                                                  ) => {
-                                                                      return (
-                                                                          <option
-                                                                              value={
-                                                                                  key
-                                                                              }
-                                                                              key={
-                                                                                  index
-                                                                              }
-                                                                          >
-                                                                              {
-                                                                                  value
-                                                                              }
-                                                                          </option>
-                                                                      );
-                                                                  }
-                                                              )
-                                                            : ""}
-                                                    </select>
+                                                        Course Details
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -1754,35 +2260,57 @@ class HODCourseConfig extends Component {
                                     </div>
 
                                     {/* Save & review */}
-                                    <div className="d-flex justify-content-end">
-                                        <button
-                                            className="btn btn-primary btn-sm shadow-none mr-1"
-                                            onClick={this.handleSubmit}
-                                        >
-                                            Save
-                                        </button>
-                                        <Link
-                                            to={`/hod/course/${this.state.course_id}`}
-                                            onClick={() => {
-                                                store.dispatch({
-                                                    type: "COURSE",
-                                                    payload:
-                                                        this.state.courseData
-                                                            .course_name,
-                                                });
-                                            }}
-                                        >
+                                    <div className="d-flex justify-content-between">
+                                        <div>
+                                            {this.state.course_id !== "" ? (
+                                                <button
+                                                    className="btn btn-primary btn-sm shadow-none px-3"
+                                                    onClick={() => {
+                                                        this.setState({
+                                                            showImageModal: true,
+                                                        });
+                                                    }}
+                                                >
+                                                    Upload Image
+                                                </button>
+                                            ) : (
+                                                ""
+                                            )}
+                                        </div>
+                                        <div>
                                             <button
-                                                className="btn btn-primary btn-sm shadow-none"
-                                                disabled={
-                                                    this.state.course_id === ""
-                                                        ? true
-                                                        : false
-                                                }
+                                                className="btn btn-primary btn-sm shadow-none mr-1"
+                                                onClick={this.handleSubmit}
                                             >
-                                                Review
+                                                {this.state.course_id === ""
+                                                    ? "Save"
+                                                    : "Update"}
                                             </button>
-                                        </Link>
+                                            <Link
+                                                to={`/hod/course/${this.state.course_id}`}
+                                                onClick={() => {
+                                                    store.dispatch({
+                                                        type: "COURSE",
+                                                        payload:
+                                                            this.state
+                                                                .courseData
+                                                                .course_name,
+                                                    });
+                                                }}
+                                            >
+                                                <button
+                                                    className="btn btn-primary btn-sm shadow-none"
+                                                    disabled={
+                                                        this.state.course_id ===
+                                                        ""
+                                                            ? true
+                                                            : false
+                                                    }
+                                                >
+                                                    Review
+                                                </button>
+                                            </Link>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
