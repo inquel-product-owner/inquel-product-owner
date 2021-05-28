@@ -4,10 +4,10 @@ import SideNav from "./shared/sidenav";
 import courseimg from "../../assets/code.jpg";
 import { Link } from "react-router-dom";
 import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
-import CarouselCard from "../sharedComponents/owlCarousel";
+import CarouselCard from "../shared/owlCarousel";
 import Footer from "./shared/footer";
-import Loading from "../sharedComponents/loader";
-import AlertBox from "../sharedComponents/alert";
+import Loading from "../shared/loader";
+import AlertBox from "../shared/alert";
 import { connect } from "react-redux";
 import store from "../../redux/store";
 

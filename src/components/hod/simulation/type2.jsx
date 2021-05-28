@@ -5,13 +5,13 @@ import { Link } from "react-router-dom";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import Select from "react-select";
-import CKeditor, { OptionEditor } from "../../sharedComponents/CKeditor";
-import ReactSwitch from "../../sharedComponents/switchComponent";
+import CKeditor, { OptionEditor } from "../../shared/CKeditor";
+import ReactSwitch from "../../shared/switchComponent";
 import { Accordion, Card, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
-import Loading from "../../sharedComponents/loader";
-import AlertBox from "../../sharedComponents/alert";
-import { ContentDeleteModal } from "../../sharedComponents/contentManagementModal";
+import Loading from "../../shared/loader";
+import AlertBox from "../../shared/alert";
+import { ContentDeleteModal } from "../../shared/contentManagementModal";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
 

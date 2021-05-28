@@ -6,8 +6,8 @@ import profilepic from "../../assets/user-v1.png";
 import Header from "./shared/navbar";
 import SideNav from "./shared/sidenav";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl";
-import Loading from "../sharedComponents/loader";
-import AlertBox from "../sharedComponents/alert";
+import Loading from "../shared/loader";
+import AlertBox from "../shared/alert";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,

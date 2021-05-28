@@ -4,14 +4,14 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
-import CKeditor, { OptionEditor } from "../../sharedComponents/CKeditor";
-import ReactSwitch from "../../sharedComponents/switchComponent";
+import CKeditor, { OptionEditor } from "../../shared/CKeditor";
+import ReactSwitch from "../../shared/switchComponent";
 import { Accordion, Card } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
-import Loading from "../../sharedComponents/loader";
-import AlertBox from "../../sharedComponents/alert";
+import Loading from "../../shared/loader";
+import AlertBox from "../../shared/alert";
 import FileModal from "../shared/fileExplorer";
-import { ContentDeleteModal } from "../../sharedComponents/contentManagementModal";
+import { ContentDeleteModal } from "../../shared/contentManagementModal";
 import TemplateUpload from "../shared/templateUpload";
 
 const mapStateToProps = (state) => ({
@@ -279,53 +279,53 @@ class TeacherType1 extends Component {
             if (response[i].files.length !== 0) {
                 // image
                 imgArr.push({
-                    title: response[i].files[0].type1_image_1_title || "",
+                    title: response[i].files.type1_image_1_title || "",
                     file_name: "",
                     image: null,
-                    path: response[i].files[0].type1_image_1 || "",
+                    path: response[i].files.type1_image_1 || "",
                 });
                 imgArr.push({
-                    title: response[i].files[0].type1_image_2_title || "",
+                    title: response[i].files.type1_image_2_title || "",
                     file_name: "",
                     image: null,
-                    path: response[i].files[0].type1_image_2 || "",
+                    path: response[i].files.type1_image_2 || "",
                 });
                 imgArr.push({
-                    title: response[i].files[0].type1_image_3_title || "",
+                    title: response[i].files.type1_image_3_title || "",
                     file_name: "",
                     image: null,
-                    path: response[i].files[0].type1_image_3 || "",
+                    path: response[i].files.type1_image_3 || "",
                 });
                 imgArr.push({
-                    title: response[i].files[0].type1_image_4_title || "",
+                    title: response[i].files.type1_image_4_title || "",
                     file_name: "",
                     image: null,
-                    path: response[i].files[0].type1_image_4 || "",
+                    path: response[i].files.type1_image_4 || "",
                 });
 
                 // audio
                 audioArr.push({
-                    title: response[i].files[0].type1_audio_1_title || "",
+                    title: response[i].files.type1_audio_1_title || "",
                     file_name: "",
                     audio: null,
-                    path: response[i].files[0].type1_audio_1 || "",
+                    path: response[i].files.type1_audio_1 || "",
                 });
                 audioArr.push({
-                    title: response[i].files[0].type1_audio_2_title || "",
+                    title: response[i].files.type1_audio_2_title || "",
                     file_name: "",
                     audio: null,
-                    path: response[i].files[0].type1_audio_2 || "",
+                    path: response[i].files.type1_audio_2 || "",
                 });
             }
 
             // video
             var path = "";
             if (response[i].files.length !== 0) {
-                if (response[i].files[0].paste_video_url) {
-                    path = response[i].files[0].paste_video_url;
+                if (response[i].files.paste_video_url) {
+                    path = response[i].files.paste_video_url;
                 }
-                if (response[i].files[0].type1_video_1) {
-                    path = response[i].files[0].type1_video_1;
+                if (response[i].files.type1_video_1) {
+                    path = response[i].files.type1_video_1;
                 }
             }
 
@@ -410,8 +410,8 @@ class TeacherType1 extends Component {
                     video: {
                         title:
                             response[i].files.length !== 0 &&
-                            response[i].files[0].type1_video_1_title
-                                ? response[i].files[0].type1_video_1_title
+                            response[i].files.type1_video_1_title
+                                ? response[i].files.type1_video_1_title
                                 : "",
                         file_name: "",
                         video: null,

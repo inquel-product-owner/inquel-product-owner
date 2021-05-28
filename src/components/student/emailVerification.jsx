@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { baseUrl, accountsUrl } from "../../shared/baseUrl.js";
-import Loading from "../sharedComponents/loader";
+import Loading from "../shared/loader";
 
 class EmailVerify extends Component {
     constructor(props) {

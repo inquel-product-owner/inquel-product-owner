@@ -3,12 +3,12 @@ import { connect } from "react-redux";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
-import CKeditor from "../../sharedComponents/CKeditor";
+import CKeditor from "../../shared/CKeditor";
 import { Accordion, Card } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
-import Loading from "../../sharedComponents/loader";
-import AlertBox from "../../sharedComponents/alert";
-import { ContentDeleteModal } from "../../sharedComponents/contentManagementModal";
+import Loading from "../../shared/loader";
+import AlertBox from "../../shared/alert";
+import { ContentDeleteModal } from "../../shared/contentManagementModal";
 import TemplateUpload from "../shared/templateUpload";
 
 const mapStateToProps = (state) => ({

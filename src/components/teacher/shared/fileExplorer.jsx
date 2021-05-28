@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { Modal, Tab, Nav } from "react-bootstrap";
 import { Player } from "video-react";
 import "video-react/dist/video-react.css";
-// import Slider from "react-slick";
 
 class FileModal extends Component {
     constructor(props) {

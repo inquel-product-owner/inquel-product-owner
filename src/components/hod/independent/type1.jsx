@@ -4,10 +4,10 @@ import { Link } from "react-router-dom";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
-import Loading from "../../sharedComponents/loader";
-import AlertBox from "../../sharedComponents/alert";
+import Loading from "../../shared/loader";
+import AlertBox from "../../shared/alert";
 import FileModal from "../shared/fileExplorer";
-import { Type1DataFormat } from "../../sharedComponents/dataFormating";
+import { QuestionDataFormat } from "../../shared/dataFormating";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
@@ -77,9 +77,13 @@ class HODSubjectTypeOne extends Component {
                 console.log(result);
                 if (result.sts === true) {
                     let data = [...this.state.questions];
-                    let response = result.data.results;
-                    if (response.length !== 0) {
-                        let questionData = Type1DataFormat(result);
+                    if (
+                        result.data.results &&
+                        result.data.results.length !== 0
+                    ) {
+                        let questionData = QuestionDataFormat(
+                            result.data.results
+                        );
                         data.push(...questionData.result);
 
                         this.setState(

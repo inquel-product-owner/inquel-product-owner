@@ -4,11 +4,11 @@ import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
-import Loading from "../../sharedComponents/loader";
-import AlertBox from "../../sharedComponents/alert";
+import Loading from "../../shared/loader";
+import AlertBox from "../../shared/alert";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
-import { Type1DataFormat } from "../../sharedComponents/dataFormating";
+import { QuestionDataFormat } from "../../shared/dataFormating";
 import Select from "react-select";
 
 const mapStateToProps = (state) => ({
@@ -77,8 +77,11 @@ class HODQuizPreview extends Component {
                 console.log(result);
                 let data = [...this.state.data];
                 if (result.sts === true) {
-                    if (result.data.results.length !== 0) {
-                        let values = Type1DataFormat(result);
+                    if (
+                        result.data.results &&
+                        result.data.results.length !== 0
+                    ) {
+                        let values = QuestionDataFormat(result.data.results);
                         data.push(...values.result);
 
                         this.setState(
@@ -491,38 +494,42 @@ class HODQuizPreview extends Component {
                                                       </div>
 
                                                       {/* ----- image preview ----- */}
-
-                                                      <div className="ml-3">
-                                                          {data.content.images.map(
-                                                              (
-                                                                  images,
-                                                                  index
-                                                              ) => {
-                                                                  return images.path !==
-                                                                      "" ? (
-                                                                      <div
-                                                                          key={
-                                                                              index
-                                                                          }
-                                                                          className="card preview-img-circle shadow-sm"
-                                                                          style={{
-                                                                              backgroundImage: `url(${images.path})`,
-                                                                          }}
-                                                                          onClick={() =>
-                                                                              this.changeImage(
-                                                                                  data
-                                                                                      .content
-                                                                                      .images,
+                                                      {data.content.images
+                                                          .length !== 0 ? (
+                                                          <div className="ml-3">
+                                                              {data.content.images.map(
+                                                                  (
+                                                                      images,
+                                                                      index
+                                                                  ) => {
+                                                                      return images.path !==
+                                                                          "" ? (
+                                                                          <div
+                                                                              key={
                                                                                   index
-                                                                              )
-                                                                          }
-                                                                      ></div>
-                                                                  ) : (
-                                                                      ""
-                                                                  );
-                                                              }
-                                                          )}
-                                                      </div>
+                                                                              }
+                                                                              className="card preview-img-circle shadow-sm"
+                                                                              style={{
+                                                                                  backgroundImage: `url(${images.path})`,
+                                                                              }}
+                                                                              onClick={() =>
+                                                                                  this.changeImage(
+                                                                                      data
+                                                                                          .content
+                                                                                          .images,
+                                                                                      index
+                                                                                  )
+                                                                              }
+                                                                          ></div>
+                                                                      ) : (
+                                                                          ""
+                                                                      );
+                                                                  }
+                                                              )}
+                                                          </div>
+                                                      ) : (
+                                                          ""
+                                                      )}
                                                   </div>
                                               </div>
                                               {/* ----- Answer type tag ----- */}

@@ -3,9 +3,9 @@ import SideNav from "./shared/sidenav";
 import Header from "./shared/navbar";
 import { Tabs, Tab } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import Loading from "../sharedComponents/loader";
+import Loading from "../shared/loader";
 import LeaderboardTable from "../table/leaderboard";
-import Paginations from "../sharedComponents/pagination";
+import Paginations from "../shared/pagination";
 import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
 import { paginationCount } from "../../shared/globalValues.js";
 

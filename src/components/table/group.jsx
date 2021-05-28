@@ -28,7 +28,7 @@ function teacherView(props) {
         <>
             <span>{props.teachers.length}</span>
             <Link to={`/hod/group/${props.id}/teacher`}>
-                <button className="btn btn-light btn-sm ml-2 shadow-sm">
+                <button className="btn btn-light btn-sm ml-2 shadow-sm shadow-none">
                     <i className="fas fa-eye fa-sm"></i>
                 </button>
             </Link>
@@ -41,7 +41,7 @@ function studentView(props) {
         <>
             <span>{props.students.length}</span>
             <Link to={`/hod/group/${props.id}/student`}>
-                <button className="btn btn-light btn-sm ml-2 shadow-sm">
+                <button className="btn btn-light btn-sm ml-2 shadow-sm shadow-none">
                     <i className="fas fa-eye fa-sm"></i>
                 </button>
             </Link>
@@ -52,7 +52,7 @@ function studentView(props) {
 function detailsView(props) {
     return (
         <Link to={`/hod/group/${props.id}/details`}>
-            <button className="btn btn-light btn-sm shadow-sm">
+            <button className="btn btn-light btn-sm shadow-sm shadow-none">
                 <i className="fas fa-eye fa-sm"></i>
             </button>
         </Link>
@@ -118,7 +118,7 @@ class GroupTable extends Component {
         return (
             <Link to={`/${this.props.path}/group/${props.id}`}>
                 <button
-                    className="btn btn-link btn-sm"
+                    className="btn btn-link btn-sm shadow-none"
                     onClick={() => this.dispatch(props.group_name)}
                 >
                     <i className="fas fa-eye"></i>
@@ -150,7 +150,6 @@ class GroupTable extends Component {
                         allowSorting={true}
                         allowSelection={true}
                         allowTextWrap={true}
-                        // allowResizing={true}
                         selectionSettings={this.select}
                         toolbar={this.toolbarOptions}
                         rowSelected={this.rowSelected.bind(this)}

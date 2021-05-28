@@ -3,8 +3,8 @@ import Header from "./shared/examNavbar";
 import { Link } from "react-router-dom";
 import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import AlertBox from "../sharedComponents/alert";
-import Loading from "../sharedComponents/loader";
+import AlertBox from "../shared/alert";
+import Loading from "../shared/loader";
 
 function remarksCondition(data) {
     let remarks = "";

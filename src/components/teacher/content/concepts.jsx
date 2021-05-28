@@ -4,15 +4,15 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
-import CKeditor from "../../sharedComponents/CKeditor";
-import ReactSwitch from "../../sharedComponents/switchComponent";
+import CKeditor from "../../shared/CKeditor";
+import ReactSwitch from "../../shared/switchComponent";
 import { Accordion, Card } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
 import ReactCardFlip from "react-card-flip";
-import Loading from "../../sharedComponents/loader";
-import AlertBox from "../../sharedComponents/alert";
+import Loading from "../../shared/loader";
+import AlertBox from "../../shared/alert";
 import FileModal from "../shared/fileExplorer";
-import { ContentDeleteModal } from "../../sharedComponents/contentManagementModal";
+import { ContentDeleteModal } from "../../shared/contentManagementModal";
 import TemplateUpload from "../shared/templateUpload";
 
 const mapStateToProps = (state) => ({

@@ -8,9 +8,9 @@ import { Link } from "react-router-dom";
 import { Spinner } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
 import { Document, Page, pdfjs } from "react-pdf";
-import Loading from "../../sharedComponents/loader";
-import AlertBox from "../../sharedComponents/alert";
-import { ContentDeleteModal } from "../../sharedComponents/contentManagementModal";
+import Loading from "../../shared/loader";
+import AlertBox from "../../shared/alert";
+import { ContentDeleteModal } from "../../shared/contentManagementModal";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,

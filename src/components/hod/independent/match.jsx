@@ -4,8 +4,8 @@ import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
-import Loading from "../../sharedComponents/loader";
-import AlertBox from "../../sharedComponents/alert";
+import Loading from "../../shared/loader";
+import AlertBox from "../../shared/alert";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,

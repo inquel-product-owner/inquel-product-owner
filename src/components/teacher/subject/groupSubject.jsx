@@ -6,12 +6,12 @@ import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
-import Loading from "../../sharedComponents/loader";
-import AlertBox from "../../sharedComponents/alert";
+import Loading from "../../shared/loader";
+import AlertBox from "../../shared/alert";
 import {
     ContentDeleteModal,
     ContentUpdateModal,
-} from "../../sharedComponents/contentManagementModal";
+} from "../../shared/contentManagementModal";
 import {
     ChapterList,
     ChapterModal,

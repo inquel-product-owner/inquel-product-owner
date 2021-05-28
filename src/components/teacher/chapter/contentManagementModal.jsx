@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Modal, Alert, Spinner } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
-import ReactSwitch from "../../sharedComponents/switchComponent";
+import ReactSwitch from "../../shared/switchComponent";
 
 export class TopicModal extends Component {
     constructor(props) {

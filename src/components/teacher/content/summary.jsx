@@ -8,10 +8,10 @@ import { Link } from "react-router-dom";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { Modal, Alert, Spinner } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
-import CKeditor from "../../sharedComponents/CKeditor";
-import Loading from "../../sharedComponents/loader";
-import AlertBox from "../../sharedComponents/alert";
-import { ContentDeleteModal } from "../../sharedComponents/contentManagementModal";
+import CKeditor from "../../shared/CKeditor";
+import Loading from "../../shared/loader";
+import AlertBox from "../../shared/alert";
+import { ContentDeleteModal } from "../../shared/contentManagementModal";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,

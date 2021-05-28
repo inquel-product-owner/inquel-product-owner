@@ -6,15 +6,10 @@ import SideNav from "./shared/sidenav";
 import { Link } from "react-router-dom";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import { paginationCount } from "../../shared/globalValues.js";
-import Loading from "../sharedComponents/loader";
-import Paginations from "../sharedComponents/pagination";
+import Loading from "../shared/loader";
+import Paginations from "../shared/pagination";
 import StudentTable from "../table/student";
-import AlertBox from "../sharedComponents/alert";
-import {
-    UserDeleteModal,
-    UserDisableModal,
-    UserEnableModal,
-} from "../sharedComponents/userManagementModal";
+import AlertBox from "../shared/alert";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
@@ -25,7 +20,6 @@ class TeacherGroupStudents extends Component {
         super(props);
         this.state = {
             showSideNav: false,
-            groupItem: [],
             studentItem: [],
             selectedStudent: [],
             activeStudentPage: 1,
@@ -156,16 +150,12 @@ class TeacherGroupStudents extends Component {
     }
 
     render() {
-        document.title =
-            this.state.groupItem.length !== 0
-                ? this.state.groupItem.group_name +
-                  " Student List - Teacher | IQLabs"
-                : "Group Student List - Teacher | IQLabs";
+        document.title = this.props.group_name + " - Teacher | IQLabs";
         return (
             <div className="wrapper">
                 {/* Navbar */}
                 <Header
-                    name={this.state.groupItem.group_name}
+                    name={this.props.group_name}
                     togglenav={this.toggleSideNav}
                 />
 
@@ -192,57 +182,6 @@ class TeacherGroupStudents extends Component {
                     shownav={this.state.showSideNav}
                     activeLink="dashboard"
                 />
-
-                {/* Student Delete Modal */}
-                {this.state.showStudent_DeleteModal ? (
-                    <UserDeleteModal
-                        show={this.state.showStudent_DeleteModal}
-                        onHide={this.handleDelete}
-                        toggleModal={this.handleDelete}
-                        formSubmission={this.formSubmission}
-                        url={`${this.url}/teacher/group/${this.groupId}/student/`}
-                        data={this.state.selectedStudent}
-                        field="student_ids"
-                        type="Student"
-                        token="Authorization"
-                    />
-                ) : (
-                    ""
-                )}
-
-                {/* Student Disable Modal */}
-                {this.state.showStudent_DisableModal ? (
-                    <UserDisableModal
-                        show={this.state.showStudent_DisableModal}
-                        onHide={this.handleDisable}
-                        toggleModal={this.handleDisable}
-                        formSubmission={this.formSubmission}
-                        url={`${this.url}/teacher/group/${this.groupId}/student/`}
-                        data={this.state.selectedStudent}
-                        field="student_ids"
-                        type="Student"
-                        token="Authorization"
-                    />
-                ) : (
-                    ""
-                )}
-
-                {/* Student Enable Modal */}
-                {this.state.showStudent_EnableModal ? (
-                    <UserEnableModal
-                        show={this.state.showStudent_EnableModal}
-                        onHide={this.handleEnable}
-                        toggleModal={this.handleEnable}
-                        formSubmission={this.formSubmission}
-                        url={`${this.url}/teacher/group/${this.groupId}/student/`}
-                        data={this.state.selectedStudent}
-                        field="student_ids"
-                        type="Student"
-                        token="Authorization"
-                    />
-                ) : (
-                    ""
-                )}
 
                 <div
                     className={`section content ${
@@ -287,24 +226,6 @@ class TeacherGroupStudents extends Component {
                             </div>
                             <div className="col-md-6">
                                 <div className="d-flex flex-wrap justify-content-end">
-                                    {/* <button
-                                        className="btn btn-primary btn-sm shadow-none mr-1"
-                                        onClick={this.handleDelete}
-                                    >
-                                        Delete
-                                    </button>
-                                    <button
-                                        className="btn btn-primary btn-sm shadow-none mr-1"
-                                        onClick={this.handleEnable}
-                                    >
-                                        Enable
-                                    </button>
-                                    <button
-                                        className="btn btn-primary btn-sm shadow-none mr-1"
-                                        onClick={this.handleDisable}
-                                    >
-                                        Disable
-                                    </button> */}
                                     <Dropdown>
                                         <Dropdown.Toggle
                                             variant="primary"

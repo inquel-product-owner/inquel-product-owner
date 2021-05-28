@@ -94,7 +94,6 @@ class LeaderboardTable extends Component {
                         allowFiltering={true}
                         allowSorting={true}
                         allowSelection={true}
-                        // allowResizing={true}
                         selectionSettings={this.select}
                         toolbar={this.toolbarOptions}
                     >

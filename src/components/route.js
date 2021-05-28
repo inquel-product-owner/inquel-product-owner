@@ -49,11 +49,14 @@ import HODSubjectTypeTwo from "./hod/independent/type2";
 import HODCyclePreview from "./hod/preview/cycle";
 import HODSemesterPreview from "./hod/preview/semester";
 import HODQuizPreview from "./hod/preview/quiz";
+import HODSimulationPaperPreview from "./hod/preview/simulationPaper";
+import HODSimulationSectionPreview from "./hod/preview/simulationSection";
 
 import HODCourse from "./hod/course/course";
 import HODCourseConfig from "./hod/course/configuration";
 import HODCourseSummary from "./hod/course/summary";
 import HODCourseNotes from "./hod/course/notes";
+import HODCourseFlashCard from "./hod/course/learnFlashCard";
 
 import HODSimulationPaper from "./hod/simulation/paper";
 import HODSimulationSection from "./hod/simulation/section";
@@ -137,7 +140,7 @@ import StudyPlanner from "./student/study-planner/";
 
 // -------------------- General Imports --------------------
 
-import { ForgotPassword } from "./sharedComponents/forgotPassword";
+import { ForgotPassword } from "./shared/forgotPassword";
 import errorPage from "./404";
 
 const routes = (
@@ -497,6 +500,18 @@ const routes = (
                 )
             }
         />
+        <Route
+            exact
+            path="/hod/subject/:subjectId/simulation/:simulationId/paper/:paperId/preview"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <HODSimulationSectionPreview {...props} />
+                )
+            }
+        />
 
         {/* ---------- Course ---------- */}
 
@@ -562,6 +577,18 @@ const routes = (
         />
         <Route
             exact
+            path="/hod/course/:courseId/chapter/:chapterId/:topicNum/learn"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <HODCourseFlashCard {...props} />
+                )
+            }
+        />
+        <Route
+            exact
             path="/hod/course/:courseId/chapter/:chapterId/cycle/:cycleId"
             render={(props) =>
                 !localStorage.getItem("Authorization") ||
@@ -593,6 +620,30 @@ const routes = (
                     <Redirect to="/hod/login" />
                 ) : (
                     <HODQuizPreview {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/hod/course/:courseId/simulation/:simulationId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <HODSimulationPaperPreview {...props} />
+                )
+            }
+        />
+        <Route
+            exact
+            path="/hod/course/:courseId/simulation/:simulationId/paper/:paperId"
+            render={(props) =>
+                !localStorage.getItem("Authorization") ||
+                !localStorage.getItem("is_hod") ? (
+                    <Redirect to="/hod/login" />
+                ) : (
+                    <HODSimulationSectionPreview {...props} />
                 )
             }
         />

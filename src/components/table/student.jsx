@@ -145,7 +145,7 @@ class StudentTable extends Component {
     viewTemplate = (props) => {
         return (
             <Link to={`/${this.props.path}/student/${props.id}`}>
-                <button className="btn btn-link btn-sm">
+                <button className="btn btn-link btn-sm shadow-none">
                     <i className="fas fa-eye"></i>
                 </button>
             </Link>
@@ -170,7 +170,6 @@ class StudentTable extends Component {
                         allowFiltering={true}
                         allowSorting={true}
                         allowSelection={true}
-                        // allowResizing={true}
                         selectionSettings={this.select}
                         toolbar={this.toolbarOptions}
                         rowSelected={this.rowSelected.bind(this)}

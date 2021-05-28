@@ -4,9 +4,9 @@ import SideNav from "./sidenav";
 import profilepic from "../../assets/user-v1.png";
 import { Tab, Row, Col, Nav, Badge } from "react-bootstrap";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
-import Loading from "../sharedComponents/loader";
+import Loading from "../shared/loader";
 import { Link } from "react-router-dom";
-import AlertBox from "../sharedComponents/alert";
+import AlertBox from "../shared/alert";
 
 function EmptyData() {
     return (

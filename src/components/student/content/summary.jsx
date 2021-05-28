@@ -3,8 +3,8 @@ import { Tab, Nav } from "react-bootstrap";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
-import Loading from "../../sharedComponents/loader";
-import AlertBox from "../../sharedComponents/alert";
+import Loading from "../../shared/loader";
+import AlertBox from "../../shared/alert";
 import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
 import { Document, Page, pdfjs } from "react-pdf";
 

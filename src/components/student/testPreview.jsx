@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import Header from "./shared/examNavbar";
 import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
-import AlertBox from "../sharedComponents/alert";
-import Loading from "../sharedComponents/loader";
+import AlertBox from "../shared/alert";
+import Loading from "../shared/loader";
 import { Document, Page, pdfjs } from "react-pdf";
 import dateFormat from "dateformat";
 import { Modal } from "react-bootstrap";
@@ -630,7 +630,7 @@ class TestPreview extends Component {
                                                               }}
                                                           ></div>
 
-                                                          <div className="row w-100 mb-2">
+                                                          <div className="row mb-2">
                                                               {/* ---------- Student answers ---------- */}
                                                               <div className="col-md-5">
                                                                   <div

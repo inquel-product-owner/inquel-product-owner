@@ -5,10 +5,10 @@ import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import ReactCardFlip from "react-card-flip";
-import Loading from "../../sharedComponents/loader";
-import AlertBox from "../../sharedComponents/alert";
+import Loading from "../../shared/loader";
+import AlertBox from "../../shared/alert";
 import FileModal from "../shared/fileExplorer";
-import { ConceptFormat } from "../../sharedComponents/dataFormating";
+import { ConceptDataFormat } from "../../shared/dataFormating";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
@@ -79,9 +79,13 @@ class HODSubjectConcepts extends Component {
                 console.log(result);
                 if (result.sts === true) {
                     let data = [...this.state.concepts];
-                    let response = result.data.results;
-                    if (response.length !== 0) {
-                        let conceptData = ConceptFormat(result);
+                    if (
+                        result.data.results &&
+                        result.data.results.length !== 0
+                    ) {
+                        let conceptData = ConceptDataFormat(
+                            result.data.results
+                        );
                         data.push(...conceptData.result);
 
                         this.setState(

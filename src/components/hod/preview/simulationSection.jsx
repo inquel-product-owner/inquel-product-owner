@@ -9,16 +9,15 @@ import AlertBox from "../../shared/alert";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
 import { QuestionDataFormat } from "../../shared/dataFormating";
-import Select from "react-select";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
     course_name: state.content.course_name,
-    chapter_name: state.content.chapter_name,
-    cycle_name: state.content.cycle_name,
+    simulation_name: state.content.simulation_name,
+    paper_name: state.content.paper_name,
 });
 
-class HODCyclePreview extends Component {
+class HODSimulationSectionPreview extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -27,9 +26,7 @@ class HODCyclePreview extends Component {
             type: "",
             duration: "",
             sections: [],
-            attempts: [],
             sectionId: "",
-            selectedAttempt: "",
 
             selectedImageData: [],
             startIndex: 0,
@@ -48,8 +45,8 @@ class HODCyclePreview extends Component {
         };
         this.subjectId = this.props.match.params.subjectId;
         this.courseId = this.props.match.params.courseId;
-        this.chapterId = this.props.match.params.chapterId;
-        this.cycleId = this.props.match.params.cycleId;
+        this.simulationId = this.props.match.params.simulationId;
+        this.paperId = this.props.match.params.paperId;
         this.url = baseUrl + hodUrl;
         this.authToken = localStorage.getItem("Authorization");
         this.headers = {
@@ -70,8 +67,8 @@ class HODCyclePreview extends Component {
         var apiURL =
             path === undefined || path === null
                 ? this.subjectId
-                    ? `${this.url}/hod/subject/${this.subjectId}/chapter/${this.chapterId}/cycle_test/${this.cycleId}/${this.state.sectionId}/?attempt_number=${this.state.selectedAttempt}`
-                    : `${this.url}/hod/course/${this.courseId}/review/chapter/${this.chapterId}/${this.cycleId}/${this.state.sectionId}/?attempt_number=${this.state.selectedAttempt}`
+                    ? `${this.url}/hod/subject/${this.subjectId}/simulation/${this.simulationId}/cycle_test/${this.paperId}/${this.state.sectionId}/`
+                    : `${this.url}/hod/course/${this.courseId}/review/simulation/${this.simulationId}/${this.paperId}/${this.state.sectionId}/`
                 : path;
         await fetch(apiURL, {
             method: "GET",
@@ -87,11 +84,8 @@ class HODCyclePreview extends Component {
                     ...this.state.currentSubQuestionIndex,
                 ];
                 if (result.sts === true) {
-                    if (
-                        result.data.results &&
-                        result.data.results.length !== 0
-                    ) {
-                        let values = QuestionDataFormat(result.data.results);
+                    if (result.data && result.data.length !== 0) {
+                        let values = QuestionDataFormat(result.data);
                         type = values.type;
                         data.push(...values.result);
                         totalSubQuestion.push(...values.totalSubQuestion);
@@ -103,10 +97,6 @@ class HODCyclePreview extends Component {
                             {
                                 data: data,
                                 type: type,
-                                duration:
-                                    result.duration !== undefined
-                                        ? result.duration
-                                        : 0,
                                 totalSubQuestion: totalSubQuestion,
                                 currentSubQuestionIndex:
                                     currentSubQuestionIndex,
@@ -142,8 +132,8 @@ class HODCyclePreview extends Component {
 
     loadSectionData = () => {
         let apiURL = this.subjectId
-            ? `${this.url}/hod/subject/${this.subjectId}/chapter/${this.chapterId}/cycle_test/${this.cycleId}/attempt/`
-            : `${this.url}/hod/course/${this.courseId}/review/chapter/${this.chapterId}/${this.cycleId}/attempt/`;
+            ? `${this.url}/hod/subject/${this.subjectId}/simulation/${this.simulationId}/cycle_test/${this.paperId}/attempt/`
+            : `${this.url}/hod/course/${this.courseId}/review/simulation/${this.simulationId}/${this.paperId}/`;
         fetch(apiURL, {
             method: "GET",
             headers: this.headers,
@@ -154,11 +144,9 @@ class HODCyclePreview extends Component {
                 if (result.sts === true) {
                     this.setState(
                         {
-                            sections: result.data.sections,
-                            attempts: result.data.attempts,
-                            sectionId: result.data.sections[0].section_id,
-                            selectedAttempt: result.data.attempts[0].name,
-                            totalSection: result.data.sections.length,
+                            sections: result.data,
+                            sectionId: result.data[0].section_id,
+                            totalSection: result.data.length,
                         },
                         () => {
                             this.loadQAData();
@@ -178,7 +166,7 @@ class HODCyclePreview extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.props.cycle_name} - HOD | IQLabs`;
+        document.title = `${this.props.paper_name} - HOD | IQLabs`;
 
         this.loadSectionData();
     };
@@ -324,90 +312,44 @@ class HODCyclePreview extends Component {
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
 
-                        <div className="row align-items-center mb-3">
-                            <div className="col-lg-8 mb-2 mb-lg-0">
-                                {/* ----- Breadcrumb ----- */}
-                                <nav aria-label="breadcrumb">
-                                    <ol className="breadcrumb">
-                                        <li className="breadcrumb-item">
-                                            <Link to="/hod">
-                                                <i className="fas fa-home fa-sm"></i>
-                                            </Link>
-                                        </li>
-                                        {this.subjectId ? (
-                                            <li className="breadcrumb-item">
-                                                <Link
-                                                    to={`/hod/subject/${this.subjectId}`}
-                                                >
-                                                    {this.props.subject_name}
-                                                </Link>
-                                            </li>
-                                        ) : (
-                                            <li className="breadcrumb-item">
-                                                <Link
-                                                    to={`/hod/course/${this.courseId}`}
-                                                >
-                                                    {this.props.course_name}
-                                                </Link>
-                                            </li>
-                                        )}
-                                        <li className="breadcrumb-item">
-                                            <Link
-                                                to="#"
-                                                onClick={
-                                                    this.props.history.goBack
-                                                }
-                                            >
-                                                {this.props.chapter_name}
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item active">
-                                            {this.props.cycle_name}
-                                        </li>
-                                    </ol>
-                                </nav>
-                            </div>
-                            <div className="col-lg-4">
-                                <Select
-                                    className="basic-single form-shadow"
-                                    placeholder="Select attempt"
-                                    isSearchable={true}
-                                    name="attempt"
-                                    value={(this.state.attempts || []).map(
-                                        (data) => {
-                                            return data.name ===
-                                                this.state.selectedAttempt
-                                                ? {
-                                                      value: data.name,
-                                                      label: data.name,
-                                                  }
-                                                : "";
-                                        }
-                                    )}
-                                    options={(this.state.attempts || []).map(
-                                        (data) => {
-                                            return {
-                                                value: data.name,
-                                                label: data.name,
-                                            };
-                                        }
-                                    )}
-                                    onChange={(event) => {
-                                        this.setState(
-                                            {
-                                                selectedAttempt: event.value,
-                                                data: [],
-                                                totalSubQuestion: [],
-                                                currentSubQuestionIndex: [],
-                                                page_loading: true,
-                                            },
-                                            () => this.loadQAData()
-                                        );
-                                    }}
-                                    required
-                                />
-                            </div>
-                        </div>
+                        {/* ----- Breadcrumb ----- */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb mb-3">
+                                <li className="breadcrumb-item">
+                                    <Link to="/hod">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                {this.subjectId ? (
+                                    <li className="breadcrumb-item">
+                                        <Link
+                                            to={`/hod/subject/${this.subjectId}`}
+                                        >
+                                            {this.props.subject_name}
+                                        </Link>
+                                    </li>
+                                ) : (
+                                    <li className="breadcrumb-item">
+                                        <Link
+                                            to={`/hod/course/${this.courseId}`}
+                                        >
+                                            {this.props.course_name}
+                                        </Link>
+                                    </li>
+                                )}
+                                <li className="breadcrumb-item">
+                                    <Link
+                                        to="#"
+                                        onClick={this.props.history.goBack}
+                                    >
+                                        {this.props.simulation_name}
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    {this.props.paper_name}
+                                </li>
+                            </ol>
+                        </nav>
 
                         {/* Header */}
                         <div className="card primary-bg text-white small mb-4">
@@ -422,19 +364,14 @@ class HODCyclePreview extends Component {
                                     </div>
                                     <div className="col-lg-5 col-md-7">
                                         <div className="row">
-                                            <div className="col-4">
-                                                {this.state.selectedAttempt}
-                                            </div>
+                                            <div className="col-4"></div>
                                             <div className="col-4">
                                                 {this.state.data.length !== 0
                                                     ? this.state.data.length
                                                     : "0"}{" "}
                                                 Questions
                                             </div>
-                                            <div className="col-4">
-                                                Total time:{" "}
-                                                {this.state.duration} mins
-                                            </div>
+                                            <div className="col-4"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -976,4 +913,4 @@ class HODCyclePreview extends Component {
     }
 }
 
-export default connect(mapStateToProps)(HODCyclePreview);
+export default connect(mapStateToProps)(HODSimulationSectionPreview);

@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import Header from "../shared/examNavbar";
 import ReactCardFlip from "react-card-flip";
 import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
-import AlertBox from "../../sharedComponents/alert";
-import Loading from "../../sharedComponents/loader";
+import AlertBox from "../../shared/alert";
+import Loading from "../../shared/loader";
 import { OverlayTrigger, Tooltip, Popover, Modal } from "react-bootstrap";
 import FullScreen from "react-fullscreen-crossbrowser";
 import { Player } from "video-react";
@@ -11,9 +11,9 @@ import "video-react/dist/video-react.css";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
 import {
-    ConceptFormat,
-    DataFormat,
-} from "../../sharedComponents/dataFormating";
+    ConceptDataFormat,
+    QuestionDataFormat,
+} from "../../shared/dataFormating";
 
 class VideoModal extends Component {
     constructor(props) {
@@ -108,12 +108,9 @@ class FavouritesFlashcard extends Component {
     // ---------- loads concepts data ----------
 
     loadConceptData = async () => {
-        let result = {
-            data: {
-                results: JSON.parse(sessionStorage.getItem("data")),
-            },
-        };
-        let response = ConceptFormat(result);
+        let response = ConceptDataFormat(
+            JSON.parse(sessionStorage.getItem("data"))
+        );
         await this.setState({
             data: response.result,
             totalItems: response.result.length,
@@ -211,9 +208,18 @@ class FavouritesFlashcard extends Component {
                                 ></div>
                             </div>
                             {/* <!----- Image & Video viewer -----> */}
-                            <div className="ml-3">
-                                {this.imageRender(data[index])}
-                            </div>
+                            {data[index] ? (
+                                data[index].content.images.length !== 0 ||
+                                data[index].content.video.path !== "" ? (
+                                    <div className="ml-3">
+                                        {this.imageRender(data[index])}
+                                    </div>
+                                ) : (
+                                    ""
+                                )
+                            ) : (
+                                ""
+                            )}
                             {/* <!-- Image viewer ends here --> */}
                         </div>
                         <button
@@ -246,29 +252,15 @@ class FavouritesFlashcard extends Component {
     // ---------- loads practice data ----------
 
     loadPracticeData = async () => {
-        let result = {
-            data: {
-                results: JSON.parse(sessionStorage.getItem("data")),
-            },
-        };
-        let response = DataFormat(result);
-        let totalSubQuestion = [];
-        let currentSubQuestionIndex = [];
-        response.result.forEach((question) => {
-            if (question.type === "type_1") {
-                totalSubQuestion.push(0);
-                currentSubQuestionIndex.push(0);
-            } else {
-                totalSubQuestion.push(question.sub_question.length);
-                currentSubQuestionIndex.push(0);
-            }
-        });
+        let response = QuestionDataFormat(
+            JSON.parse(sessionStorage.getItem("data"))
+        );
         await this.setState(
             {
                 data: response.result,
                 totalItems: response.result.length,
-                totalSubQuestion: totalSubQuestion,
-                currentSubQuestionIndex: currentSubQuestionIndex,
+                totalSubQuestion: response.totalSubQuestion,
+                currentSubQuestionIndex: response.currentSubQuestionIndex,
             },
             () => {
                 this.loopSectionStructure();
@@ -398,6 +390,24 @@ class FavouritesFlashcard extends Component {
         this.setState({
             sections: sections,
         });
+    };
+
+    handleEventChange = (event, index) => {
+        let sections = [...this.state.sections];
+        if (event.target.checked) {
+            sections[index].answers.splice(
+                sections[index].answers.indexOf(event.target.value),
+                1
+            );
+            this.setState({
+                sections: sections,
+            });
+        } else {
+            sections[index].answers.push(event.target.value);
+            this.setState({
+                sections: sections,
+            });
+        }
     };
 
     practiceRender = (data, index, section, explanation) => {
@@ -614,7 +624,12 @@ class FavouritesFlashcard extends Component {
                                                                             }
                                                                             onChange={(
                                                                                 e
-                                                                            ) => {}}
+                                                                            ) => {
+                                                                                this.handleEventChange(
+                                                                                    e,
+                                                                                    index
+                                                                                );
+                                                                            }}
                                                                         />
                                                                         <label
                                                                             className="custom-control-label"
@@ -839,9 +854,18 @@ class FavouritesFlashcard extends Component {
                             )}
                         </div>
                         {/* <!----- Image & Video viewer -----> */}
-                        <div className="ml-3">
-                            {this.imageRender(data[index])}
-                        </div>
+                        {data[index] ? (
+                            data[index].content.images.length !== 0 ||
+                            data[index].content.video.path !== "" ? (
+                                <div className="ml-3">
+                                    {this.imageRender(data[index])}
+                                </div>
+                            ) : (
+                                ""
+                            )
+                        ) : (
+                            ""
+                        )}
                         {/* <!-- Image viewer ends here --> */}
                     </div>
                 ) : (
@@ -1217,7 +1241,18 @@ class FavouritesFlashcard extends Component {
                     </div>
                 </div>
                 {/* <!----- Image & Video viewer -----> */}
-                <div className="ml-3">{this.imageRender(data[index])}</div>
+                {data[index] ? (
+                    data[index].content.images.length !== 0 ||
+                    data[index].content.video.path !== "" ? (
+                        <div className="ml-3">
+                            {this.imageRender(data[index])}
+                        </div>
+                    ) : (
+                        ""
+                    )
+                ) : (
+                    ""
+                )}
                 {/* <!-- Image viewer ends here --> */}
             </div>
         );
@@ -1518,37 +1553,31 @@ class FavouritesFlashcard extends Component {
                           );
                       })
                     : ""}
-                {data !== undefined &&
-                data.content !== undefined &&
-                data.content.video !== undefined ? (
-                    data.content.video.path !== "" ? (
-                        <OverlayTrigger
-                            key="top5"
-                            placement="top"
-                            overlay={<Tooltip id="tooltip4">Video</Tooltip>}
+                {data.content.video.path !== "" ? (
+                    <OverlayTrigger
+                        key="top5"
+                        placement="top"
+                        overlay={<Tooltip id="tooltip4">Video</Tooltip>}
+                    >
+                        <button
+                            className="btn btn-primary-invert btn-sm shadow-sm rounded-circle shadow-none mt-1"
+                            onClick={(e) => {
+                                this.toggleVideoModal(data.content.video);
+                                e.stopPropagation();
+                                this.pauseSlideshow();
+                            }}
                         >
-                            <button
-                                className="btn btn-primary-invert btn-sm shadow-sm rounded-circle shadow-none mt-1"
-                                onClick={(e) => {
-                                    this.toggleVideoModal(data.content.video);
-                                    e.stopPropagation();
-                                    this.pauseSlideshow();
+                            <i
+                                className="fas fa-video fa-sm"
+                                style={{
+                                    marginLeft: "4px",
+                                    marginRight: "1px",
+                                    marginBottom: "7px",
+                                    marginTop: "7px",
                                 }}
-                            >
-                                <i
-                                    className="fas fa-video fa-sm"
-                                    style={{
-                                        marginLeft: "4px",
-                                        marginRight: "1px",
-                                        marginBottom: "7px",
-                                        marginTop: "7px",
-                                    }}
-                                ></i>
-                            </button>
-                        </OverlayTrigger>
-                    ) : (
-                        ""
-                    )
+                            ></i>
+                        </button>
+                    </OverlayTrigger>
                 ) : (
                     ""
                 )}

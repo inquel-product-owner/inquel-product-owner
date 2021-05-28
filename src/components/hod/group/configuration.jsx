@@ -5,11 +5,11 @@ import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import { paginationCount } from "../../../shared/globalValues.js";
-import Loading from "../../sharedComponents/loader";
+import Loading from "../../shared/loader";
 import GroupTable from "../../table/group";
-import Paginations from "../../sharedComponents/pagination";
+import Paginations from "../../shared/pagination";
 import dateFormat from "dateformat";
-import AlertBox from "../../sharedComponents/alert";
+import AlertBox from "../../shared/alert";
 
 class GroupModal extends Component {
     constructor() {

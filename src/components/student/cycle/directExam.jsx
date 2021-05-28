@@ -3,8 +3,8 @@ import axios from "axios";
 import Header from "../shared/examNavbar";
 import { Spinner } from "react-bootstrap";
 import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
-import AlertBox from "../../sharedComponents/alert";
-import Loading from "../../sharedComponents/loader";
+import AlertBox from "../../shared/alert";
+import Loading from "../../shared/loader";
 import { Document, Page, pdfjs } from "react-pdf";
 import dateFormat from "dateformat";
 

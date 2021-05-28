@@ -5,11 +5,11 @@ import Header from "./shared/navbar";
 import SideNav from "./shared/sidenav";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import { paginationCount } from "../../shared/globalValues.js";
-import Loading from "../sharedComponents/loader";
-import Paginations from "../sharedComponents/pagination";
+import Loading from "../shared/loader";
+import Paginations from "../shared/pagination";
 import SubjectTable from "../table/subject";
-import CarouselCard from "../sharedComponents/owlCarousel";
-import AlertBox from "../sharedComponents/alert";
+import CarouselCard from "../shared/owlCarousel";
+import AlertBox from "../shared/alert";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
 import { Modal, Spinner, Alert } from "react-bootstrap";
-import CKeditor from "../../sharedComponents/CKeditor";
+import CKeditor from "../../shared/CKeditor";
 
 class PersonalNotes extends Component {
     constructor(props) {

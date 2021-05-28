@@ -7,12 +7,12 @@ import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
 import { paginationCount } from "../../shared/globalValues.js";
 import Header from "./navbar";
 import SideNav from "./sidenav";
-import Loading from "../sharedComponents/loader";
+import Loading from "../shared/loader";
 import GroupTable from "../table/group";
-import Paginations from "../sharedComponents/pagination";
-import ReactSwitch from "../sharedComponents/switchComponent";
+import Paginations from "../shared/pagination";
+import ReactSwitch from "../shared/switchComponent";
 import dateFormat from "dateformat";
-import AlertBox from "../sharedComponents/alert";
+import AlertBox from "../shared/alert";
 
 class AdminHodProfile extends Component {
     constructor(props) {

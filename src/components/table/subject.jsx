@@ -120,7 +120,7 @@ class SubjectTable extends Component {
         return (
             <Link to={`/${this.props.path}/subject/${props.id}`}>
                 <button
-                    className="btn btn-link btn-sm"
+                    className="btn btn-link btn-sm shadow-none"
                     onClick={() => this.dispatch(props.subject_name)}
                 >
                     <i className="fas fa-eye"></i>
@@ -148,8 +148,6 @@ class SubjectTable extends Component {
                         allowFiltering={true}
                         allowSorting={true}
                         allowSelection={true}
-                        // allowTextWrap={true}
-                        // allowResizing={true}
                         selectionSettings={this.select}
                         toolbar={this.toolbarOptions}
                         rowSelected={this.rowSelected.bind(this)}

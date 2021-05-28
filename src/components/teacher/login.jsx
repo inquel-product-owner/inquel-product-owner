@@ -3,7 +3,7 @@ import { Navbar, Alert, Spinner } from "react-bootstrap";
 import logo from "../../assets/Iq-labs-01.svg";
 import { Link, Redirect } from "react-router-dom";
 import { baseUrl, accountsUrl, adminPathUrl } from "../../shared/baseUrl.js";
-import { ForgotPasswordModal } from "../sharedComponents/forgotPassword";
+import { ForgotPasswordModal } from "../shared/forgotPassword";
 import store from "../../redux/store";
 
 class TeacherLogin extends Component {

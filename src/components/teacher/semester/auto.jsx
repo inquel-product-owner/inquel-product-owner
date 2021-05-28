@@ -6,9 +6,9 @@ import Select from "react-select";
 import { Link } from "react-router-dom";
 import { Modal, Alert, Spinner, Dropdown } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
-import Loading from "../../sharedComponents/loader";
-import AlertBox from "../../sharedComponents/alert";
-import ScoreCardTable from "../../sharedComponents/scorecard";
+import Loading from "../../shared/loader";
+import AlertBox from "../../shared/alert";
+import ScoreCardTable from "../../shared/scorecard";
 
 class Scorecard extends Component {
     constructor(props) {
@@ -1227,7 +1227,7 @@ class TeacherSemesterAuto extends Component {
                             >
                                 <table className="table">
                                     <thead className="primary-bg text-white">
-                                        <tr>
+                                        <tr style={{ whiteSpace: "nowrap" }}>
                                             <th scope="col">
                                                 Section Description
                                             </th>
