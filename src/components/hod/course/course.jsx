@@ -677,6 +677,36 @@ class HODCourse extends Component {
         });
     };
 
+    handlePublish = () => {
+        this.setState({
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            page_loading: true,
+        });
+
+        fetch(`${this.url}/hod/course/${this.courseId}/publish/`, {
+            method: "POST",
+            headers: this.headers,
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => console.log(err));
+    };
+
     render() {
         return (
             <div className="wrapper">
@@ -742,16 +772,23 @@ class HODCourse extends Component {
                                 </nav>
                             </div>
                             <div className="col-md-6 d-flex justify-content-start justify-content-md-end">
-                                <button className="btn btn-primary btn-sm shadow-none mr-1">
+                                <button
+                                    className="btn btn-primary btn-sm shadow-none"
+                                    onClick={this.handlePublish}
+                                >
                                     <i className="fas fa-share-square mr-1"></i>{" "}
                                     Publish
                                 </button>
-                                <Link to={`${this.props.match.url}/edit`}>
-                                    <button className="btn btn-primary btn-sm shadow-none">
-                                        <i className="fas fa-edit mr-1"></i>{" "}
-                                        Edit
-                                    </button>
-                                </Link>
+                                {this.state.data.publish === false ? (
+                                    <Link to={`${this.props.match.url}/edit`}>
+                                        <button className="btn btn-primary btn-sm shadow-none ml-1">
+                                            <i className="fas fa-edit mr-1"></i>{" "}
+                                            Edit
+                                        </button>
+                                    </Link>
+                                ) : (
+                                    ""
+                                )}
                             </div>
                         </div>
 
