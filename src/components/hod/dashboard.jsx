@@ -1050,6 +1050,7 @@ class HODDashboard extends Component {
                                                     this.state.subjectItems
                                                 }
                                                 path="hod"
+                                                check={true}
                                                 status={true}
                                                 category={true}
                                                 sub_category={true}
