@@ -6,6 +6,13 @@ import { Link } from "react-router-dom";
 import Loading from "../shared/loader";
 import AlertBox from "../shared/alert";
 import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
+import { connect } from "react-redux";
+import storeDispatcher from "../../redux/dispatch";
+import { CHAPTER, CONTENT } from "../../redux/action";
+
+const mapStateToProps = (state) => ({
+    subject_name: state.content.subject_name,
+});
 
 function Lock() {
     return (
@@ -272,7 +279,15 @@ const ChapterListRender = (props) => {
                                 <Link
                                     to={`${props.url}/chapter/${props.chapter.chapter_id}/summary`}
                                 >
-                                    <button className="btn btn-light btn-sm">
+                                    <button
+                                        className="btn btn-light btn-sm shadow-none"
+                                        onClick={() =>
+                                            storeDispatcher(
+                                                CHAPTER,
+                                                props.chapter.chapter_name
+                                            )
+                                        }
+                                    >
                                         <i className="fas fa-eye fa-sm"></i>
                                     </button>
                                 </Link>
@@ -281,7 +296,15 @@ const ChapterListRender = (props) => {
                                 <Link
                                     to={`${props.url}/chapter/${props.chapter.chapter_id}/notes`}
                                 >
-                                    <button className="btn btn-light btn-sm">
+                                    <button
+                                        className="btn btn-light btn-sm shadow-none"
+                                        onClick={() =>
+                                            storeDispatcher(
+                                                CHAPTER,
+                                                props.chapter.chapter_name
+                                            )
+                                        }
+                                    >
                                         <i className="fas fa-eye fa-sm"></i>
                                     </button>
                                 </Link>
@@ -714,6 +737,10 @@ class Subject extends Component {
                             );
                         }
                     }
+
+                    // redux store dispatcher
+                    storeDispatcher(CONTENT, result.data);
+
                     this.setState({
                         subjectItems: result.data,
                         topics: topics,
@@ -735,6 +762,8 @@ class Subject extends Component {
     };
 
     componentDidMount = () => {
+        document.title = `${this.props.subject_name} - Student | IQLabs`;
+
         this.loadSubjectData();
     };
 
@@ -960,21 +989,12 @@ class Subject extends Component {
     };
 
     render() {
-        document.title = `${
-            this.state.subjectItems.subject_name !== undefined
-                ? this.state.subjectItems.subject_name
-                : ""
-        } - Student | IQLabs`;
         const all_chapters = this.state.all_chapters;
         return (
             <div className="wrapper">
                 {/* Navbar */}
                 <Header
-                    name={
-                        this.state.subjectItems.subject_name !== undefined
-                            ? this.state.subjectItems.subject_name
-                            : ""
-                    }
+                    name={this.props.subject_name}
                     togglenav={this.toggleSideNav}
                 />
 
@@ -1028,16 +1048,24 @@ class Subject extends Component {
                                         </li>
                                         <li className="breadcrumb-item active">
                                             <span>Course:</span>
-                                            {this.state.subjectItems
-                                                .subject_name !== undefined
-                                                ? this.state.subjectItems
-                                                      .subject_name
-                                                : ""}
+                                            {this.props.subject_name}
                                         </li>
                                     </ol>
                                 </nav>
                             </div>
-                            <div className="col-md-6 d-flex justify-content-start justify-content-md-end">
+                            <div className="col-md-6 d-flex align-items-center justify-content-start justify-content-md-end">
+                                <div
+                                    className="border-primary primary-text small font-weight-bold-600 mr-1 rounded-sm"
+                                    style={{ padding: "5px 10px" }}
+                                >
+                                    {`Quiz Points: ${
+                                        this.state.subjectItems
+                                            .scored_quiz_points
+                                            ? this.state.subjectItems
+                                                  .scored_quiz_points
+                                            : 0
+                                    }`}
+                                </div>
                                 <Link
                                     to={`${this.props.match.url}/personal-notes`}
                                 >
@@ -1090,268 +1118,265 @@ class Subject extends Component {
                             <div className="card-body">
                                 <Accordion defaultActiveKey="">
                                     {this.state.subjectItems.length !== 0
-                                        ? this.state.subjectItems.semesters.map(
-                                              (semester, semester_index) => {
-                                                  return (
-                                                      <React.Fragment
-                                                          key={semester_index}
+                                        ? (
+                                              this.state.subjectItems
+                                                  .semesters || []
+                                          ).map((semester, semester_index) => {
+                                              return (
+                                                  <React.Fragment
+                                                      key={semester_index}
+                                                  >
+                                                      {/* ----- Chapter list ----- */}
+                                                      {(
+                                                          this.state
+                                                              .subjectItems
+                                                              .chapters || []
+                                                      ).map(
+                                                          (
+                                                              chapter,
+                                                              chapter_index
+                                                          ) => {
+                                                              return semester.chapters.includes(
+                                                                  chapter.chapter_id
+                                                              ) ? (
+                                                                  <ChapterListRender
+                                                                      key={
+                                                                          chapter_index
+                                                                      }
+                                                                      chapter={
+                                                                          chapter
+                                                                      }
+                                                                      chapter_index={
+                                                                          chapter_index
+                                                                      }
+                                                                      all_chapters={
+                                                                          all_chapters
+                                                                      }
+                                                                      url={
+                                                                          this
+                                                                              .props
+                                                                              .match
+                                                                              .url
+                                                                      }
+                                                                      subjectItems={
+                                                                          this
+                                                                              .state
+                                                                              .subjectItems
+                                                                      }
+                                                                      topics_completed={
+                                                                          this
+                                                                              .state
+                                                                              .topics_completed
+                                                                      }
+                                                                      topics_remarks={
+                                                                          this
+                                                                              .state
+                                                                              .topics_remarks
+                                                                      }
+                                                                      chapter_remarks={
+                                                                          this
+                                                                              .state
+                                                                              .chapter_remarks
+                                                                      }
+                                                                      topics={
+                                                                          this
+                                                                              .state
+                                                                              .topics
+                                                                      }
+                                                                      chapterEventKey={
+                                                                          this
+                                                                              .state
+                                                                              .chapterEventKey
+                                                                      }
+                                                                      topicEventKey={
+                                                                          this
+                                                                              .state
+                                                                              .topicEventKey
+                                                                      }
+                                                                      toggleCollapse={
+                                                                          this
+                                                                              .toggleCollapse
+                                                                      }
+                                                                      handleAllTopicCompletion={
+                                                                          this
+                                                                              .handleAllTopicCompletion
+                                                                      }
+                                                                      handleTopicCompletion={
+                                                                          this
+                                                                              .handleTopicCompletion
+                                                                      }
+                                                                      toggleTopicCollapse={
+                                                                          this
+                                                                              .toggleTopicCollapse
+                                                                      }
+                                                                      cycleTest={
+                                                                          this
+                                                                              .cycleTest
+                                                                      }
+                                                                      quiz={
+                                                                          this
+                                                                              .state
+                                                                              .quiz[
+                                                                              chapter_index
+                                                                          ]
+                                                                              ? this
+                                                                                    .state
+                                                                                    .quiz[
+                                                                                    chapter_index
+                                                                                ]
+                                                                              : {}
+                                                                      }
+                                                                  />
+                                                              ) : null;
+                                                          }
+                                                      )}
+                                                      {/* ----- Semester list ----- */}
+                                                      <div
+                                                          className="card card-header pinkrange-bg shadow-sm"
+                                                          style={{
+                                                              marginBottom:
+                                                                  "0.75rem",
+                                                          }}
                                                       >
-                                                          {/* ----- Chapter list ----- */}
-                                                          {this.state.subjectItems.chapters.map(
-                                                              (
-                                                                  chapter,
-                                                                  chapter_index
-                                                              ) => {
-                                                                  return semester.chapters.includes(
-                                                                      chapter.chapter_id
-                                                                  ) ? (
-                                                                      <ChapterListRender
-                                                                          key={
-                                                                              chapter_index
-                                                                          }
-                                                                          chapter={
-                                                                              chapter
-                                                                          }
-                                                                          chapter_index={
-                                                                              chapter_index
-                                                                          }
-                                                                          all_chapters={
-                                                                              all_chapters
-                                                                          }
-                                                                          url={
-                                                                              this
-                                                                                  .props
-                                                                                  .match
-                                                                                  .url
-                                                                          }
-                                                                          subjectItems={
-                                                                              this
-                                                                                  .state
-                                                                                  .subjectItems
-                                                                          }
-                                                                          topics_completed={
-                                                                              this
-                                                                                  .state
-                                                                                  .topics_completed
-                                                                          }
-                                                                          topics_remarks={
-                                                                              this
-                                                                                  .state
-                                                                                  .topics_remarks
-                                                                          }
-                                                                          chapter_remarks={
-                                                                              this
-                                                                                  .state
-                                                                                  .chapter_remarks
-                                                                          }
-                                                                          topics={
-                                                                              this
-                                                                                  .state
-                                                                                  .topics
-                                                                          }
-                                                                          chapterEventKey={
-                                                                              this
-                                                                                  .state
-                                                                                  .chapterEventKey
-                                                                          }
-                                                                          topicEventKey={
-                                                                              this
-                                                                                  .state
-                                                                                  .topicEventKey
-                                                                          }
-                                                                          toggleCollapse={
-                                                                              this
-                                                                                  .toggleCollapse
-                                                                          }
-                                                                          handleAllTopicCompletion={
-                                                                              this
-                                                                                  .handleAllTopicCompletion
-                                                                          }
-                                                                          handleTopicCompletion={
-                                                                              this
-                                                                                  .handleTopicCompletion
-                                                                          }
-                                                                          toggleTopicCollapse={
-                                                                              this
-                                                                                  .toggleTopicCollapse
-                                                                          }
-                                                                          cycleTest={
-                                                                              this
-                                                                                  .cycleTest
-                                                                          }
-                                                                          quiz={
-                                                                              this
-                                                                                  .state
-                                                                                  .quiz[
-                                                                                  chapter_index
-                                                                              ]
-                                                                                  ? this
-                                                                                        .state
-                                                                                        .quiz[
-                                                                                        chapter_index
-                                                                                    ]
-                                                                                  : {}
-                                                                          }
-                                                                      />
-                                                                  ) : null;
-                                                              }
-                                                          )}
-                                                          {/* ----- Semester list ----- */}
-                                                          <div
-                                                              className="card card-header pinkrange-bg shadow-sm"
-                                                              style={{
-                                                                  marginBottom:
-                                                                      "0.75rem",
-                                                              }}
-                                                          >
-                                                              <div className="row align-items-center">
-                                                                  <div className="col-6">
-                                                                      <p className="small font-weight-bold-600 mb-0">
-                                                                          {
-                                                                              semester.semester_name
-                                                                          }
-                                                                      </p>
-                                                                  </div>
-                                                                  <div className="col-6 text-right">
-                                                                      {semester.chapters_completed ===
-                                                                      true ? (
-                                                                          // Check if semester exam is created or not
-                                                                          semester.direct_question ===
-                                                                              false &&
-                                                                          semester.auto_test_question ===
-                                                                              false ? (
-                                                                              // if not then display the error message in tooltip
-                                                                              <OverlayTrigger
-                                                                                  key="top"
-                                                                                  placement="top"
-                                                                                  overlay={
-                                                                                      <Tooltip id="tooltip">
-                                                                                          Semester
-                                                                                          exam
-                                                                                          is
-                                                                                          not
-                                                                                          created
-                                                                                          yet
-                                                                                      </Tooltip>
-                                                                                  }
-                                                                              >
-                                                                                  <button className="btn btn-sm primary-text">
-                                                                                      <i className="fas fa-lock"></i>
-                                                                                  </button>
-                                                                              </OverlayTrigger>
-                                                                          ) : // if exist, then redirect them to appropriate cycle test
-                                                                          semester.direct_question ===
-                                                                            true ? (
-                                                                              <Link
-                                                                                  to={`${this.props.match.url}/semester/${semester.semester_id}/direct`}
-                                                                              >
-                                                                                  <button className="btn btn-primary btn-sm shadow-none">
-                                                                                      Start
-                                                                                  </button>
-                                                                              </Link>
-                                                                          ) : (
-                                                                              <button
-                                                                                  className="btn btn-primary btn-sm shadow-none"
-                                                                                  onClick={() =>
-                                                                                      this.handleSemesterStart(
-                                                                                          semester.semester_id
-                                                                                      )
-                                                                                  }
-                                                                              >
+                                                          <div className="row align-items-center">
+                                                              <div className="col-6">
+                                                                  <p className="small font-weight-bold-600 mb-0">
+                                                                      {
+                                                                          semester.semester_name
+                                                                      }
+                                                                  </p>
+                                                              </div>
+                                                              <div className="col-6 text-right">
+                                                                  {semester.chapters_completed ===
+                                                                  true ? (
+                                                                      // Check if semester exam is created or not
+                                                                      semester.direct_question ===
+                                                                          false &&
+                                                                      semester.auto_test_question ===
+                                                                          false ? (
+                                                                          // if not then display the error message in tooltip
+                                                                          <OverlayTrigger
+                                                                              key="top"
+                                                                              placement="top"
+                                                                              overlay={
+                                                                                  <Tooltip id="tooltip">
+                                                                                      Semester
+                                                                                      exam
+                                                                                      is
+                                                                                      not
+                                                                                      created
+                                                                                      yet
+                                                                                  </Tooltip>
+                                                                              }
+                                                                          >
+                                                                              <button className="btn btn-sm primary-text">
+                                                                                  <i className="fas fa-lock"></i>
+                                                                              </button>
+                                                                          </OverlayTrigger>
+                                                                      ) : // if exist, then redirect them to appropriate cycle test
+                                                                      semester.direct_question ===
+                                                                        true ? (
+                                                                          <Link
+                                                                              to={`${this.props.match.url}/semester/${semester.semester_id}/direct`}
+                                                                          >
+                                                                              <button className="btn btn-primary btn-sm shadow-none">
                                                                                   Start
                                                                               </button>
-                                                                          )
+                                                                          </Link>
                                                                       ) : (
-                                                                          <Lock />
-                                                                      )}
-                                                                  </div>
+                                                                          <button
+                                                                              className="btn btn-primary btn-sm shadow-none"
+                                                                              onClick={() =>
+                                                                                  this.handleSemesterStart(
+                                                                                      semester.semester_id
+                                                                                  )
+                                                                              }
+                                                                          >
+                                                                              Start
+                                                                          </button>
+                                                                      )
+                                                                  ) : (
+                                                                      <Lock />
+                                                                  )}
                                                               </div>
                                                           </div>
-                                                      </React.Fragment>
-                                                  );
-                                              }
-                                          )
+                                                      </div>
+                                                  </React.Fragment>
+                                              );
+                                          })
                                         : null}
                                     {/* ----- Unassigned chapter list ----- */}
                                     {this.state.subjectItems.length !== 0
-                                        ? this.state.subjectItems.chapters.map(
-                                              (chapter, chapter_index) => {
-                                                  return !this.state.semester_chapters.includes(
-                                                      chapter.chapter_id
-                                                  ) ? (
-                                                      <ChapterListRender
-                                                          key={chapter_index}
-                                                          chapter={chapter}
-                                                          chapter_index={
+                                        ? (
+                                              this.state.subjectItems
+                                                  .chapters || []
+                                          ).map((chapter, chapter_index) => {
+                                              return !this.state.semester_chapters.includes(
+                                                  chapter.chapter_id
+                                              ) ? (
+                                                  <ChapterListRender
+                                                      key={chapter_index}
+                                                      chapter={chapter}
+                                                      chapter_index={
+                                                          chapter_index
+                                                      }
+                                                      all_chapters={
+                                                          all_chapters
+                                                      }
+                                                      url={this.props.match.url}
+                                                      subjectItems={
+                                                          this.state
+                                                              .subjectItems
+                                                      }
+                                                      topics_completed={
+                                                          this.state
+                                                              .topics_completed
+                                                      }
+                                                      topics_remarks={
+                                                          this.state
+                                                              .topics_remarks
+                                                      }
+                                                      chapter_remarks={
+                                                          this.state
+                                                              .chapter_remarks
+                                                      }
+                                                      topics={this.state.topics}
+                                                      chapterEventKey={
+                                                          this.state
+                                                              .chapterEventKey
+                                                      }
+                                                      topicEventKey={
+                                                          this.state
+                                                              .topicEventKey
+                                                      }
+                                                      toggleCollapse={
+                                                          this.toggleCollapse
+                                                      }
+                                                      handleAllTopicCompletion={
+                                                          this
+                                                              .handleAllTopicCompletion
+                                                      }
+                                                      handleTopicCompletion={
+                                                          this
+                                                              .handleTopicCompletion
+                                                      }
+                                                      toggleTopicCollapse={
+                                                          this
+                                                              .toggleTopicCollapse
+                                                      }
+                                                      cycleTest={this.cycleTest}
+                                                      quiz={
+                                                          this.state.quiz[
                                                               chapter_index
-                                                          }
-                                                          all_chapters={
-                                                              all_chapters
-                                                          }
-                                                          url={
-                                                              this.props.match
-                                                                  .url
-                                                          }
-                                                          subjectItems={
-                                                              this.state
-                                                                  .subjectItems
-                                                          }
-                                                          topics_completed={
-                                                              this.state
-                                                                  .topics_completed
-                                                          }
-                                                          topics_remarks={
-                                                              this.state
-                                                                  .topics_remarks
-                                                          }
-                                                          chapter_remarks={
-                                                              this.state
-                                                                  .chapter_remarks
-                                                          }
-                                                          topics={
-                                                              this.state.topics
-                                                          }
-                                                          chapterEventKey={
-                                                              this.state
-                                                                  .chapterEventKey
-                                                          }
-                                                          topicEventKey={
-                                                              this.state
-                                                                  .topicEventKey
-                                                          }
-                                                          toggleCollapse={
-                                                              this
-                                                                  .toggleCollapse
-                                                          }
-                                                          handleAllTopicCompletion={
-                                                              this
-                                                                  .handleAllTopicCompletion
-                                                          }
-                                                          handleTopicCompletion={
-                                                              this
-                                                                  .handleTopicCompletion
-                                                          }
-                                                          toggleTopicCollapse={
-                                                              this
-                                                                  .toggleTopicCollapse
-                                                          }
-                                                          cycleTest={
-                                                              this.cycleTest
-                                                          }
-                                                          quiz={
-                                                              this.state.quiz[
-                                                                  chapter_index
-                                                              ]
-                                                                  ? this.state
-                                                                        .quiz[
-                                                                        chapter_index
-                                                                    ]
-                                                                  : {}
-                                                          }
-                                                      />
-                                                  ) : null;
-                                              }
-                                          )
+                                                          ]
+                                                              ? this.state.quiz[
+                                                                    chapter_index
+                                                                ]
+                                                              : {}
+                                                      }
+                                                  />
+                                              ) : null;
+                                          })
                                         : null}
                                 </Accordion>
                             </div>
@@ -1365,4 +1390,4 @@ class Subject extends Component {
     }
 }
 
-export default Subject;
+export default connect(mapStateToProps)(Subject);

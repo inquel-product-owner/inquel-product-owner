@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
-import { Card, Accordion } from "react-bootstrap";
+import { Card, Accordion, Modal, Dropdown } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl";
@@ -14,6 +14,156 @@ const mapStateToProps = (state) => ({
 });
 
 const bgColor = "#e2e2e2";
+
+const Scorecard = (props) => {
+    return (
+        <Modal
+            show={props.show}
+            onHide={props.onHide}
+            size="xl"
+            aria-labelledby="contained-modal-title-vcenter"
+            centered
+        >
+            <Modal.Header closeButton>Scorecard</Modal.Header>
+            <Modal.Body>
+                <div className="table-responsive">
+                    <table className="table table-bordered border-top">
+                        <thead className="rounded-0">
+                            <th scope="col">Range in %</th>
+                            <th scope="col">Retake Duration</th>
+                            <th scope="col">Reduction %</th>
+                            <th scope="col">Reduction Duration</th>
+                            <th scope="col">Remarks</th>
+                        </thead>
+                        <tbody>
+                            {Object.keys(props.data).length !== 0
+                                ? Object.entries(props.data).map(
+                                      ([key, value], index) => {
+                                          return (
+                                              <tr key={index}>
+                                                  <td className="d-flex align-items-center">
+                                                      {value.range[0]}
+                                                      <span className="mx-2">
+                                                          to
+                                                      </span>
+                                                      {value.range[1]}
+                                                  </td>
+                                                  <td>{value.retake}</td>
+                                                  <td>{value.reduction}</td>
+                                                  <td>
+                                                      {value.reduction_duration}
+                                                  </td>
+                                                  <td>
+                                                      <div
+                                                          style={{
+                                                              color: value.color,
+                                                          }}
+                                                      >
+                                                          {key}
+                                                      </div>
+                                                  </td>
+                                              </tr>
+                                          );
+                                      }
+                                  )
+                                : null}
+                        </tbody>
+                    </table>
+                </div>
+            </Modal.Body>
+            <Modal.Footer className="text-right">
+                <button
+                    className="btn btn-link btn-sm shadow-none"
+                    onClick={props.onHide}
+                >
+                    Close
+                </button>
+            </Modal.Footer>
+        </Modal>
+    );
+};
+
+const CourseDetail = (props) => {
+    return (
+        <Modal
+            show={props.show}
+            onHide={props.onHide}
+            size="lg"
+            aria-labelledby="contained-modal-title-vcenter"
+            centered
+            scrollable
+        >
+            <Modal.Header closeButton>Course Detail</Modal.Header>
+            <Modal.Body>
+                <div style={{ minHeight: "50vh" }}>
+                    {props.data.content !== "" ? (
+                        <>
+                            <div className="h5 font-weight-bold-600 mb-3">
+                                {props.data.title}
+                            </div>
+                            <div
+                                dangerouslySetInnerHTML={{
+                                    __html: props.data.content,
+                                }}
+                            ></div>
+                        </>
+                    ) : (
+                        "No content to display..."
+                    )}
+                </div>
+            </Modal.Body>
+            <Modal.Footer className="text-right">
+                <button
+                    className="btn btn-link btn-sm shadow-none"
+                    onClick={props.onHide}
+                >
+                    Close
+                </button>
+            </Modal.Footer>
+        </Modal>
+    );
+};
+
+const QuickPass = (props) => {
+    return (
+        <Modal
+            show={props.show}
+            onHide={props.onHide}
+            size="lg"
+            aria-labelledby="contained-modal-title-vcenter"
+            centered
+            scrollable
+        >
+            <Modal.Header closeButton>Quick Pass Tips</Modal.Header>
+            <Modal.Body>
+                <div style={{ minHeight: "50vh" }}>
+                    {props.data.content !== "" ? (
+                        <>
+                            <div className="h5 font-weight-bold-600 mb-3">
+                                {props.data.title}
+                            </div>
+                            <div
+                                dangerouslySetInnerHTML={{
+                                    __html: props.data.content,
+                                }}
+                            ></div>
+                        </>
+                    ) : (
+                        "No content to display..."
+                    )}
+                </div>
+            </Modal.Body>
+            <Modal.Footer className="text-right">
+                <button
+                    className="btn btn-link btn-sm shadow-none"
+                    onClick={props.onHide}
+                >
+                    Close
+                </button>
+            </Modal.Footer>
+        </Modal>
+    );
+};
 
 const UnitListRender = (props) => {
     return (
@@ -562,6 +712,10 @@ class HODCourse extends Component {
         super(props);
         this.state = {
             showSideNav: false,
+            showModal: false,
+            type: "",
+            selectedData: "",
+
             data: {},
             chapterEventKey: [],
             topicEventKey: [],
@@ -740,6 +894,51 @@ class HODCourse extends Component {
                     }}
                 />
 
+                {/* Scorecard Modal */}
+                {this.state.showModal && this.state.type === "scorecard" ? (
+                    <Scorecard
+                        show={this.state.showModal}
+                        onHide={() => {
+                            this.setState({
+                                showModal: false,
+                            });
+                        }}
+                        data={this.state.data.score_card_config}
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Course detail Modal */}
+                {this.state.showModal && this.state.type === "detail" ? (
+                    <CourseDetail
+                        show={this.state.showModal}
+                        onHide={() => {
+                            this.setState({
+                                showModal: false,
+                            });
+                        }}
+                        data={this.state.data.course_detail}
+                    />
+                ) : (
+                    ""
+                )}
+
+                {/* Quick pass Modal */}
+                {this.state.showModal && this.state.type === "quickpass" ? (
+                    <QuickPass
+                        show={this.state.showModal}
+                        onHide={() => {
+                            this.setState({
+                                showModal: false,
+                            });
+                        }}
+                        data={this.state.data.quick_pass_tips}
+                    />
+                ) : (
+                    ""
+                )}
+
                 <div
                     className={`section content ${
                         this.state.showSideNav ? "active" : ""
@@ -755,7 +954,7 @@ class HODCourse extends Component {
                         </button>
 
                         <div className="row align-items-center mb-3">
-                            <div className="col-md-6">
+                            <div className="col-md-6 mb-2 mb-md-0">
                                 {/* Breadcrumb */}
                                 <nav aria-label="breadcrumb">
                                     <ol className="breadcrumb">
@@ -771,7 +970,7 @@ class HODCourse extends Component {
                                     </ol>
                                 </nav>
                             </div>
-                            <div className="col-md-6 d-flex justify-content-start justify-content-md-end">
+                            <div className="col-md-6 d-flex justify-content-end">
                                 <button
                                     className="btn btn-primary btn-sm shadow-none"
                                     onClick={this.handlePublish}
@@ -789,6 +988,48 @@ class HODCourse extends Component {
                                 ) : (
                                     ""
                                 )}
+
+                                <Dropdown>
+                                    <Dropdown.Toggle
+                                        variant="Secondary"
+                                        className="btn btn-primary btn-sm shadow-none caret-off ml-1"
+                                    >
+                                        <i className="fas fa-ellipsis-h"></i>
+                                    </Dropdown.Toggle>
+
+                                    <Dropdown.Menu>
+                                        <Dropdown.Item
+                                            onClick={() => {
+                                                this.setState({
+                                                    showModal: true,
+                                                    type: "scorecard",
+                                                });
+                                            }}
+                                        >
+                                            Scorecard
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            onClick={() => {
+                                                this.setState({
+                                                    showModal: true,
+                                                    type: "detail",
+                                                });
+                                            }}
+                                        >
+                                            Course Detail
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            onClick={() => {
+                                                this.setState({
+                                                    showModal: true,
+                                                    type: "quickpass",
+                                                });
+                                            }}
+                                        >
+                                            Quick Pass
+                                        </Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown>
                             </div>
                         </div>
 

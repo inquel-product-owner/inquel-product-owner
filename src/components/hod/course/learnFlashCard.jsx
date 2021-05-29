@@ -718,7 +718,7 @@ class HODCourseFlashCard extends Component {
                                 explanation.isAnswered === true ? (
                                     <>
                                         <div
-                                            className="card card-body bg-light mb-3"
+                                            className="card card-body bg-light mb-3 position-relative"
                                             style={{
                                                 minHeight: "200px",
                                             }}
@@ -732,6 +732,78 @@ class HODCourseFlashCard extends Component {
                                                     __html: explanation.explanation,
                                                 }}
                                             ></p>
+                                            <div
+                                                className="position-absolute"
+                                                style={{ right: 0, top: "10px" }}
+                                            >
+                                                {data[index] &&
+                                                data[index].content &&
+                                                data[index].content.audio
+                                                    ? data[index].content.audio
+                                                          .length !== 0
+                                                        ? data[
+                                                              index
+                                                          ].content.audio.map(
+                                                              (
+                                                                  audio,
+                                                                  audio_index
+                                                              ) => {
+                                                                  return audio.path !==
+                                                                      "" ? (
+                                                                      <OverlayTrigger
+                                                                          trigger="click"
+                                                                          rootClose
+                                                                          key={`popover${audio_index}`}
+                                                                          placement="bottom"
+                                                                          overlay={
+                                                                              <Popover
+                                                                                  id={`popover-positioned-bottom${audio_index}`}
+                                                                              >
+                                                                                  {audio.title !==
+                                                                                  "" ? (
+                                                                                      <Popover.Title>
+                                                                                          {
+                                                                                              audio.title
+                                                                                          }
+                                                                                      </Popover.Title>
+                                                                                  ) : (
+                                                                                      ""
+                                                                                  )}
+                                                                                  <Popover.Content
+                                                                                      style={{
+                                                                                          overflow:
+                                                                                              "auto",
+                                                                                      }}
+                                                                                  >
+                                                                                      <audio
+                                                                                          src={
+                                                                                              audio.path
+                                                                                          }
+                                                                                          autoPlay
+                                                                                          controls
+                                                                                          controlsList="nodownload"
+                                                                                      ></audio>
+                                                                                  </Popover.Content>
+                                                                              </Popover>
+                                                                          }
+                                                                      >
+                                                                          <button
+                                                                              className="btn btn-primary btn-sm rounded-circle mr-2 shadow-none"
+                                                                              key={
+                                                                                  audio_index
+                                                                              }
+                                                                          >
+                                                                              <i className="fas fa-volume-up buttton fa-sm"></i>
+                                                                          </button>
+                                                                      </OverlayTrigger>
+                                                                  ) : (
+                                                                      ""
+                                                                  );
+                                                              }
+                                                          )
+                                                        : ""
+                                                    : ""}
+                                            </div>
                                         </div>
                                         {/* ----- show answer ----- */}
                                         <div className="row">
@@ -1310,7 +1382,7 @@ class HODCourseFlashCard extends Component {
                             {Object.entries(explanation).length !== 0 ? (
                                 explanation.isAnswered === true ? (
                                     <div
-                                        className="card card-body bg-light"
+                                        className="card card-body bg-light position-relative"
                                         style={{
                                             minHeight: "250px",
                                         }}
@@ -1324,6 +1396,78 @@ class HODCourseFlashCard extends Component {
                                                 __html: explanation.explanation,
                                             }}
                                         ></p>
+                                        <div
+                                            className="position-absolute"
+                                            style={{ right: 0, top: "10px" }}
+                                        >
+                                            {data[index] &&
+                                            data[index].content &&
+                                            data[index].content.audio
+                                                ? data[index].content.audio
+                                                      .length !== 0
+                                                    ? data[
+                                                          index
+                                                      ].content.audio.map(
+                                                          (
+                                                              audio,
+                                                              audio_index
+                                                          ) => {
+                                                              return audio.path !==
+                                                                  "" ? (
+                                                                  <OverlayTrigger
+                                                                      trigger="click"
+                                                                      rootClose
+                                                                      key={`popover${audio_index}`}
+                                                                      placement="bottom"
+                                                                      overlay={
+                                                                          <Popover
+                                                                              id={`popover-positioned-bottom${audio_index}`}
+                                                                          >
+                                                                              {audio.title !==
+                                                                              "" ? (
+                                                                                  <Popover.Title>
+                                                                                      {
+                                                                                          audio.title
+                                                                                      }
+                                                                                  </Popover.Title>
+                                                                              ) : (
+                                                                                  ""
+                                                                              )}
+                                                                              <Popover.Content
+                                                                                  style={{
+                                                                                      overflow:
+                                                                                          "auto",
+                                                                                  }}
+                                                                              >
+                                                                                  <audio
+                                                                                      src={
+                                                                                          audio.path
+                                                                                      }
+                                                                                      autoPlay
+                                                                                      controls
+                                                                                      controlsList="nodownload"
+                                                                                  ></audio>
+                                                                              </Popover.Content>
+                                                                          </Popover>
+                                                                      }
+                                                                  >
+                                                                      <button
+                                                                          className="btn btn-primary btn-sm rounded-circle mr-2 shadow-none"
+                                                                          key={
+                                                                              audio_index
+                                                                          }
+                                                                      >
+                                                                          <i className="fas fa-volume-up buttton fa-sm"></i>
+                                                                      </button>
+                                                                  </OverlayTrigger>
+                                                              ) : (
+                                                                  ""
+                                                              );
+                                                          }
+                                                      )
+                                                    : ""
+                                                : ""}
+                                        </div>
                                     </div>
                                 ) : (
                                     /* ---------- Sub Question ---------- */
@@ -2365,69 +2509,73 @@ class HODCourseFlashCard extends Component {
                                     </button>
                                 </div>
                                 <div className="col-md-6 text-right">
-                                    {data[index] !== undefined &&
-                                    data[index].content !== undefined &&
-                                    data[index].content.audio !== undefined
-                                        ? data[index].content.audio.length !== 0
-                                            ? data[index].content.audio.map(
-                                                  (audio, audio_index) => {
-                                                      return audio.path !==
-                                                          "" ? (
-                                                          <OverlayTrigger
-                                                              trigger="click"
-                                                              rootClose
-                                                              key={`popover${audio_index}`}
-                                                              placement="bottom"
-                                                              overlay={
-                                                                  <Popover
-                                                                      id={`popover-positioned-bottom${audio_index}`}
-                                                                  >
-                                                                      {audio.title !==
-                                                                      "" ? (
-                                                                          <Popover.Title>
-                                                                              {
-                                                                                  audio.title
-                                                                              }
-                                                                          </Popover.Title>
-                                                                      ) : (
-                                                                          ""
-                                                                      )}
-                                                                      <Popover.Content
-                                                                          style={{
-                                                                              overflow:
-                                                                                  "auto",
-                                                                          }}
+                                    {this.state.activeTab === "concept"
+                                        ? data[index] !== undefined &&
+                                          data[index].content !== undefined &&
+                                          data[index].content.audio !==
+                                              undefined
+                                            ? data[index].content.audio
+                                                  .length !== 0
+                                                ? data[index].content.audio.map(
+                                                      (audio, audio_index) => {
+                                                          return audio.path !==
+                                                              "" ? (
+                                                              <OverlayTrigger
+                                                                  trigger="click"
+                                                                  rootClose
+                                                                  key={`popover${audio_index}`}
+                                                                  placement="bottom"
+                                                                  overlay={
+                                                                      <Popover
+                                                                          id={`popover-positioned-bottom${audio_index}`}
                                                                       >
-                                                                          <audio
-                                                                              src={
-                                                                                  audio.path
-                                                                              }
-                                                                              autoPlay
-                                                                              controls
-                                                                              controlsList="nodownload"
-                                                                          ></audio>
-                                                                      </Popover.Content>
-                                                                  </Popover>
-                                                              }
-                                                          >
-                                                              <button
-                                                                  className="btn btn-primary btn-sm rounded-circle mr-3 shadow-none"
-                                                                  onClick={
-                                                                      this
-                                                                          .pauseSlideshow
-                                                                  }
-                                                                  key={
-                                                                      audio_index
+                                                                          {audio.title !==
+                                                                          "" ? (
+                                                                              <Popover.Title>
+                                                                                  {
+                                                                                      audio.title
+                                                                                  }
+                                                                              </Popover.Title>
+                                                                          ) : (
+                                                                              ""
+                                                                          )}
+                                                                          <Popover.Content
+                                                                              style={{
+                                                                                  overflow:
+                                                                                      "auto",
+                                                                              }}
+                                                                          >
+                                                                              <audio
+                                                                                  src={
+                                                                                      audio.path
+                                                                                  }
+                                                                                  autoPlay
+                                                                                  controls
+                                                                                  controlsList="nodownload"
+                                                                              ></audio>
+                                                                          </Popover.Content>
+                                                                      </Popover>
                                                                   }
                                                               >
-                                                                  <i className="fas fa-volume-up buttton fa-sm"></i>
-                                                              </button>
-                                                          </OverlayTrigger>
-                                                      ) : (
-                                                          ""
-                                                      );
-                                                  }
-                                              )
+                                                                  <button
+                                                                      className="btn btn-primary btn-sm rounded-circle mr-3 shadow-none"
+                                                                      onClick={
+                                                                          this
+                                                                              .pauseSlideshow
+                                                                      }
+                                                                      key={
+                                                                          audio_index
+                                                                      }
+                                                                  >
+                                                                      <i className="fas fa-volume-up buttton fa-sm"></i>
+                                                                  </button>
+                                                              </OverlayTrigger>
+                                                          ) : (
+                                                              ""
+                                                          );
+                                                      }
+                                                  )
+                                                : ""
                                             : ""
                                         : ""}
                                 </div>
