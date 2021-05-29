@@ -95,7 +95,7 @@ class GroupTable extends Component {
             for (let index = 0; index < selectedrecords.length; index++) {
                 element.push(selectedrecords[index].id.toString());
             }
-            this.props.handleGroupId(element);
+            if (this.props.handleGroupId) this.props.handleGroupId(element);
         }
     }
 
@@ -106,7 +106,7 @@ class GroupTable extends Component {
             for (let index = 0; index < selectedrecords.length; index++) {
                 element.push(selectedrecords[index].id.toString());
             }
-            this.props.handleGroupId(element);
+            if (this.props.handleGroupId) this.props.handleGroupId(element);
         }
     }
 

@@ -54,6 +54,7 @@ class HODSimulationType1 extends Component {
                     pair_question_id: "NOPAIR",
                     is_file_uploaded: false,
                     content: {
+                        explanation: "<p>Explanation goes here</p>",
                         fillin_answer: [""],
                         boolean_question: [
                             { correct: false, content: "True" },
@@ -206,6 +207,7 @@ class HODSimulationType1 extends Component {
                         ? true
                         : false,
                 content: {
+                    explanation: response[i].explanation,
                     fillin_answer:
                         response[i].fillin_answer.length !== 0
                             ? response[i].fillin_answer
@@ -469,6 +471,8 @@ class HODSimulationType1 extends Component {
                 JSON.stringify({
                     question: {
                         question: data[this.state.activeQuestion].question,
+                        explanation:
+                            data[this.state.activeQuestion].content.explanation,
                         content: content,
                         properties: {
                             chapter_id:
@@ -655,11 +659,21 @@ class HODSimulationType1 extends Component {
             });
     };
 
-    // -------------------------- Question --------------------------
+    // -------------------------- Question & Explanation --------------------------
 
     onEditorChange = async (evt) => {
         const values = [...this.state.questions];
         values[this.state.activeQuestion].question = evt.editor.getData();
+        await this.setState({
+            questions: values,
+        });
+        window.MathJax.typeset();
+    };
+
+    handleExplanation = async (evt) => {
+        const values = [...this.state.questions];
+        values[this.state.activeQuestion].content.explanation =
+            evt.editor.getData();
         await this.setState({
             questions: values,
         });
@@ -962,6 +976,7 @@ class HODSimulationType1 extends Component {
             pair_question_id: "NOPAIR",
             is_file_uploaded: false,
             content: {
+                explanation: "<p>Explanation goes here</p>",
                 fillin_answer: [""],
                 boolean_question: [
                     { correct: false, content: "True" },
@@ -1021,6 +1036,7 @@ class HODSimulationType1 extends Component {
             pair_question_id: "NOPAIR",
             is_file_uploaded: false,
             content: {
+                explanation: values[index].content.explanation,
                 fillin_answer: fillin,
                 boolean_question: boolean,
                 options: options,
@@ -1081,6 +1097,7 @@ class HODSimulationType1 extends Component {
                             pair_question_id: "NOPAIR",
                             is_file_uploaded: false,
                             content: {
+                                explanation: "<p>Explanation goes here</p>",
                                 fillin_answer: [""],
                                 boolean_question: [
                                     { correct: false, content: "True" },
@@ -1156,6 +1173,7 @@ class HODSimulationType1 extends Component {
                         pair_question_id: "NOPAIR",
                         is_file_uploaded: false,
                         content: {
+                            explanation: "<p>Explanation goes here</p>",
                             fillin_answer: [""],
                             boolean_question: [
                                 {
@@ -1233,6 +1251,7 @@ class HODSimulationType1 extends Component {
             pair_question_id: question.question_random_id,
             is_file_uploaded: false,
             content: {
+                explanation: "<p>Explanation goes here</p>",
                 fillin_answer: [""],
                 boolean_question: [
                     { correct: false, content: "True" },
@@ -2096,6 +2115,26 @@ class HODSimulationType1 extends Component {
                                                     ) : (
                                                         ""
                                                     )}
+
+                                                    {/* ---------- Explanation ---------- */}
+                                                    <div className="form-group">
+                                                        <label>
+                                                            Explanation
+                                                        </label>
+                                                        <CKeditor
+                                                            data={
+                                                                data[
+                                                                    this.state
+                                                                        .activeQuestion
+                                                                ].content
+                                                                    .explanation
+                                                            }
+                                                            onChange={
+                                                                this
+                                                                    .handleExplanation
+                                                            }
+                                                        />
+                                                    </div>
                                                 </Card.Body>
                                             </Accordion.Collapse>
                                         </Card>

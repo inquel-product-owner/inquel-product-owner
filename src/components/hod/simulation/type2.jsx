@@ -59,6 +59,7 @@ class HODSimulationType2 extends Component {
                 {
                     question_random_id: "",
                     question: "<p>Main Question goes here</p>",
+                    explanation: "<p>Explanation goes here</p>",
                     pair_question_id: "NOPAIR",
                     is_file_uploaded: false,
                     mcq: true,
@@ -257,6 +258,7 @@ class HODSimulationType2 extends Component {
             data.push({
                 question_random_id: response[i].question_random_id,
                 question: response[i].question,
+                explanation: response[i].explanation,
                 pair_question_id: response[i].pair_question_id,
                 is_file_uploaded:
                     Object.entries(response[i].files).length !== 0
@@ -368,6 +370,12 @@ class HODSimulationType2 extends Component {
                 showErrorAlert: true,
                 page_loading: false,
             });
+        } else if (data[this.state.activeQuestion].explanation === "") {
+            this.setState({
+                errorMsg: "Explanation is required",
+                showErrorAlert: true,
+                page_loading: false,
+            });
         } else if (
             data[this.state.activeQuestion].properties.chapter_id === ""
         ) {
@@ -384,6 +392,8 @@ class HODSimulationType2 extends Component {
                 JSON.stringify({
                     main_question: {
                         question: data[this.state.activeQuestion].question,
+                        explanation:
+                            data[this.state.activeQuestion].explanation,
                         properties: {
                             chapter_id:
                                 data[this.state.activeQuestion].properties
@@ -585,6 +595,15 @@ class HODSimulationType2 extends Component {
     onEditorChange = async (evt) => {
         const values = [...this.state.questions];
         values[this.state.activeQuestion].question = evt.editor.getData();
+        await this.setState({
+            questions: values,
+        });
+        window.MathJax.typeset();
+    };
+
+    handleExplanation = async (evt) => {
+        const values = [...this.state.questions];
+        values[this.state.activeQuestion].explanation = evt.editor.getData();
         await this.setState({
             questions: values,
         });
@@ -962,6 +981,7 @@ class HODSimulationType2 extends Component {
         values.push({
             question_random_id: "",
             question: "<p>Main Question goes here</p>",
+            explanation: "<p>Explanation goes here</p>",
             pair_question_id: "NOPAIR",
             is_file_uploaded: false,
             mcq: true,
@@ -1065,6 +1085,7 @@ class HODSimulationType2 extends Component {
         values.push({
             question_random_id: "",
             question: values[index].question,
+            explanation: values[index].explanation,
             pair_question_id: "NOPAIR",
             is_file_uploaded: false,
             mcq: values[index].mcq,
@@ -1197,6 +1218,7 @@ class HODSimulationType2 extends Component {
                         values.push({
                             question_random_id: "",
                             question: "<p>Main Question goes here</p>",
+                            explanation: "<p>Explanation goes here</p>",
                             pair_question_id: "NOPAIR",
                             is_file_uploaded: false,
                             mcq: true,
@@ -1280,6 +1302,7 @@ class HODSimulationType2 extends Component {
                     values.push({
                         question_random_id: "",
                         question: "<p>Main Question goes here</p>",
+                        explanation: "<p>Explanation goes here</p>",
                         pair_question_id: "NOPAIR",
                         is_file_uploaded: false,
                         mcq: true,
@@ -1465,6 +1488,7 @@ class HODSimulationType2 extends Component {
         values.splice(index + 1, 0, {
             question_random_id: "",
             question: "<p>Main Question goes here</p>",
+            explanation: "<p>Explanation goes here</p>",
             pair_question_id: question.question_random_id,
             is_file_uploaded: false,
             mcq: true,
@@ -2262,6 +2286,26 @@ class HODSimulationType2 extends Component {
                                                             onChange={
                                                                 this
                                                                     .onEditorChange
+                                                            }
+                                                        />
+                                                    </div>
+
+                                                    {/* ---------- Explanation ---------- */}
+
+                                                    <div className="form-group">
+                                                        <label>
+                                                            Explanation
+                                                        </label>
+                                                        <CKeditor
+                                                            data={
+                                                                data[
+                                                                    this.state
+                                                                        .activeQuestion
+                                                                ].explanation
+                                                            }
+                                                            onChange={
+                                                                this
+                                                                    .handleExplanation
                                                             }
                                                         />
                                                     </div>

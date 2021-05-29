@@ -616,7 +616,6 @@ export function QuestionDataFormat(response) {
                     sub_question_id:
                         response[i].sub_question[k].sub_question_id,
                     question: response[i].sub_question[k].question,
-                    explanation: response[i].sub_question[k].explanation,
                     mcq: response[i].sub_question[k].mcq || false,
                     fill_in: response[i].sub_question[k].fill_in || false,
                     fillin_answer: response[i].sub_question[k].fillin_answer
@@ -635,6 +634,7 @@ export function QuestionDataFormat(response) {
                 type: "type_2",
                 question: response[i].question,
                 question_random_id: response[i].question_random_id,
+                explanation: response[i].explanation,
                 pair_question_id: response[i].pair_question_id || "",
                 favourite: response[i].favourite || false,
                 personal_notes: response[i].personal_notes || {},

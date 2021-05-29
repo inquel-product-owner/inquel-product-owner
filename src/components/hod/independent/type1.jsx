@@ -8,6 +8,7 @@ import Loading from "../../shared/loader";
 import AlertBox from "../../shared/alert";
 import FileModal from "../shared/fileExplorer";
 import { QuestionDataFormat } from "../../shared/dataFormating";
+import ExplanationModal from "../../shared/explanationModal";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
@@ -21,6 +22,7 @@ class HODSubjectTypeOne extends Component {
         this.state = {
             showSideNav: false,
             showModal: false,
+            showExplanationModal: false,
 
             questions: [],
 
@@ -33,6 +35,7 @@ class HODSubjectTypeOne extends Component {
             selectedImage: "",
             selectedVideo: "",
             selectedAudio: "",
+            selectedData: "",
         };
         this.subjectId = this.props.match.params.subjectId;
         this.chapterId = this.props.match.params.chapterId;
@@ -170,6 +173,17 @@ class HODSubjectTypeOne extends Component {
                         audio={this.state.selectedAudio}
                     />
                 ) : null}
+
+                {/* Explanation modal */}
+                <ExplanationModal
+                    show={this.state.showExplanationModal}
+                    onHide={() => {
+                        this.setState({
+                            showExplanationModal: false,
+                        });
+                    }}
+                    data={this.state.selectedData}
+                />
 
                 <div
                     className={`section content ${
@@ -410,6 +424,24 @@ class HODSubjectTypeOne extends Component {
                                                           ""
                                                       )}
                                                   </div>
+
+                                                  {/* ----- Explanation ----- */}
+
+                                                  <button
+                                                      className="btn btn-link btn-sm shadow-none"
+                                                      onClick={() =>
+                                                          this.setState({
+                                                              showExplanationModal: true,
+                                                              selectedData:
+                                                                  question
+                                                                      .content
+                                                                      .explanation,
+                                                          })
+                                                      }
+                                                  >
+                                                      <i className="fas fa-info-circle mr-1"></i>{" "}
+                                                      Explanation
+                                                  </button>
                                               </div>
                                               {/* ----- Answer type tag ----- */}
                                               {question.content.mcq ? (

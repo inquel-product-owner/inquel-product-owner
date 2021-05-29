@@ -19,13 +19,10 @@ class GroupModal extends Component {
             groupDesc: "",
             level_code: "",
             level_name: "",
-            subject_code: "",
-            subject_name: "",
             valid_from: "",
             valid_to: "",
 
             levelItems: [],
-            subjectItems: {},
 
             errorMsg: "",
             successMsg: "",
@@ -56,7 +53,6 @@ class GroupModal extends Component {
                 if (result.sts === true) {
                     this.setState({
                         levelItems: result.data.LEVELS,
-                        subjectItems: result.data.SUBJECTS,
                     });
                 } else {
                     this.setState({
@@ -104,24 +100,6 @@ class GroupModal extends Component {
         });
     };
 
-    handleSubject = (event) => {
-        let temp = Object.entries(this.state.subjectItems);
-        let code = "";
-        let name = "";
-        for (let i = 0; i < Object.keys(this.state.subjectItems).length; i++) {
-            if (temp[i][0] === event.target.value) {
-                code = temp[i][0];
-                name = temp[i][1];
-            } else {
-                continue;
-            }
-        }
-        this.setState({
-            subject_code: code,
-            subject_name: name,
-        });
-    };
-
     handleSubmit = (event) => {
         event.preventDefault();
         var url = baseUrl + hodUrl;
@@ -138,7 +116,7 @@ class GroupModal extends Component {
             showSuccessAlert: false,
         });
 
-        fetch(`${url}/hod/create/group/`, {
+        fetch(`${url}/hod/group/`, {
             headers: headers,
             method: "POST",
             body: JSON.stringify({
@@ -146,8 +124,6 @@ class GroupModal extends Component {
                 group_description: this.state.groupDesc,
                 level_code: this.state.level_code,
                 level_name: this.state.level_name,
-                subject_code: this.state.subject_code,
-                subject_name: this.state.subject_name,
                 valid_from: this.state.valid_from,
                 valid_to: this.state.valid_to,
             }),
@@ -193,189 +169,162 @@ class GroupModal extends Component {
                 size="md"
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
+                scrollable
             >
                 <Modal.Header closeButton>Create Group</Modal.Header>
-                <form onSubmit={this.handleSubmit} autoComplete="off">
-                    <Modal.Body>
-                        <Alert
-                            variant="danger"
-                            show={this.state.showErrorAlert}
-                            onClose={() => {
-                                this.setState({
-                                    showErrorAlert: false,
-                                });
-                            }}
-                            dismissible
-                        >
-                            {this.state.errorMsg}
-                        </Alert>
-                        <Alert
-                            variant="success"
-                            show={this.state.showSuccessAlert}
-                            onClose={() => {
-                                this.setState({
-                                    showSuccessAlert: false,
-                                });
-                            }}
-                            dismissible
-                        >
-                            {this.state.successMsg}
-                        </Alert>
+                <Modal.Body>
+                    <Alert
+                        variant="danger"
+                        show={this.state.showErrorAlert}
+                        onClose={() => {
+                            this.setState({
+                                showErrorAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.errorMsg}
+                    </Alert>
+                    <Alert
+                        variant="success"
+                        show={this.state.showSuccessAlert}
+                        onClose={() => {
+                            this.setState({
+                                showSuccessAlert: false,
+                            });
+                        }}
+                        dismissible
+                    >
+                        {this.state.successMsg}
+                    </Alert>
 
-                        <div className="form-group">
-                            <label htmlFor="groupName">Group name</label>
+                    <div className="form-group">
+                        <label htmlFor="groupName">Group name</label>
+                        <input
+                            type="text"
+                            name="groupName"
+                            id="groupName"
+                            className="form-control borders"
+                            onChange={this.handleGroupData}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="groupDesc">Description</label>
+                        <textarea
+                            name="groupDesc"
+                            id="groupDesc"
+                            rows="4"
+                            className="form-control borders"
+                            onChange={this.handleGroupData}
+                            required
+                        ></textarea>
+                    </div>
+                    <div className="row">
+                        <div className="form-group col-md-4">
+                            <label htmlFor="category">Category</label>
                             <input
                                 type="text"
-                                name="groupName"
-                                id="groupName"
+                                name="category"
+                                id="category"
+                                value={this.props.category}
                                 className="form-control borders"
-                                onChange={this.handleGroupData}
-                                required
+                                disabled
                             />
                         </div>
-                        <div className="form-group">
-                            <label htmlFor="groupDesc">Description</label>
-                            <textarea
-                                name="groupDesc"
-                                id="groupDesc"
-                                rows="4"
+                        <div className="form-group col-md-4">
+                            <label htmlFor="sub_category">Sub Category</label>
+                            <input
+                                type="text"
+                                name="sub_category"
+                                id="sub_category"
+                                value={this.props.sub_category}
                                 className="form-control borders"
-                                onChange={this.handleGroupData}
-                                required
-                            ></textarea>
+                                disabled
+                            />
                         </div>
-                        <div className="row">
-                            <div className="form-group col-md-4">
-                                <label htmlFor="category">Category</label>
-                                <input
-                                    type="text"
-                                    name="category"
-                                    id="category"
-                                    value={this.props.category}
-                                    className="form-control borders"
-                                    disabled
-                                />
-                            </div>
-                            <div className="form-group col-md-4">
-                                <label htmlFor="sub_category">
-                                    Sub Category
-                                </label>
-                                <input
-                                    type="text"
-                                    name="sub_category"
-                                    id="sub_category"
-                                    value={this.props.sub_category}
-                                    className="form-control borders"
-                                    disabled
-                                />
-                            </div>
-                            <div className="form-group col-md-4">
-                                <label htmlFor="discipline">Discipline</label>
-                                <input
-                                    type="text"
-                                    name="discipline"
-                                    id="discipline"
-                                    value={this.props.discipline}
-                                    className="form-control borders"
-                                    disabled
-                                />
-                            </div>
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="levels">Level</label>
-                            <select
-                                name="levels"
-                                id="levels"
-                                onChange={this.handleLevels}
+                        <div className="form-group col-md-4">
+                            <label htmlFor="discipline">Discipline</label>
+                            <input
+                                type="text"
+                                name="discipline"
+                                id="discipline"
+                                value={this.props.discipline}
                                 className="form-control borders"
-                                required
-                            >
-                                <option value="">Select levels</option>
-                                {Object.keys(this.state.levelItems).length !== 0
-                                    ? Object.entries(this.state.levelItems).map(
-                                          ([key, value], index) => {
-                                              return (
-                                                  <option
-                                                      value={key}
-                                                      key={index}
-                                                  >
-                                                      {value}
-                                                  </option>
-                                              );
-                                          }
-                                      )
-                                    : null}
-                            </select>
+                                disabled
+                            />
                         </div>
-                        <div className="form-group">
-                            <label htmlFor="subject">Subject</label>
-                            <select
-                                name="subject"
-                                id="subject"
-                                onChange={this.handleSubject}
-                                className="form-control borders"
-                                required
-                            >
-                                <option value="">Select subject</option>
-                                {Object.keys(this.state.subjectItems).length !==
-                                0
-                                    ? Object.entries(
-                                          this.state.subjectItems
-                                      ).map(([key, value], index) => {
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="levels">Level</label>
+                        <select
+                            name="levels"
+                            id="levels"
+                            onChange={this.handleLevels}
+                            className="form-control borders"
+                            required
+                        >
+                            <option value="">Select levels</option>
+                            {Object.keys(this.state.levelItems).length !== 0
+                                ? Object.entries(this.state.levelItems).map(
+                                      ([key, value], index) => {
                                           return (
                                               <option value={key} key={index}>
                                                   {value}
                                               </option>
                                           );
-                                      })
-                                    : null}
-                            </select>
+                                      }
+                                  )
+                                : null}
+                        </select>
+                    </div>
+                    <div className="row">
+                        <div className="col-md-6 form-group">
+                            <label htmlFor="valid_from">Valid from</label>
+                            <input
+                                type="date"
+                                name="valid_from"
+                                id="valid_from"
+                                className="form-control borders"
+                                min={this.props.valid_from}
+                                max={this.props.valid_to}
+                                onChange={this.handleDate}
+                            />
                         </div>
-                        <div className="row">
-                            <div className="col-md-6 form-group">
-                                <label htmlFor="valid_from">Valid from</label>
-                                <input
-                                    type="date"
-                                    name="valid_from"
-                                    id="valid_from"
-                                    className="form-control borders"
-                                    min={this.props.valid_from}
-                                    max={this.props.valid_to}
-                                    onChange={this.handleDate}
-                                />
-                            </div>
-                            <div className="col-md-6 form-group">
-                                <label htmlFor="valid_to">Valid to</label>
-                                <input
-                                    type="date"
-                                    name="valid_to"
-                                    id="valid_to"
-                                    className="form-control borders"
-                                    min={this.props.valid_from}
-                                    max={this.props.valid_to}
-                                    onChange={this.handleDate}
-                                />
-                            </div>
+                        <div className="col-md-6 form-group">
+                            <label htmlFor="valid_to">Valid to</label>
+                            <input
+                                type="date"
+                                name="valid_to"
+                                id="valid_to"
+                                className="form-control borders"
+                                min={this.props.valid_from}
+                                max={this.props.valid_to}
+                                onChange={this.handleDate}
+                            />
                         </div>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <button className="btn btn-primary btn-block shadow-none">
-                            {this.state.showLoader ? (
-                                <Spinner
-                                    as="span"
-                                    animation="border"
-                                    size="sm"
-                                    role="status"
-                                    aria-hidden="true"
-                                    className="mr-2"
-                                />
-                            ) : (
-                                ""
-                            )}
-                            Create Group
-                        </button>
-                    </Modal.Footer>
-                </form>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <button
+                        className="btn btn-primary btn-block shadow-none"
+                        onClick={this.handleSubmit}
+                    >
+                        {this.state.showLoader ? (
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                                className="mr-2"
+                            />
+                        ) : (
+                            ""
+                        )}
+                        Create Group
+                    </button>
+                </Modal.Footer>
             </Modal>
         );
     }
@@ -424,7 +373,7 @@ class HODGroupConfiguration extends Component {
     };
 
     loadGroupData = () => {
-        fetch(`${this.url}/hod/groups/?page=${this.state.activeGroupPage}`, {
+        fetch(`${this.url}/hod/group/?page=${this.state.activeGroupPage}`, {
             headers: this.headers,
             method: "GET",
         })

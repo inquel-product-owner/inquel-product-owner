@@ -10,9 +10,11 @@ import Paginations from "../shared/pagination";
 import SubjectTable from "../table/subject";
 import CarouselCard from "../shared/owlCarousel";
 import AlertBox from "../shared/alert";
+import { waterMark } from "../shared/watermark";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
+    profile: state.user.profile,
 });
 
 class TeacherGroup extends Component {
@@ -127,6 +129,7 @@ class TeacherGroup extends Component {
                     className={`section content ${
                         this.state.showSideNav ? "active" : ""
                     }`}
+                    style={waterMark(this.props.profile)}
                 >
                     <div className="container-fluid">
                         {/* Back button */}
@@ -173,7 +176,7 @@ class TeacherGroup extends Component {
                             <SubjectTable
                                 subjectItems={this.state.groupItem}
                                 path={`teacher/group/${this.groupId}`}
-                                check={false}
+                                subject={true}
                             />
                             <div className="card-body p-3">
                                 {this.state.totalSubjectCount >

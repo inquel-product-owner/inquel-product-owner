@@ -127,7 +127,7 @@ class TeacherTable extends Component {
             for (let index = 0; index < selectedrecords.length; index++) {
                 element.push(selectedrecords[index].id.toString());
             }
-            this.props.handleTeacherId(element);
+            if (this.props.handleTeacherId) this.props.handleTeacherId(element);
         }
     }
 
@@ -138,7 +138,7 @@ class TeacherTable extends Component {
             for (let index = 0; index < selectedrecords.length; index++) {
                 element.push(selectedrecords[index].id.toString());
             }
-            this.props.handleTeacherId(element);
+            if (this.props.handleTeacherId) this.props.handleTeacherId(element);
         }
     }
 

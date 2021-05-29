@@ -386,7 +386,6 @@ class HODTeacherProfile extends Component {
                             <SubjectTable
                                 subjectItems={this.state.subjectItems}
                                 path="hod"
-                                check={false}
                             />
                             <div className="card-body p-3">
                                 {this.state.totalSubjectCount >
