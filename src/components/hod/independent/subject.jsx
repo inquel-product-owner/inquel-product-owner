@@ -44,7 +44,7 @@ class Scorecard extends Component {
     }
 
     loadScoreCard = () => {
-        fetch(`${this.url}/hod/subjects/${this.subjectId}/scorecard/`, {
+        fetch(`${this.url}/hod/subject/${this.subjectId}/scorecard/`, {
             method: "GET",
             headers: this.headers,
         })
@@ -108,7 +108,7 @@ class Scorecard extends Component {
             showLoader: true,
         });
 
-        fetch(`${this.url}/hod/subjects/${this.subjectId}/scorecard/`, {
+        fetch(`${this.url}/hod/subject/${this.subjectId}/scorecard/`, {
             method: "POST",
             headers: this.headers,
             body: JSON.stringify({
@@ -1079,9 +1079,7 @@ class HODSubject extends Component {
                                 >
                                     Scorecard
                                 </button>
-                                <Link
-                                    to={`${this.props.match.url}/course`}
-                                >
+                                <Link to={`${this.props.match.url}/course`}>
                                     <button className="btn btn-primary btn-sm shadow-none">
                                         Configure Course
                                     </button>
