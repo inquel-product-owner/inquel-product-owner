@@ -9,7 +9,8 @@ import Footer from "./shared/footer";
 import Loading from "../shared/loader";
 import AlertBox from "../shared/alert";
 import { connect } from "react-redux";
-import store from "../../redux/store";
+import storeDispatcher from "../../redux/dispatch";
+import { GROUP } from "../../redux/action";
 
 const mapStateToProps = (state) => ({
     profile: state.user.profile,
@@ -277,18 +278,15 @@ class Dashboard extends Component {
                                                                 >
                                                                     <button
                                                                         className="btn btn-primary btn-sm shadow-none"
-                                                                        onClick={() => {
-                                                                            store.dispatch(
-                                                                                {
-                                                                                    type: "GROUP",
-                                                                                    payload:
-                                                                                        this
-                                                                                            .state
-                                                                                            .groupData
-                                                                                            .group_name,
-                                                                                }
-                                                                            );
-                                                                        }}
+                                                                        onClick={() =>
+                                                                            storeDispatcher(
+                                                                                GROUP,
+                                                                                this
+                                                                                    .state
+                                                                                    .groupData
+                                                                                    .group_name
+                                                                            )
+                                                                        }
                                                                     >
                                                                         <i className="fas fa-eye"></i>
                                                                     </button>

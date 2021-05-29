@@ -5,6 +5,14 @@ import { Link } from "react-router-dom";
 import Loading from "../../shared/loader";
 import AlertBox from "../../shared/alert";
 import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
+import { connect } from "react-redux";
+import storeDispatcher from "../../../redux/dispatch";
+import { TEMP } from "../../../redux/action";
+
+const mapStateToProps = (state) => ({
+    content: state.storage.content,
+    subject_name: state.content.subject_name,
+});
 
 class Favourites extends Component {
     constructor(props) {
@@ -12,7 +20,6 @@ class Favourites extends Component {
         this.state = {
             showSideNav: false,
             showModal: false,
-            subjectItems: [],
             favouritesData: {},
 
             chapterId: "",
@@ -111,43 +118,21 @@ class Favourites extends Component {
     };
 
     componentDidMount = () => {
-        fetch(`${this.url}/student/subject/${this.subjectId}/`, {
-            method: "GET",
-            headers: this.headers,
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    this.setState({
-                        subjectItems: result.data,
-                    });
-                    let chapterId = "";
-                    let chapter_name = "";
-                    for (let i = 0; i < result.data.chapters.length; i++) {
-                        chapterId = result.data.chapters[0].chapter_id;
-                        chapter_name = result.data.chapters[0].chapter_name;
-                    }
-                    this.setState(
-                        {
-                            chapterId: chapterId,
-                            chapter_name: chapter_name,
-                        },
-                        () => {
-                            this.loadFavouritesData();
-                        }
-                    );
-                } else {
-                    this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+        let chapterId = "";
+        let chapter_name = "";
+        for (let i = 0; i < this.props.content.chapters.length; i++) {
+            chapterId = this.props.content.chapters[0].chapter_id;
+            chapter_name = this.props.content.chapters[0].chapter_name;
+        }
+        this.setState(
+            {
+                chapterId: chapterId,
+                chapter_name: chapter_name,
+            },
+            () => {
+                this.loadFavouritesData();
+            }
+        );
     };
 
     getTopicName = (data, topic_num) => {
@@ -167,10 +152,9 @@ class Favourites extends Component {
     };
 
     loopSubjectData = (topic_num) => {
-        let subject = this.state.subjectItems;
         let topic_name = "";
 
-        subject.chapters.forEach((chapter) => {
+        this.props.content.chapters.forEach((chapter) => {
             if (chapter.chapter_id === this.state.chapterId) {
                 chapter.topics.forEach((topic) => {
                     topic_name = this.getTopicName(
@@ -185,24 +169,19 @@ class Favourites extends Component {
     };
 
     handleRouting = (data, type, topic_num) => {
-        sessionStorage.setItem("data", JSON.stringify(data));
+        storeDispatcher(TEMP, data);
         this.props.history.push(
             `${this.props.match.url}/${this.state.chapterId}/${topic_num}/${type}`
         );
     };
 
     render() {
-        document.title = `${this.state.chapter_name} Favourites - Student | IQLabs`;
-        const chapter = this.state.subjectItems;
+        document.title = `${this.state.chapter_name} : Favourites - Student | IQLabs`;
         return (
             <div className="wrapper">
                 {/* Navbar */}
                 <Header
-                    name={
-                        this.state.subjectItems.subject_name !== undefined
-                            ? this.state.subjectItems.subject_name
-                            : ""
-                    }
+                    name={this.props.subject_name}
                     togglenav={this.toggleSideNav}
                 />
 
@@ -257,7 +236,7 @@ class Favourites extends Component {
                                         to="#"
                                         onClick={this.props.history.goBack}
                                     >
-                                        Course
+                                        {this.props.subject_name}
                                     </Link>
                                 </li>
                                 <li className="breadcrumb-item active">
@@ -272,47 +251,42 @@ class Favourites extends Component {
                                     {/* ---------- Chapter list ---------- */}
                                     <div className="col-md-3 mb-2 mb-md-0 border-right">
                                         <div className="card">
-                                            {chapter.length !== 0
-                                                ? chapter.chapters.length !== 0
-                                                    ? chapter.chapters.map(
-                                                          (data, index) => {
-                                                              return (
-                                                                  <div
-                                                                      className={`card card-body ${
-                                                                          this
-                                                                              .state
-                                                                              .selectedChapter ===
-                                                                          `chapter-${index}`
-                                                                              ? "pinkrange-bg"
-                                                                              : "light-bg"
-                                                                      } font-weight-bold-600 primary-text small shadow-sm mb-2`}
-                                                                      key={
-                                                                          index
-                                                                      }
-                                                                      onClick={() =>
-                                                                          this.toggleCollapse(
-                                                                              index,
-                                                                              data.chapter_id,
-                                                                              data.chapter_name
-                                                                          )
-                                                                      }
-                                                                      style={{
-                                                                          paddingBottom:
-                                                                              "13px",
-                                                                          paddingTop:
-                                                                              "13px",
-                                                                          cursor:
-                                                                              "default",
-                                                                      }}
-                                                                  >
-                                                                      {
-                                                                          data.chapter_name
-                                                                      }
-                                                                  </div>
-                                                              );
-                                                          }
-                                                      )
-                                                    : null
+                                            {this.props.content !== null
+                                                ? (
+                                                      this.props.content
+                                                          .chapters || []
+                                                  ).map((data, index) => {
+                                                      return (
+                                                          <div
+                                                              className={`card card-body ${
+                                                                  this.state
+                                                                      .selectedChapter ===
+                                                                  `chapter-${index}`
+                                                                      ? "pinkrange-bg"
+                                                                      : "light-bg"
+                                                              } font-weight-bold-600 primary-text small shadow-sm mb-2`}
+                                                              key={index}
+                                                              onClick={() =>
+                                                                  this.toggleCollapse(
+                                                                      index,
+                                                                      data.chapter_id,
+                                                                      data.chapter_name
+                                                                  )
+                                                              }
+                                                              style={{
+                                                                  paddingBottom:
+                                                                      "13px",
+                                                                  paddingTop:
+                                                                      "13px",
+                                                                  cursor: "default",
+                                                              }}
+                                                          >
+                                                              {
+                                                                  data.chapter_name
+                                                              }
+                                                          </div>
+                                                      );
+                                                  })
                                                 : null}
                                         </div>
                                     </div>
@@ -422,6 +396,7 @@ class Favourites extends Component {
                                 </div>
                             </div>
                         </div>
+
                         {/* Loading component */}
                         {this.state.page_loading ? <Loading /> : ""}
                     </div>
@@ -431,4 +406,4 @@ class Favourites extends Component {
     }
 }
 
-export default Favourites;
+export default connect(mapStateToProps)(Favourites);

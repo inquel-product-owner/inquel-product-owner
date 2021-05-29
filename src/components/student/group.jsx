@@ -9,6 +9,8 @@ import AlertBox from "../shared/alert";
 import Slider from "react-slick";
 import { connect } from "react-redux";
 import { waterMark } from "../shared/watermark";
+import storeDispatcher from "../../redux/dispatch";
+import { SUBJECT } from "../../redux/action";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
@@ -44,6 +46,8 @@ class Group extends Component {
     };
 
     componentDidMount = () => {
+        document.title = `${this.props.group_name} - Student | IQLabs`;
+
         fetch(`${this.url}/student/subject/`, {
             method: "GET",
             headers: this.headers,
@@ -104,7 +108,6 @@ class Group extends Component {
                 },
             ],
         };
-        document.title = `${this.props.group_name} - Student | IQLabs`;
         return (
             <div className="wrapper">
                 {/* Navbar */}
@@ -206,6 +209,12 @@ class Group extends Component {
                                                             <Link
                                                                 to={`/student/subject/${data.id}`}
                                                                 className="text-decoration-none"
+                                                                onClick={() =>
+                                                                    storeDispatcher(
+                                                                        SUBJECT,
+                                                                        data.subject_name
+                                                                    )
+                                                                }
                                                             >
                                                                 <div
                                                                     className="card-body primary-bg text-white p-2"
