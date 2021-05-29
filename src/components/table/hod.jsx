@@ -137,7 +137,7 @@ class HODTable extends Component {
             for (let index = 0; index < selectedrecords.length; index++) {
                 element.push(selectedrecords[index].id.toString());
             }
-            this.props.handleHODId(element);
+            if (this.props.handleHODId) this.props.handleHODId(element);
         }
     }
 
@@ -148,7 +148,7 @@ class HODTable extends Component {
             for (let index = 0; index < selectedrecords.length; index++) {
                 element.push(selectedrecords[index].id.toString());
             }
-            this.props.handleHODId(element);
+            if (this.props.handleHODId) this.props.handleHODId(element);
         }
     }
 

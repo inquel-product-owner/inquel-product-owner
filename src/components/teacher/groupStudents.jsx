@@ -10,9 +10,11 @@ import Loading from "../shared/loader";
 import Paginations from "../shared/pagination";
 import StudentTable from "../table/student";
 import AlertBox from "../shared/alert";
+import { waterMark } from "../shared/watermark";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
+    profile: state.user.profile,
 });
 
 class TeacherGroupStudents extends Component {
@@ -187,6 +189,7 @@ class TeacherGroupStudents extends Component {
                     className={`section content ${
                         this.state.showSideNav ? "active" : ""
                     }`}
+                    style={waterMark(this.props.profile)}
                 >
                     <div className="container-fluid">
                         {/* Back button */}

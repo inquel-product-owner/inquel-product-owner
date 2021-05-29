@@ -127,7 +127,7 @@ class StudentTable extends Component {
             for (let index = 0; index < selectedrecords.length; index++) {
                 element.push(selectedrecords[index].id.toString());
             }
-            this.props.handleStudentId(element);
+            if (this.props.handleStudentId) this.props.handleStudentId(element);
         }
     }
 
@@ -138,7 +138,7 @@ class StudentTable extends Component {
             for (let index = 0; index < selectedrecords.length; index++) {
                 element.push(selectedrecords[index].id.toString());
             }
-            this.props.handleStudentId(element);
+            if (this.props.handleStudentId) this.props.handleStudentId(element);
         }
     }
 

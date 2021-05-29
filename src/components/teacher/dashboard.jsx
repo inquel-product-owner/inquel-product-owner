@@ -202,7 +202,11 @@ class TeacherDashboard extends Component {
                             <SubjectTable
                                 subjectItems={this.state.subjectItem}
                                 path="teacher"
-                                check={false}
+                                category={true}
+                                sub_category={true}
+                                discipline={true}
+                                level={true}
+                                subject={true}
                             />
                             <div className="card-body p-3">
                                 {this.state.totalSubjectCount >

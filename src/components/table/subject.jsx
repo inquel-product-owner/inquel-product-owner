@@ -59,8 +59,8 @@ class SubjectTable extends Component {
         };
         this.select = {
             persistSelection: true,
-            type: "Multiple",
-            checkboxOnly: true,
+            type: "Single",
+            checkboxOnly: false,
         };
         this.toolbarOptions = ["Search"];
     }
@@ -97,7 +97,9 @@ class SubjectTable extends Component {
             for (let index = 0; index < selectedrecords.length; index++) {
                 element.push(selectedrecords[index].id.toString());
             }
-            this.props.handleSubjectId(element);
+            if (this.props.handleSubjectId) {
+                this.props.handleSubjectId(element);
+            }
         }
     }
 
@@ -108,7 +110,9 @@ class SubjectTable extends Component {
             for (let index = 0; index < selectedrecords.length; index++) {
                 element.push(selectedrecords[index].id.toString());
             }
-            this.props.handleSubjectId(element);
+            if (this.props.handleSubjectId) {
+                this.props.handleSubjectId(element);
+            }
         }
     }
 
@@ -154,7 +158,7 @@ class SubjectTable extends Component {
                         rowDeselected={this.rowDeselected.bind(this)}
                     >
                         <ColumnsDirective>
-                            {this.props.check !== false ? (
+                            {this.props.check === true ? (
                                 <ColumnDirective
                                     type="checkbox"
                                     allowSorting={false}
@@ -173,6 +177,46 @@ class SubjectTable extends Component {
                                 clipMode="EllipsisWithTooltip"
                                 filter={this.excel}
                             />
+                            {this.props.category === true ? (
+                                <ColumnDirective
+                                    field="category"
+                                    headerText="Category"
+                                    filter={this.excel}
+                                    clipMode="EllipsisWithTooltip"
+                                />
+                            ) : null}
+                            {this.props.sub_category === true ? (
+                                <ColumnDirective
+                                    field="sub_category"
+                                    headerText="Sub category"
+                                    filter={this.excel}
+                                    clipMode="EllipsisWithTooltip"
+                                />
+                            ) : null}
+                            {this.props.discipline === true ? (
+                                <ColumnDirective
+                                    field="discipline"
+                                    headerText="Discipline"
+                                    filter={this.excel}
+                                    clipMode="EllipsisWithTooltip"
+                                />
+                            ) : null}
+                            {this.props.level === true ? (
+                                <ColumnDirective
+                                    field="level"
+                                    headerText="Level"
+                                    filter={this.excel}
+                                    clipMode="EllipsisWithTooltip"
+                                />
+                            ) : null}
+                            {this.props.subject === true ? (
+                                <ColumnDirective
+                                    field="subject"
+                                    headerText="Subject"
+                                    filter={this.excel}
+                                    clipMode="EllipsisWithTooltip"
+                                />
+                            ) : null}
                             {this.props.status === true ? (
                                 <ColumnDirective
                                     field="status"

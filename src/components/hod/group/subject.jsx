@@ -46,7 +46,7 @@ class HODGroupSubject extends Component {
     };
 
     loadSubjectData = () => {
-        fetch(`${this.url}/hod/subjects/${this.subjectId}/chapters/`, {
+        fetch(`${this.url}/hod/subject/${this.subjectId}/chapters/`, {
             headers: this.headers,
             method: "GET",
         })

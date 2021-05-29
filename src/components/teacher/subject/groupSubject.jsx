@@ -19,10 +19,12 @@ import {
     SemesterModal,
     Scorecard,
 } from "./contentManagementModal";
+import { waterMark } from "../../shared/watermark";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
     subject_name: state.content.subject_name,
+    profile: state.user.profile,
 });
 
 class TeacherSubject extends Component {
@@ -316,10 +318,10 @@ class TeacherSubject extends Component {
                         type="Semester"
                         name={this.state.selectedSemester.semester_name}
                         data={{
-                            semester_id: this.state.selectedSemester
-                                .semester_id,
-                            semester_name: this.state.selectedSemester
-                                .semester_name,
+                            semester_id:
+                                this.state.selectedSemester.semester_id,
+                            semester_name:
+                                this.state.selectedSemester.semester_name,
                         }}
                     />
                 ) : (
@@ -336,8 +338,8 @@ class TeacherSubject extends Component {
                         type="Semester"
                         name={this.state.selectedSemester.semester_name}
                         data={{
-                            semester_id: this.state.selectedSemester
-                                .semester_id,
+                            semester_id:
+                                this.state.selectedSemester.semester_id,
                         }}
                         toggleModal={this.toggleSemester_DeleteModal}
                     />
@@ -362,6 +364,7 @@ class TeacherSubject extends Component {
                     className={`section content ${
                         this.state.showSideNav ? "active" : ""
                     }`}
+                    style={waterMark(this.props.profile)}
                 >
                     <div className="container-fluid">
                         {/* Back button */}

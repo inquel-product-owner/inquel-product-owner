@@ -29,7 +29,11 @@ class SubjectModal extends Component {
         this.state = {
             subjectName: "",
             teacher_id: "",
+            subject_code: "",
+
             teacherData: [],
+            subjectItems: {},
+
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
@@ -67,6 +71,31 @@ class SubjectModal extends Component {
             .catch((err) => {
                 console.log(err);
             });
+
+        fetch(
+            `${this.url}/hod/group/levels/?category=${this.props.category}&sub_category=${this.props.sub_category}`,
+            {
+                headers: this.headers,
+                method: "GET",
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                console.log(result);
+                if (result.sts === true) {
+                    this.setState({
+                        subjectItems: result.data.SUBJECTS,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     };
 
     handleSubmit = (event) => {
@@ -78,13 +107,13 @@ class SubjectModal extends Component {
             showSuccessAlert: false,
         });
 
-        fetch(`${this.url}/hod/create/subject/`, {
+        fetch(`${this.url}/hod/group/${this.props.groupId}/subject/`, {
             headers: this.headers,
             method: "POST",
             body: JSON.stringify({
                 subject_name: this.state.subjectName,
-                group_id: this.props.groupId,
                 teacher_id: this.state.teacher_id,
+                subject: this.state.subject_code,
             }),
         })
             .then((res) => res.json())
@@ -119,6 +148,12 @@ class SubjectModal extends Component {
     handleTeacher = (event) => {
         this.setState({
             teacher_id: event.value.toString(),
+        });
+    };
+
+    handleSubject = (event) => {
+        this.setState({
+            subject_code: event.value,
         });
     };
 
@@ -192,6 +227,31 @@ class SubjectModal extends Component {
                                 required
                             />
                         </div>
+                        <div className="form-group">
+                            <label htmlFor="subject">Subject</label>
+                            <Select
+                                className="basic-single borders"
+                                placeholder="Select subject"
+                                isSearchable={true}
+                                name="subject"
+                                id="subject"
+                                options={
+                                    Object.keys(this.state.subjectItems)
+                                        .length !== 0
+                                        ? Object.entries(
+                                              this.state.subjectItems
+                                          ).map(([key, value]) => {
+                                              return {
+                                                  value: key,
+                                                  label: value,
+                                              };
+                                          })
+                                        : null
+                                }
+                                onChange={this.handleSubject}
+                                required
+                            />
+                        </div>
                     </Modal.Body>
                     <Modal.Footer>
                         <button className="btn btn-primary btn-block shadow-none">
@@ -227,6 +287,7 @@ class HODGroup extends Component {
             showSubject_EnableModal: false,
 
             subjectItems: [],
+            groupItem: {},
             selectedSubject: [],
             activeSubjectPage: 1,
             totalSubjectCount: 0,
@@ -270,6 +331,7 @@ class HODGroup extends Component {
                 if (result.sts === true) {
                     this.setState({
                         subjectItems: result.data.subjects,
+                        groupItem: result.data,
                         totalSubjectCount: result.data.subjects.length,
                         page_loading: false,
                     });
@@ -288,7 +350,7 @@ class HODGroup extends Component {
 
     componentDidMount = () => {
         document.title = `${this.props.group_name} - HOD | IQLabs`;
-        
+
         this.loadSubjectData();
     };
 
@@ -390,6 +452,8 @@ class HODGroup extends Component {
                         onHide={this.toggleModal}
                         groupId={this.groupId}
                         formSubmission={this.formSubmission}
+                        category={this.props.profile.category}
+                        sub_category={this.props.profile.sub_category}
                     />
                 ) : (
                     ""
@@ -402,7 +466,7 @@ class HODGroup extends Component {
                         onHide={this.handleDelete}
                         toggleModal={this.handleDelete}
                         formSubmission={this.formSubmission}
-                        url={`${this.url}/hod/create/subject/`}
+                        url={`${this.url}/hod/group/subject/`}
                         data={this.state.selectedSubject}
                         field="subject_ids"
                         type="Subject"
@@ -418,7 +482,7 @@ class HODGroup extends Component {
                         onHide={this.handleDisable}
                         toggleModal={this.handleDisable}
                         formSubmission={this.formSubmission}
-                        url={`${this.url}/hod/create/subject/`}
+                        url={`${this.url}/hod/group/subject/`}
                         data={this.state.selectedSubject}
                         field="subject_ids"
                         type="Subject"
@@ -434,7 +498,7 @@ class HODGroup extends Component {
                         onHide={this.handleEnable}
                         toggleModal={this.handleEnable}
                         formSubmission={this.formSubmission}
-                        url={`${this.url}/hod/create/subject/`}
+                        url={`${this.url}/hod/group/subject/`}
                         data={this.state.selectedSubject}
                         field="subject_ids"
                         type="Subject"
@@ -470,7 +534,10 @@ class HODGroup extends Component {
                                         </li>
                                         <li className="breadcrumb-item active">
                                             <span>Group:</span>
-                                            {this.props.group_name}
+                                            {this.props.group_name} -{" "}
+                                            {this.state.groupItem.level
+                                                ? this.state.groupItem.level
+                                                : ""}
                                         </li>
                                     </ol>
                                 </nav>
@@ -531,6 +598,7 @@ class HODGroup extends Component {
                                 subjectItems={this.state.subjectItems}
                                 path={`hod/group/${this.groupId}`}
                                 status={true}
+                                subject={true}
                                 handleSubjectId={this.handleSubjectId}
                             />
                             <div className="card-body p-3">

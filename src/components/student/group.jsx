@@ -8,9 +8,11 @@ import Loading from "../shared/loader";
 import AlertBox from "../shared/alert";
 import Slider from "react-slick";
 import { connect } from "react-redux";
+import { waterMark } from "../shared/watermark";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
+    profile: state.user.profile,
 });
 
 class Group extends Component {
@@ -139,6 +141,7 @@ class Group extends Component {
                     className={`section content pb-0 ${
                         this.state.showSideNav ? "active" : ""
                     }`}
+                    style={waterMark(this.props.profile)}
                 >
                     <div className="container-fluid">
                         {/* Back button */}

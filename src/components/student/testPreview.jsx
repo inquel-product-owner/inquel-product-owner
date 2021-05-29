@@ -5,31 +5,7 @@ import AlertBox from "../shared/alert";
 import Loading from "../shared/loader";
 import { Document, Page, pdfjs } from "react-pdf";
 import dateFormat from "dateformat";
-import { Modal } from "react-bootstrap";
-
-const ExplanationModal = (props) => {
-    return (
-        <Modal
-            show={props.show}
-            onHide={props.onHide}
-            size="lg"
-            aria-labelledby="contained-modal-title-vcenter"
-            centered
-            scrollable
-        >
-            <Modal.Header closeButton>Explanation</Modal.Header>
-            <Modal.Body>
-                <div style={{ minHeight: "50vh" }}>
-                    <div
-                        dangerouslySetInnerHTML={{
-                            __html: props.data,
-                        }}
-                    ></div>
-                </div>
-            </Modal.Body>
-        </Modal>
-    );
-};
+import ExplanationModal from "../shared/explanationModal";
 
 class TestPreview extends Component {
     constructor(props) {
@@ -39,7 +15,7 @@ class TestPreview extends Component {
             selectedData: "",
 
             subject_name: "",
-            section: [],
+            questions: [],
 
             totalSection: 0,
             currentSectionIndex: 0,
@@ -126,12 +102,10 @@ class TestPreview extends Component {
                                     proper_answer:
                                         section.questions[i].sub_question[j]
                                             .proper_answer,
-                                    answer:
-                                        section.questions[i].sub_question[j]
-                                            .answer,
-                                    marks:
-                                        section.questions[i].sub_question[j]
-                                            .marks,
+                                    answer: section.questions[i].sub_question[j]
+                                        .answer,
+                                    marks: section.questions[i].sub_question[j]
+                                        .marks,
                                 });
                             }
                             questions.push({
@@ -151,7 +125,7 @@ class TestPreview extends Component {
             }
         });
         await this.setState({
-            section: sections,
+            questions: sections,
             totalSubQuestion: totalSubQuestion,
             currentSubQuestionIndex: currentSubQuestionIndex,
             totalSection: sections.length,
@@ -256,7 +230,7 @@ class TestPreview extends Component {
         } test preview - Teacher | IQLabs`;
         var data = [];
         if (this.result.auto === true) {
-            data = this.state.section[this.state.currentSectionIndex] || [];
+            data = this.state.questions[this.state.currentSectionIndex] || [];
         }
         return (
             <>
@@ -287,16 +261,12 @@ class TestPreview extends Component {
                     }}
                 />
 
-                {/* ----- Explanation modal ----- */}
-                {this.state.showExplanationModal ? (
-                    <ExplanationModal
-                        show={this.state.showExplanationModal}
-                        onHide={this.toggleModal}
-                        data={this.state.selectedData}
-                    />
-                ) : (
-                    ""
-                )}
+                {/* Explanation modal */}
+                <ExplanationModal
+                    show={this.state.showExplanationModal}
+                    onHide={this.toggleModal}
+                    data={this.state.selectedData}
+                />
 
                 <div className="exam-section">
                     <div className="container-fluid">
@@ -328,8 +298,10 @@ class TestPreview extends Component {
                                             <span className="font-weight-bold-600">
                                                 Scored Marks:
                                             </span>{" "}
-                                            {this.result.data
-                                                    .obtained_test_marks}
+                                            {
+                                                this.result.data
+                                                    .obtained_test_marks
+                                            }
                                         </div>
                                     </div>
                                 </div>
@@ -441,9 +413,10 @@ class TestPreview extends Component {
                                                     <div
                                                         className="text-center rounded py-2"
                                                         style={{
-                                                            backgroundColor: this
-                                                                .result.data[0]
-                                                                .color,
+                                                            backgroundColor:
+                                                                this.result
+                                                                    .data[0]
+                                                                    .color,
                                                             textTransform:
                                                                 "capitalize",
                                                         }}
@@ -481,8 +454,7 @@ class TestPreview extends Component {
                                                           <div
                                                               className="mb-3"
                                                               dangerouslySetInnerHTML={{
-                                                                  __html:
-                                                                      question.question,
+                                                                  __html: question.question,
                                                               }}
                                                           ></div>
 
@@ -625,8 +597,7 @@ class TestPreview extends Component {
                                                           <div
                                                               className="mb-3"
                                                               dangerouslySetInnerHTML={{
-                                                                  __html:
-                                                                      question.question,
+                                                                  __html: question.question,
                                                               }}
                                                           ></div>
 
@@ -699,20 +670,19 @@ class TestPreview extends Component {
                                                                           <div className="card secondary-bg py-2 px-3 mb-2">
                                                                               <div
                                                                                   dangerouslySetInnerHTML={{
-                                                                                      __html:
-                                                                                          question
-                                                                                              .sub_question[
+                                                                                      __html: question
+                                                                                          .sub_question[
+                                                                                          this
+                                                                                              .state
+                                                                                              .currentSubQuestionIndex[
                                                                                               this
                                                                                                   .state
-                                                                                                  .currentSubQuestionIndex[
-                                                                                                  this
-                                                                                                      .state
-                                                                                                      .currentSectionIndex
-                                                                                              ][
-                                                                                                  q_index
-                                                                                              ]
+                                                                                                  .currentSectionIndex
+                                                                                          ][
+                                                                                              q_index
                                                                                           ]
-                                                                                              .question,
+                                                                                      ]
+                                                                                          .question,
                                                                                   }}
                                                                               ></div>
                                                                           </div>
@@ -883,35 +853,46 @@ class TestPreview extends Component {
                                 {/* ---------- Section navigation ---------- */}
                                 <div className="row">
                                     <div className="col-6">
-                                        <button
-                                            className="btn btn-primary btn-sm shadow-none"
-                                            onClick={this.handlePrev}
-                                            disabled={
-                                                this.state.currentSectionIndex >
-                                                0
-                                                    ? false
-                                                    : true
-                                            }
-                                        >
-                                            <i className="fas fa-angle-left mr-1"></i>{" "}
-                                            Previous
-                                        </button>
+                                        {this.state.currentSectionIndex !==
+                                        0 ? (
+                                            <button
+                                                className="btn btn-primary btn-sm shadow-none"
+                                                onClick={this.handlePrev}
+                                            >
+                                                <i className="fas fa-angle-left mr-1"></i>{" "}
+                                                {
+                                                    this.result.data[0]
+                                                        .sections[
+                                                        this.state
+                                                            .currentSectionIndex -
+                                                            1
+                                                    ].section_description
+                                                }
+                                            </button>
+                                        ) : (
+                                            ""
+                                        )}
                                     </div>
                                     <div className="col-6 text-right">
-                                        <button
-                                            className="btn btn-primary btn-sm shadow-none"
-                                            onClick={this.handleNext}
-                                            disabled={
-                                                this.state.currentSectionIndex +
-                                                    1 >=
-                                                this.state.totalSection
-                                                    ? true
-                                                    : false
-                                            }
-                                        >
-                                            Next
-                                            <i className="fas fa-angle-right ml-2"></i>
-                                        </button>
+                                        {this.state.currentSectionIndex + 1 <
+                                        this.state.totalSection ? (
+                                            <button
+                                                className="btn btn-primary btn-sm shadow-none"
+                                                onClick={this.handleNext}
+                                            >
+                                                {
+                                                    this.result.data[0]
+                                                        .sections[
+                                                        this.state
+                                                            .currentSectionIndex +
+                                                            1
+                                                    ].section_description
+                                                }
+                                                <i className="fas fa-angle-right ml-2"></i>
+                                            </button>
+                                        ) : (
+                                            ""
+                                        )}
                                     </div>
                                 </div>
                             </>

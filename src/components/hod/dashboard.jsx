@@ -212,7 +212,7 @@ class SubjectModal extends Component {
             showLoader: true,
         });
 
-        fetch(`${this.url}/hod/create/subject/`, {
+        fetch(`${this.url}/hod/subject/`, {
             headers: this.headers,
             method: "POST",
             body: JSON.stringify({
@@ -544,7 +544,7 @@ class HODDashboard extends Component {
     };
 
     loadGroupData = () => {
-        fetch(`${this.url}/hod/groups/?page=${this.state.activeGroupPage}`, {
+        fetch(`${this.url}/hod/group/?page=${this.state.activeGroupPage}`, {
             headers: this.headers,
             method: "GET",
         })
@@ -783,7 +783,7 @@ class HODDashboard extends Component {
                         onHide={() => this.toggleModal("group", "DELETE")}
                         toggleModal={() => this.toggleModal("group", "DELETE")}
                         formSubmission={this.formSubmission}
-                        url={`${this.url}/hod/create/group/`}
+                        url={`${this.url}/hod/group/delete/`}
                         data={this.state.selectedData}
                         field="group_ids"
                         type="Group"
@@ -816,7 +816,7 @@ class HODDashboard extends Component {
                             this.toggleModal("subject", "DELETE")
                         }
                         formSubmission={this.formSubmission}
-                        url={`${this.url}/hod/create/subject/`}
+                        url={`${this.url}/hod/group/subject/`}
                         data={this.state.selectedData}
                         field="subject_ids"
                         type="subject"
@@ -836,7 +836,7 @@ class HODDashboard extends Component {
                             this.toggleModal("subject", "DISABLE")
                         }
                         formSubmission={this.formSubmission}
-                        url={`${this.url}/hod/create/subject/`}
+                        url={`${this.url}/hod/group/subject/`}
                         data={this.state.selectedData}
                         field="subject_ids"
                         type="subject"
@@ -856,7 +856,7 @@ class HODDashboard extends Component {
                             this.toggleModal("subject", "ENABLE")
                         }
                         formSubmission={this.formSubmission}
-                        url={`${this.url}/hod/create/subject/`}
+                        url={`${this.url}/hod/group/subject/`}
                         data={this.state.selectedData}
                         field="subject_ids"
                         type="subject"
@@ -1051,6 +1051,11 @@ class HODDashboard extends Component {
                                                 }
                                                 path="hod"
                                                 status={true}
+                                                category={true}
+                                                sub_category={true}
+                                                discipline={true}
+                                                level={true}
+                                                subject={true}
                                                 handleSubjectId={
                                                     this.handleSubjectId
                                                 }
@@ -1214,7 +1219,9 @@ class HODDashboard extends Component {
                                                             }
                                                         )}
                                                     </Slider>
-                                                ) : 'No data to display...'}
+                                                ) : (
+                                                    "No data to display..."
+                                                )}
                                             </div>
                                         </div>
                                     </>

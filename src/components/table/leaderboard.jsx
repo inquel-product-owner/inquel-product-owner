@@ -23,8 +23,7 @@ function nameTemplate(props) {
                             ? props.profile_link
                             : userimage
                     }
-                    alt={props.full_name}
-                    width="23"
+                    alt={props.full_name ? props.full_name : props.username}
                     className="profile-pic"
                 />
             </div>
