@@ -597,6 +597,7 @@ class HODGroup extends Component {
                             <SubjectTable
                                 subjectItems={this.state.subjectItems}
                                 path={`hod/group/${this.groupId}`}
+                                check={true}
                                 status={true}
                                 subject={true}
                                 handleSubjectId={this.handleSubjectId}
