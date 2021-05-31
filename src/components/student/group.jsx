@@ -9,7 +9,7 @@ import AlertBox from "../shared/alert";
 import Slider from "react-slick";
 import { connect } from "react-redux";
 import { waterMark } from "../shared/watermark";
-import storeDispatcher from "../../redux/dispatch";
+import storeDispatch from "../../redux/dispatch";
 import { SUBJECT } from "../../redux/action";
 
 const mapStateToProps = (state) => ({
@@ -210,7 +210,7 @@ class Group extends Component {
                                                                 to={`/student/subject/${data.id}`}
                                                                 className="text-decoration-none"
                                                                 onClick={() =>
-                                                                    storeDispatcher(
+                                                                    storeDispatch(
                                                                         SUBJECT,
                                                                         data.subject_name
                                                                     )

@@ -1,7 +1,7 @@
 export function waterMark(data) {
     return {
         backgroundImage: `url(${
-            data !== null
+            data && Object.keys(data).length !== 0
                 ? data.watermark_image
                     ? data.watermark_image
                     : ""

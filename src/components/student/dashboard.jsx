@@ -9,7 +9,7 @@ import Footer from "./shared/footer";
 import Loading from "../shared/loader";
 import AlertBox from "../shared/alert";
 import { connect } from "react-redux";
-import storeDispatcher from "../../redux/dispatch";
+import storeDispatch from "../../redux/dispatch";
 import { GROUP } from "../../redux/action";
 
 const mapStateToProps = (state) => ({
@@ -235,7 +235,8 @@ class Dashboard extends Component {
                         </div>
 
                         {/* Group section */}
-                        {this.props.profile !== null ? (
+                        {this.props.profile &&
+                        Object.entries(this.props.profile).length !== 0 ? (
                             this.props.profile.is_independent_student ===
                             false ? (
                                 <div className="card shadow-sm mb-4">
@@ -279,7 +280,7 @@ class Dashboard extends Component {
                                                                     <button
                                                                         className="btn btn-primary btn-sm shadow-none"
                                                                         onClick={() =>
-                                                                            storeDispatcher(
+                                                                            storeDispatch(
                                                                                 GROUP,
                                                                                 this
                                                                                     .state

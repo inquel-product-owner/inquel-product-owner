@@ -4,10 +4,8 @@ import ReactCardFlip from "react-card-flip";
 import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
 import AlertBox from "../../shared/alert";
 import Loading from "../../shared/loader";
-import { OverlayTrigger, Tooltip, Popover, Modal } from "react-bootstrap";
+import { OverlayTrigger, Tooltip, Popover } from "react-bootstrap";
 import FullScreen from "react-fullscreen-crossbrowser";
-import { Player } from "video-react";
-import "video-react/dist/video-react.css";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
 import {
@@ -15,43 +13,13 @@ import {
     QuestionDataFormat,
 } from "../../shared/dataFormating";
 import { connect } from "react-redux";
+import VideoModal from "../../shared/videoModal";
 
 const mapStateToProps = (state) => ({
     content: state.storage.content,
     temp: state.storage.temp,
     subject_name: state.content.subject_name,
 });
-
-const VideoModal = (props) => {
-    return (
-        <Modal
-            show={props.show}
-            onHide={props.onHide}
-            size="lg"
-            aria-labelledby="contained-modal-title-vcenter"
-            centered
-        >
-            <Modal.Body>
-                <div className="card">
-                    <Player>
-                        <source src={props.video.path} />
-                    </Player>
-                    <p className="mt-3 mb-0">
-                        If video doesn't start playing,{" "}
-                        <a
-                            href={props.video.path}
-                            target="_blank"
-                            rel="noreferrer"
-                        >
-                            Click here
-                        </a>{" "}
-                        to view the video in a seperate tab
-                    </p>
-                </div>
-            </Modal.Body>
-        </Modal>
-    );
-};
 
 class FavouritesFlashcard extends Component {
     constructor(props) {
@@ -202,7 +170,10 @@ class FavouritesFlashcard extends Component {
                                 ></div>
                             </div>
                             {/* <!----- Image & Video viewer -----> */}
-                            {data[index] ? (
+                            {data[index] &&
+                            data[index].content &&
+                            data[index].content.images &&
+                            data[index].content.video ? (
                                 data[index].content.images.length !== 0 ||
                                 data[index].content.video.path !== "" ? (
                                     <div className="ml-3">
@@ -921,7 +892,10 @@ class FavouritesFlashcard extends Component {
                             )}
                         </div>
                         {/* <!----- Image & Video viewer -----> */}
-                        {data[index] ? (
+                        {data[index] &&
+                        data[index].content &&
+                        data[index].content.images &&
+                        data[index].content.video ? (
                             data[index].content.images.length !== 0 ||
                             data[index].content.video.path !== "" ? (
                                 <div className="ml-3">
@@ -1380,7 +1354,10 @@ class FavouritesFlashcard extends Component {
                     </div>
                 </div>
                 {/* <!----- Image & Video viewer -----> */}
-                {data[index] ? (
+                {data[index] &&
+                data[index].content &&
+                data[index].content.images &&
+                data[index].content.video ? (
                     data[index].content.images.length !== 0 ||
                     data[index].content.video.path !== "" ? (
                         <div className="ml-3">

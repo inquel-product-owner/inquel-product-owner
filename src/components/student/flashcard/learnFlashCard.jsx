@@ -4,10 +4,8 @@ import ReactCardFlip from "react-card-flip";
 import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
 import AlertBox from "../../shared/alert";
 import Loading from "../../shared/loader";
-import { OverlayTrigger, Tooltip, Popover, Modal } from "react-bootstrap";
+import { OverlayTrigger, Tooltip, Popover } from "react-bootstrap";
 import FullScreen from "react-fullscreen-crossbrowser";
-import { Player } from "video-react";
-import "video-react/dist/video-react.css";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
 import {
@@ -15,46 +13,16 @@ import {
     QuestionDataFormat,
 } from "../../shared/dataFormating";
 import PersonalNotes from "./notesModal";
+import { connect } from "react-redux";
+import VideoModal from "../../shared/videoModal";
 
-class VideoModal extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            video: this.props.video,
-        };
-    }
-
-    render() {
-        return (
-            <Modal
-                show={this.props.show}
-                onHide={this.props.onHide}
-                size="lg"
-                aria-labelledby="contained-modal-title-vcenter"
-                centered
-            >
-                <Modal.Body>
-                    <div className="card">
-                        <Player>
-                            <source src={this.state.video.path} />
-                        </Player>
-                        <p className="mt-3 mb-0">
-                            If video doesn't start playing,{" "}
-                            <a
-                                href={this.state.video.path}
-                                target="_blank"
-                                rel="noreferrer"
-                            >
-                                Click here
-                            </a>{" "}
-                            to view the video in a seperate tab
-                        </p>
-                    </div>
-                </Modal.Body>
-            </Modal>
-        );
-    }
-}
+const mapStateToProps = (state) => ({
+    content: state.storage.content,
+    temp: state.storage.temp,
+    subject_name: state.content.subject_name,
+    chapter_name: state.content.chapter_name,
+    topic_name: state.content.topic_name,
+});
 
 const NoContentToDisplay = () => {
     return (
@@ -76,9 +44,6 @@ class FlashCard extends Component {
             isFlipped: false,
             showVideoModal: false,
             showNotesModal: false,
-            subject_name: "",
-            chapter_name: "",
-            topic_name: "",
             concepts: [],
             practice: [],
             match: [],
@@ -311,17 +276,19 @@ class FlashCard extends Component {
                                 <div
                                     dangerouslySetInnerHTML={{
                                         __html:
-                                            data[index] !== undefined &&
-                                            data[index].content !== undefined &&
-                                            data[index].content.definition !==
-                                                undefined
+                                            data[index] &&
+                                            data[index].content &&
+                                            data[index].content.definition
                                                 ? data[index].content.definition
                                                 : "",
                                     }}
                                 ></div>
                             </div>
                             {/* <!----- Image & Video viewer -----> */}
-                            {data[index] ? (
+                            {data[index] &&
+                            data[index].content &&
+                            data[index].content.images &&
+                            data[index].content.video ? (
                                 data[index].content.images.length !== 0 ||
                                 data[index].content.video.path !== "" ? (
                                     <div className="ml-3">
@@ -731,7 +698,10 @@ class FlashCard extends Component {
                                                 ></p>
                                                 <div
                                                     className="position-absolute"
-                                                    style={{ right: 0, top: "10px" }}
+                                                    style={{
+                                                        right: 0,
+                                                        top: "10px",
+                                                    }}
                                                 >
                                                     {data[index] &&
                                                     data[index].content &&
@@ -1213,7 +1183,10 @@ class FlashCard extends Component {
                                 )}
                             </div>
                             {/* <!----- Image & Video viewer -----> */}
-                            {data[index] ? (
+                            {data[index] &&
+                            data[index].content &&
+                            data[index].content.images &&
+                            data[index].content.video ? (
                                 data[index].content.images.length !== 0 ||
                                 data[index].content.video.path !== "" ? (
                                     <div className="ml-3">
@@ -1675,7 +1648,10 @@ class FlashCard extends Component {
                     </div>
                 </div>
                 {/* <!----- Image & Video viewer -----> */}
-                {data[index] ? (
+                {data[index] &&
+                data[index].content &&
+                data[index].content.images &&
+                data[index].content.video ? (
                     data[index].content.images.length !== 0 ||
                     data[index].content.video.path !== "" ? (
                         <div className="ml-3">
@@ -2111,73 +2087,14 @@ class FlashCard extends Component {
 
     // ---------- loads subject information ----------
 
-    loopTopicStructure = (array) => {
-        var topic_name = "";
-        array.forEach((a) => {
-            if (this.topicNum === a.topic_num) {
-                topic_name = a.topic_name;
-            } else if (Array.isArray(a.child) && a.child.length !== 0) {
-                topic_name = this.loopTopicStructure(a.child);
-            }
-        });
-        return topic_name;
-    };
-
     componentDidMount = () => {
+        document.title = `${this.props.topic_name} : learn - Student | IQLabs`;
+
         this.loadConceptData();
         this.setState({
             practice: [],
             concepts: [],
         });
-
-        fetch(`${this.url}/student/subject/${this.subjectId}/`, {
-            method: "GET",
-            headers: this.headers,
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    let chapter_name = "";
-                    let topic_name = "";
-                    // extract currently selected chapter name
-                    for (let i = 0; i < result.data.chapters.length; i++) {
-                        if (
-                            result.data.chapters[i].chapter_id ===
-                            this.chapterId
-                        ) {
-                            chapter_name = result.data.chapters[i].chapter_name;
-                            // Extracting topics from the chapter_structure
-                            for (
-                                let j = 0;
-                                j < result.data.chapters[i].topics.length;
-                                j++
-                            ) {
-                                topic_name = this.loopTopicStructure(
-                                    result.data.chapters[i].topics[j]
-                                        .chapter_structure
-                                );
-                            }
-                        } else {
-                            continue;
-                        }
-                    }
-                    this.setState({
-                        subject_name: result.data.subject_name,
-                        chapter_name: chapter_name,
-                        topic_name: topic_name,
-                    });
-                } else {
-                    this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
 
         document.addEventListener("keydown", this.handleKeys);
     };
@@ -2545,7 +2462,6 @@ class FlashCard extends Component {
     };
 
     render() {
-        document.title = `${this.state.chapter_name} learn - Student | IQLabs`;
         let data = [];
         if (this.state.activeTab === "concept") {
             data =
@@ -2583,8 +2499,8 @@ class FlashCard extends Component {
             <>
                 {/* ----- Navbar ----- */}
                 <Header
-                    name={this.state.subject_name}
-                    chapter_name={`${this.state.chapter_name} - ${this.state.topic_name}`}
+                    name={this.props.subject_name}
+                    chapter_name={`${this.props.chapter_name} - ${this.props.topic_name}`}
                     goBack={this.props.history.goBack}
                 />
 
@@ -3166,4 +3082,4 @@ class FlashCard extends Component {
     }
 }
 
-export default FlashCard;
+export default connect(mapStateToProps)(FlashCard);

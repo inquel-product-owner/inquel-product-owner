@@ -581,7 +581,9 @@ class HODSemesterPreview extends Component {
                                                               )}
                                                           </div>
                                                           {/* ----- image preview ----- */}
-                                                          {data.content.images
+                                                          {data.content &&
+                                                          data.content.images &&
+                                                          data.content.images
                                                               .length !== 0 ? (
                                                               <div className="ml-3">
                                                                   {data.content.images.map(
@@ -863,7 +865,9 @@ class HODSemesterPreview extends Component {
                                                           </div>
                                                       </div>
                                                       {/* ----- image preview ----- */}
-                                                      {data.content.images
+                                                      {data.content &&
+                                                      data.content.images &&
+                                                      data.content.images
                                                           .length !== 0 ? (
                                                           <div className="ml-3">
                                                               {data.content.images.map(

@@ -12,7 +12,8 @@ import AlertBox from "../shared/alert";
 import dateFormat from "dateformat";
 import { country } from "../../shared/countries.js";
 import { connect } from "react-redux";
-import store from "../../redux/store";
+import storeDispatch from "../../redux/dispatch";
+import { PROFILE } from "../../redux/action";
 
 const mapStateToProps = (state) => ({
     profileData: state.user.profile,
@@ -278,7 +279,7 @@ class Profile extends Component {
             .then((result) => {
                 console.log(result);
                 if (result.sts === true) {
-                    store.dispatch({ type: "PROFILE", payload: result.data });
+                    storeDispatch(PROFILE, result.data);
                     this.setState({
                         studentItems: result.data,
                         page_loading: false,

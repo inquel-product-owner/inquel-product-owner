@@ -1,5 +1,5 @@
 import store from "../store";
 
-export default function storeDispatcher(action, data) {
+export default function storeDispatch(action, data) {
     store.dispatch({ type: action, payload: data });
 }

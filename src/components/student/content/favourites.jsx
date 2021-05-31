@@ -6,7 +6,7 @@ import Loading from "../../shared/loader";
 import AlertBox from "../../shared/alert";
 import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
 import { connect } from "react-redux";
-import storeDispatcher from "../../../redux/dispatch";
+import storeDispatch from "../../../redux/dispatch";
 import { TEMP } from "../../../redux/action";
 
 const mapStateToProps = (state) => ({
@@ -169,7 +169,7 @@ class Favourites extends Component {
     };
 
     handleRouting = (data, type, topic_num) => {
-        storeDispatcher(TEMP, data);
+        storeDispatch(TEMP, data);
         this.props.history.push(
             `${this.props.match.url}/${this.state.chapterId}/${topic_num}/${type}`
         );

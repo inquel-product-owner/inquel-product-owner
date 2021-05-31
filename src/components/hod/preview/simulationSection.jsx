@@ -561,10 +561,13 @@ class HODSimulationSectionPreview extends Component {
                                                                       )}
                                                                   </div>
                                                                   {/* ----- image preview ----- */}
-                                                                  {data.content
+                                                                  {data.content &&
+                                                                  data.content
+                                                                      .images &&
+                                                                  data.content
                                                                       .images
                                                                       .length !==
-                                                                  0 ? (
+                                                                      0 ? (
                                                                       <div className="ml-3">
                                                                           {data.content.images.map(
                                                                               (
@@ -929,10 +932,13 @@ class HODSimulationSectionPreview extends Component {
                                                                   </div>
                                                               </div>
                                                               {/* ----- image preview ----- */}
-                                                              {data.content
+                                                              {data.content &&
+                                                              data.content
+                                                                  .images &&
+                                                              data.content
                                                                   .images
                                                                   .length !==
-                                                              0 ? (
+                                                                  0 ? (
                                                                   <div className="ml-3">
                                                                       {data.content.images.map(
                                                                           (

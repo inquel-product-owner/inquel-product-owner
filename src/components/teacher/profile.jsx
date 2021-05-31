@@ -12,7 +12,8 @@ import AlertBox from "../shared/alert";
 import dateFormat from "dateformat";
 import { country } from "../../shared/countries.js";
 import { connect } from "react-redux";
-import store from "../../redux/store";
+import storeDispatch from "../../redux/dispatch";
+import { PROFILE } from "../../redux/action";
 
 const mapStateToProps = (state) => ({
     profileData: state.user.profile,
@@ -278,7 +279,7 @@ class TeacherProfile extends Component {
             .then((result) => {
                 console.log(result);
                 if (result.sts === true) {
-                    store.dispatch({ type: "PROFILE", payload: result.data });
+                    storeDispatch(PROFILE, result.data);
                     this.setState({
                         teacherItems: result.data,
                         page_loading: false,
@@ -605,8 +606,7 @@ class TeacherProfile extends Component {
                                                             <div className="d-flex border-secondary rounded-lg">
                                                                 <div
                                                                     style={{
-                                                                        width:
-                                                                            "35%",
+                                                                        width: "35%",
                                                                     }}
                                                                 >
                                                                     <Select
@@ -640,8 +640,7 @@ class TeacherProfile extends Component {
                                                                                 list
                                                                             ) => {
                                                                                 return {
-                                                                                    value:
-                                                                                        list.dialCode,
+                                                                                    value: list.dialCode,
                                                                                     label: this.renderValue(
                                                                                         list
                                                                                     ),

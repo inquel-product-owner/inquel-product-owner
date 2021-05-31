@@ -1,7 +1,7 @@
 import { PROFILE } from "../action";
 
 let initialState = {
-    profile: null,
+    profile: {},
 };
 
 const userReducer = (state = initialState, action) => {

@@ -10,7 +10,8 @@ import userpic from "../../assets/user-v1.png";
 import AlertBox from "../shared/alert";
 import dateFormat from "dateformat";
 import { connect } from "react-redux";
-import store from "../../redux/store";
+import storeDispatch from "../../redux/dispatch";
+import { PROFILE } from "../../redux/action";
 
 const mapStateToProps = (state) => ({
     profileData: state.user.profile,
@@ -339,7 +340,7 @@ class HODProfile extends Component {
             .then((res) => res.json())
             .then((result) => {
                 if (result.sts === true) {
-                    store.dispatch({ type: "PROFILE", payload: result.data });
+                    storeDispatch(PROFILE, result.data);
                     this.setState({
                         hodItems: result.data,
                         page_loading: false,

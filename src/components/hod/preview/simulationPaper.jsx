@@ -6,7 +6,8 @@ import AlertBox from "../../shared/alert";
 import Loading from "../../shared/loader";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
-import store from "../../../redux/store";
+import storeDispatch from "../../../redux/dispatch";
+import { PAPER } from "../../../redux/action";
 
 const mapStateToProps = (state) => ({
     course_name: state.content.course_name,
@@ -194,15 +195,12 @@ class HODSimulationPaperPreview extends Component {
                                                             >
                                                                 <button
                                                                     className="btn btn-primary-invert btn-sm shadow-none"
-                                                                    onClick={() =>
-                                                                        store.dispatch(
-                                                                            {
-                                                                                type: "PAPER",
-                                                                                payload:
-                                                                                    data.paper_name,
-                                                                            }
-                                                                        )
-                                                                    }
+                                                                    onClick={() => {
+                                                                        storeDispatch(
+                                                                            PAPER,
+                                                                            data.paper_name
+                                                                        );
+                                                                    }}
                                                                 >
                                                                     View
                                                                 </button>

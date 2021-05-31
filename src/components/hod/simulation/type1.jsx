@@ -19,6 +19,7 @@ const mapStateToProps = (state) => ({
     simulation_name: state.content.simulation_name,
     paper_name: state.content.paper_name,
     section_name: state.content.section_name,
+    temp: state.storage.temp,
 });
 
 class HODSimulationType1 extends Component {
@@ -91,7 +92,7 @@ class HODSimulationType1 extends Component {
             "Content-Type": "application/json",
             Authorization: this.authToken,
         };
-        this.section = JSON.parse(localStorage.getItem("section"));
+        this.section = this.props.temp;
     }
 
     toggleSideNav = () => {
@@ -319,10 +320,6 @@ class HODSimulationType1 extends Component {
             });
 
         this.loadMCQData();
-
-        if (!localStorage.getItem("section")) {
-            this.props.history.goBack();
-        }
     };
 
     // -------------------------- Data submission --------------------------

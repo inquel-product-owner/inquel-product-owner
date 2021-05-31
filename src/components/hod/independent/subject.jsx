@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import store from "../../../redux/store";
 import { connect } from "react-redux";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
@@ -14,6 +13,8 @@ import {
     ContentUpdateModal,
 } from "../../shared/contentManagementModal";
 import ScoreCardTable from "../../shared/scorecard";
+import storeDispatch from "../../../redux/dispatch";
+import { CHAPTER, SEMESTER, SIMULATION } from "../../../redux/action";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
@@ -899,10 +900,6 @@ class HODSubject extends Component {
         this.loadSimulationData();
     };
 
-    dispatchSimulation = (data) => {
-        store.dispatch({ type: "SIMULATION", payload: data });
-    };
-
     render() {
         return (
             <div className="wrapper">
@@ -1186,12 +1183,9 @@ class HODSubject extends Component {
                                                                       <button
                                                                           className="btn btn-primary-invert btn-sm shadow-sm"
                                                                           onClick={() => {
-                                                                              store.dispatch(
-                                                                                  {
-                                                                                      type: "CHAPTER",
-                                                                                      payload:
-                                                                                          list.chapter_name,
-                                                                                  }
+                                                                              storeDispatch(
+                                                                                  CHAPTER,
+                                                                                  list.chapter_name
                                                                               );
                                                                           }}
                                                                       >
@@ -1225,12 +1219,9 @@ class HODSubject extends Component {
                                                                       <button
                                                                           className="btn btn-primary-invert btn-sm shadow-sm"
                                                                           onClick={() => {
-                                                                              store.dispatch(
-                                                                                  {
-                                                                                      type: "SEMESTER",
-                                                                                      payload:
-                                                                                          list.semester_name,
-                                                                                  }
+                                                                              storeDispatch(
+                                                                                  SEMESTER,
+                                                                                  list.semester_name
                                                                               );
                                                                           }}
                                                                       >
@@ -1263,11 +1254,12 @@ class HODSubject extends Component {
                                                                   >
                                                                       <button
                                                                           className="btn btn-primary-invert btn-sm shadow-sm"
-                                                                          onClick={() =>
-                                                                              this.dispatchSimulation(
+                                                                          onClick={() => {
+                                                                              storeDispatch(
+                                                                                  SIMULATION,
                                                                                   item.simulation_name
-                                                                              )
-                                                                          }
+                                                                              );
+                                                                          }}
                                                                       >
                                                                           View /
                                                                           Edit

@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import store from "../../../redux/store";
 import { connect } from "react-redux";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
@@ -20,6 +19,8 @@ import {
     IndependentCycleEditModal,
     QuizModal,
 } from "./contentManagementModal";
+import storeDispatch from "../../../redux/dispatch";
+import { CHAPTER, CYCLE, QUIZ, TOPIC } from "../../../redux/action";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
@@ -192,13 +193,12 @@ class TeacherChapters extends Component {
                     chapters.topic_id = result.data.topic_id
                         ? result.data.topic_id
                         : "";
-                    store.dispatch({
-                        type: "CHAPTER",
-                        payload:
-                            result.data.chapter_name !== undefined
-                                ? result.data.chapter_name
-                                : this.props.chapter_name,
-                    });
+                    storeDispatch(
+                        CHAPTER,
+                        result.data.chapter_name !== undefined
+                            ? result.data.chapter_name
+                            : this.props.chapter_name
+                    );
                     this.setState({
                         chapters: chapters,
                         chapterName:
@@ -398,10 +398,7 @@ class TeacherChapters extends Component {
         this.props.history.push({
             pathname: `/teacher/subject/${this.subjectId}/chapter/${event.value}`,
         });
-        store.dispatch({
-            type: "CHAPTER",
-            payload: event.label,
-        });
+        storeDispatch(CHAPTER, event.label);
         this.setState(
             {
                 chapterId: event.value,
@@ -788,15 +785,15 @@ class TeacherChapters extends Component {
     };
 
     dispatchTopic = (data) => {
-        store.dispatch({ type: "TOPIC", payload: data });
+        storeDispatch(TOPIC, data);
     };
 
     dispatchCycle = (data) => {
-        store.dispatch({ type: "CYCLE", payload: data });
+        storeDispatch(CYCLE, data);
     };
 
     dispatchQuiz = (data) => {
-        store.dispatch({ type: "QUIZ", payload: data });
+        storeDispatch(QUIZ, data);
     };
 
     render() {
@@ -1077,7 +1074,7 @@ class TeacherChapters extends Component {
                             <div className="col-md-4">
                                 <Select
                                     className="basic-single form-shadow"
-                                    placeholder='Select chapter'
+                                    placeholder="Select chapter"
                                     isSearchable={true}
                                     name="chapter"
                                     value={this.state.chapterList.map(

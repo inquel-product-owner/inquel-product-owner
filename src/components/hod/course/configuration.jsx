@@ -11,8 +11,9 @@ import { baseUrl, hodUrl } from "../../../shared/baseUrl";
 import ScoreCardTable from "../../shared/scorecard";
 import ReactSwitch from "../../shared/switchComponent";
 import CKeditor from "../../shared/CKeditor";
-import store from "../../../redux/store";
 import axios from "axios";
+import storeDispatch from "../../../redux/dispatch";
+import { COURSE } from "../../../redux/action";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
@@ -2289,13 +2290,11 @@ class HODCourseConfig extends Component {
                                             <Link
                                                 to={`/hod/course/${this.state.course_id}`}
                                                 onClick={() => {
-                                                    store.dispatch({
-                                                        type: "COURSE",
-                                                        payload:
-                                                            this.state
-                                                                .courseData
-                                                                .course_name,
-                                                    });
+                                                    storeDispatch(
+                                                        COURSE,
+                                                        this.state.courseData
+                                                            .course_name
+                                                    );
                                                 }}
                                             >
                                                 <button

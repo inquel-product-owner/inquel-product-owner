@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import store from "../../../redux/store";
 import { connect } from "react-redux";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
@@ -9,6 +8,8 @@ import { Link } from "react-router-dom";
 import Loading from "../../shared/loader";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import AlertBox from "../../shared/alert";
+import storeDispatch from "../../../redux/dispatch";
+import { CHAPTER, CYCLE, QUIZ, TOPIC } from "../../../redux/action";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
@@ -62,13 +63,12 @@ class HODSubjectChapter extends Component {
             .then((result) => {
                 console.log(result);
                 if (result.sts === true) {
-                    store.dispatch({
-                        type: "CHAPTER",
-                        payload:
-                            result.data.chapter_name !== undefined
-                                ? result.data.chapter_name
-                                : this.props.chapter_name,
-                    });
+                    storeDispatch(
+                        CHAPTER,
+                        result.data.chapter_name !== undefined
+                            ? result.data.chapter_name
+                            : this.props.chapter_name
+                    );
                     this.setState({
                         chapters: result.data.chapter_structure || [],
                         cycle_test: result.data.cycle_tests || [],
@@ -155,10 +155,7 @@ class HODSubjectChapter extends Component {
         this.props.history.push({
             pathname: `/hod/subject/${this.subjectId}/chapter/${event.value}`,
         });
-        store.dispatch({
-            type: "CHAPTER",
-            payload: event.label,
-        });
+        storeDispatch(CHAPTER, event.label);
         this.setState(
             {
                 chapterId: event.value,
@@ -237,11 +234,12 @@ class HODSubjectChapter extends Component {
                                     >
                                         <button
                                             className="btn btn-primary shadow-none"
-                                            onClick={() =>
-                                                this.dispatchTopic(
+                                            onClick={() => {
+                                                storeDispatch(
+                                                    TOPIC,
                                                     data.topic_name
-                                                )
-                                            }
+                                                );
+                                            }}
                                         >
                                             <i className="fas fa-eye"></i>
                                         </button>
@@ -253,11 +251,12 @@ class HODSubjectChapter extends Component {
                                     >
                                         <button
                                             className="btn btn-primary shadow-none"
-                                            onClick={() =>
-                                                this.dispatchTopic(
+                                            onClick={() => {
+                                                storeDispatch(
+                                                    TOPIC,
                                                     data.topic_name
-                                                )
-                                            }
+                                                );
+                                            }}
                                         >
                                             <i className="fas fa-eye"></i>
                                         </button>
@@ -269,11 +268,12 @@ class HODSubjectChapter extends Component {
                                     >
                                         <button
                                             className="btn btn-primary shadow-none"
-                                            onClick={() =>
-                                                this.dispatchTopic(
+                                            onClick={() => {
+                                                storeDispatch(
+                                                    TOPIC,
                                                     data.topic_name
-                                                )
-                                            }
+                                                );
+                                            }}
                                         >
                                             <i className="fas fa-eye"></i>
                                         </button>
@@ -285,11 +285,12 @@ class HODSubjectChapter extends Component {
                                     >
                                         <button
                                             className="btn btn-primary shadow-none"
-                                            onClick={() =>
-                                                this.dispatchTopic(
+                                            onClick={() => {
+                                                storeDispatch(
+                                                    TOPIC,
                                                     data.topic_name
-                                                )
-                                            }
+                                                );
+                                            }}
                                         >
                                             <i className="fas fa-eye"></i>
                                         </button>
@@ -354,18 +355,6 @@ class HODSubjectChapter extends Component {
                 }
             })
             .catch((err) => console.log(err));
-    };
-
-    dispatchTopic = (data) => {
-        store.dispatch({ type: "TOPIC", payload: data });
-    };
-
-    dispatchCycle = (data) => {
-        store.dispatch({ type: "CYCLE", payload: data });
-    };
-
-    dispatchQuiz = (data) => {
-        store.dispatch({ type: "QUIZ", payload: data });
     };
 
     render() {
@@ -667,12 +656,9 @@ class HODSubjectChapter extends Component {
                                                                     to={`${this.props.match.url}/cycle/${data.cycle_test_id}`}
                                                                     className="text-decoration-none"
                                                                     onClick={() => {
-                                                                        store.dispatch(
-                                                                            {
-                                                                                type: "CYCLE",
-                                                                                payload:
-                                                                                    data.cycle_test_name,
-                                                                            }
+                                                                        storeDispatch(
+                                                                            CYCLE,
+                                                                            data.cycle_test_name
                                                                         );
                                                                     }}
                                                                 >
@@ -706,12 +692,9 @@ class HODSubjectChapter extends Component {
                                                                         to={`${this.props.match.url}/quiz/${data.quiz_id}`}
                                                                         className="text-decoration-none"
                                                                         onClick={() => {
-                                                                            store.dispatch(
-                                                                                {
-                                                                                    type: "QUIZ",
-                                                                                    payload:
-                                                                                        data.quiz_name,
-                                                                                }
+                                                                            storeDispatch(
+                                                                                QUIZ,
+                                                                                data.quiz_name
                                                                             );
                                                                         }}
                                                                     >

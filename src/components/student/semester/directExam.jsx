@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import axios from "axios";
 import Header from "../shared/examNavbar";
 import { Spinner } from "react-bootstrap";
@@ -8,11 +9,15 @@ import Loading from "../../shared/loader";
 import { Document, Page, pdfjs } from "react-pdf";
 import dateFormat from "dateformat";
 
+const mapStateToProps = (state) => ({
+    subject_name: state.content.subject_name,
+    semester_name: state.content.semester_name,
+});
+
 class SemesterDirectExam extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            subject_name: "",
             semesterExamItem: [],
             url: null,
             question_url: null,
@@ -93,28 +98,7 @@ class SemesterDirectExam extends Component {
     };
 
     componentDidMount = () => {
-        fetch(`${this.url}/student/subject/${this.subjectId}/`, {
-            method: "GET",
-            headers: this.headers,
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    this.setState({
-                        subject_name: result.data.subject_name,
-                    });
-                } else {
-                    this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+        document.title = `${this.props.semester_name} : Direct - Student | IQLabs`;
 
         this.loadExamData();
     };
@@ -299,13 +283,12 @@ class SemesterDirectExam extends Component {
         this.setState((state) => ({ pageNumber: state.pageNumber + 1 }));
 
     render() {
-        document.title = `${this.state.semesterExamItem.semester_name} Direct Exam - Teacher | IQLabs`;
         return (
             <>
                 {/* Navbar */}
                 <Header
-                    name={this.state.subject_name}
-                    chapter_name={this.state.semesterExamItem.semester_name}
+                    name={this.props.subject_name}
+                    chapter_name={this.props.semester_name}
                     goBack={this.props.history.goBack}
                 />
 
@@ -537,4 +520,4 @@ class SemesterDirectExam extends Component {
     }
 }
 
-export default SemesterDirectExam;
+export default connect(mapStateToProps)(SemesterDirectExam);

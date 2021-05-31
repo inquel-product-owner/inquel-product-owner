@@ -5,6 +5,13 @@ import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import AlertBox from "../shared/alert";
 import Loading from "../shared/loader";
+import { connect } from "react-redux";
+import storeDispatch from "../../redux/dispatch";
+import { TEMP } from "../../redux/action";
+
+const mapStateToProps = (state) => ({
+    subject_name: state.content.subject_name,
+});
 
 function remarksCondition(data) {
     let remarks = "";
@@ -58,28 +65,19 @@ function CycleTestAttempts(props) {
                     to={`${props.url}/cycle/${props.attempt.cycle_test_id}/preview`}
                     onClick={() => {
                         props.attempt.auto_section.length !== 0
-                            ? sessionStorage.setItem(
-                                  "data",
-                                  JSON.stringify({
-                                      auto: true,
-                                      direct: false,
-                                      cycle_test_name:
-                                          props.data.cycle_test_name,
-                                      data: props.attempt.auto_section,
-                                      submit_time:
-                                          props.attempt.actual_submit_time,
-                                  })
-                              )
-                            : sessionStorage.setItem(
-                                  "data",
-                                  JSON.stringify({
-                                      auto: false,
-                                      direct: true,
-                                      cycle_test_name:
-                                          props.data.cycle_test_name,
-                                      data: props.attempt.direct_question,
-                                  })
-                              );
+                            ? storeDispatch(TEMP, {
+                                  auto: true,
+                                  direct: false,
+                                  cycle_test_name: props.data.cycle_test_name,
+                                  data: props.attempt.auto_section,
+                                  submit_time: props.attempt.actual_submit_time,
+                              })
+                            : storeDispatch(TEMP, {
+                                  auto: false,
+                                  direct: true,
+                                  cycle_test_name: props.data.cycle_test_name,
+                                  data: props.attempt.direct_question,
+                              });
                     }}
                 >
                     <i
@@ -123,26 +121,19 @@ function SemesterAttempts(props) {
                     to={`${props.url}/semester/${props.attempt.semester_id}/preview`}
                     onClick={() => {
                         props.attempt.auto_section.length !== 0
-                            ? sessionStorage.setItem(
-                                  "data",
-                                  JSON.stringify({
-                                      auto: true,
-                                      direct: false,
-                                      semester_name: props.data.semester_name,
-                                      data: props.attempt.auto_section,
-                                      submit_time:
-                                          props.attempt.actual_submit_time,
-                                  })
-                              )
-                            : sessionStorage.setItem(
-                                  "data",
-                                  JSON.stringify({
-                                      auto: false,
-                                      direct: true,
-                                      semester_name: props.data.semester_name,
-                                      data: props.attempt.direct_question,
-                                  })
-                              );
+                            ? storeDispatch(TEMP, {
+                                  auto: true,
+                                  direct: false,
+                                  semester_name: props.data.semester_name,
+                                  data: props.attempt.auto_section,
+                                  submit_time: props.attempt.actual_submit_time,
+                              })
+                            : storeDispatch(TEMP, {
+                                  auto: false,
+                                  direct: true,
+                                  semester_name: props.data.semester_name,
+                                  data: props.attempt.direct_question,
+                              });
                     }}
                 >
                     <i
@@ -170,7 +161,6 @@ class TestResult extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            subject_name: "",
             cycle_test: [],
             semester: [],
 
@@ -218,39 +208,17 @@ class TestResult extends Component {
     };
 
     componentDidMount = () => {
-        fetch(`${this.url}/student/subject/${this.subjectId}/`, {
-            method: "GET",
-            headers: this.headers,
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    this.setState({
-                        subject_name: result.data.subject_name,
-                    });
-                } else {
-                    this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+        document.title = `${this.props.subject_name} : Test result - Student | IQLabs`;
 
         this.loadTestResultData();
     };
 
     render() {
-        document.title = `${this.state.subject_name} Test result - Teacher | IQLabs`;
         return (
             <>
                 {/* Navbar */}
                 <Header
-                    name={this.state.subject_name}
+                    name={this.props.subject_name}
                     chapter_name=""
                     goBack={this.props.history.goBack}
                 />
@@ -410,4 +378,4 @@ class TestResult extends Component {
     }
 }
 
-export default TestResult;
+export default connect(mapStateToProps)(TestResult);

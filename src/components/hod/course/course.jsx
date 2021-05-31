@@ -7,7 +7,15 @@ import { connect } from "react-redux";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl";
 import Loading from "../../shared/loader";
 import AlertBox from "../../shared/alert";
-import store from "../../../redux/store";
+import storeDispatch from "../../../redux/dispatch";
+import {
+    CHAPTER,
+    CYCLE,
+    QUIZ,
+    SEMESTER,
+    SIMULATION,
+    TOPIC,
+} from "../../../redux/action";
 
 const mapStateToProps = (state) => ({
     course_name: state.content.course_name,
@@ -222,12 +230,9 @@ const UnitListRender = (props) => {
                                                                     <button
                                                                         className="btn btn-light btn-sm shadow-none"
                                                                         onClick={() => {
-                                                                            store.dispatch(
-                                                                                {
-                                                                                    type: "SEMESTER",
-                                                                                    payload:
-                                                                                        semester.semester_name,
-                                                                                }
+                                                                            storeDispatch(
+                                                                                SEMESTER,
+                                                                                semester.semester_name
                                                                             );
                                                                         }}
                                                                     >
@@ -283,11 +288,10 @@ const UnitListRender = (props) => {
                                                     <button
                                                         className="btn btn-light btn-sm shadow-none"
                                                         onClick={() => {
-                                                            store.dispatch({
-                                                                type: "SIMULATION",
-                                                                payload:
-                                                                    simulation.simulation_name,
-                                                            });
+                                                            storeDispatch(
+                                                                SIMULATION,
+                                                                simulation.simulation_name
+                                                            );
                                                         }}
                                                     >
                                                         View
@@ -360,11 +364,10 @@ const ChapterListRender = (props) => {
                                     <Link
                                         to={`${props.match.url}/chapter/${props.chapter.chapter_id}/summary`}
                                         onClick={() => {
-                                            store.dispatch({
-                                                type: "CHAPTER",
-                                                payload:
-                                                    props.chapter.chapter_name,
-                                            });
+                                            storeDispatch(
+                                                CHAPTER,
+                                                props.chapter.chapter_name
+                                            );
                                         }}
                                     >
                                         <button
@@ -395,11 +398,10 @@ const ChapterListRender = (props) => {
                                     <Link
                                         to={`${props.match.url}/chapter/${props.chapter.chapter_id}/notes`}
                                         onClick={() => {
-                                            store.dispatch({
-                                                type: "CHAPTER",
-                                                payload:
-                                                    props.chapter.chapter_name,
-                                            });
+                                            storeDispatch(
+                                                CHAPTER,
+                                                props.chapter.chapter_name
+                                            );
                                         }}
                                     >
                                         <button className="btn btn-light btn-sm shadow-none">
@@ -470,18 +472,15 @@ const ChapterListRender = (props) => {
                                                       <button
                                                           className="btn btn-secondary btn-sm shadow-none"
                                                           onClick={() => {
-                                                              store.dispatch({
-                                                                  type: "CHAPTER",
-                                                                  payload:
-                                                                      props
-                                                                          .chapter
-                                                                          .chapter_name,
-                                                              });
-                                                              store.dispatch({
-                                                                  type: "CYCLE",
-                                                                  payload:
-                                                                      cycle.cycle_test_name,
-                                                              });
+                                                              storeDispatch(
+                                                                  CHAPTER,
+                                                                  props.chapter
+                                                                      .chapter_name
+                                                              );
+                                                              storeDispatch(
+                                                                  CYCLE,
+                                                                  cycle.cycle_test_name
+                                                              );
                                                           }}
                                                       >
                                                           View
@@ -521,17 +520,15 @@ const ChapterListRender = (props) => {
                                                   <button
                                                       className="btn btn-secondary btn-sm shadow-none"
                                                       onClick={() => {
-                                                          store.dispatch({
-                                                              type: "CHAPTER",
-                                                              payload:
-                                                                  props.chapter
-                                                                      .chapter_name,
-                                                          });
-                                                          store.dispatch({
-                                                              type: "QUIZ",
-                                                              payload:
-                                                                  quiz.quiz_name,
-                                                          });
+                                                          storeDispatch(
+                                                              CHAPTER,
+                                                              props.chapter
+                                                                  .chapter_name
+                                                          );
+                                                          storeDispatch(
+                                                              QUIZ,
+                                                              quiz.quiz_name
+                                                          );
                                                       }}
                                                   >
                                                       View
@@ -633,17 +630,14 @@ const TopicListRender = (props) => {
                                         <button
                                             className="btn btn-sm bg-white shadow-none"
                                             onClick={() => {
-                                                store.dispatch({
-                                                    type: "CHAPTER",
-                                                    payload:
-                                                        props.chapter
-                                                            .chapter_name,
-                                                });
-                                                store.dispatch({
-                                                    type: "TOPIC",
-                                                    payload:
-                                                        props.topics.topic_name,
-                                                });
+                                                storeDispatch(
+                                                    CHAPTER,
+                                                    props.chapter.chapter_name
+                                                );
+                                                storeDispatch(
+                                                    TOPIC,
+                                                    props.topics.topic_name
+                                                );
                                             }}
                                         >
                                             {props.topics.topic_name}
@@ -668,20 +662,18 @@ const TopicListRender = (props) => {
                                         <button
                                             className="btn btn-sm bg-white shadow-none"
                                             onClick={() => {
-                                                store.dispatch({
-                                                    type: "CHAPTER",
-                                                    payload:
-                                                        props.chapter
-                                                            .chapter_name,
-                                                });
-                                                store.dispatch({
-                                                    type: "TOPIC",
-                                                    payload: getTopicName(
+                                                storeDispatch(
+                                                    CHAPTER,
+                                                    props.chapter.chapter_name
+                                                );
+                                                storeDispatch(
+                                                    TOPIC,
+                                                    getTopicName(
                                                         props.chapter
                                                             .chapter_structure,
                                                         props.topics.next_topic
-                                                    ),
-                                                });
+                                                    )
+                                                );
                                             }}
                                         >
                                             {props.topics.next_topic}

@@ -4,10 +4,8 @@ import ReactCardFlip from "react-card-flip";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import AlertBox from "../../shared/alert";
 import Loading from "../../shared/loader";
-import { OverlayTrigger, Tooltip, Popover, Modal } from "react-bootstrap";
+import { OverlayTrigger, Tooltip, Popover } from "react-bootstrap";
 import FullScreen from "react-fullscreen-crossbrowser";
-import { Player } from "video-react";
-import "video-react/dist/video-react.css";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
 import {
@@ -15,52 +13,13 @@ import {
     QuestionDataFormat,
 } from "../../shared/dataFormating";
 import { connect } from "react-redux";
+import VideoModal from "../../shared/videoModal";
 
 const mapStateToProps = (state) => ({
     course_name: state.content.course_name,
     chapter_name: state.content.chapter_name,
     topic_name: state.content.topic_name,
 });
-
-class VideoModal extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            video: this.props.video,
-        };
-    }
-
-    render() {
-        return (
-            <Modal
-                show={this.props.show}
-                onHide={this.props.onHide}
-                size="lg"
-                aria-labelledby="contained-modal-title-vcenter"
-                centered
-            >
-                <Modal.Body>
-                    <div className="card">
-                        <Player>
-                            <source src={this.state.video.path} />
-                        </Player>
-                        <p className="mt-3 mb-0">
-                            If video doesn't start playing,{" "}
-                            <a
-                                href={this.state.video.path}
-                                target="_blank"
-                                rel="noreferrer"
-                            >
-                                Click here
-                            </a>{" "}
-                            to view the video in a seperate tab
-                        </p>
-                    </div>
-                </Modal.Body>
-            </Modal>
-        );
-    }
-}
 
 const NoContentToDisplay = () => {
     return (
@@ -734,7 +693,10 @@ class HODCourseFlashCard extends Component {
                                             ></p>
                                             <div
                                                 className="position-absolute"
-                                                style={{ right: 0, top: "10px" }}
+                                                style={{
+                                                    right: 0,
+                                                    top: "10px",
+                                                }}
                                             >
                                                 {data[index] &&
                                                 data[index].content &&

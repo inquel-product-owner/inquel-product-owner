@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import store from "../../../redux/store";
 import { connect } from "react-redux";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
@@ -20,6 +19,8 @@ import {
     Scorecard,
 } from "./contentManagementModal";
 import { waterMark } from "../../shared/watermark";
+import storeDispatch from "../../../redux/dispatch";
+import { CHAPTER, SEMESTER } from "../../../redux/action";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
@@ -230,11 +231,11 @@ class TeacherSubject extends Component {
     };
 
     dispatchChapter = (data) => {
-        store.dispatch({ type: "CHAPTER", payload: data });
+        storeDispatch(CHAPTER, data);
     };
 
     dispatchSemester = (data) => {
-        store.dispatch({ type: "SEMESTER", payload: data });
+        storeDispatch(SEMESTER, data);
     };
 
     render() {

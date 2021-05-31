@@ -21,11 +21,12 @@ import {
 } from "../shared/contentManagementModal";
 import { connect } from "react-redux";
 import Slider from "react-slick";
-import store from "../../redux/store";
 import Select from "react-select";
+import storeDispatch from "../../redux/dispatch";
+import { COURSE } from "../../redux/action";
 
 const mapStateToProps = (state) => ({
-    data: state.user.profile,
+    profile: state.user.profile,
 });
 
 class SubjectModal extends Component {
@@ -585,9 +586,8 @@ class HODDashboard extends Component {
                         page_loading: false,
                     });
                 } else {
+                    console.log(result.msg);
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
                         page_loading: false,
                     });
                 }
@@ -611,9 +611,8 @@ class HODDashboard extends Component {
                         page_loading: false,
                     });
                 } else {
+                    console.log(result.msg);
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
                         page_loading: false,
                     });
                 }
@@ -985,9 +984,10 @@ class HODDashboard extends Component {
                             </div>
                         </div>
 
-                        {this.props.data !== null ? (
-                            this.props.data.permissions !== undefined ? (
-                                this.props.data.permissions.config_course ===
+                        {this.props.profile &&
+                        Object.keys(this.props.profile).length !== 0 ? (
+                            this.props.profile.permissions !== undefined ? (
+                                this.props.profile.permissions.config_course ===
                                 true ? (
                                     <>
                                         {/* ----- Subject card ----- */}
@@ -1194,12 +1194,9 @@ class HODDashboard extends Component {
                                                                                 to={`/hod/course/${data.course_id}`}
                                                                                 className="text-decoration-none"
                                                                                 onClick={() => {
-                                                                                    store.dispatch(
-                                                                                        {
-                                                                                            type: "COURSE",
-                                                                                            payload:
-                                                                                                data.course_name,
-                                                                                        }
+                                                                                    storeDispatch(
+                                                                                        COURSE,
+                                                                                        data.course_name
                                                                                     );
                                                                                 }}
                                                                             >
