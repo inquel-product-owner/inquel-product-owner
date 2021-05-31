@@ -4,12 +4,13 @@ import { Link, Redirect } from "react-router-dom";
 import logo from "../../../assets/Iq-labs-01.svg";
 import userpic from "../../../assets/user-v1.png";
 import { baseUrl, accountsUrl, studentUrl } from "../../../shared/baseUrl";
-import { Logout } from "../../shared/handleLogout";
+import { Logout } from "../../common/modal/idleLogoutModal";
 import { connect } from "react-redux";
-import store from "../../../redux/store";
+import storeDispatch from "../../../redux/dispatch";
+import { PROFILE } from "../../../redux/action";
 
 const mapStateToProps = (state) => ({
-    data: state.user.profile,
+    profile: state.user.profile,
 });
 
 class Header extends Component {
@@ -33,7 +34,7 @@ class Header extends Component {
             .then((res) => res.json())
             .then((result) => {
                 if (result.sts === true) {
-                    store.dispatch({ type: "PROFILE", payload: result.data });
+                    storeDispatch(PROFILE, result.data);
                 }
             })
             .catch((err) => {
@@ -42,7 +43,10 @@ class Header extends Component {
     };
 
     componentDidMount = () => {
-        if (this.props.data === null) {
+        if (
+            this.props.profile &&
+            Object.keys(this.props.profile).length === 0
+        ) {
             this.loadProfileData();
         }
     };
@@ -58,8 +62,7 @@ class Header extends Component {
                 this.setState({
                     isLoggedOut: true,
                 });
-                store.dispatch({ type: "PROFILE", payload: null });
-                console.log(result);
+                storeDispatch(PROFILE, {});
             })
             .catch((err) => {
                 console.log(err);
@@ -122,27 +125,35 @@ class Header extends Component {
                                         >
                                             <img
                                                 src={
-                                                    this.props.data !== null
-                                                        ? this.props.data
+                                                    this.props.profile &&
+                                                    Object.keys(
+                                                        this.props.profile
+                                                    ).length !== 0
+                                                        ? this.props.profile
                                                               .profile_link &&
-                                                          this.props.data
+                                                          this.props.profile
                                                               .profile_link !==
                                                               null
-                                                            ? this.props.data
+                                                            ? this.props.profile
                                                                   .profile_link
                                                             : userpic
                                                         : userpic
                                                 }
                                                 alt={
-                                                    this.props.data !== null
-                                                        ? this.props.data
+                                                    this.props.profile &&
+                                                    Object.keys(
+                                                        this.props.profile
+                                                    ).length !== 0
+                                                        ? this.props.profile
                                                               .username
                                                         : ""
                                                 }
                                                 className="profile-img-circle mr-1 mb-1"
                                             />{" "}
-                                            {this.props.data !== null
-                                                ? this.props.data.username
+                                            {this.props.profile &&
+                                            Object.keys(this.props.profile)
+                                                .length !== 0
+                                                ? this.props.profile.username
                                                 : ""}
                                         </Dropdown.Toggle>
 

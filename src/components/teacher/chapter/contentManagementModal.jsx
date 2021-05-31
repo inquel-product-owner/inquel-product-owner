@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Modal, Alert, Spinner } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
-import ReactSwitch from "../../shared/switchComponent";
+import ReactSwitch from "../../common/switchComponent";
 
 export class TopicModal extends Component {
     constructor(props) {
@@ -88,7 +88,6 @@ export class TopicModal extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,
@@ -226,7 +225,6 @@ export class CycleTestModal extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,
@@ -369,7 +367,6 @@ export class IndependentCycleTestModal extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,
@@ -529,7 +526,6 @@ export class IndependentCycleEditModal extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,
@@ -686,7 +682,6 @@ export class QuizModal extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,

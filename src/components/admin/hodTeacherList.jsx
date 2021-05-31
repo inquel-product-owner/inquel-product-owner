@@ -4,9 +4,9 @@ import SideNav from "./sidenav";
 import profilepic from "../../assets/user-v1.png";
 import { Tab, Row, Col, Nav, Badge } from "react-bootstrap";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
-import Loading from "../shared/loader";
+import Loading from "../common/loader";
 import { Link } from "react-router-dom";
-import AlertBox from "../shared/alert";
+import AlertBox from "../common/alert";
 
 function EmptyData() {
     return (
@@ -75,7 +75,6 @@ class AdminHodTeacherList extends Component {
                         page_loading: false,
                     });
                 }
-                console.log(result);
             })
             .catch((err) => {
                 console.log(err);

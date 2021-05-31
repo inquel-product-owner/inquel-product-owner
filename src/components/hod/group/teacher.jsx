@@ -4,10 +4,10 @@ import { Link } from "react-router-dom";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
-import Loading from "../../shared/loader";
-import AlertBox from "../../shared/alert";
+import Loading from "../../common/loader";
+import AlertBox from "../../common/alert";
 import { connect } from "react-redux";
-import { waterMark } from "../../shared/watermark";
+import { waterMark } from "../../common/function/watermark";
 
 const mapStateToProps = (state) => ({
     profile: state.user.profile,
@@ -53,14 +53,13 @@ class HODGroupTeachers extends Component {
 
     componentDidMount = () => {
         document.title = `${this.props.group_name} : Teachers - HOD | IQLabs`;
-        
+
         fetch(`${this.url}/hod/group/${this.groupId}/teacher/`, {
             headers: this.headers,
             method: "GET",
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         teacherItems: result.data.results,

@@ -5,10 +5,10 @@ import SideNav from "../shared/sidenav";
 import Select from "react-select";
 import { Link } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
-import ReactSwitch from "../../shared/switchComponent";
+import ReactSwitch from "../../common/switchComponent";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
-import Loading from "../../shared/loader";
-import AlertBox from "../../shared/alert";
+import Loading from "../../common/loader";
+import AlertBox from "../../common/alert";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
@@ -67,7 +67,6 @@ class TeacherQuizLevel extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         attempts: result.data.attempts,
@@ -98,7 +97,6 @@ class TeacherQuizLevel extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         quiz: result.data.levels,
@@ -240,7 +238,6 @@ class TeacherQuizLevel extends Component {
             )
                 .then((res) => res.json())
                 .then((result) => {
-                    console.log(result);
                     if (result.sts === true) {
                         this.setState({
                             successMsg: result.msg,
@@ -284,7 +281,6 @@ class TeacherQuizLevel extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,

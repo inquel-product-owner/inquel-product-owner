@@ -1,17 +1,16 @@
 import React, { Component } from "react";
-import store from "../../../redux/store";
 import { connect } from "react-redux";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
-import Loading from "../../shared/loader";
-import AlertBox from "../../shared/alert";
+import Loading from "../../common/loader";
+import AlertBox from "../../common/alert";
 import {
     ContentDeleteModal,
     ContentUpdateModal,
-} from "../../shared/contentManagementModal";
+} from "../../common/modal/contentManagementModal";
 import {
     ChapterList,
     ChapterModal,
@@ -19,7 +18,9 @@ import {
     SemesterModal,
     Scorecard,
 } from "./contentManagementModal";
-import { waterMark } from "../../shared/watermark";
+import { waterMark } from "../../common/function/watermark";
+import storeDispatch from "../../../redux/dispatch";
+import { CHAPTER, SEMESTER } from "../../../redux/action";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
@@ -127,7 +128,6 @@ class TeacherSubject extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         subjectItems: result.data.results,
@@ -155,7 +155,6 @@ class TeacherSubject extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     const chapters = [];
                     for (let i = 0; i < result.data.length; i++) {
@@ -230,11 +229,11 @@ class TeacherSubject extends Component {
     };
 
     dispatchChapter = (data) => {
-        store.dispatch({ type: "CHAPTER", payload: data });
+        storeDispatch(CHAPTER, data);
     };
 
     dispatchSemester = (data) => {
-        store.dispatch({ type: "SEMESTER", payload: data });
+        storeDispatch(SEMESTER, data);
     };
 
     render() {

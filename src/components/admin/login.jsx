@@ -3,7 +3,8 @@ import { Navbar, Spinner, Alert } from "react-bootstrap";
 import logo from "../../assets/Iq-labs-01.svg";
 import { Link, Redirect } from "react-router-dom";
 import { baseUrl, adminPathUrl, accountsUrl } from "../../shared/baseUrl.js";
-import store from "../../redux/store";
+import storeDispatch from "../../redux/dispatch";
+import { PROFILE } from "../../redux/action";
 
 class AdminLogin extends Component {
     constructor(props) {
@@ -39,7 +40,7 @@ class AdminLogin extends Component {
     setLocalStorage = (data) => {
         localStorage.clear();
         localStorage.setItem("Inquel-Auth", `Token ${data.token}`);
-        store.dispatch({ type: "PROFILE", payload: null });
+        storeDispatch(PROFILE, {});
 
         this.setState({
             showLoader: false,
@@ -93,7 +94,6 @@ class AdminLogin extends Component {
                         showLoader: false,
                     });
                 }
-                console.log(result);
             })
             .catch((err) => {
                 console.log(err);

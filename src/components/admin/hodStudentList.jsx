@@ -4,12 +4,12 @@ import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
 import { paginationCount } from "../../shared/globalValues.js";
-import Loading from "../shared/loader";
-import Paginations from "../shared/pagination";
+import Loading from "../common/loader";
+import Paginations from "../common/pagination";
 import StudentTable from "../table/student";
 import { Badge } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import AlertBox from "../shared/alert";
+import AlertBox from "../common/alert";
 
 class AdminHodStudentList extends Component {
     constructor(props) {
@@ -53,21 +53,18 @@ class AdminHodStudentList extends Component {
             .then((res) => res.json())
             .then((result) => {
                 if (result.sts === true) {
-                this.setState({
-                    studentItems: result.data.results,
-                    totalStudentCount: result.data.count,
-                    page_loading: false,
-                });
-            } else {
-                this.setState({
-                    errorMsg: result.detail
-                        ? result.detail
-                        : result.msg,
-                    showErrorAlert: true,
-                    page_loading: false,
-                });
-            }
-                console.log(result);
+                    this.setState({
+                        studentItems: result.data.results,
+                        totalStudentCount: result.data.count,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -84,20 +81,17 @@ class AdminHodStudentList extends Component {
             .then((res) => res.json())
             .then((result) => {
                 if (result.sts === true) {
-                this.setState({
-                    hodItems: result.data,
-                    page_loading: false,
-                });
-            } else {
-                this.setState({
-                    errorMsg: result.detail
-                        ? result.detail
-                        : result.msg,
-                    showErrorAlert: true,
-                    page_loading: false,
-                });
-            }
-                console.log(result);
+                    this.setState({
+                        hodItems: result.data,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.detail ? result.detail : result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -107,7 +101,8 @@ class AdminHodStudentList extends Component {
     };
 
     handleStudentPageChange(pageNumber) {
-        this.setState({ activeStudentPage: pageNumber, page_loading: true },
+        this.setState(
+            { activeStudentPage: pageNumber, page_loading: true },
             () => {
                 this.loadStudentData();
             }
@@ -214,15 +209,11 @@ class AdminHodStudentList extends Component {
                                             0 ? (
                                                 this.state.hodItems
                                                     .is_active ? (
-                                                    <Badge
-                                                        variant="success"
-                                                    >
+                                                    <Badge variant="success">
                                                         Active
                                                     </Badge>
                                                 ) : (
-                                                    <Badge
-                                                        variant="danger"
-                                                    >
+                                                    <Badge variant="danger">
                                                         Not active
                                                     </Badge>
                                                 )
@@ -243,7 +234,8 @@ class AdminHodStudentList extends Component {
                                 category={true}
                             />
                             <div className="card-body p-3">
-                                {this.state.totalStudentCount > paginationCount ? (
+                                {this.state.totalStudentCount >
+                                paginationCount ? (
                                     <Paginations
                                         activePage={
                                             this.state.activeStudentPage

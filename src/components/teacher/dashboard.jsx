@@ -3,11 +3,11 @@ import Header from "./shared/navbar";
 import SideNav from "./shared/sidenav";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import { paginationCount } from "../../shared/globalValues.js";
-import Loading from "../shared/loader";
+import Loading from "../common/loader";
 import GroupTable from "../table/group";
 import SubjectTable from "../table/subject";
-import Paginations from "../shared/pagination";
-import AlertBox from "../shared/alert";
+import Paginations from "../common/pagination";
+import AlertBox from "../common/alert";
 
 class TeacherDashboard extends Component {
     constructor(props) {
@@ -49,7 +49,6 @@ class TeacherDashboard extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         groupItem: result.data.results,
@@ -79,7 +78,6 @@ class TeacherDashboard extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         subjectItem: result.data.results,

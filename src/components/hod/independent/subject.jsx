@@ -1,19 +1,20 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import store from "../../../redux/store";
 import { connect } from "react-redux";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import Select from "react-select";
 import { Modal, Alert, Spinner, Dropdown } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
-import Loading from "../../shared/loader";
-import AlertBox from "../../shared/alert";
+import Loading from "../../common/loader";
+import AlertBox from "../../common/alert";
 import {
     ContentDeleteModal,
     ContentUpdateModal,
-} from "../../shared/contentManagementModal";
-import ScoreCardTable from "../../shared/scorecard";
+} from "../../common/modal/contentManagementModal";
+import ScoreCardTable from "../../common/scorecard";
+import storeDispatch from "../../../redux/dispatch";
+import { CHAPTER, SEMESTER, SIMULATION } from "../../../redux/action";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
@@ -50,7 +51,6 @@ class Scorecard extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         scorecard: result.data.score_card_config,
@@ -117,7 +117,6 @@ class Scorecard extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,
@@ -267,7 +266,6 @@ class ChapterModal extends Component {
                 this.setState({
                     teacherData: result.data,
                 });
-                console.log(result);
             })
             .catch((err) => {
                 console.log(err);
@@ -316,7 +314,6 @@ class ChapterModal extends Component {
                         showLoader: false,
                     });
                 }
-                console.log(result);
             })
             .catch((err) => {
                 console.log(err);
@@ -467,7 +464,6 @@ class ChapterReassignModal extends Component {
                 this.setState({
                     teacherData: result.data,
                 });
-                console.log(result);
             })
             .catch((err) => {
                 console.log(err);
@@ -503,7 +499,6 @@ class ChapterReassignModal extends Component {
             )
                 .then((res) => res.json())
                 .then((result) => {
-                    console.log(result);
                     if (result.sts === true) {
                         this.setState({
                             successMsg: result.msg,
@@ -642,7 +637,6 @@ class SimulationModal extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,
@@ -825,7 +819,6 @@ class HODSubject extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         chapterData: result.data.chapters,
@@ -852,7 +845,6 @@ class HODSubject extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         simulation: result.data,
@@ -897,10 +889,6 @@ class HODSubject extends Component {
             });
         }, 1000);
         this.loadSimulationData();
-    };
-
-    dispatchSimulation = (data) => {
-        store.dispatch({ type: "SIMULATION", payload: data });
     };
 
     render() {
@@ -1186,12 +1174,9 @@ class HODSubject extends Component {
                                                                       <button
                                                                           className="btn btn-primary-invert btn-sm shadow-sm"
                                                                           onClick={() => {
-                                                                              store.dispatch(
-                                                                                  {
-                                                                                      type: "CHAPTER",
-                                                                                      payload:
-                                                                                          list.chapter_name,
-                                                                                  }
+                                                                              storeDispatch(
+                                                                                  CHAPTER,
+                                                                                  list.chapter_name
                                                                               );
                                                                           }}
                                                                       >
@@ -1225,12 +1210,9 @@ class HODSubject extends Component {
                                                                       <button
                                                                           className="btn btn-primary-invert btn-sm shadow-sm"
                                                                           onClick={() => {
-                                                                              store.dispatch(
-                                                                                  {
-                                                                                      type: "SEMESTER",
-                                                                                      payload:
-                                                                                          list.semester_name,
-                                                                                  }
+                                                                              storeDispatch(
+                                                                                  SEMESTER,
+                                                                                  list.semester_name
                                                                               );
                                                                           }}
                                                                       >
@@ -1263,11 +1245,12 @@ class HODSubject extends Component {
                                                                   >
                                                                       <button
                                                                           className="btn btn-primary-invert btn-sm shadow-sm"
-                                                                          onClick={() =>
-                                                                              this.dispatchSimulation(
+                                                                          onClick={() => {
+                                                                              storeDispatch(
+                                                                                  SIMULATION,
                                                                                   item.simulation_name
-                                                                              )
-                                                                          }
+                                                                              );
+                                                                          }}
                                                                       >
                                                                           View /
                                                                           Edit

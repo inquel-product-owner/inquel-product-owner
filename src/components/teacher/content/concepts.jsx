@@ -4,15 +4,15 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
-import CKeditor from "../../shared/CKeditor";
-import ReactSwitch from "../../shared/switchComponent";
+import CKeditor from "../../common/CKEditor";
+import ReactSwitch from "../../common/switchComponent";
 import { Accordion, Card } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
 import ReactCardFlip from "react-card-flip";
-import Loading from "../../shared/loader";
-import AlertBox from "../../shared/alert";
+import Loading from "../../common/loader";
+import AlertBox from "../../common/alert";
 import FileModal from "../shared/fileExplorer";
-import { ContentDeleteModal } from "../../shared/contentManagementModal";
+import { ContentDeleteModal } from "../../common/modal/contentManagementModal";
 import TemplateUpload from "../shared/templateUpload";
 
 const mapStateToProps = (state) => ({
@@ -146,7 +146,6 @@ class TeacherConcepts extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     let data = [];
                     let keyboards = [];
@@ -198,7 +197,6 @@ class TeacherConcepts extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     let data = [...this.state.concepts];
                     let keyboards = [...this.state.keyboards];
@@ -471,7 +469,6 @@ class TeacherConcepts extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     data[this.state.activeConcept].concepts_random_id =
                         result.concepts_random_id;
@@ -520,7 +517,6 @@ class TeacherConcepts extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     data[this.state.activeConcept].concepts_random_id =
                         result.concepts_random_id;
@@ -694,7 +690,6 @@ class TeacherConcepts extends Component {
                 options
             )
             .then((result) => {
-                console.log(result);
                 if (result.data.sts === true) {
                     this.setState(
                         {
@@ -740,7 +735,6 @@ class TeacherConcepts extends Component {
                 options
             )
             .then((result) => {
-                console.log(result);
                 if (result.data.sts === true) {
                     this.setState(
                         {
@@ -845,7 +839,6 @@ class TeacherConcepts extends Component {
             )
                 .then((res) => res.json())
                 .then((result) => {
-                    console.log(result);
                     if (result.sts === true) {
                         this.setState({
                             successMsg: result.msg,
@@ -1008,7 +1001,6 @@ class TeacherConcepts extends Component {
             )
                 .then((res) => res.json())
                 .then((result) => {
-                    console.log(result);
                     if (result.sts === true) {
                         this.setState({
                             successMsg: result.msg,
@@ -1097,7 +1089,6 @@ class TeacherConcepts extends Component {
             )
                 .then((res) => res.json())
                 .then((result) => {
-                    console.log(result);
                     if (result.sts === true) {
                         this.setState({
                             successMsg: result.msg,
@@ -1662,7 +1653,6 @@ class TeacherConcepts extends Component {
             )
                 .then((res) => res.json())
                 .then((result) => {
-                    console.log(result);
                     if (result.sts === true) {
                         this.setState({
                             successMsg: result.msg,

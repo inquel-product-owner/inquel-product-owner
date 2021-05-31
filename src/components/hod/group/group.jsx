@@ -6,17 +6,17 @@ import SideNav from "../shared/sidenav";
 import Select from "react-select";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import { paginationCount } from "../../../shared/globalValues.js";
-import Loading from "../../shared/loader";
+import Loading from "../../common/loader";
 import SubjectTable from "../../table/subject";
-import Paginations from "../../shared/pagination";
-import AlertBox from "../../shared/alert";
+import Paginations from "../../common/pagination";
+import AlertBox from "../../common/alert";
 import {
     ContentDisableModal,
     ContentEnableModal,
     MultiContentDeleteModal,
-} from "../../shared/contentManagementModal";
+} from "../../common/modal/contentManagementModal";
 import { connect } from "react-redux";
-import { waterMark } from "../../shared/watermark";
+import { waterMark } from "../../common/function/watermark";
 
 const mapStateToProps = (state) => ({
     profile: state.user.profile,
@@ -56,7 +56,6 @@ class SubjectModal extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         teacherData: result.data,
@@ -81,7 +80,6 @@ class SubjectModal extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         subjectItems: result.data.SUBJECTS,
@@ -118,7 +116,6 @@ class SubjectModal extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,
@@ -327,7 +324,6 @@ class HODGroup extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         subjectItems: result.data.subjects,

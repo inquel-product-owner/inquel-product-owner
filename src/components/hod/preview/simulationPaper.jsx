@@ -2,11 +2,12 @@ import React, { Component } from "react";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
-import AlertBox from "../../shared/alert";
-import Loading from "../../shared/loader";
+import AlertBox from "../../common/alert";
+import Loading from "../../common/loader";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
-import store from "../../../redux/store";
+import storeDispatch from "../../../redux/dispatch";
+import { PAPER } from "../../../redux/action";
 
 const mapStateToProps = (state) => ({
     course_name: state.content.course_name,
@@ -53,7 +54,6 @@ class HODSimulationPaperPreview extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         data: result.data,
@@ -194,15 +194,12 @@ class HODSimulationPaperPreview extends Component {
                                                             >
                                                                 <button
                                                                     className="btn btn-primary-invert btn-sm shadow-none"
-                                                                    onClick={() =>
-                                                                        store.dispatch(
-                                                                            {
-                                                                                type: "PAPER",
-                                                                                payload:
-                                                                                    data.paper_name,
-                                                                            }
-                                                                        )
-                                                                    }
+                                                                    onClick={() => {
+                                                                        storeDispatch(
+                                                                            PAPER,
+                                                                            data.paper_name
+                                                                        );
+                                                                    }}
                                                                 >
                                                                     View
                                                                 </button>

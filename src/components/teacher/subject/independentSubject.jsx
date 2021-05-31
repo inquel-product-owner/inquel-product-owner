@@ -1,20 +1,21 @@
 import React, { Component } from "react";
-import store from "../../../redux/store";
 import { connect } from "react-redux";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl";
-import Loading from "../../shared/loader";
-import AlertBox from "../../shared/alert";
-import { ContentDeleteModal } from "../../shared/contentManagementModal";
+import Loading from "../../common/loader";
+import AlertBox from "../../common/alert";
+import { ContentDeleteModal } from "../../common/modal/contentManagementModal";
 import {
     ChapterList,
     ChapterEditModal,
     IndependentSemesterModal,
     IndependentSemesterEditModal,
 } from "./contentManagementModal";
+import storeDispatch from "../../../redux/dispatch";
+import { CHAPTER, SEMESTER } from "../../../redux/action";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
@@ -111,7 +112,6 @@ class TeacherIndependentSubject extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         subjectItems: result.data.results,
@@ -141,7 +141,6 @@ class TeacherIndependentSubject extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         semesterItems: result.data,
@@ -188,11 +187,11 @@ class TeacherIndependentSubject extends Component {
     };
 
     dispatchChapter = (data) => {
-        store.dispatch({ type: "CHAPTER", payload: data });
+        storeDispatch(CHAPTER, data);
     };
 
     dispatchSemester = (data) => {
-        store.dispatch({ type: "SEMESTER", payload: data });
+        storeDispatch(SEMESTER, data);
     };
 
     render() {
@@ -444,7 +443,7 @@ class TeacherIndependentSubject extends Component {
                                 </table>
                             </div>
                         </div>
-                        
+
                         <button
                             className="btn btn-tomato btn-block shadow-sm"
                             onClick={this.toggleSemesterModal}

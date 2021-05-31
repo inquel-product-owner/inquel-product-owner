@@ -6,11 +6,11 @@ import SideNav from "./shared/sidenav";
 import { Link } from "react-router-dom";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import { paginationCount } from "../../shared/globalValues.js";
-import Loading from "../shared/loader";
-import Paginations from "../shared/pagination";
+import Loading from "../common/loader";
+import Paginations from "../common/pagination";
 import StudentTable from "../table/student";
-import AlertBox from "../shared/alert";
-import { waterMark } from "../shared/watermark";
+import AlertBox from "../common/alert";
+import { waterMark } from "../common/function/watermark";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
@@ -69,7 +69,6 @@ class TeacherGroupStudents extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         studentItem: result.data.results,

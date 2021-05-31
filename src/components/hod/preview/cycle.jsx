@@ -4,11 +4,11 @@ import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
-import Loading from "../../shared/loader";
-import AlertBox from "../../shared/alert";
+import Loading from "../../common/loader";
+import AlertBox from "../../common/alert";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
-import { QuestionDataFormat } from "../../shared/dataFormating";
+import { QuestionDataFormat } from "../../common/function/dataFormating";
 import Select from "react-select";
 
 const mapStateToProps = (state) => ({
@@ -79,7 +79,6 @@ class HODCyclePreview extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 let type = "";
                 let data = [...this.state.data];
                 let totalSubQuestion = [...this.state.totalSubQuestion];
@@ -150,7 +149,6 @@ class HODCyclePreview extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState(
                         {
@@ -585,7 +583,9 @@ class HODCyclePreview extends Component {
                                                               )}
                                                           </div>
                                                           {/* ----- image preview ----- */}
-                                                          {data.content.images
+                                                          {data.content &&
+                                                          data.content.images &&
+                                                          data.content.images
                                                               .length !== 0 ? (
                                                               <div className="ml-3">
                                                                   {data.content.images.map(
@@ -867,7 +867,9 @@ class HODCyclePreview extends Component {
                                                           </div>
                                                       </div>
                                                       {/* ----- image preview ----- */}
-                                                      {data.content.images
+                                                      {data.content &&
+                                                      data.content.images &&
+                                                      data.content.images
                                                           .length !== 0 ? (
                                                           <div className="ml-3">
                                                               {data.content.images.map(

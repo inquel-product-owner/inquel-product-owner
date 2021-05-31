@@ -7,9 +7,9 @@ import { Link } from "react-router-dom";
 import { Spinner } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
 import { Document, Page, pdfjs } from "react-pdf";
-import Loading from "../../shared/loader";
+import Loading from "../../common/loader";
 import dateFormat from "dateformat";
-import AlertBox from "../../shared/alert";
+import AlertBox from "../../common/alert";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
@@ -74,7 +74,6 @@ class TeacherSemesterDirect extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         isFileUploaded:
@@ -264,7 +263,6 @@ class TeacherSemesterDirect extends Component {
                     options
                 )
                 .then((result) => {
-                    console.log(result);
                     if (result.data.sts === true) {
                         this.setState(
                             {
@@ -329,7 +327,6 @@ class TeacherSemesterDirect extends Component {
                         options
                     )
                     .then((result) => {
-                        console.log(result);
                         if (result.data.sts === true) {
                             this.setState(
                                 {
@@ -373,7 +370,6 @@ class TeacherSemesterDirect extends Component {
                     options
                 )
                 .then((result) => {
-                    console.log(result);
                     if (result.data.sts === true) {
                         this.setState(
                             {

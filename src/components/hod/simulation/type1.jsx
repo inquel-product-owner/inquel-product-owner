@@ -5,12 +5,12 @@ import { Link } from "react-router-dom";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import Select from "react-select";
-import CKeditor, { OptionEditor } from "../../shared/CKeditor";
+import CKeditor, { OptionEditor } from "../../common/CKEditor";
 import { Accordion, Card, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
-import Loading from "../../shared/loader";
-import AlertBox from "../../shared/alert";
-import { ContentDeleteModal } from "../../shared/contentManagementModal";
+import Loading from "../../common/loader";
+import AlertBox from "../../common/alert";
+import { ContentDeleteModal } from "../../common/modal/contentManagementModal";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
 
@@ -19,6 +19,7 @@ const mapStateToProps = (state) => ({
     simulation_name: state.content.simulation_name,
     paper_name: state.content.paper_name,
     section_name: state.content.section_name,
+    temp: state.storage.temp,
 });
 
 class HODSimulationType1 extends Component {
@@ -91,7 +92,7 @@ class HODSimulationType1 extends Component {
             "Content-Type": "application/json",
             Authorization: this.authToken,
         };
-        this.section = JSON.parse(localStorage.getItem("section"));
+        this.section = this.props.temp;
     }
 
     toggleSideNav = () => {
@@ -112,7 +113,6 @@ class HODSimulationType1 extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     let data = [];
                     let response = result.data;
@@ -301,7 +301,6 @@ class HODSimulationType1 extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         chapterData: result.data.chapter_data,
@@ -319,10 +318,6 @@ class HODSimulationType1 extends Component {
             });
 
         this.loadMCQData();
-
-        if (!localStorage.getItem("section")) {
-            this.props.history.goBack();
-        }
     };
 
     // -------------------------- Data submission --------------------------
@@ -536,7 +531,6 @@ class HODSimulationType1 extends Component {
                 options
             )
             .then((result) => {
-                console.log(result);
                 if (result.data.sts === true) {
                     this.setState(
                         {
@@ -608,7 +602,6 @@ class HODSimulationType1 extends Component {
                 options
             )
             .then((result) => {
-                console.log(result);
                 if (result.data.sts === true) {
                     this.setState(
                         {
@@ -849,7 +842,6 @@ class HODSimulationType1 extends Component {
             )
                 .then((res) => res.json())
                 .then((result) => {
-                    console.log(result);
                     if (result.sts === true) {
                         this.setState({
                             successMsg: result.msg,

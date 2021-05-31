@@ -6,13 +6,14 @@ import { Link } from "react-router-dom";
 import Select from "react-select";
 import { Spinner, Modal, Alert } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
-import Loading from "../shared/loader";
+import Loading from "../common/loader";
 import userpic from "../../assets/user-v1.png";
-import AlertBox from "../shared/alert";
+import AlertBox from "../common/alert";
 import dateFormat from "dateformat";
 import { country } from "../../shared/countries.js";
 import { connect } from "react-redux";
-import store from "../../redux/store";
+import storeDispatch from "../../redux/dispatch";
+import { PROFILE } from "../../redux/action";
 
 const mapStateToProps = (state) => ({
     profileData: state.user.profile,
@@ -71,7 +72,6 @@ class ImageUploadModal extends Component {
                 axios
                     .post(`${this.url}/teacher/profile/`, form_data, options)
                     .then((result) => {
-                        console.log(result);
                         if (result.data.sts === true) {
                             this.setState({
                                 successMsg: result.data.msg,
@@ -96,7 +96,6 @@ class ImageUploadModal extends Component {
                 axios
                     .patch(`${this.url}/teacher/profile/`, form_data, options)
                     .then((result) => {
-                        console.log(result);
                         if (result.data.sts === true) {
                             this.setState({
                                 successMsg: result.data.msg,
@@ -276,9 +275,8 @@ class TeacherProfile extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
-                    store.dispatch({ type: "PROFILE", payload: result.data });
+                    storeDispatch(PROFILE, result.data);
                     this.setState({
                         teacherItems: result.data,
                         page_loading: false,
@@ -327,7 +325,6 @@ class TeacherProfile extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState(
                         {
@@ -605,8 +602,7 @@ class TeacherProfile extends Component {
                                                             <div className="d-flex border-secondary rounded-lg">
                                                                 <div
                                                                     style={{
-                                                                        width:
-                                                                            "35%",
+                                                                        width: "35%",
                                                                     }}
                                                                 >
                                                                     <Select
@@ -640,8 +636,7 @@ class TeacherProfile extends Component {
                                                                                 list
                                                                             ) => {
                                                                                 return {
-                                                                                    value:
-                                                                                        list.dialCode,
+                                                                                    value: list.dialCode,
                                                                                     label: this.renderValue(
                                                                                         list
                                                                                     ),

@@ -2,11 +2,11 @@ import React, { Component } from "react";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
-import Loading from "../../shared/loader";
-import AlertBox from "../../shared/alert";
+import Loading from "../../common/loader";
+import AlertBox from "../../common/alert";
 import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
 import { connect } from "react-redux";
-import storeDispatcher from "../../../redux/dispatch";
+import storeDispatch from "../../../redux/dispatch";
 import { TEMP } from "../../../redux/action";
 
 const mapStateToProps = (state) => ({
@@ -73,7 +73,6 @@ class Favourites extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     let favourites = {};
                     let response = result.data;
@@ -169,7 +168,7 @@ class Favourites extends Component {
     };
 
     handleRouting = (data, type, topic_num) => {
-        storeDispatcher(TEMP, data);
+        storeDispatch(TEMP, data);
         this.props.history.push(
             `${this.props.match.url}/${this.state.chapterId}/${topic_num}/${type}`
         );

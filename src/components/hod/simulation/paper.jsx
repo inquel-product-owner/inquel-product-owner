@@ -1,13 +1,14 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import store from "../../../redux/store";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
-import Loading from "../../shared/loader";
-import AlertBox from "../../shared/alert";
+import Loading from "../../common/loader";
+import AlertBox from "../../common/alert";
+import storeDispatch from "../../../redux/dispatch";
+import { PAPER } from "../../../redux/action";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
@@ -63,7 +64,6 @@ class HODSimulationPaper extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     if (result.data.length !== 0) {
                         this.setState({
@@ -189,7 +189,6 @@ class HODSimulationPaper extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState(
                         {
@@ -387,10 +386,6 @@ class HODSimulationPaper extends Component {
                 }
             })
             .catch((err) => console.log(err));
-    };
-
-    dispatchPaper = (data) => {
-        store.dispatch({ type: "PAPER", payload: data });
     };
 
     render() {
@@ -645,11 +640,12 @@ class HODSimulationPaper extends Component {
                                                                       >
                                                                           <button
                                                                               className="btn btn-primary-invert btn-sm shadow-sm"
-                                                                              onClick={() =>
-                                                                                  this.dispatchPaper(
+                                                                              onClick={() => {
+                                                                                  storeDispatch(
+                                                                                      PAPER,
                                                                                       item.paper_name
-                                                                                  )
-                                                                              }
+                                                                                  );
+                                                                              }}
                                                                           >
                                                                               Add
                                                                               +

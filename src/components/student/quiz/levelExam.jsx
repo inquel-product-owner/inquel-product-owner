@@ -1,16 +1,24 @@
 import React, { Component } from "react";
 import Header from "../shared/examNavbar";
 import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
-import AlertBox from "../../shared/alert";
-import Loading from "../../shared/loader";
+import AlertBox from "../../common/alert";
+import Loading from "../../common/loader";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
-import { QuestionDataFormat } from "../../shared/dataFormating";
+import { QuestionDataFormat } from "../../common/function/dataFormating";
 import { Link } from "react-router-dom";
 import { Modal } from "react-bootstrap";
 import ReactHowler from "react-howler";
 import aesjs from "aes-js";
 import base64url from "base64url";
+import { connect } from "react-redux";
+
+const mapStateToProps = (state) => ({
+    subject_name: state.content.subject_name,
+    chapter_name: state.content.chapter_name,
+    quiz_name: state.content.quiz_name,
+    temp: state.storage.temp,
+});
 
 class QuizCountDown extends Component {
     constructor(props) {
@@ -213,8 +221,6 @@ class QuizLevelExam extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            subject_name: "",
-            chapter_name: "",
             quiz: {},
             level: {},
             question: [],
@@ -281,46 +287,24 @@ class QuizLevelExam extends Component {
     };
 
     loadQuizData = () => {
-        fetch(
-            `${this.url}/student/subject/${this.subjectId}/chapter/${this.chapterId}/quiz/`,
-            {
-                method: "GET",
-                headers: this.headers,
+        let level = {};
+        let currentLevel = 0;
+        this.props.temp.levels.forEach((value, index) => {
+            if (value.level_id === this.levelId) {
+                level = value;
+                currentLevel = index;
             }
-        )
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    let level = {};
-                    let currentLevel = 0;
-                    result.data.levels.forEach((value, index) => {
-                        if (value.level_id === this.levelId) {
-                            level = value;
-                            currentLevel = index;
-                        }
-                    });
-                    this.setState(
-                        {
-                            quiz: result.data,
-                            currentLevel: currentLevel,
-                            level: level,
-                        },
-                        () => {
-                            this.loadQuestionData();
-                        }
-                    );
-                } else {
-                    this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+        });
+        this.setState(
+            {
+                quiz: this.props.temp,
+                currentLevel: currentLevel,
+                level: level,
+            },
+            () => {
+                this.loadQuestionData();
+            }
+        );
     };
 
     // Handle data encryption
@@ -388,7 +372,6 @@ class QuizLevelExam extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     let response = this.handleDecrypt(result.data);
                     let question = QuestionDataFormat(
@@ -423,42 +406,7 @@ class QuizLevelExam extends Component {
             showCountdownModal: true,
         });
 
-        fetch(`${this.url}/student/subject/${this.subjectId}/`, {
-            method: "GET",
-            headers: this.headers,
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    let chapter_name = "";
-                    // extract currently selected chapter name
-                    for (let i = 0; i < result.data.chapters.length; i++) {
-                        if (
-                            result.data.chapters[i].chapter_id ===
-                            this.chapterId
-                        ) {
-                            chapter_name = result.data.chapters[i].chapter_name;
-                        } else {
-                            continue;
-                        }
-                    }
-                    this.setState({
-                        subject_name: result.data.subject_name,
-                        chapter_name: chapter_name,
-                    });
-                    this.loadQuizData();
-                } else {
-                    this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+        this.loadQuizData();
     };
 
     componentWillUnmount = () => {
@@ -720,7 +668,6 @@ class QuizLevelExam extends Component {
             )
                 .then((res) => res.json())
                 .then((result) => {
-                    console.log(result);
                     if (result.sts === true) {
                         this.setState(
                             {
@@ -1265,8 +1212,15 @@ class QuizLevelExam extends Component {
                             </div>
 
                             {/* <!----- Image viewer -----> */}
-                            {data[index].content.images.length !== 0
-                                ? this.imageRender(data[index])
+                            {data[index]
+                                ? data[index].content
+                                    ? data[index].content.images
+                                        ? data[index].content.images.length !==
+                                          0
+                                            ? this.imageRender(data[index])
+                                            : ""
+                                        : ""
+                                    : ""
                                 : ""}
                         </div>
                     </div>
@@ -1519,8 +1473,14 @@ class QuizLevelExam extends Component {
                             {/* <!----- Options ends here -----> */}
                         </div>
                         {/* <!----- Image viewer -----> */}
-                        {data[index].content.images[0].path !== ""
-                            ? this.imageRender(data[index])
+                        {data[index]
+                            ? data[index].content
+                                ? data[index].content.images
+                                    ? data[index].content.images.length !== 0
+                                        ? this.imageRender(data[index])
+                                        : ""
+                                    : ""
+                                : ""
                             : ""}
                     </div>
 
@@ -1574,7 +1534,8 @@ class QuizLevelExam extends Component {
     render() {
         document.title = `${
             this.state.level.level_name || ""
-        } : Quiz - Teacher | IQLabs`;
+        } : Quiz - Student | IQLabs`;
+
         const data = this.state.question;
         const index = this.state.currentQuestion;
         const answerSection =
@@ -1585,9 +1546,9 @@ class QuizLevelExam extends Component {
             <>
                 {/* ----- Navbar ----- */}
                 <Header
-                    name={this.state.subject_name}
-                    chapter_name={`${this.state.chapter_name} - ${
-                        this.state.quiz.quiz_name || ""
+                    name={this.props.subject_name}
+                    chapter_name={`${this.props.chapter_name} - ${
+                        this.props.quiz_name
                     } - ${this.state.level.level_name || ""}`}
                     goBack={this.props.history.goBack}
                 />
@@ -1703,4 +1664,4 @@ class QuizLevelExam extends Component {
     }
 }
 
-export default QuizLevelExam;
+export default connect(mapStateToProps)(QuizLevelExam);

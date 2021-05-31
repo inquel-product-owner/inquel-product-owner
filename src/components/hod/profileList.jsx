@@ -5,16 +5,16 @@ import { Link } from "react-router-dom";
 import { Tabs, Tab, Dropdown, Modal, Spinner, Alert } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
 import { paginationCount } from "../../shared/globalValues.js";
-import Loading from "../shared/loader";
+import Loading from "../common/loader";
 import TeacherTable from "../table/teacher";
 import StudentTable from "../table/student";
-import Paginations from "../shared/pagination";
-import AlertBox from "../shared/alert";
+import Paginations from "../common/pagination";
+import AlertBox from "../common/alert";
 import {
     UserDeleteModal,
     UserDisableModal,
     UserEnableModal,
-} from "../shared/userManagementModal";
+} from "../common/modal/userManagementModal";
 
 // Student add modal
 class AddStudentModal extends Component {
@@ -58,7 +58,6 @@ class AddStudentModal extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: "Email added successfully!",
@@ -331,7 +330,6 @@ class AddTeacherModal extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: "Teacher created successfully!",
@@ -584,7 +582,6 @@ class TeacherDeleteModal extends Component {
             })
                 .then((res) => res.json())
                 .then((result) => {
-                    console.log(result);
                     if (result.sts === true) {
                         this.setState({
                             successMsg: result.msg,
@@ -777,7 +774,6 @@ class HODTeacherStudentList extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         teacherItems: result.data.results,
@@ -807,7 +803,6 @@ class HODTeacherStudentList extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         studentItems: result.data.results,

@@ -36,7 +36,6 @@ export function ForgotPasswordModal(props) {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts) {
                     setSuccessMsg(result.msg);
                     setSuccessAlert(true);
@@ -169,7 +168,6 @@ export class ForgotPassword extends Component {
                         page_loading: false,
                     });
                 }
-                console.log(result);
             })
             .catch((err) => {
                 console.log(err);
@@ -219,7 +217,6 @@ export class ForgotPassword extends Component {
             })
                 .then((res) => res.json())
                 .then((result) => {
-                    console.log(result);
                     if (result.sts === true) {
                         this.setState({
                             successMsg: result.msg,
@@ -469,7 +466,8 @@ export class ForgotPassword extends Component {
                                 <div className="row">
                                     <div className="col-md-6">
                                         <p className="mb-3 mb-md-0 text-white text-center text-md-left">
-                                            &copy;{new Date().getFullYear()} Inquel inc. Powered By{" "}
+                                            &copy;{new Date().getFullYear()}{" "}
+                                            Inquel inc. Powered By{" "}
                                             <a
                                                 href="https://sachirva.com/"
                                                 target="_blank"

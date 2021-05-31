@@ -8,7 +8,9 @@ class SideNav extends Component {
         return (
             <div
                 id="sidebar"
-                className={`text-center light-bg ${this.props.shownav ? "active" : ""}`}
+                className={`text-center light-bg ${
+                    this.props.shownav ? "active" : ""
+                }`}
             >
                 <Link to="/admin">
                     <OverlayTrigger

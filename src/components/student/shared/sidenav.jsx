@@ -64,9 +64,7 @@ class SideNav extends Component {
                                     active === "calendar" ? "active" : ""
                                 } btn-sm mb-3`}
                             >
-                                <i
-                                    className="far fa-calendar-alt"
-                                ></i>
+                                <i className="far fa-calendar-alt"></i>
                             </button>
                         </OverlayTrigger>
                     </Link>

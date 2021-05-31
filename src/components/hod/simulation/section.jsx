@@ -1,13 +1,14 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import store from "../../../redux/store";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
-import Loading from "../../shared/loader";
-import AlertBox from "../../shared/alert";
+import Loading from "../../common/loader";
+import AlertBox from "../../common/alert";
+import storeDispatch from "../../../redux/dispatch";
+import { SECTION, TEMP } from "../../../redux/action";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
@@ -68,7 +69,6 @@ class HODSimulationSection extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         filters: result.data,
@@ -96,7 +96,6 @@ class HODSimulationSection extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     if (result.data.length !== 0) {
                         let section = [];
@@ -240,7 +239,6 @@ class HODSimulationSection extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,
@@ -409,10 +407,6 @@ class HODSimulationSection extends Component {
                 }
             );
         }
-    };
-
-    dispatchSection = (data) => {
-        store.dispatch({ type: "SECTION", payload: data });
     };
 
     render() {
@@ -777,14 +771,13 @@ class HODSimulationSection extends Component {
                                                                           <button
                                                                               className="btn btn-primary-invert btn-sm shadow-sm"
                                                                               onClick={() => {
-                                                                                  this.dispatchSection(
+                                                                                  storeDispatch(
+                                                                                      SECTION,
                                                                                       section.section_name
                                                                                   );
-                                                                                  localStorage.setItem(
-                                                                                      "section",
-                                                                                      JSON.stringify(
-                                                                                          section
-                                                                                      )
+                                                                                  storeDispatch(
+                                                                                      TEMP,
+                                                                                      section
                                                                                   );
                                                                               }}
                                                                           >

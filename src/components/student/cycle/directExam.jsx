@@ -3,17 +3,22 @@ import axios from "axios";
 import Header from "../shared/examNavbar";
 import { Spinner } from "react-bootstrap";
 import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
-import AlertBox from "../../shared/alert";
-import Loading from "../../shared/loader";
+import AlertBox from "../../common/alert";
+import Loading from "../../common/loader";
 import { Document, Page, pdfjs } from "react-pdf";
 import dateFormat from "dateformat";
+import { connect } from "react-redux";
+
+const mapStateToProps = (state) => ({
+    subject_name: state.content.subject_name,
+    chapter_name: state.content.chapter_name,
+    cycle_name: state.content.cycle_name,
+});
 
 class CycleDirectExam extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            subject_name: "",
-            chapter_name: "",
             cycleTestItem: [],
             url: null,
             question_url: null,
@@ -57,7 +62,6 @@ class CycleDirectExam extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         cycleTestItem: result.data,
@@ -95,41 +99,7 @@ class CycleDirectExam extends Component {
     };
 
     componentDidMount = () => {
-        fetch(`${this.url}/student/subject/${this.subjectId}/`, {
-            method: "GET",
-            headers: this.headers,
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    let chapter_name = "";
-                    // extract currently selected chapter name
-                    for (let i = 0; i < result.data.chapters.length; i++) {
-                        if (
-                            result.data.chapters[i].chapter_id ===
-                            this.chapterId
-                        ) {
-                            chapter_name = result.data.chapters[i].chapter_name;
-                        } else {
-                            continue;
-                        }
-                    }
-                    this.setState({
-                        subject_name: result.data.subject_name,
-                        chapter_name: chapter_name,
-                    });
-                } else {
-                    this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+        document.title = `${this.props.cycle_name} - Student | IQLabs`;
 
         this.loadExamData();
     };
@@ -223,7 +193,6 @@ class CycleDirectExam extends Component {
                 options
             )
             .then((result) => {
-                console.log(result);
                 if (result.data.sts === true) {
                     this.setState(
                         {
@@ -268,7 +237,6 @@ class CycleDirectExam extends Component {
                 options
             )
             .then((result) => {
-                console.log(result);
                 if (result.data.sts === true) {
                     this.setState(
                         {
@@ -315,13 +283,12 @@ class CycleDirectExam extends Component {
         this.setState((state) => ({ pageNumber: state.pageNumber + 1 }));
 
     render() {
-        document.title = `${this.state.chapter_name} Direct Exam - Teacher | IQLabs`;
         return (
             <>
                 {/* Navbar */}
                 <Header
-                    name={this.state.subject_name}
-                    chapter_name={`${this.state.chapter_name} - ${this.state.cycleTestItem.cycle_test_name}`}
+                    name={this.props.subject_name}
+                    chapter_name={`${this.props.chapter_name} - ${this.props.cycle_name}`}
                     goBack={this.props.history.goBack}
                 />
 
@@ -551,4 +518,4 @@ class CycleDirectExam extends Component {
     }
 }
 
-export default CycleDirectExam;
+export default connect(mapStateToProps)(CycleDirectExam);

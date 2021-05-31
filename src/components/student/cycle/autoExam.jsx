@@ -1,17 +1,26 @@
 import React, { Component } from "react";
 import Header from "../shared/examNavbar";
 import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
-import AlertBox from "../../shared/alert";
-import Loading from "../../shared/loader";
+import AlertBox from "../../common/alert";
+import Loading from "../../common/loader";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
+import { connect } from "react-redux";
+import { QuestionDataFormat } from "../../common/function/dataFormating";
+import storeDispatch from "../../../redux/dispatch";
+import { EXAMDATA } from "../../../redux/action";
+
+const mapStateToProps = (state) => ({
+    subject_name: state.content.subject_name,
+    chapter_name: state.content.chapter_name,
+    cycle_name: state.content.cycle_name,
+    examData: state.storage.examData,
+});
 
 class CycleAutoExam extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            subject_name: "",
-            chapter_name: "",
             cycleTestItem: [],
             questionSection: [],
             answerSection: [],
@@ -57,8 +66,11 @@ class CycleAutoExam extends Component {
         let temp = [...this.state.answerSection];
         let questions = [];
 
-        if (localStorage.getItem("data")) {
-            temp = JSON.parse(localStorage.getItem("data"));
+        if (
+            this.props.examData &&
+            Object.keys(this.props.examData).length !== 0
+        ) {
+            temp = JSON.parse(this.props.examData);
         } else {
             if (sections.length !== 0) {
                 sections.forEach((data) => {
@@ -106,18 +118,14 @@ class CycleAutoExam extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 let sections = [];
-                let questions = [];
-                let images = [];
-                let sub_question = [];
                 let totalSubQuestion = [];
                 let currentSubQuestionIndex = [];
                 if (result.sts === true) {
                     var duration = "";
                     let response = result.data.auto_test;
-                    if (localStorage.getItem("duration")) {
-                        duration = localStorage.getItem("duration");
+                    if (localStorage.getItem("examDuration")) {
+                        duration = localStorage.getItem("examDuration");
                     } else if (result.data.auto_test_duration !== undefined) {
                         duration = result.data.auto_test_duration * 60;
                     } else {
@@ -125,262 +133,13 @@ class CycleAutoExam extends Component {
                     }
                     if (response.length !== 0) {
                         response.forEach((data) => {
-                            questions = [];
-                            let total = [];
-                            let current = [];
-                            for (let i = 0; i < data.questions.length; i++) {
-                                // <!----- Type 1 ----->
-                                if (
-                                    data.questions[i].sub_question === undefined
-                                ) {
-                                    images = [];
-                                    total.push(0);
-                                    current.push(0);
-                                    if (
-                                        data.questions[i].files !== undefined &&
-                                        data.questions[i].files.length !== 0
-                                    ) {
-                                        // image
-                                        if (
-                                            data.questions[i].files
-                                                .type1_image_1
-                                        ) {
-                                            images.push({
-                                                title: data.questions[i].files
-                                                    .type1_image_1_title,
-                                                file_name: "",
-                                                image: null,
-                                                path: data.questions[i].files
-                                                    .type1_image_1,
-                                            });
-                                        }
-                                        if (
-                                            data.questions[i].files
-                                                .type1_image_2
-                                        ) {
-                                            images.push({
-                                                title: data.questions[i].files
-                                                    .type1_image_2_title,
-                                                file_name: "",
-                                                image: null,
-                                                path: data.questions[i].files
-                                                    .type1_image_2,
-                                            });
-                                        }
-                                        if (
-                                            data.questions[i].files
-                                                .type1_image_3
-                                        ) {
-                                            images.push({
-                                                title: data.questions[i].files
-                                                    .type1_image_3_title,
-                                                file_name: "",
-                                                image: null,
-                                                path: data.questions[i].files
-                                                    .type1_image_3,
-                                            });
-                                        }
-                                        if (
-                                            data.questions[i].files
-                                                .type1_image_4
-                                        ) {
-                                            images.push({
-                                                title: data.questions[i].files
-                                                    .type1_image_4_title,
-                                                file_name: "",
-                                                image: null,
-                                                path: data.questions[i].files
-                                                    .type1_image_4,
-                                            });
-                                        }
-                                    }
+                            let questions = QuestionDataFormat(data.questions);
 
-                                    questions.push({
-                                        type: "type_1",
-                                        question: data.questions[i].question,
-                                        question_random_id:
-                                            data.questions[i]
-                                                .question_random_id,
-                                        content: {
-                                            mcq: data.questions[i].mcq || false,
-                                            mcq_answers:
-                                                data.questions[i].mcq_answers ||
-                                                1,
-                                            fill_in:
-                                                data.questions[i].fill_in ||
-                                                false,
-                                            boolean:
-                                                data.questions[i].boolean ||
-                                                false,
-                                            boolean_question: [
-                                                {
-                                                    content: "True",
-                                                },
-                                                {
-                                                    content: "False",
-                                                },
-                                            ],
-                                            options:
-                                                data.questions[i].options !==
-                                                    undefined &&
-                                                data.questions[i].options
-                                                    .length !== 0
-                                                    ? data.questions[i].options
-                                                    : [
-                                                          {
-                                                              content: "",
-                                                          },
-                                                          {
-                                                              content: "",
-                                                          },
-                                                          {
-                                                              content: "",
-                                                          },
-                                                          {
-                                                              content: "",
-                                                          },
-                                                      ],
-                                            images:
-                                                images.length === 0
-                                                    ? []
-                                                    : images,
-                                        },
-                                    });
-                                } else if (
-                                    data.questions[i].sub_question !== undefined
-                                ) {
-                                    images = [];
-                                    sub_question = [];
-                                    total.push(
-                                        data.questions[i].sub_question.length
-                                    );
-                                    current.push(0);
-
-                                    // Image
-                                    if (data.questions[i].files !== undefined) {
-                                        if (
-                                            Object.entries(
-                                                data.questions[i].files
-                                            ).length !== 0
-                                        ) {
-                                            if (
-                                                data.questions[i].files
-                                                    .type2_image_1
-                                            ) {
-                                                images.push({
-                                                    title: data.questions[i]
-                                                        .files
-                                                        .type2_image_1_title,
-                                                    file_name: "",
-                                                    image: null,
-                                                    path: data.questions[i]
-                                                        .files.type2_image_1,
-                                                });
-                                            }
-                                            if (
-                                                data.questions[i].files
-                                                    .type2_image_2
-                                            ) {
-                                                images.push({
-                                                    title: data.questions[i]
-                                                        .files
-                                                        .type2_image_2_title,
-                                                    file_name: "",
-                                                    image: null,
-                                                    path: data.questions[i]
-                                                        .files.type2_image_2,
-                                                });
-                                            }
-                                            if (
-                                                data.questions[i].files
-                                                    .type2_image_3
-                                            ) {
-                                                images.push({
-                                                    title: data.questions[i]
-                                                        .files
-                                                        .type2_image_3_title,
-                                                    file_name: "",
-                                                    image: null,
-                                                    path: data.questions[i]
-                                                        .files.type2_image_3,
-                                                });
-                                            }
-                                            if (
-                                                data.questions[i].files
-                                                    .type2_image_4
-                                            ) {
-                                                images.push({
-                                                    title: data.questions[i]
-                                                        .files
-                                                        .type2_image_4_title,
-                                                    file_name: "",
-                                                    image: null,
-                                                    path: data.questions[i]
-                                                        .files.type2_image_4,
-                                                });
-                                            }
-                                        }
-                                    }
-
-                                    // Sub question
-                                    for (
-                                        let k = 0;
-                                        k <
-                                        data.questions[i].sub_question.length;
-                                        k++
-                                    ) {
-                                        sub_question.push({
-                                            sub_question_id:
-                                                data.questions[i].sub_question[
-                                                    k
-                                                ].sub_question_id,
-                                            question:
-                                                data.questions[i].sub_question[
-                                                    k
-                                                ].question,
-                                            mcq:
-                                                data.questions[i].sub_question[
-                                                    k
-                                                ].mcq || false,
-                                            fill_in:
-                                                data.questions[i].sub_question[
-                                                    k
-                                                ].fill_in || false,
-                                            options:
-                                                data.questions[i].sub_question[
-                                                    k
-                                                ].options !== undefined
-                                                    ? data.questions[i]
-                                                          .sub_question[k]
-                                                          .options.length !== 0
-                                                        ? data.questions[i]
-                                                              .sub_question[k]
-                                                              .options
-                                                        : ""
-                                                    : "",
-                                        });
-                                    }
-
-                                    // Main question
-                                    questions.push({
-                                        type: "type_2",
-                                        question: data.questions[i].question,
-                                        question_random_id:
-                                            data.questions[i]
-                                                .question_random_id,
-                                        sub_question: sub_question,
-                                        content: {
-                                            images:
-                                                images.length === 0
-                                                    ? []
-                                                    : images,
-                                        },
-                                    });
-                                }
-                            }
-                            totalSubQuestion.push(total);
-                            currentSubQuestionIndex.push(current);
-                            sections.push(questions);
+                            totalSubQuestion.push(questions.totalSubQuestion);
+                            currentSubQuestionIndex.push(
+                                questions.currentSubQuestionIndex
+                            );
+                            sections.push(questions.result);
                         });
                     }
                     this.setState(
@@ -421,7 +180,6 @@ class CycleAutoExam extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         examInfo: result.data,
@@ -443,44 +201,10 @@ class CycleAutoExam extends Component {
 
     // loads subject info
     componentDidMount = () => {
+        document.title = `${this.props.cycle_name} : Auto - Student | IQLabs`;
+
         let timeLeftVar = this.secondsToTime(this.state.seconds);
         this.setState({ time: timeLeftVar });
-
-        fetch(`${this.url}/student/subject/${this.subjectId}/`, {
-            method: "GET",
-            headers: this.headers,
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    let chapter_name = "";
-                    // extract currently selected chapter name
-                    for (let i = 0; i < result.data.chapters.length; i++) {
-                        if (
-                            result.data.chapters[i].chapter_id ===
-                            this.chapterId
-                        ) {
-                            chapter_name = result.data.chapters[i].chapter_name;
-                        } else {
-                            continue;
-                        }
-                    }
-                    this.setState({
-                        subject_name: result.data.subject_name,
-                        chapter_name: chapter_name,
-                    });
-                } else {
-                    this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
 
         this.loadCycleTestData();
     };
@@ -506,7 +230,6 @@ class CycleAutoExam extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState(
                         {
@@ -514,12 +237,12 @@ class CycleAutoExam extends Component {
                             showSuccessAlert: true,
                         },
                         () => {
-                            localStorage.removeItem("duration");
+                            localStorage.removeItem("examDuration");
                             setTimeout(() => {
                                 this.setState({
                                     page_loading: false,
                                 });
-                                localStorage.removeItem("data");
+                                storeDispatch(EXAMDATA, {});
                                 this.props.history.goBack();
                             }, 1000);
                         }
@@ -594,7 +317,7 @@ class CycleAutoExam extends Component {
                 this.setState({
                     answerSection: sections,
                 });
-                localStorage.setItem("data", JSON.stringify(sections));
+                storeDispatch(EXAMDATA, JSON.stringify(sections));
             } else {
                 sections[this.state.currentSectionIndex].questions[
                     index
@@ -602,7 +325,7 @@ class CycleAutoExam extends Component {
                 this.setState({
                     answerSection: sections,
                 });
-                localStorage.setItem("data", JSON.stringify(sections));
+                storeDispatch(EXAMDATA, JSON.stringify(sections));
             }
         } else if (type === "radio") {
             sections[this.state.currentSectionIndex].questions[
@@ -611,7 +334,7 @@ class CycleAutoExam extends Component {
             this.setState({
                 answerSection: sections,
             });
-            localStorage.setItem("data", JSON.stringify(sections));
+            storeDispatch(EXAMDATA, JSON.stringify(sections));
         }
     };
 
@@ -624,14 +347,14 @@ class CycleAutoExam extends Component {
             this.setState({
                 answerSection: sections,
             });
-            localStorage.setItem("data", JSON.stringify(sections));
+            storeDispatch(EXAMDATA, JSON.stringify(sections));
         } else {
             sections[this.state.currentSectionIndex].questions[index].answer =
                 [];
             this.setState({
                 answerSection: sections,
             });
-            localStorage.setItem("data", JSON.stringify(sections));
+            storeDispatch(EXAMDATA, JSON.stringify(sections));
         }
     };
 
@@ -642,7 +365,7 @@ class CycleAutoExam extends Component {
         this.setState({
             answerSection: sections,
         });
-        localStorage.setItem("data", JSON.stringify(sections));
+        storeDispatch(EXAMDATA, JSON.stringify(sections));
     };
 
     handleEventChange = (event, index) => {
@@ -659,7 +382,7 @@ class CycleAutoExam extends Component {
             this.setState({
                 answerSection: sections,
             });
-            localStorage.setItem("data", JSON.stringify(sections));
+            storeDispatch(EXAMDATA, JSON.stringify(sections));
         } else {
             sections[this.state.currentSectionIndex].questions[
                 index
@@ -667,7 +390,7 @@ class CycleAutoExam extends Component {
             this.setState({
                 answerSection: sections,
             });
-            localStorage.setItem("data", JSON.stringify(sections));
+            storeDispatch(EXAMDATA, JSON.stringify(sections));
         }
     };
 
@@ -717,7 +440,7 @@ class CycleAutoExam extends Component {
             answerSection: sections,
         });
         window.MathJax.typeset();
-        localStorage.setItem("data", JSON.stringify(sections));
+        storeDispatch(EXAMDATA, JSON.stringify(sections));
     };
 
     handleDropFillin = (event, index) => {
@@ -733,7 +456,7 @@ class CycleAutoExam extends Component {
             this.setState({
                 answerSection: sections,
             });
-            localStorage.setItem("data", JSON.stringify(sections));
+            storeDispatch(EXAMDATA, JSON.stringify(sections));
         } else {
             sections[this.state.currentSectionIndex].questions[
                 index
@@ -745,7 +468,7 @@ class CycleAutoExam extends Component {
             this.setState({
                 answerSection: sections,
             });
-            localStorage.setItem("data", JSON.stringify(sections));
+            storeDispatch(EXAMDATA, JSON.stringify(sections));
         }
     };
 
@@ -791,7 +514,7 @@ class CycleAutoExam extends Component {
             time: this.secondsToTime(seconds),
             seconds: seconds,
         });
-        // localStorage.setItem("duration", seconds);
+        localStorage.setItem("examDuration", seconds);
 
         // Check if we're at zero.
         if (seconds === 0) {
@@ -1075,8 +798,11 @@ class CycleAutoExam extends Component {
                                 ) : null}
                             </div>
                             {/* <!----- Image viewer -----> */}
-                            {data.content.images.length !== 0
-                                ? this.imageRender(data)
+                            {data.content
+                                ? data.content.images &&
+                                  data.content.images.length !== 0
+                                    ? this.imageRender(data)
+                                    : ""
                                 : ""}
                         </div>
                     </div>
@@ -1371,8 +1097,11 @@ class CycleAutoExam extends Component {
                                 </div>
                             </div>
                             {/* <!----- Image viewer -----> */}
-                            {data.content.images.length !== 0
-                                ? this.imageRender(data)
+                            {data.content
+                                ? data.content.images &&
+                                  data.content.images.length !== 0
+                                    ? this.imageRender(data)
+                                    : ""
                                 : ""}
                         </div>
                     </div>
@@ -1405,9 +1134,6 @@ class CycleAutoExam extends Component {
     };
 
     render() {
-        document.title = `${
-            this.state.cycleTestItem.cycle_test_name || ""
-        } Exam - Student | IQLabs`;
         const cycleTest =
             this.state.cycleTestItem.auto_test !== undefined
                 ? this.state.cycleTestItem.auto_test[
@@ -1430,8 +1156,8 @@ class CycleAutoExam extends Component {
             <>
                 {/* Navbar */}
                 <Header
-                    name={this.state.subject_name}
-                    chapter_name={`${this.state.chapter_name} - ${this.state.cycleTestItem.cycle_test_name}`}
+                    name={this.props.subject_name}
+                    chapter_name={`${this.props.chapter_name} - ${this.props.cycle_name}`}
                     goBack={this.props.history.goBack}
                 />
 
@@ -1531,18 +1257,30 @@ class CycleAutoExam extends Component {
                         {/* ----- Navigation ----- */}
                         <div className="row align-items-center">
                             <div className="col-3">
-                                <button
-                                    className="btn btn-primary btn-sm shadow-none"
-                                    disabled={
-                                        this.state.currentSectionIndex === 0
-                                            ? true
-                                            : false
-                                    }
-                                    onClick={this.handlePrev}
-                                >
-                                    <i className="fas fa-angle-left mr-1"></i>
-                                    Previous
-                                </button>
+                                {this.state.currentSectionIndex !== 0 ? (
+                                    <button
+                                        className="btn btn-primary btn-sm shadow-none"
+                                        onClick={this.handlePrev}
+                                    >
+                                        <i className="fas fa-angle-left mr-1"></i>
+                                        {this.state.cycleTestItem.auto_test
+                                            ? this.state.cycleTestItem
+                                                  .auto_test[
+                                                  this.state
+                                                      .currentSectionIndex - 1
+                                              ]
+                                                ? this.state.cycleTestItem
+                                                      .auto_test[
+                                                      this.state
+                                                          .currentSectionIndex -
+                                                          1
+                                                  ].section_description
+                                                : ""
+                                            : ""}
+                                    </button>
+                                ) : (
+                                    ""
+                                )}
                             </div>
                             <div className="col-6">
                                 {this.state.currentSectionIndex ===
@@ -1558,19 +1296,31 @@ class CycleAutoExam extends Component {
                                 )}
                             </div>
                             <div className="col-3 text-right">
-                                <button
-                                    className="btn btn-primary btn-sm shadow-none"
-                                    disabled={
-                                        this.state.currentSectionIndex <
-                                        this.state.questionSection.length - 1
-                                            ? false
-                                            : true
-                                    }
-                                    onClick={this.handleNext}
-                                >
-                                    Next
-                                    <i className="fas fa-angle-right ml-2"></i>
-                                </button>
+                                {this.state.currentSectionIndex <
+                                this.state.questionSection.length - 1 ? (
+                                    <button
+                                        className="btn btn-primary btn-sm shadow-none"
+                                        onClick={this.handleNext}
+                                    >
+                                        {this.state.cycleTestItem.auto_test
+                                            ? this.state.cycleTestItem
+                                                  .auto_test[
+                                                  this.state
+                                                      .currentSectionIndex + 1
+                                              ]
+                                                ? this.state.cycleTestItem
+                                                      .auto_test[
+                                                      this.state
+                                                          .currentSectionIndex +
+                                                          1
+                                                  ].section_description
+                                                : ""
+                                            : ""}
+                                        <i className="fas fa-angle-right ml-2"></i>
+                                    </button>
+                                ) : (
+                                    ""
+                                )}
                             </div>
                         </div>
                     </div>
@@ -1583,4 +1333,4 @@ class CycleAutoExam extends Component {
     }
 }
 
-export default CycleAutoExam;
+export default connect(mapStateToProps)(CycleAutoExam);

@@ -1,15 +1,22 @@
 import React, { Component } from "react";
 import Header from "../shared/examNavbar";
 import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
-import AlertBox from "../../shared/alert";
-import Loading from "../../shared/loader";
+import AlertBox from "../../common/alert";
+import Loading from "../../common/loader";
+import { connect } from "react-redux";
+import storeDispatch from "../../../redux/dispatch";
+import { TEMP } from "../../../redux/action";
+
+const mapStateToProps = (state) => ({
+    subject_name: state.content.subject_name,
+    chapter_name: state.content.chapter_name,
+    quiz_name: state.content.quiz_name,
+});
 
 class Quiz extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            subject_name: "",
-            chapter_name: "",
             quiz: {},
             cssArray: [
                 "align-items-start",
@@ -45,12 +52,12 @@ class Quiz extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         quiz: result.data,
                         page_loading: false,
                     });
+                    storeDispatch(TEMP, result.data);
                 } else {
                     this.setState({
                         errorMsg: result.detail ? result.detail : result.msg,
@@ -65,41 +72,7 @@ class Quiz extends Component {
     };
 
     componentDidMount = () => {
-        fetch(`${this.url}/student/subject/${this.subjectId}/`, {
-            method: "GET",
-            headers: this.headers,
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                if (result.sts === true) {
-                    let chapter_name = "";
-                    // extract currently selected chapter name
-                    for (let i = 0; i < result.data.chapters.length; i++) {
-                        if (
-                            result.data.chapters[i].chapter_id ===
-                            this.chapterId
-                        ) {
-                            chapter_name = result.data.chapters[i].chapter_name;
-                        } else {
-                            continue;
-                        }
-                    }
-                    this.setState({
-                        subject_name: result.data.subject_name,
-                        chapter_name: chapter_name,
-                    });
-                } else {
-                    this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
-                }
-            })
-            .catch((err) => {
-                console.log(err);
-            });
+        document.title = `${this.props.quiz_name} : Quiz - Student | IQLabs`;
 
         this.loadQuizData();
     };
@@ -122,7 +95,6 @@ class Quiz extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.props.history.push(
                         `${this.props.match.url}/level/${level_id}`
@@ -141,16 +113,13 @@ class Quiz extends Component {
     };
 
     render() {
-        document.title = `${
-            this.state.quiz.quiz_name || ""
-        } : Quiz - Teacher | IQLabs`;
         return (
             <>
                 {/* Navbar */}
                 <Header
-                    name={this.state.subject_name}
-                    chapter_name={`${this.state.chapter_name} - ${
-                        this.state.quiz.quiz_name || ""
+                    name={this.props.subject_name}
+                    chapter_name={`${this.props.chapter_name} - ${
+                        this.props.quiz_name || ""
                     }`}
                     goBack={this.props.history.goBack}
                 />
@@ -215,8 +184,7 @@ class Quiz extends Component {
                                                               <div
                                                                   className={`row ${this.state.cssArray[index]}`}
                                                                   style={{
-                                                                      height:
-                                                                          "50vh",
+                                                                      height: "50vh",
                                                                   }}
                                                               >
                                                                   <div className="col-12">
@@ -224,10 +192,8 @@ class Quiz extends Component {
                                                                           <div
                                                                               className="bg-white d-flex align-items-center justify-content-center rounded-lg font-weight-bold-600 primary-text mb-2"
                                                                               style={{
-                                                                                  width:
-                                                                                      "30px",
-                                                                                  height:
-                                                                                      "30px",
+                                                                                  width: "30px",
+                                                                                  height: "30px",
                                                                               }}
                                                                           >
                                                                               {index +
@@ -288,4 +254,4 @@ class Quiz extends Component {
     }
 }
 
-export default Quiz;
+export default connect(mapStateToProps)(Quiz);

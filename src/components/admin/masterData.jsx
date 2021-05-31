@@ -5,8 +5,8 @@ import { Link } from "react-router-dom";
 import Select from "react-select";
 import { Modal, Spinner, Alert } from "react-bootstrap";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
-import Loading from "../shared/loader";
-import AlertBox from "../shared/alert";
+import Loading from "../common/loader";
+import AlertBox from "../common/alert";
 
 class ContentAdding extends Component {
     constructor(props) {
@@ -47,7 +47,6 @@ class ContentAdding extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,
@@ -250,7 +249,6 @@ class AdminMasterData extends Component {
                         page_loading: false,
                     });
                 }
-                console.log(result);
             })
             .catch((err) => {
                 console.log(err);
@@ -295,7 +293,6 @@ class AdminMasterData extends Component {
                             showErrorAlert: true,
                         });
                     }
-                    console.log(result);
                 })
                 .catch((err) => {
                     console.log(err);
@@ -346,7 +343,6 @@ class AdminMasterData extends Component {
                             page_loading: false,
                         });
                     }
-                    console.log(result);
                 })
                 .catch((err) => {
                     console.log(err);
@@ -574,8 +570,7 @@ class AdminMasterData extends Component {
                                                         ? this.state
                                                               .selectedCategory
                                                         : {
-                                                              label:
-                                                                  "Select category",
+                                                              label: "Select category",
                                                               value: "",
                                                           }
                                                 }
@@ -634,8 +629,7 @@ class AdminMasterData extends Component {
                                                         ? this.state
                                                               .selectedSubcategory
                                                         : {
-                                                              label:
-                                                                  "Select subcategory",
+                                                              label: "Select subcategory",
                                                               value: "",
                                                           }
                                                 }

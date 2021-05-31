@@ -126,7 +126,6 @@ class StudentRegister extends Component {
                             showLoader: false,
                         });
                     }
-                    console.log(result);
                 })
                 .catch((err) => {
                     console.log(err);

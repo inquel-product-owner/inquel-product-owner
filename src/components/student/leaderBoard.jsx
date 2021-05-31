@@ -3,9 +3,9 @@ import SideNav from "./shared/sidenav";
 import Header from "./shared/navbar";
 import { Tabs, Tab } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import Loading from "../shared/loader";
+import Loading from "../common/loader";
 import LeaderboardTable from "../table/leaderboard";
-import Paginations from "../shared/pagination";
+import Paginations from "../common/pagination";
 import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
 import { paginationCount } from "../../shared/globalValues.js";
 
@@ -109,7 +109,8 @@ class Leaderboard extends Component {
                                         leaderBoard={this.state.leaderBoard}
                                     />
                                     <div className="card-body p-3">
-                                        {this.state.totalCount > paginationCount ? (
+                                        {this.state.totalCount >
+                                        paginationCount ? (
                                             <Paginations
                                                 activePage={
                                                     this.state.activePage
@@ -133,7 +134,8 @@ class Leaderboard extends Component {
                                         leaderBoard={this.state.leaderBoard}
                                     />
                                     <div className="card-body p-3">
-                                        {this.state.totalCount > paginationCount ? (
+                                        {this.state.totalCount >
+                                        paginationCount ? (
                                             <Paginations
                                                 activePage={
                                                     this.state.activePage

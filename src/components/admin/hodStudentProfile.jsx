@@ -3,10 +3,10 @@ import profilepic from "../../assets/user-v1.png";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
-import Loading from "../shared/loader";
+import Loading from "../common/loader";
 import { Badge } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import AlertBox from "../shared/alert";
+import AlertBox from "../common/alert";
 
 class AdminHodStudentProfile extends Component {
     constructor(props) {
@@ -59,7 +59,6 @@ class AdminHodStudentProfile extends Component {
                         page_loading: false,
                     });
                 }
-                console.log(result);
             })
             .catch((err) => {
                 console.log(err);

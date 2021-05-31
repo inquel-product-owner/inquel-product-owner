@@ -91,7 +91,6 @@ class TemplateUpload extends Component {
                 axios
                     .post(this.props.url, form_data, options)
                     .then((result) => {
-                        console.log(result);
                         if (result.data.sts === true) {
                             this.setState({
                                 successMsg: result.data.msg,

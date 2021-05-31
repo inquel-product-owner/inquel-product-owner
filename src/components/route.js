@@ -140,7 +140,7 @@ import StudyPlanner from "./student/study-planner/";
 
 // -------------------- General Imports --------------------
 
-import { ForgotPassword } from "./shared/forgotPassword";
+import { ForgotPassword } from "./common/forgotPassword";
 import errorPage from "./404";
 
 const routes = (

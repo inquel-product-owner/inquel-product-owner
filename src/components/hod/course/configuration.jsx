@@ -5,14 +5,15 @@ import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import Select from "react-select";
-import Loading from "../../shared/loader";
-import AlertBox from "../../shared/alert";
+import Loading from "../../common/loader";
+import AlertBox from "../../common/alert";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl";
-import ScoreCardTable from "../../shared/scorecard";
-import ReactSwitch from "../../shared/switchComponent";
-import CKeditor from "../../shared/CKeditor";
-import store from "../../../redux/store";
+import ScoreCardTable from "../../common/scorecard";
+import ReactSwitch from "../../common/switchComponent";
+import CKeditor from "../../common/CKEditor";
 import axios from "axios";
+import storeDispatch from "../../../redux/dispatch";
+import { COURSE } from "../../../redux/action";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
@@ -91,7 +92,6 @@ class Scorecard extends Component {
             )
                 .then((res) => res.json())
                 .then((result) => {
-                    console.log(result);
                     if (result.sts === true) {
                         this.setState({
                             successMsg: result.msg,
@@ -265,7 +265,6 @@ class QuickPassModal extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,
@@ -451,7 +450,6 @@ class CourseDetails extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,
@@ -650,7 +648,6 @@ class ImageUploadModal extends Component {
                         options
                     )
                     .then((result) => {
-                        console.log(result);
                         if (result.data.sts === true) {
                             this.setState({
                                 successMsg: result.data.msg,
@@ -853,7 +850,6 @@ class HODCourseConfig extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     let course = this.state.courseData;
                     course.course_name = result.data.course_name;
@@ -933,7 +929,6 @@ class HODCourseConfig extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         chapters: result.data.chapters,
@@ -964,7 +959,6 @@ class HODCourseConfig extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         configData: result.data,
@@ -2289,13 +2283,11 @@ class HODCourseConfig extends Component {
                                             <Link
                                                 to={`/hod/course/${this.state.course_id}`}
                                                 onClick={() => {
-                                                    store.dispatch({
-                                                        type: "COURSE",
-                                                        payload:
-                                                            this.state
-                                                                .courseData
-                                                                .course_name,
-                                                    });
+                                                    storeDispatch(
+                                                        COURSE,
+                                                        this.state.courseData
+                                                            .course_name
+                                                    );
                                                 }}
                                             >
                                                 <button

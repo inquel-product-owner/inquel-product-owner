@@ -6,9 +6,9 @@ import Select from "react-select";
 import { Link } from "react-router-dom";
 import { Modal, Alert, Spinner, Dropdown } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
-import Loading from "../../shared/loader";
-import AlertBox from "../../shared/alert";
-import ScoreCardTable from "../../shared/scorecard";
+import Loading from "../../common/loader";
+import AlertBox from "../../common/alert";
+import ScoreCardTable from "../../common/scorecard";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
@@ -51,7 +51,6 @@ class Scorecard extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         scorecard: result.data,
@@ -81,7 +80,6 @@ class Scorecard extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     if (
                         Object.keys(result.data.score_card_config).length !== 0
@@ -158,7 +156,6 @@ class Scorecard extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,
@@ -338,7 +335,6 @@ class TeacherCycleTestAuto extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     if (result.data.attempts !== undefined) {
                         this.setState({
@@ -370,7 +366,6 @@ class TeacherCycleTestAuto extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     if (
                         result.data.auto_test !== undefined &&
@@ -541,7 +536,6 @@ class TeacherCycleTestAuto extends Component {
             })
                 .then((res) => res.json())
                 .then((result) => {
-                    console.log(result);
                     if (result.sts === true) {
                         const filterData = [...this.state.filterData];
                         filterData[index].category = result.data.category;
@@ -597,7 +591,6 @@ class TeacherCycleTestAuto extends Component {
             )
                 .then((res) => res.json())
                 .then((result) => {
-                    console.log(result);
                     if (result.sts === true) {
                         filterData[index].marks = result.data.marks;
                         this.setState({
@@ -639,7 +632,6 @@ class TeacherCycleTestAuto extends Component {
             )
                 .then((res) => res.json())
                 .then((result) => {
-                    console.log(result);
                     if (result.sts === true) {
                         section[index].total_questions =
                             result.data.total_questions;
@@ -770,7 +762,6 @@ class TeacherCycleTestAuto extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,

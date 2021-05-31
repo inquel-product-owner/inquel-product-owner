@@ -5,8 +5,8 @@ import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import Select from "react-select";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
-import AlertBox from "../../shared/alert";
-import Loading from "../../shared/loader";
+import AlertBox from "../../common/alert";
+import Loading from "../../common/loader";
 import { Document, Page, pdfjs } from "react-pdf";
 import { Spinner } from "react-bootstrap";
 
@@ -69,7 +69,6 @@ class TeacherSemesterDirectEvaluation extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         student_list: result.data.usernames,
@@ -107,7 +106,6 @@ class TeacherSemesterDirectEvaluation extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     let temp = {};
                     let total_obtained_marks = 0;
@@ -251,7 +249,6 @@ class TeacherSemesterDirectEvaluation extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,
@@ -288,7 +285,6 @@ class TeacherSemesterDirectEvaluation extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,

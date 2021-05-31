@@ -5,8 +5,8 @@ import profilepic from "../../assets/user-v1.png";
 import Header from "./shared/navbar";
 import SideNav from "./shared/sidenav";
 import { baseUrl, hodUrl } from "../../shared/baseUrl";
-import Loading from "../shared/loader";
-import AlertBox from "../shared/alert";
+import Loading from "../common/loader";
+import AlertBox from "../common/alert";
 
 class HODStudentProfile extends Component {
     constructor(props) {
@@ -46,7 +46,6 @@ class HODStudentProfile extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         studentItems: result.data,

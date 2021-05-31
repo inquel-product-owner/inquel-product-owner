@@ -6,11 +6,11 @@ import SideNav from "./shared/sidenav";
 import courseimg from "../../assets/code.jpg";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
 import { paginationCount } from "../../shared/globalValues.js";
-import Loading from "../shared/loader";
+import Loading from "../common/loader";
 import GroupTable from "../table/group";
 import SubjectTable from "../table/subject";
-import Paginations from "../shared/pagination";
-import AlertBox from "../shared/alert";
+import Paginations from "../common/pagination";
+import AlertBox from "../common/alert";
 import {
     ContentDeleteModal,
     ContentDisableModal,
@@ -18,14 +18,15 @@ import {
     MultiContentDeleteModal,
     SingleContentDisableModal,
     SingleContentEnableModal,
-} from "../shared/contentManagementModal";
+} from "../common/modal/contentManagementModal";
 import { connect } from "react-redux";
 import Slider from "react-slick";
-import store from "../../redux/store";
 import Select from "react-select";
+import storeDispatch from "../../redux/dispatch";
+import { COURSE } from "../../redux/action";
 
 const mapStateToProps = (state) => ({
-    data: state.user.profile,
+    profile: state.user.profile,
 });
 
 class SubjectModal extends Component {
@@ -70,7 +71,6 @@ class SubjectModal extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         category: result.data.CATEGORY,
@@ -126,7 +126,6 @@ class SubjectModal extends Component {
                             showErrorAlert: true,
                         });
                     }
-                    console.log(result);
                 })
                 .catch((err) => {
                     console.log(err);
@@ -170,7 +169,6 @@ class SubjectModal extends Component {
                             content_loading: false,
                         });
                     }
-                    console.log(result);
                 })
                 .catch((err) => {
                     console.log(err);
@@ -226,7 +224,6 @@ class SubjectModal extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,
@@ -550,7 +547,6 @@ class HODDashboard extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         groupItems: result.data.results,
@@ -577,7 +573,6 @@ class HODDashboard extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         subjectItems: result.data.results,
@@ -585,9 +580,8 @@ class HODDashboard extends Component {
                         page_loading: false,
                     });
                 } else {
+                    console.log(result.msg);
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
                         page_loading: false,
                     });
                 }
@@ -604,16 +598,14 @@ class HODDashboard extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         courseItems: result.data || [],
                         page_loading: false,
                     });
                 } else {
+                    console.log(result.msg);
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
                         page_loading: false,
                     });
                 }
@@ -985,9 +977,10 @@ class HODDashboard extends Component {
                             </div>
                         </div>
 
-                        {this.props.data !== null ? (
-                            this.props.data.permissions !== undefined ? (
-                                this.props.data.permissions.config_course ===
+                        {this.props.profile &&
+                        Object.keys(this.props.profile).length !== 0 ? (
+                            this.props.profile.permissions !== undefined ? (
+                                this.props.profile.permissions.config_course ===
                                 true ? (
                                     <>
                                         {/* ----- Subject card ----- */}
@@ -1194,12 +1187,9 @@ class HODDashboard extends Component {
                                                                                 to={`/hod/course/${data.course_id}`}
                                                                                 className="text-decoration-none"
                                                                                 onClick={() => {
-                                                                                    store.dispatch(
-                                                                                        {
-                                                                                            type: "COURSE",
-                                                                                            payload:
-                                                                                                data.course_name,
-                                                                                        }
+                                                                                    storeDispatch(
+                                                                                        COURSE,
+                                                                                        data.course_name
                                                                                     );
                                                                                 }}
                                                                             >

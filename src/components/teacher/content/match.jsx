@@ -3,12 +3,12 @@ import { connect } from "react-redux";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
-import CKeditor from "../../shared/CKeditor";
+import CKeditor from "../../common/CKEditor";
 import { Accordion, Card } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
-import Loading from "../../shared/loader";
-import AlertBox from "../../shared/alert";
-import { ContentDeleteModal } from "../../shared/contentManagementModal";
+import Loading from "../../common/loader";
+import AlertBox from "../../common/alert";
+import { ContentDeleteModal } from "../../common/modal/contentManagementModal";
 import TemplateUpload from "../shared/templateUpload";
 
 const mapStateToProps = (state) => ({
@@ -92,7 +92,6 @@ class TeacherMatch extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     let data = [];
                     let response = result.data.results;
@@ -144,7 +143,6 @@ class TeacherMatch extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     let data = [...this.state.match];
                     let response = result.data.results;
@@ -245,7 +243,6 @@ class TeacherMatch extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState(
                         {
@@ -289,7 +286,6 @@ class TeacherMatch extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState(
                         {
@@ -494,7 +490,6 @@ class TeacherMatch extends Component {
             )
                 .then((res) => res.json())
                 .then((result) => {
-                    console.log(result);
                     if (result.sts === true) {
                         this.setState({
                             successMsg: result.msg,
@@ -782,8 +777,7 @@ class TeacherMatch extends Component {
                                                                     <div
                                                                         className="card-body py-3"
                                                                         dangerouslySetInnerHTML={{
-                                                                            __html:
-                                                                                match.match_terms,
+                                                                            __html: match.match_terms,
                                                                         }}
                                                                     ></div>
                                                                 </div>
@@ -793,8 +787,7 @@ class TeacherMatch extends Component {
                                                                     <div
                                                                         className="card-body py-3"
                                                                         dangerouslySetInnerHTML={{
-                                                                            __html:
-                                                                                match.match_definition,
+                                                                            __html: match.match_definition,
                                                                         }}
                                                                     ></div>
                                                                 </div>

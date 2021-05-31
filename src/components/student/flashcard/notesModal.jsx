@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
 import { Modal, Spinner, Alert } from "react-bootstrap";
-import CKeditor from "../../shared/CKeditor";
+import CKeditor from "../../common/CKEditor";
 
 class PersonalNotes extends Component {
     constructor(props) {
@@ -89,7 +89,6 @@ class PersonalNotes extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,
@@ -129,7 +128,6 @@ class PersonalNotes extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,

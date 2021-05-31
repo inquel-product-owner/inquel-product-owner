@@ -8,10 +8,10 @@ import { Link } from "react-router-dom";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { Modal, Alert, Spinner } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
-import CKeditor from "../../shared/CKeditor";
-import Loading from "../../shared/loader";
-import AlertBox from "../../shared/alert";
-import { ContentDeleteModal } from "../../shared/contentManagementModal";
+import CKeditor from "../../common/CKEditor";
+import Loading from "../../common/loader";
+import AlertBox from "../../common/alert";
+import { ContentDeleteModal } from "../../common/modal/contentManagementModal";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
@@ -79,7 +79,6 @@ class ImageUploadModal extends Component {
                     options
                 )
                 .then((result) => {
-                    console.log(result);
                     if (result.data.url && result.data.sts === true) {
                         const image = this.state.image;
                         image.push({
@@ -309,7 +308,6 @@ class TeacherSummary extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true && result.data.length !== 0) {
                     this.setState({
                         title:
@@ -412,7 +410,6 @@ class TeacherSummary extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState(
                         {
@@ -453,7 +450,6 @@ class TeacherSummary extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState(
                         {

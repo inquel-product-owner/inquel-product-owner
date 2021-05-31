@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Alert, Spinner, Navbar } from "react-bootstrap";
 import { Redirect, Link } from "react-router-dom";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
-import Loading from "../shared/loader";
+import Loading from "../common/loader";
 import logo from "../../assets/Iq-labs-01.svg";
 
 class TeacherEmailVerification extends Component {
@@ -54,7 +54,6 @@ class TeacherEmailVerification extends Component {
                         page_loading: false,
                     });
                 }
-                console.log(result);
             })
             .catch((err) => {
                 console.log(err);
@@ -118,7 +117,6 @@ class TeacherEmailVerification extends Component {
             })
                 .then((res) => res.json())
                 .then((result) => {
-                    console.log(result);
                     if (result.sts === true) {
                         this.setState({
                             successMsg: result.msg,
@@ -153,7 +151,6 @@ class TeacherEmailVerification extends Component {
                             showLoader: false,
                         });
                     }
-                    console.log(result);
                 })
                 .catch((err) => {
                     console.log(err);
@@ -417,9 +414,7 @@ class TeacherEmailVerification extends Component {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <button
-                                                        className="btn btn-primary btn-block"
-                                                    >
+                                                    <button className="btn btn-primary btn-block">
                                                         {this.state
                                                             .showLoader ? (
                                                             <Spinner
