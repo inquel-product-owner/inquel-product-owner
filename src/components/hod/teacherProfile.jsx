@@ -6,11 +6,11 @@ import { Link } from "react-router-dom";
 import { Badge } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../shared/baseUrl";
 import { paginationCount } from "../../shared/globalValues.js";
-import Loading from "../shared/loader";
+import Loading from "../common/loader";
 import GroupTable from "../table/group";
 import SubjectTable from "../table/subject";
-import Paginations from "../shared/pagination";
-import AlertBox from "../shared/alert";
+import Paginations from "../common/pagination";
+import AlertBox from "../common/alert";
 
 class HODTeacherProfile extends Component {
     constructor(props) {
@@ -54,7 +54,6 @@ class HODTeacherProfile extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         groupItems: result.data.group_data,
@@ -81,7 +80,6 @@ class HODTeacherProfile extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         subjectItems: result.data.independent_subject_data,
@@ -111,7 +109,6 @@ class HODTeacherProfile extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         teacherItems: result.data.teacher_profile,
@@ -288,7 +285,9 @@ class HODTeacherProfile extends Component {
                                 <p className="font-weight-bold-600 mb-2">
                                     Designation
                                 </p>
-                                <p className="text-break mb-0">Science Teacher</p>
+                                <p className="text-break mb-0">
+                                    Science Teacher
+                                </p>
                             </div>
                             <div className="col-md-2 col-6 mb-3 mb-md-0">
                                 <p className="font-weight-bold-600 mb-2">

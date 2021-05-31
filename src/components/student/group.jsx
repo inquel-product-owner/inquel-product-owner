@@ -4,11 +4,11 @@ import SideNav from "./shared/sidenav";
 import courseimg from "../../assets/code.jpg";
 import { Link } from "react-router-dom";
 import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
-import Loading from "../shared/loader";
-import AlertBox from "../shared/alert";
+import Loading from "../common/loader";
+import AlertBox from "../common/alert";
 import Slider from "react-slick";
 import { connect } from "react-redux";
-import { waterMark } from "../shared/watermark";
+import { waterMark } from "../common/function/watermark";
 import storeDispatch from "../../redux/dispatch";
 import { SUBJECT } from "../../redux/action";
 
@@ -54,7 +54,6 @@ class Group extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         subjectItems: result.data,

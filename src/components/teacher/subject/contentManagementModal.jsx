@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { Modal, Alert, Spinner, Dropdown } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
-import ReactSwitch from "../../shared/switchComponent";
-import ScoreCardTable from "../../shared/scorecard";
+import ReactSwitch from "../../common/switchComponent";
+import ScoreCardTable from "../../common/scorecard";
 
 export function ChapterList(props) {
     return (
@@ -161,7 +161,6 @@ export class ChapterModal extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,
@@ -314,7 +313,6 @@ export class ChapterEditModal extends Component {
                 this.setState({
                     status: result.data.chapter_status.chapters,
                 });
-                console.log(result);
             })
             .catch((err) => {
                 console.log(err);
@@ -342,7 +340,6 @@ export class ChapterEditModal extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,
@@ -528,7 +525,6 @@ export class SemesterModal extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,
@@ -674,7 +670,6 @@ export class IndependentSemesterModal extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,
@@ -885,7 +880,6 @@ export class IndependentSemesterEditModal extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,
@@ -1137,7 +1131,6 @@ export class Scorecard extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,

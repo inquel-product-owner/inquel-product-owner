@@ -5,13 +5,13 @@ import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import { paginationCount } from "../../../shared/globalValues.js";
-import Loading from "../../shared/loader";
-import Paginations from "../../shared/pagination";
+import Loading from "../../common/loader";
+import Paginations from "../../common/pagination";
 import StudentTable from "../../table/student";
-import AlertBox from "../../shared/alert";
-import { UserRemoveModal } from "../../shared/userManagementModal";
+import AlertBox from "../../common/alert";
+import { UserRemoveModal } from "../../common/modal/userManagementModal";
 import { connect } from "react-redux";
-import { waterMark } from "../../shared/watermark";
+import { waterMark } from "../../common/function/watermark";
 
 const mapStateToProps = (state) => ({
     profile: state.user.profile,
@@ -58,7 +58,6 @@ class StudentAssignModal extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts) {
                     this.setState({
                         successMsg: result.msg,
@@ -118,7 +117,6 @@ class StudentAssignModal extends Component {
                     studentItem: result.data,
                     isLoaded: true,
                 });
-                console.log(result);
             })
             .catch((err) => {
                 console.log(err);
@@ -290,7 +288,6 @@ class HODGroupStudents extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         studentItem: result.data.results,

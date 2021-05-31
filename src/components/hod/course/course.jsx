@@ -5,8 +5,8 @@ import { Card, Accordion, Modal, Dropdown } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl";
-import Loading from "../../shared/loader";
-import AlertBox from "../../shared/alert";
+import Loading from "../../common/loader";
+import AlertBox from "../../common/alert";
 import storeDispatch from "../../../redux/dispatch";
 import {
     CHAPTER,
@@ -741,7 +741,6 @@ class HODCourse extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     let chapterEventKey = [];
                     let topicEventKey = [];

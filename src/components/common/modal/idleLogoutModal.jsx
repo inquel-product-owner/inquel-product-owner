@@ -2,7 +2,7 @@ import React from "react";
 import IdleTimer from "react-idle-timer";
 import { Modal } from "react-bootstrap";
 import { Redirect } from "react-router-dom";
-import { baseUrl, accountsUrl, adminPathUrl } from "../../shared/baseUrl";
+import { baseUrl, accountsUrl, adminPathUrl } from "../../../shared/baseUrl";
 
 export class Logout extends React.Component {
     constructor(props) {
@@ -43,7 +43,6 @@ export class Logout extends React.Component {
             })
                 .then((res) => res.json())
                 .then((result) => {
-                    console.log(result);
                     localStorage.clear();
                     this.setState({ showModal: true });
                 })
@@ -107,7 +106,7 @@ export class AdminLogout extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            timeout: 1000 * 60 * 1,
+            timeout: 1000 * 60 * 15,
             showModal: false,
             isTimedOut: false,
             isLoggedOut: false,
@@ -142,7 +141,6 @@ export class AdminLogout extends React.Component {
             })
                 .then((res) => res.json())
                 .then((result) => {
-                    console.log(result);
                     localStorage.clear();
                     this.setState({ showModal: true });
                 })

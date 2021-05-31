@@ -6,8 +6,8 @@ import profilepic from "../../assets/user-v1.png";
 import Header from "./shared/navbar";
 import SideNav from "./shared/sidenav";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl";
-import Loading from "../shared/loader";
-import AlertBox from "../shared/alert";
+import Loading from "../common/loader";
+import AlertBox from "../common/alert";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
@@ -53,7 +53,6 @@ class TeacherStudentProfile extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         studentItems: result.data,

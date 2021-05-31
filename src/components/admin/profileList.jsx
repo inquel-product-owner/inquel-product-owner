@@ -6,18 +6,18 @@ import Select from "react-select";
 import Header from "./navbar";
 import SideNav from "./sidenav";
 import HODTable from "../table/hod";
-import Loading from "../shared/loader";
+import Loading from "../common/loader";
 import StudentTable from "../table/student";
-import Paginations from "../shared/pagination";
-import ReactSwitch from "../shared/switchComponent";
+import Paginations from "../common/pagination";
+import ReactSwitch from "../common/switchComponent";
 import dateFormat from "dateformat";
 import { Link } from "react-router-dom";
-import AlertBox from "../shared/alert";
+import AlertBox from "../common/alert";
 import {
     UserDeleteModal,
     UserDisableModal,
     UserEnableModal,
-} from "../shared/userManagementModal";
+} from "../common/modal/userManagementModal";
 
 class HODModal extends Component {
     constructor(props) {
@@ -83,7 +83,6 @@ class HODModal extends Component {
                     category: "",
                     sub_category: "",
                 });
-                console.log(result);
             })
             .catch((err) => {
                 console.log(err);
@@ -139,7 +138,6 @@ class HODModal extends Component {
             })
                 .then((res) => res.json())
                 .then((result) => {
-                    console.log(result);
                     if (result.sts) {
                         this.setState({
                             successMsg: result.msg,
@@ -184,7 +182,6 @@ class HODModal extends Component {
                         subCategoryItems: result.data.sub_category,
                         subcategory_loading: false,
                     });
-                    console.log(result);
                 })
                 .catch((err) => {
                     console.log(err);
@@ -212,12 +209,10 @@ class HODModal extends Component {
             )
                 .then((res) => res.json())
                 .then((result) => {
-                    console.log(result);
                     this.setState({
                         disciplineItems: result.data.DISCIPLINE,
                         discipline_loading: false,
                     });
-                    console.log(result);
                 })
                 .catch((err) => {
                     console.log(err);
@@ -859,7 +854,6 @@ class AdminHODAndStudentList extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         hodItems: result.data.results,
@@ -887,7 +881,6 @@ class AdminHODAndStudentList extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         studentItems: result.data.results,

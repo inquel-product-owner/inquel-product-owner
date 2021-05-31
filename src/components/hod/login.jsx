@@ -3,7 +3,7 @@ import { Navbar, Alert, Spinner } from "react-bootstrap";
 import logo from "../../assets/Iq-labs-01.svg";
 import { Link, Redirect } from "react-router-dom";
 import { baseUrl, accountsUrl, adminPathUrl } from "../../shared/baseUrl.js";
-import { ForgotPasswordModal } from "../shared/forgotPassword";
+import { ForgotPasswordModal } from "../common/forgotPassword";
 import storeDispatch from "../../redux/dispatch";
 import { PROFILE } from "../../redux/action";
 
@@ -127,7 +127,6 @@ class HODLogin extends Component {
                         showLoader: false,
                     });
                 }
-                console.log(result);
             })
             .catch((err) => {
                 console.log(err);

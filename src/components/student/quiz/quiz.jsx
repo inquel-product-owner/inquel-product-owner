@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import Header from "../shared/examNavbar";
 import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
-import AlertBox from "../../shared/alert";
-import Loading from "../../shared/loader";
+import AlertBox from "../../common/alert";
+import Loading from "../../common/loader";
 import { connect } from "react-redux";
 import storeDispatch from "../../../redux/dispatch";
 import { TEMP } from "../../../redux/action";
@@ -52,7 +52,6 @@ class Quiz extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         quiz: result.data,
@@ -96,7 +95,6 @@ class Quiz extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.props.history.push(
                         `${this.props.match.url}/level/${level_id}`

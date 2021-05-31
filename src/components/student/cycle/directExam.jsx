@@ -3,8 +3,8 @@ import axios from "axios";
 import Header from "../shared/examNavbar";
 import { Spinner } from "react-bootstrap";
 import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
-import AlertBox from "../../shared/alert";
-import Loading from "../../shared/loader";
+import AlertBox from "../../common/alert";
+import Loading from "../../common/loader";
 import { Document, Page, pdfjs } from "react-pdf";
 import dateFormat from "dateformat";
 import { connect } from "react-redux";
@@ -62,7 +62,6 @@ class CycleDirectExam extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         cycleTestItem: result.data,
@@ -194,7 +193,6 @@ class CycleDirectExam extends Component {
                 options
             )
             .then((result) => {
-                console.log(result);
                 if (result.data.sts === true) {
                     this.setState(
                         {
@@ -239,7 +237,6 @@ class CycleDirectExam extends Component {
                 options
             )
             .then((result) => {
-                console.log(result);
                 if (result.data.sts === true) {
                     this.setState(
                         {

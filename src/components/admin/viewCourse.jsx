@@ -56,7 +56,12 @@ class AdminCourseView extends Component {
                                             </Link>
                                         </li>
                                         <li className="breadcrumb-item">
-                                            <Link to="#" onClick={this.props.history.goBack}>
+                                            <Link
+                                                to="#"
+                                                onClick={
+                                                    this.props.history.goBack
+                                                }
+                                            >
                                                 Student
                                             </Link>
                                         </li>

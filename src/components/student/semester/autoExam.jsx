@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 import Header from "../shared/examNavbar";
 import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
-import AlertBox from "../../shared/alert";
-import Loading from "../../shared/loader";
+import AlertBox from "../../common/alert";
+import Loading from "../../common/loader";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
 import { connect } from "react-redux";
-import { QuestionDataFormat } from "../../shared/dataFormating";
+import { QuestionDataFormat } from "../../common/function/dataFormating";
 import storeDispatch from "../../../redux/dispatch";
 import { EXAMDATA } from "../../../redux/action";
 
@@ -116,7 +116,6 @@ class SemesterAutoExam extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 let sections = [];
                 let totalSubQuestion = [];
                 let currentSubQuestionIndex = [];
@@ -179,7 +178,6 @@ class SemesterAutoExam extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         examInfo: result.data,
@@ -229,7 +227,6 @@ class SemesterAutoExam extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState(
                         {

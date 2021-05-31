@@ -4,7 +4,7 @@ import { Link, Redirect } from "react-router-dom";
 import { baseUrl, accountsUrl, adminPathUrl } from "../../shared/baseUrl.js";
 import Footer from "./shared/footer";
 import AccountNavbar from "./shared/accountNavbar";
-import { ForgotPasswordModal } from "../shared/forgotPassword";
+import { ForgotPasswordModal } from "../common/forgotPassword";
 import storeDispatch from "../../redux/dispatch";
 import { PROFILE } from "../../redux/action/index.js";
 
@@ -130,7 +130,6 @@ class StudentLogin extends Component {
                         showLoader: false,
                     });
                 }
-                console.log(result);
             })
             .catch((err) => {
                 console.log(err);

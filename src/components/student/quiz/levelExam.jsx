@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import Header from "../shared/examNavbar";
 import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
-import AlertBox from "../../shared/alert";
-import Loading from "../../shared/loader";
+import AlertBox from "../../common/alert";
+import Loading from "../../common/loader";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
-import { QuestionDataFormat } from "../../shared/dataFormating";
+import { QuestionDataFormat } from "../../common/function/dataFormating";
 import { Link } from "react-router-dom";
 import { Modal } from "react-bootstrap";
 import ReactHowler from "react-howler";
@@ -372,7 +372,6 @@ class QuizLevelExam extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     let response = this.handleDecrypt(result.data);
                     let question = QuestionDataFormat(
@@ -669,7 +668,6 @@ class QuizLevelExam extends Component {
             )
                 .then((res) => res.json())
                 .then((result) => {
-                    console.log(result);
                     if (result.sts === true) {
                         this.setState(
                             {

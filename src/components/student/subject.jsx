@@ -3,8 +3,8 @@ import Header from "./shared/navbar";
 import SideNav from "./shared/sidenav";
 import { Card, Accordion, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import Loading from "../shared/loader";
-import AlertBox from "../shared/alert";
+import Loading from "../common/loader";
+import AlertBox from "../common/alert";
 import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
 import { connect } from "react-redux";
 import storeDispatch from "../../redux/dispatch";
@@ -617,7 +617,6 @@ class Subject extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     let topics_completed = [...this.state.topics_completed];
                     let all_topics_completed = [
@@ -712,7 +711,6 @@ class Subject extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     let quiz = [...this.state.quiz];
                     quiz[chapter_index] = result.data;
@@ -741,7 +739,6 @@ class Subject extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     let topics = [];
                     let all_chapters = [];
@@ -890,7 +887,6 @@ class Subject extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState(
                         {
@@ -931,7 +927,6 @@ class Subject extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.props.history.push(
                         `${this.props.match.url}/chapter/${chapter_id}/cycle/${cycle_test_id}/auto`
@@ -963,7 +958,6 @@ class Subject extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.props.history.push(
                         `${this.props.match.url}/semester/${semester_id}/auto`

@@ -3,8 +3,8 @@ import Header from "./shared/examNavbar";
 import { Link } from "react-router-dom";
 import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import AlertBox from "../shared/alert";
-import Loading from "../shared/loader";
+import AlertBox from "../common/alert";
+import Loading from "../common/loader";
 import { connect } from "react-redux";
 import storeDispatch from "../../redux/dispatch";
 import { TEMP } from "../../redux/action";
@@ -187,7 +187,6 @@ class TestResult extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         cycle_test: result.data.cycle_tests,

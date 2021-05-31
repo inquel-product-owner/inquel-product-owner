@@ -4,14 +4,14 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
-import CKeditor, { OptionEditor } from "../../shared/CKeditor";
-import ReactSwitch from "../../shared/switchComponent";
+import CKeditor, { OptionEditor } from "../../common/CKEditor";
+import ReactSwitch from "../../common/switchComponent";
 import { Accordion, Card } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
-import Loading from "../../shared/loader";
-import AlertBox from "../../shared/alert";
+import Loading from "../../common/loader";
+import AlertBox from "../../common/alert";
 import FileModal from "../shared/fileExplorer";
-import { ContentDeleteModal } from "../../shared/contentManagementModal";
+import { ContentDeleteModal } from "../../common/modal/contentManagementModal";
 import TemplateUpload from "../shared/templateUpload";
 
 const mapStateToProps = (state) => ({
@@ -185,7 +185,6 @@ class TeacherType2 extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     let data = [];
                     let keyboards = [];
@@ -237,7 +236,6 @@ class TeacherType2 extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     let data = [...this.state.questions];
                     let keyboards = [...this.state.keyboards];
@@ -377,9 +375,8 @@ class TeacherType2 extends Component {
                                   },
                               ],
                     marks: response[i].sub_question[k].marks.toString(),
-                    negative_marks: response[i].sub_question[
-                        k
-                    ].negative_marks.toString(),
+                    negative_marks:
+                        response[i].sub_question[k].negative_marks.toString(),
                 });
             }
 
@@ -516,7 +513,6 @@ class TeacherType2 extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         themeData: result.data.theme,
@@ -705,7 +701,6 @@ class TeacherType2 extends Component {
                 options
             )
             .then((result) => {
-                console.log(result);
                 if (result.data.sts === true) {
                     this.setState(
                         {
@@ -781,7 +776,6 @@ class TeacherType2 extends Component {
                 options
             )
             .then((result) => {
-                console.log(result);
                 if (result.data.sts === true) {
                     this.setState(
                         {
@@ -872,24 +866,20 @@ class TeacherType2 extends Component {
     handleOptions_mcq = () => {
         const values = [...this.state.questions];
         // main_question
-        values[this.state.activeQuestion].mcq = !values[
-            this.state.activeQuestion
-        ].mcq;
-        values[this.state.activeQuestion].fill_in = !values[
-            this.state.activeQuestion
-        ].fill_in;
+        values[this.state.activeQuestion].mcq =
+            !values[this.state.activeQuestion].mcq;
+        values[this.state.activeQuestion].fill_in =
+            !values[this.state.activeQuestion].fill_in;
         for (
             let i = 0;
             i < values[this.state.activeQuestion].sub_question.length;
             i++
         ) {
             // sub_question
-            values[this.state.activeQuestion].sub_question[i].mcq = !values[
-                this.state.activeQuestion
-            ].sub_question[i].mcq;
-            values[this.state.activeQuestion].sub_question[i].fill_in = !values[
-                this.state.activeQuestion
-            ].sub_question[i].fill_in;
+            values[this.state.activeQuestion].sub_question[i].mcq =
+                !values[this.state.activeQuestion].sub_question[i].mcq;
+            values[this.state.activeQuestion].sub_question[i].fill_in =
+                !values[this.state.activeQuestion].sub_question[i].fill_in;
         }
         this.setState({
             questions: values,
@@ -899,24 +889,20 @@ class TeacherType2 extends Component {
     handleOptions_fillin = () => {
         const values = [...this.state.questions];
         // main_question
-        values[this.state.activeQuestion].fill_in = !values[
-            this.state.activeQuestion
-        ].fill_in;
-        values[this.state.activeQuestion].mcq = !values[
-            this.state.activeQuestion
-        ].mcq;
+        values[this.state.activeQuestion].fill_in =
+            !values[this.state.activeQuestion].fill_in;
+        values[this.state.activeQuestion].mcq =
+            !values[this.state.activeQuestion].mcq;
         for (
             let i = 0;
             i < values[this.state.activeQuestion].sub_question.length;
             i++
         ) {
             // sub_question
-            values[this.state.activeQuestion].sub_question[i].fill_in = !values[
-                this.state.activeQuestion
-            ].sub_question[i].fill_in;
-            values[this.state.activeQuestion].sub_question[i].mcq = !values[
-                this.state.activeQuestion
-            ].sub_question[i].mcq;
+            values[this.state.activeQuestion].sub_question[i].fill_in =
+                !values[this.state.activeQuestion].sub_question[i].fill_in;
+            values[this.state.activeQuestion].sub_question[i].mcq =
+                !values[this.state.activeQuestion].sub_question[i].mcq;
         }
         this.setState({
             questions: values,
@@ -944,9 +930,10 @@ class TeacherType2 extends Component {
             }
             values[this.state.activeQuestion].sub_question[
                 this.state.activeSubQuestion
-            ].options[index].correct = !values[this.state.activeQuestion]
-                .sub_question[this.state.activeSubQuestion].options[index]
-                .correct;
+            ].options[index].correct =
+                !values[this.state.activeQuestion].sub_question[
+                    this.state.activeSubQuestion
+                ].options[index].correct;
             this.setState({
                 questions: values,
             });
@@ -1096,7 +1083,6 @@ class TeacherType2 extends Component {
             )
                 .then((res) => res.json())
                 .then((result) => {
-                    console.log(result);
                     if (result.sts === true) {
                         this.setState({
                             successMsg: result.msg,
@@ -1154,9 +1140,8 @@ class TeacherType2 extends Component {
         } else {
             values[this.state.activeQuestion].content.images[index].file_name =
                 event.target.files[0].name;
-            values[this.state.activeQuestion].content.images[
-                index
-            ].path = URL.createObjectURL(event.target.files[0]);
+            values[this.state.activeQuestion].content.images[index].path =
+                URL.createObjectURL(event.target.files[0]);
             values[this.state.activeQuestion].content.images[index].image =
                 event.target.files[0];
             this.setState({
@@ -1209,9 +1194,8 @@ class TeacherType2 extends Component {
         } else {
             values[this.state.activeQuestion].content.video.file_name =
                 event.target.files[0].name;
-            values[
-                this.state.activeQuestion
-            ].content.video.path = URL.createObjectURL(event.target.files[0]);
+            values[this.state.activeQuestion].content.video.path =
+                URL.createObjectURL(event.target.files[0]);
             values[this.state.activeQuestion].content.video.video =
                 event.target.files[0];
             values[this.state.activeQuestion].content.video.url = "";
@@ -1261,7 +1245,6 @@ class TeacherType2 extends Component {
             )
                 .then((res) => res.json())
                 .then((result) => {
-                    console.log(result);
                     if (result.sts === true) {
                         this.setState({
                             successMsg: result.msg,
@@ -1272,9 +1255,8 @@ class TeacherType2 extends Component {
                         values[
                             this.state.activeQuestion
                         ].content.video.file_name = "";
-                        values[
-                            this.state.activeQuestion
-                        ].content.video.video = null;
+                        values[this.state.activeQuestion].content.video.video =
+                            null;
                         values[this.state.activeQuestion].content.video.path =
                             "";
                         values[this.state.activeQuestion].content.video.url =
@@ -1350,20 +1332,18 @@ class TeacherType2 extends Component {
             )
                 .then((res) => res.json())
                 .then((result) => {
-                    console.log(result);
                     if (result.sts === true) {
                         this.setState({
                             successMsg: result.msg,
                             showSuccessAlert: true,
                         });
-                        values[this.state.activeQuestion].content.audio[
-                            index
-                        ] = {
-                            title: "",
-                            file_name: "",
-                            audio: null,
-                            path: "",
-                        };
+                        values[this.state.activeQuestion].content.audio[index] =
+                            {
+                                title: "",
+                                file_name: "",
+                                audio: null,
+                                path: "",
+                            };
                         this.setState({
                             questions: values,
                         });
@@ -1408,9 +1388,8 @@ class TeacherType2 extends Component {
         } else {
             values[this.state.activeQuestion].content.audio[index].file_name =
                 event.target.files[0].name;
-            values[this.state.activeQuestion].content.audio[
-                index
-            ].path = URL.createObjectURL(event.target.files[0]);
+            values[this.state.activeQuestion].content.audio[index].path =
+                URL.createObjectURL(event.target.files[0]);
             values[this.state.activeQuestion].content.audio[index].audio =
                 event.target.files[0];
             this.setState({
@@ -1466,13 +1445,11 @@ class TeacherType2 extends Component {
     handleAttemptSequence = (index, type) => {
         const values = [...this.state.questions];
         if (type === "test") {
-            values[this.state.activeQuestion].properties.test[index] = !values[
-                this.state.activeQuestion
-            ].properties.test[index];
+            values[this.state.activeQuestion].properties.test[index] =
+                !values[this.state.activeQuestion].properties.test[index];
         } else if (type === "semester") {
-            values[this.state.activeQuestion].properties.semester[
-                index
-            ] = !values[this.state.activeQuestion].properties.semester[index];
+            values[this.state.activeQuestion].properties.semester[index] =
+                !values[this.state.activeQuestion].properties.semester[index];
         }
         this.setState({
             questions: values,
@@ -1481,9 +1458,8 @@ class TeacherType2 extends Component {
 
     handleLearn = () => {
         const values = [...this.state.questions];
-        values[this.state.activeQuestion].properties.learn = !values[
-            this.state.activeQuestion
-        ].properties.learn;
+        values[this.state.activeQuestion].properties.learn =
+            !values[this.state.activeQuestion].properties.learn;
         this.setState({
             questions: values,
         });
@@ -1499,9 +1475,8 @@ class TeacherType2 extends Component {
 
     handleLimited = () => {
         const values = [...this.state.questions];
-        values[this.state.activeQuestion].settings.limited = !values[
-            this.state.activeQuestion
-        ].settings.limited;
+        values[this.state.activeQuestion].settings.limited =
+            !values[this.state.activeQuestion].settings.limited;
         this.setState({
             questions: values,
         });
@@ -1529,23 +1504,20 @@ class TeacherType2 extends Component {
             });
         }
         if (type === "Chemistry") {
-            keyboards[this.state.activeQuestion].chemistry = !keyboards[
-                this.state.activeQuestion
-            ].chemistry;
+            keyboards[this.state.activeQuestion].chemistry =
+                !keyboards[this.state.activeQuestion].chemistry;
             this.setState({
                 keyboards: keyboards,
             });
         } else if (type === "Physics") {
-            keyboards[this.state.activeQuestion].physics = !keyboards[
-                this.state.activeQuestion
-            ].physics;
+            keyboards[this.state.activeQuestion].physics =
+                !keyboards[this.state.activeQuestion].physics;
             this.setState({
                 keyboards: keyboards,
             });
         } else {
-            keyboards[this.state.activeQuestion].maths = !keyboards[
-                this.state.activeQuestion
-            ].maths;
+            keyboards[this.state.activeQuestion].maths =
+                !keyboards[this.state.activeQuestion].maths;
             this.setState({
                 keyboards: keyboards,
             });
@@ -2292,7 +2264,6 @@ class TeacherType2 extends Component {
             )
                 .then((res) => res.json())
                 .then((result) => {
-                    console.log(result);
                     if (result.sts === true) {
                         this.setState({
                             successMsg: result.msg,
@@ -2613,8 +2584,7 @@ class TeacherType2 extends Component {
                                                                         <div
                                                                             className="pb-2"
                                                                             dangerouslySetInnerHTML={{
-                                                                                __html:
-                                                                                    question.question,
+                                                                                __html: question.question,
                                                                             }}
                                                                         ></div>
                                                                     </div>
@@ -2760,8 +2730,7 @@ class TeacherType2 extends Component {
                                                                                 <div
                                                                                     className="pb-2"
                                                                                     dangerouslySetInnerHTML={{
-                                                                                        __html:
-                                                                                            sub_question.question,
+                                                                                        __html: sub_question.question,
                                                                                     }}
                                                                                 ></div>
 
@@ -2854,10 +2823,8 @@ class TeacherType2 extends Component {
                                                                                 <div
                                                                                     className="secondary-bg primary-text font-weight-bold px-2 py-1 position-absolute rounded-lg shadow-sm"
                                                                                     style={{
-                                                                                        bottom:
-                                                                                            "5px",
-                                                                                        right:
-                                                                                            "5px",
+                                                                                        bottom: "5px",
+                                                                                        right: "5px",
                                                                                         fontSize:
                                                                                             "10px",
                                                                                     }}
@@ -2868,10 +2835,8 @@ class TeacherType2 extends Component {
                                                                                 <div
                                                                                     className="secondary-bg primary-text font-weight-bold px-2 py-1 position-absolute rounded-lg shadow-sm"
                                                                                     style={{
-                                                                                        bottom:
-                                                                                            "5px",
-                                                                                        right:
-                                                                                            "5px",
+                                                                                        bottom: "5px",
+                                                                                        right: "5px",
                                                                                         fontSize:
                                                                                             "10px",
                                                                                     }}
@@ -4142,8 +4107,7 @@ class TeacherType2 extends Component {
                                                                                         )
                                                                                     }
                                                                                     style={{
-                                                                                        cursor:
-                                                                                            "pointer",
+                                                                                        cursor: "pointer",
                                                                                     }}
                                                                                 >
                                                                                     <i className="fas fa-check-circle"></i>

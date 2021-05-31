@@ -6,9 +6,9 @@ import { Link } from "react-router-dom";
 import Select from "react-select";
 import { Spinner, Modal, Alert } from "react-bootstrap";
 import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
-import Loading from "../shared/loader";
+import Loading from "../common/loader";
 import userpic from "../../assets/user-v1.png";
-import AlertBox from "../shared/alert";
+import AlertBox from "../common/alert";
 import dateFormat from "dateformat";
 import { country } from "../../shared/countries.js";
 import { connect } from "react-redux";
@@ -72,7 +72,6 @@ class ImageUploadModal extends Component {
                 axios
                     .post(`${this.url}/student/profile/`, form_data, options)
                     .then((result) => {
-                        console.log(result);
                         if (result.data.url && result.data.sts === true) {
                             this.setState({
                                 successMsg: result.data.msg,
@@ -97,7 +96,6 @@ class ImageUploadModal extends Component {
                 axios
                     .patch(`${this.url}/student/profile/`, form_data, options)
                     .then((result) => {
-                        console.log(result);
                         if (result.data.url && result.data.sts === true) {
                             this.setState({
                                 successMsg: result.data.msg,
@@ -277,7 +275,6 @@ class Profile extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     storeDispatch(PROFILE, result.data);
                     this.setState({
@@ -328,7 +325,6 @@ class Profile extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState(
                         {

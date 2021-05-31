@@ -5,8 +5,8 @@ import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
-import Loading from "../../shared/loader";
-import AlertBox from "../../shared/alert";
+import Loading from "../../common/loader";
+import AlertBox from "../../common/alert";
 import storeDispatch from "../../../redux/dispatch";
 import { SECTION, TEMP } from "../../../redux/action";
 
@@ -69,7 +69,6 @@ class HODSimulationSection extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         filters: result.data,
@@ -97,7 +96,6 @@ class HODSimulationSection extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     if (result.data.length !== 0) {
                         let section = [];
@@ -241,7 +239,6 @@ class HODSimulationSection extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,

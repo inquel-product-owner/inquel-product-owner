@@ -5,9 +5,9 @@ import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl";
-import Loading from "../../shared/loader";
-import AlertBox from "../../shared/alert";
-import { ContentDeleteModal } from "../../shared/contentManagementModal";
+import Loading from "../../common/loader";
+import AlertBox from "../../common/alert";
+import { ContentDeleteModal } from "../../common/modal/contentManagementModal";
 import {
     ChapterList,
     ChapterEditModal,
@@ -112,7 +112,6 @@ class TeacherIndependentSubject extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         subjectItems: result.data.results,
@@ -142,7 +141,6 @@ class TeacherIndependentSubject extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         semesterItems: result.data,

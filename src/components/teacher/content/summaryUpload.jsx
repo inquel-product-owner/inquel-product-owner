@@ -8,9 +8,9 @@ import { Link } from "react-router-dom";
 import { Spinner } from "react-bootstrap";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
 import { Document, Page, pdfjs } from "react-pdf";
-import Loading from "../../shared/loader";
-import AlertBox from "../../shared/alert";
-import { ContentDeleteModal } from "../../shared/contentManagementModal";
+import Loading from "../../common/loader";
+import AlertBox from "../../common/alert";
+import { ContentDeleteModal } from "../../common/modal/contentManagementModal";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
@@ -116,7 +116,6 @@ class TeacherSummaryUpload extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true && result.data.length !== 0) {
                     this.setState({
                         summary_id: result.data[0].summary_id,
@@ -207,7 +206,6 @@ class TeacherSummaryUpload extends Component {
                     options
                 )
                 .then((result) => {
-                    console.log(result);
                     if (result.data.sts === true) {
                         files.file = null;
                         files.file_name = null;

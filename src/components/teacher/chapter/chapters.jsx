@@ -5,13 +5,13 @@ import SideNav from "../shared/sidenav";
 import { Card, Accordion, Dropdown } from "react-bootstrap";
 import Select from "react-select";
 import { Link } from "react-router-dom";
-import Loading from "../../shared/loader";
+import Loading from "../../common/loader";
 import { baseUrl, teacherUrl } from "../../../shared/baseUrl.js";
-import AlertBox from "../../shared/alert";
+import AlertBox from "../../common/alert";
 import {
     ContentDeleteModal,
     ContentUpdateModal,
-} from "../../shared/contentManagementModal";
+} from "../../common/modal/contentManagementModal";
 import {
     TopicModal,
     CycleTestModal,
@@ -184,7 +184,6 @@ class TeacherChapters extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     const chapters = this.state.chapters;
                     chapters.chapter_structure = result.data.chapter_structure
@@ -238,7 +237,6 @@ class TeacherChapters extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         cycle_test: result.data,
@@ -267,7 +265,6 @@ class TeacherChapters extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         quiz: result.data,
@@ -306,7 +303,6 @@ class TeacherChapters extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState(
                         {

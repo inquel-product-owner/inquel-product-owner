@@ -6,11 +6,11 @@ import SideNav from "./shared/sidenav";
 import courseimg from "../../assets/code.jpg";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
 import { paginationCount } from "../../shared/globalValues.js";
-import Loading from "../shared/loader";
+import Loading from "../common/loader";
 import GroupTable from "../table/group";
 import SubjectTable from "../table/subject";
-import Paginations from "../shared/pagination";
-import AlertBox from "../shared/alert";
+import Paginations from "../common/pagination";
+import AlertBox from "../common/alert";
 import {
     ContentDeleteModal,
     ContentDisableModal,
@@ -18,7 +18,7 @@ import {
     MultiContentDeleteModal,
     SingleContentDisableModal,
     SingleContentEnableModal,
-} from "../shared/contentManagementModal";
+} from "../common/modal/contentManagementModal";
 import { connect } from "react-redux";
 import Slider from "react-slick";
 import Select from "react-select";
@@ -71,7 +71,6 @@ class SubjectModal extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         category: result.data.CATEGORY,
@@ -127,7 +126,6 @@ class SubjectModal extends Component {
                             showErrorAlert: true,
                         });
                     }
-                    console.log(result);
                 })
                 .catch((err) => {
                     console.log(err);
@@ -171,7 +169,6 @@ class SubjectModal extends Component {
                             content_loading: false,
                         });
                     }
-                    console.log(result);
                 })
                 .catch((err) => {
                     console.log(err);
@@ -227,7 +224,6 @@ class SubjectModal extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,
@@ -551,7 +547,6 @@ class HODDashboard extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         groupItems: result.data.results,
@@ -578,7 +573,6 @@ class HODDashboard extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         subjectItems: result.data.results,
@@ -604,7 +598,6 @@ class HODDashboard extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         courseItems: result.data || [],

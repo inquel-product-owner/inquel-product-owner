@@ -4,8 +4,8 @@ import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
-import Loading from "../../shared/loader";
-import AlertBox from "../../shared/alert";
+import Loading from "../../common/loader";
+import AlertBox from "../../common/alert";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
@@ -57,7 +57,6 @@ class HODSubjectMatch extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     let data = [...this.state.match];
                     let response = result.data.results;

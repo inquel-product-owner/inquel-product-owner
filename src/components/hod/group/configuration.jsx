@@ -5,11 +5,11 @@ import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
 import { paginationCount } from "../../../shared/globalValues.js";
-import Loading from "../../shared/loader";
+import Loading from "../../common/loader";
 import GroupTable from "../../table/group";
-import Paginations from "../../shared/pagination";
+import Paginations from "../../common/pagination";
 import dateFormat from "dateformat";
-import AlertBox from "../../shared/alert";
+import AlertBox from "../../common/alert";
 
 class GroupModal extends Component {
     constructor() {
@@ -49,7 +49,6 @@ class GroupModal extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         levelItems: result.data.LEVELS,
@@ -130,7 +129,6 @@ class GroupModal extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         successMsg: result.msg,
@@ -379,7 +377,6 @@ class HODGroupConfiguration extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         groupItem: result.data.results,

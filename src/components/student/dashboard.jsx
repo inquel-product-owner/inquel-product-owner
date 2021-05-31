@@ -4,10 +4,10 @@ import SideNav from "./shared/sidenav";
 import courseimg from "../../assets/code.jpg";
 import { Link } from "react-router-dom";
 import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
-import CarouselCard from "../shared/owlCarousel";
+import CarouselCard from "../common/owlCarousel";
 import Footer from "./shared/footer";
-import Loading from "../shared/loader";
-import AlertBox from "../shared/alert";
+import Loading from "../common/loader";
+import AlertBox from "../common/alert";
 import { connect } from "react-redux";
 import storeDispatch from "../../redux/dispatch";
 import { GROUP } from "../../redux/action";
@@ -52,7 +52,6 @@ class Dashboard extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         groupData: result.data,

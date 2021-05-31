@@ -5,9 +5,9 @@ import SideNav from "./shared/sidenav";
 import { Link } from "react-router-dom";
 import { Spinner, Modal, Alert } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
-import Loading from "../shared/loader";
+import Loading from "../common/loader";
 import userpic from "../../assets/user-v1.png";
-import AlertBox from "../shared/alert";
+import AlertBox from "../common/alert";
 import dateFormat from "dateformat";
 import { connect } from "react-redux";
 import storeDispatch from "../../redux/dispatch";
@@ -76,7 +76,6 @@ class ImageUploadModal extends Component {
                     axios
                         .post(`${this.url}/hod/profile/`, form_data, options)
                         .then((result) => {
-                            console.log(result);
                             if (result.data.sts === true) {
                                 this.setState({
                                     successMsg: result.data.msg,
@@ -101,7 +100,6 @@ class ImageUploadModal extends Component {
                     axios
                         .patch(`${this.url}/hod/profile/`, form_data, options)
                         .then((result) => {
-                            console.log(result);
                             if (result.data.sts === true) {
                                 this.setState({
                                     successMsg: result.data.msg,
@@ -136,7 +134,6 @@ class ImageUploadModal extends Component {
                             options
                         )
                         .then((result) => {
-                            console.log(result);
                             if (result.data.sts === true) {
                                 this.setState({
                                     successMsg: result.data.msg,
@@ -165,7 +162,6 @@ class ImageUploadModal extends Component {
                             options
                         )
                         .then((result) => {
-                            console.log(result);
                             if (result.data.sts === true) {
                                 this.setState({
                                     successMsg: result.data.msg,
@@ -392,7 +388,6 @@ class HODProfile extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState(
                         {
@@ -464,7 +459,6 @@ class HODProfile extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState(
                         {

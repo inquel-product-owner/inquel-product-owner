@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { baseUrl, accountsUrl } from "../../shared/baseUrl.js";
-import Loading from "../shared/loader";
+import Loading from "../common/loader";
 
 class EmailVerify extends Component {
     constructor(props) {
@@ -37,7 +37,6 @@ class EmailVerify extends Component {
                         page_loading: false,
                     });
                 }
-                console.log(result);
             })
             .catch((err) => {
                 console.log(err);

@@ -5,9 +5,9 @@ import SideNav from "../shared/sidenav";
 import { Card, Accordion } from "react-bootstrap";
 import Select from "react-select";
 import { Link } from "react-router-dom";
-import Loading from "../../shared/loader";
+import Loading from "../../common/loader";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
-import AlertBox from "../../shared/alert";
+import AlertBox from "../../common/alert";
 import storeDispatch from "../../../redux/dispatch";
 import { CHAPTER, CYCLE, QUIZ, TOPIC } from "../../../redux/action";
 
@@ -61,7 +61,6 @@ class HODSubjectChapter extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     storeDispatch(
                         CHAPTER,
@@ -111,7 +110,6 @@ class HODSubjectChapter extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState(
                         {

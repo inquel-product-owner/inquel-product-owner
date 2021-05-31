@@ -5,12 +5,12 @@ import Header from "./shared/navbar";
 import SideNav from "./shared/sidenav";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
 import { paginationCount } from "../../shared/globalValues.js";
-import Loading from "../shared/loader";
-import Paginations from "../shared/pagination";
+import Loading from "../common/loader";
+import Paginations from "../common/pagination";
 import SubjectTable from "../table/subject";
-import CarouselCard from "../shared/owlCarousel";
-import AlertBox from "../shared/alert";
-import { waterMark } from "../shared/watermark";
+import CarouselCard from "../common/owlCarousel";
+import AlertBox from "../common/alert";
+import { waterMark } from "../common/function/watermark";
 
 const mapStateToProps = (state) => ({
     group_name: state.content.group_name,
@@ -58,7 +58,6 @@ class TeacherGroup extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         groupItem: result.data.results,

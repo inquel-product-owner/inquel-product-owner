@@ -6,7 +6,7 @@ import dateFormat from "dateformat";
 import { connect } from "react-redux";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
-import VideoModal from "../shared/videoModal";
+import VideoModal from "../common/modal/videoModal";
 import { OverlayTrigger, Tooltip, Modal, Popover } from "react-bootstrap";
 
 const mapStateToProps = (state) => ({

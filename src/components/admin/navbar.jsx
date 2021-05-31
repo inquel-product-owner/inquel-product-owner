@@ -4,7 +4,7 @@ import { Link, Redirect } from "react-router-dom";
 import logo from "../../assets/Iq-labs-01.svg";
 import userpic from "../../assets/user-v1.png";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
-import { AdminLogout } from "../shared/handleLogout";
+import { AdminLogout } from "../common/modal/idleLogoutModal";
 import { connect } from "react-redux";
 import storeDispatch from "../../redux/dispatch";
 import { PROFILE } from "../../redux/action";
@@ -68,7 +68,6 @@ class Header extends Component {
                     isLoggedOut: true,
                 });
                 storeDispatch(PROFILE, {});
-                console.log(result);
             })
             .catch((err) => {
                 console.log(err);

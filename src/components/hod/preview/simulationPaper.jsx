@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
-import AlertBox from "../../shared/alert";
-import Loading from "../../shared/loader";
+import AlertBox from "../../common/alert";
+import Loading from "../../common/loader";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import storeDispatch from "../../../redux/dispatch";
@@ -54,7 +54,6 @@ class HODSimulationPaperPreview extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         data: result.data,

@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import Header from "../shared/examNavbar";
 import ReactCardFlip from "react-card-flip";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
-import AlertBox from "../../shared/alert";
-import Loading from "../../shared/loader";
+import AlertBox from "../../common/alert";
+import Loading from "../../common/loader";
 import { OverlayTrigger, Tooltip, Popover } from "react-bootstrap";
 import FullScreen from "react-fullscreen-crossbrowser";
 import Lightbox from "react-awesome-lightbox";
@@ -11,9 +11,9 @@ import "react-awesome-lightbox/build/style.css";
 import {
     ConceptDataFormat,
     QuestionDataFormat,
-} from "../../shared/dataFormating";
+} from "../../common/function/dataFormating";
 import { connect } from "react-redux";
-import VideoModal from "../../shared/videoModal";
+import VideoModal from "../../common/modal/videoModal";
 
 const mapStateToProps = (state) => ({
     course_name: state.content.course_name,
@@ -103,7 +103,6 @@ class HODCourseFlashCard extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     if (
                         result.data.results &&
@@ -340,7 +339,6 @@ class HODCourseFlashCard extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     if (
                         result.data.results &&
@@ -402,7 +400,6 @@ class HODCourseFlashCard extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     if (
                         result.data.results &&
@@ -1654,7 +1651,6 @@ class HODCourseFlashCard extends Component {
             )
                 .then((res) => res.json())
                 .then((result) => {
-                    console.log(result);
                     if (result.sts === true) {
                         explanation[this.state.activeData].answer =
                             result.answer;
@@ -1691,7 +1687,6 @@ class HODCourseFlashCard extends Component {
             )
                 .then((res) => res.json())
                 .then((result) => {
-                    console.log(result);
                     if (result.sts === true) {
                         explanation[this.state.activeData].explanation =
                             result.data.explanation;
@@ -1795,7 +1790,6 @@ class HODCourseFlashCard extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     let response = result.data.results;
                     let data = [...this.state.match];

@@ -7,12 +7,12 @@ import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
 import { paginationCount } from "../../shared/globalValues.js";
 import Header from "./navbar";
 import SideNav from "./sidenav";
-import Loading from "../shared/loader";
+import Loading from "../common/loader";
 import GroupTable from "../table/group";
-import Paginations from "../shared/pagination";
-import ReactSwitch from "../shared/switchComponent";
+import Paginations from "../common/pagination";
+import ReactSwitch from "../common/switchComponent";
 import dateFormat from "dateformat";
-import AlertBox from "../shared/alert";
+import AlertBox from "../common/alert";
 
 class AdminHodProfile extends Component {
     constructor(props) {
@@ -96,7 +96,6 @@ class AdminHodProfile extends Component {
             })
                 .then((res) => res.json())
                 .then((result) => {
-                    console.log(result);
                     if (result.sts === true) {
                         this.setState(
                             {
@@ -153,7 +152,6 @@ class AdminHodProfile extends Component {
             })
                 .then((res) => res.json())
                 .then((result) => {
-                    console.log(result);
                     if (result.sts === true) {
                         this.setState(
                             {
@@ -194,7 +192,6 @@ class AdminHodProfile extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         hodItems: result.data,
@@ -251,7 +248,6 @@ class AdminHodProfile extends Component {
         )
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         group: result.data.results,
@@ -283,7 +279,6 @@ class AdminHodProfile extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
                 if (result.sts === true) {
                     this.setState({
                         category: result.data.CATEGORY,
@@ -334,7 +329,6 @@ class AdminHodProfile extends Component {
                             showErrorAlert: true,
                         });
                     }
-                    console.log(result);
                 })
                 .catch((err) => {
                     console.log(err);
@@ -362,7 +356,6 @@ class AdminHodProfile extends Component {
             )
                 .then((res) => res.json())
                 .then((result) => {
-                    console.log(result);
                     if (result.sts === true) {
                         this.setState({
                             discipline: result.data.DISCIPLINE,
@@ -766,39 +759,51 @@ class AdminHodProfile extends Component {
                                         <p className="mb-1 font-weight-bold-600">
                                             Address
                                         </p>
-                                        <p className="text-break mb-0">{this.state.hodItems.address}</p>
+                                        <p className="text-break mb-0">
+                                            {this.state.hodItems.address}
+                                        </p>
                                     </div>
                                     <div className="col-md-2 col-sm-4 col-6 mb-4">
                                         <p className="mb-1 font-weight-bold-600">
                                             City
                                         </p>
-                                        <p className="text-break mb-0">{this.state.hodItems.city}</p>
+                                        <p className="text-break mb-0">
+                                            {this.state.hodItems.city}
+                                        </p>
                                     </div>
                                     <div className="col-md-2 col-sm-4 col-6 mb-4">
                                         <p className="mb-1 font-weight-bold-600">
                                             District
                                         </p>
-                                        <p className="text-break mb-0">{this.state.hodItems.district}</p>
+                                        <p className="text-break mb-0">
+                                            {this.state.hodItems.district}
+                                        </p>
                                     </div>
                                     <div className="col-md-2 col-sm-4 col-6 mb-4">
                                         <p className="mb-1 font-weight-bold-600">
                                             State
                                         </p>
-                                        <p className="text-break mb-0">{this.state.hodItems.state}</p>
+                                        <p className="text-break mb-0">
+                                            {this.state.hodItems.state}
+                                        </p>
                                     </div>
                                     <div className="col-md-2 col-sm-4 col-6 mb-4">
                                         <p className="mb-1 font-weight-bold-600">
                                             Country
                                         </p>
-                                        <p className="text-break mb-0">{this.state.hodItems.country}</p>
+                                        <p className="text-break mb-0">
+                                            {this.state.hodItems.country}
+                                        </p>
                                     </div>
                                     <div className="col-md-3 col-sm-4 col-6 mb-4">
                                         <p className="mb-1 font-weight-bold-600">
                                             Additional Details 1
                                         </p>
                                         <p className="text-break mb-0">
-                                            {this.state.hodItems
-                                                .additional_details_1}
+                                            {
+                                                this.state.hodItems
+                                                    .additional_details_1
+                                            }
                                         </p>
                                     </div>
                                     <div className="col-md-3 col-sm-4 col-6 mb-4">
@@ -806,8 +811,10 @@ class AdminHodProfile extends Component {
                                             Additional Details 2
                                         </p>
                                         <p className="text-break mb-0">
-                                            {this.state.hodItems
-                                                .additional_details_2}
+                                            {
+                                                this.state.hodItems
+                                                    .additional_details_2
+                                            }
                                         </p>
                                     </div>
                                     <div className="col-md-3 col-sm-6 col-6">
