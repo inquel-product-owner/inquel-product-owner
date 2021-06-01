@@ -25,12 +25,9 @@ class HODSubjectChapter extends Component {
 
             chapterList: [],
             chapterId: this.props.match.params.chapterId,
-            chapters: [],
+            chapters: {},
             chapterIndex: 1,
             topicEventKey: [],
-
-            cycle_test: [],
-            quiz: [],
             teacher_name: "",
 
             errorMsg: "",
@@ -69,9 +66,7 @@ class HODSubjectChapter extends Component {
                             : this.props.chapter_name
                     );
                     this.setState({
-                        chapters: result.data.chapter_structure || [],
-                        cycle_test: result.data.cycle_tests || [],
-                        quiz: result.data.quiz || [],
+                        chapters: result.data,
                         page_loading: false,
                     });
                 } else {
@@ -231,7 +226,11 @@ class HODSubjectChapter extends Component {
                                         to={`${this.props.match.url}/${data.topic_num}/match`}
                                     >
                                         <button
-                                            className="btn btn-primary shadow-none"
+                                            className={`btn ${
+                                                this.state.chapters.approve
+                                                    ? "btn-success"
+                                                    : "btn-primary"
+                                            } shadow-none`}
                                             onClick={() => {
                                                 storeDispatch(
                                                     TOPIC,
@@ -248,7 +247,11 @@ class HODSubjectChapter extends Component {
                                         to={`${this.props.match.url}/${data.topic_num}/concepts`}
                                     >
                                         <button
-                                            className="btn btn-primary shadow-none"
+                                            className={`btn ${
+                                                this.state.chapters.approve
+                                                    ? "btn-success"
+                                                    : "btn-primary"
+                                            } shadow-none`}
                                             onClick={() => {
                                                 storeDispatch(
                                                     TOPIC,
@@ -265,7 +268,11 @@ class HODSubjectChapter extends Component {
                                         to={`${this.props.match.url}/${data.topic_num}/typeone`}
                                     >
                                         <button
-                                            className="btn btn-primary shadow-none"
+                                            className={`btn ${
+                                                this.state.chapters.approve
+                                                    ? "btn-success"
+                                                    : "btn-primary"
+                                            } shadow-none`}
                                             onClick={() => {
                                                 storeDispatch(
                                                     TOPIC,
@@ -282,7 +289,11 @@ class HODSubjectChapter extends Component {
                                         to={`${this.props.match.url}/${data.topic_num}/typetwo`}
                                     >
                                         <button
-                                            className="btn btn-primary shadow-none"
+                                            className={`btn ${
+                                                this.state.chapters.approve
+                                                    ? "btn-success"
+                                                    : "btn-primary"
+                                            } shadow-none`}
                                             onClick={() => {
                                                 storeDispatch(
                                                     TOPIC,
@@ -344,6 +355,7 @@ class HODSubjectChapter extends Component {
                         showSuccessAlert: true,
                         page_loading: false,
                     });
+                    this.loadChapterData();
                 } else {
                     this.setState({
                         errorMsg: result.msg,
@@ -439,9 +451,9 @@ class HODSubjectChapter extends Component {
                                     className="btn btn-primary btn-sm shadow-none"
                                     onClick={this.handlePublish}
                                     disabled={
-                                        this.state.chapters.length === 0
-                                            ? true
-                                            : false
+                                        this.state.chapters.chapter_structure
+                                            ? false
+                                            : true
                                     }
                                 >
                                     Approve
@@ -583,12 +595,26 @@ class HODSubjectChapter extends Component {
                                                             <div className="col-2">
                                                                 {this.state
                                                                     .chapters
-                                                                    .length !==
-                                                                0 ? (
+                                                                    .chapter_structure &&
+                                                                Object.keys(
+                                                                    this.state
+                                                                        .chapters
+                                                                        .chapter_structure
+                                                                ).length !==
+                                                                    0 ? (
                                                                     <Link
                                                                         to={`${this.props.match.url}/summary`}
                                                                     >
-                                                                        <button className="btn btn-primary shadow-none">
+                                                                        <button
+                                                                            className={`btn ${
+                                                                                this
+                                                                                    .state
+                                                                                    .chapters
+                                                                                    .approve
+                                                                                    ? "btn-success"
+                                                                                    : "btn-primary"
+                                                                            } shadow-none`}
+                                                                        >
                                                                             <i className="fas fa-eye"></i>
                                                                         </button>
                                                                     </Link>
@@ -599,12 +625,26 @@ class HODSubjectChapter extends Component {
                                                             <div className="col-2">
                                                                 {this.state
                                                                     .chapters
-                                                                    .length !==
-                                                                0 ? (
+                                                                    .chapter_structure &&
+                                                                Object.keys(
+                                                                    this.state
+                                                                        .chapters
+                                                                        .chapter_structure
+                                                                ).length !==
+                                                                    0 ? (
                                                                     <Link
                                                                         to={`${this.props.match.url}/notes`}
                                                                     >
-                                                                        <button className="btn btn-primary shadow-none">
+                                                                        <button
+                                                                            className={`btn ${
+                                                                                this
+                                                                                    .state
+                                                                                    .chapters
+                                                                                    .approve
+                                                                                    ? "btn-success"
+                                                                                    : "btn-primary"
+                                                                            } shadow-none`}
+                                                                        >
                                                                             <i className="fas fa-eye"></i>
                                                                         </button>
                                                                     </Link>
@@ -621,7 +661,8 @@ class HODSubjectChapter extends Component {
                                                 <Card className="bg-transparent">
                                                     {/* ----- Topic list ----- */}
                                                     {(
-                                                        this.state.chapters ||
+                                                        this.state.chapters
+                                                            .chapter_structure ||
                                                         []
                                                     ).map((data, index) => {
                                                         return (
@@ -638,8 +679,8 @@ class HODSubjectChapter extends Component {
 
                                                     {/* ----- Cycle test list ----- */}
                                                     {(
-                                                        this.state.cycle_test ||
-                                                        []
+                                                        this.state.chapters
+                                                            .cycle_tests || []
                                                     ).map((data, index) => {
                                                         return (
                                                             <div
@@ -672,7 +713,8 @@ class HODSubjectChapter extends Component {
 
                                                     {/* ----- Quiz list ----- */}
                                                     {(
-                                                        this.state.quiz || []
+                                                        this.state.chapters
+                                                            .quiz || []
                                                     ).map(
                                                         (data, quiz_index) => {
                                                             return (
