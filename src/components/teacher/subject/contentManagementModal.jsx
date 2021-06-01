@@ -10,20 +10,20 @@ export function ChapterList(props) {
         <tr key={props.index}>
             <td>{props.chapter.chapter_name}</td>
             <td>
-                {props.chapter.chapter_status === "Yet to start" ? (
-                    <span className="text-danger">
+                {props.chapter.chapter_status.toLowerCase() === "yet to start" ? (
+                    <span className="text-danger text-capitalize">
                         {props.chapter.chapter_status}
                     </span>
-                ) : props.chapter.chapter_status === "In Progress" ? (
-                    <span className="text-warning">
+                ) : props.chapter.chapter_status.toLowerCase() === "in progress" ? (
+                    <span className="text-warning text-capitalize">
                         {props.chapter.chapter_status}
                     </span>
-                ) : props.chapter.chapter_status === "Ready for review" ? (
-                    <span className="text-primary">
+                ) : props.chapter.chapter_status.toLowerCase() === "ready for review" ? (
+                    <span className="text-primary text-capitalize">
                         {props.chapter.chapter_status}
                     </span>
-                ) : props.chapter.chapter_status === "Approved" ? (
-                    <span className="text-success">
+                ) : props.chapter.chapter_status.toLowerCase() === "approved" ? (
+                    <span className="text-success text-capitalize">
                         {props.chapter.chapter_status}
                     </span>
                 ) : (
