@@ -14,20 +14,16 @@ export function ChapterList(props) {
                     <span className="text-danger">
                         {props.chapter.chapter_status}
                     </span>
-                ) : props.chapter.chapter_status === "Approved" ? (
-                    <span className="text-success">
-                        {props.chapter.chapter_status}
-                    </span>
                 ) : props.chapter.chapter_status === "In Progress" ? (
                     <span className="text-warning">
                         {props.chapter.chapter_status}
                     </span>
-                ) : props.chapter.chapter_status === "Review" ? (
+                ) : props.chapter.chapter_status === "Ready for review" ? (
                     <span className="text-primary">
                         {props.chapter.chapter_status}
                     </span>
-                ) : props.chapter.chapter_status === "Ready for review" ? (
-                    <span className="text-primary">
+                ) : props.chapter.chapter_status === "Approved" ? (
+                    <span className="text-success">
                         {props.chapter.chapter_status}
                     </span>
                 ) : (
@@ -102,6 +98,7 @@ export function ChapterList(props) {
                     <Dropdown.Toggle
                         variant="white"
                         className="btn btn-link btn-sm shadow-none caret-off ml-2"
+                        disabled={props.chapter.publish === true ? true : false}
                     >
                         <i className="fas fa-ellipsis-v"></i>
                     </Dropdown.Toggle>
@@ -311,7 +308,7 @@ export class ChapterEditModal extends Component {
             .then((res) => res.json())
             .then((result) => {
                 this.setState({
-                    status: result.data.chapter_status.chapters,
+                    status: result.data.chapter_status,
                 });
             })
             .catch((err) => {

@@ -1117,13 +1117,6 @@ class HODSubject extends Component {
                                                                           }
                                                                       </span>
                                                                   ) : list.chapter_status ===
-                                                                    "Approved" ? (
-                                                                      <span className="text-success">
-                                                                          {
-                                                                              list.chapter_status
-                                                                          }
-                                                                      </span>
-                                                                  ) : list.chapter_status ===
                                                                     "In Progress" ? (
                                                                       <span className="text-warning">
                                                                           {
@@ -1131,15 +1124,15 @@ class HODSubject extends Component {
                                                                           }
                                                                       </span>
                                                                   ) : list.chapter_status ===
-                                                                    "Review" ? (
+                                                                    "Ready for review" ? (
                                                                       <span className="text-primary">
                                                                           {
                                                                               list.chapter_status
                                                                           }
                                                                       </span>
-                                                                  ) : list.chapter_status ===
-                                                                    "Ready for review" ? (
-                                                                      <span className="text-primary">
+                                                                  ) : list.chapter_status.toLowerCase() ===
+                                                                    "approved" ? (
+                                                                      <span className="text-success text-capitalize">
                                                                           {
                                                                               list.chapter_status
                                                                           }
