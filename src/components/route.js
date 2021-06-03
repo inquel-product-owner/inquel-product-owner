@@ -244,7 +244,7 @@ const routes = (
         />
         <Route
             exact
-            path="/admin/course-management"
+            path="/admin/master-data"
             render={(props) =>
                 !localStorage.getItem("Inquel-Auth") ? (
                     <Redirect to="/admin/login" />
@@ -254,7 +254,7 @@ const routes = (
             }
         />
         <Route
-            path="/admin/course-management/discounts"
+            path="/admin/discounts"
             render={(props) =>
                 !localStorage.getItem("Inquel-Auth") ? (
                     <Redirect to="/admin/login" />

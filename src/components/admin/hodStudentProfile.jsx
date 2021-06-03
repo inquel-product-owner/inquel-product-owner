@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import profilepic from "../../assets/user-v1.png";
-import Header from "./navbar";
-import SideNav from "./sidenav";
+import Header from "./shared/navbar";
+import SideNav from "./shared/sidenav";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
 import Loading from "../common/loader";
 import { Badge } from "react-bootstrap";

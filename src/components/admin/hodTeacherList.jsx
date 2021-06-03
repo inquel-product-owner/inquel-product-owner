@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import Header from "./navbar";
-import SideNav from "./sidenav";
+import Header from "./shared/navbar";
+import SideNav from "./shared/sidenav";
 import profilepic from "../../assets/user-v1.png";
 import { Tab, Row, Col, Nav, Badge } from "react-bootstrap";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl";

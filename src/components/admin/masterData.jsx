@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import Header from "./navbar";
-import SideNav from "./sidenav";
+import Header from "./shared/navbar";
+import SideNav from "./shared/sidenav";
 import { Link } from "react-router-dom";
 import Select from "react-select";
 import { Modal, Spinner, Alert } from "react-bootstrap";
@@ -438,10 +438,7 @@ class AdminMasterData extends Component {
         return (
             <div className="wrapper">
                 {/* Navbar */}
-                <Header
-                    name="Course Master Data"
-                    togglenav={this.toggleSideNav}
-                />
+                <Header name="Master Data" togglenav={this.toggleSideNav} />
 
                 {/* Sidebar */}
                 <SideNav shownav={this.state.showSideNav} activeLink="course" />
@@ -490,31 +487,19 @@ class AdminMasterData extends Component {
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
 
-                        <div className="row align-items-center mb-3">
-                            <div className="col-md-6">
-                                {/* Breadcrumb */}
-                                <nav aria-label="breadcrumb">
-                                    <ol className="breadcrumb">
-                                        <li className="breadcrumb-item">
-                                            <Link to="/admin">
-                                                <i className="fas fa-home fa-sm"></i>
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item active">
-                                            Master Data
-                                        </li>
-                                    </ol>
-                                </nav>
-                            </div>
-                            <div className="col-md-6 text-right">
-                                <Link to={`${this.props.match.url}/discounts`}>
-                                    <button className="btn btn-outline-secondary btn-sm shadow-none">
-                                        Discounts Configuration{" "}
-                                        <i className="fas fa-chevron-right fa-sm ml-2"></i>
-                                    </button>
-                                </Link>
-                            </div>
-                        </div>
+                        {/* Breadcrumb */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb mb-3">
+                                <li className="breadcrumb-item">
+                                    <Link to="/admin">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    Master Data
+                                </li>
+                            </ol>
+                        </nav>
 
                         {/* ----- Options ----- */}
                         <div className="row">

@@ -1237,7 +1237,7 @@ class TeacherCycleTestAuto extends Component {
                                 className="table-responsive"
                                 style={{ minWidth: "1000px" }}
                             >
-                                <table className="table">
+                                <table className="table table-hover">
                                     <thead className="primary-bg text-white">
                                         <tr style={{ whiteSpace: "nowrap" }}>
                                             <th scope="col">
