@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import { OverlayTrigger, Tooltip, Dropdown } from "react-bootstrap";
 
 class SideNav extends Component {
     render() {
@@ -11,6 +11,7 @@ class SideNav extends Component {
                 className={`text-center light-bg ${
                     this.props.shownav ? "active" : ""
                 }`}
+                style={{ overflow: "unset" }}
             >
                 <Link to="/admin">
                     <OverlayTrigger
@@ -43,29 +44,36 @@ class SideNav extends Component {
                         >
                             <i
                                 className="fas fa-users"
-                                style={{ marginLeft: "-1.5px" }}
+                                style={{ marginLeft: "-2.5px" }}
                             ></i>
                         </button>
                     </OverlayTrigger>
                 </Link>
-                <Link to="/admin/course-management">
+                <Dropdown drop="right" key="right">
                     <OverlayTrigger
                         key="right"
                         placement="right"
                         overlay={<Tooltip id="tooltip">Master Data</Tooltip>}
                     >
-                        <button
-                            className={`btn sidebar-btn ${
+                        <Dropdown.Toggle
+                            variant="white"
+                            className={`btn sidebar-btn btn-sm shadow-none caret-off ${
                                 active === "course" ? "active" : ""
-                            } btn-sm mb-3`}
+                            }`}
                         >
-                            <i
-                                className="fas fa-graduation-cap"
-                                style={{ marginLeft: "-1.5px" }}
-                            ></i>
-                        </button>
+                            <i className="fas fa-database"></i>
+                        </Dropdown.Toggle>
                     </OverlayTrigger>
-                </Link>
+
+                    <Dropdown.Menu className="dropdown-menu-right">
+                        <Dropdown.Item as={Link} to="/admin/master-data">
+                            Master Data
+                        </Dropdown.Item>
+                        <Dropdown.Item as={Link} to="/admin/discounts">
+                            Discount Configuration
+                        </Dropdown.Item>
+                    </Dropdown.Menu>
+                </Dropdown>
             </div>
         );
     }

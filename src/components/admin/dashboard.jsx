@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import Header from "./navbar";
-import SideNav from "./sidenav";
+import Header from "./shared/navbar";
+import SideNav from "./shared/sidenav";
 import { Tabs, Tab, Modal, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import Switch from "react-switch";
@@ -939,7 +939,7 @@ class AdminDashboard extends Component {
         document.title = "Dashboard - Admin | IQLabs";
     };
 
-    render() {
+    render(props) {
         return (
             <div className="wrapper">
                 {/* Navbar */}
