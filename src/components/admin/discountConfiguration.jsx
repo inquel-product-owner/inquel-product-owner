@@ -311,7 +311,7 @@ class DiscountModal extends Component {
             event.target.name === "percentage" ||
             event.target.name === "fixed_price"
         ) {
-            data[event.target.name] = Number(event.target.value) || '';
+            data[event.target.name] = Number(event.target.value) || "";
         } else if (event.target.name === "points_in_decimal") {
             data[event.target.name] = parseFloat(event.target.value) || 0;
         } else {
@@ -1158,6 +1158,7 @@ class AdminDiscountConfiguration extends Component {
                             onClick={() =>
                                 this.setState({
                                     showModal: true,
+                                    selectedData: {},
                                 })
                             }
                         >
