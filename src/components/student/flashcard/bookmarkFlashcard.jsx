@@ -515,8 +515,7 @@ class FavouritesFlashcard extends Component {
                                                     </p>
                                                     {explanation.answer ===
                                                     false
-                                                        ? explanation.answers !==
-                                                              undefined &&
+                                                        ? explanation.answers &&
                                                           explanation.answers
                                                               .lenght !== 0
                                                             ? explanation.answers.map(
@@ -539,7 +538,8 @@ class FavouritesFlashcard extends Component {
                                                               )
                                                             : ""
                                                         : section.length !== 0
-                                                        ? section.answers
+                                                        ? section.answers &&
+                                                          section.answers
                                                               .length !== 0
                                                             ? section.answers.map(
                                                                   (
@@ -575,7 +575,8 @@ class FavouritesFlashcard extends Component {
                                                             Your answer(s):
                                                         </p>
                                                         {section.length !== 0
-                                                            ? section.answers
+                                                            ? section.answers &&
+                                                              section.answers
                                                                   .length !== 0
                                                                 ? section.answers.map(
                                                                       (
@@ -722,9 +723,10 @@ class FavouritesFlashcard extends Component {
                                             ) : // ---------- True or False ----------
                                             data[index].content.boolean ===
                                               true ? (
-                                                data[
-                                                    index
-                                                ].content.boolean_question.map(
+                                                (
+                                                    data[index].content
+                                                        .boolean_question || []
+                                                ).map(
                                                     (option, boolean_index) => {
                                                         return (
                                                             <div
@@ -1019,33 +1021,37 @@ class FavouritesFlashcard extends Component {
                                     </div>
                                 ) : (
                                     <>
-                                        {section.answers.map((data, index) => {
-                                            return data.answers.length !== 0 ? (
-                                                <div
-                                                    className={`card shadow-sm mb-2 ${
-                                                        explanation.isAnswered ===
-                                                        true
-                                                            ? explanation
-                                                                  .sub_question[
-                                                                  index
-                                                              ].answer === false
-                                                                ? "danger-bg"
-                                                                : "success-bg"
-                                                            : "pinkrange-bg primary-text"
-                                                    }`}
-                                                    key={index}
-                                                >
+                                        {(section.answers || []).map(
+                                            (data, index) => {
+                                                return data.answers.length !==
+                                                    0 ? (
                                                     <div
-                                                        className="card-body small font-weight-bold-600 pt-3 pb-0"
-                                                        dangerouslySetInnerHTML={{
-                                                            __html: `<div class="mb-3">${data.answers[0]}</div>`,
-                                                        }}
-                                                    ></div>
-                                                </div>
-                                            ) : (
-                                                ""
-                                            );
-                                        })}
+                                                        className={`card shadow-sm mb-2 ${
+                                                            explanation.isAnswered ===
+                                                            true
+                                                                ? explanation
+                                                                      .sub_question[
+                                                                      index
+                                                                  ].answer ===
+                                                                  false
+                                                                    ? "danger-bg"
+                                                                    : "success-bg"
+                                                                : "pinkrange-bg primary-text"
+                                                        }`}
+                                                        key={index}
+                                                    >
+                                                        <div
+                                                            className="card-body small font-weight-bold-600 pt-3 pb-0"
+                                                            dangerouslySetInnerHTML={{
+                                                                __html: `<div class="mb-3">${data.answers[0]}</div>`,
+                                                            }}
+                                                        ></div>
+                                                    </div>
+                                                ) : (
+                                                    ""
+                                                );
+                                            }
+                                        )}
                                         {/* ----- Check button ----- */}
                                         {answerCount ===
                                         this.state.totalSubQuestion[index] ? (
@@ -1099,73 +1105,58 @@ class FavouritesFlashcard extends Component {
                                             className="position-absolute"
                                             style={{ right: 0, top: "10px" }}
                                         >
-                                            {data[index] &&
-                                            data[index].content &&
-                                            data[index].content.audio
-                                                ? data[index].content.audio
-                                                      .length !== 0
-                                                    ? data[
-                                                          index
-                                                      ].content.audio.map(
-                                                          (
-                                                              audio,
-                                                              audio_index
-                                                          ) => {
-                                                              return audio.path !==
-                                                                  "" ? (
-                                                                  <OverlayTrigger
-                                                                      trigger="click"
-                                                                      rootClose
-                                                                      key={`popover${audio_index}`}
-                                                                      placement="bottom"
-                                                                      overlay={
-                                                                          <Popover
-                                                                              id={`popover-positioned-bottom${audio_index}`}
-                                                                          >
-                                                                              {audio.title !==
-                                                                              "" ? (
-                                                                                  <Popover.Title>
-                                                                                      {
-                                                                                          audio.title
-                                                                                      }
-                                                                                  </Popover.Title>
-                                                                              ) : (
-                                                                                  ""
-                                                                              )}
-                                                                              <Popover.Content
-                                                                                  style={{
-                                                                                      overflow:
-                                                                                          "auto",
-                                                                                  }}
-                                                                              >
-                                                                                  <audio
-                                                                                      src={
-                                                                                          audio.path
-                                                                                      }
-                                                                                      autoPlay
-                                                                                      controls
-                                                                                      controlsList="nodownload"
-                                                                                  ></audio>
-                                                                              </Popover.Content>
-                                                                          </Popover>
-                                                                      }
-                                                                  >
-                                                                      <button
-                                                                          className="btn btn-primary btn-sm rounded-circle mr-2 shadow-none"
-                                                                          key={
-                                                                              audio_index
-                                                                          }
-                                                                      >
-                                                                          <i className="fas fa-volume-up buttton fa-sm"></i>
-                                                                      </button>
-                                                                  </OverlayTrigger>
-                                                              ) : (
-                                                                  ""
-                                                              );
-                                                          }
-                                                      )
-                                                    : ""
-                                                : ""}
+                                            {(
+                                                data[index].content.audio || []
+                                            ).map((audio, audio_index) => {
+                                                return audio.path !== "" ? (
+                                                    <OverlayTrigger
+                                                        trigger="click"
+                                                        rootClose
+                                                        key={`popover${audio_index}`}
+                                                        placement="bottom"
+                                                        overlay={
+                                                            <Popover
+                                                                id={`popover-positioned-bottom${audio_index}`}
+                                                            >
+                                                                {audio.title !==
+                                                                "" ? (
+                                                                    <Popover.Title>
+                                                                        {
+                                                                            audio.title
+                                                                        }
+                                                                    </Popover.Title>
+                                                                ) : (
+                                                                    ""
+                                                                )}
+                                                                <Popover.Content
+                                                                    style={{
+                                                                        overflow:
+                                                                            "auto",
+                                                                    }}
+                                                                >
+                                                                    <audio
+                                                                        src={
+                                                                            audio.path
+                                                                        }
+                                                                        autoPlay
+                                                                        controls
+                                                                        controlsList="nodownload"
+                                                                    ></audio>
+                                                                </Popover.Content>
+                                                            </Popover>
+                                                        }
+                                                    >
+                                                        <button
+                                                            className="btn btn-primary btn-sm rounded-circle mr-2 shadow-none"
+                                                            key={audio_index}
+                                                        >
+                                                            <i className="fas fa-volume-up buttton fa-sm"></i>
+                                                        </button>
+                                                    </OverlayTrigger>
+                                                ) : (
+                                                    ""
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 ) : (
@@ -1199,12 +1190,14 @@ class FavouritesFlashcard extends Component {
                                                     index
                                                 ]
                                             ].mcq
-                                                ? data[index].sub_question[
-                                                      this.state
-                                                          .currentSubQuestionIndex[
-                                                          index
-                                                      ]
-                                                  ].options.map(
+                                                ? (
+                                                      data[index].sub_question[
+                                                          this.state
+                                                              .currentSubQuestionIndex[
+                                                              index
+                                                          ]
+                                                      ].options || []
+                                                  ).map(
                                                       (
                                                           options,
                                                           option_index
@@ -1408,9 +1401,7 @@ class FavouritesFlashcard extends Component {
                         });
                     } else {
                         this.setState({
-                            errorMsg: result.detail
-                                ? result.detail
-                                : result.msg,
+                            errorMsg: result.msg,
                             showErrorAlert: true,
                             page_loading: false,
                         });
@@ -1418,6 +1409,11 @@ class FavouritesFlashcard extends Component {
                 })
                 .catch((err) => {
                     console.log(err);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
                 });
         } else if (type === "type_2") {
             await fetch(
@@ -1452,9 +1448,7 @@ class FavouritesFlashcard extends Component {
                         });
                     } else {
                         this.setState({
-                            errorMsg: result.detail
-                                ? result.detail
-                                : result.msg,
+                            errorMsg: result.msg,
                             showErrorAlert: true,
                             page_loading: false,
                         });
@@ -1462,6 +1456,11 @@ class FavouritesFlashcard extends Component {
                 })
                 .catch((err) => {
                     console.log(err);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
                 });
         }
         window.MathJax.typeset();
@@ -1616,7 +1615,7 @@ class FavouritesFlashcard extends Component {
     imageRender = (data) => {
         return (
             <>
-                {data.content.images.length !== 0
+                {data.content.images && data.content.images.length !== 0
                     ? data.content.images.map((images, index) => {
                           return images.path !== "" ? (
                               <div
@@ -1847,73 +1846,62 @@ class FavouritesFlashcard extends Component {
                                 </div>
                                 <div className="col-md-6 text-right">
                                     {this.state.activeTab === "concept"
-                                        ? data[index] !== undefined &&
-                                          data[index].content !== undefined &&
-                                          data[index].content.audio !==
-                                              undefined
-                                            ? data[index].content.audio
-                                                  .length !== 0
-                                                ? data[index].content.audio.map(
-                                                      (audio, audio_index) => {
-                                                          return audio.path !==
-                                                              "" ? (
-                                                              <OverlayTrigger
-                                                                  trigger="click"
-                                                                  rootClose
-                                                                  key={`popover${audio_index}`}
-                                                                  placement="bottom"
-                                                                  overlay={
-                                                                      <Popover
-                                                                          id={`popover-positioned-bottom${audio_index}`}
-                                                                      >
-                                                                          {audio.title !==
-                                                                          "" ? (
-                                                                              <Popover.Title>
-                                                                                  {
-                                                                                      audio.title
-                                                                                  }
-                                                                              </Popover.Title>
-                                                                          ) : (
-                                                                              ""
-                                                                          )}
-                                                                          <Popover.Content
-                                                                              style={{
-                                                                                  overflow:
-                                                                                      "auto",
-                                                                              }}
-                                                                          >
-                                                                              <audio
-                                                                                  src={
-                                                                                      audio.path
-                                                                                  }
-                                                                                  controls
-                                                                                  autoPlay
-                                                                                  controlsList="nodownload"
-                                                                              ></audio>
-                                                                          </Popover.Content>
-                                                                      </Popover>
-                                                                  }
+                                        ? (data[index].content.audio || []).map(
+                                              (audio, audio_index) => {
+                                                  return audio.path !== "" ? (
+                                                      <OverlayTrigger
+                                                          trigger="click"
+                                                          rootClose
+                                                          key={`popover${audio_index}`}
+                                                          placement="bottom"
+                                                          overlay={
+                                                              <Popover
+                                                                  id={`popover-positioned-bottom${audio_index}`}
                                                               >
-                                                                  <button
-                                                                      className="btn btn-primary btn-sm rounded-circle mr-3 shadow-none"
-                                                                      onClick={
-                                                                          this
-                                                                              .pauseSlideshow
-                                                                      }
-                                                                      key={
-                                                                          audio_index
-                                                                      }
+                                                                  {audio.title !==
+                                                                  "" ? (
+                                                                      <Popover.Title>
+                                                                          {
+                                                                              audio.title
+                                                                          }
+                                                                      </Popover.Title>
+                                                                  ) : (
+                                                                      ""
+                                                                  )}
+                                                                  <Popover.Content
+                                                                      style={{
+                                                                          overflow:
+                                                                              "auto",
+                                                                      }}
                                                                   >
-                                                                      <i className="fas fa-volume-up buttton fa-sm"></i>
-                                                                  </button>
-                                                              </OverlayTrigger>
-                                                          ) : (
-                                                              ""
-                                                          );
-                                                      }
-                                                  )
-                                                : ""
-                                            : ""
+                                                                      <audio
+                                                                          src={
+                                                                              audio.path
+                                                                          }
+                                                                          controls
+                                                                          autoPlay
+                                                                          controlsList="nodownload"
+                                                                      ></audio>
+                                                                  </Popover.Content>
+                                                              </Popover>
+                                                          }
+                                                      >
+                                                          <button
+                                                              className="btn btn-primary btn-sm rounded-circle mr-3 shadow-none"
+                                                              onClick={
+                                                                  this
+                                                                      .pauseSlideshow
+                                                              }
+                                                              key={audio_index}
+                                                          >
+                                                              <i className="fas fa-volume-up buttton fa-sm"></i>
+                                                          </button>
+                                                      </OverlayTrigger>
+                                                  ) : (
+                                                      ""
+                                                  );
+                                              }
+                                          )
                                         : ""}
                                 </div>
                             </div>

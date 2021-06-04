@@ -57,7 +57,7 @@ class Scorecard extends Component {
                     });
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                     });
                 }
@@ -67,6 +67,11 @@ class Scorecard extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -93,7 +98,7 @@ class Scorecard extends Component {
                     }
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -101,6 +106,11 @@ class Scorecard extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -165,7 +175,7 @@ class Scorecard extends Component {
                     this.props.formSubmission();
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         showLoader: false,
                     });
@@ -173,6 +183,11 @@ class Scorecard extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    showLoader: false,
+                });
             });
     };
 
@@ -353,6 +368,11 @@ class TeacherCycleTestAuto extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -410,7 +430,7 @@ class TeacherCycleTestAuto extends Component {
                     }
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -418,6 +438,11 @@ class TeacherCycleTestAuto extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -468,6 +493,11 @@ class TeacherCycleTestAuto extends Component {
                 })
                 .catch((err) => {
                     console.log(err);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
                 });
         }
     };
@@ -544,15 +574,17 @@ class TeacherCycleTestAuto extends Component {
                         });
                     } else {
                         this.setState({
-                            errorMsg: result.detail
-                                ? result.detail
-                                : result.msg,
+                            errorMsg: result.msg,
                             showErrorAlert: true,
                         });
                     }
                 })
                 .catch((err) => {
                     console.log(err);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                    });
                 });
         } else {
             const filterData = [...this.state.filterData];
@@ -598,15 +630,17 @@ class TeacherCycleTestAuto extends Component {
                         });
                     } else {
                         this.setState({
-                            errorMsg: result.detail
-                                ? result.detail
-                                : result.msg,
+                            errorMsg: result.msg,
                             showErrorAlert: true,
                         });
                     }
                 })
                 .catch((err) => {
                     console.log(err);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                    });
                 });
         }
     };
@@ -640,15 +674,17 @@ class TeacherCycleTestAuto extends Component {
                         });
                     } else {
                         this.setState({
-                            errorMsg: result.detail
-                                ? result.detail
-                                : result.msg,
+                            errorMsg: result.msg,
                             showErrorAlert: true,
                         });
                     }
                 })
                 .catch((err) => {
                     console.log(err);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                    });
                 });
         } else {
             section[index].marks = "";
@@ -777,7 +813,7 @@ class TeacherCycleTestAuto extends Component {
                     );
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -785,6 +821,11 @@ class TeacherCycleTestAuto extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -816,7 +857,7 @@ class TeacherCycleTestAuto extends Component {
                     });
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -824,6 +865,11 @@ class TeacherCycleTestAuto extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
 
         fetch(
@@ -856,7 +902,7 @@ class TeacherCycleTestAuto extends Component {
                     );
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -864,6 +910,11 @@ class TeacherCycleTestAuto extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -951,9 +1002,7 @@ class TeacherCycleTestAuto extends Component {
                         );
                     } else {
                         this.setState({
-                            errorMsg: result.detail
-                                ? result.detail
-                                : result.msg,
+                            errorMsg: result.msg,
                             showErrorAlert: true,
                             showLoader: false,
                         });
@@ -961,6 +1010,11 @@ class TeacherCycleTestAuto extends Component {
                 })
                 .catch((err) => {
                     console.log(err);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
                 });
         } else {
             const filterData = [...this.state.filterData];
@@ -1043,7 +1097,14 @@ class TeacherCycleTestAuto extends Component {
                     });
                 }
             })
-            .catch((err) => console.log(err));
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
+            });
     };
 
     render() {

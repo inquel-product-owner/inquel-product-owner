@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import Header from "./shared/navbar";
 import SideNav from "./shared/sidenav";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
-import { paginationCount } from "../../shared/globalValues.js";
+import { paginationCount } from "../../shared/constant.js";
 import Loading from "../common/loader";
 import Paginations from "../common/pagination";
 import SubjectTable from "../table/subject";
@@ -66,7 +66,7 @@ class TeacherGroup extends Component {
                     });
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -74,6 +74,11 @@ class TeacherGroup extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 

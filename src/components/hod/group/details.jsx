@@ -43,7 +43,7 @@ class HODGroupDetails extends Component {
     };
 
     componentDidMount = () => {
-        document.title = `${this.props.group_name} Details - HOD | IQLabs`;
+        document.title = `${this.props.group_name} : Details - HOD | IQLabs`;
 
         fetch(`${this.url}/hod/group/${this.groupId}/`, {
             headers: this.headers,
@@ -58,7 +58,7 @@ class HODGroupDetails extends Component {
                     });
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -66,6 +66,11 @@ class HODGroupDetails extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 

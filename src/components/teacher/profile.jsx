@@ -81,9 +81,7 @@ class ImageUploadModal extends Component {
                             this.props.formSubmission();
                         } else {
                             this.setState({
-                                errorMsg: result.data.detail
-                                    ? result.data.detail
-                                    : result.data.msg,
+                                errorMsg: result.data.msg,
                                 showErrorAlert: true,
                                 showLoader: false,
                             });
@@ -91,6 +89,11 @@ class ImageUploadModal extends Component {
                     })
                     .catch((err) => {
                         console.log(err);
+                        this.setState({
+                            errorMsg: "Something went wrong!",
+                            showErrorAlert: true,
+                            showLoader: false,
+                        });
                     });
             } else {
                 axios
@@ -105,9 +108,7 @@ class ImageUploadModal extends Component {
                             this.props.formSubmission();
                         } else {
                             this.setState({
-                                errorMsg: result.data.detail
-                                    ? result.data.detail
-                                    : result.data.msg,
+                                errorMsg: result.data.msg,
                                 showErrorAlert: true,
                                 showLoader: false,
                             });
@@ -115,6 +116,11 @@ class ImageUploadModal extends Component {
                     })
                     .catch((err) => {
                         console.log(err);
+                        this.setState({
+                            errorMsg: "Something went wrong!",
+                            showErrorAlert: true,
+                            showLoader: false,
+                        });
                     });
             }
         }
@@ -283,7 +289,7 @@ class TeacherProfile extends Component {
                     });
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -291,6 +297,11 @@ class TeacherProfile extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -344,7 +355,7 @@ class TeacherProfile extends Component {
                     );
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         showLoader: false,
                     });
@@ -352,6 +363,11 @@ class TeacherProfile extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    showLoader: false,
+                });
             });
     };
 

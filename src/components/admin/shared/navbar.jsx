@@ -44,6 +44,10 @@ class Header extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.props.errorAlert(
+                    "Something went wrong in loading profile data",
+                    true
+                );
             });
     };
 
@@ -71,6 +75,7 @@ class Header extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.props.errorAlert("Something went wrong!", true);
             });
     };
 
@@ -89,7 +94,7 @@ class Header extends Component {
                         <div className="col-md-3 col-6 pl-0">
                             <Navbar.Brand className="d-flex align-items-center mr-0">
                                 <button
-                                    className="btn btn-outline-secondary border-0 shadow-none d-block d-md-none mr-1"
+                                    className="btn btn-outline-secondary btn-sm border-0 shadow-none d-block d-md-none mr-1"
                                     onClick={this.props.togglenav}
                                 >
                                     <i className="fas fa-bars"></i>
@@ -139,14 +144,9 @@ class Header extends Component {
                                                           .username
                                                     : ""
                                             }
-                                            className="profile-img-circle mr-1 mb-1"
+                                            className="profile-img-circle mr-1"
                                         />{" "}
-                                        <span
-                                            className="d-none d-md-inline"
-                                            style={{
-                                                marginTop: "-5px",
-                                            }}
-                                        >
+                                        <span className="d-none d-md-inline">
                                             {this.props.profile &&
                                             Object.keys(this.props.profile)
                                                 .length !== 0

@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import Header from "./shared/navbar";
 import SideNav from "./shared/sidenav";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
-import { paginationCount } from "../../shared/globalValues.js";
+import { paginationCount } from "../../shared/constant.js";
 import Loading from "../common/loader";
 import GroupTable from "../table/group";
 import SubjectTable from "../table/subject";
@@ -57,7 +57,7 @@ class TeacherDashboard extends Component {
                     });
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -65,6 +65,11 @@ class TeacherDashboard extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -86,7 +91,7 @@ class TeacherDashboard extends Component {
                     });
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -94,6 +99,11 @@ class TeacherDashboard extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 

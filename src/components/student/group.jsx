@@ -61,7 +61,7 @@ class Group extends Component {
                     });
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -69,6 +69,11 @@ class Group extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -177,9 +182,10 @@ class Group extends Component {
                                 <h5>Subjects</h5>
                             </div>
                             <div className="card-body">
-                                {this.state.subjectItems.length > 0 ? (
+                                {this.state.subjectItems &&
+                                this.state.subjectItems.length > 0 ? (
                                     <Slider {...settings}>
-                                        {this.state.subjectItems.map(
+                                        {(this.state.subjectItems || []).map(
                                             (data, index) => {
                                                 return (
                                                     <div

@@ -1,18 +1,15 @@
 import React, { Component } from "react";
 import { Tabs, Tab, Modal, Alert, Spinner } from "react-bootstrap";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl.js";
-import { paginationCount } from "../../shared/globalValues.js";
+import { paginationCount } from "../../shared/constant.js";
 import Select from "react-select";
-import Header from "./shared/navbar";
-import SideNav from "./shared/sidenav";
+import Wrapper from "./wrapper";
 import HODTable from "../table/hod";
-import Loading from "../common/loader";
 import StudentTable from "../table/student";
 import Paginations from "../common/pagination";
 import ReactSwitch from "../common/switchComponent";
 import dateFormat from "dateformat";
 import { Link } from "react-router-dom";
-import AlertBox from "../common/alert";
 import {
     UserDeleteModal,
     UserDisableModal,
@@ -60,13 +57,13 @@ class HODModal extends Component {
             showPassword: false,
             selectAll: false,
         };
+        this.url = baseUrl + adminPathUrl;
         this.authToken = localStorage.getItem("Inquel-Auth");
         this.headers = {
             Accept: "application/json",
             "Content-Type": "application/json",
             "Inquel-Auth": this.authToken,
         };
-        this.url = baseUrl + adminPathUrl;
     }
 
     // Fetch Category & Board Data
@@ -77,15 +74,26 @@ class HODModal extends Component {
         })
             .then((res) => res.json())
             .then((result) => {
-                this.setState({
-                    categoryItems: result.data.CATEGORY,
-                    boardItems: result.data.BOARD,
-                    category: "",
-                    sub_category: "",
-                });
+                if (result.sts === true) {
+                    this.setState({
+                        categoryItems: result.data.CATEGORY,
+                        boardItems: result.data.BOARD,
+                        category: "",
+                        sub_category: "",
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                });
             });
     };
 
@@ -155,6 +163,11 @@ class HODModal extends Component {
                 })
                 .catch((err) => {
                     console.log(err);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
                 });
         }
     };
@@ -178,13 +191,24 @@ class HODModal extends Component {
             })
                 .then((res) => res.json())
                 .then((result) => {
-                    this.setState({
-                        subCategoryItems: result.data.sub_category,
-                        subcategory_loading: false,
-                    });
+                    if (result.sts) {
+                        this.setState({
+                            subCategoryItems: result.data.sub_category,
+                            subcategory_loading: false,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.msg,
+                            showErrorAlert: true,
+                        });
+                    }
                 })
                 .catch((err) => {
                     console.log(err);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                    });
                 });
         }
     };
@@ -209,13 +233,24 @@ class HODModal extends Component {
             )
                 .then((res) => res.json())
                 .then((result) => {
-                    this.setState({
-                        disciplineItems: result.data.DISCIPLINE,
-                        discipline_loading: false,
-                    });
+                    if (result.sts) {
+                        this.setState({
+                            disciplineItems: result.data.DISCIPLINE,
+                            discipline_loading: false,
+                        });
+                    } else {
+                        this.setState({
+                            errorMsg: result.msg,
+                            showErrorAlert: true,
+                        });
+                    }
                 })
                 .catch((err) => {
                     console.log(err);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                    });
                 });
         }
     };
@@ -805,35 +840,14 @@ class AdminHODAndStudentList extends Component {
             showStudent_DisableModal: false,
             showHOD_EnableModal: false,
             showStudent_EnableModal: false,
-            showSideNav: false,
 
             activeTab: "hod",
             hodItems: [],
             studentItems: [],
             selectedHOD: [],
             selectedStudent: [],
-
-            errorMsg: "",
-            successMsg: "",
-            showErrorAlert: false,
-            showSuccessAlert: false,
-            page_loading: true,
         };
-        this.url = baseUrl + adminPathUrl;
-        this.authToken = localStorage.getItem("Inquel-Auth");
-        this.headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            "Inquel-Auth": this.authToken,
-        };
-        this.gridRef = React.createRef();
     }
-
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
 
     toggleModal = () => {
         this.setState({
@@ -848,8 +862,8 @@ class AdminHODAndStudentList extends Component {
 
     // Fetch HOD List
     loadHodData = () => {
-        fetch(`${this.url}/hod/?page=${this.state.activeHODPage}`, {
-            headers: this.headers,
+        fetch(`${this.wrapper.url}/hod/?page=${this.state.activeHODPage}`, {
+            headers: this.wrapper.headers,
             method: "GET",
         })
             .then((res) => res.json())
@@ -858,45 +872,46 @@ class AdminHODAndStudentList extends Component {
                     this.setState({
                         hodItems: result.data.results,
                         totalHODCount: result.data.count,
-                        page_loading: false,
                     });
+                    this.wrapper.pageLoading(false);
                 } else {
-                    this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
+                    this.wrapper.pageLoading(false);
+                    this.wrapper.errorAlert(result.msg, true);
                 }
             })
             .catch((err) => {
                 console.log(err);
+                this.wrapper.pageLoading(false);
+                this.wrapper.errorAlert("Something went wrong!", true);
             });
     };
 
     // Fetch Students list
     loadStudentData = () => {
-        fetch(`${this.url}/student/?page=${this.state.activeStudentPage}`, {
-            headers: this.headers,
-            method: "GET",
-        })
+        fetch(
+            `${this.wrapper.url}/student/?page=${this.state.activeStudentPage}`,
+            {
+                headers: this.wrapper.headers,
+                method: "GET",
+            }
+        )
             .then((res) => res.json())
             .then((result) => {
                 if (result.sts === true) {
                     this.setState({
                         studentItems: result.data.results,
                         totalStudentCount: result.data.count,
-                        page_loading: false,
                     });
+                    this.wrapper.pageLoading(false);
                 } else {
-                    this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
+                    this.wrapper.pageLoading(false);
+                    this.wrapper.errorAlert(result.msg, true);
                 }
             })
             .catch((err) => {
                 console.log(err);
+                this.wrapper.pageLoading(false);
+                this.wrapper.errorAlert("Something went wrong!", true);
             });
     };
 
@@ -1009,18 +1024,17 @@ class AdminHODAndStudentList extends Component {
     };
 
     handleHODPageChange(pageNumber) {
-        this.setState({ activeHODPage: pageNumber, page_loading: true }, () => {
+        this.setState({ activeHODPage: pageNumber }, () => {
+            this.wrapper.pageLoading(true);
             this.loadHodData();
         });
     }
 
     handleStudentPageChange(pageNumber) {
-        this.setState(
-            { activeStudentPage: pageNumber, page_loading: true },
-            () => {
-                this.loadStudentData();
-            }
-        );
+        this.setState({ activeStudentPage: pageNumber }, () => {
+            this.wrapper.pageLoading(true);
+            this.loadStudentData();
+        });
     }
 
     render() {
@@ -1029,41 +1043,14 @@ class AdminHODAndStudentList extends Component {
                 ? "HOD List - Admin | IQLabs"
                 : "Student List - Admin | IQLabs";
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header
-                    name={
-                        this.state.activeTab === "hod"
-                            ? "HOD List"
-                            : "Student List"
-                    }
-                    togglenav={this.toggleSideNav}
-                />
-
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="profiles"
-                />
-
-                {/* Alert message */}
-                <AlertBox
-                    errorMsg={this.state.errorMsg}
-                    successMsg={this.state.successMsg}
-                    showErrorAlert={this.state.showErrorAlert}
-                    showSuccessAlert={this.state.showSuccessAlert}
-                    toggleSuccessAlert={() => {
-                        this.setState({
-                            showSuccessAlert: false,
-                        });
-                    }}
-                    toggleErrorAlert={() => {
-                        this.setState({
-                            showErrorAlert: false,
-                        });
-                    }}
-                />
-
+            <Wrapper
+                history={this.props.history}
+                header={`${
+                    this.state.activeTab === "hod" ? "HOD List" : "Student List"
+                }`}
+                activeLink="profiles"
+                ref={(ref) => (this.wrapper = ref)}
+            >
                 {/* HOD create Modal */}
                 {this.state.showModal ? (
                     <HODModal
@@ -1177,137 +1164,116 @@ class AdminHODAndStudentList extends Component {
                     ""
                 )}
 
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                >
-                    <div className="container-fluid">
-                        {/* Back button */}
+                <div className="row align-items-center mb-3">
+                    <div className="col-md-6">
+                        {/* Breadcrumb */}
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb">
+                                <li className="breadcrumb-item">
+                                    <Link to="/admin">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item active">
+                                    {this.state.activeTab === "hod"
+                                        ? "HOD"
+                                        : "Student"}
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <div className="col-md-6 d-flex justify-content-end">
+                        {this.state.activeTab === "hod" ? (
+                            <button
+                                className="btn btn-primary btn-sm shadow-none mr-1"
+                                onClick={this.toggleModal}
+                            >
+                                Add New
+                            </button>
+                        ) : (
+                            ""
+                        )}
                         <button
-                            className="btn btn-primary-invert btn-sm mb-3"
-                            onClick={this.props.history.goBack}
+                            className="btn btn-primary btn-sm shadow-none mr-1"
+                            onClick={this.handleDelete}
                         >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
+                            Delete
                         </button>
-
-                        <div className="row align-items-center mb-3">
-                            <div className="col-md-6">
-                                {/* Breadcrumb */}
-                                <nav aria-label="breadcrumb">
-                                    <ol className="breadcrumb">
-                                        <li className="breadcrumb-item">
-                                            <Link to="/admin">
-                                                <i className="fas fa-home fa-sm"></i>
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item active">
-                                            {this.state.activeTab === "hod"
-                                                ? "HOD"
-                                                : "Student"}
-                                        </li>
-                                    </ol>
-                                </nav>
-                            </div>
-                            <div className="col-md-6 d-flex justify-content-end">
-                                {this.state.activeTab === "hod" ? (
-                                    <button
-                                        className="btn btn-primary btn-sm shadow-none mr-1"
-                                        onClick={this.toggleModal}
-                                    >
-                                        Add New
-                                    </button>
-                                ) : (
-                                    ""
-                                )}
-                                <button
-                                    className="btn btn-primary btn-sm shadow-none mr-1"
-                                    onClick={this.handleDelete}
-                                >
-                                    Delete
-                                </button>
-                                <button
-                                    className="btn btn-primary btn-sm shadow-none mr-1"
-                                    onClick={this.handleEnable}
-                                >
-                                    Enable
-                                </button>
-                                <button
-                                    className="btn btn-primary btn-sm shadow-none"
-                                    onClick={this.handleDisable}
-                                >
-                                    Disable
-                                </button>
-                            </div>
-                        </div>
-
-                        <Tabs
-                            activeKey={
-                                !this.props.location.hash
-                                    ? "hod"
-                                    : this.props.location.hash.substring(1)
-                            }
-                            id="uncontrolled-tab-example"
-                            onSelect={this.handleSelect}
+                        <button
+                            className="btn btn-primary btn-sm shadow-none mr-1"
+                            onClick={this.handleEnable}
                         >
-                            {/* HOD Table */}
-                            <Tab eventKey="hod" title="HOD">
-                                <div className="card shadow-sm">
-                                    <HODTable
-                                        hodItems={this.state.hodItems}
-                                        handleHODId={this.handleHODId}
-                                    />
-                                    <div className="card-body p-3">
-                                        {this.state.totalHODCount >
-                                        paginationCount ? (
-                                            <Paginations
-                                                activePage={
-                                                    this.state.activeHODPage
-                                                }
-                                                totalItemsCount={
-                                                    this.state.totalHODCount
-                                                }
-                                                onChange={this.handleHODPageChange.bind(
-                                                    this
-                                                )}
-                                            />
-                                        ) : null}
-                                    </div>
-                                </div>
-                            </Tab>
-
-                            {/* Student table */}
-                            <Tab eventKey="student" title="Student">
-                                <div className="card shadow-sm">
-                                    <StudentTable
-                                        studentItems={this.state.studentItems}
-                                        path="admin"
-                                        handleStudentId={this.handleStudentId}
-                                    />
-                                    <div className="card-body p-3">
-                                        {this.state.totalStudentCount >
-                                        paginationCount ? (
-                                            <Paginations
-                                                activePage={
-                                                    this.state.activeStudentPage
-                                                }
-                                                totalItemsCount={
-                                                    this.state.totalStudentCount
-                                                }
-                                                onChange={this.handleStudentPageChange.bind(
-                                                    this
-                                                )}
-                                            />
-                                        ) : null}
-                                    </div>
-                                </div>
-                            </Tab>
-                        </Tabs>
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
+                            Enable
+                        </button>
+                        <button
+                            className="btn btn-primary btn-sm shadow-none"
+                            onClick={this.handleDisable}
+                        >
+                            Disable
+                        </button>
                     </div>
                 </div>
-            </div>
+
+                <Tabs
+                    activeKey={
+                        !this.props.location.hash
+                            ? "hod"
+                            : this.props.location.hash.substring(1)
+                    }
+                    id="uncontrolled-tab-example"
+                    onSelect={this.handleSelect}
+                >
+                    {/* HOD Table */}
+                    <Tab eventKey="hod" title="HOD">
+                        <div className="card shadow-sm">
+                            <HODTable
+                                hodItems={this.state.hodItems}
+                                handleHODId={this.handleHODId}
+                            />
+                            <div className="card-body p-3">
+                                {this.state.totalHODCount > paginationCount ? (
+                                    <Paginations
+                                        activePage={this.state.activeHODPage}
+                                        totalItemsCount={
+                                            this.state.totalHODCount
+                                        }
+                                        onChange={this.handleHODPageChange.bind(
+                                            this
+                                        )}
+                                    />
+                                ) : null}
+                            </div>
+                        </div>
+                    </Tab>
+
+                    {/* Student table */}
+                    <Tab eventKey="student" title="Student">
+                        <div className="card shadow-sm">
+                            <StudentTable
+                                studentItems={this.state.studentItems}
+                                path="admin"
+                                handleStudentId={this.handleStudentId}
+                            />
+                            <div className="card-body p-3">
+                                {this.state.totalStudentCount >
+                                paginationCount ? (
+                                    <Paginations
+                                        activePage={
+                                            this.state.activeStudentPage
+                                        }
+                                        totalItemsCount={
+                                            this.state.totalStudentCount
+                                        }
+                                        onChange={this.handleStudentPageChange.bind(
+                                            this
+                                        )}
+                                    />
+                                ) : null}
+                            </div>
+                        </div>
+                    </Tab>
+                </Tabs>
+            </Wrapper>
         );
     }
 }

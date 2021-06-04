@@ -189,7 +189,7 @@ export class ContentDeleteModal extends Component {
                     this.props.formSubmission();
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         showLoader: false,
                     });
@@ -488,7 +488,7 @@ export class SingleContentDisableModal extends Component {
                     this.props.formSubmission();
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         showLoader: false,
                     });
@@ -776,7 +776,7 @@ export class SingleContentEnableModal extends Component {
                     this.props.formSubmission();
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         showLoader: false,
                     });

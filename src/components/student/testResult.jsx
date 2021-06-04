@@ -195,7 +195,7 @@ class TestResult extends Component {
                     });
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -203,6 +203,11 @@ class TestResult extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -259,113 +264,109 @@ class TestResult extends Component {
                                 </div>
 
                                 {/* ----- Cycle test list ----- */}
-                                {this.state.cycle_test.length !== 0
-                                    ? this.state.cycle_test.map(
-                                          (data, index) => {
-                                              return (
-                                                  <div
-                                                      className="card light-bg shadow-sm mb-2"
-                                                      key={index}
-                                                  >
-                                                      <div className="row align-items-center font-weight-bold-600 small">
-                                                          <div className="col-3">
-                                                              <div className="card card-body secondary-bg p-3">
-                                                                  {
-                                                                      data.cycle_test_name
-                                                                  }
-                                                              </div>
-                                                          </div>
-                                                          {/* ----- Attempts score card ----- */}
-                                                          <div className="col-9">
-                                                              {data.student_cycle_test !==
-                                                              undefined
-                                                                  ? data.student_cycle_test.map(
-                                                                        (
-                                                                            attempt,
+                                {(this.state.cycle_test || []).map(
+                                    (data, index) => {
+                                        return (
+                                            <div
+                                                className="card light-bg shadow-sm mb-2"
+                                                key={index}
+                                            >
+                                                <div className="row align-items-center font-weight-bold-600 small">
+                                                    <div className="col-3">
+                                                        <div className="card card-body secondary-bg p-3">
+                                                            {
+                                                                data.cycle_test_name
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                    {/* ----- Attempts score card ----- */}
+                                                    <div className="col-9">
+                                                        {(
+                                                            data.student_cycle_test ||
+                                                            []
+                                                        ).map(
+                                                            (
+                                                                attempt,
+                                                                attempt_index
+                                                            ) => {
+                                                                return (
+                                                                    <CycleTestAttempts
+                                                                        key={
                                                                             attempt_index
-                                                                        ) => {
-                                                                            return (
-                                                                                <CycleTestAttempts
-                                                                                    key={
-                                                                                        attempt_index
-                                                                                    }
-                                                                                    attempt={
-                                                                                        attempt
-                                                                                    }
-                                                                                    data={
-                                                                                        data
-                                                                                    }
-                                                                                    url={
-                                                                                        this
-                                                                                            .props
-                                                                                            .match
-                                                                                            .url
-                                                                                    }
-                                                                                />
-                                                                            );
                                                                         }
-                                                                    )
-                                                                  : ""}
-                                                          </div>
-                                                      </div>
-                                                  </div>
-                                              );
-                                          }
-                                      )
-                                    : ""}
+                                                                        attempt={
+                                                                            attempt
+                                                                        }
+                                                                        data={
+                                                                            data
+                                                                        }
+                                                                        url={
+                                                                            this
+                                                                                .props
+                                                                                .match
+                                                                                .url
+                                                                        }
+                                                                    />
+                                                                );
+                                                            }
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    }
+                                )}
 
                                 {/* ----- Semester list ----- */}
-                                {this.state.semester.length !== 0
-                                    ? this.state.semester.map((data, index) => {
-                                          return (
-                                              <div
-                                                  className="card light-bg shadow-sm mb-2"
-                                                  key={index}
-                                              >
-                                                  <div className="row align-items-center font-weight-bold-600 small">
-                                                      <div className="col-3">
-                                                          <div className="card card-body secondary-bg p-3">
-                                                              {
-                                                                  data.semester_name
-                                                              }
-                                                          </div>
-                                                      </div>
-                                                      <div className="col-9">
-                                                          {data.student_semester !==
-                                                          undefined
-                                                              ? data.student_semester.map(
-                                                                    (
-                                                                        attempt,
-                                                                        attempt_index
-                                                                    ) => {
-                                                                        return (
-                                                                            <SemesterAttempts
-                                                                                key={
-                                                                                    attempt_index
-                                                                                }
-                                                                                attempt={
-                                                                                    attempt
-                                                                                }
-                                                                                data={
-                                                                                    data
-                                                                                }
-                                                                                url={
-                                                                                    this
-                                                                                        .props
-                                                                                        .match
-                                                                                        .url
-                                                                                }
-                                                                            />
-                                                                        );
-                                                                    }
-                                                                )
-                                                              : ""}
-                                                      </div>
-                                                  </div>
-                                              </div>
-                                          );
-                                      })
-                                    : ""}
+                                {(this.state.semester || []).map(
+                                    (data, index) => {
+                                        return (
+                                            <div
+                                                className="card light-bg shadow-sm mb-2"
+                                                key={index}
+                                            >
+                                                <div className="row align-items-center font-weight-bold-600 small">
+                                                    <div className="col-3">
+                                                        <div className="card card-body secondary-bg p-3">
+                                                            {data.semester_name}
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-9">
+                                                        {(
+                                                            data.student_semester ||
+                                                            []
+                                                        ).map(
+                                                            (
+                                                                attempt,
+                                                                attempt_index
+                                                            ) => {
+                                                                return (
+                                                                    <SemesterAttempts
+                                                                        key={
+                                                                            attempt_index
+                                                                        }
+                                                                        attempt={
+                                                                            attempt
+                                                                        }
+                                                                        data={
+                                                                            data
+                                                                        }
+                                                                        url={
+                                                                            this
+                                                                                .props
+                                                                                .match
+                                                                                .url
+                                                                        }
+                                                                    />
+                                                                );
+                                                            }
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    }
+                                )}
                             </div>
                         </div>
                     </div>

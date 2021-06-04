@@ -360,7 +360,7 @@ const ChapterListRender = (props) => {
                                 {props.chapter.weightage}
                             </div>
                             <div className="col-3">
-                                {props.chapter.chapter_structure ? (
+                                {props.chapter.topics ? (
                                     <Link
                                         to={`${props.match.url}/chapter/${props.chapter.chapter_id}/summary`}
                                         onClick={() => {
@@ -373,7 +373,7 @@ const ChapterListRender = (props) => {
                                         <button
                                             className="btn btn-light btn-sm shadow-none"
                                             disabled={
-                                                props.chapter.chapter_structure
+                                                props.chapter.topics
                                                     ? false
                                                     : true
                                             }
@@ -394,7 +394,7 @@ const ChapterListRender = (props) => {
                                 )}
                             </div>
                             <div className="col-3">
-                                {props.chapter.chapter_structure ? (
+                                {props.chapter.topics ? (
                                     <Link
                                         to={`${props.match.url}/chapter/${props.chapter.chapter_id}/notes`}
                                         onClick={() => {
@@ -429,20 +429,18 @@ const ChapterListRender = (props) => {
             <Accordion.Collapse eventKey={props.chapter.chapter_id}>
                 <>
                     {/* ----- Topic list ----- */}
-                    {props.chapter.chapter_structure
-                        ? props.chapter.chapter_structure.map(
-                              (topics, topic_index) => {
-                                  return (
-                                      <Accordion key={topic_index}>
-                                          <TopicListRender
-                                              {...props}
-                                              topics={topics}
-                                              topic_index={topic_index}
-                                          />
-                                      </Accordion>
-                                  );
-                              }
-                          )
+                    {props.chapter.topics
+                        ? props.chapter.topics.map((topics, topic_index) => {
+                              return (
+                                  <Accordion key={topic_index}>
+                                      <TopicListRender
+                                          {...props}
+                                          topics={topics}
+                                          topic_index={topic_index}
+                                      />
+                                  </Accordion>
+                              );
+                          })
                         : null}
 
                     {/* ----- Cycle test list ----- */}
@@ -669,8 +667,7 @@ const TopicListRender = (props) => {
                                                 storeDispatch(
                                                     TOPIC,
                                                     getTopicName(
-                                                        props.chapter
-                                                            .chapter_structure,
+                                                        props.chapter.topics,
                                                         props.topics.next_topic
                                                     )
                                                 );
@@ -765,7 +762,7 @@ class HODCourse extends Component {
                     });
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -773,6 +770,11 @@ class HODCourse extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -849,7 +851,14 @@ class HODCourse extends Component {
                     });
                 }
             })
-            .catch((err) => console.log(err));
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
+            });
     };
 
     render() {

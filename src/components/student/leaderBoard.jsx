@@ -7,7 +7,7 @@ import Loading from "../common/loader";
 import LeaderboardTable from "../table/leaderboard";
 import Paginations from "../common/pagination";
 import { baseUrl, studentUrl } from "../../shared/baseUrl.js";
-import { paginationCount } from "../../shared/globalValues.js";
+import { paginationCount } from "../../shared/constant.js";
 
 class Leaderboard extends Component {
     constructor() {

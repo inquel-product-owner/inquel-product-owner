@@ -1,52 +1,29 @@
 import React, { Component } from "react";
 import profilepic from "../../assets/user-v1.png";
-import Header from "./shared/navbar";
-import SideNav from "./shared/sidenav";
-import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
-import { paginationCount } from "../../shared/globalValues.js";
-import Loading from "../common/loader";
+import Wrapper from "./wrapper";
+import { paginationCount } from "../../shared/constant.js";
 import Paginations from "../common/pagination";
 import StudentTable from "../table/student";
 import { Badge } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import AlertBox from "../common/alert";
 
 class AdminHodStudentList extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             studentItems: [],
             hodItems: [],
-            page_loading: true,
             activeStudentPage: 1,
             totalStudentCount: 0,
-            errorMsg: "",
-            successMsg: "",
-            showErrorAlert: false,
-            showSuccessAlert: false,
         };
         this.hodId = this.props.match.params.hodId;
-        this.url = baseUrl + adminPathUrl;
-        this.authToken = localStorage.getItem("Inquel-Auth");
-        this.headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            "Inquel-Auth": this.authToken,
-        };
     }
-
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
 
     loadStudentData = () => {
         fetch(
-            `${this.url}/hod/${this.hodId}/student/?page=${this.state.activeStudentPage}`,
+            `${this.wrapper.url}/hod/${this.hodId}/student/?page=${this.state.activeStudentPage}`,
             {
-                headers: this.headers,
+                headers: this.wrapper.headers,
                 method: "GET",
             }
         )
@@ -56,26 +33,25 @@ class AdminHodStudentList extends Component {
                     this.setState({
                         studentItems: result.data.results,
                         totalStudentCount: result.data.count,
-                        page_loading: false,
                     });
+                    this.wrapper.pageLoading(false);
                 } else {
-                    this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
+                    this.wrapper.pageLoading(false);
+                    this.wrapper.errorAlert(result.msg, true);
                 }
             })
             .catch((err) => {
                 console.log(err);
+                this.wrapper.pageLoading(false);
+                this.wrapper.errorAlert("Something went wrong!", true);
             });
     };
 
     componentDidMount = () => {
         document.title = "Student list - Admin | IQLabs";
 
-        fetch(`${this.url}/hod/${this.hodId}/`, {
-            headers: this.headers,
+        fetch(`${this.wrapper.url}/hod/${this.hodId}/`, {
+            headers: this.wrapper.headers,
             method: "GET",
         })
             .then((res) => res.json())
@@ -83,178 +59,120 @@ class AdminHodStudentList extends Component {
                 if (result.sts === true) {
                     this.setState({
                         hodItems: result.data,
-                        page_loading: false,
                     });
+                    this.wrapper.pageLoading(false);
                 } else {
-                    this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
+                    this.wrapper.pageLoading(false);
+                    this.wrapper.errorAlert(result.msg, true);
                 }
             })
             .catch((err) => {
                 console.log(err);
+                this.wrapper.pageLoading(false);
+                this.wrapper.errorAlert("Something went wrong!", true);
             });
 
         this.loadStudentData();
     };
 
     handleStudentPageChange(pageNumber) {
-        this.setState(
-            { activeStudentPage: pageNumber, page_loading: true },
-            () => {
-                this.loadStudentData();
-            }
-        );
+        this.setState({ activeStudentPage: pageNumber }, () => {
+            this.wrapper.pageLoading(true);
+            this.loadStudentData();
+        });
     }
 
     render() {
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header name="Student List" togglenav={this.toggleSideNav} />
+            <Wrapper
+                history={this.props.history}
+                header="Student List"
+                activeLink="profiles"
+                ref={(ref) => (this.wrapper = ref)}
+            >
+                {/* Breadcrumb */}
+                <nav aria-label="breadcrumb">
+                    <ol className="breadcrumb mb-3">
+                        <li className="breadcrumb-item">
+                            <Link to="/admin">
+                                <i className="fas fa-home fa-sm"></i>
+                            </Link>
+                        </li>
+                        <li className="breadcrumb-item">
+                            <Link to="#" onClick={this.props.history.goBack}>
+                                HOD
+                            </Link>
+                        </li>
+                        <li className="breadcrumb-item active">Student</li>
+                    </ol>
+                </nav>
 
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="profiles"
-                />
-
-                {/* Alert message */}
-                <AlertBox
-                    errorMsg={this.state.errorMsg}
-                    successMsg={this.state.successMsg}
-                    showErrorAlert={this.state.showErrorAlert}
-                    showSuccessAlert={this.state.showSuccessAlert}
-                    toggleSuccessAlert={() => {
-                        this.setState({
-                            showSuccessAlert: false,
-                        });
-                    }}
-                    toggleErrorAlert={() => {
-                        this.setState({
-                            showErrorAlert: false,
-                        });
-                    }}
-                />
-
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                >
-                    <div className="container-fluid">
-                        {/* Back button */}
-                        <button
-                            className="btn btn-primary-invert btn-sm mb-3"
-                            onClick={this.props.history.goBack}
-                        >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
-                        </button>
-
-                        {/* Breadcrumb */}
-                        <nav aria-label="breadcrumb">
-                            <ol className="breadcrumb mb-3">
-                                <li className="breadcrumb-item">
-                                    <Link to="/admin">
-                                        <i className="fas fa-home fa-sm"></i>
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item">
-                                    <Link
-                                        to="#"
-                                        onClick={this.props.history.goBack}
-                                    >
-                                        HOD
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item active">
-                                    Student
-                                </li>
-                            </ol>
-                        </nav>
-
-                        <div className="row align-items-center mb-4">
-                            <div className="col-md-6">
-                                <div className="row align-items-center">
-                                    <div className="col-md-2 col-3">
-                                        <img
-                                            src={
-                                                this.state.hodItems.length !== 0
-                                                    ? this.state.hodItems
-                                                          .profile_link !== null
-                                                        ? this.state.hodItems
-                                                              .profile_link
-                                                        : profilepic
-                                                    : profilepic
-                                            }
-                                            alt={this.state.hodItems.full_name}
-                                            className="img-fluid profile-pic"
-                                        />
-                                    </div>
-                                    <div className="col-md-10 col-9 pl-0">
-                                        <h5 className="primary-text">
-                                            {this.state.hodItems.length !== 0
+                <div className="row align-items-center mb-4">
+                    <div className="col-md-6">
+                        <div className="row align-items-center">
+                            <div className="col-md-2 col-3">
+                                <img
+                                    src={
+                                        this.state.hodItems.length !== 0
+                                            ? this.state.hodItems
+                                                  .profile_link !== null
                                                 ? this.state.hodItems
-                                                      .full_name !== ""
-                                                    ? this.state.hodItems
-                                                          .full_name
-                                                    : this.state.hodItems
-                                                          .username
-                                                : ""}
-                                        </h5>
-                                        <p className="mb-0">
-                                            {this.state.hodItems.length !==
-                                            0 ? (
-                                                this.state.hodItems
-                                                    .is_active ? (
-                                                    <Badge variant="success">
-                                                        Active
-                                                    </Badge>
-                                                ) : (
-                                                    <Badge variant="danger">
-                                                        Not active
-                                                    </Badge>
-                                                )
-                                            ) : (
-                                                ""
-                                            )}
-                                        </p>
-                                    </div>
-                                </div>
+                                                      .profile_link
+                                                : profilepic
+                                            : profilepic
+                                    }
+                                    alt={this.state.hodItems.full_name}
+                                    className="img-fluid profile-pic"
+                                />
+                            </div>
+                            <div className="col-md-10 col-9 pl-0">
+                                <h5 className="primary-text">
+                                    {this.state.hodItems.length !== 0
+                                        ? this.state.hodItems.full_name !== ""
+                                            ? this.state.hodItems.full_name
+                                            : this.state.hodItems.username
+                                        : ""}
+                                </h5>
+                                <p className="mb-0">
+                                    {this.state.hodItems.length !== 0 ? (
+                                        this.state.hodItems.is_active ? (
+                                            <Badge variant="success">
+                                                Active
+                                            </Badge>
+                                        ) : (
+                                            <Badge variant="danger">
+                                                Not active
+                                            </Badge>
+                                        )
+                                    ) : (
+                                        ""
+                                    )}
+                                </p>
                             </div>
                         </div>
-
-                        {/* Student List */}
-                        <div className="card shadow-sm">
-                            <StudentTable
-                                studentItems={this.state.studentItems}
-                                path={`admin/hod/${this.hodId}`}
-                                category={true}
-                            />
-                            <div className="card-body p-3">
-                                {this.state.totalStudentCount >
-                                paginationCount ? (
-                                    <Paginations
-                                        activePage={
-                                            this.state.activeStudentPage
-                                        }
-                                        totalItemsCount={
-                                            this.state.totalStudentCount
-                                        }
-                                        onChange={this.handleStudentPageChange.bind(
-                                            this
-                                        )}
-                                    />
-                                ) : null}
-                            </div>
-                        </div>
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
-            </div>
+
+                {/* Student List */}
+                <div className="card shadow-sm">
+                    <StudentTable
+                        studentItems={this.state.studentItems}
+                        path={`admin/hod/${this.hodId}`}
+                        category={true}
+                    />
+                    <div className="card-body p-3">
+                        {this.state.totalStudentCount > paginationCount ? (
+                            <Paginations
+                                activePage={this.state.activeStudentPage}
+                                totalItemsCount={this.state.totalStudentCount}
+                                onChange={this.handleStudentPageChange.bind(
+                                    this
+                                )}
+                            />
+                        ) : null}
+                    </div>
+                </div>
+            </Wrapper>
         );
     }
 }

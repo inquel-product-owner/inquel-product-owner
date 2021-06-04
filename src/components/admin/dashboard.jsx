@@ -939,7 +939,7 @@ class AdminDashboard extends Component {
         document.title = "Dashboard - Admin | IQLabs";
     };
 
-    render(props) {
+    render() {
         return (
             <div className="wrapper">
                 {/* Navbar */}

@@ -86,6 +86,11 @@ class TeacherCycleDirectEvaluation extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -151,7 +156,14 @@ class TeacherCycleDirectEvaluation extends Component {
                     });
                 }
             })
-            .catch((err) => console.log(err));
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
+            });
     };
 
     handleObtainedMarks = (event, topic_num) => {
@@ -240,7 +252,14 @@ class TeacherCycleDirectEvaluation extends Component {
                     });
                 }
             })
-            .catch((err) => console.log(err));
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
+            });
     };
 
     handlePublish = () => {
@@ -277,7 +296,14 @@ class TeacherCycleDirectEvaluation extends Component {
                     });
                 }
             })
-            .catch((err) => console.log(err));
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
+            });
     };
 
     onDocumentLoadSuccess = ({ numPages }) => {

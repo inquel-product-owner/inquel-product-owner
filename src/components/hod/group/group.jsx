@@ -5,7 +5,7 @@ import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import Select from "react-select";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
-import { paginationCount } from "../../../shared/globalValues.js";
+import { paginationCount } from "../../../shared/constant";
 import Loading from "../../common/loader";
 import SubjectTable from "../../table/subject";
 import Paginations from "../../common/pagination";
@@ -62,13 +62,17 @@ class SubjectModal extends Component {
                     });
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                     });
                 }
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                });
             });
 
         fetch(
@@ -86,13 +90,17 @@ class SubjectModal extends Component {
                     });
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                     });
                 }
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                });
             });
     };
 
@@ -133,6 +141,11 @@ class SubjectModal extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    showLoader: false,
+                });
             });
     };
 
@@ -333,7 +346,7 @@ class HODGroup extends Component {
                     });
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -341,6 +354,11 @@ class HODGroup extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 

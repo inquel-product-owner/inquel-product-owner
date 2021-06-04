@@ -1,12 +1,8 @@
 import React, { Component } from "react";
-import Header from "./shared/navbar";
-import SideNav from "./shared/sidenav";
+import Wrapper from "./wrapper";
 import { Link } from "react-router-dom";
 import Select from "react-select";
 import { Modal, Spinner, Alert } from "react-bootstrap";
-import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
-import Loading from "../common/loader";
-import AlertBox from "../common/alert";
 
 class ContentAdding extends Component {
     constructor(props) {
@@ -18,13 +14,6 @@ class ContentAdding extends Component {
             showErrorAlert: false,
             showSuccessAlert: false,
             showLoader: false,
-        };
-        this.url = baseUrl + adminPathUrl;
-        this.authToken = localStorage.getItem("Authorization");
-        this.headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: this.authToken,
         };
     }
 
@@ -40,8 +29,8 @@ class ContentAdding extends Component {
             showLoader: true,
         });
 
-        fetch(`${this.url}/data/master/`, {
-            headers: this.headers,
+        fetch(`${this.props.url}/data/master/`, {
+            headers: this.props.headers,
             method: "PUT",
             body: JSON.stringify(this.state.data),
         })
@@ -56,7 +45,7 @@ class ContentAdding extends Component {
                     this.props.formSubmission();
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         showLoader: false,
                     });
@@ -64,6 +53,11 @@ class ContentAdding extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    showLoader: false,
+                });
             });
     };
 
@@ -180,7 +174,6 @@ class AdminMasterData extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             showModal: false,
             activeType: "",
             selectedCategory: { label: "", value: "" },
@@ -196,27 +189,8 @@ class AdminMasterData extends Component {
             board: [],
             type: [],
             subcategory_loading: false,
-
-            errorMsg: "",
-            successMsg: "",
-            showErrorAlert: false,
-            showSuccessAlert: false,
-            page_loading: true,
-        };
-        this.url = baseUrl + adminPathUrl;
-        this.authToken = localStorage.getItem("Inquel-Auth");
-        this.headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            "Inquel-Auth": this.authToken,
         };
     }
-
-    toggleSideNav = () => {
-        this.setState({
-            showSideNav: !this.state.showSideNav,
-        });
-    };
 
     handleType = (event) => {
         this.setState({
@@ -227,8 +201,8 @@ class AdminMasterData extends Component {
     };
 
     loadMasterData = () => {
-        fetch(`${this.url}/data/filter/`, {
-            headers: this.headers,
+        fetch(`${this.wrapper.url}/data/filter/`, {
+            headers: this.wrapper.headers,
             method: "GET",
         })
             .then((res) => res.json())
@@ -240,18 +214,17 @@ class AdminMasterData extends Component {
                         type: result.data.TYPE,
                         selectedCategory: { label: "", value: "" },
                         selectedSubcategory: { label: "", value: "" },
-                        page_loading: false,
                     });
+                    this.wrapper.pageLoading(false);
                 } else {
-                    this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
-                        showErrorAlert: true,
-                        page_loading: false,
-                    });
+                    this.wrapper.pageLoading(false);
+                    this.wrapper.errorAlert(result.msg, true);
                 }
             })
             .catch((err) => {
                 console.log(err);
+                this.wrapper.pageLoading(false);
+                this.wrapper.errorAlert("Something went wrong!", true);
             });
     };
 
@@ -274,8 +247,8 @@ class AdminMasterData extends Component {
         });
 
         if (event.value !== "") {
-            fetch(`${this.url}/data/filter/?category=${event.value}`, {
-                headers: this.headers,
+            fetch(`${this.wrapper.url}/data/filter/?category=${event.value}`, {
+                headers: this.wrapper.headers,
                 method: "GET",
             })
                 .then((res) => res.json())
@@ -286,16 +259,13 @@ class AdminMasterData extends Component {
                             subcategory_loading: false,
                         });
                     } else {
-                        this.setState({
-                            errorMsg: result.detail
-                                ? result.detail
-                                : result.msg,
-                            showErrorAlert: true,
-                        });
+                        this.wrapper.errorAlert(result.msg, true);
                     }
                 })
                 .catch((err) => {
                     console.log(err);
+                    this.wrapper.pageLoading(false);
+                    this.wrapper.errorAlert("Something went wrong!", true);
                 });
         }
     };
@@ -306,22 +276,14 @@ class AdminMasterData extends Component {
         sub_category.value = event.value;
         this.setState({
             selectedSubcategory: sub_category,
-            page_loading: true,
         });
-
-        var url = baseUrl + adminPathUrl;
-        var authToken = localStorage.getItem("Inquel-Auth");
-        var headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            "Inquel-Auth": authToken,
-        };
+        this.wrapper.pageLoading(true);
 
         if (event.value !== "") {
             fetch(
-                `${url}/data/filter/?category=${this.state.selectedCategory.value}&sub_category=${event.value}`,
+                `${this.wrapper.url}/data/filter/?category=${this.state.selectedCategory.value}&sub_category=${event.value}`,
                 {
-                    headers: headers,
+                    headers: this.wrapper.headers,
                     method: "GET",
                 }
             )
@@ -332,20 +294,17 @@ class AdminMasterData extends Component {
                             discipline: result.data.DISCIPLINE,
                             levels: result.data.LEVELS,
                             subjects: result.data.SUBJECTS,
-                            page_loading: false,
                         });
+                        this.wrapper.pageLoading(false);
                     } else {
-                        this.setState({
-                            errorMsg: result.detail
-                                ? result.detail
-                                : result.msg,
-                            showErrorAlert: true,
-                            page_loading: false,
-                        });
+                        this.wrapper.pageLoading(false);
+                        this.wrapper.errorAlert(result.msg, true);
                     }
                 })
                 .catch((err) => {
                     console.log(err);
+                    this.wrapper.pageLoading(false);
+                    this.wrapper.errorAlert("Something went wrong!", true);
                 });
         }
     };
@@ -436,31 +395,13 @@ class AdminMasterData extends Component {
 
     render() {
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header name="Master Data" togglenav={this.toggleSideNav} />
-
-                {/* Sidebar */}
-                <SideNav shownav={this.state.showSideNav} activeLink="course" />
-
-                {/* Alert message */}
-                <AlertBox
-                    errorMsg={this.state.errorMsg}
-                    successMsg={this.state.successMsg}
-                    showErrorAlert={this.state.showErrorAlert}
-                    showSuccessAlert={this.state.showSuccessAlert}
-                    toggleSuccessAlert={() => {
-                        this.setState({
-                            showSuccessAlert: false,
-                        });
-                    }}
-                    toggleErrorAlert={() => {
-                        this.setState({
-                            showErrorAlert: false,
-                        });
-                    }}
-                />
-
+            <Wrapper
+                history={this.props.history}
+                header="Master Data"
+                activeLink="course"
+                ref={(ref) => (this.wrapper = ref)}
+            >
+                {/* Content adding modal */}
                 {this.state.showModal ? (
                     <ContentAdding
                         show={this.state.showModal}
@@ -468,429 +409,356 @@ class AdminMasterData extends Component {
                         formSubmission={this.formSubmission}
                         type={this.state.contentAddingType}
                         data={this.state.selectedData}
+                        url={this.wrapper.url}
+                        headers={this.wrapper.headers}
                     />
                 ) : (
                     ""
                 )}
 
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                >
-                    <div className="container-fluid">
-                        {/* Back button */}
-                        <button
-                            className="btn btn-primary-invert btn-sm mb-3"
-                            onClick={this.props.history.goBack}
-                        >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
-                        </button>
+                {/* Breadcrumb */}
+                <nav aria-label="breadcrumb">
+                    <ol className="breadcrumb mb-3">
+                        <li className="breadcrumb-item">
+                            <Link to="/admin">
+                                <i className="fas fa-home fa-sm"></i>
+                            </Link>
+                        </li>
+                        <li className="breadcrumb-item active">Master Data</li>
+                    </ol>
+                </nav>
 
-                        {/* Breadcrumb */}
-                        <nav aria-label="breadcrumb">
-                            <ol className="breadcrumb mb-3">
-                                <li className="breadcrumb-item">
-                                    <Link to="/admin">
-                                        <i className="fas fa-home fa-sm"></i>
-                                    </Link>
-                                </li>
-                                <li className="breadcrumb-item active">
-                                    Master Data
-                                </li>
-                            </ol>
-                        </nav>
+                {/* ----- Options ----- */}
+                <div className="row">
+                    <div className="col-md-3 mb-3 mb-md-0">
+                        <div className="card shadow-sm">
+                            <div className="card-body">
+                                <div className="form-group">
+                                    <label htmlFor="select1">Option</label>
+                                    <Select
+                                        className="basic-single form-shadow"
+                                        placeholder="Select option"
+                                        isSearchable={true}
+                                        name="option"
+                                        options={[
+                                            {
+                                                label: "Categories",
+                                                value: "category",
+                                            },
+                                            {
+                                                label: "Board",
+                                                value: "board",
+                                            },
+                                            {
+                                                label: "Types",
+                                                value: "types",
+                                            },
+                                        ]}
+                                        onChange={this.handleType}
+                                    />
+                                </div>
 
-                        {/* ----- Options ----- */}
-                        <div className="row">
-                            <div className="col-md-3 mb-3 mb-md-0">
-                                <div className="card shadow-sm">
-                                    <div className="card-body">
-                                        <div className="form-group">
-                                            <label htmlFor="select1">
-                                                Option
-                                            </label>
-                                            <Select
-                                                className="basic-single form-shadow"
-                                                placeholder="Select option"
-                                                isSearchable={true}
-                                                name="option"
-                                                options={[
-                                                    {
-                                                        label: "Categories",
-                                                        value: "category",
-                                                    },
-                                                    {
-                                                        label: "Board",
-                                                        value: "board",
-                                                    },
-                                                    {
-                                                        label: "Types",
-                                                        value: "types",
-                                                    },
-                                                ]}
-                                                onChange={this.handleType}
-                                            />
+                                <div className="form-group">
+                                    <label htmlFor="category">Category</label>
+                                    <Select
+                                        className="basic-single form-shadow"
+                                        isSearchable={true}
+                                        name="category"
+                                        options={this.state.category.map(
+                                            function (list) {
+                                                return {
+                                                    value: list.code,
+                                                    label: list.title,
+                                                };
+                                            }
+                                        )}
+                                        value={
+                                            this.state.selectedCategory
+                                                .label !== ""
+                                                ? this.state.selectedCategory
+                                                : {
+                                                      label: "Select category",
+                                                      value: "",
+                                                  }
+                                        }
+                                        isDisabled={
+                                            this.state.activeType === "category"
+                                                ? false
+                                                : true
+                                        }
+                                        onChange={this.handleCategory}
+                                        required
+                                    />
+                                </div>
+
+                                <button
+                                    className="btn btn-light btn-sm btn-block border-secondary shadow-none mb-2"
+                                    onClick={() => this.toggleModal("category")}
+                                    disabled={
+                                        this.state.activeType === "category"
+                                            ? false
+                                            : true
+                                    }
+                                >
+                                    Add +
+                                </button>
+
+                                <div className="form-group">
+                                    <label htmlFor="select3">
+                                        Sub Category
+                                    </label>
+                                    <Select
+                                        className="basic-single form-shadow"
+                                        isSearchable={true}
+                                        name="subcategory"
+                                        isLoading={
+                                            this.state.subcategory_loading
+                                                ? true
+                                                : false
+                                        }
+                                        options={this.state.subcategory.map(
+                                            function (list) {
+                                                return {
+                                                    value: list.code,
+                                                    label: list.title,
+                                                };
+                                            }
+                                        )}
+                                        value={
+                                            this.state.selectedSubcategory
+                                                .label !== ""
+                                                ? this.state.selectedSubcategory
+                                                : {
+                                                      label: "Select subcategory",
+                                                      value: "",
+                                                  }
+                                        }
+                                        isDisabled={
+                                            this.state.selectedCategory
+                                                .value === ""
+                                                ? true
+                                                : false
+                                        }
+                                        onChange={this.handleSubcategory}
+                                        required
+                                    />
+                                </div>
+
+                                <button
+                                    className="btn btn-light btn-sm btn-block border-secondary shadow-none"
+                                    onClick={() =>
+                                        this.toggleModal("sub_category")
+                                    }
+                                    disabled={
+                                        this.state.selectedCategory.value === ""
+                                            ? true
+                                            : false
+                                    }
+                                >
+                                    Add +
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="col-md-9">
+                        {/* ----- Category Data ----- */}
+                        {this.state.activeType === "category" &&
+                        this.state.selectedCategory.value !== "" &&
+                        this.state.selectedSubcategory.value !== "" ? (
+                            <div className="row">
+                                <div className="col-md-4 mb-3 mb-md-0">
+                                    <div className="card border-primary">
+                                        <div className="card-header secondary-bg text-black">
+                                            Discipline
                                         </div>
-
-                                        <div className="form-group">
-                                            <label htmlFor="category">
-                                                Category
-                                            </label>
-                                            <Select
-                                                className="basic-single form-shadow"
-                                                isSearchable={true}
-                                                name="category"
-                                                options={this.state.category.map(
-                                                    function (list) {
-                                                        return {
-                                                            value: list.code,
-                                                            label: list.title,
-                                                        };
-                                                    }
-                                                )}
-                                                value={
-                                                    this.state.selectedCategory
-                                                        .label !== ""
-                                                        ? this.state
-                                                              .selectedCategory
-                                                        : {
-                                                              label: "Select category",
-                                                              value: "",
-                                                          }
+                                        <div className="card-body">
+                                            {this.state.discipline.length !==
+                                            0 ? (
+                                                Object.values(
+                                                    this.state.discipline
+                                                ).map((list, index) => {
+                                                    return (
+                                                        <div key={index}>
+                                                            <p className="mb-2">
+                                                                {list}
+                                                            </p>
+                                                            <div className="dropdown-divider"></div>
+                                                        </div>
+                                                    );
+                                                })
+                                            ) : (
+                                                <p>Data not available</p>
+                                            )}
+                                            <button
+                                                className="btn btn-light btn-sm btn-block border-secondary shadow-none"
+                                                onClick={() =>
+                                                    this.toggleModal(
+                                                        "discipline"
+                                                    )
                                                 }
-                                                isDisabled={
-                                                    this.state.activeType ===
-                                                    "category"
-                                                        ? false
-                                                        : true
-                                                }
-                                                onChange={this.handleCategory}
-                                                required
-                                            />
+                                            >
+                                                Add +
+                                            </button>
                                         </div>
-
-                                        <button
-                                            className="btn btn-light btn-sm btn-block border-secondary shadow-none mb-2"
-                                            onClick={() =>
-                                                this.toggleModal("category")
-                                            }
-                                            disabled={
-                                                this.state.activeType ===
-                                                "category"
-                                                    ? false
-                                                    : true
-                                            }
-                                        >
-                                            Add +
-                                        </button>
-
-                                        <div className="form-group">
-                                            <label htmlFor="select3">
-                                                Sub Category
-                                            </label>
-                                            <Select
-                                                className="basic-single form-shadow"
-                                                isSearchable={true}
-                                                name="subcategory"
-                                                isLoading={
-                                                    this.state
-                                                        .subcategory_loading
-                                                        ? true
-                                                        : false
-                                                }
-                                                options={this.state.subcategory.map(
-                                                    function (list) {
-                                                        return {
-                                                            value: list.code,
-                                                            label: list.title,
-                                                        };
-                                                    }
-                                                )}
-                                                value={
-                                                    this.state
-                                                        .selectedSubcategory
-                                                        .label !== ""
-                                                        ? this.state
-                                                              .selectedSubcategory
-                                                        : {
-                                                              label: "Select subcategory",
-                                                              value: "",
-                                                          }
-                                                }
-                                                isDisabled={
-                                                    this.state.selectedCategory
-                                                        .value === ""
-                                                        ? true
-                                                        : false
-                                                }
-                                                onChange={
-                                                    this.handleSubcategory
-                                                }
-                                                required
-                                            />
+                                    </div>
+                                </div>
+                                <div className="col-md-4 mb-3 mb-md-0">
+                                    <div className="card border-primary">
+                                        <div className="card-header secondary-bg text-black">
+                                            Level
                                         </div>
-
-                                        <button
-                                            className="btn btn-light btn-sm btn-block border-secondary shadow-none"
-                                            onClick={() =>
-                                                this.toggleModal("sub_category")
-                                            }
-                                            disabled={
-                                                this.state.selectedCategory
-                                                    .value === ""
-                                                    ? true
-                                                    : false
-                                            }
-                                        >
-                                            Add +
-                                        </button>
+                                        <div className="card-body">
+                                            {this.state.levels.length !== 0 ? (
+                                                Object.values(
+                                                    this.state.levels
+                                                ).map((list, index) => {
+                                                    return (
+                                                        <div key={index}>
+                                                            <p className="mb-2">
+                                                                {list}
+                                                            </p>
+                                                            <div className="dropdown-divider"></div>
+                                                        </div>
+                                                    );
+                                                })
+                                            ) : (
+                                                <p>Data not available</p>
+                                            )}
+                                            <button
+                                                className="btn btn-light btn-sm btn-block border-secondary shadow-none"
+                                                onClick={() =>
+                                                    this.toggleModal("level")
+                                                }
+                                            >
+                                                Add +
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-md-4">
+                                    <div className="card border-primary">
+                                        <div className="card-header secondary-bg text-black">
+                                            Subject
+                                        </div>
+                                        <div className="card-body">
+                                            {this.state.subjects.length !==
+                                            0 ? (
+                                                Object.values(
+                                                    this.state.subjects
+                                                ).map((list, index) => {
+                                                    return (
+                                                        <div key={index}>
+                                                            <p className="mb-2">
+                                                                {list}
+                                                            </p>
+                                                            <div className="dropdown-divider"></div>
+                                                        </div>
+                                                    );
+                                                })
+                                            ) : (
+                                                <p>Data not available</p>
+                                            )}
+                                            <button
+                                                className="btn btn-light btn-sm btn-block border-secondary shadow-none"
+                                                onClick={() =>
+                                                    this.toggleModal("subject")
+                                                }
+                                            >
+                                                Add +
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+                        ) : (
+                            ""
+                        )}
 
-                            <div className="col-md-9">
-                                {/* ----- Category Data ----- */}
-                                {this.state.activeType === "category" &&
-                                this.state.selectedCategory.value !== "" &&
-                                this.state.selectedSubcategory.value !== "" ? (
-                                    <div className="row">
-                                        <div className="col-md-4 mb-3 mb-md-0">
-                                            <div className="card border-primary">
-                                                <div className="card-header secondary-bg text-black">
-                                                    Discipline
-                                                </div>
-                                                <div className="card-body">
-                                                    {this.state.discipline
-                                                        .length !== 0 ? (
-                                                        Object.values(
-                                                            this.state
-                                                                .discipline
-                                                        ).map((list, index) => {
-                                                            return (
-                                                                <div
-                                                                    key={index}
-                                                                >
-                                                                    <p className="mb-2">
-                                                                        {list}
-                                                                    </p>
-                                                                    <div className="dropdown-divider"></div>
-                                                                </div>
-                                                            );
-                                                        })
-                                                    ) : (
-                                                        <p>
-                                                            Data not available
-                                                        </p>
-                                                    )}
-                                                    <button
-                                                        className="btn btn-light btn-sm btn-block border-secondary shadow-none"
-                                                        onClick={() =>
-                                                            this.toggleModal(
-                                                                "discipline"
-                                                            )
-                                                        }
-                                                    >
-                                                        Add +
-                                                    </button>
-                                                </div>
-                                            </div>
+                        {/* ----- Board Data ----- */}
+                        {this.state.activeType === "board" ? (
+                            <div className="row">
+                                <div className="col-md-4 mb-3 mb-md-0">
+                                    <div className="card border-primary">
+                                        <div className="card-header secondary-bg text-black text-center">
+                                            Board / University
                                         </div>
-                                        <div className="col-md-4 mb-3 mb-md-0">
-                                            <div className="card border-primary">
-                                                <div className="card-header secondary-bg text-black">
-                                                    Level
-                                                </div>
-                                                <div className="card-body">
-                                                    {this.state.levels
-                                                        .length !== 0 ? (
-                                                        Object.values(
-                                                            this.state.levels
-                                                        ).map((list, index) => {
-                                                            return (
-                                                                <div
-                                                                    key={index}
-                                                                >
-                                                                    <p className="mb-2">
-                                                                        {list}
-                                                                    </p>
-                                                                    <div className="dropdown-divider"></div>
-                                                                </div>
-                                                            );
-                                                        })
-                                                    ) : (
-                                                        <p>
-                                                            Data not available
-                                                        </p>
-                                                    )}
-                                                    <button
-                                                        className="btn btn-light btn-sm btn-block border-secondary shadow-none"
-                                                        onClick={() =>
-                                                            this.toggleModal(
-                                                                "level"
-                                                            )
-                                                        }
-                                                    >
-                                                        Add +
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="col-md-4">
-                                            <div className="card border-primary">
-                                                <div className="card-header secondary-bg text-black">
-                                                    Subject
-                                                </div>
-                                                <div className="card-body">
-                                                    {this.state.subjects
-                                                        .length !== 0 ? (
-                                                        Object.values(
-                                                            this.state.subjects
-                                                        ).map((list, index) => {
-                                                            return (
-                                                                <div
-                                                                    key={index}
-                                                                >
-                                                                    <p className="mb-2">
-                                                                        {list}
-                                                                    </p>
-                                                                    <div className="dropdown-divider"></div>
-                                                                </div>
-                                                            );
-                                                        })
-                                                    ) : (
-                                                        <p>
-                                                            Data not available
-                                                        </p>
-                                                    )}
-                                                    <button
-                                                        className="btn btn-light btn-sm btn-block border-secondary shadow-none"
-                                                        onClick={() =>
-                                                            this.toggleModal(
-                                                                "subject"
-                                                            )
-                                                        }
-                                                    >
-                                                        Add +
-                                                    </button>
-                                                </div>
-                                            </div>
+                                        <div className="card-body">
+                                            {this.state.board.length !== 0 ? (
+                                                this.state.board.map(
+                                                    (list, index) => {
+                                                        return (
+                                                            <div key={index}>
+                                                                <p className="mb-2">
+                                                                    {list.title}
+                                                                </p>
+                                                                <div className="dropdown-divider"></div>
+                                                            </div>
+                                                        );
+                                                    }
+                                                )
+                                            ) : (
+                                                <p>Data not available</p>
+                                            )}
+                                            <button
+                                                className="btn btn-light btn-sm btn-block border-secondary shadow-none"
+                                                onClick={() =>
+                                                    this.toggleModal("board")
+                                                }
+                                            >
+                                                Add +
+                                            </button>
                                         </div>
                                     </div>
-                                ) : (
-                                    ""
-                                )}
-
-                                {/* ----- Board Data ----- */}
-                                {this.state.activeType === "board" ? (
-                                    <div className="row">
-                                        <div className="col-md-4 mb-3 mb-md-0">
-                                            <div className="card border-primary">
-                                                <div className="card-header secondary-bg text-black text-center">
-                                                    Board / University
-                                                </div>
-                                                <div className="card-body">
-                                                    {this.state.board.length !==
-                                                    0 ? (
-                                                        this.state.board.map(
-                                                            (list, index) => {
-                                                                return (
-                                                                    <div
-                                                                        key={
-                                                                            index
-                                                                        }
-                                                                    >
-                                                                        <p className="mb-2">
-                                                                            {
-                                                                                list.title
-                                                                            }
-                                                                        </p>
-                                                                        <div className="dropdown-divider"></div>
-                                                                    </div>
-                                                                );
-                                                            }
-                                                        )
-                                                    ) : (
-                                                        <p>
-                                                            Data not available
-                                                        </p>
-                                                    )}
-                                                    <button
-                                                        className="btn btn-light btn-sm btn-block border-secondary shadow-none"
-                                                        onClick={() =>
-                                                            this.toggleModal(
-                                                                "board"
-                                                            )
-                                                        }
-                                                    >
-                                                        Add +
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    ""
-                                )}
-
-                                {/* ----- Type Data ----- */}
-                                {this.state.activeType === "types" ? (
-                                    <div className="row">
-                                        <div className="col-md-4 mb-3 mb-md-0">
-                                            <div className="card border-primary">
-                                                <div className="card-header primary-bg text-white text-center font-weight-bold">
-                                                    Course
-                                                </div>
-                                                <div className="card-body">
-                                                    {this.state.type.length !==
-                                                    0 ? (
-                                                        this.state.type.map(
-                                                            (list, index) => {
-                                                                return (
-                                                                    <div
-                                                                        key={
-                                                                            index
-                                                                        }
-                                                                    >
-                                                                        <p className="mb-2">
-                                                                            {
-                                                                                list.title
-                                                                            }
-                                                                        </p>
-                                                                        <div className="dropdown-divider"></div>
-                                                                    </div>
-                                                                );
-                                                            }
-                                                        )
-                                                    ) : (
-                                                        <p>
-                                                            Data not available
-                                                        </p>
-                                                    )}
-                                                    <button
-                                                        className="btn btn-light btn-sm btn-block border-secondary shadow-none"
-                                                        onClick={() =>
-                                                            this.toggleModal(
-                                                                "course"
-                                                            )
-                                                        }
-                                                    >
-                                                        Add +
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    ""
-                                )}
+                                </div>
                             </div>
-                        </div>
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
+                        ) : (
+                            ""
+                        )}
+
+                        {/* ----- Type Data ----- */}
+                        {this.state.activeType === "types" ? (
+                            <div className="row">
+                                <div className="col-md-4 mb-3 mb-md-0">
+                                    <div className="card border-primary">
+                                        <div className="card-header primary-bg text-white text-center font-weight-bold">
+                                            Course
+                                        </div>
+                                        <div className="card-body">
+                                            {this.state.type.length !== 0 ? (
+                                                this.state.type.map(
+                                                    (list, index) => {
+                                                        return (
+                                                            <div key={index}>
+                                                                <p className="mb-2">
+                                                                    {list.title}
+                                                                </p>
+                                                                <div className="dropdown-divider"></div>
+                                                            </div>
+                                                        );
+                                                    }
+                                                )
+                                            ) : (
+                                                <p>Data not available</p>
+                                            )}
+                                            <button
+                                                className="btn btn-light btn-sm btn-block border-secondary shadow-none"
+                                                onClick={() =>
+                                                    this.toggleModal("course")
+                                                }
+                                            >
+                                                Add +
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            ""
+                        )}
                     </div>
                 </div>
-            </div>
+            </Wrapper>
         );
     }
 }

@@ -213,7 +213,7 @@ class TeacherChapters extends Component {
                     });
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -221,6 +221,11 @@ class TeacherChapters extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -244,7 +249,7 @@ class TeacherChapters extends Component {
                     });
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -252,6 +257,11 @@ class TeacherChapters extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -272,7 +282,7 @@ class TeacherChapters extends Component {
                     });
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -280,6 +290,11 @@ class TeacherChapters extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -315,7 +330,7 @@ class TeacherChapters extends Component {
                     );
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -323,6 +338,11 @@ class TeacherChapters extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
 
         this.loadTopicData();
@@ -751,16 +771,18 @@ class TeacherChapters extends Component {
             page_loading: true,
         });
 
-        fetch(
-            `${this.url}/teacher/subject/${this.subjectId}/chapter/publish/`,
-            {
-                method: "POST",
-                headers: this.headers,
-                body: JSON.stringify({
-                    chapter_id: this.state.chapterId,
-                }),
-            }
-        )
+        let URL =
+            this.groupId !== undefined
+                ? `${this.url}/teacher/subject/${this.subjectId}/chapter/publish/`
+                : `${this.url}/teacher/independent/subject/${this.subjectId}/chapter/publish/`;
+
+        fetch(URL, {
+            method: "POST",
+            headers: this.headers,
+            body: JSON.stringify({
+                chapter_id: this.state.chapterId,
+            }),
+        })
             .then((res) => res.json())
             .then((result) => {
                 if (result.sts === true) {
@@ -777,7 +799,14 @@ class TeacherChapters extends Component {
                     });
                 }
             })
-            .catch((err) => console.log(err));
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
+            });
     };
 
     dispatchTopic = (data) => {
@@ -1096,18 +1125,16 @@ class TeacherChapters extends Component {
                                     required
                                 />
                             </div>
-                            {this.groupId === undefined ? (
-                                <div className="col-md-8 text-right">
-                                    <button
-                                        className="btn btn-primary btn-sm shadow-none"
-                                        onClick={this.handlePublish}
-                                    >
-                                        Publish
-                                    </button>
-                                </div>
-                            ) : (
-                                ""
-                            )}
+                            <div className="col-md-8 text-right">
+                                <button
+                                    className="btn btn-primary btn-sm shadow-none"
+                                    onClick={this.handlePublish}
+                                >
+                                    {this.groupId !== undefined
+                                        ? "Publish to Group"
+                                        : "Publish to HOD"}
+                                </button>
+                            </div>
                         </div>
 
                         {/* Course details */}

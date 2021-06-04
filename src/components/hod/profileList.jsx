@@ -4,7 +4,7 @@ import SideNav from "./shared/sidenav";
 import { Link } from "react-router-dom";
 import { Tabs, Tab, Dropdown, Modal, Spinner, Alert } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
-import { paginationCount } from "../../shared/globalValues.js";
+import { paginationCount } from "../../shared/constant.js";
 import Loading from "../common/loader";
 import TeacherTable from "../table/teacher";
 import StudentTable from "../table/student";
@@ -85,6 +85,11 @@ class AddStudentModal extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    showLoader: false,
+                });
             });
     };
 
@@ -366,6 +371,11 @@ class AddTeacherModal extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    showLoader: false,
+                });
             });
     };
 
@@ -619,6 +629,11 @@ class TeacherDeleteModal extends Component {
                 })
                 .catch((err) => {
                     console.log(err);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
                 });
         } else {
             alert("Please select a teacher to delete");
@@ -782,7 +797,7 @@ class HODTeacherStudentList extends Component {
                     });
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -790,6 +805,11 @@ class HODTeacherStudentList extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -811,7 +831,7 @@ class HODTeacherStudentList extends Component {
                     });
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -819,6 +839,11 @@ class HODTeacherStudentList extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 

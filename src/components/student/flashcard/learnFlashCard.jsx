@@ -136,7 +136,7 @@ class FlashCard extends Component {
                     }
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -144,6 +144,11 @@ class FlashCard extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
         window.MathJax.typeset();
     };
@@ -381,7 +386,7 @@ class FlashCard extends Component {
                     }
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -389,6 +394,11 @@ class FlashCard extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
         window.MathJax.typeset();
     };
@@ -446,7 +456,7 @@ class FlashCard extends Component {
                     }
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -454,6 +464,11 @@ class FlashCard extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
         window.MathJax.typeset();
     };
@@ -700,74 +715,67 @@ class FlashCard extends Component {
                                                         top: "10px",
                                                     }}
                                                 >
-                                                    {data[index] &&
-                                                    data[index].content &&
-                                                    data[index].content.audio
-                                                        ? data[index].content
-                                                              .audio.length !==
-                                                          0
-                                                            ? data[
-                                                                  index
-                                                              ].content.audio.map(
-                                                                  (
-                                                                      audio,
-                                                                      audio_index
-                                                                  ) => {
-                                                                      return audio.path !==
-                                                                          "" ? (
-                                                                          <OverlayTrigger
-                                                                              trigger="click"
-                                                                              rootClose
-                                                                              key={`popover${audio_index}`}
-                                                                              placement="bottom"
-                                                                              overlay={
-                                                                                  <Popover
-                                                                                      id={`popover-positioned-bottom${audio_index}`}
-                                                                                  >
-                                                                                      {audio.title !==
-                                                                                      "" ? (
-                                                                                          <Popover.Title>
-                                                                                              {
-                                                                                                  audio.title
-                                                                                              }
-                                                                                          </Popover.Title>
-                                                                                      ) : (
-                                                                                          ""
-                                                                                      )}
-                                                                                      <Popover.Content
-                                                                                          style={{
-                                                                                              overflow:
-                                                                                                  "auto",
-                                                                                          }}
-                                                                                      >
-                                                                                          <audio
-                                                                                              src={
-                                                                                                  audio.path
-                                                                                              }
-                                                                                              autoPlay
-                                                                                              controls
-                                                                                              controlsList="nodownload"
-                                                                                          ></audio>
-                                                                                      </Popover.Content>
-                                                                                  </Popover>
-                                                                              }
-                                                                          >
-                                                                              <button
-                                                                                  className="btn btn-primary btn-sm rounded-circle mr-2 shadow-none"
-                                                                                  key={
-                                                                                      audio_index
-                                                                                  }
-                                                                              >
-                                                                                  <i className="fas fa-volume-up buttton fa-sm"></i>
-                                                                              </button>
-                                                                          </OverlayTrigger>
-                                                                      ) : (
-                                                                          ""
-                                                                      );
-                                                                  }
-                                                              )
-                                                            : ""
-                                                        : ""}
+                                                    {(
+                                                        data[index].content
+                                                            .audio || []
+                                                    ).map(
+                                                        (
+                                                            audio,
+                                                            audio_index
+                                                        ) => {
+                                                            return audio.path !==
+                                                                "" ? (
+                                                                <OverlayTrigger
+                                                                    trigger="click"
+                                                                    rootClose
+                                                                    key={`popover${audio_index}`}
+                                                                    placement="bottom"
+                                                                    overlay={
+                                                                        <Popover
+                                                                            id={`popover-positioned-bottom${audio_index}`}
+                                                                        >
+                                                                            {audio.title !==
+                                                                            "" ? (
+                                                                                <Popover.Title>
+                                                                                    {
+                                                                                        audio.title
+                                                                                    }
+                                                                                </Popover.Title>
+                                                                            ) : (
+                                                                                ""
+                                                                            )}
+                                                                            <Popover.Content
+                                                                                style={{
+                                                                                    overflow:
+                                                                                        "auto",
+                                                                                }}
+                                                                            >
+                                                                                <audio
+                                                                                    src={
+                                                                                        audio.path
+                                                                                    }
+                                                                                    autoPlay
+                                                                                    controls
+                                                                                    controlsList="nodownload"
+                                                                                ></audio>
+                                                                            </Popover.Content>
+                                                                        </Popover>
+                                                                    }
+                                                                >
+                                                                    <button
+                                                                        className="btn btn-primary btn-sm rounded-circle mr-2 shadow-none"
+                                                                        key={
+                                                                            audio_index
+                                                                        }
+                                                                    >
+                                                                        <i className="fas fa-volume-up buttton fa-sm"></i>
+                                                                    </button>
+                                                                </OverlayTrigger>
+                                                            ) : (
+                                                                ""
+                                                            );
+                                                        }
+                                                    )}
                                                 </div>
                                             </div>
                                             {/* ----- show answer ----- */}
@@ -784,53 +792,50 @@ class FlashCard extends Component {
                                                         </p>
                                                         {explanation.answer ===
                                                         false
-                                                            ? explanation.answers !==
-                                                                  undefined &&
-                                                              explanation
-                                                                  .answers
-                                                                  .length !== 0
-                                                                ? explanation.answers.map(
-                                                                      (
-                                                                          data,
-                                                                          index
-                                                                      ) => {
-                                                                          return (
-                                                                              <p
-                                                                                  className="small mb-2"
-                                                                                  key={
-                                                                                      index
-                                                                                  }
-                                                                                  dangerouslySetInnerHTML={{
-                                                                                      __html: data,
-                                                                                  }}
-                                                                              ></p>
-                                                                          );
-                                                                      }
-                                                                  )
-                                                                : ""
+                                                            ? (
+                                                                  explanation.answers ||
+                                                                  []
+                                                              ).map(
+                                                                  (
+                                                                      data,
+                                                                      index
+                                                                  ) => {
+                                                                      return (
+                                                                          <p
+                                                                              className="small mb-2"
+                                                                              key={
+                                                                                  index
+                                                                              }
+                                                                              dangerouslySetInnerHTML={{
+                                                                                  __html: data,
+                                                                              }}
+                                                                          ></p>
+                                                                      );
+                                                                  }
+                                                              )
                                                             : section.length !==
                                                               0
-                                                            ? section.answers
-                                                                  .length !== 0
-                                                                ? section.answers.map(
-                                                                      (
-                                                                          data,
-                                                                          index
-                                                                      ) => {
-                                                                          return (
-                                                                              <p
-                                                                                  className="small mb-2"
-                                                                                  key={
-                                                                                      index
-                                                                                  }
-                                                                                  dangerouslySetInnerHTML={{
-                                                                                      __html: data,
-                                                                                  }}
-                                                                              ></p>
-                                                                          );
-                                                                      }
-                                                                  )
-                                                                : ""
+                                                            ? (
+                                                                  section.answers ||
+                                                                  []
+                                                              ).map(
+                                                                  (
+                                                                      data,
+                                                                      index
+                                                                  ) => {
+                                                                      return (
+                                                                          <p
+                                                                              className="small mb-2"
+                                                                              key={
+                                                                                  index
+                                                                              }
+                                                                              dangerouslySetInnerHTML={{
+                                                                                  __html: data,
+                                                                              }}
+                                                                          ></p>
+                                                                      );
+                                                                  }
+                                                              )
                                                             : ""}
                                                     </div>
                                                 </div>
@@ -847,32 +852,27 @@ class FlashCard extends Component {
                                                             <p className="font-weight-bold-600 mb-2">
                                                                 Your answer(s):
                                                             </p>
-                                                            {section.length !==
-                                                            0
-                                                                ? section
-                                                                      .answers
-                                                                      .length !==
-                                                                  0
-                                                                    ? section.answers.map(
-                                                                          (
-                                                                              data,
-                                                                              index
-                                                                          ) => {
-                                                                              return (
-                                                                                  <p
-                                                                                      className="small mb-2"
-                                                                                      key={
-                                                                                          index
-                                                                                      }
-                                                                                      dangerouslySetInnerHTML={{
-                                                                                          __html: data,
-                                                                                      }}
-                                                                                  ></p>
-                                                                              );
-                                                                          }
-                                                                      )
-                                                                    : ""
-                                                                : ""}
+                                                            {(
+                                                                section.answers ||
+                                                                []
+                                                            ).map(
+                                                                (
+                                                                    data,
+                                                                    index
+                                                                ) => {
+                                                                    return (
+                                                                        <p
+                                                                            className="small mb-2"
+                                                                            key={
+                                                                                index
+                                                                            }
+                                                                            dangerouslySetInnerHTML={{
+                                                                                __html: data,
+                                                                            }}
+                                                                        ></p>
+                                                                    );
+                                                                }
+                                                            )}
                                                         </div>
                                                     </div>
                                                 ) : (
@@ -886,9 +886,10 @@ class FlashCard extends Component {
                                             <div className="col-md-6">
                                                 {data[index].content.mcq ===
                                                 true ? (
-                                                    data[
-                                                        index
-                                                    ].content.options.map(
+                                                    (
+                                                        data[index].content
+                                                            .options || []
+                                                    ).map(
                                                         (
                                                             option,
                                                             option_index
@@ -1003,9 +1004,11 @@ class FlashCard extends Component {
                                                 ) : // ---------- True or False ----------
                                                 data[index].content.boolean ===
                                                   true ? (
-                                                    data[
-                                                        index
-                                                    ].content.boolean_question.map(
+                                                    (
+                                                        data[index].content
+                                                            .boolean_question ||
+                                                        []
+                                                    ).map(
                                                         (
                                                             option,
                                                             boolean_index
@@ -1310,33 +1313,37 @@ class FlashCard extends Component {
                                     </div>
                                 ) : (
                                     <>
-                                        {section.answers.map((data, index) => {
-                                            return data.answers.length !== 0 ? (
-                                                <div
-                                                    className={`card shadow-sm mb-2 ${
-                                                        explanation.isAnswered ===
-                                                        true
-                                                            ? explanation
-                                                                  .sub_question[
-                                                                  index
-                                                              ].answer === false
-                                                                ? "danger-bg"
-                                                                : "success-bg"
-                                                            : "pinkrange-bg primary-text"
-                                                    }`}
-                                                    key={index}
-                                                >
+                                        {(section.answers || []).map(
+                                            (data, index) => {
+                                                return data.answers.length !==
+                                                    0 ? (
                                                     <div
-                                                        className="card-body small font-weight-bold-600 pt-3 pb-0"
-                                                        dangerouslySetInnerHTML={{
-                                                            __html: `<div class="mb-3">${data.answers[0]}</div>`,
-                                                        }}
-                                                    ></div>
-                                                </div>
-                                            ) : (
-                                                ""
-                                            );
-                                        })}
+                                                        className={`card shadow-sm mb-2 ${
+                                                            explanation.isAnswered ===
+                                                            true
+                                                                ? explanation
+                                                                      .sub_question[
+                                                                      index
+                                                                  ].answer ===
+                                                                  false
+                                                                    ? "danger-bg"
+                                                                    : "success-bg"
+                                                                : "pinkrange-bg primary-text"
+                                                        }`}
+                                                        key={index}
+                                                    >
+                                                        <div
+                                                            className="card-body small font-weight-bold-600 pt-3 pb-0"
+                                                            dangerouslySetInnerHTML={{
+                                                                __html: `<div class="mb-3">${data.answers[0]}</div>`,
+                                                            }}
+                                                        ></div>
+                                                    </div>
+                                                ) : (
+                                                    ""
+                                                );
+                                            }
+                                        )}
                                         {/* ----- Check button ----- */}
                                         {answerCount ===
                                         this.state.totalSubQuestion[index] ? (
@@ -1390,73 +1397,58 @@ class FlashCard extends Component {
                                             className="position-absolute"
                                             style={{ right: 0, top: "10px" }}
                                         >
-                                            {data[index] &&
-                                            data[index].content &&
-                                            data[index].content.audio
-                                                ? data[index].content.audio
-                                                      .length !== 0
-                                                    ? data[
-                                                          index
-                                                      ].content.audio.map(
-                                                          (
-                                                              audio,
-                                                              audio_index
-                                                          ) => {
-                                                              return audio.path !==
-                                                                  "" ? (
-                                                                  <OverlayTrigger
-                                                                      trigger="click"
-                                                                      rootClose
-                                                                      key={`popover${audio_index}`}
-                                                                      placement="bottom"
-                                                                      overlay={
-                                                                          <Popover
-                                                                              id={`popover-positioned-bottom${audio_index}`}
-                                                                          >
-                                                                              {audio.title !==
-                                                                              "" ? (
-                                                                                  <Popover.Title>
-                                                                                      {
-                                                                                          audio.title
-                                                                                      }
-                                                                                  </Popover.Title>
-                                                                              ) : (
-                                                                                  ""
-                                                                              )}
-                                                                              <Popover.Content
-                                                                                  style={{
-                                                                                      overflow:
-                                                                                          "auto",
-                                                                                  }}
-                                                                              >
-                                                                                  <audio
-                                                                                      src={
-                                                                                          audio.path
-                                                                                      }
-                                                                                      autoPlay
-                                                                                      controls
-                                                                                      controlsList="nodownload"
-                                                                                  ></audio>
-                                                                              </Popover.Content>
-                                                                          </Popover>
-                                                                      }
-                                                                  >
-                                                                      <button
-                                                                          className="btn btn-primary btn-sm rounded-circle mr-2 shadow-none"
-                                                                          key={
-                                                                              audio_index
-                                                                          }
-                                                                      >
-                                                                          <i className="fas fa-volume-up buttton fa-sm"></i>
-                                                                      </button>
-                                                                  </OverlayTrigger>
-                                                              ) : (
-                                                                  ""
-                                                              );
-                                                          }
-                                                      )
-                                                    : ""
-                                                : ""}
+                                            {(
+                                                data[index].content.audio || []
+                                            ).map((audio, audio_index) => {
+                                                return audio.path !== "" ? (
+                                                    <OverlayTrigger
+                                                        trigger="click"
+                                                        rootClose
+                                                        key={`popover${audio_index}`}
+                                                        placement="bottom"
+                                                        overlay={
+                                                            <Popover
+                                                                id={`popover-positioned-bottom${audio_index}`}
+                                                            >
+                                                                {audio.title !==
+                                                                "" ? (
+                                                                    <Popover.Title>
+                                                                        {
+                                                                            audio.title
+                                                                        }
+                                                                    </Popover.Title>
+                                                                ) : (
+                                                                    ""
+                                                                )}
+                                                                <Popover.Content
+                                                                    style={{
+                                                                        overflow:
+                                                                            "auto",
+                                                                    }}
+                                                                >
+                                                                    <audio
+                                                                        src={
+                                                                            audio.path
+                                                                        }
+                                                                        autoPlay
+                                                                        controls
+                                                                        controlsList="nodownload"
+                                                                    ></audio>
+                                                                </Popover.Content>
+                                                            </Popover>
+                                                        }
+                                                    >
+                                                        <button
+                                                            className="btn btn-primary btn-sm rounded-circle mr-2 shadow-none"
+                                                            key={audio_index}
+                                                        >
+                                                            <i className="fas fa-volume-up buttton fa-sm"></i>
+                                                        </button>
+                                                    </OverlayTrigger>
+                                                ) : (
+                                                    ""
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 ) : (
@@ -1490,12 +1482,14 @@ class FlashCard extends Component {
                                                     index
                                                 ]
                                             ].mcq
-                                                ? data[index].sub_question[
-                                                      this.state
-                                                          .currentSubQuestionIndex[
-                                                          index
-                                                      ]
-                                                  ].options.map(
+                                                ? (
+                                                      data[index].sub_question[
+                                                          this.state
+                                                              .currentSubQuestionIndex[
+                                                              index
+                                                          ]
+                                                      ].options || []
+                                                  ).map(
                                                       (
                                                           options,
                                                           option_index
@@ -1699,9 +1693,7 @@ class FlashCard extends Component {
                         });
                     } else {
                         this.setState({
-                            errorMsg: result.detail
-                                ? result.detail
-                                : result.msg,
+                            errorMsg: result.msg,
                             showErrorAlert: true,
                             page_loading: false,
                         });
@@ -1709,6 +1701,11 @@ class FlashCard extends Component {
                 })
                 .catch((err) => {
                     console.log(err);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
                 });
         } else if (type === "type_2") {
             await fetch(
@@ -1739,9 +1736,7 @@ class FlashCard extends Component {
                         });
                     } else {
                         this.setState({
-                            errorMsg: result.detail
-                                ? result.detail
-                                : result.msg,
+                            errorMsg: result.msg,
                             showErrorAlert: true,
                             page_loading: false,
                         });
@@ -1749,6 +1744,11 @@ class FlashCard extends Component {
                 })
                 .catch((err) => {
                     console.log(err);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
                 });
         }
         window.MathJax.typeset();
@@ -1892,7 +1892,7 @@ class FlashCard extends Component {
                     );
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -1900,6 +1900,11 @@ class FlashCard extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
         window.MathJax.typeset();
     };
@@ -2037,10 +2042,10 @@ class FlashCard extends Component {
             </div>
         ) : (
             <div className="row">
-                {this.state.match_temp.map((data, index) => {
+                {(this.state.match_temp || []).map((data, index) => {
                     return (
                         <div className="col-lg-3 col-md-4 col-6" key={index}>
-                            {data.map((item, index) => {
+                            {(data || []).map((item, index) => {
                                 return (
                                     <div
                                         className={`card card-body shadow-sm mb-3 ${
@@ -2217,29 +2222,24 @@ class FlashCard extends Component {
     imageRender = (data) => {
         return (
             <>
-                {data.content.images.length !== 0
-                    ? data.content.images.map((images, index) => {
-                          return images.path !== "" ? (
-                              <div
-                                  key={index}
-                                  className="card preview-img-circle shadow-sm"
-                                  style={{
-                                      backgroundImage: `url(${images.path})`,
-                                  }}
-                                  onClick={(e) => {
-                                      this.changeImage(
-                                          data.content.images,
-                                          index
-                                      );
-                                      e.stopPropagation();
-                                      this.pauseSlideshow();
-                                  }}
-                              ></div>
-                          ) : (
-                              ""
-                          );
-                      })
-                    : ""}
+                {(data.content.images || []).map((images, index) => {
+                    return images.path !== "" ? (
+                        <div
+                            key={index}
+                            className="card preview-img-circle shadow-sm"
+                            style={{
+                                backgroundImage: `url(${images.path})`,
+                            }}
+                            onClick={(e) => {
+                                this.changeImage(data.content.images, index);
+                                e.stopPropagation();
+                                this.pauseSlideshow();
+                            }}
+                        ></div>
+                    ) : (
+                        ""
+                    );
+                })}
                 {data.content.video.path !== "" ? (
                     <OverlayTrigger
                         key="top5"
@@ -2673,73 +2673,62 @@ class FlashCard extends Component {
                                     )}
 
                                     {this.state.activeTab === "concept"
-                                        ? data[index] !== undefined &&
-                                          data[index].content !== undefined &&
-                                          data[index].content.audio !==
-                                              undefined
-                                            ? data[index].content.audio
-                                                  .length !== 0
-                                                ? data[index].content.audio.map(
-                                                      (audio, audio_index) => {
-                                                          return audio.path !==
-                                                              "" ? (
-                                                              <OverlayTrigger
-                                                                  trigger="click"
-                                                                  rootClose
-                                                                  key={`popover${audio_index}`}
-                                                                  placement="bottom"
-                                                                  overlay={
-                                                                      <Popover
-                                                                          id={`popover-positioned-bottom${audio_index}`}
-                                                                      >
-                                                                          {audio.title !==
-                                                                          "" ? (
-                                                                              <Popover.Title>
-                                                                                  {
-                                                                                      audio.title
-                                                                                  }
-                                                                              </Popover.Title>
-                                                                          ) : (
-                                                                              ""
-                                                                          )}
-                                                                          <Popover.Content
-                                                                              style={{
-                                                                                  overflow:
-                                                                                      "auto",
-                                                                              }}
-                                                                          >
-                                                                              <audio
-                                                                                  src={
-                                                                                      audio.path
-                                                                                  }
-                                                                                  autoPlay
-                                                                                  controls
-                                                                                  controlsList="nodownload"
-                                                                              ></audio>
-                                                                          </Popover.Content>
-                                                                      </Popover>
-                                                                  }
+                                        ? (data[index].content.audio || []).map(
+                                              (audio, audio_index) => {
+                                                  return audio.path !== "" ? (
+                                                      <OverlayTrigger
+                                                          trigger="click"
+                                                          rootClose
+                                                          key={`popover${audio_index}`}
+                                                          placement="bottom"
+                                                          overlay={
+                                                              <Popover
+                                                                  id={`popover-positioned-bottom${audio_index}`}
                                                               >
-                                                                  <button
-                                                                      className="btn btn-primary btn-sm rounded-circle ml-3 shadow-none"
-                                                                      onClick={
-                                                                          this
-                                                                              .pauseSlideshow
-                                                                      }
-                                                                      key={
-                                                                          audio_index
-                                                                      }
+                                                                  {audio.title !==
+                                                                  "" ? (
+                                                                      <Popover.Title>
+                                                                          {
+                                                                              audio.title
+                                                                          }
+                                                                      </Popover.Title>
+                                                                  ) : (
+                                                                      ""
+                                                                  )}
+                                                                  <Popover.Content
+                                                                      style={{
+                                                                          overflow:
+                                                                              "auto",
+                                                                      }}
                                                                   >
-                                                                      <i className="fas fa-volume-up buttton fa-sm"></i>
-                                                                  </button>
-                                                              </OverlayTrigger>
-                                                          ) : (
-                                                              ""
-                                                          );
-                                                      }
-                                                  )
-                                                : ""
-                                            : ""
+                                                                      <audio
+                                                                          src={
+                                                                              audio.path
+                                                                          }
+                                                                          autoPlay
+                                                                          controls
+                                                                          controlsList="nodownload"
+                                                                      ></audio>
+                                                                  </Popover.Content>
+                                                              </Popover>
+                                                          }
+                                                      >
+                                                          <button
+                                                              className="btn btn-primary btn-sm rounded-circle ml-3 shadow-none"
+                                                              onClick={
+                                                                  this
+                                                                      .pauseSlideshow
+                                                              }
+                                                              key={audio_index}
+                                                          >
+                                                              <i className="fas fa-volume-up buttton fa-sm"></i>
+                                                          </button>
+                                                      </OverlayTrigger>
+                                                  ) : (
+                                                      ""
+                                                  );
+                                              }
+                                          )
                                         : ""}
                                 </div>
                             </div>

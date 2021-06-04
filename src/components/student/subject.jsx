@@ -473,24 +473,20 @@ const ChapterListRender = (props) => {
             >
                 <>
                     {/* ----- Topic list ----- */}
-                    {props.chapter.topics.map((topic, structure_index) => {
-                        return topic.chapter_structure.map(
-                            (topics, topic_index) => {
-                                return (
-                                    <Accordion key={topic_index}>
-                                        <TopicListRender
-                                            {...props}
-                                            topics={topics}
-                                            topic_index={topic_index}
-                                        />
-                                    </Accordion>
-                                );
-                            }
+                    {(props.chapter.topics || []).map((topics, topic_index) => {
+                        return (
+                            <Accordion key={topic_index}>
+                                <TopicListRender
+                                    {...props}
+                                    topics={topics}
+                                    topic_index={topic_index}
+                                />
+                            </Accordion>
                         );
                     })}
 
                     {/* ----- Cycle test list ----- */}
-                    {props.chapter.cycle_tests.map((cycle, cycle_index) => {
+                    {(props.chapter.cycle_tests || []).map((cycle, cycle_index) => {
                         return props.cycleTest(
                             cycle,
                             cycle_index,
@@ -673,7 +669,7 @@ class Subject extends Component {
                     });
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -681,6 +677,11 @@ class Subject extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -720,7 +721,7 @@ class Subject extends Component {
                     });
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -728,6 +729,11 @@ class Subject extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -807,7 +813,7 @@ class Subject extends Component {
                     });
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -815,6 +821,11 @@ class Subject extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -899,7 +910,7 @@ class Subject extends Component {
                     );
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -907,6 +918,11 @@ class Subject extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -933,7 +949,7 @@ class Subject extends Component {
                     );
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -941,6 +957,11 @@ class Subject extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -964,7 +985,7 @@ class Subject extends Component {
                     );
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -972,6 +993,11 @@ class Subject extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 

@@ -390,7 +390,7 @@ class QuizLevelExam extends Component {
                     );
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -398,6 +398,11 @@ class QuizLevelExam extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -691,7 +696,14 @@ class QuizLevelExam extends Component {
                         });
                     }
                 })
-                .catch((err) => console.log(err));
+                .catch((err) => {
+                    console.log(err);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                });
         }, 1000);
     };
 
@@ -823,7 +835,7 @@ class QuizLevelExam extends Component {
     imageRender = (data) => {
         return (
             <div className="ml-3">
-                {data.content.images.map((images, index) => {
+                {(data.content.images||[]).map((images, index) => {
                     return images.path !== "" ? (
                         <div
                             key={index}
@@ -969,7 +981,7 @@ class QuizLevelExam extends Component {
                                 >
                                     {/* ----- MCQ ----- */}
                                     {data[index].content.mcq === true
-                                        ? data[index].content.options.map(
+                                        ? (data[index].content.options||[]).map(
                                               (option, option_index) => {
                                                   return (
                                                       <div
@@ -1102,9 +1114,9 @@ class QuizLevelExam extends Component {
                                           )
                                         : // ----- True or false -----
                                         data[index].content.boolean === true
-                                        ? data[
+                                        ? (data[
                                               index
-                                          ].content.boolean_question.map(
+                                          ].content.boolean_question||[]).map(
                                               (option, boolean_index) => {
                                                   return (
                                                       <div
@@ -1403,7 +1415,7 @@ class QuizLevelExam extends Component {
                             <div className="row small">
                                 {/* ----- MCQ ----- */}
                                 {data[index].content.mcq === true
-                                    ? data[index].content.options.map(
+                                    ? (data[index].content.options||[]).map(
                                           (option, option_index) => {
                                               return (
                                                   <div
@@ -1440,7 +1452,7 @@ class QuizLevelExam extends Component {
                                       )
                                     : // ----- True or false -----
                                     data[index].content.boolean === true
-                                    ? data[index].content.boolean_question.map(
+                                    ? (data[index].content.boolean_question||[]).map(
                                           (option, boolean_index) => {
                                               return (
                                                   <div
@@ -1487,7 +1499,7 @@ class QuizLevelExam extends Component {
                     {/* ----- Pagination ----- */}
 
                     <div className="d-flex mt-auto align-items-center justify-content-center w-100">
-                        {this.state.answer.map((answer, index) => {
+                        {(this.state.answer||[]).map((answer, index) => {
                             return (
                                 <div
                                     key={index}

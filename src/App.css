@@ -431,7 +431,7 @@ input[type="search"]:focus {
     display: inline-block;
     left: 80.1%;
     position: absolute;
-    top: -9.7px;
+    top: -9.6px;
 }
 
 .dropdown-menu::after {
@@ -460,6 +460,11 @@ input[type="search"]:focus {
     left: -6.7%;
     transform: rotate(270deg);
     top: 13px;
+}
+
+/* menu down */
+.dropdown-menu-btn {
+    top: 10px !important;
 }
 
 /* -=-=-=-=-= Border =-=-=-=-=- */

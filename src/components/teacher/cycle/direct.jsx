@@ -112,7 +112,7 @@ class TeacherCyleTestDirect extends Component {
                     });
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         showLoader: false,
                     });
@@ -123,6 +123,11 @@ class TeacherCyleTestDirect extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -283,9 +288,7 @@ class TeacherCyleTestDirect extends Component {
                         );
                     } else if (result.data.sts === false) {
                         this.setState({
-                            errorMsg: result.data.detail
-                                ? result.data.detail
-                                : result.data.msg,
+                            errorMsg: result.data.msg,
                             showErrorAlert: true,
                             showLoader: false,
                         });
@@ -293,9 +296,7 @@ class TeacherCyleTestDirect extends Component {
                 })
                 .catch((err) => {
                     this.setState({
-                        errorMsg: err.response.data.detail
-                            ? err.response.data.detail
-                            : err.response.data.msg,
+                        errorMsg: err.response.data.msg,
                         showErrorAlert: true,
                         showLoader: false,
                     });
@@ -347,9 +348,7 @@ class TeacherCyleTestDirect extends Component {
                             );
                         } else if (result.data.sts === false) {
                             this.setState({
-                                errorMsg: result.data.detail
-                                    ? result.data.detail
-                                    : result.data.msg,
+                                errorMsg: result.data.msg,
                                 showErrorAlert: true,
                                 showLoader: false,
                             });
@@ -357,9 +356,7 @@ class TeacherCyleTestDirect extends Component {
                     })
                     .catch((err) => {
                         this.setState({
-                            errorMsg: err.response.data.detail
-                                ? err.response.data.detail
-                                : err.response.data.msg,
+                            errorMsg: err.response.data.msg,
                             showErrorAlert: true,
                             showLoader: false,
                         });
@@ -453,7 +450,14 @@ class TeacherCyleTestDirect extends Component {
                     });
                 }
             })
-            .catch((err) => console.log(err));
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
+            });
     };
 
     onDocumentLoadSuccess = ({ numPages }) => {
