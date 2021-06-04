@@ -82,12 +82,16 @@ class AdminLogin extends Component {
                             })
                             .catch((err) => {
                                 console.log(err);
+                                this.setState({
+                                    errorMsg: "Something went wrong!",
+                                    showErrorAlert: true,
+                                    showLoader: false,
+                                });
                             });
                     } else {
                         this.setLocalStorage(result);
                     }
-                }
-                if (!result.sts && result.msg) {
+                } else {
                     this.setState({
                         errorMsg: result.msg,
                         showErrorAlert: true,
@@ -97,6 +101,11 @@ class AdminLogin extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    showLoader: false,
+                });
             });
     };
 

@@ -3,6 +3,9 @@ import Header from "./shared/navbar";
 import SideNav from "./shared/sidenav";
 import Loading from "../common/loader";
 import AlertBox from "../common/alert";
+import { ErrorBoundary } from "react-error-boundary";
+import ErrorFallback from "../common/ErrorFallback";
+import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
 
 class Wrapper extends React.Component {
     constructor(props) {
@@ -13,7 +16,14 @@ class Wrapper extends React.Component {
             successMsg: "",
             showErrorAlert: false,
             showSuccessAlert: false,
-            page_loading: false,
+            page_loading: true,
+        };
+        this.url = baseUrl + adminPathUrl;
+        this.authToken = localStorage.getItem("Inquel-Auth");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Inquel-Auth": this.authToken,
         };
     }
 
@@ -23,21 +33,21 @@ class Wrapper extends React.Component {
         });
     };
 
-    handleErrorAlert = (msg, sts) => {
+    errorAlert = (msg, sts) => {
         this.setState({
             errorMsg: msg,
             showErrorAlert: sts,
         });
     };
 
-    handleSuccessAlert = (msg, sts) => {
+    successAlert = (msg, sts) => {
         this.setState({
             successMsg: msg,
             showSuccessAlert: sts,
         });
     };
 
-    handlePageLoading = (sts) => {
+    pageLoading = (sts) => {
         this.setState({
             page_loading: sts,
         });
@@ -90,7 +100,13 @@ class Wrapper extends React.Component {
                             <i className="fas fa-chevron-left fa-sm"></i> Back
                         </button>
 
-                        {this.props.children}
+                        {/* Children component */}
+                        <ErrorBoundary
+                            FallbackComponent={ErrorFallback}
+                            onReset={() => window.location.reload()}
+                        >
+                            {this.props.children}
+                        </ErrorBoundary>
 
                         {/* Loading component */}
                         {this.state.page_loading ? <Loading /> : ""}
