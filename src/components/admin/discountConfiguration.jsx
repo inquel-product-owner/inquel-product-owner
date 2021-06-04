@@ -438,7 +438,7 @@ class DiscountModal extends Component {
 
                     {/* Coupon ID & Title */}
                     <div className="form-row">
-                        <div className="col-md-6 form-group">
+                        <div className="col-md-4 form-group">
                             <label htmlFor="coupon_name">Coupon ID</label>
                             <input
                                 type="text"
@@ -452,7 +452,7 @@ class DiscountModal extends Component {
                                 required
                             />
                         </div>
-                        <div className="col-md-6 form-group">
+                        <div className="col-md-8 form-group">
                             <label htmlFor="title">Coupon Title</label>
                             <input
                                 type="text"
@@ -468,371 +468,405 @@ class DiscountModal extends Component {
                         </div>
                     </div>
 
-                    {/* Category & Sub category */}
-                    <div className="form-row">
-                        <div className="col-md-6 form-group">
-                            <label htmlFor="category">Category</label>
-                            <Select
-                                className="basic-single borders"
-                                placeholder="Select category"
-                                isSearchable={true}
-                                name="category"
-                                id="category"
-                                options={(this.state.category || []).map(
-                                    (list) => {
+                    <div className="row">
+                        <div className="col-md-4">
+                            {/* Category & Sub category */}
+                            <div className="mb-2">
+                                <label htmlFor="category">Category</label>
+                                <Select
+                                    className="basic-single borders"
+                                    placeholder="Select category"
+                                    isSearchable={true}
+                                    name="category"
+                                    id="category"
+                                    options={(this.state.category || []).map(
+                                        (list) => {
+                                            return {
+                                                value: list.code,
+                                                label: list.title,
+                                            };
+                                        }
+                                    )}
+                                    value={(this.state.category || []).map(
+                                        (list) => {
+                                            return this.state.data.category ===
+                                                list.code
+                                                ? {
+                                                      value: list.code,
+                                                      label: list.title,
+                                                  }
+                                                : "";
+                                        }
+                                    )}
+                                    onChange={this.handleCategory}
+                                    required
+                                />
+                            </div>
+                            <div className="mb-2">
+                                <label htmlFor="sub_category">
+                                    Sub category
+                                </label>
+                                <Select
+                                    className="basic-single borders"
+                                    placeholder="Select subcategory"
+                                    isSearchable={true}
+                                    name="sub_category"
+                                    id="sub_category"
+                                    isLoading={
+                                        this.state.subcategory_loading
+                                            ? true
+                                            : false
+                                    }
+                                    options={this.state.sub_category.map(
+                                        (list) => {
+                                            return {
+                                                value: list.code,
+                                                label: list.title,
+                                            };
+                                        }
+                                    )}
+                                    value={(this.state.sub_category || []).map(
+                                        (list) => {
+                                            return this.state.data
+                                                .sub_category === list.code
+                                                ? {
+                                                      value: list.code,
+                                                      label: list.title,
+                                                  }
+                                                : "";
+                                        }
+                                    )}
+                                    isDisabled={
+                                        this.state.data.category === ""
+                                            ? true
+                                            : false
+                                    }
+                                    onChange={this.handleSubcategory}
+                                    required
+                                />
+                            </div>
+
+                            {/* Discipline, Level & Subject */}
+                            <div className="mb-2">
+                                <label htmlFor="discipline">Discipline</label>
+                                <Select
+                                    className="basic-single borders"
+                                    placeholder="Select discipline"
+                                    isSearchable={true}
+                                    name="discipline"
+                                    id="discipline"
+                                    isLoading={
+                                        this.state.content_loading
+                                            ? true
+                                            : false
+                                    }
+                                    options={(
+                                        Object.entries(this.state.discipline) ||
+                                        []
+                                    ).map(([key, value]) => {
                                         return {
-                                            value: list.code,
-                                            label: list.title,
+                                            value: key,
+                                            label: value,
                                         };
-                                    }
-                                )}
-                                value={(this.state.category || []).map(
-                                    (list) => {
-                                        return this.state.data.category ===
-                                            list.code
+                                    })}
+                                    value={(
+                                        Object.entries(this.state.discipline) ||
+                                        []
+                                    ).map(([key, value]) => {
+                                        return this.state.data.discipline ===
+                                            key
                                             ? {
-                                                  value: list.code,
-                                                  label: list.title,
+                                                  value: key,
+                                                  label: value,
                                               }
                                             : "";
+                                    })}
+                                    isDisabled={
+                                        this.state.data.sub_category === ""
+                                            ? true
+                                            : false
                                     }
-                                )}
-                                onChange={this.handleCategory}
-                                required
-                            />
-                        </div>
-                        <div className="col-md-6 form-group">
-                            <label htmlFor="sub_category">Sub category</label>
-                            <Select
-                                className="basic-single borders"
-                                placeholder="Select subcategory"
-                                isSearchable={true}
-                                name="sub_category"
-                                id="sub_category"
-                                isLoading={
-                                    this.state.subcategory_loading
-                                        ? true
-                                        : false
-                                }
-                                options={this.state.sub_category.map((list) => {
-                                    return {
-                                        value: list.code,
-                                        label: list.title,
-                                    };
-                                })}
-                                value={(this.state.sub_category || []).map(
-                                    (list) => {
-                                        return this.state.data.sub_category ===
-                                            list.code
+                                    onChange={this.handleDiscipline}
+                                    required
+                                />
+                            </div>
+                            <div className="mb-2">
+                                <label htmlFor="level">Level</label>
+                                <Select
+                                    className="basic-single borders"
+                                    placeholder="Select level"
+                                    isSearchable={true}
+                                    name="level"
+                                    id="level"
+                                    isLoading={
+                                        this.state.content_loading
+                                            ? true
+                                            : false
+                                    }
+                                    options={(
+                                        Object.entries(this.state.levels) || []
+                                    ).map(([key, value]) => {
+                                        return {
+                                            value: key,
+                                            label: value,
+                                        };
+                                    })}
+                                    value={(
+                                        Object.entries(this.state.levels) || []
+                                    ).map(([key, value]) => {
+                                        return this.state.data.level === key
                                             ? {
-                                                  value: list.code,
-                                                  label: list.title,
+                                                  value: key,
+                                                  label: value,
                                               }
                                             : "";
+                                    })}
+                                    isDisabled={
+                                        this.state.data.sub_category === ""
+                                            ? true
+                                            : false
                                     }
-                                )}
-                                isDisabled={
-                                    this.state.data.category === ""
-                                        ? true
-                                        : false
-                                }
-                                onChange={this.handleSubcategory}
-                                required
-                            />
+                                    onChange={this.handleLevel}
+                                    required
+                                />
+                            </div>
+                            <div className="mb-2">
+                                <label htmlFor="subject">Subject</label>
+                                <Select
+                                    className="basic-single borders"
+                                    placeholder="Select subject"
+                                    isSearchable={true}
+                                    name="subject"
+                                    id="subject"
+                                    isLoading={
+                                        this.state.content_loading
+                                            ? true
+                                            : false
+                                    }
+                                    options={(
+                                        Object.entries(this.state.subjects) ||
+                                        []
+                                    ).map(([key, value]) => {
+                                        return {
+                                            value: key,
+                                            label: value,
+                                        };
+                                    })}
+                                    value={(
+                                        Object.entries(this.state.subjects) ||
+                                        []
+                                    ).map(([key, value]) => {
+                                        return this.state.data.subject === key
+                                            ? {
+                                                  value: key,
+                                                  label: value,
+                                              }
+                                            : "";
+                                    })}
+                                    isDisabled={
+                                        this.state.data.sub_category === ""
+                                            ? true
+                                            : false
+                                    }
+                                    onChange={this.handleSubject}
+                                    required
+                                />
+                            </div>
                         </div>
-                    </div>
+                        <div className="col-md-8">
+                            {/* Valid from & Valid to */}
+                            <div className="form-row">
+                                <div className="col-md-6 form-group">
+                                    <label htmlFor="valid_from">
+                                        Valid from
+                                    </label>
+                                    <input
+                                        type="date"
+                                        name="valid_from"
+                                        id="valid_from"
+                                        value={dateFormat(
+                                            this.state.data.valid_from,
+                                            "yyyy-mm-dd"
+                                        )}
+                                        className="form-control borders"
+                                        onChange={this.handleDate}
+                                        required
+                                    />
+                                </div>
+                                <div className="col-md-6 form-group">
+                                    <label htmlFor="valid_to">Valid to</label>
+                                    <input
+                                        type="date"
+                                        name="valid_to"
+                                        id="valid_to"
+                                        value={dateFormat(
+                                            this.state.data.valid_to,
+                                            "yyyy-mm-dd"
+                                        )}
+                                        className="form-control borders"
+                                        onChange={this.handleDate}
+                                        required
+                                    />
+                                </div>
+                            </div>
 
-                    {/* Discipline, Level & Subject */}
-                    <div className="form-row">
-                        <div className="col-md-4 form-group">
-                            <label htmlFor="discipline">Discipline</label>
-                            <Select
-                                className="basic-single borders"
-                                placeholder="Select discipline"
-                                isSearchable={true}
-                                name="discipline"
-                                id="discipline"
-                                isLoading={
-                                    this.state.content_loading ? true : false
-                                }
-                                options={(
-                                    Object.entries(this.state.discipline) || []
-                                ).map(([key, value]) => {
-                                    return {
-                                        value: key,
-                                        label: value,
-                                    };
-                                })}
-                                value={(
-                                    Object.entries(this.state.discipline) || []
-                                ).map(([key, value]) => {
-                                    return this.state.data.discipline === key
-                                        ? {
-                                              value: key,
-                                              label: value,
-                                          }
-                                        : "";
-                                })}
-                                isDisabled={
-                                    this.state.data.sub_category === ""
-                                        ? true
-                                        : false
-                                }
-                                onChange={this.handleDiscipline}
-                                required
-                            />
-                        </div>
-                        <div className="col-md-4 form-group">
-                            <label htmlFor="level">Level</label>
-                            <Select
-                                className="basic-single borders"
-                                placeholder="Select level"
-                                isSearchable={true}
-                                name="level"
-                                id="level"
-                                isLoading={
-                                    this.state.content_loading ? true : false
-                                }
-                                options={(
-                                    Object.entries(this.state.levels) || []
-                                ).map(([key, value]) => {
-                                    return {
-                                        value: key,
-                                        label: value,
-                                    };
-                                })}
-                                value={(
-                                    Object.entries(this.state.levels) || []
-                                ).map(([key, value]) => {
-                                    return this.state.data.level === key
-                                        ? {
-                                              value: key,
-                                              label: value,
-                                          }
-                                        : "";
-                                })}
-                                isDisabled={
-                                    this.state.data.sub_category === ""
-                                        ? true
-                                        : false
-                                }
-                                onChange={this.handleLevel}
-                                required
-                            />
-                        </div>
-                        <div className="col-md-4 form-group">
-                            <label htmlFor="subject">Subject</label>
-                            <Select
-                                className="basic-single borders"
-                                placeholder="Select subject"
-                                isSearchable={true}
-                                name="subject"
-                                id="subject"
-                                isLoading={
-                                    this.state.content_loading ? true : false
-                                }
-                                options={(
-                                    Object.entries(this.state.subjects) || []
-                                ).map(([key, value]) => {
-                                    return {
-                                        value: key,
-                                        label: value,
-                                    };
-                                })}
-                                value={(
-                                    Object.entries(this.state.subjects) || []
-                                ).map(([key, value]) => {
-                                    return this.state.data.subject === key
-                                        ? {
-                                              value: key,
-                                              label: value,
-                                          }
-                                        : "";
-                                })}
-                                isDisabled={
-                                    this.state.data.sub_category === ""
-                                        ? true
-                                        : false
-                                }
-                                onChange={this.handleSubject}
-                                required
-                            />
-                        </div>
-                    </div>
+                            {/* Min points, Max points & Points Decimal */}
+                            <div className="form-row">
+                                <div className="col-md-6 form-group">
+                                    <label htmlFor="min_points">
+                                        Minimum Points
+                                    </label>
+                                    <input
+                                        type="number"
+                                        name="min_points"
+                                        id="min_points"
+                                        value={this.state.data.min_points}
+                                        className="form-control borders"
+                                        onChange={this.handleInput}
+                                        placeholder="Enter min points"
+                                        autoComplete="off"
+                                        disabled={
+                                            this.state.data.percent_exists ||
+                                            this.state.data.price_exists
+                                                ? true
+                                                : false
+                                        }
+                                        required
+                                    />
+                                </div>
+                                <div className="col-md-6 form-group">
+                                    <label htmlFor="max_points">
+                                        Maximum Points
+                                    </label>
+                                    <input
+                                        type="number"
+                                        name="max_points"
+                                        id="max_points"
+                                        value={this.state.data.max_points}
+                                        className="form-control borders"
+                                        onChange={this.handleInput}
+                                        placeholder="Enter max points"
+                                        autoComplete="off"
+                                        disabled={
+                                            this.state.data.percent_exists ||
+                                            this.state.data.price_exists
+                                                ? true
+                                                : false
+                                        }
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div className="form-row">
+                                <div className="col-md-6 form-group">
+                                    <label htmlFor="deduction_points">
+                                        Deduction points
+                                    </label>
+                                    <input
+                                        type="number"
+                                        name="deduction_points"
+                                        id="deduction_points"
+                                        value={this.state.data.deduction_points}
+                                        className="form-control borders"
+                                        onChange={this.handleInput}
+                                        placeholder="Enter deduction points"
+                                        autoComplete="off"
+                                        disabled={
+                                            this.state.data.percent_exists ||
+                                            this.state.data.price_exists
+                                                ? true
+                                                : false
+                                        }
+                                        required
+                                    />
+                                </div>
+                                <div className="col-md-6 form-group">
+                                    <label htmlFor="points_in_decimal">
+                                        Points in Decimal
+                                    </label>
+                                    <input
+                                        type="number"
+                                        name="points_in_decimal"
+                                        id="points_in_decimal"
+                                        value={
+                                            this.state.data.points_in_decimal
+                                        }
+                                        className="form-control borders"
+                                        onChange={this.handleInput}
+                                        placeholder="Enter points in decimal"
+                                        autoComplete="off"
+                                        disabled={
+                                            this.state.data.percent_exists ||
+                                            this.state.data.price_exists
+                                                ? true
+                                                : false
+                                        }
+                                        step="0.1"
+                                        required
+                                    />
+                                </div>
+                            </div>
 
-                    {/* Valid from & Valid to */}
-                    <div className="form-row">
-                        <div className="col-md-6 form-group">
-                            <label htmlFor="valid_from">Valid from</label>
-                            <input
-                                type="date"
-                                name="valid_from"
-                                id="valid_from"
-                                value={dateFormat(
-                                    this.state.data.valid_from,
-                                    "yyyy-mm-dd"
-                                )}
-                                className="form-control borders"
-                                onChange={this.handleDate}
-                                required
-                            />
-                        </div>
-                        <div className="col-md-6 form-group">
-                            <label htmlFor="valid_to">Valid to</label>
-                            <input
-                                type="date"
-                                name="valid_to"
-                                id="valid_to"
-                                value={dateFormat(
-                                    this.state.data.valid_to,
-                                    "yyyy-mm-dd"
-                                )}
-                                className="form-control borders"
-                                onChange={this.handleDate}
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    {/* Min points, Max points & Points Decimal */}
-                    <div className="form-row">
-                        <div className="col-md-3 form-group">
-                            <label htmlFor="min_points">Minimum Points</label>
-                            <input
-                                type="number"
-                                name="min_points"
-                                id="min_points"
-                                value={this.state.data.min_points}
-                                className="form-control borders"
-                                onChange={this.handleInput}
-                                placeholder="Enter min points"
-                                autoComplete="off"
-                                disabled={
-                                    this.state.data.percent_exists ||
-                                    this.state.data.price_exists
-                                        ? true
-                                        : false
-                                }
-                                required
-                            />
-                        </div>
-                        <div className="col-md-3 form-group">
-                            <label htmlFor="max_points">Maximum Points</label>
-                            <input
-                                type="number"
-                                name="max_points"
-                                id="max_points"
-                                value={this.state.data.max_points}
-                                className="form-control borders"
-                                onChange={this.handleInput}
-                                placeholder="Enter max points"
-                                autoComplete="off"
-                                disabled={
-                                    this.state.data.percent_exists ||
-                                    this.state.data.price_exists
-                                        ? true
-                                        : false
-                                }
-                                required
-                            />
-                        </div>
-                        <div className="col-md-3 form-group">
-                            <label htmlFor="deduction_points">
-                                Deduction points
-                            </label>
-                            <input
-                                type="number"
-                                name="deduction_points"
-                                id="deduction_points"
-                                value={this.state.data.deduction_points}
-                                className="form-control borders"
-                                onChange={this.handleInput}
-                                placeholder="Enter deduction points"
-                                autoComplete="off"
-                                disabled={
-                                    this.state.data.percent_exists ||
-                                    this.state.data.price_exists
-                                        ? true
-                                        : false
-                                }
-                                required
-                            />
-                        </div>
-                        <div className="col-md-3 form-group">
-                            <label htmlFor="points_in_decimal">
-                                Points in Decimal
-                            </label>
-                            <input
-                                type="number"
-                                name="points_in_decimal"
-                                id="points_in_decimal"
-                                value={this.state.data.points_in_decimal}
-                                className="form-control borders"
-                                onChange={this.handleInput}
-                                placeholder="Enter points in decimal"
-                                autoComplete="off"
-                                disabled={
-                                    this.state.data.percent_exists ||
-                                    this.state.data.price_exists
-                                        ? true
-                                        : false
-                                }
-                                step="0.1"
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    {/* Percentage, Fixed price & Currency */}
-                    <div className="form-row">
-                        <div className="col-md-4 form-group">
-                            <label htmlFor="percentage">Percentage</label>
-                            <input
-                                type="text"
-                                name="percentage"
-                                id="percentage"
-                                value={this.state.data.percentage}
-                                className="form-control borders"
-                                onChange={this.handleInput}
-                                placeholder="Enter percentage"
-                                autoComplete="off"
-                                disabled={
-                                    this.state.data.points_exists ? true : false
-                                }
-                                required
-                            />
-                        </div>
-                        <div className="col-md-4 form-group">
-                            <label htmlFor="fixed_price">Fixed Price</label>
-                            <input
-                                type="text"
-                                name="fixed_price"
-                                id="fixed_price"
-                                value={this.state.data.fixed_price}
-                                className="form-control borders"
-                                onChange={this.handleInput}
-                                placeholder="Enter fixed price"
-                                autoComplete="off"
-                                disabled={
-                                    this.state.data.points_exists ? true : false
-                                }
-                                required
-                            />
-                        </div>
-                        <div className="col-md-4 form-group">
-                            <label htmlFor="currency">Currency</label>
-                            <input
-                                type="text"
-                                name="currency"
-                                id="currency"
-                                value={this.state.data.currency}
-                                className="form-control borders"
-                                onChange={this.handleInput}
-                                placeholder="Enter currency"
-                                autoComplete="off"
-                                disabled
-                                required
-                            />
+                            {/* Percentage, Fixed price & Currency */}
+                            <div className="form-row">
+                                <div className="col-md-6 form-group">
+                                    <label htmlFor="percentage">
+                                        Percentage
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="percentage"
+                                        id="percentage"
+                                        value={this.state.data.percentage}
+                                        className="form-control borders"
+                                        onChange={this.handleInput}
+                                        placeholder="Enter percentage"
+                                        autoComplete="off"
+                                        disabled={
+                                            this.state.data.points_exists
+                                                ? true
+                                                : false
+                                        }
+                                        required
+                                    />
+                                </div>
+                                <div className="col-md-6 form-group">
+                                    <label htmlFor="fixed_price">
+                                        Fixed Price
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="fixed_price"
+                                        id="fixed_price"
+                                        value={this.state.data.fixed_price}
+                                        className="form-control borders"
+                                        onChange={this.handleInput}
+                                        placeholder="Enter fixed price"
+                                        autoComplete="off"
+                                        disabled={
+                                            this.state.data.points_exists
+                                                ? true
+                                                : false
+                                        }
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="currency">Currency</label>
+                                <input
+                                    type="text"
+                                    name="currency"
+                                    id="currency"
+                                    value={this.state.data.currency}
+                                    className="form-control borders"
+                                    onChange={this.handleInput}
+                                    placeholder="Enter currency"
+                                    autoComplete="off"
+                                    disabled
+                                    required
+                                />
+                            </div>
                         </div>
                     </div>
                 </Modal.Body>
@@ -1195,3 +1229,403 @@ class AdminDiscountConfiguration extends Component {
 }
 
 export default AdminDiscountConfiguration;
+
+// {/* Coupon ID & Title */}
+// <div className="form-row">
+// <div className="col-md-6 form-group">
+//     <label htmlFor="coupon_name">Coupon ID</label>
+//     <input
+//         type="text"
+//         name="coupon_name"
+//         id="coupon_name"
+//         value={this.state.data.coupon_name}
+//         className="form-control borders"
+//         onChange={this.handleInput}
+//         placeholder="Enter coupon code"
+//         autoComplete="off"
+//         required
+//     />
+// </div>
+// <div className="col-md-6 form-group">
+//     <label htmlFor="title">Coupon Title</label>
+//     <input
+//         type="text"
+//         name="title"
+//         id="title"
+//         value={this.state.data.title}
+//         className="form-control borders"
+//         onChange={this.handleInput}
+//         placeholder="Enter coupon title"
+//         autoComplete="off"
+//         required
+//     />
+// </div>
+// </div>
+
+// {/* Category & Sub category */}
+// <div className="form-row">
+// <div className="col-md-6 form-group">
+//     <label htmlFor="category">Category</label>
+//     <Select
+//         className="basic-single borders"
+//         placeholder="Select category"
+//         isSearchable={true}
+//         name="category"
+//         id="category"
+//         options={(this.state.category || []).map(
+//             (list) => {
+//                 return {
+//                     value: list.code,
+//                     label: list.title,
+//                 };
+//             }
+//         )}
+//         value={(this.state.category || []).map(
+//             (list) => {
+//                 return this.state.data.category ===
+//                     list.code
+//                     ? {
+//                           value: list.code,
+//                           label: list.title,
+//                       }
+//                     : "";
+//             }
+//         )}
+//         onChange={this.handleCategory}
+//         required
+//     />
+// </div>
+// <div className="col-md-6 form-group">
+//     <label htmlFor="sub_category">Sub category</label>
+//     <Select
+//         className="basic-single borders"
+//         placeholder="Select subcategory"
+//         isSearchable={true}
+//         name="sub_category"
+//         id="sub_category"
+//         isLoading={
+//             this.state.subcategory_loading
+//                 ? true
+//                 : false
+//         }
+//         options={this.state.sub_category.map((list) => {
+//             return {
+//                 value: list.code,
+//                 label: list.title,
+//             };
+//         })}
+//         value={(this.state.sub_category || []).map(
+//             (list) => {
+//                 return this.state.data.sub_category ===
+//                     list.code
+//                     ? {
+//                           value: list.code,
+//                           label: list.title,
+//                       }
+//                     : "";
+//             }
+//         )}
+//         isDisabled={
+//             this.state.data.category === ""
+//                 ? true
+//                 : false
+//         }
+//         onChange={this.handleSubcategory}
+//         required
+//     />
+// </div>
+// </div>
+
+// {/* Discipline, Level & Subject */}
+// <div className="form-row">
+// <div className="col-md-4 form-group">
+//     <label htmlFor="discipline">Discipline</label>
+//     <Select
+//         className="basic-single borders"
+//         placeholder="Select discipline"
+//         isSearchable={true}
+//         name="discipline"
+//         id="discipline"
+//         isLoading={
+//             this.state.content_loading ? true : false
+//         }
+//         options={(
+//             Object.entries(this.state.discipline) || []
+//         ).map(([key, value]) => {
+//             return {
+//                 value: key,
+//                 label: value,
+//             };
+//         })}
+//         value={(
+//             Object.entries(this.state.discipline) || []
+//         ).map(([key, value]) => {
+//             return this.state.data.discipline === key
+//                 ? {
+//                       value: key,
+//                       label: value,
+//                   }
+//                 : "";
+//         })}
+//         isDisabled={
+//             this.state.data.sub_category === ""
+//                 ? true
+//                 : false
+//         }
+//         onChange={this.handleDiscipline}
+//         required
+//     />
+// </div>
+// <div className="col-md-4 form-group">
+//     <label htmlFor="level">Level</label>
+//     <Select
+//         className="basic-single borders"
+//         placeholder="Select level"
+//         isSearchable={true}
+//         name="level"
+//         id="level"
+//         isLoading={
+//             this.state.content_loading ? true : false
+//         }
+//         options={(
+//             Object.entries(this.state.levels) || []
+//         ).map(([key, value]) => {
+//             return {
+//                 value: key,
+//                 label: value,
+//             };
+//         })}
+//         value={(
+//             Object.entries(this.state.levels) || []
+//         ).map(([key, value]) => {
+//             return this.state.data.level === key
+//                 ? {
+//                       value: key,
+//                       label: value,
+//                   }
+//                 : "";
+//         })}
+//         isDisabled={
+//             this.state.data.sub_category === ""
+//                 ? true
+//                 : false
+//         }
+//         onChange={this.handleLevel}
+//         required
+//     />
+// </div>
+// <div className="col-md-4 form-group">
+//     <label htmlFor="subject">Subject</label>
+//     <Select
+//         className="basic-single borders"
+//         placeholder="Select subject"
+//         isSearchable={true}
+//         name="subject"
+//         id="subject"
+//         isLoading={
+//             this.state.content_loading ? true : false
+//         }
+//         options={(
+//             Object.entries(this.state.subjects) || []
+//         ).map(([key, value]) => {
+//             return {
+//                 value: key,
+//                 label: value,
+//             };
+//         })}
+//         value={(
+//             Object.entries(this.state.subjects) || []
+//         ).map(([key, value]) => {
+//             return this.state.data.subject === key
+//                 ? {
+//                       value: key,
+//                       label: value,
+//                   }
+//                 : "";
+//         })}
+//         isDisabled={
+//             this.state.data.sub_category === ""
+//                 ? true
+//                 : false
+//         }
+//         onChange={this.handleSubject}
+//         required
+//     />
+// </div>
+// </div>
+
+// {/* Valid from & Valid to */}
+// <div className="form-row">
+// <div className="col-md-6 form-group">
+//     <label htmlFor="valid_from">Valid from</label>
+//     <input
+//         type="date"
+//         name="valid_from"
+//         id="valid_from"
+//         value={dateFormat(
+//             this.state.data.valid_from,
+//             "yyyy-mm-dd"
+//         )}
+//         className="form-control borders"
+//         onChange={this.handleDate}
+//         required
+//     />
+// </div>
+// <div className="col-md-6 form-group">
+//     <label htmlFor="valid_to">Valid to</label>
+//     <input
+//         type="date"
+//         name="valid_to"
+//         id="valid_to"
+//         value={dateFormat(
+//             this.state.data.valid_to,
+//             "yyyy-mm-dd"
+//         )}
+//         className="form-control borders"
+//         onChange={this.handleDate}
+//         required
+//     />
+// </div>
+// </div>
+
+// {/* Min points, Max points & Points Decimal */}
+// <div className="form-row">
+// <div className="col-md-3 form-group">
+//     <label htmlFor="min_points">Minimum Points</label>
+//     <input
+//         type="number"
+//         name="min_points"
+//         id="min_points"
+//         value={this.state.data.min_points}
+//         className="form-control borders"
+//         onChange={this.handleInput}
+//         placeholder="Enter min points"
+//         autoComplete="off"
+//         disabled={
+//             this.state.data.percent_exists ||
+//             this.state.data.price_exists
+//                 ? true
+//                 : false
+//         }
+//         required
+//     />
+// </div>
+// <div className="col-md-3 form-group">
+//     <label htmlFor="max_points">Maximum Points</label>
+//     <input
+//         type="number"
+//         name="max_points"
+//         id="max_points"
+//         value={this.state.data.max_points}
+//         className="form-control borders"
+//         onChange={this.handleInput}
+//         placeholder="Enter max points"
+//         autoComplete="off"
+//         disabled={
+//             this.state.data.percent_exists ||
+//             this.state.data.price_exists
+//                 ? true
+//                 : false
+//         }
+//         required
+//     />
+// </div>
+// <div className="col-md-3 form-group">
+//     <label htmlFor="deduction_points">
+//         Deduction points
+//     </label>
+//     <input
+//         type="number"
+//         name="deduction_points"
+//         id="deduction_points"
+//         value={this.state.data.deduction_points}
+//         className="form-control borders"
+//         onChange={this.handleInput}
+//         placeholder="Enter deduction points"
+//         autoComplete="off"
+//         disabled={
+//             this.state.data.percent_exists ||
+//             this.state.data.price_exists
+//                 ? true
+//                 : false
+//         }
+//         required
+//     />
+// </div>
+// <div className="col-md-3 form-group">
+//     <label htmlFor="points_in_decimal">
+//         Points in Decimal
+//     </label>
+//     <input
+//         type="number"
+//         name="points_in_decimal"
+//         id="points_in_decimal"
+//         value={this.state.data.points_in_decimal}
+//         className="form-control borders"
+//         onChange={this.handleInput}
+//         placeholder="Enter points in decimal"
+//         autoComplete="off"
+//         disabled={
+//             this.state.data.percent_exists ||
+//             this.state.data.price_exists
+//                 ? true
+//                 : false
+//         }
+//         step="0.1"
+//         required
+//     />
+// </div>
+// </div>
+
+// {/* Percentage, Fixed price & Currency */}
+// <div className="form-row">
+// <div className="col-md-4 form-group">
+//     <label htmlFor="percentage">Percentage</label>
+//     <input
+//         type="text"
+//         name="percentage"
+//         id="percentage"
+//         value={this.state.data.percentage}
+//         className="form-control borders"
+//         onChange={this.handleInput}
+//         placeholder="Enter percentage"
+//         autoComplete="off"
+//         disabled={
+//             this.state.data.points_exists ? true : false
+//         }
+//         required
+//     />
+// </div>
+// <div className="col-md-4 form-group">
+//     <label htmlFor="fixed_price">Fixed Price</label>
+//     <input
+//         type="text"
+//         name="fixed_price"
+//         id="fixed_price"
+//         value={this.state.data.fixed_price}
+//         className="form-control borders"
+//         onChange={this.handleInput}
+//         placeholder="Enter fixed price"
+//         autoComplete="off"
+//         disabled={
+//             this.state.data.points_exists ? true : false
+//         }
+//         required
+//     />
+// </div>
+// <div className="col-md-4 form-group">
+//     <label htmlFor="currency">Currency</label>
+//     <input
+//         type="text"
+//         name="currency"
+//         id="currency"
+//         value={this.state.data.currency}
+//         className="form-control borders"
+//         onChange={this.handleInput}
+//         placeholder="Enter currency"
+//         autoComplete="off"
+//         disabled
+//         required
+//     />
+// </div>
+// </div>
