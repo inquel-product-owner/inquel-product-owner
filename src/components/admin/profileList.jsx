@@ -1,9 +1,9 @@
 import React, { Component } from "react";
+import Wrapper from "./wrapper";
 import { Tabs, Tab, Modal, Alert, Spinner } from "react-bootstrap";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl.js";
 import { paginationCount } from "../../shared/constant.js";
 import Select from "react-select";
-import Wrapper from "./wrapper";
 import HODTable from "../table/hod";
 import StudentTable from "../table/student";
 import Paginations from "../common/pagination";
@@ -15,6 +15,8 @@ import {
     UserDisableModal,
     UserEnableModal,
 } from "../common/modal/userManagementModal";
+import Loading from "../common/loader";
+import AlertBox from "../common/alert";
 
 class HODModal extends Component {
     constructor(props) {
@@ -846,6 +848,19 @@ class AdminHODAndStudentList extends Component {
             studentItems: [],
             selectedHOD: [],
             selectedStudent: [],
+
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            page_loading: true,
+        };
+        this.url = baseUrl + adminPathUrl;
+        this.authToken = localStorage.getItem("Inquel-Auth");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Inquel-Auth": this.authToken,
         };
     }
 
@@ -862,8 +877,8 @@ class AdminHODAndStudentList extends Component {
 
     // Fetch HOD List
     loadHodData = () => {
-        fetch(`${this.wrapper.url}/hod/?page=${this.state.activeHODPage}`, {
-            headers: this.wrapper.headers,
+        fetch(`${this.url}/hod/?page=${this.state.activeHODPage}`, {
+            headers: this.headers,
             method: "GET",
         })
             .then((res) => res.json())
@@ -872,46 +887,55 @@ class AdminHODAndStudentList extends Component {
                     this.setState({
                         hodItems: result.data.results,
                         totalHODCount: result.data.count,
+                        page_loading: false,
                     });
-                    this.wrapper.pageLoading(false);
                 } else {
-                    this.wrapper.pageLoading(false);
-                    this.wrapper.errorAlert(result.msg, true);
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
                 }
             })
             .catch((err) => {
                 console.log(err);
-                this.wrapper.pageLoading(false);
-                this.wrapper.errorAlert("Something went wrong!", true);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
     // Fetch Students list
     loadStudentData = () => {
-        fetch(
-            `${this.wrapper.url}/student/?page=${this.state.activeStudentPage}`,
-            {
-                headers: this.wrapper.headers,
-                method: "GET",
-            }
-        )
+        fetch(`${this.url}/student/?page=${this.state.activeStudentPage}`, {
+            headers: this.headers,
+            method: "GET",
+        })
             .then((res) => res.json())
             .then((result) => {
                 if (result.sts === true) {
                     this.setState({
                         studentItems: result.data.results,
                         totalStudentCount: result.data.count,
+                        page_loading: false,
                     });
-                    this.wrapper.pageLoading(false);
                 } else {
-                    this.wrapper.pageLoading(false);
-                    this.wrapper.errorAlert(result.msg, true);
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
                 }
             })
             .catch((err) => {
                 console.log(err);
-                this.wrapper.pageLoading(false);
-                this.wrapper.errorAlert("Something went wrong!", true);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -1024,17 +1048,18 @@ class AdminHODAndStudentList extends Component {
     };
 
     handleHODPageChange(pageNumber) {
-        this.setState({ activeHODPage: pageNumber }, () => {
-            this.wrapper.pageLoading(true);
+        this.setState({ activeHODPage: pageNumber, page_loading: true }, () => {
             this.loadHodData();
         });
     }
 
     handleStudentPageChange(pageNumber) {
-        this.setState({ activeStudentPage: pageNumber }, () => {
-            this.wrapper.pageLoading(true);
-            this.loadStudentData();
-        });
+        this.setState(
+            { activeStudentPage: pageNumber, page_loading: true },
+            () => {
+                this.loadStudentData();
+            }
+        );
     }
 
     render() {
@@ -1049,8 +1074,25 @@ class AdminHODAndStudentList extends Component {
                     this.state.activeTab === "hod" ? "HOD List" : "Student List"
                 }`}
                 activeLink="profiles"
-                ref={(ref) => (this.wrapper = ref)}
             >
+                {/* Alert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
+                />
+
                 {/* HOD create Modal */}
                 {this.state.showModal ? (
                     <HODModal
@@ -1273,6 +1315,9 @@ class AdminHODAndStudentList extends Component {
                         </div>
                     </Tab>
                 </Tabs>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
             </Wrapper>
         );
     }

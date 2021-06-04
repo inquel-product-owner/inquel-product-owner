@@ -17,8 +17,6 @@ import { connect } from "react-redux";
 import VideoModal from "../../common/modal/videoModal";
 
 const mapStateToProps = (state) => ({
-    content: state.storage.content,
-    temp: state.storage.temp,
     subject_name: state.content.subject_name,
     chapter_name: state.content.chapter_name,
     topic_name: state.content.topic_name,

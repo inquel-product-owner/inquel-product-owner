@@ -3,6 +3,9 @@ import Wrapper from "./wrapper";
 import { Link } from "react-router-dom";
 import Select from "react-select";
 import { Modal, Spinner, Alert } from "react-bootstrap";
+import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
+import Loading from "../common/loader";
+import AlertBox from "../common/alert";
 
 class ContentAdding extends Component {
     constructor(props) {
@@ -189,6 +192,19 @@ class AdminMasterData extends Component {
             board: [],
             type: [],
             subcategory_loading: false,
+
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            page_loading: true,
+        };
+        this.url = baseUrl + adminPathUrl;
+        this.authToken = localStorage.getItem("Inquel-Auth");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Inquel-Auth": this.authToken,
         };
     }
 
@@ -201,8 +217,8 @@ class AdminMasterData extends Component {
     };
 
     loadMasterData = () => {
-        fetch(`${this.wrapper.url}/data/filter/`, {
-            headers: this.wrapper.headers,
+        fetch(`${this.url}/data/filter/`, {
+            headers: this.headers,
             method: "GET",
         })
             .then((res) => res.json())
@@ -214,17 +230,23 @@ class AdminMasterData extends Component {
                         type: result.data.TYPE,
                         selectedCategory: { label: "", value: "" },
                         selectedSubcategory: { label: "", value: "" },
+                        page_loading: false,
                     });
-                    this.wrapper.pageLoading(false);
                 } else {
-                    this.wrapper.pageLoading(false);
-                    this.wrapper.errorAlert(result.msg, true);
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
                 }
             })
             .catch((err) => {
                 console.log(err);
-                this.wrapper.pageLoading(false);
-                this.wrapper.errorAlert("Something went wrong!", true);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -247,8 +269,8 @@ class AdminMasterData extends Component {
         });
 
         if (event.value !== "") {
-            fetch(`${this.wrapper.url}/data/filter/?category=${event.value}`, {
-                headers: this.wrapper.headers,
+            fetch(`${this.url}/data/filter/?category=${event.value}`, {
+                headers: this.headers,
                 method: "GET",
             })
                 .then((res) => res.json())
@@ -259,13 +281,19 @@ class AdminMasterData extends Component {
                             subcategory_loading: false,
                         });
                     } else {
-                        this.wrapper.errorAlert(result.msg, true);
+                        this.setState({
+                            errorMsg: result.msg,
+                            showErrorAlert: true,
+                        });
                     }
                 })
                 .catch((err) => {
                     console.log(err);
-                    this.wrapper.pageLoading(false);
-                    this.wrapper.errorAlert("Something went wrong!", true);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
                 });
         }
     };
@@ -276,14 +304,14 @@ class AdminMasterData extends Component {
         sub_category.value = event.value;
         this.setState({
             selectedSubcategory: sub_category,
+            page_loading: true,
         });
-        this.wrapper.pageLoading(true);
 
         if (event.value !== "") {
             fetch(
-                `${this.wrapper.url}/data/filter/?category=${this.state.selectedCategory.value}&sub_category=${event.value}`,
+                `${this.url}/data/filter/?category=${this.state.selectedCategory.value}&sub_category=${event.value}`,
                 {
-                    headers: this.wrapper.headers,
+                    headers: this.headers,
                     method: "GET",
                 }
             )
@@ -294,17 +322,23 @@ class AdminMasterData extends Component {
                             discipline: result.data.DISCIPLINE,
                             levels: result.data.LEVELS,
                             subjects: result.data.SUBJECTS,
+                            page_loading: false,
                         });
-                        this.wrapper.pageLoading(false);
                     } else {
-                        this.wrapper.pageLoading(false);
-                        this.wrapper.errorAlert(result.msg, true);
+                        this.setState({
+                            errorMsg: result.msg,
+                            showErrorAlert: true,
+                            page_loading: false,
+                        });
                     }
                 })
                 .catch((err) => {
                     console.log(err);
-                    this.wrapper.pageLoading(false);
-                    this.wrapper.errorAlert("Something went wrong!", true);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
                 });
         }
     };
@@ -399,8 +433,25 @@ class AdminMasterData extends Component {
                 history={this.props.history}
                 header="Master Data"
                 activeLink="course"
-                ref={(ref) => (this.wrapper = ref)}
             >
+                {/* Alert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
+                />
+
                 {/* Content adding modal */}
                 {this.state.showModal ? (
                     <ContentAdding
@@ -409,8 +460,8 @@ class AdminMasterData extends Component {
                         formSubmission={this.formSubmission}
                         type={this.state.contentAddingType}
                         data={this.state.selectedData}
-                        url={this.wrapper.url}
-                        headers={this.wrapper.headers}
+                        url={this.url}
+                        headers={this.headers}
                     />
                 ) : (
                     ""
@@ -758,6 +809,9 @@ class AdminMasterData extends Component {
                         )}
                     </div>
                 </div>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
             </Wrapper>
         );
     }

@@ -9,7 +9,7 @@ import { baseUrl, studentUrl } from "../../../shared/baseUrl.js";
 import { connect } from "react-redux";
 
 const mapStateToProps = (state) => ({
-    content: state.storage.content,
+    subject_data: state.storage.response,
     subject_name: state.content.subject_name,
 });
 
@@ -189,17 +189,17 @@ class PersonalNotes extends Component {
 
         let topicName = "";
         let topic_num = "";
-        for (let i = 0; i < this.props.content.chapters.length; i++) {
+        for (let i = 0; i < this.props.subject_data.chapters.length; i++) {
             // extract topic name from the current chapter
-            if (this.props.content.chapters[i].chapter_id === chapterId) {
+            if (this.props.subject_data.chapters[i].chapter_id === chapterId) {
                 topicName =
-                    this.props.content.chapters[i].topics.length !== 0
-                        ? this.props.content.chapters[i].topics[0]
+                    this.props.subject_data.chapters[i].topics.length !== 0
+                        ? this.props.subject_data.chapters[i].topics[0]
                               .chapter_structure[0].topic_name
                         : "Topic";
                 topic_num =
-                    this.props.content.chapters[i].topics.length !== 0
-                        ? this.props.content.chapters[i].topics[0]
+                    this.props.subject_data.chapters[i].topics.length !== 0
+                        ? this.props.subject_data.chapters[i].topics[0]
                               .chapter_structure[0].topic_num
                         : "1.1";
             } else {
@@ -296,23 +296,23 @@ class PersonalNotes extends Component {
         let chapterId = "";
         let topicName = "";
         let topic_num = "";
-        for (let i = 0; i < this.props.content.chapters.length; i++) {
+        for (let i = 0; i < this.props.subject_data.chapters.length; i++) {
             // adds collapse state
             collapsed.push(i === 0 ? false : true);
             topicEventKey.push([]);
 
-            chapterId = this.props.content.chapters[0].chapter_id;
+            chapterId = this.props.subject_data.chapters[0].chapter_id;
 
             // extract topic name from the current chapter
             if (i === 0) {
                 topicName =
-                    this.props.content.chapters[i].topics.length !== 0
-                        ? this.props.content.chapters[i].topics[0]
+                    this.props.subject_data.chapters[i].topics.length !== 0
+                        ? this.props.subject_data.chapters[i].topics[0]
                               .chapter_structure[0].topic_name
                         : "Topic";
                 topic_num =
-                    this.props.content.chapters[i].topics.length !== 0
-                        ? this.props.content.chapters[i].topics[0]
+                    this.props.subject_data.chapters[i].topics.length !== 0
+                        ? this.props.subject_data.chapters[i].topics[0]
                               .chapter_structure[0].topic_num
                         : "1.1";
             } else {
@@ -553,9 +553,11 @@ class PersonalNotes extends Component {
                                     <div className="col-md-3 mb-2 mb-md-0 border-right">
                                         <div className="card">
                                             <Accordion defaultActiveKey="chapter-0">
-                                                {this.props.content !== null
+                                                {this.props.subject_data &&
+                                                Object.keys(this.props.subject_data)
+                                                    .length !== 0
                                                     ? (
-                                                          this.props.content
+                                                          this.props.subject_data
                                                               .chapters || []
                                                       ).map((data, index) => {
                                                           return (

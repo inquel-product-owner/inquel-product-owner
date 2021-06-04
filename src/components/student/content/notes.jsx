@@ -10,7 +10,7 @@ import { Document, Page, pdfjs } from "react-pdf";
 import { connect } from "react-redux";
 
 const mapStateToProps = (state) => ({
-    content: state.storage.content,
+    subject_data: state.storage.response,
     subject_name: state.content.subject_name,
 });
 
@@ -64,17 +64,17 @@ class Notes extends Component {
 
         let topicName = "";
         let topic_num = "";
-        for (let i = 0; i < this.props.content.chapters.length; i++) {
+        for (let i = 0; i < this.props.subject_data.chapters.length; i++) {
             // extract topic name from the current chapter
-            if (this.props.content.chapters[i].chapter_id === chapter_id) {
+            if (this.props.subject_data.chapters[i].chapter_id === chapter_id) {
                 topicName =
-                    this.props.content.chapters[i].topics.length !== 0
-                        ? this.props.content.chapters[i].topics[0]
+                    this.props.subject_data.chapters[i].topics.length !== 0
+                        ? this.props.subject_data.chapters[i].topics[0]
                               .chapter_structure[0].topic_name
                         : "Topic";
                 topic_num =
-                    this.props.content.chapters[i].topics.length !== 0
-                        ? this.props.content.chapters[i].topics[0]
+                    this.props.subject_data.chapters[i].topics.length !== 0
+                        ? this.props.subject_data.chapters[i].topics[0]
                               .chapter_structure[0].topic_num
                         : "1.1";
             } else {
@@ -157,10 +157,10 @@ class Notes extends Component {
         let topicEventKey = [];
         let topicName = "";
         let topic_num = "";
-        for (let i = 0; i < this.props.content.chapters.length; i++) {
+        for (let i = 0; i < this.props.subject_data.chapters.length; i++) {
             // adds collapse state
             collapsed.push(
-                this.props.content.chapters[i].chapter_id ===
+                this.props.subject_data.chapters[i].chapter_id ===
                     this.state.chapterId
                     ? false
                     : true
@@ -168,17 +168,17 @@ class Notes extends Component {
             topicEventKey.push([]);
             // extract topic name from the current chapter
             if (
-                this.props.content.chapters[i].chapter_id ===
+                this.props.subject_data.chapters[i].chapter_id ===
                 this.state.chapterId
             ) {
                 topicName =
-                    this.props.content.chapters[i].topics.length !== 0
-                        ? this.props.content.chapters[i].topics[0]
+                    this.props.subject_data.chapters[i].topics.length !== 0
+                        ? this.props.subject_data.chapters[i].topics[0]
                               .chapter_structure[0].topic_name
                         : "Topic";
                 topic_num =
-                    this.props.content.chapters[i].topics.length !== 0
-                        ? this.props.content.chapters[i].topics[0]
+                    this.props.subject_data.chapters[i].topics.length !== 0
+                        ? this.props.subject_data.chapters[i].topics[0]
                               .chapter_structure[0].topic_num
                         : "1.1";
             } else {
@@ -404,9 +404,11 @@ class Notes extends Component {
                                                     this.state.chapterId
                                                 }
                                             >
-                                                {this.props.content !== null
+                                                {this.props.subject_data &&
+                                                Object.keys(this.props.subject_data)
+                                                    .length !== 0
                                                     ? (
-                                                          this.props.content
+                                                          this.props.subject_data
                                                               .chapters || []
                                                       ).map((data, index) => {
                                                           return (

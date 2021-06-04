@@ -10,7 +10,7 @@ import { connect } from "react-redux";
 import storeDispatch from "../../redux/dispatch";
 import {
     CHAPTER,
-    CONTENT,
+    RESPONSE,
     CYCLE,
     QUIZ,
     SEMESTER,
@@ -486,17 +486,19 @@ const ChapterListRender = (props) => {
                     })}
 
                     {/* ----- Cycle test list ----- */}
-                    {(props.chapter.cycle_tests || []).map((cycle, cycle_index) => {
-                        return props.cycleTest(
-                            cycle,
-                            cycle_index,
-                            props.all_chapters.indexOf(
-                                props.chapter.chapter_id
-                            ),
-                            props.chapter.chapter_id,
-                            props.chapter.chapter_name
-                        );
-                    })}
+                    {(props.chapter.cycle_tests || []).map(
+                        (cycle, cycle_index) => {
+                            return props.cycleTest(
+                                cycle,
+                                cycle_index,
+                                props.all_chapters.indexOf(
+                                    props.chapter.chapter_id
+                                ),
+                                props.chapter.chapter_id,
+                                props.chapter.chapter_name
+                            );
+                        }
+                    )}
 
                     {/* ----- Quiz list ----- */}
                     {Object.entries(props.quiz).length !== 0 ? (
@@ -801,7 +803,7 @@ class Subject extends Component {
                     }
 
                     // redux store dispatcher
-                    storeDispatch(CONTENT, result.data);
+                    storeDispatch(RESPONSE, result.data);
                     storeDispatch(TEMP, {});
 
                     this.setState({

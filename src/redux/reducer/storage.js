@@ -1,15 +1,15 @@
-import { CONTENT, EXAMDATA, TEMP } from "../action";
+import { RESPONSE, EXAMDATA, TEMP } from "../action";
 
 let initialState = {
-    content: {},
+    response: {},
     temp: {},
     examData: {},
 };
 
 const storageReducer = (state = initialState, action) => {
     switch (action.type) {
-        case CONTENT:
-            return { ...state, content: action.payload };
+        case RESPONSE:
+            return { ...state, response: action.payload };
         case TEMP:
             return { ...state, temp: action.payload };
         case EXAMDATA:

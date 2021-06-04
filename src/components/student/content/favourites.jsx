@@ -10,7 +10,7 @@ import storeDispatch from "../../../redux/dispatch";
 import { TEMP } from "../../../redux/action";
 
 const mapStateToProps = (state) => ({
-    content: state.storage.content,
+    subject_data: state.storage.response,
     subject_name: state.content.subject_name,
 });
 
@@ -124,9 +124,9 @@ class Favourites extends Component {
     componentDidMount = () => {
         let chapterId = "";
         let chapter_name = "";
-        for (let i = 0; i < this.props.content.chapters.length; i++) {
-            chapterId = this.props.content.chapters[0].chapter_id;
-            chapter_name = this.props.content.chapters[0].chapter_name;
+        for (let i = 0; i < this.props.subject_data.chapters.length; i++) {
+            chapterId = this.props.subject_data.chapters[0].chapter_id;
+            chapter_name = this.props.subject_data.chapters[0].chapter_name;
         }
         this.setState(
             {
@@ -158,7 +158,7 @@ class Favourites extends Component {
     loopSubjectData = (topic_num) => {
         let topic_name = "";
 
-        this.props.content.chapters.forEach((chapter) => {
+        this.props.subject_data.chapters.forEach((chapter) => {
             if (chapter.chapter_id === this.state.chapterId) {
                 chapter.topics.forEach((topic) => {
                     topic_name = this.getTopicName(
@@ -255,9 +255,11 @@ class Favourites extends Component {
                                     {/* ---------- Chapter list ---------- */}
                                     <div className="col-md-3 mb-2 mb-md-0 border-right">
                                         <div className="card">
-                                            {this.props.content !== null
+                                            {this.props.subject_data &&
+                                            Object.keys(this.props.subject_data)
+                                                .length !== 0
                                                 ? (
-                                                      this.props.content
+                                                      this.props.subject_data
                                                           .chapters || []
                                                   ).map((data, index) => {
                                                       return (

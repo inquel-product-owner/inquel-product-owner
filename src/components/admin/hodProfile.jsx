@@ -9,6 +9,11 @@ import GroupTable from "../table/group";
 import Paginations from "../common/pagination";
 import ReactSwitch from "../common/switchComponent";
 import dateFormat from "dateformat";
+import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
+import Loading from "../common/loader";
+import AlertBox from "../common/alert";
+import storeDispatch from "../../redux/dispatch";
+import { TEMP } from "../../redux/action";
 
 class AdminHodProfile extends Component {
     constructor(props) {
@@ -47,20 +52,33 @@ class AdminHodProfile extends Component {
             subcategory_loading: false,
             discipline_loading: false,
             showConfigLoader: false,
+
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            page_loading: true,
         };
         this.hodId = this.props.match.params.hodId;
+        this.url = baseUrl + adminPathUrl;
+        this.authToken = localStorage.getItem("Inquel-Auth");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Inquel-Auth": this.authToken,
+        };
     }
 
     handleConfiguration = () => {
         this.setState({
             showConfigLoader: true,
+            showErrorAlert: false,
+            showSuccessAlert: false,
         });
-        this.wrapper.errorAlert("", false);
-        this.wrapper.successAlert("", false);
 
         if (this.state.hodItems.is_active) {
-            fetch(`${this.wrapper.url}/hod/${this.hodId}/`, {
-                headers: this.wrapper.headers,
+            fetch(`${this.url}/hod/${this.hodId}/`, {
+                headers: this.headers,
                 method: "PUT",
                 body: JSON.stringify({
                     prog_sco_card: this.state.progressivescore,
@@ -80,46 +98,52 @@ class AdminHodProfile extends Component {
                 .then((res) => res.json())
                 .then((result) => {
                     if (result.sts === true) {
-                        this.wrapper.successAlert(result.msg, true);
                         this.setState(
                             {
                                 showConfigLoader: false,
+                                successMsg: result.msg,
+                                showSuccessAlert: true,
+                                page_loading: true,
                             },
                             () => {
-                                this.wrapper.pageLoading(true);
                                 this.loadHodData();
                             }
                         );
                     } else {
                         this.setState({
+                            errorMsg: result.msg,
+                            showErrorAlert: true,
                             showConfigLoader: false,
                         });
-                        this.wrapper.errorAlert(result.msg, true);
                     }
                 })
                 .catch((err) => {
                     console.log(err);
                     this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
                         showConfigLoader: false,
                     });
-                    this.wrapper.errorAlert("Something went wrong!", true);
                 });
         } else {
             this.setState({
+                errorMsg: "Cannot update inactive HOD!",
+                showErrorAlert: true,
                 showConfigLoader: false,
             });
-            this.wrapper.errorAlert("Can't update inactive HOD!", true);
         }
     };
 
     handleDetails = () => {
-        this.wrapper.pageLoading(true);
-        this.wrapper.errorAlert("", false);
-        this.wrapper.successAlert("", false);
+        this.setState({
+            page_loading: true,
+            showErrorAlert: false,
+            showSuccessAlert: false,
+        });
 
         if (this.state.hodItems.is_active) {
-            fetch(`${this.wrapper.url}/hod/${this.hodId}/`, {
-                headers: this.wrapper.headers,
+            fetch(`${this.url}/hod/${this.hodId}/`, {
+                headers: this.headers,
                 method: "PUT",
                 body: JSON.stringify({
                     category: this.state.selectedCategory,
@@ -133,27 +157,39 @@ class AdminHodProfile extends Component {
                 .then((res) => res.json())
                 .then((result) => {
                     if (result.sts === true) {
-                        this.wrapper.successAlert(result.msg, true);
+                        this.setState({
+                            successMsg: result.msg,
+                            showSuccessAlert: true,
+                        });
                         this.loadHodData();
                     } else {
-                        this.wrapper.pageLoading(false);
-                        this.wrapper.errorAlert(result.msg, true);
+                        this.setState({
+                            errorMsg: result.msg,
+                            showErrorAlert: true,
+                            page_loading: false,
+                        });
                     }
                 })
                 .catch((err) => {
                     console.log(err);
-                    this.wrapper.pageLoading(false);
-                    this.wrapper.errorAlert("Something went wrong!", true);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
                 });
         } else {
-            this.wrapper.pageLoading(false);
-            this.wrapper.errorAlert("Can't update inactive HOD!", true);
+            this.setState({
+                errorMsg: "Cannot update inactive HOD!",
+                showErrorAlert: true,
+                page_loading: false,
+            });
         }
     };
 
     loadHodData = () => {
-        fetch(`${this.wrapper.url}/hod/${this.hodId}/`, {
-            headers: this.wrapper.headers,
+        fetch(`${this.url}/hod/${this.hodId}/`, {
+            headers: this.headers,
             method: "GET",
         })
             .then((res) => res.json())
@@ -189,25 +225,32 @@ class AdminHodProfile extends Component {
                         lockingoftest: result.data.permissions[0].lock_test,
                         notesdownload: result.data.permissions[0].copy_download,
                         mobileapp: result.data.permissions[0].android_app,
+                        page_loading: false,
                     });
-                    this.wrapper.pageLoading(false);
+                    storeDispatch(TEMP, result.data);
                 } else {
-                    this.wrapper.pageLoading(false);
-                    this.wrapper.errorAlert(result.msg, true);
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
                 }
             })
             .catch((err) => {
                 console.log(err);
-                this.wrapper.pageLoading(false);
-                this.wrapper.errorAlert("Something went wrong!", true);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
     loadGroupData = () => {
         fetch(
-            `${this.wrapper.url}/hod/${this.hodId}/group/?page=${this.state.activeGroupPage}`,
+            `${this.url}/hod/${this.hodId}/group/?page=${this.state.activeGroupPage}`,
             {
-                headers: this.wrapper.headers,
+                headers: this.headers,
                 method: "GET",
             }
         )
@@ -217,17 +260,23 @@ class AdminHodProfile extends Component {
                     this.setState({
                         group: result.data.results,
                         totalGroupCount: result.data.count,
+                        page_loading: false,
                     });
-                    this.wrapper.pageLoading(false);
                 } else {
-                    this.wrapper.pageLoading(false);
-                    this.wrapper.errorAlert(result.msg, true);
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
                 }
             })
             .catch((err) => {
                 console.log(err);
-                this.wrapper.pageLoading(false);
-                this.wrapper.errorAlert("Something went wrong!", true);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -237,8 +286,8 @@ class AdminHodProfile extends Component {
         this.loadHodData();
         this.loadGroupData();
 
-        fetch(`${this.wrapper.url}/data/filter/`, {
-            headers: this.wrapper.headers,
+        fetch(`${this.url}/data/filter/`, {
+            headers: this.headers,
             method: "GET",
         })
             .then((res) => res.json())
@@ -249,12 +298,18 @@ class AdminHodProfile extends Component {
                         board: result.data.BOARD,
                     });
                 } else {
-                    this.wrapper.errorAlert(result.msg, true);
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                    });
                 }
             })
             .catch((err) => {
                 console.log(err);
-                this.wrapper.errorAlert("Something went wrong!", true);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                });
             });
     };
 
@@ -271,8 +326,8 @@ class AdminHodProfile extends Component {
         });
 
         if (event.value !== "") {
-            fetch(`${this.wrapper.url}/data/filter/?category=${event.value}`, {
-                headers: this.wrapper.headers,
+            fetch(`${this.url}/data/filter/?category=${event.value}`, {
+                headers: this.headers,
                 method: "GET",
             })
                 .then((res) => res.json())
@@ -283,12 +338,18 @@ class AdminHodProfile extends Component {
                             subcategory_loading: false,
                         });
                     } else {
-                        this.wrapper.errorAlert(result.msg, true);
+                        this.setState({
+                            errorMsg: result.msg,
+                            showErrorAlert: true,
+                        });
                     }
                 })
                 .catch((err) => {
                     console.log(err);
-                    this.wrapper.errorAlert("Something went wrong!", true);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                    });
                 });
         }
     };
@@ -305,9 +366,9 @@ class AdminHodProfile extends Component {
 
         if (event.value !== "") {
             fetch(
-                `${this.wrapper.url}/data/filter/?category=${this.state.selectedCategory}&sub_category=${event.value}`,
+                `${this.url}/data/filter/?category=${this.state.selectedCategory}&sub_category=${event.value}`,
                 {
-                    headers: this.wrapper.headers,
+                    headers: this.headers,
                     method: "GET",
                 }
             )
@@ -319,12 +380,18 @@ class AdminHodProfile extends Component {
                             discipline_loading: false,
                         });
                     } else {
-                        this.wrapper.errorAlert(result.msg, true);
+                        this.setState({
+                            errorMsg: result.msg,
+                            showErrorAlert: true,
+                        });
                     }
                 })
                 .catch((err) => {
                     console.log(err);
-                    this.wrapper.errorAlert("Something went wrong!", true);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                    });
                 });
         }
     };
@@ -421,10 +488,12 @@ class AdminHodProfile extends Component {
     };
 
     handleGroupPageChange(pageNumber) {
-        this.setState({ activeGroupPage: pageNumber }, () => {
-            this.wrapper.pageLoading(true);
-            this.loadGroupData();
-        });
+        this.setState(
+            { activeGroupPage: pageNumber, page_loading: true },
+            () => {
+                this.loadGroupData();
+            }
+        );
     }
 
     render() {
@@ -433,8 +502,25 @@ class AdminHodProfile extends Component {
                 history={this.props.history}
                 header="HOD Profile"
                 activeLink="profiles"
-                ref={(ref) => (this.wrapper = ref)}
             >
+                {/* Alert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
+                />
+
                 {/* Breadcrumb */}
                 <nav aria-label="breadcrumb">
                     <ol className="breadcrumb mb-3">
@@ -1168,6 +1254,9 @@ class AdminHodProfile extends Component {
                         </div>
                     </div>
                 </div>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
             </Wrapper>
         );
     }

@@ -10,7 +10,7 @@ import { Document, Page, pdfjs } from "react-pdf";
 import { connect } from "react-redux";
 
 const mapStateToProps = (state) => ({
-    content: state.storage.content,
+    subject_data: state.storage.response,
     subject_name: state.content.subject_name,
     chapter_name: state.content.chapter_name,
 });
@@ -197,9 +197,11 @@ class Summary extends Component {
                                                 variant="pills"
                                                 className="flex-column"
                                             >
-                                                {this.props.content !== null
+                                                {this.props.subject_data &&
+                                                Object.keys(this.props.subject_data)
+                                                    .length !== 0
                                                     ? (
-                                                          this.props.content
+                                                          this.props.subject_data
                                                               .chapters || []
                                                       ).map((data, index) => {
                                                           return (
