@@ -163,6 +163,11 @@ class SemesterAutoExam extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
         window.MathJax.typeset();
     };
@@ -194,6 +199,11 @@ class SemesterAutoExam extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -254,6 +264,11 @@ class SemesterAutoExam extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -567,7 +582,7 @@ class SemesterAutoExam extends Component {
                                 <div className="row small">
                                     {/* ----- MCQ ----- */}
                                     {data.content.mcq === true ? (
-                                        data.content.options.map(
+                                        (data.content.options || []).map(
                                             (option, option_index) => {
                                                 return (
                                                     <div
@@ -690,68 +705,66 @@ class SemesterAutoExam extends Component {
                                         )
                                     ) : // ----- True or false -----
                                     data.content.boolean === true ? (
-                                        data.content.boolean_question.map(
-                                            (option, boolean_index) => {
-                                                return (
+                                        (
+                                            data.content.boolean_question || []
+                                        ).map((option, boolean_index) => {
+                                            return (
+                                                <div
+                                                    className="col-md-6 mb-3"
+                                                    key={boolean_index}
+                                                >
                                                     <div
-                                                        className="col-md-6 mb-3"
-                                                        key={boolean_index}
+                                                        className="card card-body secondary-bg shadow-sm small font-weight-bold-600 p-3"
+                                                        onClick={() =>
+                                                            this.handleBoolean(
+                                                                option.content,
+                                                                index
+                                                            )
+                                                        }
                                                     >
-                                                        <div
-                                                            className="card card-body secondary-bg shadow-sm small font-weight-bold-600 p-3"
-                                                            onClick={() =>
-                                                                this.handleBoolean(
-                                                                    option.content,
-                                                                    index
-                                                                )
-                                                            }
-                                                        >
-                                                            <div className="custom-control custom-radio">
-                                                                <input
-                                                                    type="radio"
-                                                                    id={`customRadio1${index}-${boolean_index}`}
-                                                                    name={`customRadio${index}`}
-                                                                    className="custom-control-input"
-                                                                    value={
-                                                                        option.content
-                                                                    }
-                                                                    checked={
-                                                                        answerSection.length !==
-                                                                        0
+                                                        <div className="custom-control custom-radio">
+                                                            <input
+                                                                type="radio"
+                                                                id={`customRadio1${index}-${boolean_index}`}
+                                                                name={`customRadio${index}`}
+                                                                className="custom-control-input"
+                                                                value={
+                                                                    option.content
+                                                                }
+                                                                checked={
+                                                                    answerSection.length !==
+                                                                    0
+                                                                        ? answerSection[
+                                                                              index
+                                                                          ]
+                                                                              .answer
+                                                                              .length !==
+                                                                          0
                                                                             ? answerSection[
                                                                                   index
-                                                                              ]
-                                                                                  .answer
-                                                                                  .length !==
-                                                                              0
-                                                                                ? answerSection[
-                                                                                      index
-                                                                                  ].answer.includes(
-                                                                                      option.content
-                                                                                  )
-                                                                                    ? true
-                                                                                    : false
+                                                                              ].answer.includes(
+                                                                                  option.content
+                                                                              )
+                                                                                ? true
                                                                                 : false
                                                                             : false
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) => {}}
-                                                                />
-                                                                <label
-                                                                    className="custom-control-label"
-                                                                    htmlFor={`customRadio1${index}-${boolean_index}`}
-                                                                >
-                                                                    {
-                                                                        option.content
-                                                                    }
-                                                                </label>
-                                                            </div>
+                                                                        : false
+                                                                }
+                                                                onChange={(
+                                                                    e
+                                                                ) => {}}
+                                                            />
+                                                            <label
+                                                                className="custom-control-label"
+                                                                htmlFor={`customRadio1${index}-${boolean_index}`}
+                                                            >
+                                                                {option.content}
+                                                            </label>
                                                         </div>
                                                     </div>
-                                                );
-                                            }
-                                        )
+                                                </div>
+                                            );
+                                        })
                                     ) : // ----- Fill in answers -----
                                     data.content.fill_in === true ? (
                                         <div
@@ -870,37 +883,36 @@ class SemesterAutoExam extends Component {
                                                 </div>
                                             ) : (
                                                 <>
-                                                    {answerSection.length !== 0
-                                                        ? answerSection[
-                                                              index
-                                                          ].sub_question.map(
-                                                              (
-                                                                  sub_answer,
-                                                                  answer_index
-                                                              ) => {
-                                                                  return sub_answer
-                                                                      .answer
-                                                                      .length !==
-                                                                      0 ? (
-                                                                      <div
-                                                                          className="card shadow-sm mb-2 pinkrange-bg"
-                                                                          key={
-                                                                              answer_index
-                                                                          }
-                                                                      >
-                                                                          <div
-                                                                              className="card-body small font-weight-bold-600 primary-text pt-3 pb-0"
-                                                                              dangerouslySetInnerHTML={{
-                                                                                  __html: `<div class="mb-3">${sub_answer.answer[0]}</div>`,
-                                                                              }}
-                                                                          ></div>
-                                                                      </div>
-                                                                  ) : (
-                                                                      ""
-                                                                  );
-                                                              }
-                                                          )
-                                                        : ""}
+                                                    {(
+                                                        answerSection[index]
+                                                            .sub_question || []
+                                                    ).map(
+                                                        (
+                                                            sub_answer,
+                                                            answer_index
+                                                        ) => {
+                                                            return sub_answer
+                                                                .answer
+                                                                .length !==
+                                                                0 ? (
+                                                                <div
+                                                                    className="card shadow-sm mb-2 pinkrange-bg"
+                                                                    key={
+                                                                        answer_index
+                                                                    }
+                                                                >
+                                                                    <div
+                                                                        className="card-body small font-weight-bold-600 primary-text pt-3 pb-0"
+                                                                        dangerouslySetInnerHTML={{
+                                                                            __html: `<div class="mb-3">${sub_answer.answer[0]}</div>`,
+                                                                        }}
+                                                                    ></div>
+                                                                </div>
+                                                            ) : (
+                                                                ""
+                                                            );
+                                                        }
+                                                    )}
                                                 </>
                                             )}
                                         </div>
@@ -939,13 +951,15 @@ class SemesterAutoExam extends Component {
                                                             .currentSectionIndex
                                                     ][index]
                                                 ].mcq
-                                                    ? data.sub_question[
-                                                          this.state
-                                                              .currentSubQuestionIndex[
+                                                    ? (
+                                                          data.sub_question[
                                                               this.state
-                                                                  .currentSectionIndex
-                                                          ][index]
-                                                      ].options.map(
+                                                                  .currentSubQuestionIndex[
+                                                                  this.state
+                                                                      .currentSectionIndex
+                                                              ][index]
+                                                          ].options || []
+                                                      ).map(
                                                           (
                                                               options,
                                                               option_index
@@ -1115,7 +1129,7 @@ class SemesterAutoExam extends Component {
     imageRender = (data) => {
         return (
             <div className="ml-3">
-                {data.content.images.map((images, index) => {
+                {(data.content.images || []).map((images, index) => {
                     return images.path !== "" ? (
                         <div
                             key={index}
@@ -1240,21 +1254,15 @@ class SemesterAutoExam extends Component {
                         </div>
 
                         {/* ---------- Q&A ---------- */}
-                        {questionSection.length !== 0
-                            ? questionSection.map((data, index) => {
-                                  return data.type === "type_1"
-                                      ? this.typeOneRender(
-                                            data,
-                                            index,
-                                            answerSection
-                                        )
-                                      : this.typeTwoRender(
-                                            data,
-                                            index,
-                                            answerSection
-                                        );
-                              })
-                            : null}
+                        {(questionSection || []).map((data, index) => {
+                            return data.type === "type_1"
+                                ? this.typeOneRender(data, index, answerSection)
+                                : this.typeTwoRender(
+                                      data,
+                                      index,
+                                      answerSection
+                                  );
+                        })}
 
                         {/* ----- Navigation ----- */}
                         <div className="row align-items-center">

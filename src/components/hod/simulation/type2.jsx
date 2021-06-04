@@ -177,6 +177,11 @@ class HODSimulationType2 extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
         window.MathJax.typeset();
     };
@@ -343,6 +348,11 @@ class HODSimulationType2 extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
 
         this.loadMCQData();
@@ -479,9 +489,7 @@ class HODSimulationType2 extends Component {
                     );
                 } else {
                     this.setState({
-                        errorMsg: result.data.detail
-                            ? result.data.detail
-                            : result.data.msg,
+                        errorMsg: result.data.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -553,9 +561,7 @@ class HODSimulationType2 extends Component {
                     );
                 } else {
                     this.setState({
-                        errorMsg: result.data.detail
-                            ? result.data.detail
-                            : result.data.msg,
+                        errorMsg: result.data.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -855,15 +861,17 @@ class HODSimulationType2 extends Component {
                         });
                     } else {
                         this.setState({
-                            errorMsg: result.detail
-                                ? result.detail
-                                : result.msg,
+                            errorMsg: result.msg,
                             showErrorAlert: true,
                         });
                     }
                 })
                 .catch((err) => {
                     console.log(err);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                    });
                 });
         } else {
             values[this.state.activeQuestion].content.images[index] = {

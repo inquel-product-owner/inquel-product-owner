@@ -85,9 +85,7 @@ class ImageUploadModal extends Component {
                                 this.props.formSubmission();
                             } else {
                                 this.setState({
-                                    errorMsg: result.data.detail
-                                        ? result.data.detail
-                                        : result.data.msg,
+                                    errorMsg: result.data.msg,
                                     showErrorAlert: true,
                                     showLoader: false,
                                 });
@@ -95,6 +93,11 @@ class ImageUploadModal extends Component {
                         })
                         .catch((err) => {
                             console.log(err);
+                            this.setState({
+                                errorMsg: "Something went wrong!",
+                                showErrorAlert: true,
+                                showLoader: false,
+                            });
                         });
                 } else {
                     axios
@@ -109,9 +112,7 @@ class ImageUploadModal extends Component {
                                 this.props.formSubmission();
                             } else {
                                 this.setState({
-                                    errorMsg: result.data.detail
-                                        ? result.data.detail
-                                        : result.data.msg,
+                                    errorMsg: result.data.msg,
                                     showErrorAlert: true,
                                     showLoader: false,
                                 });
@@ -119,6 +120,11 @@ class ImageUploadModal extends Component {
                         })
                         .catch((err) => {
                             console.log(err);
+                            this.setState({
+                                errorMsg: "Something went wrong!",
+                                showErrorAlert: true,
+                                showLoader: false,
+                            });
                         });
                 }
                 // If image upload type is watermark then perform watermark image Submission
@@ -143,9 +149,7 @@ class ImageUploadModal extends Component {
                                 this.props.formSubmission();
                             } else {
                                 this.setState({
-                                    errorMsg: result.data.detail
-                                        ? result.data.detail
-                                        : result.data.msg,
+                                    errorMsg: result.data.msg,
                                     showErrorAlert: true,
                                     showLoader: false,
                                 });
@@ -153,6 +157,11 @@ class ImageUploadModal extends Component {
                         })
                         .catch((err) => {
                             console.log(err);
+                            this.setState({
+                                errorMsg: "Something went wrong!",
+                                showErrorAlert: true,
+                                showLoader: false,
+                            });
                         });
                 } else {
                     axios
@@ -171,9 +180,7 @@ class ImageUploadModal extends Component {
                                 this.props.formSubmission();
                             } else {
                                 this.setState({
-                                    errorMsg: result.data.detail
-                                        ? result.data.detail
-                                        : result.data.msg,
+                                    errorMsg: result.data.msg,
                                     showErrorAlert: true,
                                     showLoader: false,
                                 });
@@ -181,6 +188,11 @@ class ImageUploadModal extends Component {
                         })
                         .catch((err) => {
                             console.log(err);
+                            this.setState({
+                                errorMsg: "Something went wrong!",
+                                showErrorAlert: true,
+                                showLoader: false,
+                            });
                         });
                 }
             }
@@ -351,6 +363,11 @@ class HODProfile extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -415,6 +432,11 @@ class HODProfile extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    showLoader: false,
+                });
             });
     };
 
@@ -481,6 +503,11 @@ class HODProfile extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    showLoader: false,
+                });
             });
     };
 

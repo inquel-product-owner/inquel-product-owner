@@ -213,6 +213,11 @@ class TeacherType1 extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
         window.MathJax.typeset();
     };
@@ -264,6 +269,11 @@ class TeacherType1 extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
         window.MathJax.typeset();
     };
@@ -507,6 +517,11 @@ class TeacherType1 extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
 
         this.loadMCQData();
@@ -741,6 +756,11 @@ class TeacherType1 extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -807,6 +827,11 @@ class TeacherType1 extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -989,9 +1014,7 @@ class TeacherType1 extends Component {
                     );
                 } else {
                     this.setState({
-                        errorMsg: result.data.detail
-                            ? result.data.detail
-                            : result.data.msg,
+                        errorMsg: result.data.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -999,6 +1022,11 @@ class TeacherType1 extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -1033,9 +1061,7 @@ class TeacherType1 extends Component {
                     );
                 } else {
                     this.setState({
-                        errorMsg: result.data.detail
-                            ? result.data.detail
-                            : result.data.msg,
+                        errorMsg: result.data.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -1043,6 +1069,11 @@ class TeacherType1 extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -1296,15 +1327,17 @@ class TeacherType1 extends Component {
                         });
                     } else {
                         this.setState({
-                            errorMsg: result.detail
-                                ? result.detail
-                                : result.msg,
+                            errorMsg: result.msg,
                             showErrorAlert: true,
                         });
                     }
                 })
                 .catch((err) => {
                     console.log(err);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                    });
                 });
         } else {
             values[this.state.activeQuestion].content.images[index] = {
@@ -1463,15 +1496,17 @@ class TeacherType1 extends Component {
                         });
                     } else {
                         this.setState({
-                            errorMsg: result.detail
-                                ? result.detail
-                                : result.msg,
+                            errorMsg: result.msg,
                             showErrorAlert: true,
                         });
                     }
                 })
                 .catch((err) => {
                     console.log(err);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                    });
                 });
         } else {
             values[this.state.activeQuestion].content.video.title = "";
@@ -1548,15 +1583,17 @@ class TeacherType1 extends Component {
                         });
                     } else {
                         this.setState({
-                            errorMsg: result.detail
-                                ? result.detail
-                                : result.msg,
+                            errorMsg: result.msg,
                             showErrorAlert: true,
                         });
                     }
                 })
                 .catch((err) => {
                     console.log(err);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                    });
                 });
         } else {
             values[this.state.activeQuestion].content.audio[index] = {
@@ -2268,9 +2305,7 @@ class TeacherType1 extends Component {
                         });
                     } else {
                         this.setState({
-                            errorMsg: result.detail
-                                ? result.detail
-                                : result.msg,
+                            errorMsg: result.msg,
                             showErrorAlert: true,
                             page_loading: false,
                         });
@@ -2278,6 +2313,11 @@ class TeacherType1 extends Component {
                 })
                 .catch((err) => {
                     console.log(err);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
                 });
         } else {
             this.setState({

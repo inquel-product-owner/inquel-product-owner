@@ -1,15 +1,14 @@
 import React, { Component } from "react";
+import Wrapper from "../wrapper";
 import { connect } from "react-redux";
-import Header from "../shared/navbar";
-import SideNav from "../shared/sidenav";
 import { Card, Accordion } from "react-bootstrap";
 import Select from "react-select";
 import { Link } from "react-router-dom";
-import Loading from "../../common/loader";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
-import AlertBox from "../../common/alert";
 import storeDispatch from "../../../redux/dispatch";
 import { CHAPTER, CYCLE, QUIZ, TOPIC } from "../../../redux/action";
+import AlertBox from "../../common/alert";
+import Loading from "../../common/loader";
 
 const mapStateToProps = (state) => ({
     subject_name: state.content.subject_name,
@@ -20,7 +19,6 @@ class HODSubjectChapter extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showSideNav: false,
             collapsed: false,
 
             chapterList: [],
@@ -79,6 +77,11 @@ class HODSubjectChapter extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -124,6 +127,11 @@ class HODSubjectChapter extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
 
         this.loadChapterData();
@@ -181,7 +189,7 @@ class HODSubjectChapter extends Component {
                         cursor: "default",
                     }}
                     onClick={() =>
-                        data.child.length !== 0
+                        data.child && data.child.length !== 0
                             ? this.toggleTopicCollapse(
                                   `topic-${index}-${data.topic_num}`
                               )
@@ -192,7 +200,7 @@ class HODSubjectChapter extends Component {
                         <div className="col-4">
                             <div className="row align-items-center">
                                 <div className="col-1">
-                                    {data.child.length !== 0 ? (
+                                    {data.child && data.child.length !== 0 ? (
                                         <div>
                                             <i
                                                 className={`fas fa-chevron-circle-down ${
@@ -364,23 +372,25 @@ class HODSubjectChapter extends Component {
                     });
                 }
             })
-            .catch((err) => console.log(err));
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
+            });
     };
 
     render() {
         document.title = `${this.props.chapter_name} - HOD | IQLabs`;
         return (
-            <div className="wrapper">
-                {/* Navbar */}
-                <Header
-                    name={this.props.subject_name}
-                    togglenav={() => {
-                        this.setState({
-                            showSideNav: !this.state.showSideNav,
-                        });
-                    }}
-                />
-
+            <Wrapper
+                header={this.props.subject_name}
+                activeLink="dashboard"
+                history={this.props.history}
+                ref={(ref) => (this.wrapper = ref)}
+            >
                 {/* Alert message */}
                 <AlertBox
                     errorMsg={this.state.errorMsg}
@@ -399,367 +409,296 @@ class HODSubjectChapter extends Component {
                     }}
                 />
 
-                {/* Sidebar */}
-                <SideNav
-                    shownav={this.state.showSideNav}
-                    activeLink="dashboard"
-                />
-
-                <div
-                    className={`section content ${
-                        this.state.showSideNav ? "active" : ""
-                    }`}
-                >
-                    <div className="container-fluid">
-                        {/* Back button */}
+                {/* ----- Breadcrumb ----- */}
+                <div className="row align-items-center mb-3">
+                    <div className="col-md-6 col-9">
+                        <nav aria-label="breadcrumb">
+                            <ol className="breadcrumb">
+                                <li className="breadcrumb-item">
+                                    <Link to="/hod">
+                                        <i className="fas fa-home fa-sm"></i>
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item">
+                                    <Link
+                                        to="#"
+                                        onClick={this.props.history.goBack}
+                                    >
+                                        {this.props.subject_name}
+                                    </Link>
+                                </li>
+                                <li className="breadcrumb-item text-truncate active">
+                                    <span>Chapter:</span>
+                                    {this.props.chapter_name}
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <div className="col-md-6 col-2 text-right">
                         <button
-                            className="btn btn-primary-invert btn-sm mb-3"
-                            onClick={this.props.history.goBack}
+                            className="btn btn-primary btn-sm shadow-none"
+                            onClick={this.handlePublish}
+                            disabled={this.state.chapters.topics ? false : true}
                         >
-                            <i className="fas fa-chevron-left fa-sm"></i> Back
+                            Approve
                         </button>
+                    </div>
+                </div>
 
-                        {/* ----- Breadcrumb ----- */}
-                        <div className="row align-items-center mb-3">
-                            <div className="col-md-6 col-9">
-                                <nav aria-label="breadcrumb">
-                                    <ol className="breadcrumb">
-                                        <li className="breadcrumb-item">
-                                            <Link to="/hod">
-                                                <i className="fas fa-home fa-sm"></i>
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item">
-                                            <Link
-                                                to="#"
-                                                onClick={
-                                                    this.props.history.goBack
-                                                }
-                                            >
-                                                {this.props.subject_name}
-                                            </Link>
-                                        </li>
-                                        <li className="breadcrumb-item text-truncate active">
-                                            <span>Chapter:</span>
-                                            {this.props.chapter_name}
-                                        </li>
-                                    </ol>
-                                </nav>
-                            </div>
-                            <div className="col-md-6 col-2 text-right">
-                                <button
-                                    className="btn btn-primary btn-sm shadow-none"
-                                    onClick={this.handlePublish}
-                                    disabled={
-                                        this.state.chapters.topics
-                                            ? false
-                                            : true
-                                    }
-                                >
-                                    Approve
-                                </button>
-                            </div>
+                <div className="row align-items-center mb-3">
+                    <div className="col-md-4 mb-2 mb-md-0">
+                        <Select
+                            className="basic-single form-shadow"
+                            placeholder="Select chapter"
+                            isSearchable={true}
+                            name="chapter"
+                            value={this.state.chapterList.map((list) => {
+                                return this.props.chapter_name ===
+                                    list.chapter_name
+                                    ? {
+                                          value: list.chapter_id,
+                                          label: list.chapter_name,
+                                      }
+                                    : "";
+                            })}
+                            options={this.state.chapterList.map((list) => {
+                                return {
+                                    value: list.chapter_id,
+                                    label: list.chapter_name,
+                                };
+                            })}
+                            onChange={this.handleSelect}
+                            required
+                        />
+                    </div>
+                    <div className="col-md-8 d-flex align-items-center justify-content-start justify-content-md-end">
+                        <div className="mr-2 primary-text font-weight-bold-600">
+                            Assigned to:
                         </div>
+                        <div className="p-2 bg-white shadow-sm rounded-lg small font-weight-bold-600">
+                            {this.state.teacher_name}
+                        </div>
+                    </div>
+                </div>
 
-                        <div className="row align-items-center mb-3">
-                            <div className="col-md-4 mb-2 mb-md-0">
-                                <Select
-                                    className="basic-single form-shadow"
-                                    placeholder="Select chapter"
-                                    isSearchable={true}
-                                    name="chapter"
-                                    value={this.state.chapterList.map(
-                                        (list) => {
-                                            return this.props.chapter_name ===
-                                                list.chapter_name
-                                                ? {
-                                                      value: list.chapter_id,
-                                                      label: list.chapter_name,
-                                                  }
-                                                : "";
-                                        }
-                                    )}
-                                    options={this.state.chapterList.map(
-                                        (list) => {
-                                            return {
-                                                value: list.chapter_id,
-                                                label: list.chapter_name,
-                                            };
-                                        }
-                                    )}
-                                    onChange={this.handleSelect}
-                                    required
-                                />
-                            </div>
-                            <div className="col-md-8 d-flex align-items-center justify-content-start justify-content-md-end">
-                                <div className="mr-2 primary-text font-weight-bold-600">
-                                    Assigned to:
-                                </div>
-                                <div className="p-2 bg-white shadow-sm rounded-lg small font-weight-bold-600">
-                                    {this.state.teacher_name}
+                <div className="card shadow-sm" style={{ overflow: "auto" }}>
+                    {/* Course details */}
+                    <div style={{ minWidth: "1100px" }}>
+                        <div className="card-header tomato-bg primary-text font-weight-bold-600">
+                            <div className="row align-items-center">
+                                <div className="col-4">Topic structure</div>
+                                <div className="col-8 small primary-text font-weight-bold">
+                                    <div className="row justify-content-end">
+                                        <div className="col-2">Summary</div>
+                                        <div className="col-2">Notes</div>
+                                        <div className="col-2">Match</div>
+                                        <div className="col-2">Concept</div>
+                                        <div className="col-2">Type 1 Q</div>
+                                        <div className="col-2">Type 2 Q</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        <div className="card-body p-3">
+                            <Accordion defaultActiveKey="0">
+                                <Card className="bg-transparent">
+                                    <Accordion.Toggle
+                                        as={Card.Header}
+                                        eventKey="0"
+                                        className="secondary-bg shadow-sm mb-2 py-2"
+                                        style={{
+                                            borderRadius: "8px",
+                                            cursor: "default",
+                                        }}
+                                        onClick={() => {
+                                            this.setState({
+                                                collapsed:
+                                                    !this.state.collapsed,
+                                            });
+                                        }}
+                                    >
+                                        <div className="row align-items-center">
+                                            <div className="col-4">
+                                                <div className="row align-items-center">
+                                                    <div className="col-1">
+                                                        <span>
+                                                            <i
+                                                                className={`fas fa-chevron-circle-down ${
+                                                                    this.state
+                                                                        .collapsed
+                                                                        ? "fa-rotate-270"
+                                                                        : ""
+                                                                }`}
+                                                            ></i>
+                                                        </span>
+                                                    </div>
+                                                    <div className="col-10 d-flex small font-weight-bold">
+                                                        <div className="mr-3">
+                                                            {
+                                                                this.state
+                                                                    .chapterIndex
+                                                            }
+                                                        </div>
+                                                        <div>
+                                                            {
+                                                                this.props
+                                                                    .chapter_name
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-                        <div
-                            className="card shadow-sm"
-                            style={{ overflow: "auto" }}
-                        >
-                            {/* Course details */}
-                            <div style={{ minWidth: "1100px" }}>
-                                <div className="card-header tomato-bg primary-text font-weight-bold-600">
-                                    <div className="row align-items-center">
-                                        <div className="col-4">
-                                            Topic structure
-                                        </div>
-                                        <div className="col-8 small primary-text font-weight-bold">
-                                            <div className="row justify-content-end">
-                                                <div className="col-2">
-                                                    Summary
-                                                </div>
-                                                <div className="col-2">
-                                                    Notes
-                                                </div>
-                                                <div className="col-2">
-                                                    Match
-                                                </div>
-                                                <div className="col-2">
-                                                    Concept
-                                                </div>
-                                                <div className="col-2">
-                                                    Type 1 Q
-                                                </div>
-                                                <div className="col-2">
-                                                    Type 2 Q
+                                            <div className="col-8">
+                                                <div className="row align-items-center">
+                                                    <div className="col-2">
+                                                        {this.state.chapters
+                                                            .topics &&
+                                                        Object.keys(
+                                                            this.state.chapters
+                                                                .topics
+                                                        ).length !== 0 ? (
+                                                            <Link
+                                                                to={`${this.props.match.url}/summary`}
+                                                            >
+                                                                <button
+                                                                    className={`btn ${
+                                                                        this
+                                                                            .state
+                                                                            .chapters
+                                                                            .approve
+                                                                            ? "btn-success"
+                                                                            : "btn-primary"
+                                                                    } shadow-none`}
+                                                                >
+                                                                    <i className="fas fa-eye"></i>
+                                                                </button>
+                                                            </Link>
+                                                        ) : (
+                                                            ""
+                                                        )}
+                                                    </div>
+                                                    <div className="col-2">
+                                                        {this.state.chapters
+                                                            .topics &&
+                                                        Object.keys(
+                                                            this.state.chapters
+                                                                .topics
+                                                        ).length !== 0 ? (
+                                                            <Link
+                                                                to={`${this.props.match.url}/notes`}
+                                                            >
+                                                                <button
+                                                                    className={`btn ${
+                                                                        this
+                                                                            .state
+                                                                            .chapters
+                                                                            .approve
+                                                                            ? "btn-success"
+                                                                            : "btn-primary"
+                                                                    } shadow-none`}
+                                                                >
+                                                                    <i className="fas fa-eye"></i>
+                                                                </button>
+                                                            </Link>
+                                                        ) : (
+                                                            ""
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                                <div className="card-body p-3">
-                                    <Accordion defaultActiveKey="0">
+                                    </Accordion.Toggle>
+
+                                    <Accordion.Collapse eventKey="0">
                                         <Card className="bg-transparent">
-                                            <Accordion.Toggle
-                                                as={Card.Header}
-                                                eventKey="0"
-                                                className="secondary-bg shadow-sm mb-2 py-2"
-                                                style={{
-                                                    borderRadius: "8px",
-                                                    cursor: "default",
-                                                }}
-                                                onClick={() => {
-                                                    this.setState({
-                                                        collapsed:
-                                                            !this.state
-                                                                .collapsed,
-                                                    });
-                                                }}
-                                            >
-                                                <div className="row align-items-center">
-                                                    <div className="col-4">
-                                                        <div className="row align-items-center">
-                                                            <div className="col-1">
-                                                                <span>
-                                                                    <i
-                                                                        className={`fas fa-chevron-circle-down ${
-                                                                            this
-                                                                                .state
-                                                                                .collapsed
-                                                                                ? "fa-rotate-270"
-                                                                                : ""
-                                                                        }`}
-                                                                    ></i>
-                                                                </span>
-                                                            </div>
-                                                            <div className="col-10 d-flex small font-weight-bold">
-                                                                <div className="mr-3">
-                                                                    {
-                                                                        this
-                                                                            .state
-                                                                            .chapterIndex
-                                                                    }
-                                                                </div>
-                                                                <div>
-                                                                    {
-                                                                        this
-                                                                            .props
-                                                                            .chapter_name
-                                                                    }
-                                                                </div>
-                                                            </div>
-                                                        </div>
+                                            {/* ----- Topic list ----- */}
+                                            {(
+                                                this.state.chapters.topics || []
+                                            ).map((data, index) => {
+                                                return (
+                                                    <Accordion key={index}>
+                                                        {this.topicRender(
+                                                            data,
+                                                            index
+                                                        )}
+                                                    </Accordion>
+                                                );
+                                            })}
+
+                                            {/* ----- Cycle test list ----- */}
+                                            {(
+                                                this.state.chapters
+                                                    .cycle_tests || []
+                                            ).map((data, index) => {
+                                                return (
+                                                    <div
+                                                        className="card card-header bg-light border shadow-sm mb-2"
+                                                        style={{
+                                                            padding: "12px",
+                                                        }}
+                                                        key={index}
+                                                    >
+                                                        <Link
+                                                            to={`${this.props.match.url}/cycle/${data.cycle_test_id}`}
+                                                            className="text-decoration-none"
+                                                            onClick={() => {
+                                                                storeDispatch(
+                                                                    CYCLE,
+                                                                    data.cycle_test_name
+                                                                );
+                                                            }}
+                                                        >
+                                                            <p className="small primary-text text-center font-weight-bold-600 mb-0">
+                                                                {
+                                                                    data.cycle_test_name
+                                                                }
+                                                            </p>
+                                                        </Link>
                                                     </div>
+                                                );
+                                            })}
 
-                                                    <div className="col-8">
-                                                        <div className="row align-items-center">
-                                                            <div className="col-2">
-                                                                {this.state
-                                                                    .chapters
-                                                                    .topics &&
-                                                                Object.keys(
-                                                                    this.state
-                                                                        .chapters
-                                                                        .topics
-                                                                ).length !==
-                                                                    0 ? (
-                                                                    <Link
-                                                                        to={`${this.props.match.url}/summary`}
-                                                                    >
-                                                                        <button
-                                                                            className={`btn ${
-                                                                                this
-                                                                                    .state
-                                                                                    .chapters
-                                                                                    .approve
-                                                                                    ? "btn-success"
-                                                                                    : "btn-primary"
-                                                                            } shadow-none`}
-                                                                        >
-                                                                            <i className="fas fa-eye"></i>
-                                                                        </button>
-                                                                    </Link>
-                                                                ) : (
-                                                                    ""
-                                                                )}
-                                                            </div>
-                                                            <div className="col-2">
-                                                                {this.state
-                                                                    .chapters
-                                                                    .topics &&
-                                                                Object.keys(
-                                                                    this.state
-                                                                        .chapters
-                                                                        .topics
-                                                                ).length !==
-                                                                    0 ? (
-                                                                    <Link
-                                                                        to={`${this.props.match.url}/notes`}
-                                                                    >
-                                                                        <button
-                                                                            className={`btn ${
-                                                                                this
-                                                                                    .state
-                                                                                    .chapters
-                                                                                    .approve
-                                                                                    ? "btn-success"
-                                                                                    : "btn-primary"
-                                                                            } shadow-none`}
-                                                                        >
-                                                                            <i className="fas fa-eye"></i>
-                                                                        </button>
-                                                                    </Link>
-                                                                ) : (
-                                                                    ""
-                                                                )}
-                                                            </div>
-                                                        </div>
+                                            {/* ----- Quiz list ----- */}
+                                            {(
+                                                this.state.chapters.quiz || []
+                                            ).map((data, quiz_index) => {
+                                                return (
+                                                    <div
+                                                        className="card card-header bg-light border shadow-sm mb-2"
+                                                        style={{
+                                                            padding: "12px",
+                                                        }}
+                                                        key={quiz_index}
+                                                    >
+                                                        <Link
+                                                            to={`${this.props.match.url}/quiz/${data.quiz_id}`}
+                                                            className="text-decoration-none"
+                                                            onClick={() => {
+                                                                storeDispatch(
+                                                                    QUIZ,
+                                                                    data.quiz_name
+                                                                );
+                                                            }}
+                                                        >
+                                                            <p className="small primary-text text-center font-weight-bold-600 mb-0">
+                                                                {data.quiz_name}
+                                                            </p>
+                                                        </Link>
                                                     </div>
-                                                </div>
-                                            </Accordion.Toggle>
-
-                                            <Accordion.Collapse eventKey="0">
-                                                <Card className="bg-transparent">
-                                                    {/* ----- Topic list ----- */}
-                                                    {(
-                                                        this.state.chapters
-                                                            .topics || []
-                                                    ).map((data, index) => {
-                                                        return (
-                                                            <Accordion
-                                                                key={index}
-                                                            >
-                                                                {this.topicRender(
-                                                                    data,
-                                                                    index
-                                                                )}
-                                                            </Accordion>
-                                                        );
-                                                    })}
-
-                                                    {/* ----- Cycle test list ----- */}
-                                                    {(
-                                                        this.state.chapters
-                                                            .cycle_tests || []
-                                                    ).map((data, index) => {
-                                                        return (
-                                                            <div
-                                                                className="card card-header bg-light border shadow-sm mb-2"
-                                                                style={{
-                                                                    padding:
-                                                                        "12px",
-                                                                }}
-                                                                key={index}
-                                                            >
-                                                                <Link
-                                                                    to={`${this.props.match.url}/cycle/${data.cycle_test_id}`}
-                                                                    className="text-decoration-none"
-                                                                    onClick={() => {
-                                                                        storeDispatch(
-                                                                            CYCLE,
-                                                                            data.cycle_test_name
-                                                                        );
-                                                                    }}
-                                                                >
-                                                                    <p className="small primary-text text-center font-weight-bold-600 mb-0">
-                                                                        {
-                                                                            data.cycle_test_name
-                                                                        }
-                                                                    </p>
-                                                                </Link>
-                                                            </div>
-                                                        );
-                                                    })}
-
-                                                    {/* ----- Quiz list ----- */}
-                                                    {(
-                                                        this.state.chapters
-                                                            .quiz || []
-                                                    ).map(
-                                                        (data, quiz_index) => {
-                                                            return (
-                                                                <div
-                                                                    className="card card-header bg-light border shadow-sm mb-2"
-                                                                    style={{
-                                                                        padding:
-                                                                            "12px",
-                                                                    }}
-                                                                    key={
-                                                                        quiz_index
-                                                                    }
-                                                                >
-                                                                    <Link
-                                                                        to={`${this.props.match.url}/quiz/${data.quiz_id}`}
-                                                                        className="text-decoration-none"
-                                                                        onClick={() => {
-                                                                            storeDispatch(
-                                                                                QUIZ,
-                                                                                data.quiz_name
-                                                                            );
-                                                                        }}
-                                                                    >
-                                                                        <p className="small primary-text text-center font-weight-bold-600 mb-0">
-                                                                            {
-                                                                                data.quiz_name
-                                                                            }
-                                                                        </p>
-                                                                    </Link>
-                                                                </div>
-                                                            );
-                                                        }
-                                                    )}
-                                                </Card>
-                                            </Accordion.Collapse>
+                                                );
+                                            })}
                                         </Card>
-                                    </Accordion>
-                                </div>
-                            </div>
+                                    </Accordion.Collapse>
+                                </Card>
+                            </Accordion>
                         </div>
-
-                        {/* Loading component */}
-                        {this.state.page_loading ? <Loading /> : ""}
                     </div>
                 </div>
-            </div>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
+            </Wrapper>
         );
     }
 }

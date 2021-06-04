@@ -68,6 +68,11 @@ class Quiz extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -109,6 +114,11 @@ class Quiz extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -173,74 +183,72 @@ class Quiz extends Component {
                                 <div className="row">
                                     {Object.entries(this.state.quiz).length !==
                                     0
-                                        ? this.state.quiz.levels
-                                            ? this.state.quiz.levels.map(
-                                                  (level, index) => {
-                                                      return (
+                                        ? (this.state.quiz.levels || []).map(
+                                              (level, index) => {
+                                                  return (
+                                                      <div
+                                                          className="col-md-4"
+                                                          key={index}
+                                                      >
                                                           <div
-                                                              className="col-md-4"
-                                                              key={index}
+                                                              className={`row ${this.state.cssArray[index]}`}
+                                                              style={{
+                                                                  height: "50vh",
+                                                              }}
                                                           >
-                                                              <div
-                                                                  className={`row ${this.state.cssArray[index]}`}
-                                                                  style={{
-                                                                      height: "50vh",
-                                                                  }}
-                                                              >
-                                                                  <div className="col-12">
-                                                                      <div className="text-center d-flex flex-column align-items-center justify-content-center rounded-pill primary-bg p-4">
-                                                                          <div
-                                                                              className="bg-white d-flex align-items-center justify-content-center rounded-lg font-weight-bold-600 primary-text mb-2"
-                                                                              style={{
-                                                                                  width: "30px",
-                                                                                  height: "30px",
-                                                                              }}
-                                                                          >
-                                                                              {index +
-                                                                                  1}
-                                                                          </div>
-                                                                          <p className="h5 text-white font-weight-bold-600 mb-0">
-                                                                              {this
-                                                                                  .state
-                                                                                  .quiz
-                                                                                  .scored_points >=
-                                                                              level.min_points
-                                                                                  ? level.level_name
-                                                                                  : `Earn ${level.min_points} points to unlock`}
-                                                                          </p>
+                                                              <div className="col-12">
+                                                                  <div className="text-center d-flex flex-column align-items-center justify-content-center rounded-pill primary-bg p-4">
+                                                                      <div
+                                                                          className="bg-white d-flex align-items-center justify-content-center rounded-lg font-weight-bold-600 primary-text mb-2"
+                                                                          style={{
+                                                                              width: "30px",
+                                                                              height: "30px",
+                                                                          }}
+                                                                      >
+                                                                          {index +
+                                                                              1}
                                                                       </div>
-                                                                      <div className="text-center mt-2">
+                                                                      <p className="h5 text-white font-weight-bold-600 mb-0">
                                                                           {this
                                                                               .state
                                                                               .quiz
                                                                               .scored_points >=
-                                                                          level.min_points ? (
-                                                                              <button
-                                                                                  className="btn btn-primary shadow-none rounded-pill px-3"
-                                                                                  onClick={() =>
-                                                                                      this.handleExamStart(
-                                                                                          level.level_id,
-                                                                                          level.complexity
-                                                                                      )
-                                                                                  }
-                                                                              >
-                                                                                  <i className="fas fa-lock-open fa-sm mr-1"></i>{" "}
-                                                                                  Start
-                                                                              </button>
-                                                                          ) : (
-                                                                              <button className="btn btn-primary shadow-none rounded-pill px-3">
-                                                                                  <i className="fas fa-lock fa-sm mr-1"></i>{" "}
-                                                                                  Lock
-                                                                              </button>
-                                                                          )}
-                                                                      </div>
+                                                                          level.min_points
+                                                                              ? level.level_name
+                                                                              : `Earn ${level.min_points} points to unlock`}
+                                                                      </p>
+                                                                  </div>
+                                                                  <div className="text-center mt-2">
+                                                                      {this
+                                                                          .state
+                                                                          .quiz
+                                                                          .scored_points >=
+                                                                      level.min_points ? (
+                                                                          <button
+                                                                              className="btn btn-primary shadow-none rounded-pill px-3"
+                                                                              onClick={() =>
+                                                                                  this.handleExamStart(
+                                                                                      level.level_id,
+                                                                                      level.complexity
+                                                                                  )
+                                                                              }
+                                                                          >
+                                                                              <i className="fas fa-lock-open fa-sm mr-1"></i>{" "}
+                                                                              Start
+                                                                          </button>
+                                                                      ) : (
+                                                                          <button className="btn btn-primary shadow-none rounded-pill px-3">
+                                                                              <i className="fas fa-lock fa-sm mr-1"></i>{" "}
+                                                                              Lock
+                                                                          </button>
+                                                                      )}
                                                                   </div>
                                                               </div>
                                                           </div>
-                                                      );
-                                                  }
-                                              )
-                                            : ""
+                                                      </div>
+                                                  );
+                                              }
+                                          )
                                         : ""}
                                 </div>
                             </div>

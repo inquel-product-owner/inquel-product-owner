@@ -40,6 +40,10 @@ class EmailVerify extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    validToken: false,
+                    page_loading: false,
+                });
             });
     };
 

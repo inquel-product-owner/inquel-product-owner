@@ -70,6 +70,11 @@ class Summary extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
         window.MathJax.typeset();
     };
@@ -241,6 +246,8 @@ class Summary extends Component {
                                                     <div className="card">
                                                         <div className="card-body py-0">
                                                             {this.state
+                                                                .summaryData &&
+                                                            this.state
                                                                 .summaryData
                                                                 .length !== 0
                                                                 ? this.state.summaryData.map(

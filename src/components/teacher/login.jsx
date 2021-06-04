@@ -93,6 +93,11 @@ class TeacherLogin extends Component {
                             })
                             .catch((err) => {
                                 console.log(err);
+                                this.setState({
+                                    errorMsg: "Something went wrong!",
+                                    showErrorAlert: true,
+                                    page_loading: false,
+                                });
                             });
                         // Logout the admin if he is logged in
                     } else if (localStorage.getItem("Inquel-Auth")) {
@@ -116,12 +121,16 @@ class TeacherLogin extends Component {
                             })
                             .catch((err) => {
                                 console.log(err);
+                                this.setState({
+                                    errorMsg: "Something went wrong!",
+                                    showErrorAlert: true,
+                                    page_loading: false,
+                                });
                             });
                     } else {
                         this.setLocalStorage(result);
                     }
-                }
-                if (!result.sts && result.msg) {
+                } else {
                     this.setState({
                         errorMsg: result.msg,
                         showErrorAlert: true,
@@ -131,6 +140,11 @@ class TeacherLogin extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 

@@ -144,6 +144,8 @@ class TeacherNotesUpload extends Component {
             .catch((err) => {
                 console.log(err);
                 this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
                     page_loading: false,
                 });
             });
@@ -222,11 +224,9 @@ class TeacherNotesUpload extends Component {
                             notes_id: result.data.notes_id,
                         });
                         this.loadNotesData();
-                    } else if (result.data.sts === false) {
+                    } else {
                         this.setState({
-                            errorMsg: result.data.detail
-                                ? result.data.detail
-                                : result.data.msg,
+                            errorMsg: result.data.msg,
                             showErrorAlert: true,
                             showLoader: false,
                         });
@@ -234,9 +234,7 @@ class TeacherNotesUpload extends Component {
                 })
                 .catch((err) => {
                     this.setState({
-                        errorMsg: err.response.data.detail
-                            ? err.response.data.detail
-                            : err.response.data.msg,
+                        errorMsg: err.response.data.msg,
                         showErrorAlert: true,
                         showLoader: false,
                     });

@@ -71,6 +71,11 @@ class NotesModal extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    showLoader: false,
+                });
             });
     };
 
@@ -276,6 +281,11 @@ class PersonalNotes extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
         window.MathJax.typeset();
     };
@@ -600,29 +610,26 @@ class PersonalNotes extends Component {
                                                                   >
                                                                       <Card>
                                                                           {/* ----- Topic list ----- */}
-                                                                          {data.topics.map(
+                                                                          {(
+                                                                              data.topics ||
+                                                                              []
+                                                                          ).map(
                                                                               (
-                                                                                  topic
+                                                                                  topic,
+                                                                                  topic_index
                                                                               ) => {
-                                                                                  return topic.chapter_structure.map(
-                                                                                      (
-                                                                                          topics,
-                                                                                          topic_index
-                                                                                      ) => {
-                                                                                          return (
-                                                                                              <Accordion
-                                                                                                  key={
-                                                                                                      topic_index
-                                                                                                  }
-                                                                                              >
-                                                                                                  {this.topic(
-                                                                                                      topics,
-                                                                                                      topic_index,
-                                                                                                      index
-                                                                                                  )}
-                                                                                              </Accordion>
-                                                                                          );
-                                                                                      }
+                                                                                  return (
+                                                                                      <Accordion
+                                                                                          key={
+                                                                                              topic_index
+                                                                                          }
+                                                                                      >
+                                                                                          {this.topic(
+                                                                                              topic,
+                                                                                              topic_index,
+                                                                                              index
+                                                                                          )}
+                                                                                      </Accordion>
                                                                                   );
                                                                               }
                                                                           )}
@@ -645,57 +652,46 @@ class PersonalNotes extends Component {
                                             ).length !== 0 ? (
                                                 this.state.notesData[
                                                     this.state.topic_num
-                                                ] !== undefined ? (
-                                                    this.state.notesData[
-                                                        this.state.topic_num
-                                                    ].length !== 0 ? (
-                                                        <div className="row">
-                                                            {this.state.notesData[
-                                                                this.state
-                                                                    .topic_num
-                                                            ].map(
-                                                                (
-                                                                    data,
-                                                                    index
-                                                                ) => {
-                                                                    return (
-                                                                        <div
-                                                                            className="col-md-6 mb-3"
-                                                                            key={
-                                                                                index
-                                                                            }
-                                                                        >
-                                                                            <div className="card light-bg shadow-sm">
-                                                                                <div className="card-body">
-                                                                                    <div className="row align-items-center pr-2">
-                                                                                        <div className="col-10 primary-text font-weight-bold-600 small">
-                                                                                            {
-                                                                                                data.personal_notes_title
-                                                                                            }
-                                                                                        </div>
-                                                                                        <div className="col-2">
-                                                                                            <button
-                                                                                                className="btn btn-primary btn-sm shadow-none"
-                                                                                                onClick={() =>
-                                                                                                    this.toggleModal(
-                                                                                                        data
-                                                                                                    )
-                                                                                                }
-                                                                                            >
-                                                                                                View
-                                                                                            </button>
-                                                                                        </div>
-                                                                                    </div>
+                                                ] &&
+                                                this.state.notesData[
+                                                    this.state.topic_num
+                                                ].length !== 0 ? (
+                                                    <div className="row">
+                                                        {this.state.notesData[
+                                                            this.state.topic_num
+                                                        ].map((data, index) => {
+                                                            return (
+                                                                <div
+                                                                    className="col-md-6 mb-3"
+                                                                    key={index}
+                                                                >
+                                                                    <div className="card light-bg shadow-sm">
+                                                                        <div className="card-body">
+                                                                            <div className="row align-items-center pr-2">
+                                                                                <div className="col-10 primary-text font-weight-bold-600 small">
+                                                                                    {
+                                                                                        data.personal_notes_title
+                                                                                    }
+                                                                                </div>
+                                                                                <div className="col-2">
+                                                                                    <button
+                                                                                        className="btn btn-primary btn-sm shadow-none"
+                                                                                        onClick={() =>
+                                                                                            this.toggleModal(
+                                                                                                data
+                                                                                            )
+                                                                                        }
+                                                                                    >
+                                                                                        View
+                                                                                    </button>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
-                                                                    );
-                                                                }
-                                                            )}
-                                                        </div>
-                                                    ) : (
-                                                        "No content to display..."
-                                                    )
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
                                                 ) : (
                                                     "No content to display..."
                                                 )

@@ -142,6 +142,8 @@ class TeacherSummaryUpload extends Component {
             .catch((err) => {
                 console.log(err);
                 this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
                     page_loading: false,
                 });
             });
@@ -221,9 +223,7 @@ class TeacherSummaryUpload extends Component {
                         this.loadSummaryData();
                     } else if (result.data.sts === false) {
                         this.setState({
-                            errorMsg: result.data.detail
-                                ? result.data.detail
-                                : result.data.msg,
+                            errorMsg: result.data.msg,
                             showErrorAlert: true,
                             showLoader: false,
                         });
@@ -231,9 +231,7 @@ class TeacherSummaryUpload extends Component {
                 })
                 .catch((err) => {
                     this.setState({
-                        errorMsg: err.response.data.detail
-                            ? err.response.data.detail
-                            : err.response.data.msg,
+                        errorMsg: err.response.data.msg,
                         showErrorAlert: true,
                         showLoader: false,
                     });

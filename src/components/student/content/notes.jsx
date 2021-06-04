@@ -143,6 +143,11 @@ class Notes extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
         window.MathJax.typeset();
     };
@@ -460,29 +465,26 @@ class Notes extends Component {
                                                                   >
                                                                       <Card>
                                                                           {/* ----- Topic list ----- */}
-                                                                          {data.topics.map(
+                                                                          {(
+                                                                              data.topics ||
+                                                                              []
+                                                                          ).map(
                                                                               (
-                                                                                  topic
+                                                                                  topic,
+                                                                                  topic_index
                                                                               ) => {
-                                                                                  return topic.chapter_structure.map(
-                                                                                      (
-                                                                                          topics,
-                                                                                          topic_index
-                                                                                      ) => {
-                                                                                          return (
-                                                                                              <Accordion
-                                                                                                  key={
-                                                                                                      topic_index
-                                                                                                  }
-                                                                                              >
-                                                                                                  {this.topic(
-                                                                                                      topics,
-                                                                                                      topic_index,
-                                                                                                      index
-                                                                                                  )}
-                                                                                              </Accordion>
-                                                                                          );
-                                                                                      }
+                                                                                  return (
+                                                                                      <Accordion
+                                                                                          key={
+                                                                                              topic_index
+                                                                                          }
+                                                                                      >
+                                                                                          {this.topic(
+                                                                                              topic,
+                                                                                              topic_index,
+                                                                                              index
+                                                                                          )}
+                                                                                      </Accordion>
                                                                                   );
                                                                               }
                                                                           )}
@@ -501,8 +503,9 @@ class Notes extends Component {
                                     <div className="col-md-9 pl-md-0">
                                         <div className="card">
                                             <div className="card-body py-0">
-                                                {this.state.notesData.length !==
-                                                0
+                                                {this.state.notesData &&
+                                                this.state.notesData.length !==
+                                                    0
                                                     ? this.state.notesData.map(
                                                           (data, index) => {
                                                               return data.direct_question_urls !==

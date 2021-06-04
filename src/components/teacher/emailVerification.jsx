@@ -57,6 +57,10 @@ class TeacherEmailVerification extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    validToken: false,
+                    page_loading: false,
+                });
             });
     };
 
@@ -154,6 +158,11 @@ class TeacherEmailVerification extends Component {
                 })
                 .catch((err) => {
                     console.log(err);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
                 });
         }
     };

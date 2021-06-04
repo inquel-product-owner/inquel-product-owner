@@ -112,6 +112,11 @@ class Favourites extends Component {
             })
             .catch((err) => {
                 console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
         window.MathJax.typeset();
     };
@@ -294,7 +299,8 @@ class Favourites extends Component {
 
                                     <div className="col-md-9 pl-md-0">
                                         <div className="card card-body py-0">
-                                            {Object.entries(
+                                            {this.state.favouritesData &&
+                                            Object.entries(
                                                 this.state.favouritesData
                                             ).length !== 0
                                                 ? Object.entries(

@@ -96,9 +96,7 @@ class ImageUploadModal extends Component {
                         });
                     } else {
                         this.setState({
-                            errorMsg: result.data.detail
-                                ? result.data.detail
-                                : result.data.msg,
+                            errorMsg: result.data.msg,
                             showErrorAlert: true,
                             showLoader: false,
                         });
@@ -106,6 +104,11 @@ class ImageUploadModal extends Component {
                 })
                 .catch((err) => {
                     console.log(err);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
                 });
         }
     };
@@ -332,7 +335,7 @@ class TeacherNotes extends Component {
                         url: result.data.direct_question_urls || [],
                         page_loading: false,
                     });
-                } else if (result.sts === false) {
+                } else {
                     this.setState({
                         errorMsg: result.msg,
                         showErrorAlert: true,
@@ -345,6 +348,8 @@ class TeacherNotes extends Component {
             .catch((err) => {
                 console.log(err);
                 this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
                     page_loading: false,
                 });
             });
@@ -440,10 +445,12 @@ class TeacherNotes extends Component {
                 }
             })
             .catch((err) => {
+                console.log(err);
                 this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
                     showLoader: false,
                 });
-                console.log(err);
             });
     };
 
@@ -484,10 +491,12 @@ class TeacherNotes extends Component {
                 }
             })
             .catch((err) => {
+                console.log(err);
                 this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
                     showLoader: false,
                 });
-                console.log(err);
             });
     };
 
