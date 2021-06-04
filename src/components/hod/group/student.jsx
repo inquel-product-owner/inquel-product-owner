@@ -4,7 +4,7 @@ import Header from "../shared/navbar";
 import SideNav from "../shared/sidenav";
 import { Link } from "react-router-dom";
 import { baseUrl, hodUrl } from "../../../shared/baseUrl.js";
-import { paginationCount } from "../../../shared/globalValues.js";
+import { paginationCount } from "../../../shared/constant.js";
 import Loading from "../../common/loader";
 import Paginations from "../../common/pagination";
 import StudentTable from "../../table/student";
@@ -296,7 +296,7 @@ class HODGroupStudents extends Component {
                     });
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });

@@ -5,7 +5,7 @@ import SideNav from "./shared/sidenav";
 import { Link } from "react-router-dom";
 import { Badge } from "react-bootstrap";
 import { baseUrl, hodUrl } from "../../shared/baseUrl";
-import { paginationCount } from "../../shared/globalValues.js";
+import { paginationCount } from "../../shared/constant.js";
 import Loading from "../common/loader";
 import GroupTable from "../table/group";
 import SubjectTable from "../table/subject";
@@ -62,7 +62,7 @@ class HODTeacherProfile extends Component {
                     });
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -89,7 +89,7 @@ class HODTeacherProfile extends Component {
                     });
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -116,7 +116,7 @@ class HODTeacherProfile extends Component {
                     });
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });

@@ -71,7 +71,7 @@ class HODSubjectChapter extends Component {
                     });
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -116,7 +116,7 @@ class HODSubjectChapter extends Component {
                     );
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
@@ -451,7 +451,7 @@ class HODSubjectChapter extends Component {
                                     className="btn btn-primary btn-sm shadow-none"
                                     onClick={this.handlePublish}
                                     disabled={
-                                        this.state.chapters.chapter_structure
+                                        this.state.chapters.topics
                                             ? false
                                             : true
                                     }
@@ -595,11 +595,11 @@ class HODSubjectChapter extends Component {
                                                             <div className="col-2">
                                                                 {this.state
                                                                     .chapters
-                                                                    .chapter_structure &&
+                                                                    .topics &&
                                                                 Object.keys(
                                                                     this.state
                                                                         .chapters
-                                                                        .chapter_structure
+                                                                        .topics
                                                                 ).length !==
                                                                     0 ? (
                                                                     <Link
@@ -625,11 +625,11 @@ class HODSubjectChapter extends Component {
                                                             <div className="col-2">
                                                                 {this.state
                                                                     .chapters
-                                                                    .chapter_structure &&
+                                                                    .topics &&
                                                                 Object.keys(
                                                                     this.state
                                                                         .chapters
-                                                                        .chapter_structure
+                                                                        .topics
                                                                 ).length !==
                                                                     0 ? (
                                                                     <Link
@@ -662,8 +662,7 @@ class HODSubjectChapter extends Component {
                                                     {/* ----- Topic list ----- */}
                                                     {(
                                                         this.state.chapters
-                                                            .chapter_structure ||
-                                                        []
+                                                            .topics || []
                                                     ).map((data, index) => {
                                                         return (
                                                             <Accordion

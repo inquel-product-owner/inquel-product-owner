@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import profilepic from "../../assets/user-v1.png";
 import Wrapper from "./wrapper";
-import { paginationCount } from "../../shared/globalValues.js";
+import { paginationCount } from "../../shared/constant.js";
 import Paginations from "../common/pagination";
 import StudentTable from "../table/student";
 import { Badge } from "react-bootstrap";

@@ -4,8 +4,8 @@ import { Modal, Alert, Spinner, Dropdown } from "react-bootstrap";
 import Header from "./shared/navbar";
 import SideNav from "./shared/sidenav";
 import courseimg from "../../assets/code.jpg";
-import { baseUrl, hodUrl } from "../../shared/baseUrl.js";
-import { paginationCount } from "../../shared/globalValues.js";
+import { baseUrl, hodUrl } from "../../shared/baseUrl";
+import { paginationCount } from "../../shared/constant";
 import Loading from "../common/loader";
 import GroupTable from "../table/group";
 import SubjectTable from "../table/subject";
@@ -77,7 +77,7 @@ class SubjectModal extends Component {
                     });
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         showLoader: false,
                     });
@@ -233,7 +233,7 @@ class SubjectModal extends Component {
                     this.props.formSubmission();
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         showLoader: false,
                     });
@@ -555,7 +555,7 @@ class HODDashboard extends Component {
                     });
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });

@@ -77,16 +77,14 @@ class Header extends Component {
             <>
                 <Logout path="teacher" />
                 <Navbar
-                    collapseOnSelect
-                    expand="md"
                     variant="light"
                     className="shadow-sm fixed-top bg-white justify-content-center"
                 >
-                    <div className="row align-items-center w-100">
-                        <div className="col-4 pl-0">
-                            <Navbar.Brand className="d-flex mr-0">
+                    <div className="row align-items-center justify-content-between w-100">
+                        <div className="col-md-3 col-6 pl-0">
+                            <Navbar.Brand className="d-flex align-items-center mr-0">
                                 <button
-                                    className="btn btn-outline-secondary btn-sm d-block d-md-none mr-2"
+                                    className="btn btn-outline-secondary btn-sm border-0 shadow-none d-block d-md-none mr-1"
                                     onClick={this.props.togglenav}
                                 >
                                     <i className="fas fa-bars"></i>
@@ -97,85 +95,85 @@ class Header extends Component {
                             </Navbar.Brand>
                         </div>
 
-                        <div className="col-4 d-none d-md-block">
+                        <div className="col-6 d-none d-md-block">
                             <h5 className="primary-text text-center font-weight-bold-600 mb-0 text-truncate">
                                 {this.props.name}
                             </h5>
                         </div>
 
-                        <Navbar.Toggle
-                            aria-controls="responsive-navbar-nav"
-                            className="ml-auto"
-                        />
-
-                        <div className="col-md-4 px-0">
-                            <Navbar.Collapse
-                                id="responsive-navbar-nav"
-                                style={{ flexGrow: "0" }}
-                            >
-                                <Nav className="ml-auto">
-                                    <Nav.Link href="/">
-                                        <i className="far fa-bell mr-md-3 mr-0 mt-0 mt-md-2"></i>
-                                    </Nav.Link>
-                                    <Dropdown>
-                                        <Dropdown.Toggle
-                                            variant="light"
-                                            className="bg-white border-0 nav-link shadow-none"
-                                            id="dropdown-basic"
-                                        >
-                                            <img
-                                                src={
-                                                    this.props.profile &&
-                                                    Object.keys(
-                                                        this.props.profile
-                                                    ).length !== 0
+                        <div className="col-md-3 col-6 d-flex justify-content-end pr-0">
+                            <Nav className="ml-auto">
+                                <Nav.Link href="/">
+                                    <i className="far fa-bell mr-2 mt-2"></i>
+                                </Nav.Link>
+                                <Dropdown>
+                                    <Dropdown.Toggle
+                                        variant="light"
+                                        className="bg-white border-0 nav-link shadow-none"
+                                        id="dropdown-basic"
+                                    >
+                                        <img
+                                            src={
+                                                this.props.profile &&
+                                                Object.keys(this.props.profile)
+                                                    .length !== 0
+                                                    ? this.props.profile
+                                                          .profile_link &&
+                                                      this.props.profile
+                                                          .profile_link !== null
                                                         ? this.props.profile
-                                                              .profile_link &&
-                                                          this.props.profile
-                                                              .profile_link !==
-                                                              null
-                                                            ? this.props.profile
-                                                                  .profile_link
-                                                            : userpic
+                                                              .profile_link
                                                         : userpic
-                                                }
-                                                alt={
-                                                    this.props.profile &&
-                                                    Object.keys(
-                                                        this.props.profile
-                                                    ).length !== 0
-                                                        ? this.props.profile
-                                                              .username
-                                                        : ""
-                                                }
-                                                className="profile-img-circle mr-1 mb-1"
-                                            />{" "}
+                                                    : userpic
+                                            }
+                                            alt={
+                                                this.props.profile &&
+                                                Object.keys(this.props.profile)
+                                                    .length !== 0
+                                                    ? this.props.profile
+                                                          .username
+                                                    : ""
+                                            }
+                                            className="profile-img-circle mr-1"
+                                        />{" "}
+                                        <span className="d-none d-md-inline">
                                             {this.props.profile &&
                                             Object.keys(this.props.profile)
                                                 .length !== 0
                                                 ? this.props.profile.username
                                                 : ""}
-                                        </Dropdown.Toggle>
+                                        </span>
+                                    </Dropdown.Toggle>
 
-                                        <Dropdown.Menu>
-                                            <Dropdown.Item
-                                                as={Link}
-                                                to="/teacher/profile"
-                                            >
-                                                <i className="fas fa-user mr-2"></i>{" "}
-                                                My Profile
-                                            </Dropdown.Item>
-                                            <Dropdown.Divider />
-                                            <Dropdown.Item
-                                                onClick={this.handleLogout}
-                                            >
-                                                <i className="fas fa-sign-out-alt mr-2"></i>{" "}
-                                                Logout
-                                            </Dropdown.Item>
-                                        </Dropdown.Menu>
-                                    </Dropdown>
-                                </Nav>
-                            </Navbar.Collapse>
+                                    <Dropdown.Menu>
+                                        <Dropdown.Header className="d-block d-md-none font-weight-bold-600 text-center">
+                                            Hi,{" "}
+                                            <span className="primary-text">
+                                                {this.props.profile &&
+                                                Object.keys(this.props.profile)
+                                                    .length !== 0
+                                                    ? this.props.profile
+                                                          .username
+                                                    : ""}
+                                            </span>
+                                        </Dropdown.Header>
+                                        <Dropdown.Item
+                                            as={Link}
+                                            to="/teacher/profile"
+                                        >
+                                            <i className="fas fa-user mr-2"></i>{" "}
+                                            My Profile
+                                        </Dropdown.Item>
+                                        <Dropdown.Divider />
+                                        <Dropdown.Item
+                                            onClick={this.handleLogout}
+                                        >
+                                            <i className="fas fa-sign-out-alt mr-2"></i>{" "}
+                                            Logout
+                                        </Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                            </Nav>
                         </div>
                     </div>
                 </Navbar>

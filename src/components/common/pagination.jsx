@@ -1,6 +1,6 @@
 import React from "react";
 import Pagination from "react-js-pagination";
-import { paginationCount } from "../../shared/globalValues";
+import { paginationCount } from "../../shared/constant";
 
 function Paginations(props) {
     return (

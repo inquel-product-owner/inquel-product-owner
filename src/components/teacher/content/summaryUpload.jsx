@@ -131,7 +131,7 @@ class TeacherSummaryUpload extends Component {
                     });
                 } else if (result.sts === false) {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                     });
                 }

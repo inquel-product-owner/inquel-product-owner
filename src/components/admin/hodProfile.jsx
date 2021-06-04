@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Badge, Spinner } from "react-bootstrap";
 import profilepic from "../../assets/user-v1.png";
 import Select from "react-select";
-import { paginationCount } from "../../shared/globalValues.js";
+import { paginationCount } from "../../shared/constant.js";
 import GroupTable from "../table/group";
 import Paginations from "../common/pagination";
 import ReactSwitch from "../common/switchComponent";

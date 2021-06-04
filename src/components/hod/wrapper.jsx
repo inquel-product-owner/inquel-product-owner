@@ -5,7 +5,6 @@ import Loading from "../common/loader";
 import AlertBox from "../common/alert";
 import { ErrorBoundary } from "react-error-boundary";
 import ErrorFallback from "../common/ErrorFallback";
-import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
 
 class Wrapper extends React.Component {
     constructor(props) {
@@ -17,13 +16,6 @@ class Wrapper extends React.Component {
             showErrorAlert: false,
             showSuccessAlert: false,
             page_loading: true,
-        };
-        this.url = baseUrl + adminPathUrl;
-        this.authToken = localStorage.getItem("Inquel-Auth");
-        this.headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            "Inquel-Auth": this.authToken,
         };
     }
 

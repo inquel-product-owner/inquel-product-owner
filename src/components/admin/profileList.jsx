@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Tabs, Tab, Modal, Alert, Spinner } from "react-bootstrap";
 import { baseUrl, adminPathUrl } from "../../shared/baseUrl.js";
-import { paginationCount } from "../../shared/globalValues.js";
+import { paginationCount } from "../../shared/constant.js";
 import Select from "react-select";
 import Wrapper from "./wrapper";
 import HODTable from "../table/hod";

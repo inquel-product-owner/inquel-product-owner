@@ -4,7 +4,7 @@ import SideNav from "./shared/sidenav";
 import { Dropdown } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { baseUrl, teacherUrl } from "../../shared/baseUrl.js";
-import { paginationCount } from "../../shared/globalValues.js";
+import { paginationCount } from "../../shared/constant.js";
 import Loading from "../common/loader";
 import StudentTable from "../table/student";
 import Paginations from "../common/pagination";
@@ -75,7 +75,7 @@ class TeacherStudentList extends Component {
                     });
                 } else {
                     this.setState({
-                        errorMsg: result.detail ? result.detail : result.msg,
+                        errorMsg: result.msg,
                         showErrorAlert: true,
                         page_loading: false,
                     });
