@@ -44,10 +44,6 @@ class Header extends Component {
             })
             .catch((err) => {
                 console.log(err);
-                this.props.errorAlert(
-                    "Something went wrong in loading profile data",
-                    true
-                );
             });
     };
 
@@ -75,7 +71,6 @@ class Header extends Component {
             })
             .catch((err) => {
                 console.log(err);
-                this.props.errorAlert("Something went wrong!", true);
             });
     };
 

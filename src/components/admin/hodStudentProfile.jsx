@@ -1,45 +1,64 @@
 import React, { Component } from "react";
-import profilepic from "../../assets/user-v1.png";
 import Wrapper from "./wrapper";
+import profilepic from "../../assets/user-v1.png";
 import { Badge } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
+import Loading from "../common/loader";
+import AlertBox from "../common/alert";
 
 class AdminHodStudentProfile extends Component {
     constructor(props) {
         super(props);
         this.state = {
             studentItems: [],
+
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            page_loading: true,
         };
         this.hodId = this.props.match.params.hodId;
         this.studentId = this.props.match.params.studentId;
+        this.url = baseUrl + adminPathUrl;
+        this.authToken = localStorage.getItem("Inquel-Auth");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Inquel-Auth": this.authToken,
+        };
     }
 
     componentDidMount = () => {
         document.title = "Student Profile - Admin | IQLabs";
 
-        fetch(
-            `${this.wrapper.url}/hod/${this.hodId}/student/${this.studentId}/`,
-            {
-                headers: this.wrapper.headers,
-                method: "GET",
-            }
-        )
+        fetch(`${this.url}/hod/${this.hodId}/student/${this.studentId}/`, {
+            headers: this.headers,
+            method: "GET",
+        })
             .then((res) => res.json())
             .then((result) => {
                 if (result.sts === true) {
                     this.setState({
                         studentItems: result.data,
+                        page_loading: false,
                     });
-                    this.wrapper.pageLoading(false);
                 } else {
-                    this.wrapper.pageLoading(false);
-                    this.wrapper.errorAlert(result.msg, true);
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
                 }
             })
             .catch((err) => {
                 console.log(err);
-                this.wrapper.pageLoading(false);
-                this.wrapper.errorAlert("Something went wrong!", true);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -49,8 +68,25 @@ class AdminHodStudentProfile extends Component {
                 history={this.props.history}
                 header="Student Profile"
                 activeLink="profiles"
-                ref={(ref) => (this.wrapper = ref)}
             >
+                {/* Alert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
+                />
+
                 {/* Breadcrumb */}
                 <nav aria-label="breadcrumb">
                     <ol className="breadcrumb mb-3">
@@ -187,6 +223,9 @@ class AdminHodStudentProfile extends Component {
                         </p>
                     </div>
                 </div>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
             </Wrapper>
         );
     }

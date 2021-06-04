@@ -3,6 +3,14 @@ import Wrapper from "./wrapper";
 import profilepic from "../../assets/user-v1.png";
 import { Tab, Row, Col, Nav, Badge } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
+import Loading from "../common/loader";
+import AlertBox from "../common/alert";
+import { connect } from "react-redux";
+
+const mapStateToProps = (state) => ({
+    hod_data: state.storage.temp,
+});
 
 function EmptyData() {
     return (
@@ -17,40 +25,52 @@ class AdminHodTeacherList extends Component {
         super(props);
         this.state = {
             teacherItems: [],
-            hodItems: [],
+
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            page_loading: true,
         };
         this.hodId = this.props.match.params.hodId;
+        this.url = baseUrl + adminPathUrl;
+        this.authToken = localStorage.getItem("Inquel-Auth");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Inquel-Auth": this.authToken,
+        };
     }
 
     componentDidMount = () => {
         document.title = "Teacher Profile - Admin | IQLabs";
 
-        Promise.all([
-            fetch(`${this.wrapper.url}/hod/${this.hodId}/`, {
-                headers: this.wrapper.headers,
-                method: "GET",
-            }).then((res) => res.json()),
-            fetch(`${this.wrapper.url}/hod/${this.hodId}/teacher/`, {
-                headers: this.wrapper.headers,
-                method: "GET",
-            }).then((res) => res.json()),
-        ])
+        fetch(`${this.url}/hod/${this.hodId}/teacher/`, {
+            headers: this.headers,
+            method: "GET",
+        })
+            .then((res) => res.json())
             .then((result) => {
-                if (result[1].sts === true) {
+                if (result.sts === true) {
                     this.setState({
-                        hodItems: result[0].data,
-                        teacherItems: result[1].data.results,
+                        teacherItems: result.data.results,
+                        page_loading: false,
                     });
-                    this.wrapper.pageLoading(false);
                 } else {
-                    this.wrapper.pageLoading(false);
-                    this.wrapper.errorAlert(result[1].msg, true);
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
                 }
             })
             .catch((err) => {
                 console.log(err);
-                this.wrapper.pageLoading(false);
-                this.wrapper.errorAlert("Something went wrong!", true);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -60,8 +80,25 @@ class AdminHodTeacherList extends Component {
                 history={this.props.history}
                 header="Teacher List"
                 activeLink="profiles"
-                ref={(ref) => (this.wrapper = ref)}
             >
+                {/* Alert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
+                />
+
                 {/* Breadcrumb */}
                 <nav aria-label="breadcrumb">
                     <ol className="breadcrumb mb-3">
@@ -86,29 +123,35 @@ class AdminHodTeacherList extends Component {
                             <div className="col-md-2 col-3">
                                 <img
                                     src={
-                                        this.state.hodItems.length !== 0
-                                            ? this.state.hodItems
+                                        this.props.hod_data &&
+                                        Object.keys(this.props.hod_data)
+                                            .length !== 0
+                                            ? this.props.hod_data
                                                   .profile_link !== null
-                                                ? this.state.hodItems
+                                                ? this.props.hod_data
                                                       .profile_link
                                                 : profilepic
                                             : profilepic
                                     }
-                                    alt={this.state.hodItems.full_name}
+                                    alt={this.props.hod_data.full_name}
                                     className="img-fluid profile-pic"
                                 />
                             </div>
                             <div className="col-md-10 col-9 pl-0">
                                 <h5 className="primary-text">
-                                    {this.state.hodItems.length !== 0
-                                        ? this.state.hodItems.full_name !== ""
-                                            ? this.state.hodItems.full_name
-                                            : this.state.hodItems.username
+                                    {this.props.hod_data &&
+                                    Object.keys(this.props.hod_data).length !==
+                                        0
+                                        ? this.props.hod_data.full_name !== ""
+                                            ? this.props.hod_data.full_name
+                                            : this.props.hod_data.username
                                         : ""}
                                 </h5>
                                 <p className="mb-0">
-                                    {this.state.hodItems.length !== 0 ? (
-                                        this.state.hodItems.is_active ? (
+                                    {this.props.hod_data &&
+                                    Object.keys(this.props.hod_data).length !==
+                                        0 ? (
+                                        this.props.hod_data.is_active ? (
                                             <Badge variant="success">
                                                 Active
                                             </Badge>
@@ -292,9 +335,12 @@ class AdminHodTeacherList extends Component {
                         </Tab.Container>
                     </div>
                 </div>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
             </Wrapper>
         );
     }
 }
 
-export default AdminHodTeacherList;
+export default connect(mapStateToProps)(AdminHodTeacherList);

@@ -5,6 +5,11 @@ import { Tabs, Tab, Modal, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import Switch from "react-switch";
 import courseimg from "../../assets/code.jpg";
+import { baseUrl, adminPathUrl } from "../../shared/baseUrl";
+import Loading from "../common/loader";
+import AlertBox from "../common/alert";
+import { ErrorBoundary } from "react-error-boundary";
+import ErrorFallback from "../common/ErrorFallback";
 
 class SubscriptionModal extends Component {
     render() {
@@ -908,6 +913,18 @@ class AdminDashboard extends Component {
             viewCourseCard: false,
             tableView: true,
             showSideNav: false,
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            page_loading: false,
+        };
+        this.url = baseUrl + adminPathUrl;
+        this.authToken = localStorage.getItem("Inquel-Auth");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Inquel-Auth": this.authToken,
         };
     }
 
@@ -951,1645 +968,1755 @@ class AdminDashboard extends Component {
                     activeLink="dashboard"
                 />
 
+                {/* Alert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
+                />
+
+                {/* Subscription create modal */}
+                <ErrorBoundary
+                    FallbackComponent={ErrorFallback}
+                    onReset={() => window.location.reload()}
+                >
+                    <AddCourse
+                        show={this.state.addCourseModal}
+                        onHide={this.toggleCourseModal}
+                    />
+                </ErrorBoundary>
+
                 <div
                     className={`section content ${
                         this.state.showSideNav ? "active" : ""
                     }`}
                 >
-                    <div className="container-fluid">
-                        <AddCourse
-                            show={this.state.addCourseModal}
-                            onHide={this.toggleCourseModal}
-                        />
-                        <div className="row">
-                            <div className="col-md-9">
-                                {/* Stats */}
-                                <p className="small font-weight-bold">
-                                    Quick Stats
-                                </p>
-                                <div className="row mb-4">
-                                    <div className="col-md-3 col-6 mb-3 mb-md-0">
-                                        <div className="card shadow-sm p-2 h-100">
-                                            <div className="card-body">
-                                                <p className="small font-weight-bold mb-2">
-                                                    Total Courses
-                                                </p>
-                                                <h3 className="font-weight-bold">
-                                                    28,345
-                                                </h3>
+                    <ErrorBoundary
+                        FallbackComponent={ErrorFallback}
+                        onReset={() => window.location.reload()}
+                    >
+                        <div className="container-fluid">
+                            <div className="row">
+                                <div className="col-md-9">
+                                    {/* Stats */}
+                                    <p className="small font-weight-bold">
+                                        Quick Stats
+                                    </p>
+                                    <div className="row mb-4">
+                                        <div className="col-md-3 col-6 mb-3 mb-md-0">
+                                            <div className="card shadow-sm p-2 h-100">
+                                                <div className="card-body">
+                                                    <p className="small font-weight-bold mb-2">
+                                                        Total Courses
+                                                    </p>
+                                                    <h3 className="font-weight-bold">
+                                                        28,345
+                                                    </h3>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="col-md-3 col-6 mb-3 mb-md-0">
+                                            <div className="card shadow-sm p-2 h-100">
+                                                <div className="card-body">
+                                                    <p className="small font-weight-bold mb-2">
+                                                        Pending Approval
+                                                    </p>
+                                                    <h3
+                                                        className="font-weight-bold"
+                                                        style={{
+                                                            color: "tomato",
+                                                        }}
+                                                    >
+                                                        120
+                                                    </h3>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="col-md-3 col-6 mb-3 mb-md-0">
+                                            <div className="card shadow-sm p-2 h-100">
+                                                <div className="card-body">
+                                                    <p className="small font-weight-bold mb-2">
+                                                        New Courses this month
+                                                    </p>
+                                                    <h3 className="font-weight-bold">
+                                                        89{" "}
+                                                        <span className="text-success">
+                                                            <i className="fas fa-angle-double-up ml-2 fa-sm"></i>
+                                                        </span>
+                                                    </h3>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="col-md-3 col-6 mb-3 mb-md-0">
+                                            <div className="card shadow-sm p-2 h-100">
+                                                <div className="card-body">
+                                                    <p className="small font-weight-bold mb-2">
+                                                        Online learning
+                                                    </p>
+                                                    <h3 className="font-weight-bold">
+                                                        46%{" "}
+                                                        <span className="text-danger">
+                                                            <i className="fas fa-angle-double-down ml-2 fa-sm"></i>
+                                                        </span>
+                                                    </h3>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="col-md-3 col-6 mb-3 mb-md-0">
-                                        <div className="card shadow-sm p-2 h-100">
-                                            <div className="card-body">
-                                                <p className="small font-weight-bold mb-2">
-                                                    Pending Approval
-                                                </p>
-                                                <h3
-                                                    className="font-weight-bold"
-                                                    style={{ color: "tomato" }}
-                                                >
-                                                    120
-                                                </h3>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-md-3 col-6 mb-3 mb-md-0">
-                                        <div className="card shadow-sm p-2 h-100">
-                                            <div className="card-body">
-                                                <p className="small font-weight-bold mb-2">
-                                                    New Courses this month
-                                                </p>
-                                                <h3 className="font-weight-bold">
-                                                    89{" "}
-                                                    <span className="text-success">
-                                                        <i className="fas fa-angle-double-up ml-2 fa-sm"></i>
-                                                    </span>
-                                                </h3>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-md-3 col-6 mb-3 mb-md-0">
-                                        <div className="card shadow-sm p-2 h-100">
-                                            <div className="card-body">
-                                                <p className="small font-weight-bold mb-2">
-                                                    Online learning
-                                                </p>
-                                                <h3 className="font-weight-bold">
-                                                    46%{" "}
-                                                    <span className="text-danger">
-                                                        <i className="fas fa-angle-double-down ml-2 fa-sm"></i>
-                                                    </span>
-                                                </h3>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
 
-                                {/* Filter area */}
-                                <div className="row justify-content-center justify-content-md-end mb-4">
-                                    <div className="col-md-4 pr-md-0">
-                                        <div className="form-group">
-                                            <input
-                                                type="search"
-                                                name="search"
-                                                id="search"
-                                                className="form-control mb-md-0 mb-2"
-                                                placeholder="Search"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-5 text-md-right text-center">
-                                        <button className="btn btn-primary-invert btn-sm shadow-none mr-1">
-                                            Filter{" "}
-                                            <i className="fas fa-filter ml-1"></i>
-                                        </button>
-                                        <button
-                                            className="btn btn-primary btn-sm shadow-none mr-1"
-                                            onClick={this.toggleCourseModal}
-                                        >
-                                            Add
-                                        </button>
-                                        <button className="btn btn-primary btn-sm shadow-none mr-1">
-                                            Delete
-                                        </button>
-                                        <button className="btn btn-primary btn-sm shadow-none mr-1">
-                                            Enable
-                                        </button>
-                                        <button className="btn btn-primary btn-sm shadow-none">
-                                            Disable
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {/* Change view */}
-                                <div className="text-right mb-2">
-                                    <div
-                                        className="btn-group btn-group-toggle"
-                                        data-toggle="buttons"
-                                    >
-                                        <OverlayTrigger
-                                            key="top"
-                                            placement="top"
-                                            overlay={
-                                                <Tooltip
-                                                    id="tooltip"
-                                                    className="text-left"
-                                                >
-                                                    Table View
-                                                </Tooltip>
-                                            }
-                                        >
-                                            <label
-                                                className={`btn btn-light ${
-                                                    this.state.tableView
-                                                        ? "active"
-                                                        : ""
-                                                }`}
-                                            >
+                                    {/* Filter area */}
+                                    <div className="row justify-content-center justify-content-md-end mb-4">
+                                        <div className="col-md-4 pr-md-0">
+                                            <div className="form-group">
                                                 <input
-                                                    type="radio"
-                                                    name="options"
-                                                    id="tableview"
-                                                    onChange={() => {
-                                                        this.setState({
-                                                            tableView: true,
-                                                        });
-                                                    }}
-                                                />{" "}
-                                                <i className="fas fa-th-list"></i>
-                                            </label>
-                                        </OverlayTrigger>
-                                        <OverlayTrigger
-                                            key="top"
-                                            placement="top"
-                                            overlay={
-                                                <Tooltip
-                                                    id="tooltip"
-                                                    className="text-left"
-                                                >
-                                                    Card View
-                                                </Tooltip>
-                                            }
-                                        >
-                                            <label
-                                                className={`btn btn-light ${
-                                                    this.state.tableView
-                                                        ? ""
-                                                        : "active"
-                                                }`}
+                                                    type="search"
+                                                    name="search"
+                                                    id="search"
+                                                    className="form-control mb-md-0 mb-2"
+                                                    placeholder="Search"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="col-md-5 text-md-right text-center">
+                                            <button className="btn btn-primary-invert btn-sm shadow-none mr-1">
+                                                Filter{" "}
+                                                <i className="fas fa-filter ml-1"></i>
+                                            </button>
+                                            <button
+                                                className="btn btn-primary btn-sm shadow-none mr-1"
+                                                onClick={this.toggleCourseModal}
                                             >
-                                                <input
-                                                    type="radio"
-                                                    name="options"
-                                                    id="cardview"
-                                                    onChange={() => {
-                                                        this.setState({
-                                                            tableView: false,
-                                                        });
-                                                    }}
-                                                />{" "}
-                                                <i className="fas fa-th-large"></i>
-                                            </label>
-                                        </OverlayTrigger>
+                                                Add
+                                            </button>
+                                            <button className="btn btn-primary btn-sm shadow-none mr-1">
+                                                Delete
+                                            </button>
+                                            <button className="btn btn-primary btn-sm shadow-none mr-1">
+                                                Enable
+                                            </button>
+                                            <button className="btn btn-primary btn-sm shadow-none">
+                                                Disable
+                                            </button>
+                                        </div>
                                     </div>
+
+                                    {/* Change view */}
+                                    <div className="text-right mb-2">
+                                        <div
+                                            className="btn-group btn-group-toggle"
+                                            data-toggle="buttons"
+                                        >
+                                            <OverlayTrigger
+                                                key="top"
+                                                placement="top"
+                                                overlay={
+                                                    <Tooltip
+                                                        id="tooltip"
+                                                        className="text-left"
+                                                    >
+                                                        Table View
+                                                    </Tooltip>
+                                                }
+                                            >
+                                                <label
+                                                    className={`btn btn-light ${
+                                                        this.state.tableView
+                                                            ? "active"
+                                                            : ""
+                                                    }`}
+                                                >
+                                                    <input
+                                                        type="radio"
+                                                        name="options"
+                                                        id="tableview"
+                                                        onChange={() => {
+                                                            this.setState({
+                                                                tableView: true,
+                                                            });
+                                                        }}
+                                                    />{" "}
+                                                    <i className="fas fa-th-list"></i>
+                                                </label>
+                                            </OverlayTrigger>
+                                            <OverlayTrigger
+                                                key="top"
+                                                placement="top"
+                                                overlay={
+                                                    <Tooltip
+                                                        id="tooltip"
+                                                        className="text-left"
+                                                    >
+                                                        Card View
+                                                    </Tooltip>
+                                                }
+                                            >
+                                                <label
+                                                    className={`btn btn-light ${
+                                                        this.state.tableView
+                                                            ? ""
+                                                            : "active"
+                                                    }`}
+                                                >
+                                                    <input
+                                                        type="radio"
+                                                        name="options"
+                                                        id="cardview"
+                                                        onChange={() => {
+                                                            this.setState({
+                                                                tableView: false,
+                                                            });
+                                                        }}
+                                                    />{" "}
+                                                    <i className="fas fa-th-large"></i>
+                                                </label>
+                                            </OverlayTrigger>
+                                        </div>
+                                    </div>
+
+                                    {/* Courses list */}
+                                    {this.state.tableView ? (
+                                        <Tabs
+                                            defaultActiveKey="all"
+                                            id="uncontrolled-tab-example"
+                                        >
+                                            <Tab eventKey="all" title="All">
+                                                <div className="card shadow-sm mb-3 mb-md-0">
+                                                    <div className="table-responsive">
+                                                        <table className="table">
+                                                            <thead className="primary-text">
+                                                                <tr>
+                                                                    <th scope="col"></th>
+                                                                    <th scope="col">
+                                                                        Course
+                                                                        name
+                                                                    </th>
+                                                                    <th scope="col">
+                                                                        Subject
+                                                                    </th>
+                                                                    <th scope="col">
+                                                                        Category
+                                                                    </th>
+                                                                    <th scope="col">
+                                                                        Sub
+                                                                        Category
+                                                                    </th>
+                                                                    <th scope="col">
+                                                                        Subscription
+                                                                        ID
+                                                                    </th>
+                                                                    <th scope="col">
+                                                                        Pricing
+                                                                    </th>
+                                                                    <th scope="col"></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td className="text-center">
+                                                                        <form>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                name="enable"
+                                                                                id="enable"
+                                                                            />
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        Mathematics
+                                                                        10th
+                                                                        CBSE
+                                                                    </td>
+                                                                    <td>
+                                                                        Degree
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        SP202021001
+                                                                    </td>
+                                                                    <td>
+                                                                        2000 INR
+                                                                    </td>
+                                                                    <td>
+                                                                        <button
+                                                                            className="btn btn-sm btn-primary"
+                                                                            onClick={
+                                                                                this
+                                                                                    .showViewCourseCard
+                                                                            }
+                                                                        >
+                                                                            View
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td className="text-center">
+                                                                        <form>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                name="enable"
+                                                                                id="enable"
+                                                                            />
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        Physics
+                                                                    </td>
+                                                                    <td>
+                                                                        Degree
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        SP202021001
+                                                                    </td>
+                                                                    <td>
+                                                                        3000 INR
+                                                                    </td>
+                                                                    <td>
+                                                                        <button
+                                                                            className="btn btn-sm btn-primary"
+                                                                            onClick={
+                                                                                this
+                                                                                    .showViewCourseCard
+                                                                            }
+                                                                        >
+                                                                            View
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td className="text-center">
+                                                                        <form>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                name="enable"
+                                                                                id="enable"
+                                                                            />
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        Chemistry
+                                                                    </td>
+                                                                    <td>
+                                                                        Degree
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        SP202021001
+                                                                    </td>
+                                                                    <td>
+                                                                        5000 INR
+                                                                    </td>
+                                                                    <td>
+                                                                        <button
+                                                                            className="btn btn-sm btn-primary"
+                                                                            onClick={
+                                                                                this
+                                                                                    .showViewCourseCard
+                                                                            }
+                                                                        >
+                                                                            View
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td className="text-center">
+                                                                        <form>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                name="enable"
+                                                                                id="enable"
+                                                                            />
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        Biology
+                                                                    </td>
+                                                                    <td>
+                                                                        Degree
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        SP202021001
+                                                                    </td>
+                                                                    <td>
+                                                                        8000 INR
+                                                                    </td>
+                                                                    <td>
+                                                                        <button
+                                                                            className="btn btn-sm btn-primary"
+                                                                            onClick={
+                                                                                this
+                                                                                    .showViewCourseCard
+                                                                            }
+                                                                        >
+                                                                            View
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td className="text-center">
+                                                                        <form>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                name="enable"
+                                                                                id="enable"
+                                                                            />
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        Industrial
+                                                                        electronics
+                                                                    </td>
+                                                                    <td>
+                                                                        Degree
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        SP202021001
+                                                                    </td>
+                                                                    <td>
+                                                                        7000 INR
+                                                                    </td>
+                                                                    <td>
+                                                                        <button
+                                                                            className="btn btn-sm btn-primary"
+                                                                            onClick={
+                                                                                this
+                                                                                    .showViewCourseCard
+                                                                            }
+                                                                        >
+                                                                            View
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td className="text-center">
+                                                                        <form>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                name="enable"
+                                                                                id="enable"
+                                                                            />
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        Micro
+                                                                        processors
+                                                                    </td>
+                                                                    <td>
+                                                                        Degree
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        SP202021001
+                                                                    </td>
+                                                                    <td>
+                                                                        2000 INR
+                                                                    </td>
+                                                                    <td>
+                                                                        <button
+                                                                            className="btn btn-sm btn-primary"
+                                                                            onClick={
+                                                                                this
+                                                                                    .showViewCourseCard
+                                                                            }
+                                                                        >
+                                                                            View
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td className="text-center">
+                                                                        <form>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                name="enable"
+                                                                                id="enable"
+                                                                            />
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        Software
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        Degree
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        SP202021001
+                                                                    </td>
+                                                                    <td>
+                                                                        2000 INR
+                                                                    </td>
+                                                                    <td>
+                                                                        <button
+                                                                            className="btn btn-sm btn-primary"
+                                                                            onClick={
+                                                                                this
+                                                                                    .showViewCourseCard
+                                                                            }
+                                                                        >
+                                                                            View
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td className="text-center">
+                                                                        <form>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                name="enable"
+                                                                                id="enable"
+                                                                            />
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        C, C++
+                                                                    </td>
+                                                                    <td>
+                                                                        Degree
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        SP202021001
+                                                                    </td>
+                                                                    <td>
+                                                                        1000 INR
+                                                                    </td>
+                                                                    <td>
+                                                                        <button
+                                                                            className="btn btn-sm btn-primary"
+                                                                            onClick={
+                                                                                this
+                                                                                    .showViewCourseCard
+                                                                            }
+                                                                        >
+                                                                            View
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </Tab>
+                                            <Tab
+                                                eventKey="published"
+                                                title="Courses published"
+                                            >
+                                                <div className="card shadow-sm mb-3 mb-md-0">
+                                                    <div className="table-responsive">
+                                                        <table className="table">
+                                                            <thead className="primary-text">
+                                                                <tr>
+                                                                    <th scope="col"></th>
+                                                                    <th scope="col">
+                                                                        Course
+                                                                        name
+                                                                    </th>
+                                                                    <th scope="col">
+                                                                        Subject
+                                                                    </th>
+                                                                    <th scope="col">
+                                                                        Category
+                                                                    </th>
+                                                                    <th scope="col">
+                                                                        Sub
+                                                                        Category
+                                                                    </th>
+                                                                    <th scope="col">
+                                                                        Subscription
+                                                                        ID
+                                                                    </th>
+                                                                    <th scope="col">
+                                                                        Pricing
+                                                                    </th>
+                                                                    <th scope="col"></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td className="text-center">
+                                                                        <form>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                name="enable"
+                                                                                id="enable"
+                                                                            />
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        Mathematics
+                                                                        10th
+                                                                        CBSE
+                                                                    </td>
+                                                                    <td>
+                                                                        Degree
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        SP202021001
+                                                                    </td>
+                                                                    <td>
+                                                                        2000 INR
+                                                                    </td>
+                                                                    <td>
+                                                                        <button
+                                                                            className="btn btn-sm btn-primary"
+                                                                            onClick={
+                                                                                this
+                                                                                    .showViewCourseCard
+                                                                            }
+                                                                        >
+                                                                            View
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td className="text-center">
+                                                                        <form>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                name="enable"
+                                                                                id="enable"
+                                                                            />
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        Physics
+                                                                    </td>
+                                                                    <td>
+                                                                        Degree
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        SP202021001
+                                                                    </td>
+                                                                    <td>
+                                                                        3000 INR
+                                                                    </td>
+                                                                    <td>
+                                                                        <button
+                                                                            className="btn btn-sm btn-primary"
+                                                                            onClick={
+                                                                                this
+                                                                                    .showViewCourseCard
+                                                                            }
+                                                                        >
+                                                                            View
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td className="text-center">
+                                                                        <form>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                name="enable"
+                                                                                id="enable"
+                                                                            />
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        Chemistry
+                                                                    </td>
+                                                                    <td>
+                                                                        Degree
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        SP202021001
+                                                                    </td>
+                                                                    <td>
+                                                                        5000 INR
+                                                                    </td>
+                                                                    <td>
+                                                                        <button
+                                                                            className="btn btn-sm btn-primary"
+                                                                            onClick={
+                                                                                this
+                                                                                    .showViewCourseCard
+                                                                            }
+                                                                        >
+                                                                            View
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td className="text-center">
+                                                                        <form>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                name="enable"
+                                                                                id="enable"
+                                                                            />
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        Biology
+                                                                    </td>
+                                                                    <td>
+                                                                        Degree
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        SP202021001
+                                                                    </td>
+                                                                    <td>
+                                                                        8000 INR
+                                                                    </td>
+                                                                    <td>
+                                                                        <button
+                                                                            className="btn btn-sm btn-primary"
+                                                                            onClick={
+                                                                                this
+                                                                                    .showViewCourseCard
+                                                                            }
+                                                                        >
+                                                                            View
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td className="text-center">
+                                                                        <form>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                name="enable"
+                                                                                id="enable"
+                                                                            />
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        Industrial
+                                                                        electronics
+                                                                    </td>
+                                                                    <td>
+                                                                        Degree
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        SP202021001
+                                                                    </td>
+                                                                    <td>
+                                                                        7000 INR
+                                                                    </td>
+                                                                    <td>
+                                                                        <button
+                                                                            className="btn btn-sm btn-primary"
+                                                                            onClick={
+                                                                                this
+                                                                                    .showViewCourseCard
+                                                                            }
+                                                                        >
+                                                                            View
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td className="text-center">
+                                                                        <form>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                name="enable"
+                                                                                id="enable"
+                                                                            />
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        Micro
+                                                                        processors
+                                                                    </td>
+                                                                    <td>
+                                                                        Degree
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        SP202021001
+                                                                    </td>
+                                                                    <td>
+                                                                        2000 INR
+                                                                    </td>
+                                                                    <td>
+                                                                        <button
+                                                                            className="btn btn-sm btn-primary"
+                                                                            onClick={
+                                                                                this
+                                                                                    .showViewCourseCard
+                                                                            }
+                                                                        >
+                                                                            View
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td className="text-center">
+                                                                        <form>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                name="enable"
+                                                                                id="enable"
+                                                                            />
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        Software
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        Degree
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        SP202021001
+                                                                    </td>
+                                                                    <td>
+                                                                        2000 INR
+                                                                    </td>
+                                                                    <td>
+                                                                        <button
+                                                                            className="btn btn-sm btn-primary"
+                                                                            onClick={
+                                                                                this
+                                                                                    .showViewCourseCard
+                                                                            }
+                                                                        >
+                                                                            View
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td className="text-center">
+                                                                        <form>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                name="enable"
+                                                                                id="enable"
+                                                                            />
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        C, C++
+                                                                    </td>
+                                                                    <td>
+                                                                        Degree
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        SP202021001
+                                                                    </td>
+                                                                    <td>
+                                                                        1000 INR
+                                                                    </td>
+                                                                    <td>
+                                                                        <button
+                                                                            className="btn btn-sm btn-primary"
+                                                                            onClick={
+                                                                                this
+                                                                                    .showViewCourseCard
+                                                                            }
+                                                                        >
+                                                                            View
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </Tab>
+                                            <Tab
+                                                eventKey="publishing"
+                                                title="Ready for publishing"
+                                            >
+                                                <div className="card shadow-sm mb-3 mb-md-0">
+                                                    <div className="table-responsive">
+                                                        <table className="table">
+                                                            <thead className="primary-text">
+                                                                <tr>
+                                                                    <th scope="col"></th>
+                                                                    <th scope="col">
+                                                                        Course
+                                                                        name
+                                                                    </th>
+                                                                    <th scope="col">
+                                                                        Subject
+                                                                    </th>
+                                                                    <th scope="col">
+                                                                        Category
+                                                                    </th>
+                                                                    <th scope="col">
+                                                                        Sub
+                                                                        Category
+                                                                    </th>
+                                                                    <th scope="col">
+                                                                        Subscription
+                                                                        ID
+                                                                    </th>
+                                                                    <th scope="col">
+                                                                        Pricing
+                                                                    </th>
+                                                                    <th scope="col"></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td className="text-center">
+                                                                        <form>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                name="enable"
+                                                                                id="enable"
+                                                                            />
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        Mathematics
+                                                                        10th
+                                                                        CBSE
+                                                                    </td>
+                                                                    <td>
+                                                                        Degree
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        SP202021001
+                                                                    </td>
+                                                                    <td>
+                                                                        2000 INR
+                                                                    </td>
+                                                                    <td>
+                                                                        <button
+                                                                            className="btn btn-sm btn-primary"
+                                                                            onClick={
+                                                                                this
+                                                                                    .showViewCourseCard
+                                                                            }
+                                                                        >
+                                                                            View
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td className="text-center">
+                                                                        <form>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                name="enable"
+                                                                                id="enable"
+                                                                            />
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        Physics
+                                                                    </td>
+                                                                    <td>
+                                                                        Degree
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        SP202021001
+                                                                    </td>
+                                                                    <td>
+                                                                        3000 INR
+                                                                    </td>
+                                                                    <td>
+                                                                        <button
+                                                                            className="btn btn-sm btn-primary"
+                                                                            onClick={
+                                                                                this
+                                                                                    .showViewCourseCard
+                                                                            }
+                                                                        >
+                                                                            View
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td className="text-center">
+                                                                        <form>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                name="enable"
+                                                                                id="enable"
+                                                                            />
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        Chemistry
+                                                                    </td>
+                                                                    <td>
+                                                                        Degree
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        SP202021001
+                                                                    </td>
+                                                                    <td>
+                                                                        5000 INR
+                                                                    </td>
+                                                                    <td>
+                                                                        <button
+                                                                            className="btn btn-sm btn-primary"
+                                                                            onClick={
+                                                                                this
+                                                                                    .showViewCourseCard
+                                                                            }
+                                                                        >
+                                                                            View
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td className="text-center">
+                                                                        <form>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                name="enable"
+                                                                                id="enable"
+                                                                            />
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        Biology
+                                                                    </td>
+                                                                    <td>
+                                                                        Degree
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        SP202021001
+                                                                    </td>
+                                                                    <td>
+                                                                        8000 INR
+                                                                    </td>
+                                                                    <td>
+                                                                        <button
+                                                                            className="btn btn-sm btn-primary"
+                                                                            onClick={
+                                                                                this
+                                                                                    .showViewCourseCard
+                                                                            }
+                                                                        >
+                                                                            View
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td className="text-center">
+                                                                        <form>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                name="enable"
+                                                                                id="enable"
+                                                                            />
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        Industrial
+                                                                        electronics
+                                                                    </td>
+                                                                    <td>
+                                                                        Degree
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        SP202021001
+                                                                    </td>
+                                                                    <td>
+                                                                        7000 INR
+                                                                    </td>
+                                                                    <td>
+                                                                        <button
+                                                                            className="btn btn-sm btn-primary"
+                                                                            onClick={
+                                                                                this
+                                                                                    .showViewCourseCard
+                                                                            }
+                                                                        >
+                                                                            View
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td className="text-center">
+                                                                        <form>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                name="enable"
+                                                                                id="enable"
+                                                                            />
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        Micro
+                                                                        processors
+                                                                    </td>
+                                                                    <td>
+                                                                        Degree
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        SP202021001
+                                                                    </td>
+                                                                    <td>
+                                                                        2000 INR
+                                                                    </td>
+                                                                    <td>
+                                                                        <button
+                                                                            className="btn btn-sm btn-primary"
+                                                                            onClick={
+                                                                                this
+                                                                                    .showViewCourseCard
+                                                                            }
+                                                                        >
+                                                                            View
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td className="text-center">
+                                                                        <form>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                name="enable"
+                                                                                id="enable"
+                                                                            />
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        Software
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        Degree
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        SP202021001
+                                                                    </td>
+                                                                    <td>
+                                                                        2000 INR
+                                                                    </td>
+                                                                    <td>
+                                                                        <button
+                                                                            className="btn btn-sm btn-primary"
+                                                                            onClick={
+                                                                                this
+                                                                                    .showViewCourseCard
+                                                                            }
+                                                                        >
+                                                                            View
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td className="text-center">
+                                                                        <form>
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                name="enable"
+                                                                                id="enable"
+                                                                            />
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        C, C++
+                                                                    </td>
+                                                                    <td>
+                                                                        Degree
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        Engineering
+                                                                    </td>
+                                                                    <td>
+                                                                        SP202021001
+                                                                    </td>
+                                                                    <td>
+                                                                        1000 INR
+                                                                    </td>
+                                                                    <td>
+                                                                        <button
+                                                                            className="btn btn-sm btn-primary"
+                                                                            onClick={
+                                                                                this
+                                                                                    .showViewCourseCard
+                                                                            }
+                                                                        >
+                                                                            View
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </Tab>
+                                        </Tabs>
+                                    ) : (
+                                        <Tabs
+                                            defaultActiveKey="all"
+                                            id="uncontrolled-tab-example"
+                                        >
+                                            <Tab eventKey="all" title="All">
+                                                <div className="row mt-3">
+                                                    <div className="col-md-3 col-sm-6 mb-3">
+                                                        <div
+                                                            className="card"
+                                                            onClick={
+                                                                this
+                                                                    .showViewCourseCard
+                                                            }
+                                                            style={{
+                                                                cursor: "pointer",
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={courseimg}
+                                                                className="card-img-top"
+                                                                alt="Course"
+                                                            />
+                                                            <div className="card-body primary-bg text-white p-2">
+                                                                <div className="row">
+                                                                    <div className="col-6">
+                                                                        <p className="mb-0">
+                                                                            Course
+                                                                        </p>
+                                                                    </div>
+                                                                    <div className="col-6 text-right">
+                                                                        4.{" "}
+                                                                        <span className="small">
+                                                                            <i className="fas fa-star ml-1 fa-sm"></i>
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-md-3 col-sm-6 mb-3">
+                                                        <div
+                                                            className="card"
+                                                            onClick={
+                                                                this
+                                                                    .showViewCourseCard
+                                                            }
+                                                            style={{
+                                                                cursor: "pointer",
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={courseimg}
+                                                                className="card-img-top"
+                                                                alt="Course"
+                                                            />
+                                                            <div className="card-body primary-bg text-white p-2">
+                                                                <div className="row">
+                                                                    <div className="col-6">
+                                                                        <p className="mb-0">
+                                                                            Course
+                                                                        </p>
+                                                                    </div>
+                                                                    <div className="col-6 text-right">
+                                                                        4.{" "}
+                                                                        <span className="small">
+                                                                            <i className="fas fa-star ml-1 fa-sm"></i>
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-md-3 col-sm-6 mb-3">
+                                                        <div
+                                                            className="card"
+                                                            onClick={
+                                                                this
+                                                                    .showViewCourseCard
+                                                            }
+                                                            style={{
+                                                                cursor: "pointer",
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={courseimg}
+                                                                className="card-img-top"
+                                                                alt="Course"
+                                                            />
+                                                            <div className="card-body primary-bg text-white p-2">
+                                                                <div className="row">
+                                                                    <div className="col-6">
+                                                                        <p className="mb-0">
+                                                                            Course
+                                                                        </p>
+                                                                    </div>
+                                                                    <div className="col-6 text-right">
+                                                                        4.{" "}
+                                                                        <span className="small">
+                                                                            <i className="fas fa-star ml-1 fa-sm"></i>
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-md-3 col-sm-6 mb-3">
+                                                        <div
+                                                            className="card"
+                                                            onClick={
+                                                                this
+                                                                    .showViewCourseCard
+                                                            }
+                                                            style={{
+                                                                cursor: "pointer",
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={courseimg}
+                                                                className="card-img-top"
+                                                                alt="Course"
+                                                            />
+                                                            <div className="card-body primary-bg text-white p-2">
+                                                                <div className="row">
+                                                                    <div className="col-6">
+                                                                        <p className="mb-0">
+                                                                            Course
+                                                                        </p>
+                                                                    </div>
+                                                                    <div className="col-6 text-right">
+                                                                        4.{" "}
+                                                                        <span className="small">
+                                                                            <i className="fas fa-star ml-1 fa-sm"></i>
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </Tab>
+                                            <Tab
+                                                eventKey="published"
+                                                title="Courses published"
+                                            >
+                                                <div className="row mt-3">
+                                                    <div className="col-md-3 col-sm-6 mb-3">
+                                                        <div
+                                                            className="card"
+                                                            onClick={
+                                                                this
+                                                                    .showViewCourseCard
+                                                            }
+                                                            style={{
+                                                                cursor: "pointer",
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={courseimg}
+                                                                className="card-img-top"
+                                                                alt="Course"
+                                                            />
+                                                            <div className="card-body primary-bg text-white p-2">
+                                                                <div className="row">
+                                                                    <div className="col-6">
+                                                                        <p className="mb-0">
+                                                                            Course
+                                                                        </p>
+                                                                    </div>
+                                                                    <div className="col-6 text-right">
+                                                                        4.{" "}
+                                                                        <span className="small">
+                                                                            <i className="fas fa-star ml-1 fa-sm"></i>
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-md-3 col-sm-6 mb-3">
+                                                        <div
+                                                            className="card"
+                                                            onClick={
+                                                                this
+                                                                    .showViewCourseCard
+                                                            }
+                                                            style={{
+                                                                cursor: "pointer",
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={courseimg}
+                                                                className="card-img-top"
+                                                                alt="Course"
+                                                            />
+                                                            <div className="card-body primary-bg text-white p-2">
+                                                                <div className="row">
+                                                                    <div className="col-6">
+                                                                        <p className="mb-0">
+                                                                            Course
+                                                                        </p>
+                                                                    </div>
+                                                                    <div className="col-6 text-right">
+                                                                        4.{" "}
+                                                                        <span className="small">
+                                                                            <i className="fas fa-star ml-1 fa-sm"></i>
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-md-3 col-sm-6 mb-3">
+                                                        <div
+                                                            className="card"
+                                                            onClick={
+                                                                this
+                                                                    .showViewCourseCard
+                                                            }
+                                                            style={{
+                                                                cursor: "pointer",
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={courseimg}
+                                                                className="card-img-top"
+                                                                alt="Course"
+                                                            />
+                                                            <div className="card-body primary-bg text-white p-2">
+                                                                <div className="row">
+                                                                    <div className="col-6">
+                                                                        <p className="mb-0">
+                                                                            Course
+                                                                        </p>
+                                                                    </div>
+                                                                    <div className="col-6 text-right">
+                                                                        4.{" "}
+                                                                        <span className="small">
+                                                                            <i className="fas fa-star ml-1 fa-sm"></i>
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-md-3 col-sm-6 mb-3">
+                                                        <div
+                                                            className="card"
+                                                            onClick={
+                                                                this
+                                                                    .showViewCourseCard
+                                                            }
+                                                            style={{
+                                                                cursor: "pointer",
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={courseimg}
+                                                                className="card-img-top"
+                                                                alt="Course"
+                                                            />
+                                                            <div className="card-body primary-bg text-white p-2">
+                                                                <div className="row">
+                                                                    <div className="col-6">
+                                                                        <p className="mb-0">
+                                                                            Course
+                                                                        </p>
+                                                                    </div>
+                                                                    <div className="col-6 text-right">
+                                                                        4.{" "}
+                                                                        <span className="small">
+                                                                            <i className="fas fa-star ml-1 fa-sm"></i>
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </Tab>
+                                            <Tab
+                                                eventKey="publishing"
+                                                title="Ready for publishing"
+                                            >
+                                                <div className="row mt-3">
+                                                    <div className="col-md-3 col-sm-6 mb-3">
+                                                        <div
+                                                            className="card"
+                                                            onClick={
+                                                                this
+                                                                    .showViewCourseCard
+                                                            }
+                                                            style={{
+                                                                cursor: "pointer",
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={courseimg}
+                                                                className="card-img-top"
+                                                                alt="Course"
+                                                            />
+                                                            <div className="card-body primary-bg text-white p-2">
+                                                                <div className="row">
+                                                                    <div className="col-6">
+                                                                        <p className="mb-0">
+                                                                            Course
+                                                                        </p>
+                                                                    </div>
+                                                                    <div className="col-6 text-right">
+                                                                        4.{" "}
+                                                                        <span className="small">
+                                                                            <i className="fas fa-star ml-1 fa-sm"></i>
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-md-3 col-sm-6 mb-3">
+                                                        <div
+                                                            className="card"
+                                                            onClick={
+                                                                this
+                                                                    .showViewCourseCard
+                                                            }
+                                                            style={{
+                                                                cursor: "pointer",
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={courseimg}
+                                                                className="card-img-top"
+                                                                alt="Course"
+                                                            />
+                                                            <div className="card-body primary-bg text-white p-2">
+                                                                <div className="row">
+                                                                    <div className="col-6">
+                                                                        <p className="mb-0">
+                                                                            Course
+                                                                        </p>
+                                                                    </div>
+                                                                    <div className="col-6 text-right">
+                                                                        4.{" "}
+                                                                        <span className="small">
+                                                                            <i className="fas fa-star ml-1 fa-sm"></i>
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-md-3 col-sm-6 mb-3">
+                                                        <div
+                                                            className="card"
+                                                            onClick={
+                                                                this
+                                                                    .showViewCourseCard
+                                                            }
+                                                            style={{
+                                                                cursor: "pointer",
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={courseimg}
+                                                                className="card-img-top"
+                                                                alt="Course"
+                                                            />
+                                                            <div className="card-body primary-bg text-white p-2">
+                                                                <div className="row">
+                                                                    <div className="col-6">
+                                                                        <p className="mb-0">
+                                                                            Course
+                                                                        </p>
+                                                                    </div>
+                                                                    <div className="col-6 text-right">
+                                                                        4.{" "}
+                                                                        <span className="small">
+                                                                            <i className="fas fa-star ml-1 fa-sm"></i>
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-md-3 col-sm-6 mb-3">
+                                                        <div
+                                                            className="card"
+                                                            onClick={
+                                                                this
+                                                                    .showViewCourseCard
+                                                            }
+                                                            style={{
+                                                                cursor: "pointer",
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={courseimg}
+                                                                className="card-img-top"
+                                                                alt="Course"
+                                                            />
+                                                            <div className="card-body primary-bg text-white p-2">
+                                                                <div className="row">
+                                                                    <div className="col-6">
+                                                                        <p className="mb-0">
+                                                                            Course
+                                                                        </p>
+                                                                    </div>
+                                                                    <div className="col-6 text-right">
+                                                                        4.{" "}
+                                                                        <i className="fas fa-star ml-1 fa-sm"></i>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </Tab>
+                                        </Tabs>
+                                    )}
                                 </div>
 
-                                {/* Courses list */}
-                                {this.state.tableView ? (
-                                    <Tabs
-                                        defaultActiveKey="all"
-                                        id="uncontrolled-tab-example"
-                                    >
-                                        <Tab eventKey="all" title="All">
-                                            <div className="card shadow-sm mb-3 mb-md-0">
-                                                <div className="table-responsive">
-                                                    <table className="table">
-                                                        <thead className="primary-text">
-                                                            <tr>
-                                                                <th scope="col"></th>
-                                                                <th scope="col">
-                                                                    Course name
-                                                                </th>
-                                                                <th scope="col">
-                                                                    Subject
-                                                                </th>
-                                                                <th scope="col">
-                                                                    Category
-                                                                </th>
-                                                                <th scope="col">
-                                                                    Sub Category
-                                                                </th>
-                                                                <th scope="col">
-                                                                    Subscription
-                                                                    ID
-                                                                </th>
-                                                                <th scope="col">
-                                                                    Pricing
-                                                                </th>
-                                                                <th scope="col"></th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <td className="text-center">
-                                                                    <form>
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            name="enable"
-                                                                            id="enable"
-                                                                        />
-                                                                    </form>
-                                                                </td>
-                                                                <td>
-                                                                    Mathematics
-                                                                    10th CBSE
-                                                                </td>
-                                                                <td>Degree</td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    SP202021001
-                                                                </td>
-                                                                <td>
-                                                                    2000 INR
-                                                                </td>
-                                                                <td>
-                                                                    <button
-                                                                        className="btn btn-sm btn-primary"
-                                                                        onClick={
-                                                                            this
-                                                                                .showViewCourseCard
-                                                                        }
-                                                                    >
-                                                                        View
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td className="text-center">
-                                                                    <form>
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            name="enable"
-                                                                            id="enable"
-                                                                        />
-                                                                    </form>
-                                                                </td>
-                                                                <td>Physics</td>
-                                                                <td>Degree</td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    SP202021001
-                                                                </td>
-                                                                <td>
-                                                                    3000 INR
-                                                                </td>
-                                                                <td>
-                                                                    <button
-                                                                        className="btn btn-sm btn-primary"
-                                                                        onClick={
-                                                                            this
-                                                                                .showViewCourseCard
-                                                                        }
-                                                                    >
-                                                                        View
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td className="text-center">
-                                                                    <form>
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            name="enable"
-                                                                            id="enable"
-                                                                        />
-                                                                    </form>
-                                                                </td>
-                                                                <td>
-                                                                    Chemistry
-                                                                </td>
-                                                                <td>Degree</td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    SP202021001
-                                                                </td>
-                                                                <td>
-                                                                    5000 INR
-                                                                </td>
-                                                                <td>
-                                                                    <button
-                                                                        className="btn btn-sm btn-primary"
-                                                                        onClick={
-                                                                            this
-                                                                                .showViewCourseCard
-                                                                        }
-                                                                    >
-                                                                        View
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td className="text-center">
-                                                                    <form>
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            name="enable"
-                                                                            id="enable"
-                                                                        />
-                                                                    </form>
-                                                                </td>
-                                                                <td>Biology</td>
-                                                                <td>Degree</td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    SP202021001
-                                                                </td>
-                                                                <td>
-                                                                    8000 INR
-                                                                </td>
-                                                                <td>
-                                                                    <button
-                                                                        className="btn btn-sm btn-primary"
-                                                                        onClick={
-                                                                            this
-                                                                                .showViewCourseCard
-                                                                        }
-                                                                    >
-                                                                        View
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td className="text-center">
-                                                                    <form>
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            name="enable"
-                                                                            id="enable"
-                                                                        />
-                                                                    </form>
-                                                                </td>
-                                                                <td>
-                                                                    Industrial
-                                                                    electronics
-                                                                </td>
-                                                                <td>Degree</td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    SP202021001
-                                                                </td>
-                                                                <td>
-                                                                    7000 INR
-                                                                </td>
-                                                                <td>
-                                                                    <button
-                                                                        className="btn btn-sm btn-primary"
-                                                                        onClick={
-                                                                            this
-                                                                                .showViewCourseCard
-                                                                        }
-                                                                    >
-                                                                        View
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td className="text-center">
-                                                                    <form>
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            name="enable"
-                                                                            id="enable"
-                                                                        />
-                                                                    </form>
-                                                                </td>
-                                                                <td>
-                                                                    Micro
-                                                                    processors
-                                                                </td>
-                                                                <td>Degree</td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    SP202021001
-                                                                </td>
-                                                                <td>
-                                                                    2000 INR
-                                                                </td>
-                                                                <td>
-                                                                    <button
-                                                                        className="btn btn-sm btn-primary"
-                                                                        onClick={
-                                                                            this
-                                                                                .showViewCourseCard
-                                                                        }
-                                                                    >
-                                                                        View
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td className="text-center">
-                                                                    <form>
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            name="enable"
-                                                                            id="enable"
-                                                                        />
-                                                                    </form>
-                                                                </td>
-                                                                <td>
-                                                                    Software
-                                                                    Engineering
-                                                                </td>
-                                                                <td>Degree</td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    SP202021001
-                                                                </td>
-                                                                <td>
-                                                                    2000 INR
-                                                                </td>
-                                                                <td>
-                                                                    <button
-                                                                        className="btn btn-sm btn-primary"
-                                                                        onClick={
-                                                                            this
-                                                                                .showViewCourseCard
-                                                                        }
-                                                                    >
-                                                                        View
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td className="text-center">
-                                                                    <form>
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            name="enable"
-                                                                            id="enable"
-                                                                        />
-                                                                    </form>
-                                                                </td>
-                                                                <td>C, C++</td>
-                                                                <td>Degree</td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    SP202021001
-                                                                </td>
-                                                                <td>
-                                                                    1000 INR
-                                                                </td>
-                                                                <td>
-                                                                    <button
-                                                                        className="btn btn-sm btn-primary"
-                                                                        onClick={
-                                                                            this
-                                                                                .showViewCourseCard
-                                                                        }
-                                                                    >
-                                                                        View
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </Tab>
-                                        <Tab
-                                            eventKey="published"
-                                            title="Courses published"
-                                        >
-                                            <div className="card shadow-sm mb-3 mb-md-0">
-                                                <div className="table-responsive">
-                                                    <table className="table">
-                                                        <thead className="primary-text">
-                                                            <tr>
-                                                                <th scope="col"></th>
-                                                                <th scope="col">
-                                                                    Course name
-                                                                </th>
-                                                                <th scope="col">
-                                                                    Subject
-                                                                </th>
-                                                                <th scope="col">
-                                                                    Category
-                                                                </th>
-                                                                <th scope="col">
-                                                                    Sub Category
-                                                                </th>
-                                                                <th scope="col">
-                                                                    Subscription
-                                                                    ID
-                                                                </th>
-                                                                <th scope="col">
-                                                                    Pricing
-                                                                </th>
-                                                                <th scope="col"></th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <td className="text-center">
-                                                                    <form>
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            name="enable"
-                                                                            id="enable"
-                                                                        />
-                                                                    </form>
-                                                                </td>
-                                                                <td>
-                                                                    Mathematics
-                                                                    10th CBSE
-                                                                </td>
-                                                                <td>Degree</td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    SP202021001
-                                                                </td>
-                                                                <td>
-                                                                    2000 INR
-                                                                </td>
-                                                                <td>
-                                                                    <button
-                                                                        className="btn btn-sm btn-primary"
-                                                                        onClick={
-                                                                            this
-                                                                                .showViewCourseCard
-                                                                        }
-                                                                    >
-                                                                        View
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td className="text-center">
-                                                                    <form>
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            name="enable"
-                                                                            id="enable"
-                                                                        />
-                                                                    </form>
-                                                                </td>
-                                                                <td>Physics</td>
-                                                                <td>Degree</td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    SP202021001
-                                                                </td>
-                                                                <td>
-                                                                    3000 INR
-                                                                </td>
-                                                                <td>
-                                                                    <button
-                                                                        className="btn btn-sm btn-primary"
-                                                                        onClick={
-                                                                            this
-                                                                                .showViewCourseCard
-                                                                        }
-                                                                    >
-                                                                        View
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td className="text-center">
-                                                                    <form>
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            name="enable"
-                                                                            id="enable"
-                                                                        />
-                                                                    </form>
-                                                                </td>
-                                                                <td>
-                                                                    Chemistry
-                                                                </td>
-                                                                <td>Degree</td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    SP202021001
-                                                                </td>
-                                                                <td>
-                                                                    5000 INR
-                                                                </td>
-                                                                <td>
-                                                                    <button
-                                                                        className="btn btn-sm btn-primary"
-                                                                        onClick={
-                                                                            this
-                                                                                .showViewCourseCard
-                                                                        }
-                                                                    >
-                                                                        View
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td className="text-center">
-                                                                    <form>
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            name="enable"
-                                                                            id="enable"
-                                                                        />
-                                                                    </form>
-                                                                </td>
-                                                                <td>Biology</td>
-                                                                <td>Degree</td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    SP202021001
-                                                                </td>
-                                                                <td>
-                                                                    8000 INR
-                                                                </td>
-                                                                <td>
-                                                                    <button
-                                                                        className="btn btn-sm btn-primary"
-                                                                        onClick={
-                                                                            this
-                                                                                .showViewCourseCard
-                                                                        }
-                                                                    >
-                                                                        View
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td className="text-center">
-                                                                    <form>
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            name="enable"
-                                                                            id="enable"
-                                                                        />
-                                                                    </form>
-                                                                </td>
-                                                                <td>
-                                                                    Industrial
-                                                                    electronics
-                                                                </td>
-                                                                <td>Degree</td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    SP202021001
-                                                                </td>
-                                                                <td>
-                                                                    7000 INR
-                                                                </td>
-                                                                <td>
-                                                                    <button
-                                                                        className="btn btn-sm btn-primary"
-                                                                        onClick={
-                                                                            this
-                                                                                .showViewCourseCard
-                                                                        }
-                                                                    >
-                                                                        View
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td className="text-center">
-                                                                    <form>
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            name="enable"
-                                                                            id="enable"
-                                                                        />
-                                                                    </form>
-                                                                </td>
-                                                                <td>
-                                                                    Micro
-                                                                    processors
-                                                                </td>
-                                                                <td>Degree</td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    SP202021001
-                                                                </td>
-                                                                <td>
-                                                                    2000 INR
-                                                                </td>
-                                                                <td>
-                                                                    <button
-                                                                        className="btn btn-sm btn-primary"
-                                                                        onClick={
-                                                                            this
-                                                                                .showViewCourseCard
-                                                                        }
-                                                                    >
-                                                                        View
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td className="text-center">
-                                                                    <form>
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            name="enable"
-                                                                            id="enable"
-                                                                        />
-                                                                    </form>
-                                                                </td>
-                                                                <td>
-                                                                    Software
-                                                                    Engineering
-                                                                </td>
-                                                                <td>Degree</td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    SP202021001
-                                                                </td>
-                                                                <td>
-                                                                    2000 INR
-                                                                </td>
-                                                                <td>
-                                                                    <button
-                                                                        className="btn btn-sm btn-primary"
-                                                                        onClick={
-                                                                            this
-                                                                                .showViewCourseCard
-                                                                        }
-                                                                    >
-                                                                        View
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td className="text-center">
-                                                                    <form>
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            name="enable"
-                                                                            id="enable"
-                                                                        />
-                                                                    </form>
-                                                                </td>
-                                                                <td>C, C++</td>
-                                                                <td>Degree</td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    SP202021001
-                                                                </td>
-                                                                <td>
-                                                                    1000 INR
-                                                                </td>
-                                                                <td>
-                                                                    <button
-                                                                        className="btn btn-sm btn-primary"
-                                                                        onClick={
-                                                                            this
-                                                                                .showViewCourseCard
-                                                                        }
-                                                                    >
-                                                                        View
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </Tab>
-                                        <Tab
-                                            eventKey="publishing"
-                                            title="Ready for publishing"
-                                        >
-                                            <div className="card shadow-sm mb-3 mb-md-0">
-                                                <div className="table-responsive">
-                                                    <table className="table">
-                                                        <thead className="primary-text">
-                                                            <tr>
-                                                                <th scope="col"></th>
-                                                                <th scope="col">
-                                                                    Course name
-                                                                </th>
-                                                                <th scope="col">
-                                                                    Subject
-                                                                </th>
-                                                                <th scope="col">
-                                                                    Category
-                                                                </th>
-                                                                <th scope="col">
-                                                                    Sub Category
-                                                                </th>
-                                                                <th scope="col">
-                                                                    Subscription
-                                                                    ID
-                                                                </th>
-                                                                <th scope="col">
-                                                                    Pricing
-                                                                </th>
-                                                                <th scope="col"></th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <td className="text-center">
-                                                                    <form>
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            name="enable"
-                                                                            id="enable"
-                                                                        />
-                                                                    </form>
-                                                                </td>
-                                                                <td>
-                                                                    Mathematics
-                                                                    10th CBSE
-                                                                </td>
-                                                                <td>Degree</td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    SP202021001
-                                                                </td>
-                                                                <td>
-                                                                    2000 INR
-                                                                </td>
-                                                                <td>
-                                                                    <button
-                                                                        className="btn btn-sm btn-primary"
-                                                                        onClick={
-                                                                            this
-                                                                                .showViewCourseCard
-                                                                        }
-                                                                    >
-                                                                        View
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td className="text-center">
-                                                                    <form>
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            name="enable"
-                                                                            id="enable"
-                                                                        />
-                                                                    </form>
-                                                                </td>
-                                                                <td>Physics</td>
-                                                                <td>Degree</td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    SP202021001
-                                                                </td>
-                                                                <td>
-                                                                    3000 INR
-                                                                </td>
-                                                                <td>
-                                                                    <button
-                                                                        className="btn btn-sm btn-primary"
-                                                                        onClick={
-                                                                            this
-                                                                                .showViewCourseCard
-                                                                        }
-                                                                    >
-                                                                        View
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td className="text-center">
-                                                                    <form>
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            name="enable"
-                                                                            id="enable"
-                                                                        />
-                                                                    </form>
-                                                                </td>
-                                                                <td>
-                                                                    Chemistry
-                                                                </td>
-                                                                <td>Degree</td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    SP202021001
-                                                                </td>
-                                                                <td>
-                                                                    5000 INR
-                                                                </td>
-                                                                <td>
-                                                                    <button
-                                                                        className="btn btn-sm btn-primary"
-                                                                        onClick={
-                                                                            this
-                                                                                .showViewCourseCard
-                                                                        }
-                                                                    >
-                                                                        View
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td className="text-center">
-                                                                    <form>
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            name="enable"
-                                                                            id="enable"
-                                                                        />
-                                                                    </form>
-                                                                </td>
-                                                                <td>Biology</td>
-                                                                <td>Degree</td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    SP202021001
-                                                                </td>
-                                                                <td>
-                                                                    8000 INR
-                                                                </td>
-                                                                <td>
-                                                                    <button
-                                                                        className="btn btn-sm btn-primary"
-                                                                        onClick={
-                                                                            this
-                                                                                .showViewCourseCard
-                                                                        }
-                                                                    >
-                                                                        View
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td className="text-center">
-                                                                    <form>
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            name="enable"
-                                                                            id="enable"
-                                                                        />
-                                                                    </form>
-                                                                </td>
-                                                                <td>
-                                                                    Industrial
-                                                                    electronics
-                                                                </td>
-                                                                <td>Degree</td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    SP202021001
-                                                                </td>
-                                                                <td>
-                                                                    7000 INR
-                                                                </td>
-                                                                <td>
-                                                                    <button
-                                                                        className="btn btn-sm btn-primary"
-                                                                        onClick={
-                                                                            this
-                                                                                .showViewCourseCard
-                                                                        }
-                                                                    >
-                                                                        View
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td className="text-center">
-                                                                    <form>
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            name="enable"
-                                                                            id="enable"
-                                                                        />
-                                                                    </form>
-                                                                </td>
-                                                                <td>
-                                                                    Micro
-                                                                    processors
-                                                                </td>
-                                                                <td>Degree</td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    SP202021001
-                                                                </td>
-                                                                <td>
-                                                                    2000 INR
-                                                                </td>
-                                                                <td>
-                                                                    <button
-                                                                        className="btn btn-sm btn-primary"
-                                                                        onClick={
-                                                                            this
-                                                                                .showViewCourseCard
-                                                                        }
-                                                                    >
-                                                                        View
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td className="text-center">
-                                                                    <form>
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            name="enable"
-                                                                            id="enable"
-                                                                        />
-                                                                    </form>
-                                                                </td>
-                                                                <td>
-                                                                    Software
-                                                                    Engineering
-                                                                </td>
-                                                                <td>Degree</td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    SP202021001
-                                                                </td>
-                                                                <td>
-                                                                    2000 INR
-                                                                </td>
-                                                                <td>
-                                                                    <button
-                                                                        className="btn btn-sm btn-primary"
-                                                                        onClick={
-                                                                            this
-                                                                                .showViewCourseCard
-                                                                        }
-                                                                    >
-                                                                        View
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td className="text-center">
-                                                                    <form>
-                                                                        <input
-                                                                            type="checkbox"
-                                                                            name="enable"
-                                                                            id="enable"
-                                                                        />
-                                                                    </form>
-                                                                </td>
-                                                                <td>C, C++</td>
-                                                                <td>Degree</td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    Engineering
-                                                                </td>
-                                                                <td>
-                                                                    SP202021001
-                                                                </td>
-                                                                <td>
-                                                                    1000 INR
-                                                                </td>
-                                                                <td>
-                                                                    <button
-                                                                        className="btn btn-sm btn-primary"
-                                                                        onClick={
-                                                                            this
-                                                                                .showViewCourseCard
-                                                                        }
-                                                                    >
-                                                                        View
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </Tab>
-                                    </Tabs>
-                                ) : (
-                                    <Tabs
-                                        defaultActiveKey="all"
-                                        id="uncontrolled-tab-example"
-                                    >
-                                        <Tab eventKey="all" title="All">
-                                            <div className="row mt-3">
-                                                <div className="col-md-3 col-sm-6 mb-3">
-                                                    <div
-                                                        className="card"
-                                                        onClick={
-                                                            this
-                                                                .showViewCourseCard
-                                                        }
-                                                        style={{
-                                                            cursor: "pointer",
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={courseimg}
-                                                            className="card-img-top"
-                                                            alt="Course"
-                                                        />
-                                                        <div className="card-body primary-bg text-white p-2">
-                                                            <div className="row">
-                                                                <div className="col-6">
-                                                                    <p className="mb-0">
-                                                                        Course
-                                                                    </p>
-                                                                </div>
-                                                                <div className="col-6 text-right">
-                                                                    4.{" "}
-                                                                    <span className="small">
-                                                                        <i className="fas fa-star ml-1 fa-sm"></i>
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-md-3 col-sm-6 mb-3">
-                                                    <div
-                                                        className="card"
-                                                        onClick={
-                                                            this
-                                                                .showViewCourseCard
-                                                        }
-                                                        style={{
-                                                            cursor: "pointer",
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={courseimg}
-                                                            className="card-img-top"
-                                                            alt="Course"
-                                                        />
-                                                        <div className="card-body primary-bg text-white p-2">
-                                                            <div className="row">
-                                                                <div className="col-6">
-                                                                    <p className="mb-0">
-                                                                        Course
-                                                                    </p>
-                                                                </div>
-                                                                <div className="col-6 text-right">
-                                                                    4.{" "}
-                                                                    <span className="small">
-                                                                        <i className="fas fa-star ml-1 fa-sm"></i>
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-md-3 col-sm-6 mb-3">
-                                                    <div
-                                                        className="card"
-                                                        onClick={
-                                                            this
-                                                                .showViewCourseCard
-                                                        }
-                                                        style={{
-                                                            cursor: "pointer",
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={courseimg}
-                                                            className="card-img-top"
-                                                            alt="Course"
-                                                        />
-                                                        <div className="card-body primary-bg text-white p-2">
-                                                            <div className="row">
-                                                                <div className="col-6">
-                                                                    <p className="mb-0">
-                                                                        Course
-                                                                    </p>
-                                                                </div>
-                                                                <div className="col-6 text-right">
-                                                                    4.{" "}
-                                                                    <span className="small">
-                                                                        <i className="fas fa-star ml-1 fa-sm"></i>
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-md-3 col-sm-6 mb-3">
-                                                    <div
-                                                        className="card"
-                                                        onClick={
-                                                            this
-                                                                .showViewCourseCard
-                                                        }
-                                                        style={{
-                                                            cursor: "pointer",
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={courseimg}
-                                                            className="card-img-top"
-                                                            alt="Course"
-                                                        />
-                                                        <div className="card-body primary-bg text-white p-2">
-                                                            <div className="row">
-                                                                <div className="col-6">
-                                                                    <p className="mb-0">
-                                                                        Course
-                                                                    </p>
-                                                                </div>
-                                                                <div className="col-6 text-right">
-                                                                    4.{" "}
-                                                                    <span className="small">
-                                                                        <i className="fas fa-star ml-1 fa-sm"></i>
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </Tab>
-                                        <Tab
-                                            eventKey="published"
-                                            title="Courses published"
-                                        >
-                                            <div className="row mt-3">
-                                                <div className="col-md-3 col-sm-6 mb-3">
-                                                    <div
-                                                        className="card"
-                                                        onClick={
-                                                            this
-                                                                .showViewCourseCard
-                                                        }
-                                                        style={{
-                                                            cursor: "pointer",
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={courseimg}
-                                                            className="card-img-top"
-                                                            alt="Course"
-                                                        />
-                                                        <div className="card-body primary-bg text-white p-2">
-                                                            <div className="row">
-                                                                <div className="col-6">
-                                                                    <p className="mb-0">
-                                                                        Course
-                                                                    </p>
-                                                                </div>
-                                                                <div className="col-6 text-right">
-                                                                    4.{" "}
-                                                                    <span className="small">
-                                                                        <i className="fas fa-star ml-1 fa-sm"></i>
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-md-3 col-sm-6 mb-3">
-                                                    <div
-                                                        className="card"
-                                                        onClick={
-                                                            this
-                                                                .showViewCourseCard
-                                                        }
-                                                        style={{
-                                                            cursor: "pointer",
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={courseimg}
-                                                            className="card-img-top"
-                                                            alt="Course"
-                                                        />
-                                                        <div className="card-body primary-bg text-white p-2">
-                                                            <div className="row">
-                                                                <div className="col-6">
-                                                                    <p className="mb-0">
-                                                                        Course
-                                                                    </p>
-                                                                </div>
-                                                                <div className="col-6 text-right">
-                                                                    4.{" "}
-                                                                    <span className="small">
-                                                                        <i className="fas fa-star ml-1 fa-sm"></i>
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-md-3 col-sm-6 mb-3">
-                                                    <div
-                                                        className="card"
-                                                        onClick={
-                                                            this
-                                                                .showViewCourseCard
-                                                        }
-                                                        style={{
-                                                            cursor: "pointer",
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={courseimg}
-                                                            className="card-img-top"
-                                                            alt="Course"
-                                                        />
-                                                        <div className="card-body primary-bg text-white p-2">
-                                                            <div className="row">
-                                                                <div className="col-6">
-                                                                    <p className="mb-0">
-                                                                        Course
-                                                                    </p>
-                                                                </div>
-                                                                <div className="col-6 text-right">
-                                                                    4.{" "}
-                                                                    <span className="small">
-                                                                        <i className="fas fa-star ml-1 fa-sm"></i>
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-md-3 col-sm-6 mb-3">
-                                                    <div
-                                                        className="card"
-                                                        onClick={
-                                                            this
-                                                                .showViewCourseCard
-                                                        }
-                                                        style={{
-                                                            cursor: "pointer",
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={courseimg}
-                                                            className="card-img-top"
-                                                            alt="Course"
-                                                        />
-                                                        <div className="card-body primary-bg text-white p-2">
-                                                            <div className="row">
-                                                                <div className="col-6">
-                                                                    <p className="mb-0">
-                                                                        Course
-                                                                    </p>
-                                                                </div>
-                                                                <div className="col-6 text-right">
-                                                                    4.{" "}
-                                                                    <span className="small">
-                                                                        <i className="fas fa-star ml-1 fa-sm"></i>
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </Tab>
-                                        <Tab
-                                            eventKey="publishing"
-                                            title="Ready for publishing"
-                                        >
-                                            <div className="row mt-3">
-                                                <div className="col-md-3 col-sm-6 mb-3">
-                                                    <div
-                                                        className="card"
-                                                        onClick={
-                                                            this
-                                                                .showViewCourseCard
-                                                        }
-                                                        style={{
-                                                            cursor: "pointer",
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={courseimg}
-                                                            className="card-img-top"
-                                                            alt="Course"
-                                                        />
-                                                        <div className="card-body primary-bg text-white p-2">
-                                                            <div className="row">
-                                                                <div className="col-6">
-                                                                    <p className="mb-0">
-                                                                        Course
-                                                                    </p>
-                                                                </div>
-                                                                <div className="col-6 text-right">
-                                                                    4.{" "}
-                                                                    <span className="small">
-                                                                        <i className="fas fa-star ml-1 fa-sm"></i>
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-md-3 col-sm-6 mb-3">
-                                                    <div
-                                                        className="card"
-                                                        onClick={
-                                                            this
-                                                                .showViewCourseCard
-                                                        }
-                                                        style={{
-                                                            cursor: "pointer",
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={courseimg}
-                                                            className="card-img-top"
-                                                            alt="Course"
-                                                        />
-                                                        <div className="card-body primary-bg text-white p-2">
-                                                            <div className="row">
-                                                                <div className="col-6">
-                                                                    <p className="mb-0">
-                                                                        Course
-                                                                    </p>
-                                                                </div>
-                                                                <div className="col-6 text-right">
-                                                                    4.{" "}
-                                                                    <span className="small">
-                                                                        <i className="fas fa-star ml-1 fa-sm"></i>
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-md-3 col-sm-6 mb-3">
-                                                    <div
-                                                        className="card"
-                                                        onClick={
-                                                            this
-                                                                .showViewCourseCard
-                                                        }
-                                                        style={{
-                                                            cursor: "pointer",
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={courseimg}
-                                                            className="card-img-top"
-                                                            alt="Course"
-                                                        />
-                                                        <div className="card-body primary-bg text-white p-2">
-                                                            <div className="row">
-                                                                <div className="col-6">
-                                                                    <p className="mb-0">
-                                                                        Course
-                                                                    </p>
-                                                                </div>
-                                                                <div className="col-6 text-right">
-                                                                    4.{" "}
-                                                                    <span className="small">
-                                                                        <i className="fas fa-star ml-1 fa-sm"></i>
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-md-3 col-sm-6 mb-3">
-                                                    <div
-                                                        className="card"
-                                                        onClick={
-                                                            this
-                                                                .showViewCourseCard
-                                                        }
-                                                        style={{
-                                                            cursor: "pointer",
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={courseimg}
-                                                            className="card-img-top"
-                                                            alt="Course"
-                                                        />
-                                                        <div className="card-body primary-bg text-white p-2">
-                                                            <div className="row">
-                                                                <div className="col-6">
-                                                                    <p className="mb-0">
-                                                                        Course
-                                                                    </p>
-                                                                </div>
-                                                                <div className="col-6 text-right">
-                                                                    4.{" "}
-                                                                    <i className="fas fa-star ml-1 fa-sm"></i>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </Tab>
-                                    </Tabs>
-                                )}
+                                <div className="col-md-3">
+                                    {this.state.viewCourseCard ? (
+                                        <VewCourseCard />
+                                    ) : (
+                                        <ReminderCard />
+                                    )}
+                                </div>
                             </div>
 
-                            <div className="col-md-3">
-                                {this.state.viewCourseCard ? (
-                                    <VewCourseCard />
-                                ) : (
-                                    <ReminderCard />
-                                )}
-                            </div>
+                            {/* Loading component */}
+                            {this.state.page_loading ? <Loading /> : ""}
                         </div>
-                    </div>
+                    </ErrorBoundary>
                 </div>
             </div>
         );

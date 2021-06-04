@@ -15,6 +15,6 @@ export const PAPER = "PAPER";
 export const PROFILE = "PROFILE";
 
 // storage reducer
-export const CONTENT = "CONTENT";
+export const RESPONSE = "RESPONSE";
 export const TEMP = "TEMP";
 export const EXAMDATA = "EXAMDATA";

@@ -1,10 +1,15 @@
 import React, { Component } from "react";
 import Wrapper from "./wrapper";
 import { Link } from "react-router-dom";
-import dateformat from "dateformat";
+import dateFormat from "dateformat";
 import { Dropdown, Modal, Alert, Spinner } from "react-bootstrap";
 import axios from "axios";
 import Select from "react-select";
+import { baseUrl, inquelAdminUrl } from "../../shared/baseUrl";
+import Loading from "../common/loader";
+import AlertBox from "../common/alert";
+import { paginationCount } from "../../shared/constant";
+import Paginations from "../common/pagination";
 
 class DiscountModal extends Component {
     constructor() {
@@ -27,15 +32,15 @@ class DiscountModal extends Component {
                 level: "",
                 subject: "",
 
-                max_points: "",
                 min_points: "",
+                max_points: "",
                 deduction_points: "",
                 points_in_decimal: "",
 
                 fixed_price: "",
                 percentage: "",
 
-                currency: "",
+                currency: "INR",
                 points_exists: false,
                 percent_exists: false,
                 price_exists: false,
@@ -50,32 +55,142 @@ class DiscountModal extends Component {
             showSuccessAlert: false,
             showLoader: false,
         };
+        this.url = baseUrl + inquelAdminUrl;
+        this.authToken = localStorage.getItem("Inquel-Auth");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Inquel-Auth": this.authToken,
+        };
     }
 
     componentDidMount = () => {
+        // check if the props contain data or add empty object in the state
         if (this.props.data && Object.keys(this.props.data).length !== 0) {
-            this.setState({
-                data: this.props.data,
-            });
+            let tempObj = {
+                coupon_id: this.props.data.coupon_id,
+                coupon_name: this.props.data.coupon_name,
+                title: this.props.data.title,
+                valid_from: `${dateFormat(
+                    this.props.data.valid_from,
+                    "yyyy-mm-dd"
+                )} 00:00:00`,
+                valid_to: `${dateFormat(
+                    this.props.data.valid_to,
+                    "yyyy-mm-dd"
+                )} 00:00:00`,
+                category: this.props.data.category,
+                sub_category: this.props.data.sub_category,
+                discipline: this.props.data.discipline,
+                level: this.props.data.level,
+                subject: this.props.data.subject,
+
+                min_points: this.props.data.min_points || "",
+                max_points: this.props.data.max_points || "",
+                deduction_points: this.props.data.deduction_points || "",
+                points_in_decimal: this.props.data.points_in_decimal || "",
+
+                fixed_price: this.props.data.fixed_price || "",
+                percentage: this.props.data.percentage || "",
+
+                currency: this.props.data.currency || "",
+                points_exists: false,
+                percent_exists: false,
+                price_exists: false,
+            };
+
+            if (
+                (this.props.data.min_points !== "" &&
+                    this.props.data.min_points !== 0 &&
+                    this.props.data.min_points !== null) ||
+                (this.props.data.max_points !== "" &&
+                    this.props.data.max_points !== 0 &&
+                    this.props.data.max_points !== null) ||
+                (this.props.data.deduction_points !== "" &&
+                    this.props.data.deduction_points !== 0 &&
+                    this.props.data.deduction_points !== null) ||
+                (this.props.data.points_in_decimal !== "" &&
+                    this.props.data.points_in_decimal !== 0 &&
+                    this.props.data.points_in_decimal !== null)
+            ) {
+                tempObj.points_exists = true;
+            } else if (
+                this.props.data.percentage !== "" &&
+                this.props.data.percentage !== 0 &&
+                this.props.data.percentage !== null
+            ) {
+                tempObj.percent_exists = true;
+            } else if (
+                this.props.data.fixed_price !== "" &&
+                this.props.data.fixed_price !== 0 &&
+                this.props.data.fixed_price !== null
+            ) {
+                tempObj.price_exists = true;
+            } else {
+                tempObj.points_exists = false;
+                tempObj.percent_exists = false;
+                tempObj.price_exists = false;
+            }
+
+            this.setState(
+                {
+                    data: tempObj,
+                },
+                () => {
+                    let category = {
+                        value: this.props.data.category,
+                    };
+                    let sub_category = {
+                        value: this.props.data.sub_category,
+                    };
+                    this.handleCategory(category);
+                    this.handleSubcategory(sub_category);
+                }
+            );
         }
+
+        // loads category list
+        fetch(`${this.url}/coupon/filter/`, {
+            headers: this.headers,
+            method: "GET",
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    this.setState({
+                        category: result.data.CATEGORY,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                });
+            });
     };
 
+    // loads sub category list
     handleCategory = (event) => {
-        let category = this.state.selectedCategory;
-        category.label = event.label;
-        category.value = event.value;
+        let data = this.state.data;
+        data.category = event.value;
         this.setState({
-            selectedCategory: category,
+            data: data,
             sub_category: [],
             discipline: [],
             levels: [],
             subjects: [],
-            selectedSubcategory: { label: "", value: "" },
             subcategory_loading: true,
         });
 
         if (event.value !== "") {
-            fetch(`${this.url}/hod/levels/?category=${event.value}`, {
+            fetch(`${this.url}/coupon/filter/?category=${event.value}`, {
                 headers: this.headers,
                 method: "GET",
             })
@@ -95,16 +210,20 @@ class DiscountModal extends Component {
                 })
                 .catch((err) => {
                     console.log(err);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                    });
                 });
         }
     };
 
+    // loads discipline, levels & subjects data
     handleSubcategory = (event) => {
-        let sub_category = this.state.selectedSubcategory;
-        sub_category.label = event.label;
-        sub_category.value = event.value;
+        let data = this.state.data;
+        data.sub_category = event.value;
         this.setState({
-            selectedSubcategory: sub_category,
+            data: data,
             discipline: [],
             levels: [],
             subjects: [],
@@ -113,7 +232,7 @@ class DiscountModal extends Component {
 
         if (event.value !== "") {
             fetch(
-                `${this.url}/hod/levels/?category=${this.state.selectedCategory.value}&sub_category=${event.value}`,
+                `${this.url}/coupon/filter/?category=${data.category}&sub_category=${event.value}`,
                 {
                     headers: this.headers,
                     method: "GET",
@@ -122,10 +241,22 @@ class DiscountModal extends Component {
                 .then((res) => res.json())
                 .then((result) => {
                     if (result.sts === true) {
+                        let appendObj = {
+                            ALL: "All",
+                        };
                         this.setState({
-                            discipline: result.data.DISCIPLINE,
-                            levels: result.data.LEVELS,
-                            subjects: result.data.SUBJECTS,
+                            discipline: Object.assign(
+                                appendObj,
+                                result.data.DISCIPLINE
+                            ),
+                            levels: Object.assign(
+                                appendObj,
+                                result.data.LEVELS
+                            ),
+                            subjects: Object.assign(
+                                appendObj,
+                                result.data.SUBJECTS
+                            ),
                             content_loading: false,
                         });
                     } else {
@@ -138,35 +269,134 @@ class DiscountModal extends Component {
                 })
                 .catch((err) => {
                     console.log(err);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                        content_loading: false,
+                    });
                 });
         }
     };
 
     handleDiscipline = (event) => {
-        let discipline = this.state.selectedDiscipline;
-        discipline.label = event.label;
-        discipline.value = event.value;
+        let data = this.state.data;
+        data.discipline = event.value;
         this.setState({
-            selectedDiscipline: discipline,
+            data: data,
         });
     };
 
     handleLevel = (event) => {
-        let level = this.state.selectedlevels;
-        level.label = event.label;
-        level.value = event.value;
+        let data = this.state.data;
+        data.level = event.value;
         this.setState({
-            selectedlevels: level,
+            data: data,
         });
     };
 
     handleSubject = (event) => {
-        let subject = this.state.selectedSubjects;
-        subject.label = event.label;
-        subject.value = event.value;
+        let data = this.state.data;
+        data.subject = event.value;
         this.setState({
-            selectedSubjects: subject,
+            data: data,
         });
+    };
+
+    handleInput = (event) => {
+        let data = this.state.data;
+        if (
+            event.target.name === "min_points" ||
+            event.target.name === "max_points" ||
+            event.target.name === "deduction_points" ||
+            event.target.name === "percentage" ||
+            event.target.name === "fixed_price"
+        ) {
+            data[event.target.name] = Number(event.target.value) || '';
+        } else if (event.target.name === "points_in_decimal") {
+            data[event.target.name] = parseFloat(event.target.value) || 0;
+        } else {
+            data[event.target.name] = event.target.value;
+        }
+
+        if (
+            (data.min_points !== "" && data.min_points !== 0) ||
+            (data.max_points !== "" && data.max_points !== 0) ||
+            (data.deduction_points !== "" && data.deduction_points !== 0) ||
+            (data.points_in_decimal !== "" && data.points_in_decimal !== 0)
+        ) {
+            data.points_exists = true;
+        } else if (data.percentage !== "" && data.percentage !== 0) {
+            data.percent_exists = true;
+        } else if (data.fixed_price !== "" && data.fixed_price !== 0) {
+            data.price_exists = true;
+        } else {
+            data.points_exists = false;
+            data.percent_exists = false;
+            data.price_exists = false;
+        }
+
+        this.setState({
+            data: data,
+        });
+    };
+
+    handleDate = (event) => {
+        let data = this.state.data;
+        data[event.target.name] = `${dateFormat(
+            event.target.value,
+            "yyyy-mm-dd"
+        )} 00:00:00`;
+
+        this.setState({
+            data: data,
+        });
+    };
+
+    handleSubmit = () => {
+        this.setState({
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            showLoader: true,
+        });
+        let data = this.state.data;
+
+        fetch(
+            `${
+                data.coupon_id === ""
+                    ? `${this.url}/coupon/`
+                    : `${this.url}/coupon/${data.coupon_id}/`
+            }`,
+            {
+                method: `${data.coupon_id === "" ? "POST" : "PUT"}`,
+                headers: this.headers,
+                body: JSON.stringify(data),
+            }
+        )
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                        showLoader: false,
+                    });
+                    this.props.formSubmission();
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    showLoader: false,
+                });
+            });
     };
 
     render() {
@@ -209,14 +439,16 @@ class DiscountModal extends Component {
                     {/* Coupon ID & Title */}
                     <div className="form-row">
                         <div className="col-md-6 form-group">
-                            <label htmlFor="code">Coupon ID</label>
+                            <label htmlFor="coupon_name">Coupon ID</label>
                             <input
                                 type="text"
-                                name="code"
-                                id="code"
+                                name="coupon_name"
+                                id="coupon_name"
+                                value={this.state.data.coupon_name}
                                 className="form-control borders"
                                 onChange={this.handleInput}
-                                placeholder="Enter code"
+                                placeholder="Enter coupon code"
+                                autoComplete="off"
                                 required
                             />
                         </div>
@@ -226,9 +458,11 @@ class DiscountModal extends Component {
                                 type="text"
                                 name="title"
                                 id="title"
+                                value={this.state.data.title}
                                 className="form-control borders"
                                 onChange={this.handleInput}
-                                placeholder="Enter title"
+                                placeholder="Enter coupon title"
+                                autoComplete="off"
                                 required
                             />
                         </div>
@@ -434,8 +668,12 @@ class DiscountModal extends Component {
                                 type="date"
                                 name="valid_from"
                                 id="valid_from"
+                                value={dateFormat(
+                                    this.state.data.valid_from,
+                                    "yyyy-mm-dd"
+                                )}
                                 className="form-control borders"
-                                onChange={this.handleInput}
+                                onChange={this.handleDate}
                                 required
                             />
                         </div>
@@ -445,8 +683,12 @@ class DiscountModal extends Component {
                                 type="date"
                                 name="valid_to"
                                 id="valid_to"
+                                value={dateFormat(
+                                    this.state.data.valid_to,
+                                    "yyyy-mm-dd"
+                                )}
                                 className="form-control borders"
-                                onChange={this.handleInput}
+                                onChange={this.handleDate}
                                 required
                             />
                         </div>
@@ -454,41 +696,88 @@ class DiscountModal extends Component {
 
                     {/* Min points, Max points & Points Decimal */}
                     <div className="form-row">
-                        <div className="col-md-4 form-group">
+                        <div className="col-md-3 form-group">
                             <label htmlFor="min_points">Minimum Points</label>
                             <input
-                                type="text"
+                                type="number"
                                 name="min_points"
                                 id="min_points"
+                                value={this.state.data.min_points}
                                 className="form-control borders"
                                 onChange={this.handleInput}
                                 placeholder="Enter min points"
+                                autoComplete="off"
+                                disabled={
+                                    this.state.data.percent_exists ||
+                                    this.state.data.price_exists
+                                        ? true
+                                        : false
+                                }
                                 required
                             />
                         </div>
-                        <div className="col-md-4 form-group">
+                        <div className="col-md-3 form-group">
                             <label htmlFor="max_points">Maximum Points</label>
                             <input
-                                type="text"
+                                type="number"
                                 name="max_points"
                                 id="max_points"
+                                value={this.state.data.max_points}
                                 className="form-control borders"
                                 onChange={this.handleInput}
                                 placeholder="Enter max points"
+                                autoComplete="off"
+                                disabled={
+                                    this.state.data.percent_exists ||
+                                    this.state.data.price_exists
+                                        ? true
+                                        : false
+                                }
                                 required
                             />
                         </div>
-                        <div className="col-md-4 form-group">
+                        <div className="col-md-3 form-group">
+                            <label htmlFor="deduction_points">
+                                Deduction points
+                            </label>
+                            <input
+                                type="number"
+                                name="deduction_points"
+                                id="deduction_points"
+                                value={this.state.data.deduction_points}
+                                className="form-control borders"
+                                onChange={this.handleInput}
+                                placeholder="Enter deduction points"
+                                autoComplete="off"
+                                disabled={
+                                    this.state.data.percent_exists ||
+                                    this.state.data.price_exists
+                                        ? true
+                                        : false
+                                }
+                                required
+                            />
+                        </div>
+                        <div className="col-md-3 form-group">
                             <label htmlFor="points_in_decimal">
                                 Points in Decimal
                             </label>
                             <input
-                                type="text"
+                                type="number"
                                 name="points_in_decimal"
                                 id="points_in_decimal"
+                                value={this.state.data.points_in_decimal}
                                 className="form-control borders"
                                 onChange={this.handleInput}
                                 placeholder="Enter points in decimal"
+                                autoComplete="off"
+                                disabled={
+                                    this.state.data.percent_exists ||
+                                    this.state.data.price_exists
+                                        ? true
+                                        : false
+                                }
+                                step="0.1"
                                 required
                             />
                         </div>
@@ -502,9 +791,14 @@ class DiscountModal extends Component {
                                 type="text"
                                 name="percentage"
                                 id="percentage"
+                                value={this.state.data.percentage}
                                 className="form-control borders"
                                 onChange={this.handleInput}
                                 placeholder="Enter percentage"
+                                autoComplete="off"
+                                disabled={
+                                    this.state.data.points_exists ? true : false
+                                }
                                 required
                             />
                         </div>
@@ -514,9 +808,14 @@ class DiscountModal extends Component {
                                 type="text"
                                 name="fixed_price"
                                 id="fixed_price"
+                                value={this.state.data.fixed_price}
                                 className="form-control borders"
                                 onChange={this.handleInput}
                                 placeholder="Enter fixed price"
+                                autoComplete="off"
+                                disabled={
+                                    this.state.data.points_exists ? true : false
+                                }
                                 required
                             />
                         </div>
@@ -526,16 +825,22 @@ class DiscountModal extends Component {
                                 type="text"
                                 name="currency"
                                 id="currency"
+                                value={this.state.data.currency}
                                 className="form-control borders"
                                 onChange={this.handleInput}
                                 placeholder="Enter currency"
+                                autoComplete="off"
+                                disabled
                                 required
                             />
                         </div>
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <button className="btn btn-primary btn-block shadow-none">
+                    <button
+                        className="btn btn-primary btn-block shadow-none"
+                        onClick={this.handleSubmit}
+                    >
                         {this.state.showLoader ? (
                             <Spinner
                                 as="span"
@@ -573,6 +878,7 @@ const DiscountTable = (props) => {
                     <th scope="col">Valid to</th>
                     <th scope="col">Minimum points</th>
                     <th scope="col">Maximum points</th>
+                    <th scope="col">Deduction points</th>
                     <th scope="col">Points value (Decimal)</th>
                     <th scope="col">Percentage</th>
                     <th scope="col">Fixed Price</th>
@@ -599,13 +905,14 @@ const DiscountTable = (props) => {
                                 <td>{list.level}</td>
                                 <td>{list.subject}</td>
                                 <td>
-                                    {dateformat(list.valid_from, "dd/mm/yyyy")}
+                                    {dateFormat(list.valid_from, "dd/mm/yyyy")}
                                 </td>
                                 <td>
-                                    {dateformat(list.valid_to, "dd/mm/yyyy")}
+                                    {dateFormat(list.valid_to, "dd/mm/yyyy")}
                                 </td>
                                 <td>{list.min_points}</td>
                                 <td>{list.max_points}</td>
+                                <td>{list.deduction_points}</td>
                                 <td>{list.points_in_decimal}</td>
                                 <td>{list.percentage}</td>
                                 <td>{list.fixed_price}</td>
@@ -627,20 +934,18 @@ const DiscountTable = (props) => {
                                             }`}
                                         >
                                             <Dropdown.Item
-                                                disabled={
-                                                    list.coupon_id !== ""
-                                                        ? false
-                                                        : true
+                                                onClick={() =>
+                                                    props.handleEdit(list)
                                                 }
                                             >
                                                 <i className="far fa-edit mr-1"></i>{" "}
                                                 Edit
                                             </Dropdown.Item>
                                             <Dropdown.Item
-                                                disabled={
-                                                    list.coupon_id !== ""
-                                                        ? false
-                                                        : true
+                                                onClick={() =>
+                                                    props.handleDelete(
+                                                        list.coupon_id
+                                                    )
                                                 }
                                             >
                                                 <i className="far fa-trash-alt mr-1"></i>{" "}
@@ -670,25 +975,60 @@ class AdminDiscountConfiguration extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            activeIndex: "",
-            showModal: false,
             data: [],
             selectedData: {},
+            activeIndex: "",
+
+            activePage: 1,
+            totalCount: 0,
+
+            showModal: false,
+            errorMsg: "",
+            successMsg: "",
+            showErrorAlert: false,
+            showSuccessAlert: false,
+            page_loading: true,
+        };
+        this.url = baseUrl + inquelAdminUrl;
+        this.authToken = localStorage.getItem("Inquel-Auth");
+        this.headers = {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "Inquel-Auth": this.authToken,
         };
     }
 
     loadDiscountData = () => {
+        let URL =
+            this.state.activePage === 1
+                ? `${this.url}/coupon/`
+                : `${this.url}/coupon/?page=${this.state.activePage}`;
         axios
-            .get(`${this.wrapper.url}/inquel_admin/coupon/`, {
-                headers: this.wrapper.headers,
+            .get(URL, {
+                headers: this.headers,
             })
             .then((response) => {
-                console.log(response);
+                if (response.data.sts === true) {
+                    this.setState({
+                        data: response.data.data.results,
+                        totalCount: response.data.data.count,
+                        page_loading: false,
+                    });
+                } else {
+                    this.setState({
+                        errorMsg: response.data.data.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
             })
             .catch((err) => {
                 console.log(err);
-                this.wrapper.pageLoading(false);
-                this.wrapper.errorAlert("Something went wrong!", true);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
             });
     };
 
@@ -707,14 +1047,79 @@ class AdminDiscountConfiguration extends Component {
         this.loadDiscountData();
     };
 
+    handlePageChange(pageNumber) {
+        this.setState({ activePage: pageNumber, page_loading: true }, () => {
+            this.loadDiscountData();
+        });
+    }
+
+    handleEdit = (data) => {
+        this.setState({
+            showModal: !this.state.showModal,
+            selectedData: data,
+        });
+    };
+
+    handleDelete = (coupon_id) => {
+        this.setState({
+            page_loading: true,
+        });
+
+        fetch(`${this.url}/coupon/${coupon_id}/`, {
+            method: "DELETE",
+            headers: this.headers,
+        })
+            .then((res) => res.json())
+            .then((result) => {
+                if (result.sts === true) {
+                    this.setState({
+                        successMsg: result.msg,
+                        showSuccessAlert: true,
+                    });
+                    this.loadDiscountData();
+                } else {
+                    this.setState({
+                        errorMsg: result.msg,
+                        showErrorAlert: true,
+                        page_loading: false,
+                    });
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                this.setState({
+                    errorMsg: "Something went wrong!",
+                    showErrorAlert: true,
+                    page_loading: false,
+                });
+            });
+    };
+
     render() {
         return (
             <Wrapper
                 history={this.props.history}
                 header="Discount Configuration"
                 activeLink="course"
-                ref={(ref) => (this.wrapper = ref)}
             >
+                {/* Alert message */}
+                <AlertBox
+                    errorMsg={this.state.errorMsg}
+                    successMsg={this.state.successMsg}
+                    showErrorAlert={this.state.showErrorAlert}
+                    showSuccessAlert={this.state.showSuccessAlert}
+                    toggleSuccessAlert={() => {
+                        this.setState({
+                            showSuccessAlert: false,
+                        });
+                    }}
+                    toggleErrorAlert={() => {
+                        this.setState({
+                            showErrorAlert: false,
+                        });
+                    }}
+                />
+
                 {/* ----- Discount Modal ----- */}
                 {this.state.showModal ? (
                     <DiscountModal
@@ -764,9 +1169,25 @@ class AdminDiscountConfiguration extends Component {
                 {/* ----- Discount table ----- */}
                 <div className="card shadow-sm">
                     <div className="table-responsive">
-                        <DiscountTable state={this.state} />
+                        <DiscountTable
+                            state={this.state}
+                            handleEdit={this.handleEdit}
+                            handleDelete={this.handleDelete}
+                        />
+                    </div>
+                    <div className="card-body p-3">
+                        {this.state.totalCount > paginationCount ? (
+                            <Paginations
+                                activePage={this.state.activePage}
+                                totalItemsCount={this.state.totalCount}
+                                onChange={this.handlePageChange.bind(this)}
+                            />
+                        ) : null}
                     </div>
                 </div>
+
+                {/* Loading component */}
+                {this.state.page_loading ? <Loading /> : ""}
             </Wrapper>
         );
     }
