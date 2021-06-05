@@ -278,6 +278,7 @@ class SubjectModal extends Component {
                 <Modal.Header closeButton>Create Subject</Modal.Header>
                 <Modal.Body>
                     <Alert
+                        className="sticky-top"
                         variant="danger"
                         show={this.state.showErrorAlert}
                         onClose={() => {
@@ -290,6 +291,7 @@ class SubjectModal extends Component {
                         {this.state.errorMsg}
                     </Alert>
                     <Alert
+                        className="sticky-top"
                         variant="success"
                         show={this.state.showSuccessAlert}
                         onClose={() => {

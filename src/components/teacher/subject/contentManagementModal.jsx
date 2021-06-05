@@ -10,19 +10,23 @@ export function ChapterList(props) {
         <tr key={props.index}>
             <td>{props.chapter.chapter_name}</td>
             <td>
-                {props.chapter.chapter_status.toLowerCase() === "yet to start" ? (
+                {props.chapter.chapter_status.toLowerCase() ===
+                "yet to start" ? (
                     <span className="text-danger text-capitalize">
                         {props.chapter.chapter_status}
                     </span>
-                ) : props.chapter.chapter_status.toLowerCase() === "in progress" ? (
+                ) : props.chapter.chapter_status.toLowerCase() ===
+                  "in progress" ? (
                     <span className="text-warning text-capitalize">
                         {props.chapter.chapter_status}
                     </span>
-                ) : props.chapter.chapter_status.toLowerCase() === "ready for review" ? (
+                ) : props.chapter.chapter_status.toLowerCase() ===
+                  "ready for review" ? (
                     <span className="text-primary text-capitalize">
                         {props.chapter.chapter_status}
                     </span>
-                ) : props.chapter.chapter_status.toLowerCase() === "approved" ? (
+                ) : props.chapter.chapter_status.toLowerCase() ===
+                  "approved" ? (
                     <span className="text-success text-capitalize">
                         {props.chapter.chapter_status}
                     </span>
@@ -103,7 +107,7 @@ export function ChapterList(props) {
                         <i className="fas fa-ellipsis-v"></i>
                     </Dropdown.Toggle>
 
-                    <Dropdown.Menu>
+                    <Dropdown.Menu className="dropdown-menu-btn">
                         <Dropdown.Item
                             onClick={() =>
                                 props.toggleChapter_EditModal(props.chapter)
