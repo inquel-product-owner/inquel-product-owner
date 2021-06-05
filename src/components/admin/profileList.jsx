@@ -12,8 +12,7 @@ import dateFormat from "dateformat";
 import { Link } from "react-router-dom";
 import {
     UserDeleteModal,
-    UserDisableModal,
-    UserEnableModal,
+    UserEnableDisableModal,
 } from "../common/modal/userManagementModal";
 import Loading from "../common/loader";
 import AlertBox from "../common/alert";
@@ -837,11 +836,9 @@ class AdminHODAndStudentList extends Component {
 
             showModal: false,
             showHOD_DeleteModal: false,
+            showHOD_EnableDisableModal: false,
             showStudent_DeleteModal: false,
-            showHOD_DisableModal: false,
-            showStudent_DisableModal: false,
-            showHOD_EnableModal: false,
-            showStudent_EnableModal: false,
+            showStudent_EnableDisableModal: false,
 
             activeTab: "hod",
             hodItems: [],
@@ -962,26 +959,16 @@ class AdminHODAndStudentList extends Component {
         }
     };
 
-    handleDisable = () => {
+    handleEnableDisable = () => {
         if (this.state.activeTab === "hod") {
             this.setState({
-                showHOD_DisableModal: !this.state.showHOD_DisableModal,
+                showHOD_EnableDisableModal:
+                    !this.state.showHOD_EnableDisableModal,
             });
         } else if (this.state.activeTab === "student") {
             this.setState({
-                showStudent_DisableModal: !this.state.showStudent_DisableModal,
-            });
-        }
-    };
-
-    handleEnable = () => {
-        if (this.state.activeTab === "hod") {
-            this.setState({
-                showHOD_EnableModal: !this.state.showHOD_EnableModal,
-            });
-        } else if (this.state.activeTab === "student") {
-            this.setState({
-                showStudent_EnableModal: !this.state.showStudent_EnableModal,
+                showStudent_EnableDisableModal:
+                    !this.state.showStudent_EnableDisableModal,
             });
         }
     };
@@ -1029,8 +1016,7 @@ class AdminHODAndStudentList extends Component {
             this.setState({
                 showModal: false,
                 showHOD_DeleteModal: false,
-                showHOD_DisableModal: false,
-                showHOD_EnableModal: false,
+                showHOD_EnableDisableModal: false,
             });
         }, 1000);
         this.loadHodData();
@@ -1040,8 +1026,7 @@ class AdminHODAndStudentList extends Component {
         setTimeout(() => {
             this.setState({
                 showStudent_DeleteModal: false,
-                showStudent_DisableModal: false,
-                showStudent_EnableModal: false,
+                showStudent_EnableDisableModal: false,
             });
         }, 1000);
         this.loadStudentData();
@@ -1121,29 +1106,12 @@ class AdminHODAndStudentList extends Component {
                     ""
                 )}
 
-                {/* HOD Disable Modal */}
-                {this.state.showHOD_DisableModal ? (
-                    <UserDisableModal
-                        show={this.state.showHOD_DisableModal}
-                        onHide={this.handleDisable}
-                        toggleModal={this.handleDisable}
-                        formSubmission={this.formSubmission}
-                        url={`${this.url}/hod/`}
-                        data={this.state.selectedHOD}
-                        field="hod_ids"
-                        type="HOD"
-                        token="Inquel-Auth"
-                    />
-                ) : (
-                    ""
-                )}
-
-                {/* HOD Enable Modal */}
-                {this.state.showHOD_EnableModal ? (
-                    <UserEnableModal
-                        show={this.state.showHOD_EnableModal}
-                        onHide={this.handleEnable}
-                        toggleModal={this.handleEnable}
+                {/* HOD Enable Disable Modal */}
+                {this.state.showHOD_EnableDisableModal ? (
+                    <UserEnableDisableModal
+                        show={this.state.showHOD_EnableDisableModal}
+                        onHide={this.handleEnableDisable}
+                        toggleModal={this.handleEnableDisable}
                         formSubmission={this.formSubmission}
                         url={`${this.url}/hod/`}
                         data={this.state.selectedHOD}
@@ -1172,29 +1140,12 @@ class AdminHODAndStudentList extends Component {
                     ""
                 )}
 
-                {/* Student Disable Modal */}
-                {this.state.showStudent_DisableModal ? (
-                    <UserDisableModal
-                        show={this.state.showStudent_DisableModal}
-                        onHide={this.handleDisable}
-                        toggleModal={this.handleDisable}
-                        formSubmission={this.studentFormSubmission}
-                        url={`${this.url}/student/`}
-                        data={this.state.selectedStudent}
-                        field="student_ids"
-                        type="Student"
-                        token="Inquel-Auth"
-                    />
-                ) : (
-                    ""
-                )}
-
-                {/* Student Enable Modal */}
-                {this.state.showStudent_EnableModal ? (
-                    <UserEnableModal
-                        show={this.state.showStudent_EnableModal}
-                        onHide={this.handleEnable}
-                        toggleModal={this.handleEnable}
+                {/* Student Enable Disable Modal */}
+                {this.state.showStudent_EnableDisableModal ? (
+                    <UserEnableDisableModal
+                        show={this.state.showStudent_EnableDisableModal}
+                        onHide={this.handleEnableDisable}
+                        toggleModal={this.handleEnableDisable}
                         formSubmission={this.studentFormSubmission}
                         url={`${this.url}/student/`}
                         data={this.state.selectedStudent}
@@ -1242,16 +1193,10 @@ class AdminHODAndStudentList extends Component {
                             Delete
                         </button>
                         <button
-                            className="btn btn-primary btn-sm shadow-none mr-1"
-                            onClick={this.handleEnable}
-                        >
-                            Enable
-                        </button>
-                        <button
                             className="btn btn-primary btn-sm shadow-none"
-                            onClick={this.handleDisable}
+                            onClick={this.handleEnableDisable}
                         >
-                            Disable
+                            Enable / Disable
                         </button>
                     </div>
                 </div>

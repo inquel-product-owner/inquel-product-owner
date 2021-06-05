@@ -772,7 +772,7 @@ class TeacherQuizLevel extends Component {
                                                                       <i className="fas fa-ellipsis-h"></i>
                                                                   </Dropdown.Toggle>
 
-                                                                  <Dropdown.Menu>
+                                                                  <Dropdown.Menu className="dropdown-menu-btn">
                                                                       <Dropdown.Item
                                                                           onClick={() => {
                                                                               this.handleSubmit(

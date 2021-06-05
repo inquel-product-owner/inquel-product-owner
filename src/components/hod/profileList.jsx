@@ -12,8 +12,7 @@ import Paginations from "../common/pagination";
 import AlertBox from "../common/alert";
 import {
     UserDeleteModal,
-    UserDisableModal,
-    UserEnableModal,
+    UserEnableDisableModal,
 } from "../common/modal/userManagementModal";
 
 // Student add modal
@@ -740,13 +739,11 @@ class HODTeacherStudentList extends Component {
 
             activeTab: "teacher",
             showTeacherModal: false,
-            showStudentModal: false,
             showTeacher_DeleteModal: false,
+            showTeacher_EnableDisableModal: false,
+            showStudentModal: false,
             showStudent_DeleteModal: false,
-            showTeacher_DisableModal: false,
-            showStudent_DisableModal: false,
-            showTeacher_EnableModal: false,
-            showStudent_EnableModal: false,
+            showStudent_EnableDisableModal: false,
 
             teacherItems: [],
             studentItems: [],
@@ -882,26 +879,16 @@ class HODTeacherStudentList extends Component {
         }
     };
 
-    handleDisable = () => {
+    handleEnableDisable = () => {
         if (this.state.activeTab === "teacher") {
             this.setState({
-                showTeacher_DisableModal: !this.state.showTeacher_DisableModal,
+                showTeacher_EnableDisableModal:
+                    !this.state.showTeacher_EnableDisableModal,
             });
         } else if (this.state.activeTab === "student") {
             this.setState({
-                showStudent_DisableModal: !this.state.showStudent_DisableModal,
-            });
-        }
-    };
-
-    handleEnable = () => {
-        if (this.state.activeTab === "teacher") {
-            this.setState({
-                showTeacher_EnableModal: !this.state.showTeacher_EnableModal,
-            });
-        } else if (this.state.activeTab === "student") {
-            this.setState({
-                showStudent_EnableModal: !this.state.showStudent_EnableModal,
+                showStudent_EnableDisableModal:
+                    !this.state.showStudent_EnableDisableModal,
             });
         }
     };
@@ -911,8 +898,7 @@ class HODTeacherStudentList extends Component {
             this.setState({
                 showTeacherModal: false,
                 showTeacher_DeleteModal: false,
-                showTeacher_DisableModal: false,
-                showTeacher_EnableModal: false,
+                showTeacher_EnableDisableModal: false,
             });
         }, 1000);
         this.loadTeacherData();
@@ -923,8 +909,7 @@ class HODTeacherStudentList extends Component {
             this.setState({
                 showStudentModal: false,
                 showStudent_DeleteModal: false,
-                showStudent_DisableModal: false,
-                showStudent_EnableModal: false,
+                showStudent_EnableDisableModal: false,
             });
         }, 1000);
         this.loadStudentData();
@@ -1047,29 +1032,12 @@ class HODTeacherStudentList extends Component {
                     />
                 ) : null}
 
-                {/* Teacher Disable Modal */}
-                {this.state.showTeacher_DisableModal ? (
-                    <UserDisableModal
-                        show={this.state.showTeacher_DisableModal}
-                        onHide={this.handleDisable}
-                        toggleModal={this.handleDisable}
-                        formSubmission={this.teacherFormSubmission}
-                        url={`${this.url}/hod/teacher/`}
-                        data={this.state.selectedTeacher}
-                        field="teacher_ids"
-                        type="Teacher"
-                        token="Authorization"
-                    />
-                ) : (
-                    ""
-                )}
-
-                {/* Teacher Enable Modal */}
-                {this.state.showTeacher_EnableModal ? (
-                    <UserEnableModal
-                        show={this.state.showTeacher_EnableModal}
-                        onHide={this.handleEnable}
-                        toggleModal={this.handleEnable}
+                {/* Teacher Enable Disable Modal */}
+                {this.state.showTeacher_EnableDisableModal ? (
+                    <UserEnableDisableModal
+                        show={this.state.showTeacher_EnableDisableModal}
+                        onHide={this.handleEnableDisable}
+                        toggleModal={this.handleEnableDisable}
                         formSubmission={this.teacherFormSubmission}
                         url={`${this.url}/hod/teacher/`}
                         data={this.state.selectedTeacher}
@@ -1107,29 +1075,12 @@ class HODTeacherStudentList extends Component {
                     ""
                 )}
 
-                {/* Student Disable Modal */}
-                {this.state.showStudent_DisableModal ? (
-                    <UserDisableModal
-                        show={this.state.showStudent_DisableModal}
-                        onHide={this.handleDisable}
-                        toggleModal={this.handleDisable}
-                        formSubmission={this.studentFormSubmission}
-                        url={`${this.url}/hod/create/student/`}
-                        data={this.state.selectedStudent}
-                        field="student_ids"
-                        type="Student"
-                        token="Authorization"
-                    />
-                ) : (
-                    ""
-                )}
-
-                {/* Student Enable Modal */}
-                {this.state.showStudent_EnableModal ? (
-                    <UserEnableModal
-                        show={this.state.showStudent_EnableModal}
-                        onHide={this.handleEnable}
-                        toggleModal={this.handleEnable}
+                {/* Student Enable Disable Modal */}
+                {this.state.showStudent_EnableDisableModal ? (
+                    <UserEnableDisableModal
+                        show={this.state.showStudent_EnableDisableModal}
+                        onHide={this.handleEnableDisable}
+                        toggleModal={this.handleEnableDisable}
                         formSubmission={this.studentFormSubmission}
                         url={`${this.url}/hod/create/student/`}
                         data={this.state.selectedStudent}
@@ -1188,15 +1139,9 @@ class HODTeacherStudentList extends Component {
                                 </button>
                                 <button
                                     className="btn btn-primary btn-sm shadow-none mr-1"
-                                    onClick={this.handleEnable}
+                                    onClick={this.handleEnableDisable}
                                 >
-                                    Enable
-                                </button>
-                                <button
-                                    className="btn btn-primary btn-sm shadow-none mr-1"
-                                    onClick={this.handleDisable}
-                                >
-                                    Disable
+                                    Enable / Disable
                                 </button>
                                 <Dropdown>
                                     <Dropdown.Toggle
@@ -1207,7 +1152,7 @@ class HODTeacherStudentList extends Component {
                                         Notify
                                     </Dropdown.Toggle>
 
-                                    <Dropdown.Menu>
+                                    <Dropdown.Menu className="dropdown-menu-btn">
                                         <Dropdown.Item>
                                             Notify All
                                         </Dropdown.Item>

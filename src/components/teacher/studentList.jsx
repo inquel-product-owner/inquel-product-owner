@@ -9,11 +9,6 @@ import Loading from "../common/loader";
 import StudentTable from "../table/student";
 import Paginations from "../common/pagination";
 import AlertBox from "../common/alert";
-import {
-    UserDeleteModal,
-    UserDisableModal,
-    UserEnableModal,
-} from "../common/modal/userManagementModal";
 
 class TeacherStudentList extends Component {
     constructor(props) {
@@ -22,13 +17,8 @@ class TeacherStudentList extends Component {
             activeStudentPage: 1,
             totalStudentCount: 0,
             showSideNav: false,
-            activeTab: "teacher",
             studentItems: [],
             selectedStudent: [],
-
-            showStudent_DeleteModal: false,
-            showStudent_DisableModal: false,
-            showStudent_EnableModal: false,
 
             errorMsg: "",
             successMsg: "",
@@ -48,12 +38,6 @@ class TeacherStudentList extends Component {
     toggleSideNav = () => {
         this.setState({
             showSideNav: !this.state.showSideNav,
-        });
-    };
-
-    toggleModal = () => {
-        this.setState({
-            showModal: !this.state.showModal,
         });
     };
 
@@ -95,24 +79,6 @@ class TeacherStudentList extends Component {
         this.loadStudentData();
     };
 
-    handleDelete = () => {
-        this.setState({
-            showStudent_DeleteModal: !this.state.showStudent_DeleteModal,
-        });
-    };
-
-    handleDisable = () => {
-        this.setState({
-            showStudent_DisableModal: !this.state.showStudent_DisableModal,
-        });
-    };
-
-    handleEnable = () => {
-        this.setState({
-            showStudent_EnableModal: !this.state.showStudent_EnableModal,
-        });
-    };
-
     // Gets Student ID from the Student table
     handleStudentId = (data) => {
         let value = [];
@@ -130,18 +96,6 @@ class TeacherStudentList extends Component {
         this.setState({
             selectedStudent: value,
         });
-    };
-
-    formSubmission = () => {
-        setTimeout(() => {
-            this.setState({
-                is_formSubmited: true,
-                showStudent_DeleteModal: false,
-                showStudent_DisableModal: false,
-                showStudent_EnableModal: false,
-            });
-            this.loadStudentData();
-        }, 1000);
     };
 
     handleStudentPageChange(pageNumber) {
@@ -187,57 +141,6 @@ class TeacherStudentList extends Component {
                     activeLink="profiles"
                 />
 
-                {/* Student Delete Modal */}
-                {this.state.showStudent_DeleteModal ? (
-                    <UserDeleteModal
-                        show={this.state.showStudent_DeleteModal}
-                        onHide={this.handleDelete}
-                        toggleModal={this.handleDelete}
-                        formSubmission={this.formSubmission}
-                        url={`${this.url}/teacher/student/`}
-                        data={this.state.selectedStudent}
-                        field="student_ids"
-                        type="Student"
-                        token="Authorization"
-                    />
-                ) : (
-                    ""
-                )}
-
-                {/* Student Disable Modal */}
-                {this.state.showStudent_DisableModal ? (
-                    <UserDisableModal
-                        show={this.state.showStudent_DisableModal}
-                        onHide={this.handleDisable}
-                        toggleModal={this.handleDisable}
-                        formSubmission={this.formSubmission}
-                        url={`${this.url}/teacher/student/`}
-                        data={this.state.selectedStudent}
-                        field="student_ids"
-                        type="Student"
-                        token="Authorization"
-                    />
-                ) : (
-                    ""
-                )}
-
-                {/* Student Enable Modal */}
-                {this.state.showStudent_EnableModal ? (
-                    <UserEnableModal
-                        show={this.state.showStudent_EnableModal}
-                        onHide={this.handleEnable}
-                        toggleModal={this.handleEnable}
-                        formSubmission={this.formSubmission}
-                        url={`${this.url}/teacher/student/`}
-                        data={this.state.selectedStudent}
-                        field="student_ids"
-                        type="Student"
-                        token="Authorization"
-                    />
-                ) : (
-                    ""
-                )}
-
                 <div
                     className={`section content ${
                         this.state.showSideNav ? "active" : ""
@@ -271,24 +174,6 @@ class TeacherStudentList extends Component {
                             </div>
                             <div className="col-md-6">
                                 <div className="d-flex flex-wrap justify-content-end">
-                                    {/* <button
-                                        className="btn btn-primary btn-sm shadow-none mr-1"
-                                        onClick={this.handleDelete}
-                                    >
-                                        Delete
-                                    </button>
-                                    <button
-                                        className="btn btn-primary btn-sm shadow-none mr-1"
-                                        onClick={this.handleEnable}
-                                    >
-                                        Enable
-                                    </button>
-                                    <button
-                                        className="btn btn-primary btn-sm shadow-none mr-1"
-                                        onClick={this.handleDisable}
-                                    >
-                                        Disable
-                                    </button> */}
                                     <Dropdown>
                                         <Dropdown.Toggle
                                             variant="primary"
@@ -298,7 +183,7 @@ class TeacherStudentList extends Component {
                                             Notify
                                         </Dropdown.Toggle>
 
-                                        <Dropdown.Menu>
+                                        <Dropdown.Menu className="dropdown-menu-btn">
                                             <Dropdown.Item>
                                                 Notify All
                                             </Dropdown.Item>

@@ -1221,10 +1221,10 @@ class TeacherChapters extends Component {
                                         <Accordion.Collapse eventKey="0">
                                             <Card>
                                                 {/* ----- Topic list ----- */}
-                                                {this.state.chapters
-                                                    .chapter_structure
+                                                {this.state.chapters.topics &&
+                                                this.state.chapters.topics
                                                     .length !== 0
-                                                    ? this.state.chapters.chapter_structure.map(
+                                                    ? this.state.chapters.topics.map(
                                                           (data, index) => {
                                                               return (
                                                                   <Accordion

@@ -620,7 +620,7 @@ class TeacherSubject extends Component {
                                                                               <i className="fas fa-ellipsis-v"></i>
                                                                           </Dropdown.Toggle>
 
-                                                                          <Dropdown.Menu>
+                                                                          <Dropdown.Menu className="dropdown-menu-btn">
                                                                               <Dropdown.Item
                                                                                   onClick={() =>
                                                                                       this.toggleSemester_EditModal(

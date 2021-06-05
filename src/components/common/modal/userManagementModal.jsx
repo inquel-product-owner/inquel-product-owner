@@ -151,7 +151,7 @@ export class UserDeleteModal extends Component {
 }
 
 // User disable modal
-export class UserDisableModal extends Component {
+export class UserEnableDisableModal extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -199,9 +199,7 @@ export class UserDisableModal extends Component {
                         this.props.formSubmission();
                     } else {
                         this.setState({
-                            errorMsg: result.detail
-                                ? result.detail
-                                : result.msg,
+                            errorMsg: result.msg,
                             showErrorAlert: true,
                             showLoader: false,
                         });
@@ -209,10 +207,15 @@ export class UserDisableModal extends Component {
                 })
                 .catch((err) => {
                     console.log(err);
+                    this.setState({
+                        errorMsg: "Something went wrong!",
+                        showErrorAlert: true,
+                        showLoader: false,
+                    });
                 });
         } else {
             this.setState({
-                errorMsg: `Please select a ${this.props.type} to disable`,
+                errorMsg: `Please select a ${this.props.type} to enable / disable`,
                 showErrorAlert: true,
                 showLoader: false,
             });
@@ -228,9 +231,7 @@ export class UserDisableModal extends Component {
                 aria-labelledby="contained-modal-title-vcenter"
                 centered
             >
-                <Modal.Header closeButton>
-                    Disable {this.props.type}
-                </Modal.Header>
+                <Modal.Header closeButton>Update Status</Modal.Header>
                 <Modal.Body>
                     <Alert
                         variant="success"
@@ -257,7 +258,7 @@ export class UserDisableModal extends Component {
                         {this.state.errorMsg}
                     </Alert>
                     <p>
-                        Are you sure that you want to disable this{" "}
+                        Are you sure that you want to enable / disable this{" "}
                         {this.props.type}?
                     </p>
                     {this.props.data.map((item, index) => {
@@ -291,156 +292,7 @@ export class UserDisableModal extends Component {
                         ) : (
                             ""
                         )}
-                        Disable
-                    </button>
-                </Modal.Footer>
-            </Modal>
-        );
-    }
-}
-
-// User enable modal
-export class UserEnableModal extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            errorMsg: "",
-            successMsg: "",
-            showErrorAlert: false,
-            showSuccessAlert: false,
-            showLoader: false,
-        };
-        this.headers = {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-        };
-        this.headers[this.props.token] = localStorage.getItem(this.props.token);
-    }
-
-    handleEnable = () => {
-        this.setState({
-            showSuccessAlert: false,
-            showErrorAlert: false,
-            showLoader: true,
-        });
-
-        if (this.props.data.length !== 0) {
-            let temp = [];
-            let body = {};
-            this.props.data.forEach((data) => {
-                temp.push(data.id);
-            });
-            body[this.props.field] = temp;
-
-            fetch(`${this.props.url}`, {
-                method: "PUT",
-                headers: this.headers,
-                body: JSON.stringify(body),
-            })
-                .then((res) => res.json())
-                .then((result) => {
-                    if (result.sts === true) {
-                        this.setState({
-                            successMsg: result.msg,
-                            showSuccessAlert: true,
-                            showLoader: false,
-                        });
-                        this.props.formSubmission();
-                    } else {
-                        this.setState({
-                            errorMsg: result.detail
-                                ? result.detail
-                                : result.msg,
-                            showErrorAlert: true,
-                            showLoader: false,
-                        });
-                    }
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-        } else {
-            this.setState({
-                errorMsg: `Please select a ${this.props.type} to enable`,
-                showErrorAlert: true,
-                showLoader: false,
-            });
-        }
-    };
-
-    render() {
-        return (
-            <Modal
-                show={this.props.show}
-                onHide={this.props.onHide}
-                size="md"
-                aria-labelledby="contained-modal-title-vcenter"
-                centered
-            >
-                <Modal.Header closeButton>
-                    Enable {this.props.type}
-                </Modal.Header>
-                <Modal.Body>
-                    <Alert
-                        variant="success"
-                        show={this.state.showSuccessAlert}
-                        onClose={() => {
-                            this.setState({
-                                showSuccessAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.successMsg}
-                    </Alert>
-                    <Alert
-                        variant="danger"
-                        show={this.state.showErrorAlert}
-                        onClose={() => {
-                            this.setState({
-                                showErrorAlert: false,
-                            });
-                        }}
-                        dismissible
-                    >
-                        {this.state.errorMsg}
-                    </Alert>
-                    <p>
-                        Are you sure that you want to enable this{" "}
-                        {this.props.type}?
-                    </p>
-                    {this.props.data.map((item, index) => {
-                        return (
-                            <p className="small mb-2" key={index}>
-                                {index + 1}. {item.username}
-                            </p>
-                        );
-                    })}
-                </Modal.Body>
-                <Modal.Footer>
-                    <button
-                        className="btn btn-link btn-sm shadow-none mr-2"
-                        onClick={this.props.toggleModal}
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        className="btn btn-primary btn-sm shadow-none"
-                        onClick={this.handleEnable}
-                    >
-                        {this.state.showLoader ? (
-                            <Spinner
-                                as="span"
-                                animation="border"
-                                size="sm"
-                                role="status"
-                                aria-hidden="true"
-                                className="mr-2"
-                            />
-                        ) : (
-                            ""
-                        )}
-                        Enable
+                        Update
                     </button>
                 </Modal.Footer>
             </Modal>
@@ -596,3 +448,152 @@ export class UserRemoveModal extends Component {
         );
     }
 }
+
+// User enable modal
+// export class UserEnableModal extends Component {
+//     constructor(props) {
+//         super(props);
+//         this.state = {
+//             errorMsg: "",
+//             successMsg: "",
+//             showErrorAlert: false,
+//             showSuccessAlert: false,
+//             showLoader: false,
+//         };
+//         this.headers = {
+//             Accept: "application/json",
+//             "Content-Type": "application/json",
+//         };
+//         this.headers[this.props.token] = localStorage.getItem(this.props.token);
+//     }
+
+//     handleEnable = () => {
+//         this.setState({
+//             showSuccessAlert: false,
+//             showErrorAlert: false,
+//             showLoader: true,
+//         });
+
+//         if (this.props.data.length !== 0) {
+//             let temp = [];
+//             let body = {};
+//             this.props.data.forEach((data) => {
+//                 temp.push(data.id);
+//             });
+//             body[this.props.field] = temp;
+
+//             fetch(`${this.props.url}`, {
+//                 method: "PUT",
+//                 headers: this.headers,
+//                 body: JSON.stringify(body),
+//             })
+//                 .then((res) => res.json())
+//                 .then((result) => {
+//                     if (result.sts === true) {
+//                         this.setState({
+//                             successMsg: result.msg,
+//                             showSuccessAlert: true,
+//                             showLoader: false,
+//                         });
+//                         this.props.formSubmission();
+//                     } else {
+//                         this.setState({
+//                             errorMsg: result.detail
+//                                 ? result.detail
+//                                 : result.msg,
+//                             showErrorAlert: true,
+//                             showLoader: false,
+//                         });
+//                     }
+//                 })
+//                 .catch((err) => {
+//                     console.log(err);
+//                 });
+//         } else {
+//             this.setState({
+//                 errorMsg: `Please select a ${this.props.type} to enable`,
+//                 showErrorAlert: true,
+//                 showLoader: false,
+//             });
+//         }
+//     };
+
+//     render() {
+//         return (
+//             <Modal
+//                 show={this.props.show}
+//                 onHide={this.props.onHide}
+//                 size="md"
+//                 aria-labelledby="contained-modal-title-vcenter"
+//                 centered
+//             >
+//                 <Modal.Header closeButton>
+//                     Enable {this.props.type}
+//                 </Modal.Header>
+//                 <Modal.Body>
+//                     <Alert
+//                         variant="success"
+//                         show={this.state.showSuccessAlert}
+//                         onClose={() => {
+//                             this.setState({
+//                                 showSuccessAlert: false,
+//                             });
+//                         }}
+//                         dismissible
+//                     >
+//                         {this.state.successMsg}
+//                     </Alert>
+//                     <Alert
+//                         variant="danger"
+//                         show={this.state.showErrorAlert}
+//                         onClose={() => {
+//                             this.setState({
+//                                 showErrorAlert: false,
+//                             });
+//                         }}
+//                         dismissible
+//                     >
+//                         {this.state.errorMsg}
+//                     </Alert>
+//                     <p>
+//                         Are you sure that you want to enable this{" "}
+//                         {this.props.type}?
+//                     </p>
+//                     {this.props.data.map((item, index) => {
+//                         return (
+//                             <p className="small mb-2" key={index}>
+//                                 {index + 1}. {item.username}
+//                             </p>
+//                         );
+//                     })}
+//                 </Modal.Body>
+//                 <Modal.Footer>
+//                     <button
+//                         className="btn btn-link btn-sm shadow-none mr-2"
+//                         onClick={this.props.toggleModal}
+//                     >
+//                         Cancel
+//                     </button>
+//                     <button
+//                         className="btn btn-primary btn-sm shadow-none"
+//                         onClick={this.handleEnable}
+//                     >
+//                         {this.state.showLoader ? (
+//                             <Spinner
+//                                 as="span"
+//                                 animation="border"
+//                                 size="sm"
+//                                 role="status"
+//                                 aria-hidden="true"
+//                                 className="mr-2"
+//                             />
+//                         ) : (
+//                             ""
+//                         )}
+//                         Enable
+//                     </button>
+//                 </Modal.Footer>
+//             </Modal>
+//         );
+//     }
+// }

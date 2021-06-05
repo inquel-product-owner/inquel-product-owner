@@ -1624,7 +1624,7 @@ class TeacherSemesterAuto extends Component {
                                                                       </Dropdown.Toggle>
 
                                                                       <Dropdown.Menu
-                                                                          className={`${
+                                                                          className={`dropdown-menu-btn ${
                                                                               this
                                                                                   .state
                                                                                   .sections

@@ -181,6 +181,7 @@ class GroupModal extends Component {
                 <Modal.Header closeButton>Create Group</Modal.Header>
                 <Modal.Body>
                     <Alert
+                        className="sticky-top"
                         variant="danger"
                         show={this.state.showErrorAlert}
                         onClose={() => {
@@ -193,6 +194,7 @@ class GroupModal extends Component {
                         {this.state.errorMsg}
                     </Alert>
                     <Alert
+                        className="sticky-top"
                         variant="success"
                         show={this.state.showSuccessAlert}
                         onClose={() => {

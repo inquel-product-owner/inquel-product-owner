@@ -27,10 +27,6 @@ class TeacherGroupStudents extends Component {
             activeStudentPage: 1,
             totalStudentCount: 0,
 
-            showStudent_DeleteModal: false,
-            showStudent_DisableModal: false,
-            showStudent_EnableModal: false,
-
             errorMsg: "",
             successMsg: "",
             showErrorAlert: false,
@@ -50,12 +46,6 @@ class TeacherGroupStudents extends Component {
     toggleSideNav = () => {
         this.setState({
             showSideNav: !this.state.showSideNav,
-        });
-    };
-
-    toggleStudentModal = () => {
-        this.setState({
-            showStudentModal: !this.state.showStudentModal,
         });
     };
 
@@ -97,24 +87,6 @@ class TeacherGroupStudents extends Component {
         this.loadStudentData();
     };
 
-    handleDelete = () => {
-        this.setState({
-            showStudent_DeleteModal: !this.state.showStudent_DeleteModal,
-        });
-    };
-
-    handleDisable = () => {
-        this.setState({
-            showStudent_DisableModal: !this.state.showStudent_DisableModal,
-        });
-    };
-
-    handleEnable = () => {
-        this.setState({
-            showStudent_EnableModal: !this.state.showStudent_EnableModal,
-        });
-    };
-
     // Gets Student ID from the Student table
     handleStudentId = (data) => {
         let value = [];
@@ -132,18 +104,6 @@ class TeacherGroupStudents extends Component {
         this.setState({
             selectedStudent: value,
         });
-    };
-
-    formSubmission = () => {
-        setTimeout(() => {
-            this.setState({
-                is_formSubmited: true,
-                showStudent_DeleteModal: false,
-                showStudent_DisableModal: false,
-                showStudent_EnableModal: false,
-            });
-            this.loadStudentData();
-        }, 1000);
     };
 
     handleStudentPageChange(pageNumber) {
@@ -242,7 +202,7 @@ class TeacherGroupStudents extends Component {
                                             Notify
                                         </Dropdown.Toggle>
 
-                                        <Dropdown.Menu>
+                                        <Dropdown.Menu className="dropdown-menu-btn">
                                             <Dropdown.Item>
                                                 Notify All
                                             </Dropdown.Item>
